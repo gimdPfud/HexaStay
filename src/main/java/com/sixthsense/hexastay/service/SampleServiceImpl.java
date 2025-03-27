@@ -10,12 +10,14 @@ package com.sixthsense.hexastay.service;
 import com.sixthsense.hexastay.entity.Sample;
 import com.sixthsense.hexastay.repository.SampleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class SampleServiceImpl implements SampleService{
     private final SampleRepository sampleRepository;
 
