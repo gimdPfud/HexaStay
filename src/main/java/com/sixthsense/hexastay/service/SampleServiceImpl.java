@@ -7,10 +7,12 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.SampleDTO;
 import com.sixthsense.hexastay.entity.Sample;
 import com.sixthsense.hexastay.repository.SampleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,12 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class SampleServiceImpl implements SampleService{
     private final SampleRepository sampleRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public Page<Sample> sampleMethod(Pageable sampleParam) {
-        Page<Sample> sampleResult = sampleRepository.findAll(sampleParam);
+    public Page<SampleDTO> sampleMethod(Pageable sampleParam) {
+        Page<Sample> samplePage = sampleRepository.findAll(sampleParam);
+        Page<SampleDTO> sampleResult = samplePage.map(data->modelMapper.map(data,SampleDTO.class));
         return sampleResult;
     }
 }
