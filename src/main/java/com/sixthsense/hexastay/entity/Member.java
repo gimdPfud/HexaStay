@@ -22,4 +22,8 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "memberNum")
     private Long memberNum;
+
+    private String memberPassword;          //비밀번호
+    private String memberPhone;             //전화번호
+//    private String memberPhone;             //전화번호
 }
