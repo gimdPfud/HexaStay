@@ -43,10 +43,9 @@ public class AdminDTO {
     private String adminBrand;
 
     //어드민 생성일
-    private LocalDateTime adminCreateDate;
+    private LocalDateTime createDate;
 
     //어드민 수정일
-    private LocalDateTime adminModifyDate;
-
+    private LocalDateTime modifyDate;
 
 }

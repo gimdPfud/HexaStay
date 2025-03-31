@@ -3,14 +3,13 @@
  * 기능 : Union 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Unions {
+public class Unions extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "unionsNum")
@@ -42,11 +41,5 @@ public class Unions {
 
     //외부 업체 패스워드
     private String unionsPassword;
-
-    //등록일자
-    private LocalDateTime unionCreateDate;
-
-    //수정일자
-    private LocalDateTime unionModifyDate;
 
 }
