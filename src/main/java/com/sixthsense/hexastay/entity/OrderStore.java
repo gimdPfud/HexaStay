@@ -3,14 +3,13 @@
  * 기능 : OrderStore 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderStore {
+public class OrderStore extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderStoreNum")
@@ -30,12 +29,6 @@ public class OrderStore {
 
     //외부업체 상품가격
     private Long orderStorePrice;
-
-    //외부업체 상품판매일
-    private LocalDateTime orderStoreCreateDate;
-
-    //외부업체 상품 수정일자
-    private LocalDateTime orderStoreModifyDate;
 
     //외부업체 상품 총금액
     private Long orderStoreTotalPrice;

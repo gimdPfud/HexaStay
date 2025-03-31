@@ -1,18 +1,15 @@
 /***********************************************
  * 클래스명 : HotelRoomDTO
  * 기능 : HotelRoomDTO 엔티티
- * 작성자 :
+ * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제, 상태 체크인 체크아웃 필드 추가 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "hotelRoom")
-public class HotelRoom {
+public class HotelRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hotelRoomNum")
@@ -40,14 +37,6 @@ public class HotelRoom {
     @Column(name = "hotelRoomQr")
     private String hotelRoomQr;                 //Qr명
 
-    @CreatedDate
-    @Column(name = "hotelRoomCreateDate")
-    private LocalDateTime hotelRoomCreateDate;  //등록일자
-
-    @LastModifiedDate
-    @Column(name = "hotelRoomModifyDate")
-    private LocalDateTime hotelRoomModifyDate;  //수정일자
-
     @Column(name = "hotelRoomContent")
     private String hotelRoomContent;            //방 상세설명
 
@@ -57,15 +46,20 @@ public class HotelRoom {
     @Column(name = "hotelRoomPassword")
     private String hotelRoomPassword;           //비밀번호
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "centerNum")
-    private Center hotelRoomCenter;             //센터 참조
+    @Column(name = "hotelRoomStatus")
+    private boolean hotelRoomStatus;            //활성화 상태
+
+    @Column(name = "hotelRoomCheckIn")
+    private String hotelRoomCheckIn;            //체크인
+
+    @Column(name = "hotelRoomCheckOut")
+    private String hotelRoomCheckOut;           //체크아웃
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branchNum")
-    private Branch hotelRoomBranch;             //지사 참조
+    private Branch branch;             //지사 참조
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "facilityNum")
-    private Facility hotelRoomFacility;         //시설 참조
+    private Facility facility;         //시설 참조
 }
