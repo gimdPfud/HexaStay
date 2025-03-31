@@ -1,16 +1,15 @@
 /***********************************************
  * 클래스명 : Admin
  * 기능 : Admin 엔티티
- * 작성자 :
+ * 작성자 : 깁부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Admin {
+public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adminNum")
@@ -42,13 +41,5 @@ public class Admin {
 
     //어드미Brand
     private String adminBrand;
-
-    //어드민 생성일
-    private LocalDateTime adminCreateDate;
-
-    //어드민 수정일
-    private LocalDateTime adminModifyDate;
-
-
 
 }

@@ -3,15 +3,13 @@
  * 기능 : FacilityDTO 엔티티
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Facility {
+public class Facility extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "facilityNum")
@@ -41,11 +39,7 @@ public class Facility {
     @Column(name = "facilityCeoName")
     private String facilityCeoName;             //대표 이름
 
-    @CreatedDate
-    @Column(name = "facilityCreateDate")
-    private LocalDateTime facilityCreateDate;   //등록일자
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")
-    private Center facilityCenter;              //본사 참조
+    private Center center;              //본사 참조
 }

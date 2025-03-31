@@ -1,16 +1,15 @@
 /***********************************************
  * 클래스명 : ServiceUnion
  * 기능 : ServiceUnion 엔티티
- * 작성자 :
+ * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceUnion {
+public class ServiceUnion extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "serviceUnionNum")
@@ -39,12 +38,6 @@ public class ServiceUnion {
 
     //룸서비스외부 업체상품 서비스 활성화 여부
     private String serviceUnionStatus;
-
-    //룸서비스외부 등록일
-    private LocalDateTime serviceUnionCreateDate;
-
-    //룸서비스외부 수정일
-    private LocalDateTime serviceUnionModifyDate;
 
     //참조 테이블 - Unions 테이블 Pk 참조
     @ManyToOne(fetch = FetchType.LAZY)
