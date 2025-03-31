@@ -3,7 +3,7 @@
  * 기능 : Union DTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
  * ***********************************************/
 
 package com.sixthsense.hexastay.dto;
@@ -36,9 +36,9 @@ public class UniosDTO {
     private String unionsPassword;
 
     //등록일자
-    private LocalDateTime unionCreateDate;
+    private LocalDateTime createDate;
 
     //수정일자
-    private LocalDateTime unionModifyDate;
+    private LocalDateTime modifyDate;
 
 }

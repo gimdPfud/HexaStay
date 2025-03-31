@@ -26,9 +26,9 @@ public class BoardDTO {
 
     private String boardWriter;             //작성자
 
-    private LocalDateTime boardCreateDate;  //등록일자
+    private LocalDateTime createDate; //등록일자
 
-    private LocalDateTime boardModifyDate;  //수정일자
+    private LocalDateTime modifyDate; //수정일자
 
     private Integer boardView;              //조회수
 
