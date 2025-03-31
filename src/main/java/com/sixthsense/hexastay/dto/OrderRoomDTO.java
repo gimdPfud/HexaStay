@@ -25,10 +25,10 @@ public class OrderRoomDTO {
     private Long orderRoomTotalPrice;
 
     //호텔숙박매출일
-    private LocalDateTime createDate;
+    private LocalDateTime orderRoomCreateDate;
 
     //호텔숙박매출일자
-    private LocalDateTime modifyDate;
+    private LocalDateTime orderRoomModifyDate;
 
     //***참조 테이블 PK************************
     //Room테이블 - HotelRoom
