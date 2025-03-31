@@ -3,14 +3,13 @@
  * 기능 : OrderService 엔티티
  * 작성자 : 깁부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderService {
+public class OrderService extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderServiceNum")
@@ -36,12 +35,6 @@ public class OrderService {
 
     //룸서비스 결재
     private String orderServicePay;
-
-    //룸서비스 발생일자
-    private LocalDateTime orderServiceCreateDate;
-
-    //룸서비스 수정일자
-    private LocalDateTime orderServiceModifyDate;
 
     //*****참조테이블*************
     //룸서비스 참조(RoomService)

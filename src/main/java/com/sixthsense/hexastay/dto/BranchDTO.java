@@ -30,7 +30,9 @@ public class BranchDTO {
 
     private String branchCeoName;           //대표명
 
-    private LocalDateTime branchCreateDate; //등록일자
+    private LocalDateTime createDate; //등록일자
 
-    private CenterDTO branchCenterDTO;            //센터 참조
+    private LocalDateTime modifyDate; //수정일자
+
+    private Long centerNum;            //센터 참조
 }

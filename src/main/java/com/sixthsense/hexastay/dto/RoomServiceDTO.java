@@ -1,13 +1,12 @@
 /***********************************************
  * 클래스명 : RoomServiceDTO
  * 기능 : RoomServiceDTO 엔티티
- * 작성자 :
+ * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.HotelRoom;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,9 +30,9 @@ public class RoomServiceDTO {
 
     private boolean roomServiceStatus;              //활성화 여부
 
-    private LocalDateTime roomServiceCreateDate;    //등록일자
+    private LocalDateTime createDate;    //등록일자
 
-    private LocalDateTime roomServiceModifyDate;    //수정일자
+    private LocalDateTime modifyDate;    //수정일자
 
-    private HotelRoom roomServiceHotelRoom;         //방 참조
+    private Long hotelRoomNum;         //방 참조
 }
