@@ -1,12 +1,14 @@
 /***********************************************
 * 클래스명 : ReviewDTO
 * 기능 : ReviewDTO 엔티티
-* 작성자 : 김예령
+* 작성자 : 
 * 작성일 : 2025-03-31
-* 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+* 수정 : 2025-03-31
 * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.HotelRoom;
+import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,13 +30,13 @@ public class ReviewDTO {
 
     private Integer reviewView;             //조회수
 
-    private LocalDateTime createDate; //등록일자
+    private LocalDateTime reviewCreateDate; //등록일자
 
-    private LocalDateTime modifyDate; //수정일자
+    private LocalDateTime reviewModifyDate; //수정일자
 
     private String reviewPassword;          //등록비밀번호
 
-    private Long hotelRoomNum;      //방 참조
+    private HotelRoom reviewHotelRoom;      //방 참조
 
-    private Long memberNum;            //회원 참조
+    private Member reviewMember;            //회원 참조
 }

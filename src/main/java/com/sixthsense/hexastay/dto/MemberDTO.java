@@ -3,7 +3,7 @@
  * 기능 : MemberDTO 엔티티
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-03-31
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
@@ -31,7 +31,5 @@ public class MemberDTO {
 
     private Gender memberGender;                        //성별
 
-    private LocalDateTime createDate; //등록일자
-
-    private LocalDateTime modifyDate; //수정일자
+    private LocalDateTime memberCreateDate;             //등록일자
 }

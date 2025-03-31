@@ -3,7 +3,7 @@
  * 기능 : HotelRoomDTO 엔티티
  * 작성자 :
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-03-31
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
@@ -28,17 +28,19 @@ public class HotelRoomDTO {
 
     private String hotelRoomQr;                 //Qr명
 
+    private LocalDateTime hotelRoomCreateDate;  //등록일자
+
+    private LocalDateTime hotelRoomModifyDate;  //수정일자
+
     private String hotelRoomContent;            //방 상세설명
 
     private Integer hotelRoomPrice;              //가격
 
     private String hotelRoomPassword;           //비밀번호
 
-    private LocalDateTime createDate; //등록일자
+    private CenterDTO hotelRoomCenterDTO;             //센터 참조
 
-    private LocalDateTime modifyDate; //수정일자
+    private BranchDTO hotelRoomBranchDTO;             //지사 참조
 
-    private Long branchNum;             //지사 참조
-
-    private Long facilityNum;         //시설 참조
+    private FacilityDTO hotelRoomFacilityDTO;         //시설 참조
 }
