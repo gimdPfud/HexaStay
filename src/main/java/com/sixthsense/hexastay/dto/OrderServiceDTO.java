@@ -1,5 +1,7 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.RoomService;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,10 +30,10 @@ public class OrderServiceDTO {
     private String orderServicePay;
 
     //룸서비스 발생일자
-    private LocalDateTime createDate;
+    private LocalDateTime orderServiceCreateDate;
 
     //룸서비스 수정일자
-    private LocalDateTime modifyDate;
+    private LocalDateTime orderServiceModifyDate;
 
     //*****참조테이블*************
     //룸서비스 참조(RoomService)
