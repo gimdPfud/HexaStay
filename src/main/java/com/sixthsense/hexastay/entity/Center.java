@@ -3,14 +3,13 @@
  * 기능 : CenterDTO 엔티티
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Center {
+public class Center extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "centerNum")
@@ -43,6 +42,4 @@ public class Center {
     @Column(name = "centerCeoName")
     private String centerCeoName;           //대표자명
 
-    @Column(name = "centerCreateDate")
-    private LocalDateTime centerCreateDate; //등록일자
 }

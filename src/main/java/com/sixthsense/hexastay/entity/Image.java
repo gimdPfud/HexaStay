@@ -3,7 +3,7 @@
  * 기능 : ImageDTO 엔티티 (todo 추후 수정)
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 카테고리 컬럼 두 개 추가 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
@@ -29,5 +29,8 @@ public class Image {
     @Column(name = "imageUrl")
     private String imageUrl;        //이미지 경로
 
-    /*나중에 참조*/
+    @Column(name = "imageSuperEntity")
+    private String imageSuperEntity;//카테고리 1번 : 어디 테이블?
+    @Column(name = "imageSuperNum")
+    private String imageSuperNum;   //카테고리 2번 : 그 중 어느 row?
 }

@@ -1,16 +1,15 @@
 /***********************************************
  * 클래스명 : OrderRoom
  * 기능 : OrderRoom 엔티티
- * 작성자 :
+ * 작성자 : 깁부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제, Member 참조 추가 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRoom {
+public class OrderRoom  extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderRoomNum")
@@ -34,11 +33,6 @@ public class OrderRoom {
     //호텔 수박가격 총 매출액
     private Long orderRoomTotalPrice;
 
-    //호텔숙박매출일
-    private LocalDateTime orderRoomCreateDate;
-
-    //호텔숙박매출일자
-    private LocalDateTime orderRoomModifyDate;
 
     //***참조 테이블************************
     //Room테이블 - HotelRoom
@@ -48,7 +42,9 @@ public class OrderRoom {
 
 
     //멤버 테이블
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberNum")
+    private Member member;
 
 
 

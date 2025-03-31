@@ -32,5 +32,7 @@ public class CenterDTO {
 
     private String centerCeoName;           //대표자명
 
-    private LocalDateTime centerCreateDate; //등록일자
+    private LocalDateTime createDate; //등록일자
+
+    private LocalDateTime modifyDate; //수정일자
 }
