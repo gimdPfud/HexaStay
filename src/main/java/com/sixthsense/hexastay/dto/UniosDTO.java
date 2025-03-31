@@ -1,28 +1,20 @@
 /***********************************************
  * 클래스명 : Union
- * 기능 : Union 엔티티
+ * 기능 : Union DTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31
  * ***********************************************/
-package com.sixthsense.hexastay.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+package com.sixthsense.hexastay.dto;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Unions {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "unionsNum")
+
+
+public class UniosDTO {
+
+
     private Long unionsNum;
 
     //외부 업체 이름
