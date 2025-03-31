@@ -3,7 +3,7 @@
  * 기능 : OrderStore DTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
@@ -39,10 +39,10 @@ public class ServiceUnionDTO {
     private String serviceUnionStatus;
 
     //룸서비스외부 등록일
-    private LocalDateTime serviceUnionCreateDate;
+    private LocalDateTime createDate;
 
     //룸서비스외부 수정일
-    private LocalDateTime serviceUnionModifyDate;
+    private LocalDateTime modifyDate;
 
     //참조 테이블 - Unions 테이블 Pk 참조
     private Long unionsNum;
