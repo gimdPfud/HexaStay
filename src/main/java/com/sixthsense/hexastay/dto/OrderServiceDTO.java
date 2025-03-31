@@ -1,28 +1,20 @@
-/***********************************************
- * 클래스명 : OrderService
- * 기능 : OrderService 엔티티
- * 작성자 : 깁부환
- * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
- * ***********************************************/
-package com.sixthsense.hexastay.entity;
+package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.RoomService;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderService {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderServiceNum")
+public class OrderServiceDTO {
+
+
     private Long orderServiceNum;
 
     //룸서비스 판매수량
@@ -45,9 +37,6 @@ public class OrderService {
 
     //*****참조테이블*************
     //룸서비스 참조(RoomService)
-    @ManyToOne
-    @JoinColumn(name = "roomServiceNum")
-    private RoomService roomService;
-
+    private Long roomServiceNum;
 
 }
