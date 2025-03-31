@@ -1,6 +1,6 @@
 /***********************************************
- * 클래스명 : OrderRoom
- * 기능 : OrderRoom 엔티티
+ * 클래스명 : ServiceUnion
+ * 기능 : ServiceUnion 엔티티
  * 작성자 :
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31
@@ -17,9 +17,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRoom {
+public class ServiceUnion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderRoomNum")
-    private Long orderRoomNum;
+    @Column(name = "serviceUnionNum")
+    private Long serviceUnionNum;
 }
