@@ -10,6 +10,8 @@ package com.sixthsense.hexastay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -22,4 +24,32 @@ public class ServiceUnion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "serviceUnionNum")
     private Long serviceUnionNum;
+
+    //룸서비스외부 업체 상품이름
+    private String serviceUnionsName;
+
+    //룸서비스외부 업체상품 가격
+    private Long serviceUnionPrice;
+
+    //룸서비스외부 업체상품 설명
+    private String serviceUnionContent;
+
+    //룸서비스외부 업체상품 카테고리
+    private String serviceUnionCategory;
+
+    //룸서비스외부 업체상품 서비스 활성화 여부
+    private String serviceUnionStatus;
+
+    //룸서비스외부 등록일
+    private LocalDateTime serviceUnionCreateDate;
+
+    //룸서비스외부 수정일
+    private LocalDateTime serviceUnionModifyDate;
+
+    //참조 테이블 - Unions 테이블 Pk 참조
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unionsNum")
+    private Unions Unions;
+
+
 }

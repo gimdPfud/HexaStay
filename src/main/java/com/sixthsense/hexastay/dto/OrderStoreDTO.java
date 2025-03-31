@@ -1,11 +1,13 @@
+package com.sixthsense.hexastay.dto;
+
 /********************************************
  * 클래스명 : OrderStoreDTO
  * 기능 : OrderStoreDTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-03-31
  * ***********************************************/
-package com.sixthsense.hexastay.dto;
+
 
 import lombok.*;
 
@@ -27,10 +29,10 @@ public class OrderStoreDTO {
     private Long orderStorePrice;
 
     //외부업체 상품판매일
-    private LocalDateTime createDate;
+    private LocalDateTime orderStoreCreateDate;
 
     //외부업체 상품 수정일자
-    private LocalDateTime modifyDate;
+    private LocalDateTime orderStoreModifyDate;
 
     //외부업체 상품 총금액
     private Long orderStoreTotalPrice;
