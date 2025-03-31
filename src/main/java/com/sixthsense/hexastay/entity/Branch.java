@@ -1,13 +1,12 @@
 /***********************************************
- * 클래스명 : BranchDTO
- * 기능 : BranchDTO 엔티티
- * 작성자 : 김예령
+ * 클래스명 : Branch
+ * 기능 : Branch 엔티티
+ * 작성자 :
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
+ * 수정 : 2025-03-31
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
-import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,28 +17,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Branch  extends BaseEntity {
+public class Branch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "branchNum")
-    private Long branchNum;                 //번호
-
-    @Column(name = "branchName")
-    private String branchName;              //이름
-
-    @Column(name = "branchPhone")
-    private String branchPhone;             //전화번호
-
-    @Column(name = "branchEmail")
-    private String branchEmail;             //이메일
-
-    @Column(name = "branchAddress")
-    private String branchAddress;           //주소
-
-    @Column(name = "branchCeoName")
-    private String branchCeoName;           //대표명
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "centerNum")
-    private Center center;            //센터 참조
+    private Long branchNum;
 }

@@ -1,6 +1,6 @@
 /***********************************************
- * 클래스명 : OrderService
- * 기능 : OrderService 엔티티
+ * 클래스명 : Union
+ * 기능 : Union 엔티티
  * 작성자 :
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31
@@ -17,9 +17,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderService {
+public class Union {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderServiceNum")
-    private Long orderServiceNum;
+    @Column(name = "unionNum")
+    private Long unionNum;
 }
