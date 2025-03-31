@@ -1,28 +1,27 @@
-/***********************************************
- * 클래스명 : Admin
- * 기능 : Admin 엔티티
- * 작성자 :
+package com.sixthsense.hexastay.dto;
+
+/********************************************
+ * 클래스명 : AdminDTO
+ * 기능 : AdminDTO
+ * 작성자 : 김부환
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31
  * ***********************************************/
-package com.sixthsense.hexastay.entity;
 
-import jakarta.persistence.*;
+
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "adminNum")
+public class AdminDTO {
+
+
     private Long adminNum;
 
     //어드민 패스워드
@@ -48,7 +47,6 @@ public class Admin {
 
     //어드민 수정일
     private LocalDateTime adminModifyDate;
-
 
 
 }

@@ -1,0 +1,52 @@
+/***********************************************
+ * 클래스명 : Union
+ * 기능 : Union 엔티티
+ * 작성자 : 김부환
+ * 작성일 : 2025-03-31
+ * 수정 : 2025-03-31
+ * ***********************************************/
+package com.sixthsense.hexastay.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Unions {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "unionsNum")
+    private Long unionsNum;
+
+    //외부 업체 이름
+    private String unionsName;
+
+    //외부업체 이메일
+    private String unionsEmail;
+
+    //외부업체 폰 번호
+    private String unionsPhone;
+
+    //외부 업체주소
+    private String unionsAddress;
+
+    //외부 업체 대표자명
+    private String unionsCeoName;
+
+    //외부 업체 패스워드
+    private String unionsPassword;
+
+    //등록일자
+    private LocalDateTime unionCreateDate;
+
+    //수정일자
+    private LocalDateTime unionModifyDate;
+
+}
