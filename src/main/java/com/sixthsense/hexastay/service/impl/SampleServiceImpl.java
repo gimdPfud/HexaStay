@@ -5,11 +5,12 @@
  * 작성일 : 2025-03-27
  * 수정 : 2025-03-27
  * ***********************************************/
-package com.sixthsense.hexastay.service;
+package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.SampleDTO;
 import com.sixthsense.hexastay.entity.Sample;
 import com.sixthsense.hexastay.repository.SampleRepository;
+import com.sixthsense.hexastay.service.SampleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class SampleServiceImpl implements SampleService{
+public class SampleServiceImpl implements SampleService {
     private final SampleRepository sampleRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
