@@ -10,7 +10,6 @@
 <body class="w-100 vh-100 bg-light">
 
 <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
-
     <div class="d-flex justify-content-center">
         <h2 class="text-center mb-4">본사 등록</h2>
     </div>
@@ -19,79 +18,84 @@
         <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
     </div>
 
-    <div class="mb-2">
-        <label class="form-label">브랜드명</label>
-        <input type="text" name="centerBrand" class="form-control">
-    </div>
-    <div class="mb-2">
-        <label class="form-label">상호명</label>
-        <input type="text" name="centerName" class="form-control">
-    </div>
-    <div class="mb-2">
-        <label class="form-label">사업자등록번호</label>
-        <div class="row g-2">
-            <div class="col">
-                <input type="text" name="centerBusinessNum" class="form-control">
-            </div>
-            <div class="col-auto">-</div>
-            <div class="col">
-                <input type="text" name="centerBusinessNum" class="form-control">
-            </div>
-            <div class="col-auto">-</div>
-            <div class="col">
-                <input type="text" name="centerBusinessNum" class="form-control">
+    <form id="signupForm" action="/center/signup" method="post">
+        <div class="mb-2">
+            <label class="form-label">브랜드명</label>
+            <input type="text" name="centerBrand" id="centerBrand" class="form-control">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">상호명</label>
+            <input type="text" name="centerName" id="centerName" class="form-control">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">사업자등록번호</label>
+            <div class="row g-2">
+                <div class="col">
+                    <input type="text" id="centerBusinessNumOne" class="form-control">
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col">
+                    <input type="text" id="centerBusinessNumTwo" class="form-control">
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col">
+                    <input type="text" id="centerBusinessNumThree" class="form-control">
+                </div>
+                    <input hidden name="centerBusinessNum" id="centerBusinessNum">
             </div>
         </div>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">대표자명</label>
-        <input type="text" name="centerCeoName" class="form-control">
-    </div>
-    <div class="mb-2">
-        <label class="form-label">전화번호</label>
-        <div class="row g-2">
-            <div class="col">
-                <select name="adminPhone" class="form-select">
-                    <option>02</option>
-                    <option>031</option>
-                    <option>032</option>
-                    <option>053</option>
-                    <option>051</option>
-                    <option>052</option>
-                    <option>054</option>
-                    <option>055</option>
-                    <option>033</option>
-                    <option>042</option>
-                    <option>041</option>
-                    <option>043</option>
-                    <option>062</option>
-                    <option>061</option>
-                    <option>063</option>
-                    <option>064</option>
-                </select>
-            </div>
-            <div class="col-auto">-</div>
-            <div class="col">
-                <input type="text" name="adminPhone" class="form-control">
-            </div>
-            <div class="col-auto">-</div>
-            <div class="col">
-                <input type="text" name="adminPhone" class="form-control">
+        <div class="mb-2">
+            <label class="form-label">대표자명</label>
+            <input type="text" name="centerCeoName" id="centerCeoName" class="form-control">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">전화번호</label>
+            <div class="row g-2">
+                <div class="col">
+                    <select id="centerPhoneone" class="form-select">
+                        <option>02</option>
+                        <option>031</option>
+                        <option>032</option>
+                        <option>041</option>
+                    </select>
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col">
+                    <input type="text" id="centerPhonetwo" class="form-control">
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col">
+                    <input type="text" id="centerPhonethree" class="form-control">
+                </div>
+                <input hidden name="centerPhone" id="centerPhone">
             </div>
         </div>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">이메일</label>
-        <input type="email" name="centerEmail" class="form-control">
-    </div>
-    <div class="mb-4">
-        <label class="form-label">주소</label>
-        <input name="centerAddress" type="text" class="form-control">
-    </div>
-    <div class="d-flex justify-content-center gap-3">
-        <button type="submit" class="btn btn-success">등록</button>
-        <a th:href="@{/center/list}" class="btn btn-danger">취소</a>
-    </div>
+        <div class="mb-2">
+            <label class="form-label">이메일</label>
+            <input type="email" name="centerEmail" id="email" class="form-control">
+        </div>
+        <div class="mb-4">
+            <label class="form-label">주소</label>
+            <input name="centerAddress" type="text" id="centerAddress" class="form-control">
+        </div>
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-success" onclick="submitForm()">등록</button>
+            <a th:href="@{/center/list}" class="btn btn-danger">취소</a>
+        </div>
+    </form>
+
+    <script>
+        // 가입양식 관련
+        function submitForm() {
+            // 주민번호 합체
+            document.getElementById('centerBusinessNum').value = document.getElementById('centerBusinessNumOne').value + "-" + document.getElementById('centerBusinessNumTwo').value + "-" + document.getElementById('centerBusinessNumThree').value;
+            // 폰번호 합체
+            document.getElementById('centerPhone').value = document.getElementById('centerPhoneone').value + "-" + document.getElementById('centerPhonetwo').value + "-" + document.getElementById('centerPhonethree').value;
+        console.log(document.getElementById('centerPhone').value);
+        }
+        //
+    </script>
+
 </div>
 </body>
 </html>
