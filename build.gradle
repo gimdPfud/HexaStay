@@ -41,6 +41,9 @@ dependencies {
 
     /*모델매퍼 추가*/
     implementation 'org.modelmapper:modelmapper:3.1.1'
+
+    /*레이아웃*/
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 }
 
 tasks.named('test') {
