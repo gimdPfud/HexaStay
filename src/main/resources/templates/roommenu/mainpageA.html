@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    .container {
+        width: 80%;
+        margin: 20px auto;
+        border: 3px solid black;
+        padding: 10px;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 3px solid black;
+    }
+    .welcome {
+        margin: 20px 0;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .box {
+        border: 2px solid black;
+        padding: 40px;
+        margin: 10px 0;
+    }
+    .input-section {
+        border: 2px solid black;
+        padding: 10px;
+    }
+    .input-section input {
+        padding: 5px;
+        margin-left: 10px;
+    }
+    .submit-btn {
+        margin-top: 10px;
+        padding: 5px 15px;
+        border: 2px solid black;
+        background: white;
+        cursor: pointer;
+    }
+
+    /* 화면 가로 480px 이하에서만 적용되는 스타일 */
+    @media (max-width: 480px) {
+        body {
+            background-color: white;  /* 예시: 배경색 변경 */
+        }
+
+        .container {
+            padding: 10px;  /* 모바일 화면에서는 패딩을 줄여서 공간을 확보 */
+        }
+
+        .title {
+            font-size: 1.5rem; /* 타이틀 폰트 크기 조정 */
+        }
+    }
+</style>
+<body>
+<div class="container">
+    <div class="header">
+        <div></div>
+        <div>~님 환영합니다. <br> XXX호실</div>
+    </div>
+    <div class="welcome">신라호텔에 오신것을 환영합니다.</div>
+    <div class="box">호텔이미지</div>
+    <div class="box">관광지나 주변 추천 이미지</div>
+    <div class="input-section">
+        인증키 : <input type="password">
+    </div>
+    <button class="submit-btn">접속</button>
+</div>
+</body>
+</html>

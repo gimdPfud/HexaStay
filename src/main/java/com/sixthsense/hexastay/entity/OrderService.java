@@ -40,7 +40,7 @@ public class OrderService extends BaseEntity {
     //룸서비스 참조(RoomService)
     @ManyToOne
     @JoinColumn(name = "roomServiceNum")
-    private RoomService roomService;
+    private RoomMenu roomService;
 
 
 }
