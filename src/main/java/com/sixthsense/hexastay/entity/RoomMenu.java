@@ -18,27 +18,30 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "roomService")
-public class RoomService extends BaseEntity {
+@Table(name = "roomMenu")
+public class RoomMenu extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "roomServiceNum")
-    private Long roomServiceNum;
+    @Column(name = "roomMenuNum")
+    private Long roomMenuNum;
 
-    @Column(name = "roomServiceName")
-    private String roomServiceName;                 //이름
+    @Column(name = "roomMenuName")
+    private String roomMenuName;                 //상품이름
 
-    @Column(name = "roomServicePrice")
-    private Integer roomServicePrice;                //가격
+    @Column(name = "roomMenuPrice")
+    private Integer roomMenuPrice;                //상품가격
 
-    @Column(name = "roomServiceContent")
-    private String roomServiceContent;              //상품설명
+    @Column(name = "roomMenuAmount")
+    private Integer roomMenuAmount;                 // 상품수량
 
-    @Column(name = "roomServiceCategory")
-    private String roomServiceCategory;             //카테고리
+    @Column(name = "roomMenuContent")
+    private String roomMenuContent;              //상품설명
 
-    @Column(name = "roomServiceStatus")
-    private boolean roomServiceStatus;              //활성화 여부
+    @Column(name = "roomMenuCategory")
+    private String roomMenuCategory;             //카테고리
+
+    @Column(name = "roomMenuStatus")
+    private String roomMenuStatus;              //품절여부
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotelRoomNum")

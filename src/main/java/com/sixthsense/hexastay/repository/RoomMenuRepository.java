@@ -7,13 +7,13 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.RoomService;
+import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface RoomServiceRepository extends JpaRepository<RoomService, Long> {
-    @Query("select a from RoomService a")
-    public Page<RoomService> findAll(Pageable pageable);
+public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
+    @Query("select a from RoomMenu a")
+    public Page<RoomMenu> findAll(Pageable pageable);
 }

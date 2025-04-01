@@ -7,6 +7,10 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,22 +21,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoomServiceDTO {
-    private Long roomServiceNum;
+public class RoomMenuDTO {
 
-    private String roomServiceName;                 //이름
+    private Long roomMenuNum;
 
-    private Integer roomServicePrice;                //가격
+    private String roomMenuName;                 //상품이름
 
-    private String roomServiceContent;              //상품설명
+    private Integer roomMenuPrice;                //상품가격
 
-    private String roomServiceCategory;             //카테고리
+    private Integer roomMenuAmount;                 // 상품수량
 
-    private boolean roomServiceStatus;              //활성화 여부
+    private String roomMenuContent;              //상품설명
+
+    private String roomMenuCategory;             //카테고리
+
+    private String roomMenuStatus;              //품절여부
 
     private LocalDateTime createDate;    //등록일자
 
     private LocalDateTime modifyDate;    //수정일자
 
     private Long hotelRoomNum;         //방 참조
+
 }
