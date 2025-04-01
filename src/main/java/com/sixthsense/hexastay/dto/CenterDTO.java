@@ -22,7 +22,7 @@ public class CenterDTO {
 
     private String centerBrand;             //브랜드명
 
-    private String centerName;              //이름
+    private String centerName;              //이름(상호명)
 
     private String centerPhone;             //전화번호
 
@@ -32,7 +32,9 @@ public class CenterDTO {
 
     private String centerCeoName;           //대표자명
 
-    private LocalDateTime createDate; //등록일자
+    private LocalDateTime createDate;       //등록일자
 
-    private LocalDateTime modifyDate; //수정일자
+    private LocalDateTime modifyDate;       //수정일자
+
+    private String centerBusinessNum;       //사업자등록번호
 }
