@@ -11,8 +11,12 @@ import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -39,5 +43,21 @@ public class StoreController {
         log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
         return "store/insert";
+    }
+
+
+    @GetMapping("/list")
+    public String list(Pageable pageable, Model model){
+        Page<StoreDTO> storeDTOPage = storeService.list(pageable);
+        log.info("list : "+storeDTOPage);
+        model.addAttribute("list",storeDTOPage);
+        return "store/list";
+    }
+
+    @GetMapping("/read/{id}")
+    public String read(@PathVariable Long id, Model model){
+        StoreDTO data = storeService.read(id);
+        model.addAttribute("data",data);
+        return "store/read";
     }
 }
