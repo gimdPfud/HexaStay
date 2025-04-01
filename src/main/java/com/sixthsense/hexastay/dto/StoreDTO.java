@@ -12,28 +12,28 @@ import java.time.LocalDateTime;
 
 
 
-public class UniosDTO {
+public class StoreDTO {
 
 
-    private Long unionsNum;
+    private Long storeNum;
 
     //외부 업체 이름
-    private String unionsName;
+    private String storeName;
 
     //외부업체 이메일
-    private String unionsEmail;
+    private String storeEmail;
 
     //외부업체 폰 번호
-    private String unionsPhone;
+    private String storePhone;
 
     //외부 업체주소
-    private String unionsAddress;
+    private String storeAddress;
 
     //외부 업체 대표자명
-    private String unionsCeoName;
+    private String storeCeoName;
 
     //외부 업체 패스워드
-    private String unionsPassword;
+    private String storePassword;
 
     //등록일자
     private LocalDateTime createDate;
