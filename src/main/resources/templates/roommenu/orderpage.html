@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모바일 주문 페이지</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 20px; border-bottom: 2px solid #ddd; }
+        .menu-icon, .cart-icon { font-size: 24px; cursor: pointer; }
+        .search-container { display: none; padding: 10px; background: #f1f1f1; border-bottom: 2px solid #ddd; }
+        .search-box input { width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 5px; }
+        .category-tabs { display: flex; justify-content: space-around; padding: 10px; }
+        .category-tab { cursor: pointer; padding: 5px 10px; font-size: 14px; background: #ddd; border-radius: 5px; }
+        .tabs { display: flex; justify-content: space-around; padding: 10px; border-bottom: 2px solid #ddd; }
+        .tab { cursor: pointer; padding: 5px 10px; }
+        .tab.active { font-weight: bold; border-bottom: 2px solid black; }
+        .food-list { list-style: none; padding: 10px; }
+        .food-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; }
+        .food-item img { width: 60px; height: 60px; border-radius: 10px; margin-right: 10px; }
+        .food-info { flex-grow: 1; }
+        .food-info p { margin: 2px 0; }
+        .price { font-weight: bold; }
+        .rating { color: #ff9800; }
+    </style>
+    <script>
+        function toggleSearch() {
+            var searchContainer = document.getElementById("search-container");
+            if (searchContainer.style.display === "none" || searchContainer.style.display === "") {
+                searchContainer.style.display = "block";
+            } else {
+                searchContainer.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="menu-icon" onclick="toggleSearch()">☰</div>
+        <div>주문</div>
+        <div class="cart-icon">🛒</div>
+    </div>
+    <div id="search-container" class="search-container">
+        <div class="search-box"><input type="text" placeholder="음식을 검색하세요..."></div>
+        <div class="category-tabs">
+            <div class="category-tab">한식</div>
+            <div class="category-tab">양식</div>
+            <div class="category-tab">중식</div>
+            <div class="category-tab">에피타이저</div>
+        </div>
+    </div>
+    <div class="tabs">
+        <div class="tab active">추천</div>
+        <div class="tab">한식</div>
+        <div class="tab">양식</div>
+        <div class="tab">중식</div>
+        <div class="tab">에피타</div>
+    </div>
+    <ul class="food-list">
+        <li class="food-item">
+            <img src="pizza.jpg" alt="맛있는 피자">
+            <div class="food-info">
+                <p>맛있는 피자</p>
+                <p class="price">30,000원</p>
+                <p class="rating">⭐ 4.0</p>
+            </div>
+        </li>
+        <li class="food-item">
+            <img src="steak.jpg" alt="풍미 스테이크">
+            <div class="food-info">
+                <p>풍미 스테이크</p>
+                <p class="price">25,000원</p>
+                <p class="rating">⭐ 4.7</p>
+            </div>
+        </li>
+        <li class="food-item">
+            <img src="pasta.jpg" alt="정통 오징어 파스타">
+            <div class="food-info">
+                <p>정통 오징어 파스타</p>
+                <p class="price">23,000원</p>
+                <p class="rating">⭐ 3.9</p>
+            </div>
+        </li>
+        <li class="food-item">
+            <img src="sushi.jpg" alt="신선한 초밥">
+            <div class="food-info">
+                <p>신선한 초밥</p>
+                <p class="price">27,000원</p>
+                <p class="rating">⭐ 4.5</p>
+            </div>
+        </li>
+        <li class="food-item">
+            <img src="bibimbap.jpg" alt="담백한 비빔밥">
+            <div class="food-info">
+                <p>담백한 비빔밥</p>
+                <p class="price">17,000원</p>
+                <p class="rating">⭐ 4.9</p>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

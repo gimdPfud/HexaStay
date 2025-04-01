@@ -26,8 +26,7 @@
             <th scope="col">수량</th>
             <th scope="col">카테고리</th>
             <th scope="col">상태</th>
-            <th scope="col">수정</th>
-            <th scope="col">삭제</th>
+            <th scope="col">기능</th>
         </tr>
         </thead>
         <tbody>
@@ -40,10 +39,8 @@
             <td>한식</td>
             <td>판매중</td>
             <td>
-                <a href="/roommenu/modify/" class="btn btn-warning btn-sm">수정</a>
-            </td>
-            <td>
-                <form action="/roommenu/delete/" method="post" style="display:inline;">
+                <a href="/roommenu/modify" class="btn btn-warning btn-sm">수정</a>
+                <form action="/roomservice/delete" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-danger btn-sm">삭제</button>
                 </form>
             </td>
@@ -55,14 +52,6 @@
             <td>5</td>
             <td>양식</td>
             <td>품절</td>
-            <td>
-                <a href="/roommenu/modify" class="btn btn-warning btn-sm">수정</a>
-            </td>
-            <td>
-                <form action="/roomservice/delete" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
-                </form>
-            </td>
         </tr>
         <!-- 추가적인 메뉴 항목들이 여기에 동적으로 추가될 수 있습니다. -->
         </tbody>

@@ -63,4 +63,11 @@ public class RoomMenuController {
         Pageable pageable = PageRequest.of(page, size);
         return roomMenuService.RoomMenuList(pageable);
     }
+
+    @GetMapping("/roommenu/orderpage")
+    public String orderpage(){
+
+
+        return "roommenu/orderpage";
+    }
 }
