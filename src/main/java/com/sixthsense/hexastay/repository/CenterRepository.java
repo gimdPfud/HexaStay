@@ -16,4 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface CenterRepository extends JpaRepository<Center, Long> {
     @Query("select a from Center a")
     public Page<Center> findAll(Pageable pageable);
+
+
+
 }
