@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class CenterDTO {
     private Long centerNum;                 //번호
 
-    private String centerBrand;             //브랜드명
+    private String centerBrand;             //브랜드명 //신라 조선
 
     private String centerName;              //이름
 
