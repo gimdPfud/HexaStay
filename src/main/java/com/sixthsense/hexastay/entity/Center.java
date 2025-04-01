@@ -28,7 +28,7 @@ public class Center extends BaseEntity {
     private String centerBrand;             //브랜드명
 
     @Column(name = "centerName")
-    private String centerName;              //이름
+    private String centerName;              //이름(상호명)
 
     @Column(name = "centerPhone")
     private String centerPhone;             //전화번호
@@ -42,4 +42,6 @@ public class Center extends BaseEntity {
     @Column(name = "centerCeoName")
     private String centerCeoName;           //대표자명
 
+    @Column(name = "centerBusinessNum")
+    private String centerBusinessNum;       //사업자등록번호
 }

@@ -6,6 +6,8 @@ import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +24,15 @@ public class CenterController {
     private final CenterService centerService;
 
     @GetMapping("/list")
-    public String listCenter(){
+    public String listCenter(Model model, Pageable pageable){
         log.info("get 방식 center 목록 controller 진입");
 
+        Page<CenterDTO> centerDTOS = centerService.centerList(pageable);
 
-        return "";
+        model.addAttribute("centerDTOS", centerDTOS);
+
+
+        return "center/list";
     }
 
     @GetMapping("/signup")
@@ -43,6 +49,8 @@ public class CenterController {
         centerService.centerInsert(centerDTO);
 
         return "redirect:/center/list";
+
+
     }
 
 

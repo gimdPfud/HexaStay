@@ -73,6 +73,7 @@ public class CenterServiceImpl implements CenterService {
         center.setCenterEmail(centerDTO.getCenterEmail());
         center.setCenterAddress(centerDTO.getCenterAddress());
         center.setCenterCeoName(centerDTO.getCenterCeoName());
+        center.setCenterBusinessNum(centerDTO.getCenterBusinessNum());
 
         centerRepository.save(center);
 
@@ -84,6 +85,8 @@ public class CenterServiceImpl implements CenterService {
     public void centerDelete(Long centerNum) {
 
         centerRepository.deleteById(centerNum);
+
+        log.info("삭제된 pk : " + centerNum);
 
     }
 }
