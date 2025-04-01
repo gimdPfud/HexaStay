@@ -1,254 +1,278 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
->
-<head>
-    <meta charset="UTF-8">
-    <!--부트 스트랩-->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--부트 스트랩 스타일시트(HTML 속성)-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!--부트스트랩에 효과(자바스크립트)-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!--부트스트랩 아이콘-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 
-    <title>Title</title>
-</head>
 
-<!--호텔룸 배정정보 등록 페이지-->
-<body>
-<div class="container mt-4"><!--인서트 container 시작-->
-    <h3 class="mb-3">룸 배정 내역 조회</h3>
+    <head>
+        <meta charset="UTF-8">
+        <!--부트 스트랩-->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--부트 스트랩 스타일시트(HTML 속성)-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!--부트스트랩에 효과(자바스크립트)-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!--부트스트랩 아이콘-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 
-    <div class="row g-3"><!--상단 시작-->
-        <div class="col-md-6">
-            <div class="card p-3">
-                <label class="form-label">Brand브랜드명</label>
-                <select class="form-select">
-                    <option>세령</option>
-                    <option>Hexa</option>
-                    <option>SixSense</option>
-                </select>
-                <label class="form-label mt-2">Branch지사명</label>
-                <select class="form-select">
-                    <option>Hexa역곡지점</option>
-                    <option>세령 워터파크 부천점</option>
-                    <option>부천점</option>
-                </select>
-                <label class="form-label mt-2">가입경로</label>
-                <div>
-                    <input type="radio" name="가입정보" id="전체" checked> <label for="전체">전체</label>
-                    <input type="radio" name="가입정보" id="일반"> <label for="일반">일반</label>
-                    <input type="radio" name="가입정보" id="카카오톡"> <label for="카카오톡">카카오톡</label>
-                    <input type="radio" name="가입정보" id="네이버"> <label for="네이버">네이버</label>
-                </div>
-                <label class="form-label mt-2">날짜 입력</label>
-                <input type="date" class="form-control">
 
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card p-3">
-                <label class="form-label">Facillity지점명</label>
-                <select class="form-select">
-                    <option>지점 선택</option>
-                    <option>세령호텔</option>
-                    <option>헥사호텔</option>
-                </select>
-                <label class="form-label mt-2">HotelRoom호텔룸명</label>
-                <select class="form-select">
-                    <option>산울림101호</option>
-                    <option>숲속201호</option>
-                    <option>바다풍경101호</option>
-                </select>
-                <label class="form-label mt-2">배정상태</label>
-                <div>
-                    <input type="radio" name="가입정보" id="전체" checked> <label for="전체">숙박중</label>
-                    <input type="radio" name="가입정보" id="일반"> <label for="일반">숙박종료</label>
+        <title>Title</title>
+    </head>
+
+    <!--호텔룸 배정정보 등록 페이지-->
+    <body>
+
+
+    <div class="container mt-4"><!--인서트 container 시작-->
+        <h3 class="mb-3">룸 배정 내역 조회</h3>
+
+
+        <div class="row g-3"><!--상단 시작-->
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <label class="form-label">Brand브랜드명</label>
+                    <select class="form-select">
+                        <option>세령</option>
+                        <option>Hexa</option>
+                        <option>SixSense</option>
+                    </select>
+                    <label class="form-label mt-2">Branch지사명</label>
+                    <select class="form-select">
+                        <option>Hexa역곡지점</option>
+                        <option>세령 워터파크 부천점</option>
+                        <option>부천점</option>
+                    </select>
+                    <label class="form-label mt-2">가입경로</label>
+                    <div>
+                        <input type="radio" name="가입정보" id="전체" checked> <label for="전체">전체</label>
+                        <input type="radio" name="가입정보" id="일반"> <label for="일반">일반</label>
+                        <input type="radio" name="가입정보" id="카카오톡"> <label for="카카오톡">카카오톡</label>
+                        <input type="radio" name="가입정보" id="네이버"> <label for="네이버">네이버</label>
+                    </div>
+                    <label class="form-label mt-2">날짜 입력</label>
+                    <input type="date" class="form-control">
 
                 </div>
-                <label class="form-label mt-2">비밀번호</label>
-                <div class="row">
-                    <div class="col-md-6">
-                        <input type="password" class="form-control" placeholder="비밀번호 입력">
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <label class="form-label">Facillity지점명</label>
+                    <select class="form-select">
+                        <option>지점 선택</option>
+                        <option>세령호텔</option>
+                        <option>헥사호텔</option>
+                    </select>
+                    <label class="form-label mt-2">HotelRoom호텔룸명</label>
+                    <select class="form-select">
+                        <option>산울림101호</option>
+                        <option>숲속201호</option>
+                        <option>바다풍경101호</option>
+                    </select>
+                    <label class="form-label mt-2">배정상태</label>
+                    <div>
+                        <input type="radio" name="가입정보" id="전체" checked> <label for="전체">숙박중</label>
+                        <input type="radio" name="가입정보" id="일반"> <label for="일반">숙박종료</label>
+
                     </div>
-                    <div class="col-md-6">
-                        <input type="password" class="form-control bg-secondary text-white" placeholder="비밀번호 확인">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div><!--상단 페이지 종료-->
-
-    <div class="text-center my-3"><!--중단 버튼 시작-->
-        <button class="btn btn-primary">검색</button>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#idSearchModal">아이디 검색</button>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#registerModal">등록</button>
-        <button class="btn btn-secondary">엑셀 저장</button>
-    </div><!--중단 버튼 종료-->
-
-    <div class="table-responsive"><!--하단 게시판 페이지 시작-->
-        <table class="table table-bordered text-center">
-            <thead class="table-dark">
-            <tr>
-                <th>Check</th>
-                <th>No</th>
-                <th>가입경로</th>
-                <th>이메일</th>
-                <th>이름</th>
-                <th>연락처</th>
-
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td><input type="checkbox"></td>
-                <td>1</td>
-                <td>야놀자</td>
-                <td>112121@12112</td>
-                <td>산세형</td>
-                <td>010-0003-0004</td>
-
-            </tr>
-            <tr>
-                <td><input type="checkbox"></td>
-                <td>2</td>
-                <td>네이버호텔</td>
-                <td>3434@343.com</td>
-                <td>상상나라</td>
-                <td>010-5555-3333</td>
-
-            </tr>
-            </tbody>
-        </table><!--하단 게시판 페이지 종료-->
-    </div><!--하단페이지 종료-->
-</div><!--container 끝점-->
-
-<!--1번 모달 Modal 페이지 시작 등록 버튼에 연결 되어 있음 -->
-<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="registerModalLabel">등록</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label">브랜드명</label>
-                <input type="text" class="form-control" placeholder="브랜드명 입력">
-                <label class="form-label mt-2">지사명</label>
-                <input type="text" class="form-control" placeholder="지사명 입력">
-                <label class="form-label mt-2">호명</label>
-                <input type="text" class="form-control" placeholder="호명 입력">
-                <label class="form-label mt-2">숙박 시작일</label>
-                <input type="date" class="form-control">
-                <label class="form-label mt-2">숙박 종료일</label>
-                <input type="date" class="form-control">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-primary">저장</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--Modal 페이지 끝점-->
-
-<!--2번 모달-->
-<div class="modal fade" id="idSearchModal" tabindex="-1" aria-labelledby="idSearchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">아이디 검색</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- 검색 폼 -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="아이디 입력" th:value="${searchId}">
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-primary">검색</button>
+                    <label class="form-label mt-2">비밀번호</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="password" class="form-control" placeholder="비밀번호 입력">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="password" class="form-control bg-secondary text-white" placeholder="비밀번호 확인">
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div><!--상단 페이지 종료-->
 
-                <!-- 검색 결과 테이블 -->
-                <table class="table table-bordered text-center">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>No</th>
-                        <th>아이디(이메일)</th>
-                        <th>닉네임</th>
-                        <th>전화번호</th>
-                        <th>추가</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="user, stat : ${userList}">
-                        <td th:text="${stat.count}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td th:text="${user.nickname}"></td>
-                        <td th:text="${user.phone}"></td>
-                        <td><button class="btn btn-success" th:attr="onclick='addUser(\'' + ${user.email} + '\')'">추가</button></td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="text-center my-3"><!--중단 버튼 시작-->
+            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                검색사이드바
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#idSearchModal">아이디 검색</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#registerModal">등록</button>
+            <button class="btn btn-secondary">엑셀 저장</button>
+        </div><!--중단 버튼 종료-->
 
-                <!-- 추가된 사용자 리스트 -->
-                <h5 class="mt-4">추가된 사용자</h5>
-                <table class="table table-bordered text-center">
-                    <thead class="table-light">
-                    <tr>
-                        <th>No</th>
-                        <th>아이디(이메일)</th>
-                        <th>닉네임</th>
-                        <th>전화번호</th>
-                        <th>삭제</th>
-                    </tr>
-                    </thead>
-                    <tbody id="addedUsers">
-                    <!-- JavaScript로 동적 추가 -->
-                    </tbody>
-                </table>
+        <div class="table-responsive"><!--하단 게시판 페이지 시작-->
+            <table class="table table-bordered text-center">
+                <thead class="table-dark">
+                <tr>
+                    <th>Check</th>
+                    <th>No</th>
+                    <th>가입경로</th>
+                    <th>이메일</th>
+                    <th>이름</th>
+                    <th>연락처</th>
 
-                <div class="text-center mt-3">
-                    <button class="btn btn-primary">추가</button>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>1</td>
+                    <td>야놀자</td>
+                    <td>112121@12112</td>
+                    <td>산세형</td>
+                    <td>010-0003-0004</td>
+
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>2</td>
+                    <td>네이버호텔</td>
+                    <td>3434@343.com</td>
+                    <td>상상나라</td>
+                    <td>010-5555-3333</td>
+
+                </tr>
+                </tbody>
+            </table><!--하단 게시판 페이지 종료-->
+        </div><!--하단페이지 종료-->
+    </div><!--container 끝점-->
+
+    <!--1번 모달 Modal 페이지 시작 등록 버튼에 연결 되어 있음 -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">브랜드명</label>
+                    <input type="text" class="form-control" placeholder="브랜드명 입력">
+                    <label class="form-label mt-2">지사명</label>
+                    <input type="text" class="form-control" placeholder="지사명 입력">
+                    <label class="form-label mt-2">호명</label>
+                    <input type="text" class="form-control" placeholder="호명 입력">
+                    <label class="form-label mt-2">숙박 시작일</label>
+                    <input type="date" class="form-control">
+                    <label class="form-label mt-2">숙박 종료일</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary">저장</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <!--Modal 페이지 끝점-->
+
+    <!--2번 모달-->
+    <div class="modal fade" id="idSearchModal" tabindex="-1" aria-labelledby="idSearchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">아이디 검색</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 검색 폼 -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="아이디 입력" th:value="${searchId}">
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary">검색</button>
+                        </div>
+                    </div>
+
+                    <!-- 검색 결과 테이블 -->
+                    <table class="table table-bordered text-center">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>아이디(이메일)</th>
+                            <th>닉네임</th>
+                            <th>전화번호</th>
+                            <th>추가</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user, stat : ${userList}">
+                            <td th:text="${stat.count}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.nickname}"></td>
+                            <td th:text="${user.phone}"></td>
+                            <td><button class="btn btn-success" th:attr="onclick='addUser(\'' + ${user.email} + '\')'">추가</button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 추가된 사용자 리스트 -->
+                    <h5 class="mt-4">추가된 사용자</h5>
+                    <table class="table table-bordered text-center">
+                        <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>아이디(이메일)</th>
+                            <th>닉네임</th>
+                            <th>전화번호</th>
+                            <th>삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody id="addedUsers">
+                        <!-- JavaScript로 동적 추가 -->
+                        </tbody>
+                    </table>
+
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary">추가</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 사이드바 (오른쪽에서 왼쪽으로) -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="sidebarMenu"><!--사이드바 시작 지점-->
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">메뉴</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="list-group">
+                <li class="list-group-item"><a href="#">홈</a></li>
+                <li class="list-group-item"><a href="#">설정</a></li>
+                <li class="list-group-item"><a href="#">도움말</a></li>
+            </ul>
+        </div>
+    </div><!--사이드바 끝지점-->
 
-<!--아이디 검색 스트립트 부분-->
-<script>
-    function addUser(email) {
-        let table = document.getElementById("addedUsers");
-        let row = table.insertRow();
-        row.innerHTML = `
+
+
+
+
+    <!--아이디 검색 스트립트 부분-->
+    <script>
+        function addUser(email) {
+            let table = document.getElementById("addedUsers");
+            let row = table.insertRow();
+            row.innerHTML = `
                 <td>#</td>
                 <td>${email}</td>
                 <td>사용자 닉네임</td>
                 <td>010-1234-5678</td>
                 <td><button class="btn btn-danger" onclick="removeUser(this)">삭제</button></td>
             `;
-    }
+        }
 
-    function removeUser(button) {
-        let row = button.parentElement.parentElement;
-        row.remove();
-    }
-</script>
+        function removeUser(button) {
+            let row = button.parentElement.parentElement;
+            row.remove();
+        }
+    </script>
 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 
