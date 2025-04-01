@@ -42,4 +42,7 @@ public class Store extends BaseEntity {
     //외부 업체 패스워드
     private String storePassword;
 
+    //추가 : 활성화 상태
+    private String storeStatus;
+
 }

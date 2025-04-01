@@ -1,9 +1,9 @@
 /***********************************************
- * 클래스명 : OrderStoreDTO
- * 기능 : OrderStore DTO
+ * 클래스명 : StoreMenuDTO
+ * 기능 : StoreMenuDTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-04-01 이름 수정 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
@@ -21,22 +21,22 @@ import java.time.LocalDateTime;
 @Builder
 public class StoreMenuDTO {
 
-    private Long storeServiceNum;
+    private Long storeMenuNum;
 
     //룸서비스외부 업체 상품이름
-    private String storeServiceName;
+    private String storeMenuName;
 
     //룸서비스외부 업체상품 가격
-    private Long storeServicePrice;
+    private Long storeMenuPrice;
 
     //룸서비스외부 업체상품 설명
-    private String storeServiceContent;
+    private String storeMenuContent;
 
     //룸서비스외부 업체상품 카테고리
-    private String storeServiceCategory;
+    private String storeMenuCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
-    private String storeServiceStatus;
+    private String storeMenuStatus;
 
     //룸서비스외부 등록일
     private LocalDateTime createDate;

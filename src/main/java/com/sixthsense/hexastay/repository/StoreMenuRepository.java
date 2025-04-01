@@ -16,4 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface StoreMenuRepository extends JpaRepository<StoreMenu, Long> {
     @Query("select a from StoreMenu a")
     public Page<StoreMenu> findAll(Pageable pageable);
+
+/*활성화여부로 목록뽑기*/
+    public Page<StoreMenu> findByStoreMenuStatus(String status, Pageable pageable);
 }
