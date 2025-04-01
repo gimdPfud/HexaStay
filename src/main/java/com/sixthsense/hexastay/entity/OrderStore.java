@@ -38,8 +38,8 @@ public class OrderStore extends BaseEntity {
 
     //외부업체 상품 서비스를 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "storeServiceNum")
-    private StoreService storeService;
+    @JoinColumn(name = "storeMenuNum")
+    private StoreMenu storeMenu;
 
 
     //멤버 정보를 가져올 참조 테이블

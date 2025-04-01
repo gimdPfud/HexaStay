@@ -8,10 +8,17 @@
 
 package com.sixthsense.hexastay.dto;
 
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 
-
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StoreDTO {
 
 
@@ -40,5 +47,7 @@ public class StoreDTO {
 
     //수정일자
     private LocalDateTime modifyDate;
+
+    private String storeStatus; //활성화 상태
 
 }

@@ -16,4 +16,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query("select a from Store a")
     public Page<Store> findAll(Pageable pageable);
+
+    public Page<Store> findByStoreStatus(String status, Pageable pageable);
 }
