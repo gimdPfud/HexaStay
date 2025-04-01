@@ -32,5 +32,4 @@ public class AdminController {
     public String insertcompany() {
         return "admin/insertcompany";
     }
-
 }
