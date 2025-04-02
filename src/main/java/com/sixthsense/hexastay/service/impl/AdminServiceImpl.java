@@ -50,18 +50,19 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
-    public List<BranchDTO> getBranchList(Long centerNum) {
+    public List<BranchDTO> getBranchList(String CenterName) {
+
         List<BranchDTO> branchDTOList = new ArrayList<>();
-        List<Branch> branchList = branchRepository.findByBranch_CenterNum(centerNum);
+        List<Branch> branchList = branchRepository.findByCenter_CenterName(centerName);
         for (Branch branch : branchList) {
             branchDTOList.add(modelMapper.map(branch, BranchDTO.class));
         }
         return branchDTOList;
     }
 
-    public List<FacilityDTO> getFacilityList(Long centerNum) {
+    public List<FacilityDTO> getFacilityList(String CenterName) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
-        List<Facility> facilityList = facilityRepository.findByFacility_CenterNum(centerNum);
+        List<Facility> facilityList = facilityRepository.findByCenter_CenterName(centerName);
         for (Facility facility : facilityList) {
             facilityDTOList.add(modelMapper.map(facility, FacilityDTO.class));
         }

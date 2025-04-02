@@ -57,14 +57,14 @@ public class AdminController {
     }
 
     @GetMapping("/searchbranch")
-    public String insertbranch(@RequestParam Long centerNum) {
-        adminService.getBranchList(centerNum);
+    public String insertbranch(@RequestParam Long centerName) {
+        adminService.getBranchList(centerName);
         return "admin/insertcompany";
     }
 
     @GetMapping("/searchfacility")
-    public String insertfacility(@RequestParam Long branchNum) {
-        adminService.getFacilityList(branchNum);
+    public String insertfacility(@RequestParam Long branchName) {
+        adminService.getFacilityList(branchName);
         return "admin/insertcompany";
     }
 }
