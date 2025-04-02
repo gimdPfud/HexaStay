@@ -23,5 +23,6 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
     public Page<Facility> findAll(Pageable pageable);
 
     // 회원가입용
+    public List<Facility> findByFacilityName(String facilityName);
     public List<Facility> findByCenter_CenterName (String centerName);
 }

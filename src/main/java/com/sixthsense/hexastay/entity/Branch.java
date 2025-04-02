@@ -25,7 +25,7 @@ public class Branch  extends BaseEntity {
     private Long branchNum;                 //번호
 
     @Column(name = "branchName")
-    private String branchName;              //이름
+    private String branchName;              //이름(상호명)
 
     @Column(name = "branchPhone")
     private String branchPhone;             //전화번호
@@ -37,7 +37,10 @@ public class Branch  extends BaseEntity {
     private String branchAddress;           //주소
 
     @Column(name = "branchCeoName")
-    private String branchCeoName;           //대표명
+    private String branchCeoName;           //대표자명
+
+    @Column(name = "centerBusinessNum")
+    private String centerBusinessNum;       //사업자등록번호
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")

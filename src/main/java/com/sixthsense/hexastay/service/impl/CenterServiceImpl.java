@@ -28,7 +28,6 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public void centerInsert(CenterDTO centerDTO) {
-
         log.info("center Insert Service 진입");
 
         //center 등록
@@ -40,7 +39,6 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public Page<CenterDTO> centerList(Pageable pageable) {
-
         log.info("center List Service 진입");
 
         //center 목록
@@ -52,7 +50,6 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public CenterDTO centerRead(Long centerNum) {
-
         log.info("center Read Service 진입");
 
         //center 상세보기
@@ -64,7 +61,6 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public void centerModify(CenterDTO centerDTO) {
-
         log.info("center Modify Service 진입");
 
         //center 수정
