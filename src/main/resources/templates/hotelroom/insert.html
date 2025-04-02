@@ -4,7 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 
-
     <head>
         <meta charset="UTF-8">
         <!--부트 스트랩-->
@@ -24,14 +23,17 @@
     <!--호텔룸 배정정보 등록 페이지-->
     <body>
 
-
     <div class="container mt-4"><!--인서트 container 시작-->
-        <h3 class="mb-3">룸 배정 등록 페이지</h3>
-
+        <div class="row"><!--상단 제목 나중에 수정 들어 갈수 있음-->
+            <div class="col">
+                <h3 class="mb-3">룸 등록 페이지</h3>
+                    <h5><a th:href="@{/hotelroom/list}">룸리스트</a> </h5>
+            </div>
+        </div><!--상단 제목 나중에 수정 들어 갈수 있음-->
 
         <div class="row g-3"><!--상단 시작-->
-            <div class="col-md-6">
-                <div class="card p-3">
+            <div class="col-md-6" >
+                <div class="card p-3" style="background: #d2f5ea">
                     <label class="form-label">Brand브랜드명</label>
                     <select class="form-select">
                         <option>세령</option>
@@ -57,7 +59,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card p-3">
+                <div class="card p-3" style="background: #d2f5ea">
                     <label class="form-label">Facillity지점명</label>
                     <select class="form-select">
                         <option>지점 선택</option>
@@ -90,44 +92,45 @@
         </div><!--상단 페이지 종료-->
 
         <div class="text-center my-3"><!--중단 버튼 시작-->
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#idSearchModal">가입회원검색</button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#registerModal">HotelRoom회원등록</button>
             <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
                 검색사이드바
             </button>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#idSearchModal">아이디 검색</button>
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#registerModal">HotelRoom회원등록</button>
-            <button class="btn btn-secondary">엑셀 저장</button>
+            <button class="btn btn-warning">룸배정</button>
         </div><!--중단 버튼 종료-->
 
+        <!--멤버 등록 정보 보여주기-->
         <div class="table-responsive"><!--하단 게시판 페이지 시작-->
             <table class="table table-bordered text-center">
                 <thead class="table-dark">
                 <tr>
                     <th>Check</th>
                     <th>No</th>
-                    <th>가입경로</th>
-                    <th>이메일</th>
                     <th>이름</th>
+                    <th>이메일</th>
                     <th>연락처</th>
+                    <th>체크인</th>
+                    <th>체크아웃</th>
+                    <th>상태</th>
 
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
+                <tbody >
+                <tr id="memberTableBody" th:each="memberdata:${membersDTOs}">
                     <td><input type="checkbox"></td>
-                    <td>1</td>
-                    <td>야놀자</td>
-                    <td>112121@12112</td>
-                    <td>산세형</td>
-                    <td>010-0003-0004</td>
-
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>2</td>
-                    <td>네이버호텔</td>
-                    <td>3434@343.com</td>
-                    <td>상상나라</td>
-                    <td>010-5555-3333</td>
+                    <td th:text="${memberdata.memberNum}">NO</td>
+                    <td th:text="${memberdata.memberName}">이름</td>
+                    <td th:text="${memberdata.memberEmail}">이메일</td>
+                    <td th:text="${memberdata.memberPhone}">연락처</td>
+                    <td th:text="${#temporals.format(memberdata.checkInDate,'yyyy-MM-dd')}">체크인</td>
+                    <td th:text="${#temporals.format(memberdata.checkOutDate,'yyyy-MM-dd')}">체크아웃</td>
+                    <td>
+                        <form action="/member/delete" ><!--키워드 값 히든 으로 숨겨 놨음 -->
+                            <input type="hidden" name="memberNum" th:value="${memberdata.memberNum}">
+                            <button type="submit" class="btn btn-danger">삭제</button>
+                        </form>
+                    </td>
 
                 </tr>
                 </tbody>
@@ -143,24 +146,30 @@
                     <h5 class="modal-title" id="registerModalLabel">Room회원등록</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body"><!--호텔룸 이용 등록 modal form 태그-->
-                    <label class="form-label">이름</label>
-                    <input type="text" class="form-control" placeholder="브랜드명 입력">
-                    <label class="form-label">아이디(이메일)</label>
-                    <input type="email" class="form-control" placeholder="브랜드명 입력">
-                    <label class="form-label mt-2">전화번호</label>
-                    <input type="text" class="form-control" placeholder="지사명 입력">
-                    <label class="form-label mt-2">패스워드</label>
-                    <input type="text" class="form-control" placeholder="호명 입력">
-                    <label class="form-label mt-2">숙박 시작일</label>
-                    <input type="date" class="form-control">
-                    <label class="form-label mt-2">숙박 종료일</label>
-                    <input type="date" class="form-control">
-                </div>
+                <!--회원 등록 페이지-->
+                <form id="registerForm" action="/hotelroom/insert" method="post">
+                    <div class="modal-body"><!--호텔룸 이용 등록 modal form 태그-->
+                        <label class="form-label">이름</label>
+                        <input type="text" name="memberName" class="form-control" placeholder="브랜드명 입력">
+                        <label class="form-label">아이디(이메일)</label>
+                        <input type="email" name="memberEmail"  class="form-control" placeholder="브랜드명 입력">
+                        <label class="form-label mt-2">전화번호</label>
+                        <input type="text" name="memberPhone"  class="form-control" placeholder="지사명 입력">
+                        <label class="form-label mt-2">패스워드</label>
+                        <input type="text" name="memberPassword" class="form-control" placeholder="호명 입력">
+                        <label class="form-label mt-2">숙박 시작일</label>
+                        <input type="date" name="checkInDate" id="checkInDate" class="form-control" required>
+
+                        <label class="form-label mt-2">숙박 종료일</label>
+                        <input type="date" name="checkOutDate" id="checkOutDate" class="form-control" required>
+                    </div>
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <button type="button" class="btn btn-primary">저장</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
                 </div>
+                </form><!--회원 등록 페이지 종류 지점-->
             </div>
         </div>
     </div>
@@ -251,28 +260,49 @@
 
 
 
-
-
-    <!--아이디 검색 스트립트 부분-->
     <script>
-        function addUser(email) {
-            let table = document.getElementById("addedUsers");
-            let row = table.insertRow();
-            row.innerHTML = `
+        $(document).ready(function () {
+            $('#registerForm').submit(function (event) {
+                event.preventDefault();
+                let formData = $(this).serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/hotelroom/insert',
+                    data: formData,
+                    success: function (response) {
+                        location.reload(); // 성공적으로 저장된 후 페이지 새로고침
+                    },
+                    error: function () {
+                        alert('회원 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+
+            <!--아이디 검색 스트립트 부분-->
+            function addUser(email) {
+                let table = document.getElementById("addedUsers");
+                let row = table.insertRow();
+                row.innerHTML = `
                 <td>#</td>
                 <td>${email}</td>
                 <td>사용자 닉네임</td>
                 <td>010-1234-5678</td>
                 <td><button class="btn btn-danger" onclick="removeUser(this)">삭제</button></td>
             `;
-        }
+            }
 
-        function removeUser(button) {
-            let row = button.parentElement.parentElement;
-            row.remove();
-        }
+            function removeUser(button) {
+                let row = button.parentElement.parentElement;
+                row.remove();
+            }
+
+
+        });
+
+
+
     </script>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
