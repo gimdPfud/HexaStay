@@ -48,12 +48,10 @@
     <thead>
     <tr>
       <th>브랜드명</th>
-      <th>상호명</th>
-      <th>사업자등록번호</th>
-      <th>대표자명</th>
-      <th>전화번호</th>
-      <th>이메일</th>
-      <th>주소</th>
+      <th>본사명</th>
+      <th>지사명</th>
+      <th>지점명</th>
+
     </tr>
     </thead>
     <tbody>
@@ -67,7 +65,7 @@
       <td th:text="${centerDTOS.centerAddress}"></td>
 
       <td>
-        <a th:href="@{/center/modify/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">수정</a>
+        <a th:href="@{/center/modify/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">상세보기</a>
       </td>
 
     </tr>
