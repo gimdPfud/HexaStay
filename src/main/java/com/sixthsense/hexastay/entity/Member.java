@@ -12,6 +12,9 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -43,5 +46,11 @@ public class Member  extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "memberGender")
     private Gender memberGender;                        //성별
+
+    //멤버 체크인
+    private LocalDate checkInDate;
+
+    //멤버 체크아웃
+    private LocalDate checkOutDate;
 
 }

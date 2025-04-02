@@ -9,7 +9,9 @@ package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.constant.Gender;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -33,7 +35,19 @@ public class MemberDTO {
 
     private Gender memberGender;                        //성별
 
+
     private LocalDateTime createDate; //등록일자
 
+
     private LocalDateTime modifyDate; //수정일자
+
+    //멤버 체크인
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate checkInDate;
+
+    //멤버 체크아웃
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate checkOutDate;
+
+
 }
