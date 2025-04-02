@@ -13,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -88,5 +91,16 @@ public class CenterServiceImpl implements CenterService {
 
         log.info("삭제된 pk : " + centerNum);
 
+    }
+
+    //가입용
+    public List<CenterDTO> allCenterList(){
+        List<Center> centerList = centerRepository.findAll();
+        List<CenterDTO> centerDTOList = new ArrayList<>();
+        for (Center center : centerList) {
+            CenterDTO centerDTO = modelMapper.map(center, CenterDTO.class);
+            centerDTOList.add(centerDTO);
+        }
+        return centerDTOList;
     }
 }
