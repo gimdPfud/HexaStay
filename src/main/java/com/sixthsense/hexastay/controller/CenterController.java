@@ -61,8 +61,8 @@ public class CenterController {
         return "center/read";
     }
 
-    @GetMapping("/modify")
-    public String modifyCenterGet(Long centerNum, Model model) {
+    @GetMapping("/modify/{centerNum}")
+    public String modifyCenterGet(@PathVariable("centerNum") Long centerNum, Model model) {
         log.info("get 방식 center 수정 controller 진입");
 
         CenterDTO centerDTO = centerService.centerRead(centerNum);

@@ -93,14 +93,13 @@ public class CenterServiceImpl implements CenterService {
 
     }
 
-
-
     //가입용
     public List<CenterDTO> allCenterList(){
         List<Center> centerList = centerRepository.findAll();
         List<CenterDTO> centerDTOList = new ArrayList<>();
         for (Center center : centerList) {
             CenterDTO centerDTO = modelMapper.map(center, CenterDTO.class);
+            centerDTOList.add(centerDTO);
         }
         return centerDTOList;
     }
