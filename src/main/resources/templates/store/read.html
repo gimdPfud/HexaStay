@@ -36,10 +36,6 @@
                 <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
             </div>
             <div class="mb-3">
-                <label class="form-label">활성화 상태</label>
-                <input type="text" class="form-control" th:value="${data.storeStatus}" readonly>
-            </div>
-            <div class="mb-3">
                 <label class="form-label">등록일자</label>
                 <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
             </div>
@@ -48,8 +44,8 @@
                 <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
             </div>
             <div class="text-center mt-4">
-                <a th:href="@{/store/list}" class="btn btn-success">목록</a>
-                <a th:href="@{/store/modify/${data.storeNum}}" class="btn btn-primary">수정</a>
+                <a th:href="@{/store/list}" class="btn btn-dark">목록</a>
+                <a th:href="@{'/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
             </div>
         </div>
         <div class="col-md-2"></div>

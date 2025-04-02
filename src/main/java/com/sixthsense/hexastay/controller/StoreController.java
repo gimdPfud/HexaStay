@@ -48,11 +48,12 @@ public class StoreController {
 
     @GetMapping("/list")
     public String list(Pageable pageable, Model model){
-        Page<StoreDTO> storeDTOPage = storeService.list(pageable);
+        Page<StoreDTO> storeDTOPage = storeService.list("active", pageable);
         log.info("list : "+storeDTOPage);
         model.addAttribute("list",storeDTOPage);
         return "store/list";
     }
+
 
     @GetMapping("/read/{id}")
     public String read(@PathVariable Long id, Model model){
@@ -61,10 +62,22 @@ public class StoreController {
         return "store/read";
     }
 
+
     @GetMapping("/modify/{id}")
     public String modify(@PathVariable Long id, Model model){
         StoreDTO data = storeService.read(id);
         model.addAttribute("data",data);
         return "store/modify";
+    }
+    @PostMapping("/modify")
+    public String modify(StoreDTO storeDTO){
+        Long storeNum = storeService.modify(storeDTO);
+        return "redirect:/store/read/"+storeNum;
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Long id){
+        storeService.delete(id);
+        return "redirect:/store/list";
     }
 }
