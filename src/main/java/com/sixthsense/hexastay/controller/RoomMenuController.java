@@ -1,22 +1,21 @@
 package com.sixthsense.hexastay.controller;
-import com.sixthsense.hexastay.dto.RoomMenuDTO;
-import com.sixthsense.hexastay.service.RoomMenuService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /* 클래스명 : RoomMenuController
  * 기능 : 룸서비스(메뉴)와 관련된 컨트롤러
  * 작성자 : 홍길동
  * 작성일 : 2025-04-01
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
+
+import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.service.RoomMenuService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -64,30 +63,82 @@ public class RoomMenuController {
     }
 
     @GetMapping("/roommenu/list")
-    public Page<RoomMenuDTO> getRoomMenuList(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public String RoomMenuList(Model model, Pageable pageable) {
         log.info("리스트 컨트롤러 진입");
 
-        Pageable pageable = PageRequest.of(page, size);
-        return roomMenuService.RoomMenuList(pageable);
+        Page<RoomMenuDTO> roomMenuDTOPage =
+                roomMenuService.RoomMenuList(pageable);
+
+        model.addAttribute("list", roomMenuDTOPage);
+
+        return "roommenu/list";
     }
 
     @GetMapping("/roommenu/read")
-    public String roomMenuRead(Integer num, Model model){
+    public String roomMenuRead(Long num, Model model) {
         log.info("상세보기 컨트롤러 진입" + num);
 
         RoomMenuDTO roomMenuDTO = roomMenuService.read(num);
 
         model.addAttribute("roomMenuDTO", roomMenuDTO);
-        log.info("모델로 받은 dto" + roomMenuDTO );
+        log.info("모델로 받은 dto" + roomMenuDTO);
 
         return "roommenu/read";
 
+    }
 
+    @GetMapping("/roommenu/modify")
+    public String roomMenuModifyGet(Long num, Model model, RoomMenuDTO roomMenuDTO) {
+        log.info("Get 수정 컨트롤러 진입" + num);
 
+        try {
+
+            RoomMenuDTO menuDTO = roomMenuService.read(num);
+
+            if (menuDTO != null){
+                model.addAttribute("menuDTO", menuDTO);
+            }else{
+                log.info("해당 메뉴가 없습니다.");
+                return "redirect:/roommenu/list";
+            }
+
+        } catch (Exception e) {
+
+            log.info("업데이트 GET 컨트롤러 실패");
+            return "redirect:/roommenu/list";
+
+        }
+        return "roommenu/modify";
+    }
+
+    @PostMapping("/roommenu/modify")
+    public String roomMenuModifyPost(Long num, RoomMenuDTO roomMenuDTO) {
+
+        try {
+            log.info("Post 수정 컨트롤러 진입: " + roomMenuDTO.getRoomMenuNum());
+
+            roomMenuService.modify(roomMenuDTO);
+
+        } catch (Exception e) {
+
+            log.info("업데이트 POST 컨트롤러 실패");
+            return "redirect:/roommenu/list";
+
+        }
+
+        return "redirect:/roommenu/read?num=" + roomMenuDTO.getRoomMenuNum();
+    }
+
+    @PostMapping("/roommenu/delete")
+    public String roomMenuDelete(Long num){
+        log.info("삭제 컨트롤러 진입" + num);
+
+        roomMenuService.delete(num);
+
+        return "redirect:/roommenu/list";
 
     }
+
 
     @GetMapping("/roommenu/orderpage")
     public String orderpage(){

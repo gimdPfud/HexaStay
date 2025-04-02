@@ -48,20 +48,22 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         Page<RoomMenu> roomMenus = roomMenuRepository.findAll(pageable);
 
         roomMenus.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+
         log.info("변환된 DTO" + roomMenus);
 
         return roomMenus.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
 
 
 
+
     }
 
     @Override
-    public RoomMenuDTO read(Integer num) {
+    public RoomMenuDTO read(Long num) {
         log.info("상세보기 페이지 서비스 진입" + num);
 
         Optional<RoomMenu> optionalRoomMenu =
-                roomMenuRepository.findById(num.longValue());
+                roomMenuRepository.findById(num);
         // inter를 long으로 형 변환
 
         RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
@@ -75,7 +77,31 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
     @Override
     public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO) {
-        return null;
+        log.info("업데이트 서비스 진입: " + roomMenuDTO);
+
+        try {
+            RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
+
+            roomMenu = roomMenuRepository.save(roomMenu);
+
+            RoomMenuDTO updatedMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
+
+            return updatedMenuDTO;
+
+        } catch (Exception e) {
+            log.error("데이터 수정에 실패함: " + e.getMessage(), e);  //
+            throw new RuntimeException("데이터 수정에 실패했습니다.", e);
+        }
+    }
+
+    @Override
+    public void delete(Long num) {
+
+        log.info("삭제 서비스 진입" + num);
+        roomMenuRepository.deleteById(num);
+
+        log.info("삭제완료 db를 확인하세요.");
+
     }
 
 }

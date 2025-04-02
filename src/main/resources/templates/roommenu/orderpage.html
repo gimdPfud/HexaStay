@@ -41,15 +41,18 @@
     <div class="header">
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
         <div>주문</div>
-        <div class="cart-icon">🛒</div>
+        <a href="/roommenu/cart" class="cart-icon">🛒</a>
     </div>
     <div id="search-container" class="search-container">
-        <div class="search-box"><input type="text" placeholder="음식을 검색하세요..."></div>
-        <div class="category-tabs">
-            <div class="category-tab">한식</div>
-            <div class="category-tab">양식</div>
-            <div class="category-tab">중식</div>
-            <div class="category-tab">에피타이저</div>
+        <div class="search-box">
+            <input type="text" placeholder="음식을 검색하세요..." style="width: 300px; padding: 8px; display: inline;">
+            <button type="button" class="search-btn" style="padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; display: inline;">검색</button>
+        </div>
+        <div class="category-tabs mt-3">
+            <div class="category-tab">김치찌개</div>
+            <div class="category-tab">파스타</div>
+            <div class="category-tab">초밥</div>
+            <div class="category-tab">피자</div>
         </div>
     </div>
     <div class="tabs">
@@ -103,22 +106,4 @@
     </ul>
 </div>
 </body>
-
-<script>
-    /****************************
-     기능 : 자바스크립트로 한식, 중식, 양식을 클릭했을 때 ative 변경
-
-         ************************/
-    const tabs = document.querySelectorAll('.tab');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // 기존 active 클래스를 제거
-            tabs.forEach(tab => tab.classList.remove('active'));
-
-            // 클릭한 탭에 active 클래스를 추가
-            this.classList.add('active');
-        });
-    });
-</script>
 </html>
