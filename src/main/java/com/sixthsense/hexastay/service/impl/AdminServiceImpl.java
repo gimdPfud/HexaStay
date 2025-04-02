@@ -1,17 +1,11 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.BranchDTO;
-import com.sixthsense.hexastay.dto.CenterDTO;
-import com.sixthsense.hexastay.dto.FacilityDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;
 import com.sixthsense.hexastay.entity.Facility;
-import com.sixthsense.hexastay.repository.AdminRepository;
-import com.sixthsense.hexastay.repository.BranchRepository;
-import com.sixthsense.hexastay.repository.CenterRepository;
-import com.sixthsense.hexastay.repository.FacilityRepository;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.AdminService;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +25,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final CenterRepository centerRepository;
     private final BranchRepository branchRepository;
+    private final StoreRepository storeRepository;
     private final FacilityRepository facilityRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -50,7 +45,7 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
-    public List<BranchDTO> getBranchList(String CenterName) {
+    public List<BranchDTO> getBranchList(String centerName) {
 
         List<BranchDTO> branchDTOList = new ArrayList<>();
         List<Branch> branchList = branchRepository.findByCenter_CenterName(centerName);
@@ -60,13 +55,25 @@ public class AdminServiceImpl implements AdminService {
         return branchDTOList;
     }
 
-    public List<FacilityDTO> getFacilityList(String CenterName) {
+    public List<FacilityDTO> getFacilityList(String centerName) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
         List<Facility> facilityList = facilityRepository.findByCenter_CenterName(centerName);
         for (Facility facility : facilityList) {
             facilityDTOList.add(modelMapper.map(facility, FacilityDTO.class));
         }
         return facilityDTOList;
+    }
 
+    public List<StoreDTO> getStoreList(String branchName, String facilityName) {
+
+        List<StoreDTO> storeDTOList = new ArrayList<>();
+        if (branchName != null) {
+            storeRepository.findBy_(branchName);
+        } else {
+            facilityRepository.findByFacilityName(facilityName);
+            return
+        }
+
+        return null;
     }
 }

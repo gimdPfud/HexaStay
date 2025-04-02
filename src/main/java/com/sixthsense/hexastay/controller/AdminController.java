@@ -1,7 +1,6 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -57,14 +57,23 @@ public class AdminController {
     }
 
     @GetMapping("/searchbranch")
-    public String insertbranch(@RequestParam Long centerName) {
-        adminService.getBranchList(centerName);
-        return "admin/insertcompany";
+    @ResponseBody
+    public List<BranchDTO> insertbranch(@RequestParam String centerName) {
+        log.info("헤헤"+centerName);
+        return adminService.getBranchList(centerName);
     }
 
     @GetMapping("/searchfacility")
-    public String insertfacility(@RequestParam Long branchName) {
-        adminService.getFacilityList(branchName);
-        return "admin/insertcompany";
+    @ResponseBody
+    public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
+        log.info("헤헤"+centerName);
+        return adminService.getFacilityList(centerName);
     }
+
+    @GetMapping("/searchstore")
+    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
+        if (branchName != null) {
+            return adminService.getBranch(branchName);
+    }
+
 }
