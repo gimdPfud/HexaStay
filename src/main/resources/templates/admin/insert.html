@@ -64,7 +64,7 @@
                 <input type="text" id="phonePartTwo" class="form-control" style="width:30%"> -
                 <input type="text" id="phonePartThree" class="form-control" style="width:30%">
 
-                <input hidden name="adminPhone" id="phonePartFour" class="form-control" style="width:30%"
+                <input hidden name="adminPhone" id="phonePartFour" class="form-control" style="width:30%">
             </div>
 
             <div class="mb-2">
@@ -93,6 +93,7 @@
                             <option></option>
                         </select>
                     </div>
+                    <input hidden name="adminBrand" id="adminBrand" value="">
                 </div>
             </div>
 
@@ -118,16 +119,15 @@
 
         // 소속 선택 시 다른 선택 박스 활성화/비활성화
         adminChoice.addEventListener("change", function () {
-            let choiceValue = adminChoice.value;
             adminBranchFacility.innerHTML = "<option value=''></option>";
 
-            if (choiceValue === "본사") {
+            if (adminChoice.value === "본사") {
                 adminBranchFacility.disabled = true;
                 adminStore.disabled = true;
-            } else if (choiceValue === "지사" || choiceValue === "지점") {
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
                 adminBranchFacility.disabled = false;
                 adminStore.disabled = true;
-            } else if (choiceValue === "스토어") {
+            } else if (adminChoice.value === "스토어") {
                 adminBranchFacility.disabled = false;
                 adminStore.disabled = false;
             }
@@ -155,7 +155,7 @@
 
                         adminBranchFacility.disabled = false;
                     })
-                    .catch(error => console.error("지사 데이터 불러오기 오류:", error));
+                    .catch(error => console.error("지사 데이터 불러오기 실패:", error));
 
             } else if (choiceValue === "지점") {
                 fetch(`/searchfacility?centerName=${adminCenterValue}`)
@@ -172,9 +172,80 @@
 
                         adminBranchFacility.disabled = false;
                     })
-                    .catch(error => console.error("지점 데이터 불러오기 오류:", error));
+                    .catch(error => console.error("지점 데이터 불러오기 실패:", error));
+            } else {
+                fetch(`/searchbranchfacility?centerName=${adminCenterValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                    data.forEach(item => {
+                        let branchOption = document.createElement("option");
+                        branchOption.value = item.branchNum;
+                        branchOption.textContent = "[브랜치] " + item.branchName;
+                        document.querySelector("select").appendChild(branchOption);
+
+                        let facilityOption = document.createElement("option");
+                        facilityOption.value = item.facilityNum;
+                        facilityOption.textContent = "[시설] " + item.facilityName;
+                        document.querySelector("select").appendChild(facilityOption);
+                    });
+                })
             }
         });
+
+
+        adminBranchFacility.addEventListener("change", function () {
+            let choiceValue = adminChoice.value;
+            let branchfacilityValue = adminBranchFacility.value;
+
+            if (choiceValue === "지사") {
+                fetch(`/searchstore?branchName=${branchfacilityValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminStore.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.storeName;
+                            option.textContent = item.storeNum;
+                            adminStore.appendChild(option);
+                        });
+
+                        adminStore.disabled = false;
+                    })
+                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+
+            } else if (choiceValue === "지점") {
+                fetch(`/searchfacility?facilityName=${branchfacilityValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminStore.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.storeName;
+                            option.textContent = item.storeNum;
+                            adminStore.appendChild(option);
+                        });
+
+                        adminStore.disabled = false;
+                    })
+                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+            }
+        });
+
+
+        function submitForm() {
+            if (adminChoice.value === "본사") {
+                document.getElementById("adminBrand").value = adminCenter.value;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                document.getElementById("adminBrand").value = adminBranchFacility.value;
+            } else if (adminChoice.value === "스토어") {
+                document.getElementById("adminBrand").value = adminStore.value;
+            }
+
+        }
 
 
     </script>
