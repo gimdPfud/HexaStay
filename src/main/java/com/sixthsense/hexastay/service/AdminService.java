@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
@@ -10,6 +11,8 @@ public interface AdminService {
 
 
 
+    // 어드민 등록
+    void insertAdmin(AdminDTO adminDTO);
 
     // 회원가입떄 쓸 로직
     List<CenterDTO> getCenterList (String CenterName);

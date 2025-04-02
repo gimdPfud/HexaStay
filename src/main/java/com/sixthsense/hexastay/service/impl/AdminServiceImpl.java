@@ -1,8 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;
 import com.sixthsense.hexastay.entity.Facility;
@@ -42,6 +44,12 @@ public class AdminServiceImpl implements AdminService {
         return centerDTOList;
     }
 
+    // 회원 등록
+    public void insertAdmin(AdminDTO adminDTO) {
+        Admin admin = modelMapper.map(adminDTO, Admin.class);
+        adminRepository.save(admin);
+    }
+
     public List<BranchDTO> getBranchList(Long centerNum) {
         List<BranchDTO> branchDTOList = new ArrayList<>();
         List<Branch> branchList = branchRepository.findByBranch_CenterNum(centerNum);
@@ -51,9 +59,9 @@ public class AdminServiceImpl implements AdminService {
         return branchDTOList;
     }
 
-    public List<FacilityDTO> getFacilityList(Long branchNum) {
+    public List<FacilityDTO> getFacilityList(Long centerNum) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
-        List<Facility> facilityList = facilityRepository.findByFacility_BranchNum(branchNum);
+        List<Facility> facilityList = facilityRepository.findByFacility_CenterNum(centerNum);
         for (Facility facility : facilityList) {
             facilityDTOList.add(modelMapper.map(facility, FacilityDTO.class));
         }
