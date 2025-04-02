@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 public class MemberDTO {
     private Long memberNum;                             //번호
 
+    private String memberName;                          //이름
+
     private String memberPassword;                      //비밀번호
 
     private String memberPhone;                         //전화번호

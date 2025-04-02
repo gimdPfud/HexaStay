@@ -25,6 +25,9 @@ public class Member  extends BaseEntity {
     @Column(name = "memberNum")
     private Long memberNum;                             //번호
 
+    @Column(name = "memberName")
+    private String memberName;                          //이름
+
     @Column(name = "memberPassword")
     private String memberPassword;                      //비밀번호
 
