@@ -2,58 +2,90 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>룸서비스 메뉴 판매 상세보기</title>
+    <title>룸서비스 메뉴 상세보기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .card-body {
+            font-size: 1.1rem;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+        }
+        .btn-back {
+            margin-top: 20px;
+        }
+        .card-img-top {
+            max-height: 300px;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1 class="mt-4">룸서비스 메뉴 판매 상세보기</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">룸서비스 메뉴 상세보기</h1>
 
-    <!-- 메뉴 등록/수정 폼 -->
-    <form action="/roommenu/insert" method="post">
-        <div class="mb-3">
-            <label for="roomMenuName" class="form-label">메뉴 이름</label>
-            <input type="text" class="form-control" id="roomMenuName" name="roomMenuName" required>
+    <!-- 상세보기 카드 -->
+    <div class="card">
+
+        <div class="card-header">
+            <h4 th:text="${roomMenuDTO.roomMenuName}">메뉴 이름</h4>
         </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <dt class="col-sm-3">상품 번호</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuNum}">상품 번호</dd>
 
-        <div class="mb-3">
-            <label for="roomMenuPrice" class="form-label">메뉴 가격</label>
-            <input type="number" class="form-control" id="roomMenuPrice" name="roomMenuPrice" required>
+                    <dt class="col-sm-3">상품 이름</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품 이름</dd>
+
+                    <dt class="col-sm-3">상품 가격</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuPrice}">상품 가격</dd>
+
+                    <dt class="col-sm-3">상품 수량</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuAmount}">상품 수량</dd>
+
+                </div>
+                <div class="col-4">
+                    <dt class="col-sm-3">카테고리</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuCategory}">카테고리</dd>
+
+                    <dt class="col-sm-3">상태</dt>
+                    <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuStatus}">상태</dd>
+
+                    <dt class="col-sm-3">등록일자</dt>
+                    <dd class="col-sm-9" th:text="${#temporals.format(roomMenuDTO.createDate, 'yyyy-MM-dd HH:mm:ss')}">등록일자</dd>
+
+                    <dt class="col-sm-3">수정일자</dt>
+                    <dd class="col-sm-9" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}">등록일자</dd>
+                </div>
+                <div class="col-4">
+                    <div class="card" style="width: 18rem; border: 2px solid #ccc;">
+                        <img src="#" th:src="@{/image/사탕.png}" class="card-img-top" alt="상품 이미지"> <!-- static/image/샘플이미지.png 경로 -->
+                        <div class="card-body">
+                            <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</dd>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer mt-3" >
+                <!-- 수정 및 삭제 버튼 -->
+                <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary">수정</a>
+                <form action="/roommenu/delete" method="post" style="display:inline;">
+                    <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
+                    <button type="submit" class="btn btn-danger">삭제</button>
+                </form>
+            </div>
+
+
+
+            <!-- 뒤로 가기 버튼 -->
+            <a href="/roommenu/list" class="btn btn-secondary btn-back">목록으로 돌아가기</a>
         </div>
-
-        <div class="mb-3">
-            <label for="roomMenuAmount" class="form-label">메뉴 수량</label>
-            <input type="number" class="form-control" id="roomMenuAmount" name="roomMenuAmount" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="roomMenuContent" class="form-label">메뉴 설명</label>
-            <textarea class="form-control" id="roomMenuContent" name="roomMenuContent" rows="3" required></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="roomMenuCategory" class="form-label">메뉴 카테고리</label>
-            <select class="form-select" id="roomMenuCategory" name="roomMenuCategory">
-                <option value="" disabled selected>카테고리 선택</option> <!-- 기본값을 빈 값으로 설정 -->
-                <option value="한식">한식</option>
-                <option value="양식">양식</option>
-                <option value="중식">중식</option>
-                <option value="에피타이저">에피타이저</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="roomMenuStatus" class="form-label">메뉴 판매 상태</label>
-            <select class="form-select" id="roomMenuStatus" name="roomMenuStatus">
-                <option value="판매중">판매중</option>
-                <option value="품절">품절</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">등록</button>
-    </form>
+    </div>
 </div>
 </body>
 </html>
