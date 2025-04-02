@@ -111,69 +111,61 @@
     </form>
 
     <script>
-        let center = document.getElementById('adminCenter');
-        let branchfacility = document.getElementById('adminBranchFacility');
-        let store = document.getElementById('adminStore');
-        let choice = document.getElementById('adminChoice').value;
+        document.addEventListener("DOMContentLoaded", function () {
+            const adminChoice = document.getElementById("adminChoice");
+            const adminCenter = document.getElementById("adminCenter");
+            const adminBranchFacility = document.getElementById("adminBranchFacility");
+            const adminStore = document.getElementById("adminStore");
 
-        // 셀렉트 박스 조작
-        document.getElementById('adminChoice').addEventListener('change', function () {
-            let choice = this.value;
+            // 직책 선택에 따라 입력 활성화/비활성화
+            adminChoice.addEventListener("change", function () {
+                let choice = adminChoice.value;
 
-            // 모든 선택창 초기화
-            branchfacility.value = "";
-            store.value = "";
+                resetSelectOptions(adminBranchFacility);
+                resetSelectOptions(adminStore);
 
-            if (choice === "본사") {
-                center.disabled = false;
-            } else if (choice === "지사") {
-                center.disabled = false;
-                branchfacility.disabled = false;
-            } else if (choice === "지점") {
-                center.disabled = false;
-                branchfacility.disabled = false;
-            } else if (choice === "스토어") {
-                center.disabled = false;
-                branchfacility.disabled = false;
-                store.disabled = false;
+                adminCenter.disabled = false; // 센터는 항상 선택 가능
+                adminBranchFacility.disabled = choice === "본사"; // 본사면 지사 선택 불가
+                adminStore.disabled = choice !== "스토어"; // 스토어일 때만 지점 선택 가능
+            });
+
+            // 센터 선택 시 지사 목록 불러오기
+            adminCenter.addEventListener("change", function () {
+                if (!adminBranchFacility.disabled) {
+                    fetchData(`/searchbranch?centerName=${adminCenter.value}`, adminBranchFacility);
+                }
+            });
+
+            // 지사 또는 지점 선택 시 맞는 URL로 데이터 요청
+            adminBranchFacility.addEventListener("change", function () {
+                if (!adminStore.disabled) {
+                    let url = adminChoice.value === "지사"
+                        ? `/searchbranch?centerName=${adminBranchFacility.value}`
+                        : `/searchfacility?centerName=${adminBranchFacility.value}`;
+                    fetchData(url, adminStore);
+                }
+            });
+
+            function fetchData(url, targetSelect) {
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        resetSelectOptions(targetSelect);
+                        data.forEach(item => {
+                            let option = new Option(item.centerName, item.centerNum);
+                            targetSelect.appendChild(option);
+                        });
+                        targetSelect.disabled = false;
+                    })
+                    .catch(error => console.error("데이터 로드 실패:", error));
+            }
+
+            function resetSelectOptions(selectElement) {
+                selectElement.innerHTML = '<option value="">선택</option>';
+                selectElement.disabled = true;
             }
         });
 
-        // 가입버튼 관련
-        function submitForm() {
-            // 주민번호 합체
-            document.getElementById('adminResidentNum').value = document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById('adminResidentNumPartTwo').value;
-            // 폰번호 합체
-            document.getElementById('adminPhone').value = document.getElementById('phonePartOne').value + "-" + document.getElementById('phonePartTwo').value + "-" + document.getElementById('phonePartThree').value;
-
-            // 다른 벨류 차단
-
-            if (choice === "지사") {
-                center.disabled = true;
-            } else if (choice === "지점") {
-                center.disabled = true;
-            } else if (choice === "스토어") {
-                center.disabled = true;
-                branchfacility.disabled = true;
-            }
-        }
-
-        document.getElementById('adminBranchFacility').addEventListener('change', function () {
-            if (branchfacility.value === "지사") {
-                fetch('/searchbranch?centerName=' + branchfacility.value, {
-                })
-            } else if (branchfacility.value === "지점") {
-                fetch('/searchfacility?centerName=' + branchfacility.value, {
-                })
-            } else if (branchfacility.value === "스토어" && choice.value === "지점" ) {
-                fetch('/searchstorebranch?centerName=' + branchfacility.value, {
-                })
-            } else if (branchfacility.value === "스토어" && choice.value === "지사") {
-                fetch('/searchstorefacility?centerName=' + branchfacility.value, {
-                })
-            }
-
-        })
 
 
 

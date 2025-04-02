@@ -46,14 +46,29 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<BranchDTO> getBranchList(String centerName) {
-
         List<BranchDTO> branchDTOList = new ArrayList<>();
         List<Branch> branchList = branchRepository.findByCenter_CenterName(centerName);
         for (Branch branch : branchList) {
-            branchDTOList.add(modelMapper.map(branch, BranchDTO.class));
+        BranchDTO branchDTO = new BranchDTO();
+        branchDTO.setBranchAddress(branch.getBranchAddress());
+        branchDTO.setBranchName(branch.getBranchName());
+        branchDTO.setBranchEmail(branch.getBranchEmail());
+        branchDTO.setBranchNum(branch.getBranchNum());
+        branchDTO.setBranchPhone(branch.getBranchPhone());
+        branchDTO.setBranchCeoName(branch.getBranchCeoName());
+        branchDTO.setCenterBusinessNum(branch.getCenterBusinessNum());
+        branchDTO.setCreateDate(branch.getCreateDate());
+        branchDTO.setModifyDate(branch.getModifyDate());
+        branchDTO.setCenterNum(branch.getCenter().getCenterNum());
+        branchDTO.setCenterName(branch.getCenter().getCenterName());
+
+        branchDTOList.add(branchDTO);
+
+
         }
         return branchDTOList;
     }
+
 
     public List<FacilityDTO> getFacilityList(String centerName) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
