@@ -24,6 +24,14 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     private final RoomMenuRepository roomMenuRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
+
+    /**************************************************
+     * 룸서비스 메뉴 등록
+     * 기능 : 룸서비스 메뉴를 등록하는 서비스
+     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하여 DB에 저장하고,
+     *        다시 DTO로 변환하여 클라이언트에게 반환
+     **************************************************/
+
     @Override
     public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) {
         log.info("룸서비스 아이템 등록 서비스 진입" + roomMenuDTO);
@@ -40,6 +48,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         return roomMenuDTO;
 
     }
+
+    /**************************************************
+     * 룸서비스 메뉴 리스트 조회
+     * 기능 : 룸서비스 메뉴의 목록을 페이지네이션 처리하여 반환
+     * 설명 : Pageable을 사용하여 페이지 단위로 메뉴 리스트를 조회하고,
+     *        해당 리스트를 DTO로 변환하여 반환
+     **************************************************/
 
     @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable) {
@@ -58,6 +73,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
     }
 
+    /**************************************************
+     * 룸서비스 메뉴 상세 보기
+     * 기능 : 특정 메뉴의 상세 정보를 조회
+     * 설명 : 메뉴 번호를 이용해 DB에서 해당 메뉴를 조회하고,
+     *        이를 DTO로 변환하여 반환
+     **************************************************/
+
     @Override
     public RoomMenuDTO read(Long num) {
         log.info("상세보기 페이지 서비스 진입" + num);
@@ -74,6 +96,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
 
     }
+
+    /**************************************************
+     * 룸서비스 메뉴 수정
+     * 기능 : 룸서비스 메뉴 정보를 수정
+     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하고, 해당 메뉴를 수정한 후,
+     *        수정된 엔티티를 다시 DTO로 변환하여 반환
+     **************************************************/
 
     @Override
     public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO) {
@@ -93,6 +122,12 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             throw new RuntimeException("데이터 수정에 실패했습니다.", e);
         }
     }
+
+    /**************************************************
+     * 룸서비스 메뉴 삭제
+     * 기능 : 특정 메뉴를 삭제하는 서비스
+     * 설명 : 메뉴 번호로 해당 메뉴를 찾아 삭제
+     **************************************************/
 
     @Override
     public void delete(Long num) {

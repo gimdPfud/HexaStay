@@ -56,10 +56,10 @@
                     <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuStatus}">상태</dd>
 
                     <dt class="col-sm-3">등록일자</dt>
-                    <dd class="col-sm-9" th:text="${roomMenuDTO.createDate}">등록일자</dd>
+                    <dd class="col-sm-9" th:text="${#temporals.format(roomMenuDTO.createDate, 'yyyy-MM-dd HH:mm:ss')}">등록일자</dd>
 
                     <dt class="col-sm-3">수정일자</dt>
-                    <dd class="col-sm-9" th:text="${roomMenuDTO.modifyDate}">수정일자</dd>
+                    <dd class="col-sm-9" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}">등록일자</dd>
                 </div>
                 <div class="col-4">
                     <div class="card" style="width: 18rem; border: 2px solid #ccc;">
@@ -73,7 +73,7 @@
             </div>
             <div class="card-footer mt-3" >
                 <!-- 수정 및 삭제 버튼 -->
-                <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-warning">수정</a>
+                <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary">수정</a>
                 <form action="/roommenu/delete" method="post" style="display:inline;">
                     <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
                     <button type="submit" class="btn btn-danger">삭제</button>

@@ -59,20 +59,18 @@
                         <div class="mb-3">
                             <label for="roomMenuCategory" class="form-label">카테고리</label>
                             <select id="roomMenuCategory" name="roomMenuCategory" class="form-control">
-                                <option th:value="${roomMenuDTO.roomMenuCategory}" th:text="${roomMenuDTO.roomMenuCategory}" selected>카테고리</option>
-                                <option value="한식">한식</option>
-                                <option value="양식">양식</option>
-                                <option value="중식">중식</option>
-                                <option value="에피타이저">에피타이저</option>
+                                <option th:value="한식" th:text="한식" th:selected="${menuDTO.roomMenuCategory == '한식'}">한식</option>
+                                <option th:value="양식" th:text="양식" th:selected="${menuDTO.roomMenuCategory == '양식'}">양식</option>
+                                <option th:value="중식" th:text="중식" th:selected="${menuDTO.roomMenuCategory == '중식'}">중식</option>
+                                <option th:value="에피타이저" th:text="에피타이저" th:selected="${menuDTO.roomMenuCategory == '에피타이저'}">에피타이저</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="roomMenuStatus" class="form-label">상태</label>
                             <select id="roomMenuStatus" name="roomMenuStatus" class="form-control">
-                                <option th:value="${roomMenuDTO.roomMenuStatus}" th:text="${roomMenuDTO.roomMenuStatus}" selected>현재 상태</option>
-                                <option value="판매중">판매중</option>
-                                <option value="품절">품절</option>
+                                <option th:value="판매중" th:text="판매중" th:selected="${menuDTO.roomMenuStatus == '판매중'}">판매중</option>
+                                <option th:value="품절" th:text="품절" th:selected="${menuDTO.roomMenuStatus == '품절'}">품절</option>
                             </select>
                         </div>
 
