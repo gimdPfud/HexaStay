@@ -32,18 +32,15 @@
             <label class="form-label">사업자등록번호</label>
             <div class="row g-2">
                 <div class="col">
-                    <input type="text" id="centerBusinessNumOne" class="form-control" readonly style="background: #cccccc"
-                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 0, 3)}">
+                    <input type="text" id="centerBusinessNumOne" class="form-control" readonly style="background: #cccccc">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumTwo" class="form-control" readonly style="background: #cccccc"
-                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 4, 6)}">
+                    <input type="text" id="centerBusinessNumTwo" class="form-control" readonly style="background: #cccccc">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumThree" class="form-control" readonly style="background: #cccccc"
-                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 7, 12)}">
+                    <input type="text" id="centerBusinessNumThree" class="form-control" readonly style="background: #cccccc">
                 </div>
                 <input hidden type="text" id="centerBusinessNum" name="centerBusinessNum" th:value="${centerDTO.centerBusinessNum}">
             </div>
@@ -55,8 +52,8 @@
         <div class="mb-2">
             <label class="form-label">전화번호</label>
             <div class="row g-2">
-                <div class="col-4">
-                    <select id="centerPhoneone" class="form-select" th:value="${#strings.substring(centerDTO.centerPhone, 0, centerDTO.centerPhone.indexOf('-'))}">
+                <div class="col">
+                    <select id="centerPhoneone" class="form-select">
                         <option>02</option>
                         <option>031</option>
                         <option>032</option>
@@ -64,19 +61,16 @@
                     </select>
                 </div>
                 <div class="col-auto">-</div>
-                <div class="col-3">
-                    <input type="text" id="centerPhonetwo" class="form-control"
-                           th:value="${#strings.substring(centerDTO.centerPhone, centerDTO.centerPhone.indexOf('-') + 1, centerDTO.centerPhone.lastIndexOf('-'))}">
+                <div class="col">
+                    <input type="text" id="centerPhonetwo" class="form-control">
                 </div>
                 <div class="col-auto">-</div>
-                <div class="col-4">
-                    <input type="text" id="centerPhonethree" class="form-control"
-                           th:value="${#strings.substring(centerDTO.centerPhone, centerDTO.centerPhone.lastIndexOf('-') + 1)}">
+                <div class="col">
+                    <input type="text" id="centerPhonethree" class="form-control">
                 </div>
                 <input hidden name="centerPhone" id="centerPhone" th:value="${centerDTO.centerPhone}">
             </div>
         </div>
-
         <div class="mb-2">
             <label class="form-label">이메일</label>
             <input type="email" name="centerEmail" id="email" class="form-control" th:value="${centerDTO.centerEmail}">
@@ -101,6 +95,33 @@
 
         // 사업자번호 표기용
         let centerBusinessNum = document.getElementById("centerBusinessNum").value;
+
+        // "-" 기준으로 나누기
+        let BusinessParts = centerBusinessNum.split("-");
+
+        // 변수에 각각 저장
+        document.getElementById("centerBusinessNumOne").value = BusinessParts[0];  // 첫 번째 3자리 숫자
+        document.getElementById("centerBusinessNumTwo").value = BusinessParts[1];  // 두 번째 2자리 숫자
+        document.getElementById("centerBusinessNumThree").value = BusinessParts[2]; // 세 번째 5자리 숫자
+
+
+        // 사업자번호 표기용
+        let centerPhoneNum = document.getElementById("centerPhone").value;
+
+        // "-" 기준으로 나누기
+        let PhoneParts = centerPhoneNum.split("-");
+
+        let selectBox = document.getElementById("centerPhoneone");
+        let phoneValue = PhoneParts[0];
+
+
+        document.getElementById("centerPhoneone").value = PhoneParts[0];  // 1번째
+        document.getElementById("centerPhonetwo").value = PhoneParts[1];  // 2번째
+        document.getElementById("centerPhonethree").value = PhoneParts[2]; // 3번째
+
+
+
+
 
     </script>
 

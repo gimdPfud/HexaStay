@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -65,7 +66,13 @@ public class CenterController {
     public String modifyCenterGet(@PathVariable("centerNum") Long centerNum, Model model) {
         log.info("get 방식 center 수정 controller 진입");
 
+        if(centerNum == null){
+            log.info("centerNum을 찾을 수 없음");
+            return "redirect:/center/list";
+        }
+
         CenterDTO centerDTO = centerService.centerRead(centerNum);
+
         model.addAttribute("centerDTO", centerDTO);
 
         return "center/modify";
