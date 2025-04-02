@@ -68,9 +68,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
         return roomMenus.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
 
-
-
-
     }
 
     /**************************************************
@@ -92,8 +89,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         log.info("변환된 dto read service의 값" + menuDTO);
 
         return menuDTO;
-
-
 
     }
 

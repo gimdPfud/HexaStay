@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,34 +25,24 @@
         .price { font-weight: bold; }
         .rating { color: #ff9800; }
     </style>
-    <script>
-        function toggleSearch() {
-            var searchContainer = document.getElementById("search-container");
-            if (searchContainer.style.display === "none" || searchContainer.style.display === "") {
-                searchContainer.style.display = "block";
-            } else {
-                searchContainer.style.display = "none";
-            }
-        }
-    </script>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
         <div>주문</div>
-        <a href="/roommenu/cart" class="cart-icon">🛒</a>
+        <div class="cart-icon" th:href="@{/roommenu/testorder}" >🛒</div>
     </div>
     <div id="search-container" class="search-container">
         <div class="search-box">
-            <input type="text" placeholder="음식을 검색하세요..." style="width: 300px; padding: 8px; display: inline;">
-            <button type="button" class="search-btn" style="padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; display: inline;">검색</button>
+            <input type="text" placeholder="음식을 검색하세요..." style="width: 300px; padding: 5px;">
+            <button type="button" style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">검색</button>
         </div>
-        <div class="category-tabs mt-3">
+        <div class="category-tabs">
             <div class="category-tab">김치찌개</div>
-            <div class="category-tab">파스타</div>
-            <div class="category-tab">초밥</div>
-            <div class="category-tab">피자</div>
+            <div class="category-tab">호떡</div>
+            <div class="category-tab">케이크</div>
+            <div class="category-tab">짜장면</div>
         </div>
     </div>
     <div class="tabs">
@@ -60,50 +50,38 @@
         <div class="tab">한식</div>
         <div class="tab">양식</div>
         <div class="tab">중식</div>
-        <div class="tab">에피타</div>
+        <div class="tab">에피타이저</div>
     </div>
+
+    <!-- 메뉴 목록 동적으로 생성 -->
     <ul class="food-list">
-        <li class="food-item">
-            <img src="pizza.jpg" alt="맛있는 피자">
+        <li th:each="roomMenuDTOPage : ${roomMenuList}" class="food-item">
+            <!-- 메뉴 이미지 -->
+            <img th:src="@{${roomMenuDTOPage.imageUrl}}" alt="메뉴 이미지">
             <div class="food-info">
-                <p>맛있는 피자</p>
-                <p class="price">30,000원</p>
-                <p class="rating">⭐ 4.0</p>
-            </div>
-        </li>
-        <li class="food-item">
-            <img src="steak.jpg" alt="풍미 스테이크">
-            <div class="food-info">
-                <p>풍미 스테이크</p>
-                <p class="price">25,000원</p>
-                <p class="rating">⭐ 4.7</p>
-            </div>
-        </li>
-        <li class="food-item">
-            <img src="pasta.jpg" alt="정통 오징어 파스타">
-            <div class="food-info">
-                <p>정통 오징어 파스타</p>
-                <p class="price">23,000원</p>
-                <p class="rating">⭐ 3.9</p>
-            </div>
-        </li>
-        <li class="food-item">
-            <img src="sushi.jpg" alt="신선한 초밥">
-            <div class="food-info">
-                <p>신선한 초밥</p>
-                <p class="price">27,000원</p>
-                <p class="rating">⭐ 4.5</p>
-            </div>
-        </li>
-        <li class="food-item">
-            <img src="bibimbap.jpg" alt="담백한 비빔밥">
-            <div class="food-info">
-                <p>담백한 비빔밥</p>
-                <p class="price">17,000원</p>
-                <p class="rating">⭐ 4.9</p>
+                <p th:text="${roomMenuList.roomMenuName}">맛있는 피자</p> <!-- 메뉴 이름 -->
+                <p class="price" th:text="${roomMenuList.roomMenuPrice + '원'}">30,000원</p> <!-- 가격 -->
+                <p class="rating">⭐ <span th:text="${roomMenuList.rating}">4.0</span></p> <!-- 평점 -->
             </div>
         </li>
     </ul>
 </div>
 </body>
+
+<script>
+    /****************************
+     기능 : 자바스크립트로 한식, 중식, 양식을 클릭했을 때 ative 변경
+     ****************************/
+    const tabs = document.querySelectorAll('.tab');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // 기존 active 클래스를 제거
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 클릭한 탭에 active 클래스를 추가
+            this.classList.add('active');
+        });
+    });
+</script>
 </html>
