@@ -33,14 +33,6 @@ public class Board  extends BaseEntity {
     //뷰
     @Column(name = "boardView")
     private Integer boardView;
-    //생성일
-    @CreatedDate
-    @Column(name = "createDate",nullable = false)
-    private LocalDateTime createDate;
-    //수정일
-    @LastModifiedDate
-    @Column(name = "medifyDate")
-    private LocalDateTime modifyDate;
     //가져오기
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberNum")

@@ -7,7 +7,7 @@ import java.security.Principal;
 
 public interface BoardService {
     //등록
-    public void boardInsert(BoardDTO boardDTO,Long memberNum);
+    public void boardInsert(BoardDTO boardDTO);
     //목록
     public Page<BoardDTO> boardList(Pageable pageable, Principal principal ,String type, String keyword);
     //읽기

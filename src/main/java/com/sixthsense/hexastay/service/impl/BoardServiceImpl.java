@@ -30,7 +30,7 @@ public class BoardServiceImpl implements BoardService {
     private final ModelMapper modelMapper = new ModelMapper();
     //등록
     @Override
-    public void boardInsert(BoardDTO boardDTO,Long memberNum){
+    public void boardInsert(BoardDTO boardDTO){
         Board board = modelMapper.map(boardDTO, Board.class);
         Member member =memberRepository.findById(boardDTO.getMemberNum()).orElseThrow();
         board.setMember(member);
