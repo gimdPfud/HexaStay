@@ -38,4 +38,6 @@ public class BranchDTO {
     private LocalDateTime modifyDate; //수정일자
 
     private Long centerNum;            //센터 참조
+
+    private String centerName;
 }
