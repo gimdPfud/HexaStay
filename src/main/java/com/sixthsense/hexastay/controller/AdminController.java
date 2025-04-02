@@ -66,14 +66,18 @@ public class AdminController {
     @GetMapping("/searchfacility")
     @ResponseBody
     public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
-        log.info("헤헤"+centerName);
+        log.info("후후"+centerName);
         return adminService.getFacilityList(centerName);
     }
 
 //    @GetMapping("/searchstore")
 //    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
 //        if (branchName != null) {
-//            return adminService.getBranch(branchName);
+//            return adminService.getStoreWithBranchList(branchName);
+//    }   else {
+//        return adminService.getStoreWithFacilityList(facilityName);
+//        }
 //    }
+
 
 }
