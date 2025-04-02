@@ -69,6 +69,7 @@
 
   <div class="text-center my-3"><!--중단 버튼-->
     <button class="btn btn-primary">검색</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#idSearchModal">룸배정내역 검색</button><!--자바 스크립트-->
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#registerModal">등록</button>
     <button class="btn btn-secondary">엑셀 저장</button>
   </div><!--중단 버튼 종료-->
@@ -122,7 +123,7 @@
   </div><!--하단 게시판 종료-->
 </div>
 
-<!--modal 시작지점-->
+<!--1.modal 시작지점-->
 <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -163,7 +164,98 @@
     </div>
   </div>
 </div>
-<!--modal 끝지점-->
+<!--1.modal 끝지점-->
+
+<!--2.Modal시작점-->
+<div class="modal fade" id="idSearchModal" tabindex="-1" aria-labelledby="idSearchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">아이디 검색</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- 검색 폼 -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="아이디 입력" th:value="${searchId}">
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-primary">검색</button>
+          </div>
+        </div>
+
+        <!-- 검색 결과 테이블 -->
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
+          <tr>
+            <th>No</th>
+            <th>아이디(이메일)</th>
+            <th>닉네임</th>
+            <th>전화번호</th>
+            <th>추가</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="user, stat : ${userList}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.nickname}"></td>
+            <td th:text="${user.phone}"></td>
+            <td><button class="btn btn-success" th:attr="onclick='addUser(\'' + ${user.email} + '\')'">추가</button></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- 추가된 사용자 리스트 -->
+        <h5 class="mt-4">추가된 사용자</h5>
+        <table class="table table-bordered text-center">
+          <thead class="table-light">
+          <tr>
+            <th>No</th>
+            <th>아이디(이메일)</th>
+            <th>닉네임</th>
+            <th>전화번호</th>
+            <th>삭제</th>
+          </tr>
+          </thead>
+          <tbody id="addedUsers">
+          <!-- JavaScript로 동적 추가 -->
+          </tbody>
+        </table>
+
+        <div class="text-center mt-3">
+          <button class="btn btn-primary">추가</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--2.Modal 끝점-->
+
+
+<!--룸매정 내역 검색  검색 스트립트 부분-->
+<script>
+  function addUser(email) {
+    let table = document.getElementById("addedUsers");
+    let row = table.insertRow();
+    row.innerHTML = `
+                <td>#</td>
+                <td>${email}</td>
+                <td>사용자 닉네임</td>
+                <td>010-1234-5678</td>
+                <td><button class="btn btn-danger" onclick="removeUser(this)">삭제</button></td>
+            `;
+  }
+
+  function removeUser(button) {
+    let row = button.parentElement.parentElement;
+    row.remove();
+  }
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
