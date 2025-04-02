@@ -1,12 +1,24 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.service.AdminService;
+import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Log4j2
 public class AdminController {
+
+    private final AdminService adminService;
+    private final CenterService centerService;
 
     @GetMapping("/list")
     public String list() {
@@ -19,7 +31,9 @@ public class AdminController {
     }
 
     @GetMapping("/insert")
-    public String insert() {
+    public String insert(Model model) {
+        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        model.addAttribute("centerDTOList", centerDTOList);
         return "admin/insert";
     }
 
@@ -30,6 +44,18 @@ public class AdminController {
 
     @GetMapping("/insertcompany")
     public String insertcompany() {
+        return "admin/insertcompany";
+    }
+
+    @GetMapping("/searchbranch")
+    public String insertbranch(@RequestParam Long centerNum) {
+        adminService.getBranchList(centerNum);
+        return "admin/insertcompany";
+    }
+
+    @GetMapping("/searchfacility")
+    public String insertfacility(@RequestParam Long branchNum) {
+        adminService.getFacilityList(branchNum);
         return "admin/insertcompany";
     }
 }

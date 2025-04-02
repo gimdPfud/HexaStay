@@ -17,6 +17,9 @@
             <div class="d-flex w-100" style="justify-content: center;">
                 <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
             </div>
+            <div class="d-flex w-100 ms-5 mt-3" style="justify-content: center;">
+                <input type="file" name="file" id="file">
+            </div>
 
             <div class="mb-2">
                 <label class="form-label">사번</label>
@@ -55,19 +58,27 @@
             <div class="mb-2">
                 <label class="form-label">소속</label>
                 <div class="row g-2">
-                    <div class="col-4">
-                        <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option>asdasdsad</option>
+                    <div class="col-3">
+                        <select id="adminChoice" class="form-select">
+                            <option>본사</option>
+                            <option>지사</option>
+                            <option>지점</option>
+                            <option>스토어</option>
                         </select>
                     </div>
-                    <div class="col-4">
-                        <select name="adminBranch" id="adminBranch" class="form-select">
+                    <div class="col-3">
+                        <select name="adminCenter" id="adminCenter" class="form-select">
+                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <select name="adminBranch" id="adminBranch" class="form-select" disabled>
                             <option></option>
                         </select>
                     </div>
-                    <div class="col-4">
-                        <select name="adminFacility" id="adminFacility" class="form-select">
-                            <option>asdasdsad</option>
+                    <div class="col-3">
+                        <select name="adminFacility" id="adminFacility" class="form-select" disabled>
+                            <option></option>
                         </select>
                     </div>
                 </div>
@@ -85,14 +96,104 @@
     </form>
 
     <script>
-        // 가입양식 관련
+        let center = document.getElementById('adminCenter');
+        let branch = document.getElementById('adminBranch');
+        let facility = document.getElementById('adminFacility');
+
+        // 셀렉트 박스 조작
+        document.getElementById('adminChoice').addEventListener('change', function () {
+            let choice = this.value;
+
+            // 모든 선택창 초기화
+            branch.disabled = true;
+            facility.disabled = true;
+            branch.value = "";
+            facility.value = "";
+
+            if (choice === "본사") {
+                center.disabled = false;
+            } else if (choice === "지사") {
+                center.disabled = false;
+                branch.disabled = false;
+            } else if (choice === "지점") {
+                center.disabled = false;
+                branch.disabled = false;
+            } else if (choice === "스토어") {
+                center.disabled = false;
+                branch.disabled = false;
+                facility.disabled = false;
+            }
+        });
+
+        // 가입버튼 관련
         function submitForm() {
             // 주민번호 합체
             document.getElementById('adminResidentNum').value = document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById('adminResidentNumPartTwo').value;
             // 폰번호 합체
             document.getElementById('adminPhone').value = document.getElementById('phonePartOne').value + "-" + document.getElementById('phonePartTwo').value + "-" + document.getElementById('phonePartThree').value;
+
+            // 다른 벨류 차단
+            let choice = document.getElementById('adminChoice').value;
+
+            if (choice === "지사") {
+                center.disabled = true;
+            } else if (choice === "지점") {
+                center.disabled = true;
+                branch.disabled = true;
+            } else if (choice === "스토어") {
+                center.disabled = true;
+                branch.disabled = true;
+                facility.disabled = true;
+            }
+
+
+
         }
-        //
+
+
+
+        // 소속 조회
+        document.getElementById('adminChoice').addEventListener('change', async function () {
+            let choice = this.value;
+            let branchSelect = document.getElementById('adminBranch');
+            let facilitySelect = document.getElementById('adminFacility');
+
+            // 지사 조회
+            if (choice === "지사" || choice === "지점" || choice === "스토어") {
+                await fetchOptions('/searchbranch', { branchName: choice }, branchSelect);
+            }
+
+            // 지점 조회
+            if (choice === "지점" || choice === "스토어") {
+                await fetchOptions('/searchfacility', { facilityName: choice }, facilitySelect);
+            }
+        });
+
+        async function fetchOptions(url, params, selectElement) {
+            let queryString = new URLSearchParams(params).toString();
+            let response = await fetch(`${url}?${queryString}`);
+            if (response.ok) {
+                let data = await response.json();
+                updateSelectOptions(selectElement, data);
+            }
+        }
+
+        function updateSelectOptions(selectElement, data) {
+            selectElement.innerHTML = '<option value="">선택</option>'; // 초기화
+            data.forEach(item => {
+                let option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // 지사 조회
+
+
+        // 지점 조회
+
+
     </script>
 
 </div>
