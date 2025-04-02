@@ -60,4 +60,11 @@ public class StoreController {
         model.addAttribute("data",data);
         return "store/read";
     }
+
+    @GetMapping("/modify/{id}")
+    public String modify(@PathVariable Long id, Model model){
+        StoreDTO data = storeService.read(id);
+        model.addAttribute("data",data);
+        return "store/modify";
+    }
 }

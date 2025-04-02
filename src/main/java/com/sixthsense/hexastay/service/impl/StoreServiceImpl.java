@@ -35,7 +35,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public void insert(StoreDTO storeDTO) {
         Store store = modelMapper.map(storeDTO, Store.class);
-        store = storeRepository.save(store);
+        storeRepository.save(store);
     }
 
 
