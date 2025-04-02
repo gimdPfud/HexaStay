@@ -103,4 +103,22 @@
     </ul>
 </div>
 </body>
+
+<script>
+    /****************************
+     기능 : 자바스크립트로 한식, 중식, 양식을 클릭했을 때 ative 변경
+
+         ************************/
+    const tabs = document.querySelectorAll('.tab');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // 기존 active 클래스를 제거
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 클릭한 탭에 active 클래스를 추가
+            this.classList.add('active');
+        });
+    });
+</script>
 </html>

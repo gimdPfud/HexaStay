@@ -11,4 +11,10 @@ public interface RoomMenuService {
 
     // 목록
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable);
+
+    // 상세보기
+    public RoomMenuDTO read(Integer num);
+
+    // 수정하기
+    public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO);
 }

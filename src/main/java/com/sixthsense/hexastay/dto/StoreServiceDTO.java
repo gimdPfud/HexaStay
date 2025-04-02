@@ -19,24 +19,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceUnionDTO {
+public class StoreServiceDTO {
 
-    private Long serviceUnionNum;
+    private Long storeServiceNum;
 
     //룸서비스외부 업체 상품이름
-    private String serviceUnionsName;
+    private String storeServiceName;
 
     //룸서비스외부 업체상품 가격
-    private Long serviceUnionPrice;
+    private Long storeServicePrice;
 
     //룸서비스외부 업체상품 설명
-    private String serviceUnionContent;
+    private String storeServiceContent;
 
     //룸서비스외부 업체상품 카테고리
-    private String serviceUnionCategory;
+    private String storeServiceCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
-    private String serviceUnionStatus;
+    private String storeServiceStatus;
 
     //룸서비스외부 등록일
     private LocalDateTime createDate;
@@ -44,8 +44,8 @@ public class ServiceUnionDTO {
     //룸서비스외부 수정일
     private LocalDateTime modifyDate;
 
-    //참조 테이블 - Unions 테이블 Pk 참조
-    private Long unionsNum;
+    //참조 테이블 - Store 테이블 Pk 참조
+    private Long storeNum;
 
 
 }

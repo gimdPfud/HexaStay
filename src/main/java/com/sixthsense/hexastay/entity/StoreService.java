@@ -1,6 +1,6 @@
 /***********************************************
- * 클래스명 : ServiceUnion
- * 기능 : ServiceUnion 엔티티
+ * 클래스명 : StoreService
+ * 기능 : StoreService 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
@@ -18,31 +18,31 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceUnion extends BaseEntity {
+public class StoreService extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "serviceUnionNum")
-    private Long serviceUnionNum;
+    @Column(name = "storeServiceNum")
+    private Long storeServiceNum;
 
     //룸서비스외부 업체 상품이름
-    private String serviceUnionsName;
+    private String storeServicesName;
 
     //룸서비스외부 업체상품 가격
-    private Long serviceUnionPrice;
+    private Long storeServicePrice;
 
     //룸서비스외부 업체상품 설명
-    private String serviceUnionContent;
+    private String storeServiceContent;
 
     //룸서비스외부 업체상품 카테고리
-    private String serviceUnionCategory;
+    private String storeServiceCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
-    private String serviceUnionStatus;
+    private String storeServiceStatus;
 
-    //참조 테이블 - Unions 테이블 Pk 참조
+    //참조 테이블 - Store 테이블 Pk 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unionsNum")
-    private Unions Unions;
+    @JoinColumn(name = "storeNum")
+    private Store Store;
 
 
 }
