@@ -35,7 +35,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public void insert(StoreDTO storeDTO) {
         Store store = modelMapper.map(storeDTO, Store.class);
-        store = storeRepository.save(store);
+        storeRepository.save(store);
     }
 
 
@@ -98,5 +98,18 @@ public class StoreServiceImpl implements StoreService {
         Page<Store> storePage = storeRepository.findAll(pageable);
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
+    }
+
+
+    /*
+     * 메소드명 : delete
+     * 인수 값 : Long
+     * 리턴 값 : void
+     * 기  능 : pk를 받아 해당하는 Store객체의 활성화 컬럼 데이터를 inactive로 바꾼다.
+     * */
+    @Override
+    public void delete(Long pk) {
+        Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        store.setStoreStatus("inactive");
     }
 }

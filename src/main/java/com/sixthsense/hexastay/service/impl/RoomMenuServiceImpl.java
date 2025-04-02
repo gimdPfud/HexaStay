@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -52,6 +54,28 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
 
 
+    }
+
+    @Override
+    public RoomMenuDTO read(Integer num) {
+        log.info("상세보기 페이지 서비스 진입" + num);
+
+        Optional<RoomMenu> optionalRoomMenu =
+                roomMenuRepository.findById(num.longValue());
+        // inter를 long으로 형 변환
+
+        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
+        log.info("변환된 dto read service의 값" + menuDTO);
+
+        return menuDTO;
+
+
+
+    }
+
+    @Override
+    public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO) {
+        return null;
     }
 
 }

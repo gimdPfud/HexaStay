@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장바구니</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 10px; border-radius: 10px; }
+        .cart-item { display: flex; align-items: center; border-bottom: 1px solid #ddd; padding: 10px; }
+        .cart-item img { width: 50px; height: 50px; margin-right: 10px; border-radius: 5px; }
+        .item-info { flex-grow: 1; }
+        .quantity { display: flex; align-items: center; }
+        .quantity button { padding: 5px; margin: 0 5px; }
+        .total { font-weight: bold; margin-top: 10px; }
+        .order-btn { display: block; width: 100%; padding: 10px; background: green; color: white; text-align: center; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>장바구니</h2>
+    <div id="cart-items"></div>
+    <div class="total">총 결제금액: <span id="total-price">0</span>원</div>
+    <button class="order-btn" onclick="placeOrder()">주문하기</button>
+</div>
+
+<script>
+    let cart = [
+        { id: 1, name: "호텔 피자", price: 38000, quantity: 1, image: "pizza.jpg", discount: 3600 }
+    ];
+
+    function updateCart() {
+        const cartItemsContainer = document.getElementById("cart-items");
+        const totalPriceElement = document.getElementById("total-price");
+        cartItemsContainer.innerHTML = "";
+        let total = 0;
+
+        cart.forEach(item => {
+            let finalPrice = (item.price - item.discount) * item.quantity;
+            total += finalPrice;
+
+            cartItemsContainer.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-info">
+                            <p>${item.name}</p>
+                            <p>${item.price}원 - 할인 ${item.discount}원</p>
+                            <div class="quantity">
+                                <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        });
+        totalPriceElement.textContent = total;
+    }
+
+    function changeQuantity(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (item) {
+            item.quantity = Math.max(1, item.quantity + delta);
+            updateCart();
+        }
+    }
+
+    function placeOrder() {
+        alert("주문이 완료되었습니다!");
+    }
+
+    updateCart();
+</script>
+</body>
+</html>

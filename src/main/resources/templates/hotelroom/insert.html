@@ -26,7 +26,7 @@
 
 
     <div class="container mt-4"><!--인서트 container 시작-->
-        <h3 class="mb-3">룸 배정 내역 조회</h3>
+        <h3 class="mb-3">룸 배정 등록 페이지</h3>
 
 
         <div class="row g-3"><!--상단 시작-->
@@ -93,8 +93,8 @@
             <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
                 검색사이드바
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#idSearchModal">아이디 검색</button>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#registerModal">등록</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#idSearchModal">아이디 검색</button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#registerModal">HotelRoom회원등록</button>
             <button class="btn btn-secondary">엑셀 저장</button>
         </div><!--중단 버튼 종료-->
 
@@ -135,20 +135,22 @@
         </div><!--하단페이지 종료-->
     </div><!--container 끝점-->
 
-    <!--1번 모달 Modal 페이지 시작 등록 버튼에 연결 되어 있음 -->
+    <!--1번 Modal 페이지 시작 -룸 이용 고객 등록 버튼에 연결 되어 있음 -->
     <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="registerModalLabel">등록</h5>
+                    <h5 class="modal-title" id="registerModalLabel">Room회원등록</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <label class="form-label">브랜드명</label>
+                <div class="modal-body"><!--호텔룸 이용 등록 modal form 태그-->
+                    <label class="form-label">이름</label>
                     <input type="text" class="form-control" placeholder="브랜드명 입력">
-                    <label class="form-label mt-2">지사명</label>
+                    <label class="form-label">아이디(이메일)</label>
+                    <input type="email" class="form-control" placeholder="브랜드명 입력">
+                    <label class="form-label mt-2">전화번호</label>
                     <input type="text" class="form-control" placeholder="지사명 입력">
-                    <label class="form-label mt-2">호명</label>
+                    <label class="form-label mt-2">패스워드</label>
                     <input type="text" class="form-control" placeholder="호명 입력">
                     <label class="form-label mt-2">숙박 시작일</label>
                     <input type="date" class="form-control">
@@ -230,7 +232,7 @@
         </div>
     </div>
 
-
+    <!--HTML 디자인 시작 지점-->
 
     <!-- 사이드바 (오른쪽에서 왼쪽으로) -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="sidebarMenu"><!--사이드바 시작 지점-->

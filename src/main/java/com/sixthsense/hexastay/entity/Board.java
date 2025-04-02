@@ -1,16 +1,12 @@
-/***********************************************
- * 클래스명 : BoardDTO
- * 기능 : BoardDTO 엔티티
- * 작성자 : 김예령
- * 작성일 : 2025-03-31
- * 수정 : 2025-03-31, BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
- * ***********************************************/
 package com.sixthsense.hexastay.entity;
-
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
@@ -18,22 +14,36 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Board  extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //번호
     @Column(name = "boardNum")
     private Long boardNum;                  //번호
-
+    //제목
     @Column(name = "boardTitle")
     private String boardTitle;              //제목
-
+    //내용
     @Column(name = "boardContent")
     private String boardContent;            //내용
-
+    //작성자
     @Column(name = "boardWriter")
     private String boardWriter;             //작성자
-
+    //뷰
     @Column(name = "boardView")
-    private Integer boardView;              //조회수
+    private Integer boardView;
+    //생성일
+    @CreatedDate
+    @Column(name = "createDate",nullable = false)
+    private LocalDateTime createDate;
+    //수정일
+    @LastModifiedDate
+    @Column(name = "medifyDate")
+    private LocalDateTime modifyDate;
+    //가져오기
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberNum")
+    private Member member;
 
 }
