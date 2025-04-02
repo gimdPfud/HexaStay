@@ -13,7 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("select a from Branch a")
     public Page<Branch> findAll(Pageable pageable);
+
+
+    // 회원가입용
+    public List<Branch> findByBranchName (String branchName);
 }
