@@ -40,7 +40,7 @@ public class OrderStoreDTO {
 
     //*********************************
     //외부업체 상품 가져올 PK - Storemenu
-    private Long storeMenuNum;
+    private Long storemenuNum;
 
     //**********************************
     //멤버 정보를 가져올 PK - member
