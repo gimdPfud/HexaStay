@@ -35,4 +35,6 @@ public class FacilityDTO {
     private LocalDateTime modifyDate; //수정일자
 
     private Long centerNum;              //본사 참조
+
+    private String centerName;
 }
