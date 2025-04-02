@@ -1,14 +1,17 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -37,6 +40,12 @@ public class AdminController {
         return "admin/insert";
     }
 
+    @PostMapping("/insert")
+    public ResponseEntity<Void> insert(AdminDTO adminDTO) {
+        adminDTO.setAdminActive(true);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/mypage")
     public String mypage() {
         return "admin/mypage";
@@ -48,14 +57,23 @@ public class AdminController {
     }
 
     @GetMapping("/searchbranch")
-    public String insertbranch(@RequestParam Long centerNum) {
-        adminService.getBranchList(centerNum);
-        return "admin/insertcompany";
+    @ResponseBody
+    public List<BranchDTO> insertbranch(@RequestParam String centerName) {
+        log.info("헤헤"+centerName);
+        return adminService.getBranchList(centerName);
     }
 
     @GetMapping("/searchfacility")
-    public String insertfacility(@RequestParam Long branchNum) {
-        adminService.getFacilityList(branchNum);
-        return "admin/insertcompany";
+    @ResponseBody
+    public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
+        log.info("헤헤"+centerName);
+        return adminService.getFacilityList(centerName);
     }
+
+//    @GetMapping("/searchstore")
+//    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
+//        if (branchName != null) {
+//            return adminService.getBranch(branchName);
+//    }
+
 }

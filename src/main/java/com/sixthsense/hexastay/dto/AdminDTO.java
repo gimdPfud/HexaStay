@@ -48,7 +48,7 @@ public class AdminDTO {
     //어드민 직책
     private String adminPosition;
 
-    //어드미Brand
+    //어드민 Brand
     private String adminBrand;
 
     //어드민 생성일

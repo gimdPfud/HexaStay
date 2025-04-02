@@ -23,5 +23,5 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
 
     // 회원가입용
-    public List<Branch> findByCenter_CenterNum (Long centerNum);
+    public List<Branch> findByCenter_CenterName (String centerName);
 }

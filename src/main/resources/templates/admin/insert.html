@@ -26,6 +26,18 @@
                 <input type="text" name="adminEmployeeNum" class="form-control">
             </div>
             <div class="mb-2">
+                <label class="form-label">이메일 (ID)</label>
+                <input type="text" name="adminEmail" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호</label>
+                <input type="text" name="adminPassword" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="text" id="adminPasswordTwo" class="form-control">
+            </div>
+            <div class="mb-2">
                 <label class="form-label">이름</label>
                 <input type="text" name="adminName" class="form-control">
             </div>
@@ -72,17 +84,19 @@
                         </select>
                     </div>
                     <div class="col-3">
-                        <select name="adminBranch" id="adminBranch" class="form-select" disabled>
+                        <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
                             <option></option>
                         </select>
                     </div>
                     <div class="col-3">
-                        <select name="adminFacility" id="adminFacility" class="form-select" disabled>
+                        <select name="adminStore" id="adminStore" class="form-select" disabled>
                             <option></option>
                         </select>
                     </div>
                 </div>
             </div>
+
+
 
             <div class="mb-3">
                 <label class="form-label">입사일</label>
@@ -93,35 +107,35 @@
                 <button class="btn btn-danger">취소</button>
             </div>
         </div>
+
     </form>
 
     <script>
         let center = document.getElementById('adminCenter');
-        let branch = document.getElementById('adminBranch');
-        let facility = document.getElementById('adminFacility');
+        let branchfacility = document.getElementById('adminBranchFacility');
+        let store = document.getElementById('adminStore');
+        let choice = document.getElementById('adminChoice').value;
 
         // 셀렉트 박스 조작
         document.getElementById('adminChoice').addEventListener('change', function () {
             let choice = this.value;
 
             // 모든 선택창 초기화
-            branch.disabled = true;
-            facility.disabled = true;
-            branch.value = "";
-            facility.value = "";
+            branchfacility.value = "";
+            store.value = "";
 
             if (choice === "본사") {
                 center.disabled = false;
             } else if (choice === "지사") {
                 center.disabled = false;
-                branch.disabled = false;
+                branchfacility.disabled = false;
             } else if (choice === "지점") {
                 center.disabled = false;
-                branch.disabled = false;
+                branchfacility.disabled = false;
             } else if (choice === "스토어") {
                 center.disabled = false;
-                branch.disabled = false;
-                facility.disabled = false;
+                branchfacility.disabled = false;
+                store.disabled = false;
             }
         });
 
@@ -133,65 +147,34 @@
             document.getElementById('adminPhone').value = document.getElementById('phonePartOne').value + "-" + document.getElementById('phonePartTwo').value + "-" + document.getElementById('phonePartThree').value;
 
             // 다른 벨류 차단
-            let choice = document.getElementById('adminChoice').value;
 
             if (choice === "지사") {
                 center.disabled = true;
             } else if (choice === "지점") {
                 center.disabled = true;
-                branch.disabled = true;
             } else if (choice === "스토어") {
                 center.disabled = true;
-                branch.disabled = true;
-                facility.disabled = true;
-            }
-
-
-
-        }
-
-
-
-        // 소속 조회
-        document.getElementById('adminChoice').addEventListener('change', async function () {
-            let choice = this.value;
-            let branchSelect = document.getElementById('adminBranch');
-            let facilitySelect = document.getElementById('adminFacility');
-
-            // 지사 조회
-            if (choice === "지사" || choice === "지점" || choice === "스토어") {
-                await fetchOptions('/searchbranch', { branchName: choice }, branchSelect);
-            }
-
-            // 지점 조회
-            if (choice === "지점" || choice === "스토어") {
-                await fetchOptions('/searchfacility', { facilityName: choice }, facilitySelect);
-            }
-        });
-
-        async function fetchOptions(url, params, selectElement) {
-            let queryString = new URLSearchParams(params).toString();
-            let response = await fetch(`${url}?${queryString}`);
-            if (response.ok) {
-                let data = await response.json();
-                updateSelectOptions(selectElement, data);
+                branchfacility.disabled = true;
             }
         }
 
-        function updateSelectOptions(selectElement, data) {
-            selectElement.innerHTML = '<option value="">선택</option>'; // 초기화
-            data.forEach(item => {
-                let option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                selectElement.appendChild(option);
-            });
-        }
+        document.getElementById('adminBranchFacility').addEventListener('change', function () {
+            if (branchfacility.value === "지사") {
+                fetch('/searchbranch?centerName=' + branchfacility.value, {
+                })
+            } else if (branchfacility.value === "지점") {
+                fetch('/searchfacility?centerName=' + branchfacility.value, {
+                })
+            } else if (branchfacility.value === "스토어" && choice.value === "지점" ) {
+                fetch('/searchstorebranch?centerName=' + branchfacility.value, {
+                })
+            } else if (branchfacility.value === "스토어" && choice.value === "지사") {
+                fetch('/searchstorefacility?centerName=' + branchfacility.value, {
+                })
+            }
 
-        // 지사 조회
+        })
 
-
-        // 지점 조회
 
 
     </script>
