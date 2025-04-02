@@ -13,13 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
     @Query("select a from Facility a")
     public Page<Facility> findAll(Pageable pageable);
 
     // 회원가입용
-    public List<Facility> findByFacilityName (String facilityName);
+    public List<Facility> findByCenter_CenterNum (Long centerNum);
 }

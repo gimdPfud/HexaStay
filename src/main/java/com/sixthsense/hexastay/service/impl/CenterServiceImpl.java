@@ -94,6 +94,7 @@ public class CenterServiceImpl implements CenterService {
     }
 
     //가입용
+    @Override
     public List<CenterDTO> allCenterList(){
         List<Center> centerList = centerRepository.findAll();
         List<CenterDTO> centerDTOList = new ArrayList<>();
