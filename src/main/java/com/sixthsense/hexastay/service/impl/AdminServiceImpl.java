@@ -64,16 +64,16 @@ public class AdminServiceImpl implements AdminService {
         return facilityDTOList;
     }
 
-    public List<StoreDTO> getStoreList(String branchName, String facilityName) {
-
-        List<StoreDTO> storeDTOList = new ArrayList<>();
-        if (branchName != null) {
-            storeRepository.findBy_(branchName);
-        } else {
-            facilityRepository.findByFacilityName(facilityName);
-            return
-        }
-
-        return null;
-    }
+//    public List<StoreDTO> getStoreList(String branchName, String facilityName) {
+//
+//        List<StoreDTO> storeDTOList = new ArrayList<>();
+//        if (branchName != null) {
+//            storeRepository.findBy_(branchName);
+//        } else {
+//            facilityRepository.findByFacilityName(facilityName);
+//            return
+//        }
+//
+//        return null;
+//    }
 }

@@ -70,10 +70,10 @@ public class AdminController {
         return adminService.getFacilityList(centerName);
     }
 
-    @GetMapping("/searchstore")
-    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
-        if (branchName != null) {
-            return adminService.getBranch(branchName);
-    }
+//    @GetMapping("/searchstore")
+//    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
+//        if (branchName != null) {
+//            return adminService.getBranch(branchName);
+//    }
 
 }
