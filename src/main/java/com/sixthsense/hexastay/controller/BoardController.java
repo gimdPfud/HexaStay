@@ -1,9 +1,7 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.BoardDTO;
-import com.sixthsense.hexastay.repository.BoardRepository;
 import com.sixthsense.hexastay.service.BoardService;
-import com.sixthsense.hexastay.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -31,18 +29,17 @@ public class BoardController {
     private final ModelMapper modelMapper = new ModelMapper();
     //등록
     @GetMapping("/insert")
-    public String insert (Model model, Long memberNum) {
-        log.info(memberNum);
-        model.addAttribute("memberNum", memberNum);
+    public String insert (Model model) {
+        log.info("보드");
+        model.addAttribute("memberNum");
         log.info("insert into board");
-        return "board/insert";
+        return "/board/insert";
     }
     @PostMapping("/insert")
-    public String insertPost(BoardDTO boardDTO, @RequestParam
-            (name="memberNum")Long memberNum) {
+    public String insertPost(BoardDTO boardDTO) {
         log.info("포스트:"+boardDTO);
-        boardService.boardInsert(boardDTO, memberNum);
-        return "redirect:/board/list?memberNum=" + memberNum;
+        boardService.boardInsert(boardDTO);
+        return "redirect:/board/list?";
     }
     //목록
     @GetMapping(value = {"/","/list"})
@@ -64,5 +61,6 @@ public class BoardController {
         model.addAllAttributes(pageInfo);
         return "/board/list";
     }
+
 
 }
