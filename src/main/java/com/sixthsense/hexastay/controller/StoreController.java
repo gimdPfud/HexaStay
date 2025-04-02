@@ -49,7 +49,7 @@ public class StoreController {
     @GetMapping("/list")
     public String list(Pageable pageable, Model model){
         Page<StoreDTO> storeDTOPage = storeService.list("active", pageable);
-        log.info("list : "+storeDTOPage);
+        storeDTOPage.forEach(log::info);
         model.addAttribute("list",storeDTOPage);
         return "store/list";
     }
@@ -74,6 +74,7 @@ public class StoreController {
         Long storeNum = storeService.modify(storeDTO);
         return "redirect:/store/read/"+storeNum;
     }
+
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){

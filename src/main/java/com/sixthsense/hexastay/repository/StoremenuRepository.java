@@ -1,5 +1,5 @@
 /***********************************************
- * 인터페이스명 : StoreMenuRepository
+ * 인터페이스명 : StoremenuRepository
  * 기능 :
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
@@ -7,16 +7,17 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.StoreMenu;
+import com.sixthsense.hexastay.entity.Storemenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface StoreMenuRepository extends JpaRepository<StoreMenu, Long> {
-    @Query("select a from StoreMenu a")
-    public Page<StoreMenu> findAll(Pageable pageable);
+public interface StoremenuRepository extends JpaRepository<Storemenu, Long> {
+    @Query("select a from Storemenu a")
+    public Page<Storemenu> findAll(Pageable pageable);
 
-/*활성화여부로 목록뽑기*/
-    public Page<StoreMenu> findByStoreMenuStatus(String status, Pageable pageable);
+
+    /*활성화여부와 상위 가게 pk로...*/
+    Page<Storemenu> findByStoreStoreNumAndStoremenuStatus(Long storeNum, String storemenuStatus, Pageable pageable);
 }

@@ -1,9 +1,9 @@
 /***********************************************
- * 클래스명 : StoreService
- * 기능 : StoreService 엔티티
+ * 클래스명 : Storemenu
+ * 기능 : Storemenu 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
+ * 수정 : 2025-04-01 이름 변경 : 김예령
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
@@ -18,31 +18,30 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StoreService extends BaseEntity {
+public class Storemenu extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "storeServiceNum")
-    private Long storeServiceNum;
+    private Long storemenuNum;
 
     //룸서비스외부 업체 상품이름
-    private String storeServicesName;
+    private String storemenuName;
 
     //룸서비스외부 업체상품 가격
-    private Long storeServicePrice;
+    private Long storemenuPrice;
 
     //룸서비스외부 업체상품 설명
-    private String storeServiceContent;
+    private String storemenuContent;
 
     //룸서비스외부 업체상품 카테고리
-    private String storeServiceCategory;
+    private String storemenuCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
-    private String storeServiceStatus;
+    private String storemenuStatus;
 
     //참조 테이블 - Store 테이블 Pk 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storeNum")
-    private Store Store;
+    private Store store;
 
 
 }
