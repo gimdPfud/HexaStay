@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.repository.FacilityRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 @Service
+@Log4j2
 public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
@@ -40,18 +42,18 @@ public class AdminServiceImpl implements AdminService {
         return centerDTOList;
     }
 
-    public List<BranchDTO> getBranchList(String branchName) {
+    public List<BranchDTO> getBranchList(Long centerNum) {
         List<BranchDTO> branchDTOList = new ArrayList<>();
-        List<Branch> branchList = branchRepository.findByBranchName(branchName);
+        List<Branch> branchList = branchRepository.findByBranch_CenterNum(centerNum);
         for (Branch branch : branchList) {
             branchDTOList.add(modelMapper.map(branch, BranchDTO.class));
         }
         return branchDTOList;
     }
 
-    public List<FacilityDTO> getFacilityList(String facilityName) {
+    public List<FacilityDTO> getFacilityList(Long branchNum) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
-        List<Facility> facilityList = facilityRepository.findByFacilityName(facilityName);
+        List<Facility> facilityList = facilityRepository.findByFacility_BranchNum(branchNum);
         for (Facility facility : facilityList) {
             facilityDTOList.add(modelMapper.map(facility, FacilityDTO.class));
         }

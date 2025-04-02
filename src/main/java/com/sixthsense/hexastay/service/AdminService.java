@@ -9,10 +9,13 @@ import java.util.List;
 public interface AdminService {
 
 
+
+
     // 회원가입떄 쓸 로직
     List<CenterDTO> getCenterList (String CenterName);
 
-    List<BranchDTO> getBranchList (String BranchName);
-    List<FacilityDTO> getFacilityList (String FacilityName);
+    // 회원가입때 쓸 로직2
+    List<BranchDTO> getBranchList (Long centerNum);
+    List<FacilityDTO> getFacilityList (Long branchNum);
 
 }

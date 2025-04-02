@@ -34,10 +34,6 @@ public class AdminController {
     public String insert(Model model) {
         List<CenterDTO> centerDTOList = centerService.allCenterList();
         model.addAttribute("centerDTOList", centerDTOList);
-                for (CenterDTO centers : centerDTOList) {
-                    log.info("뭐지?" +centers);
-        }
-
         return "admin/insert";
     }
 
@@ -52,14 +48,14 @@ public class AdminController {
     }
 
     @GetMapping("/searchbranch")
-    public String insertbranch(@RequestParam String branchName) {
-        adminService.getBranchList(branchName);
+    public String insertbranch(@RequestParam Long centerNum) {
+        adminService.getBranchList(centerNum);
         return "admin/insertcompany";
     }
 
     @GetMapping("/searchfacility")
-    public String insertfacility(@RequestParam String facilityName) {
-        adminService.getFacilityList(facilityName);
+    public String insertfacility(@RequestParam Long branchNum) {
+        adminService.getFacilityList(branchNum);
         return "admin/insertcompany";
     }
 }

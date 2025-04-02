@@ -17,6 +17,9 @@
             <div class="d-flex w-100" style="justify-content: center;">
                 <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
             </div>
+            <div class="d-flex w-100 ms-5 mt-3" style="justify-content: center;">
+                <input type="file" name="file" id="file">
+            </div>
 
             <div class="mb-2">
                 <label class="form-label">사번</label>
@@ -65,7 +68,7 @@
                     </div>
                     <div class="col-3">
                         <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="centerList : ${centerDTOList}" th:text="centerList" th:valuie="centerList"></option>
+                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
                         </select>
                     </div>
                     <div class="col-3">
@@ -115,7 +118,6 @@
             } else if (choice === "지점") {
                 center.disabled = false;
                 branch.disabled = false;
-                facility.disabled = false;
             } else if (choice === "스토어") {
                 center.disabled = false;
                 branch.disabled = false;
