@@ -21,7 +21,9 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("select a from Branch a")
     public Page<Branch> findAll(Pageable pageable);
 
+    List<Branch> findByCenter_CenterNum(Long centerNum);
 
     // 회원가입용
+    public List<Branch> findByBranchName(String branchName);
     public List<Branch> findByCenter_CenterName (String centerName);
 }

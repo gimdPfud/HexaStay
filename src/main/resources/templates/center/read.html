@@ -49,7 +49,36 @@
   <div class="d-flex justify-content-center gap-3">
     <a th:href="@{/center/list}" class="btn btn-secondary">목록</a>
     <a th:href="@{/center/modify/{centerNum}(centerNum=${centerDTO.centerNum})}" class="btn btn-success">수정</a>
+    <form id="deleteForm" th:action="@{/center/delete/{centerNum}(centerNum=${centerDTO.centerNum})}" method="post">
+      <button type="submit" class="btn btn-danger">삭제</button>
+    </form>
   </div>
 </div>
+
+<script>
+  function deleteCenter() {
+    if (confirm("정말 삭제하시겠습니까?")) {
+      let centerNum = "[[${centerDTO.centerNum}]]"; // Thymeleaf 변수 바인딩
+      fetch(`/center/delete/${centerNum}`, {
+        method: "POST", // DELETE 메서드도 가능하지만, 일부 브라우저 지원 문제로 POST 사용
+        headers: {
+          "Content-Type": "application/json"
+        },
+      }).then(response => {
+        if (response.ok) {
+          alert("삭제되었습니다.");
+          window.location.href = "/center/list"; // 삭제 후 목록 페이지로 이동
+        } else {
+          alert("삭제 실패! 다시 시도해주세요.");
+        }
+      }).catch(error => {
+        console.error("Error:", error);
+        alert("오류가 발생했습니다.");
+      });
+    }
+  }
+</script>
+
+
 </body>
 </html>

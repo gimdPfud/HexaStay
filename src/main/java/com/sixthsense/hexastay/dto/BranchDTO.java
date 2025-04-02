@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,8 @@ public class BranchDTO {
     private String branchAddress;           //주소
 
     private String branchCeoName;           //대표명
+
+    private String centerBusinessNum;       //사업자등록번호
 
     private LocalDateTime createDate; //등록일자
 
