@@ -20,12 +20,12 @@
 <!--            </div>-->
 
             <!--임시 링크-->
-            <div class="text-center" th:if="${list.number == 0}">
+            <div class="text-center" th:if="${list.isEmpty()}">
                 <a href="/store/insert" class="btn btn-primary btn-lg">등록</a>
                 <!--텅~~~-->
             </div>
 
-            <div th:unless="${list.number==0}">
+            <div th:unless="${list.isEmpty()}">
                 <table class="table table-bordered text-center">
                     <thead class="table-light">
                     <tr>

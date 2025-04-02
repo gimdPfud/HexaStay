@@ -1,6 +1,6 @@
 /***********************************************
- * 클래스명 : StoreMenuDTO
- * 기능 : StoreMenuDTO
+ * 클래스명 : StoremenuDTO
+ * 기능 : StoremenuDTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
  * 수정 : 2025-04-01 이름 수정 : 김예령
@@ -19,24 +19,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StoreMenuDTO {
+public class StoremenuDTO {
 
-    private Long storeMenuNum;
+    private Long storemenuNum;
 
     //룸서비스외부 업체 상품이름
-    private String storeMenuName;
+    private String storemenuName;
 
     //룸서비스외부 업체상품 가격
-    private Long storeMenuPrice;
+    private Long storemenuPrice;
 
     //룸서비스외부 업체상품 설명
-    private String storeMenuContent;
+    private String storemenuContent;
 
     //룸서비스외부 업체상품 카테고리
-    private String storeMenuCategory;
+    private String storemenuCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
-    private String storeMenuStatus;
+    private String storemenuStatus;
 
     //룸서비스외부 등록일
     private LocalDateTime createDate;

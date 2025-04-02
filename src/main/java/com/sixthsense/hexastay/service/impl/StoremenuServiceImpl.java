@@ -1,0 +1,99 @@
+/***********************************************
+ * 클래스명 : StoremenuServiceImpl
+ * 기능 :
+ * 작성자 :
+ * 작성일 : 2025-04-01
+ * 수정 : 2025-04-01
+ * ***********************************************/
+package com.sixthsense.hexastay.service.impl;
+
+import com.sixthsense.hexastay.dto.StoremenuDTO;
+import com.sixthsense.hexastay.entity.Storemenu;
+import com.sixthsense.hexastay.repository.StoremenuRepository;
+import com.sixthsense.hexastay.service.StoremenuService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@RequiredArgsConstructor
+@Service
+@Log4j2
+public class StoremenuServiceImpl implements StoremenuService {
+    private final ModelMapper modelMapper = new ModelMapper();
+    private final StoremenuRepository storemenuRepository;
+
+    /*
+     * 메소드명 : insert
+     * 인수 값 : StoremenuDTO
+     * 리턴 값 : Long
+     * 기  능 : DTO를 받아 데이터베이스에 추가하고, 등록한 객체의 pk를 반환함.
+     * */
+    @Override
+    public Long insert(StoremenuDTO storemenuDTO) {
+        storemenuDTO.setStoremenuStatus("active");
+        Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
+        storemenu = storemenuRepository.save(storemenu);
+        return storemenu.getStoremenuNum();
+    }
+
+    /*
+     * 메소드명 : read
+     * 인수 값 : Long
+     * 리턴 값 : StoremenuDTO
+     * 기  능 : pk를 받아 해당하는 데이터를 찾아 반환함.
+     * */
+    @Override
+    public StoremenuDTO read(Long pk) {
+        Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        StoremenuDTO data = modelMapper.map(storemenu, StoremenuDTO.class);
+        return data;
+    }
+
+    /*
+     * 메소드명 : modify
+     * 인수 값 : StoremenuDTO
+     * 리턴 값 : Long
+     * 기  능 : DTO를 받아 수정한 후, 수정한 객체의 pk를 반환한다.
+     * */
+    @Override
+    public Long modify(StoremenuDTO storemenuDTO) {
+        Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
+        entity.setStoremenuContent(storemenuDTO.getStoremenuContent());
+        entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
+        entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
+        entity.setStoremenuName(storemenuDTO.getStoremenuName());
+        entity.setStoremenuStatus(storemenuDTO.getStoremenuStatus());
+        return entity.getStoremenuNum();
+    }
+
+
+    /*
+     * 메소드명 : list
+     * 인수 값 : Long storeNum, String status, Pageable pageable
+     * 리턴 값 : Page<StoremenuDTO>
+     * 기  능 : 활성화상태가 입력받은값과 동일하면서, fk가 해당되는 데이터만 page로 가져온다.
+     * */
+    @Override
+    public Page<StoremenuDTO> list(Long storeNum, String status, Pageable pageable) {
+        Page<Storemenu> storemenuPage = storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum,status, pageable);
+        Page<StoremenuDTO> storemenuDTOPage = storemenuPage.map(data -> modelMapper.map(data, StoremenuDTO.class));
+        return storemenuDTOPage;
+    }
+
+
+    /*
+     * 메소드명 : delete
+     * 인수 값 : Long
+     * 리턴 값 : void
+     * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 inactive로 바꾼다.
+     * */
+    @Override
+    public void delete(Long pk) {
+        Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        storemenu.setStoremenuStatus("inactive");
+    }
+}

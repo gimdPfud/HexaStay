@@ -39,7 +39,7 @@ public class OrderStoreDTO {
     private String orderStorePay;
 
     //*********************************
-    //외부업체 상품 가져올 PK - StoreMenu
+    //외부업체 상품 가져올 PK - Storemenu
     private Long storeMenuNum;
 
     //**********************************
