@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장바구니</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 10px; border-radius: 10px; }
+        .cart-item { display: flex; align-items: center; border-bottom: 1px solid #ddd; padding: 10px; }
+        .cart-item img { width: 50px; height: 50px; margin-right: 10px; border-radius: 5px; }
+        .item-info { flex-grow: 1; }
+        .quantity { display: flex; align-items: center; }
+        .quantity button { padding: 5px; margin: 0 5px; }
+        .total { font-weight: bold; margin-top: 10px; }
+        .order-btn { display: block; width: 100%; padding: 10px; background: green; color: white; text-align: center; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>장바구니</h2>
+    <div id="cart-items"></div>
+    <div class="total">총 결제금액: <span id="total-price">0</span>원</div>
+    <button class="order-btn">주문하기</button>
+</div>
+
+<script>
+    // (여기서부터 기존의 cart 관리 로직을 유지)
+</script>
+<script>
+    function addToCart() {
+        const cartData = {
+            memberNum: 1, // 예시로 memberId 1을 사용, 실제로는 로그인된 사용자 ID로 처리
+            roomMenuCartItems: cart.map(item => ({
+                roomMenuNum: item.id,
+                roomMenuCartItemAmount: item.quantity,
+                roomMenuCartItemPrice: (item.price - item.discount) * item.quantity
+            }))
+        };
+
+        fetch("/api/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(cartData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert("장바구니에 항목이 추가되었습니다!");
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("장바구니 추가 실패", error);
+            });
+    }
+
+    document.querySelector(".order-btn").addEventListener("click", addToCart);
+
+    const cartData = {
+        roomMenuCartNum: 1,
+        totalPrice: 20000,
+        memberNum: 123,
+        roomMenuCartItems: [
+            {
+                roomMenuCartItemNum: 1,
+                roomMenuCartItemAmount: 2,
+                roomMenuCartItemPrice: 38000,
+                roomMenuNum: 101,
+                roomMenuName: "호텔 피자"
+            }
+        ]
+    };
+
+    // POST 요청 보내기
+    fetch('/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartData) // 요청 본문에 데이터를 JSON으로 포함
+    })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+
+
+</script>
+</body>
+</html>
