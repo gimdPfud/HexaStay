@@ -26,4 +26,7 @@ public interface StoreService {
     * 모든 외부 업체 목록 보여주기*/
     public Page<StoreDTO> list(String status, Pageable pageable);
     public Page<StoreDTO> list(Pageable pageable);
+
+    /*삭제: 활성화->비활성화 바꾸기*/
+    public void delete(Long pk);
 }

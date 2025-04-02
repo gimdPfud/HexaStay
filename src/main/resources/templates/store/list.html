@@ -19,72 +19,79 @@
 <!--                <input type="text" id="search" class="form-control" placeholder="업체명을 입력하세요">-->
 <!--            </div>-->
 
-            <table class="table table-bordered text-center">
-                <thead class="table-light">
-                <tr>
-                    <th>업체명</th>
-                    <th>이메일</th>
-                    <th>전화번호</th>
-                    <th>주소</th>
-                    <th>대표자</th>
-                    <th>상세보기</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="data : ${list}">
-                    <td th:text="${data.storeName}"></td>
-                    <td th:text="${data.storeEmail}"></td>
-                    <td th:text="${data.storePhone}"></td>
-                    <td th:text="${data.storeAddress}"></td>
-                    <td th:text="${data.storeCeoName}"></td>
-                    <td>
-                        <a th:href="@{/store/read/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <!--임시 링크-->
+            <div class="text-center" th:if="${list.number == 0}">
+                <a href="/store/insert" class="btn btn-primary btn-lg">등록</a>
+                <!--텅~~~-->
+            </div>
+
+            <div th:unless="${list.number==0}">
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                    <tr>
+                        <th>업체명</th>
+                        <th>이메일</th>
+                        <th>전화번호</th>
+                        <th>주소</th>
+                        <th>대표자</th>
+                        <th>상세보기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="data : ${list}">
+                        <td th:text="${data.storeName}"></td>
+                        <td th:text="${data.storeEmail}"></td>
+                        <td th:text="${data.storePhone}"></td>
+                        <td th:text="${data.storeAddress}"></td>
+                        <td th:text="${data.storeCeoName}"></td>
+                        <td>
+                            <a th:href="@{/store/read/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
 
-            <nav>
-                <!--페이징-->
-                <div class="row m-0 p-0 mt-3">
-                    <div class="col-3"></div>
-                    <ul class="col-6 pagination justify-content-center col">
-                        <!-- 처음 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                            <a class="page-link" th:href="@{/store/list?page=0}">처음</a>
-                        </li>
+                <nav>
+                    <!--페이징-->
+                    <div class="row m-0 p-0 mt-3">
+                        <div class="col-3"></div>
+                        <ul class="col-6 pagination justify-content-center col">
+                            <!-- 처음 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
+                                <a class="page-link" th:href="@{/store/list?page=0}">처음</a>
+                            </li>
 
-                        <!-- 이전 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
-                        </li>
+                            <!-- 이전 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
+                                <a class="page-link" th:href="@{/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
+                            </li>
 
-                        <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
-                        <li class="page-item"
-                            th:each="pageNum : ${#numbers.sequence(
-    (list.number - 4 > 0 ? list.number - 4 : 0),
-    (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1)
-    )}"
-                            th:classappend="${pageNum == list.number} ? 'active'">
-                            <a class="page-link" th:href="@{/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-                        </li>
+                            <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
+                            <li class="page-item"
+                                th:each="pageNum : ${#numbers.sequence(
+        (list.number - 4 > 0 ? list.number - 4 : 0),
+        (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1)
+        )}"
+                                th:classappend="${pageNum == list.number} ? 'active'">
+                                <a class="page-link" th:href="@{/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+                            </li>
 
-                        <!-- 다음 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/store/list?page={next}(next=${list.number + 1})}">다음</a>
-                        </li>
+                            <!-- 다음 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
+                                <a class="page-link" th:href="@{/store/list?page={next}(next=${list.number + 1})}">다음</a>
+                            </li>
 
-                        <!-- 마지막 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
-                        </li>
+                            <!-- 마지막 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
+                            </li>
 
-                    </ul>
+                        </ul>
 
-                </div>
-            </nav>
-
+                    </div>
+                </nav>
+            </div>
 
         </div>
         <div class="col-1"></div>
