@@ -74,7 +74,6 @@ public class CenterController {
     @PostMapping("/modify")
     public String modifyCenterPost(CenterDTO centerDTO) {
         log.info("post 방식 center 수정 controller 진입");
-
         centerService.centerModify(centerDTO);
 
         return "redirect:/center/list";

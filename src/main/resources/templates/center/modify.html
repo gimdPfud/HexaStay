@@ -22,51 +22,88 @@
         <input type="hidden" name="centerNum" th:value="${centerDTO.centerNum}">
         <div class="mb-2">
             <label class="form-label">브랜드명</label>
-            <input type="text" class="form-control" name="centerBrand" th:value="${centerDTO.centerBrand}">
+            <input type="text" name="centerBrand" id="centerBrand" class="form-control" th:value="${centerDTO.centerBrand}">
         </div>
         <div class="mb-2">
             <label class="form-label">상호명</label>
-            <input type="text" class="form-control" name="centerName" th:value="${centerDTO.centerName}">
+            <input type="text" name="centerName" id="centerName" class="form-control" th:value="${centerDTO.centerName}">
         </div>
         <div class="mb-2">
             <label class="form-label">사업자등록번호</label>
             <div class="row g-2">
                 <div class="col">
-                    <input type="text" id="centerBusinessNumOne" class="form-control" th:value="${centerDTO.centerBusinessNum}">
+                    <input type="text" id="centerBusinessNumOne" class="form-control" readonly style="background: #cccccc"
+                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 0, 3)}">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumTwo" class="form-control" th:value="${centerDTO.centerBusinessNum}">
+                    <input type="text" id="centerBusinessNumTwo" class="form-control" readonly style="background: #cccccc"
+                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 4, 6)}">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumThree" class="form-control" th:value="${centerDTO.centerBusinessNum}">
+                    <input type="text" id="centerBusinessNumThree" class="form-control" readonly style="background: #cccccc"
+                           th:value="${#strings.substring(centerDTO.centerBusinessNum, 7, 12)}">
                 </div>
-                <input hidden name="centerBusinessNum" id="centerBusinessNum">
+                <input hidden type="text" id="centerBusinessNum" name="centerBusinessNum" th:value="${centerDTO.centerBusinessNum}">
+            </div>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">대표자명</label>
+            <input type="text" name="centerCeoName" id="centerCeoName" class="form-control" th:value="${centerDTO.centerCeoName}">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">전화번호</label>
+            <div class="row g-2">
+                <div class="col-4">
+                    <select id="centerPhoneone" class="form-select" th:value="${#strings.substring(centerDTO.centerPhone, 0, centerDTO.centerPhone.indexOf('-'))}">
+                        <option>02</option>
+                        <option>031</option>
+                        <option>032</option>
+                        <option>041</option>
+                    </select>
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col-3">
+                    <input type="text" id="centerPhonetwo" class="form-control"
+                           th:value="${#strings.substring(centerDTO.centerPhone, centerDTO.centerPhone.indexOf('-') + 1, centerDTO.centerPhone.lastIndexOf('-'))}">
+                </div>
+                <div class="col-auto">-</div>
+                <div class="col-4">
+                    <input type="text" id="centerPhonethree" class="form-control"
+                           th:value="${#strings.substring(centerDTO.centerPhone, centerDTO.centerPhone.lastIndexOf('-') + 1)}">
+                </div>
+                <input hidden name="centerPhone" id="centerPhone" th:value="${centerDTO.centerPhone}">
             </div>
         </div>
 
         <div class="mb-2">
-            <label class="form-label">대표자명</label>
-            <input type="text" class="form-control" name="centerCeoName" th:value="${centerDTO.centerCeoName}">
-        </div>
-        <div class="mb-2">
-            <label class="form-label">전화번호</label>
-            <input type="text" class="form-control" name="centerPhone" th:value="${centerDTO.centerPhone}">
-        </div>
-        <div class="mb-2">
             <label class="form-label">이메일</label>
-            <input type="email" class="form-control" name="centerEmail" th:value="${centerDTO.centerEmail}">
+            <input type="email" name="centerEmail" id="email" class="form-control" th:value="${centerDTO.centerEmail}">
         </div>
         <div class="mb-4">
             <label class="form-label">주소</label>
-            <input type="text" class="form-control" name="centerAddress" th:value="${centerDTO.centerAddress}">
+            <input name="centerAddress" type="text" id="centerAddress" class="form-control" th:value="${centerDTO.centerAddress}">
         </div>
         <div class="d-flex justify-content-center gap-3">
             <a th:href="@{/center/list}" class="btn btn-secondary">취소</a>
-            <button type="submit" class="btn btn-success">저장</button>
+            <button type="submit" class="btn btn-success" onclick="submitForm()">저장</button>
         </div>
     </form>
+
+    <script>
+        // 수정양식 관련
+        function submitForm() {
+            // 사업자등록번호 합체
+            // 폰번호 합체
+            document.getElementById('centerPhone').value = document.getElementById('centerPhoneone').value + "-" + document.getElementById('centerPhonetwo').value + "-" + document.getElementById('centerPhonethree').value;
+        }
+
+        // 사업자번호 표기용
+        let centerBusinessNum = document.getElementById("centerBusinessNum").value;
+
+    </script>
+
 </div>
 </body>
 </html>
