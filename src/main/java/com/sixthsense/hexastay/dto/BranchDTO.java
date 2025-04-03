@@ -39,7 +39,9 @@ public class BranchDTO {
 
     private Long centerNum;            //센터 참조
 
-    private String centerName;
+    private String centerName;          //본사명
+
+    private String centerBrand;         //브랜드명
 
 
 }

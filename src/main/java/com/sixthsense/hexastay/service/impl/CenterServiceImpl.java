@@ -59,6 +59,7 @@ public class CenterServiceImpl implements CenterService {
         return centerDTO;
     }
 
+
     @Override
     public void centerModify(CenterDTO centerDTO) {
         log.info("center Modify Service 진입");

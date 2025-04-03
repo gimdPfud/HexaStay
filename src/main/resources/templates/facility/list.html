@@ -55,17 +55,19 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="centerDTOS : ${centerDTOS}">
-      <td th:text="${centerDTOS.centerBrand}"></td>
-      <td th:text="${centerDTOS.centerName}"></td>
-      <td th:text="${centerDTOS.centerBusinessNum}"></td>
-      <td th:text="${centerDTOS.centerCeoName}"></td>
-      <td th:text="${centerDTOS.centerPhone}"></td>
-      <td th:text="${centerDTOS.centerEmail}"></td>
-      <td th:text="${centerDTOS.centerAddress}"></td>
+    <tr th:each="facilityDTOS : ${facilityDTOS}">
+      <td th:text="${facilityDTOS.브랜드명}"></td>
+      <td th:text="${facilityDTOS.센터명}"></td>
+      <td th:text="${facilityDTOS.지사명}"></td>
+      <td th:text="${facilityDTOS.facilityName}"></td>
+      <td th:text="${facilityDTOS.facilityBusinessNum}"></td>
+      <td th:text="${facilityDTOS.facilityCeoName}"></td>
+      <td th:text="${facilityDTOS.facilityPhone}"></td>
+      <td th:text="${facilityDTOS.facilityEmail}"></td>
+      <td th:text="${facilityDTOS.facilityAddress}"></td>
 
       <td>
-        <a th:href="@{/center/read/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">상세보기</a>
+        <a th:href="@{/facility/read/{facilityNum}(facilityNum=${facilityDTOS.facilityNum})}" class="btn btn-success">상세보기</a>
       </td>
 
     </tr>
@@ -77,33 +79,33 @@
     <div class="col-3"></div>
     <ul class="col-6 pagination justify-content-center col">
       <!-- 처음 페이지 버튼 -->
-      <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">
+      <li class="page-item" th:classappend="${facilityDTOS.number == 0} ? 'disabled'">
         <a class="page-link" th:href="@{/freeboard?page=0}">처음</a>
       </li>
 
       <!-- 이전 페이지 버튼 -->
-      <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>
+      <li class="page-item" th:classappend="${!facilityDTOS.hasPrevious()} ? 'disabled'">
+        <a class="page-link" th:href="@{/freeboard?page={prev}(prev=${facilityDTOS.number - 1})}">이전</a>
       </li>
 
       <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
       <li class="page-item"
           th:each="pageNum : ${#numbers.sequence(
-    (centerDTOS.number - 4 > 0 ? centerDTOS.number - 4 : 0),
-    (centerDTOS.number + 5 < centerDTOS.totalPages - 1 ? centerDTOS.number + 5 : centerDTOS.totalPages - 1)
+    (facilityDTOS.number - 4 > 0 ? facilityDTOS.number - 4 : 0),
+    (facilityDTOS.number + 5 < facilityDTOS.totalPages - 1 ? facilityDTOS.number + 5 : facilityDTOS.totalPages - 1)
     )}"
-          th:classappend="${pageNum == centerDTOS.number} ? 'active'">
+          th:classappend="${pageNum == facilityDTOS.number} ? 'active'">
         <a class="page-link" th:href="@{/freeboard?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
       </li>
 
       <!-- 다음 페이지 버튼 -->
-      <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={next}(next=${centerDTOS.number + 1})}">다음</a>
+      <li class="page-item" th:classappend="${!facilityDTOS.hasNext()} ? 'disabled'">
+        <a class="page-link" th:href="@{/freeboard?page={next}(next=${facilityDTOS.number + 1})}">다음</a>
       </li>
 
       <!-- 마지막 페이지 버튼 -->
-      <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>
+      <li class="page-item" th:classappend="${facilityDTOS.number == facilityDTOS.totalPages - 1} ? 'disabled'">
+        <a class="page-link" th:href="@{/freeboard?page={last}(last=${facilityDTOS.totalPages - 1})}">마지막</a>
       </li>
 
     </ul>
