@@ -133,118 +133,121 @@
             }
 
 
-        adminCenter.addEventListener("change", function () {
-            adminBranchFacility.innerHTML = "<option value=''></option>";
-            adminStore.innerHTML = "<option value=''></option>";
-            let adminCenterValue = adminCenter.value;
-            let choiceValue = adminChoice.value;
+            adminCenter.addEventListener("change", function () {
+                adminBranchFacility.innerHTML = "<option value=''></option>";
+                adminStore.innerHTML = "<option value=''></option>";
+                let adminCenterValue = adminCenter.value;
+                let choiceValue = adminChoice.value;
 
-            if (choiceValue === "지사") {
-                fetch(`/searchbranch?centerName=${adminCenterValue}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        adminBranchFacility.innerHTML = "<option value=''></option>";
+                if (choiceValue === "지사") {
+                    fetch(`/searchbranch?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
 
-                        data.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.branchNum;
-                            option.textContent = item.branchName;
-                            adminBranchFacility.appendChild(option);
-                        });
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.branchNum;
+                                option.textContent = item.branchName;
+                                adminBranchFacility.appendChild(option);
+                            });
 
-                        adminBranchFacility.disabled = false;
-                    })
-                    .catch(error => console.error("지사 데이터 불러오기 실패:", error));
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지사 데이터 불러오기 실패:", error));
 
-            } else if (choiceValue === "지점") {
-                fetch(`/searchfacility?centerName=${adminCenterValue}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        adminBranchFacility.innerHTML = "<option value=''></option>";
+                } else if (choiceValue === "지점") {
+                    fetch(`/searchfacility?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
 
-                        data.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.facilityNum;
-                            option.textContent = item.facilityName;
-                            adminBranchFacility.appendChild(option);
-                        });
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.facilityNum;
+                                option.textContent = item.facilityName;
+                                adminBranchFacility.appendChild(option);
+                            });
 
-                        adminBranchFacility.disabled = false;
-                    })
-                    .catch(error => console.error("지점 데이터 불러오기 실패:", error));
-            } else {
-                fetch(`/searchbranchfacility?centerName=${adminCenterValue}`)
-                .then(response => response.json())
-                .then(data => {
-                    adminBranchFacility.innerHTML = "<option value=''></option>";
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지점 데이터 불러오기 실패:", error));
+                } else {
+                    fetch(`/searchbranchfacility?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
 
-                    data.forEach(item => {
-                        let branchOption = document.createElement("option");
-                        branchOption.value = item.branchNum;
-                        branchOption.textContent = "[브랜치] " + item.branchName;
-                        document.querySelector("select").appendChild(branchOption);
+                            data.forEach(item => {
+                                let branchOption = document.createElement("option");
+                                branchOption.value = item.branchNum;
+                                branchOption.textContent = "[브랜치] " + item.branchName;
+                                document.querySelector("select").appendChild(branchOption);
 
-                        let facilityOption = document.createElement("option");
-                        facilityOption.value = item.facilityNum;
-                        facilityOption.textContent = "[시설] " + item.facilityName;
-                        document.querySelector("select").appendChild(facilityOption);
-                    });
-                })
+                                let facilityOption = document.createElement("option");
+                                facilityOption.value = item.facilityNum;
+                                facilityOption.textContent = "[시설] " + item.facilityName;
+                                document.querySelector("select").appendChild(facilityOption);
+                            });
+                        })
+                }
+            });
+
+
+            adminBranchFacility.addEventListener("change", function () {
+                let choiceValue = adminChoice.value;
+                let branchfacilityValue = adminBranchFacility.value;
+
+                if (choiceValue === "지사") {
+                    fetch(`/searchstore?branchName=${branchfacilityValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminStore.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.storeName;
+                                option.textContent = item.storeNum;
+                                adminStore.appendChild(option);
+                            });
+
+                            adminStore.disabled = false;
+                        })
+                        .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+
+                } else if (choiceValue === "지점") {
+                    fetch(`/searchfacility?facilityName=${branchfacilityValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminStore.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.storeName;
+                                option.textContent = item.storeNum;
+                                adminStore.appendChild(option);
+                            });
+
+                            adminStore.disabled = false;
+                        })
+                        .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+                }
+            });
+
+
+            function submitForm() {
+                if (adminChoice.value === "본사") {
+                    document.getElementById("adminBrand").value = adminCenter.value;
+                } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                    document.getElementById("adminBrand").value = adminBranchFacility.value;
+                } else if (adminChoice.value === "스토어") {
+                    document.getElementById("adminBrand").value = adminStore.value;
+                }
+
             }
         });
 
 
-        adminBranchFacility.addEventListener("change", function () {
-            let choiceValue = adminChoice.value;
-            let branchfacilityValue = adminBranchFacility.value;
-
-            if (choiceValue === "지사") {
-                fetch(`/searchstore?branchName=${branchfacilityValue}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        adminStore.innerHTML = "<option value=''></option>";
-
-                        data.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.storeName;
-                            option.textContent = item.storeNum;
-                            adminStore.appendChild(option);
-                        });
-
-                        adminStore.disabled = false;
-                    })
-                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
-
-            } else if (choiceValue === "지점") {
-                fetch(`/searchfacility?facilityName=${branchfacilityValue}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        adminStore.innerHTML = "<option value=''></option>";
-
-                        data.forEach(item => {
-                            let option = document.createElement("option");
-                            option.value = item.storeName;
-                            option.textContent = item.storeNum;
-                            adminStore.appendChild(option);
-                        });
-
-                        adminStore.disabled = false;
-                    })
-                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
-            }
-        });
-
-
-        function submitForm() {
-            if (adminChoice.value === "본사") {
-                document.getElementById("adminBrand").value = adminCenter.value;
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                document.getElementById("adminBrand").value = adminBranchFacility.value;
-            } else if (adminChoice.value === "스토어") {
-                document.getElementById("adminBrand").value = adminStore.value;
-            }
-
-        }
 
 
     </script>
