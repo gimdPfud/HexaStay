@@ -46,4 +46,5 @@ public class RoomMenu extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotelRoomNum")
     private HotelRoom hotelRoom;                    //방 참조
+
 }

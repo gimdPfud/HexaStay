@@ -9,6 +9,8 @@
 </head>
 
 <body>
+
+[[${list}]]
 <div class="container mt-4">
     <h1>룸서비스 메뉴 목록</h1>
 
@@ -31,22 +33,21 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="roomMenuDTOPage : ${list}">
-            <th scope="row" th:text="${roomMenuDTOPage.roomMenuNum}"></th>
+        <tr th:each="roomMenuDTO : ${list}">
+            <th scope="row" th:text="${roomMenuDTO.roomMenuNum}"></th>
             <td>
-                <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTOPage.roomMenuNum}}"
-                   th:text="${roomMenuDTOPage.roomMenuName}">
+                <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTO.roomMenuNum}}"
+                   th:text="${roomMenuDTO.roomMenuName}">
                 </a>
             </td>
-            <td th:text="${roomMenuDTOPage.roomMenuPrice}"></td>
-            <td th:text="${roomMenuDTOPage.roomMenuAmount}"></td>
-            <td th:text="${roomMenuDTOPage.roomMenuCategory}"></td>
-            <td th:text="${roomMenuDTOPage.roomMenuStatus}"></td>
+            <td th:text="${roomMenuDTO.roomMenuPrice}"></td>
+            <td th:text="${roomMenuDTO.roomMenuAmount}"></td>
+            <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
+            <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
             <td>
-
-                <a th:href="@{/roommenu/modify(num=${roomMenuDTOPage.roomMenuNum})}" class="btn btn-primary btn-sm">수정</a>
+                <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary btn-sm">수정</a>
                 <form action="/roommenu/delete" method="post" style="display:inline;">
-                    <input type="hidden" name="num" th:value="${roomMenuDTOPage.roomMenuNum}">
+                    <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
                     <button type="submit" class="btn btn-danger btn-sm">삭제</button>
                 </form>
             </td>
