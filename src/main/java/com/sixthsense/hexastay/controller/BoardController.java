@@ -50,15 +50,11 @@ public class BoardController {
             Model model, Principal principal){
         //서비스 연동
         Page<BoardDTO> listDTOS = boardService.boardList(pageable,principal,type, keyword);
-        //페이지 정보 가공
-        Map<String,Integer> pageInfo= Pagination(listDTOS);
         //값 전달(model)
         model.addAttribute("list", listDTOS);
         //조회정보전달
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
-        //페이지 정보 전달
-        model.addAllAttributes(pageInfo);
         return "/board/list";
     }
 
