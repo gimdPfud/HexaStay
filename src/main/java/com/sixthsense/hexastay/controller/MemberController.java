@@ -16,6 +16,10 @@ public class MemberController {
 
     private final MemberService memberService;
 
+
+
+
+    //멤버 테이블 삭제 버튼
     @GetMapping("/delete")
     public String delteMember(Long memberNum) {
         log.info("member Controller에 도착 했지 :" + memberNum);

@@ -16,4 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select a from Member a")
     public Page<Member> findAll(Pageable pageable);
+
+
+
 }

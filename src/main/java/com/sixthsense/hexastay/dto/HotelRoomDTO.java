@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,33 @@ public class HotelRoomDTO {
 
     private LocalDateTime modifyDate; //수정일자
 
+    //todo:참조 참조 구분 하기 편하게
+    //*********참조 참조******************/////
     private Long branchNum;             //지사 참조
 
     private Long facilityNum;         //시설 참조
+
+    private Long memberNum;  //Member 참조    -pk
+
+
+    //todo : 추후에 Member 에 특정 값 만 가져 오기 위힌 것임
+     //*********참조 참조******************//참조 클래스
+    //필드 에서 MemberDTO가 처음 부터 HotelDTO가 가지고 가는 방식의 메소드 로직
+    private MemberDTO memberDTO;
+
+    //ModelMapper를 이용해서 한번에 참조 값을 변환 하기 위한 메서드
+    public HotelRoomDTO setMember(MemberDTO memberDTO) {
+
+        this.memberDTO = memberDTO;
+
+        return this;
+    }
+
+
+
+
+
+
+
+
 }
