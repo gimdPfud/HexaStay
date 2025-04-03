@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.BoardDTO;
 import com.sixthsense.hexastay.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -48,6 +49,7 @@ public class BoardController {
             @RequestParam(value = "type",defaultValue = "") String type,
             @RequestParam(value = "keyword",defaultValue = "") String keyword,
             Model model, Principal principal){
+        log.info("목록 진입");
         //서비스 연동
         Page<BoardDTO> listDTOS = boardService.boardList(pageable,principal,type, keyword);
         //값 전달(model)
@@ -55,8 +57,7 @@ public class BoardController {
         //조회정보전달
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
+        log.info("목록");
         return "/board/list";
     }
-
-
 }

@@ -10,32 +10,31 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Board  extends BaseEntity {
+public class Board extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //번호
     @Column(name = "boardNum")
-    private Long boardNum;                  //번호
-    //제목
-    @Column(name = "boardTitle")
-    private String boardTitle;              //제목
-    //내용
-    @Column(name = "boardContent")
-    private String boardContent;            //내용
-    //작성자
-    @Column(name = "boardWriter")
-    private String boardWriter;             //작성자
-    //뷰
-    @Column(name = "boardView")
-    private Integer boardView;
+    private Long boardNum; // 번호
+
+    @Column(name = "boardTitle", nullable = false, length = 50)
+    private String boardTitle; // 제목
+
+    @Column(name = "boardContent", nullable = false, columnDefinition = "TEXT")
+    private String boardContent; // 내용
+
+    @Column(name = "boardWriter", nullable = false, length = 20)
+    private String boardWriter; // 작성자
+
+    @Column(name = "boardView", nullable = false, columnDefinition = "INT default 0")
+    private Integer boardView; // 조회수
     //가져오기
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberNum")
+    @JoinColumn(name = "member")
     private Member member;
 
 }

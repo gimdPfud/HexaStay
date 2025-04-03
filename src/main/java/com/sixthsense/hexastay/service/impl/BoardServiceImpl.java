@@ -44,7 +44,7 @@ public class BoardServiceImpl implements BoardService {
         //String username = principal.getName(); // 로그인한 사용자 정보
         int currentPage = pageable.getPageNumber() - 1;
         int limits = 10;
-        Pageable temp = PageRequest.of(currentPage, limits, Sort.Direction.DESC, "id");
+        Pageable temp = PageRequest.of(currentPage, limits, Sort.Direction.DESC, "boardNum");
 
         Page<Board> boardList;
 

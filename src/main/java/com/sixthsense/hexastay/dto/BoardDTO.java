@@ -21,21 +21,20 @@ import java.time.LocalDateTime;
 @Builder
 //공지,QA
 public class BoardDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardNum;                  //번호
+    private Long boardNum; // 번호
 
-    private String boardTitle;              //제목
+    private String boardTitle; // 제목
 
-    private String boardContent;            //내용
+    private String boardContent; // 내용
 
-    private String boardWriter;             //작성자
+    private String boardWriter; // 작성자
 
-    private LocalDateTime createDate;       //등록일자
+    private LocalDateTime createDate; // 등록일자
 
-    private LocalDateTime modifyDate;       //수정일자
+    private LocalDateTime modifyDate; // 수정일자
 
-    private Integer boardView;              //조회수
+    private Integer boardView; // 조회수
 
-    private Long memberNum;
+    private Long memberNum; // 회원 번호
+
 }
