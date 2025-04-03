@@ -85,25 +85,50 @@
                     </div>
                     <div class="col-3">
                         <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
-                            <option></option>
                         </select>
                     </div>
                     <div class="col-3">
                         <select name="adminStore" id="adminStore" class="form-select" disabled>
-                            <option></option>
                         </select>
                     </div>
-
                     <input hidden name="adminBrand" id="adminBrand" value="">
-
                 </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
+                <select class="form-select" id="adminCenterRank">
+                    <option>임원진</option>
+                    <option>관리직</option>
+                    <option>사원</option>
+                </select>
+                <select class="form-select" id="adminBranchFacilityRank" hidden>
+                    <option>운영 총괄</option>
+                    <option>관리직</option>
+                    <option>사원</option>
+                    <option>협력 업체</option>
+                </select>
+                <select class="form-select" id="adminStoreRank" hidden>
+                    <option>운영총괄</option>
+                    <option>부매니저</option>
+                    <option>매장 직원</option>
+                </select>
+
+                <input hidden name="adminRank" id="adminRank">
+
             </div>
 
 
 
             <div class="mb-3">
+                <label class="form-label">직책</label>
+                <input type="text"  name="adminPosition" class="form-control">
+            </div>
+
+
+            <div class="mb-3">
                 <label class="form-label">입사일</label>
-                <input type="date" class="form-control">
+                <input type="date" name="adminJoinDate" class="form-control">
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="submit" onclick="submitForm()" class="btn btn-success">등록</button>
@@ -114,27 +139,54 @@
     </form>
 
     <script>
-        let adminChoice = document.getElementById("adminChoice");
-        let adminCenter = document.getElementById("adminCenter");
-        let adminBranchFacility = document.getElementById("adminBranchFacility");
-        let adminStore = document.getElementById("adminStore");
+        const adminChoice = document.getElementById("adminChoice");
+        const adminCenter = document.getElementById("adminCenter");
+        const adminBranchFacility = document.getElementById("adminBranchFacility");
+        const adminStore = document.getElementById("adminStore");
+        const adminCenterRank = document.getElementById("adminCenterRank");
+        const adminBranchFacilityRank = document.getElementById("adminBranchFacilityRank");
+        const adminStoreRank = document.getElementById("adminStoreRank");
+
 
         // 소속 선택 시 다른 선택 박스 활성화/비활성화
         adminChoice.addEventListener("change", function () {
             adminBranchFacility.innerHTML = "<option value=''></option>";
 
             if (adminChoice.value === "본사") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
                 adminCenter.disabled = false;
                 adminBranchFacility.disabled = true;
                 adminStore.disabled = true;
+
+                adminCenterRank.hidden = false;
+                adminBranchFacilityRank.hidden = true;
+                adminStoreRank.hidden = true;
+
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
                 adminCenter.disabled = false;
                 adminBranchFacility.disabled = false;
                 adminStore.disabled = true;
+
+                adminCenterRank.hidden = true;
+                adminBranchFacilityRank.hidden = false;
+                adminStoreRank.hidden = true;
+
             } else if (adminChoice.value === "스토어") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
                 adminCenter.disabled = true;
                 adminBranchFacility.disabled = true;
                 adminStore.disabled = false;
+
+                adminCenterRank.hidden = true;
+                adminBranchFacilityRank.hidden = true;
+                adminStoreRank.hidden = false;
 
                     fetch(`/searchstore`)
                         .then(response => response.json())
@@ -198,10 +250,13 @@
         function submitForm() {
             if (adminChoice.value === "본사") {
                 document.getElementById("adminBrand").value = adminCenter.value;
+                document.getElementById("adminRank").value = adminCenterRank.value;
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
                 document.getElementById("adminBrand").value = adminBranchFacility.value;
+                document.getElementById("adminRank").value = adminBranchFacilityRank.value;
             } else if (adminChoice.value === "스토어") {
                 document.getElementById("adminBrand").value = adminStore.value;
+                document.getElementById("adminRank").value = adminStoreRank.value;
             }
 
             document.getElementById('adminResidentNum').value =
@@ -211,6 +266,8 @@
                 document.getElementById('adminPhonePartOne').value + "-" +
                 document.getElementById('adminPhonePartTwo').value + "-" +
                 document.getElementById('adminPhonePartThree').value
+
+
 
         }
 
