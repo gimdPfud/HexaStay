@@ -5,7 +5,9 @@ import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
+import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +32,84 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //호텔룸 레퍼지토리
     private final HotelRoomRepository hotelRoomRepository;
 
+    //MemberRepository
+    private final MemberRepository memberRepository;
+
     //변환 처리를 위한 ModelMapper
     private final ModelMapper modelMapper = new ModelMapper();
 
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
+
+    //******************************//
+    //void 방식의 메서드 체이닝을 이용한 등록 메서드
+    @Override
+    public void insertMemberHoterl(HotelRoomDTO hotelRoomDTO) {
+
+        //호텔룸 entity를 가져오기
+        HotelRoom hotelRoom =
+                modelMapper.map(hotelRoomDTO, HotelRoom.class);
+
+        //참조 엔티티 가져오기
+
+
+    }
+
+
+
+
+    // 호텔룸 등록 (회원 정보 포함)
+    @Override
+    public HotelRoomDTO insertHotelRoomMember(HotelRoomDTO hotelRoomDTO, Long memberNum) {
+
+        //member 정보를 가져 오기
+        Member member = memberRepository.findById(memberNum)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+
+        //룸 DB에 member 테이블 합쳐 주기
+
+        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
+        hotelRoom.setMember(member); // 회원 정보 설정
+
+        //DB에 저장 설정
+        HotelRoom savedHotelRoom = hotelRoomRepository.save(hotelRoom);
+
+        //HotelRoom DTO 에 반환 하기
+        return modelMapper.map(savedHotelRoom, HotelRoomDTO.class);
+    }
+
+    // 호텔룸과 배정된 회원 정보 조회
+    @Override
+    public Optional<HotelRoomDTO> getHotelRoomWithMember(Long hotelRoomNum) {
+        return hotelRoomRepository.findById(hotelRoomNum)
+                .map(hotelRoom -> {
+                    HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
+                    if (hotelRoom.getMember() != null) {
+                        hotelRoomDTO.setMemberDTO(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
+                    }
+                    return hotelRoomDTO;
+                });
+    }
+
+    // 호텔룸에 배정된 회원 정보 리스트 조회
+    @Override
+    public List<MemberDTO> getAllMembersInHotelRooms() {
+        return hotelRoomRepository.findAll().stream()
+                .map(HotelRoom::getMember)
+                .filter(Objects::nonNull)
+                .map(member -> modelMapper.map(member, MemberDTO.class))
+                .collect(Collectors.toList());
+    }
+
+
+
+
+    @Override
+    public Optional<MemberDTO> getMemberByHotelRoomNum(Long hotelRoomNum) {
+        return hotelRoomRepository.findMemberByHotelRoomNum(hotelRoomNum)
+                .map(member -> modelMapper.map(member, MemberDTO.class));
+    }
+
+
 
 
     //1.등록
@@ -44,6 +123,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoomRepository.save(hotelRoom);
 
     }
+
+
 
     //2.리스트
     @Override
@@ -113,4 +194,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoomRepository.deleteById(hotelRoomNum);
 
     }
+
+    //추가
+
+
+
 }

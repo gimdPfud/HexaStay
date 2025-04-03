@@ -26,7 +26,7 @@
     <div class="container mt-4"><!--인서트 container 시작-->
         <div class="row"><!--상단 제목 나중에 수정 들어 갈수 있음-->
             <div class="col">
-                <h3 class="mb-3">룸 등록 페이지</h3>
+                <h3 class="mb-3">프런트 등록 페이지</h3>
                     <h5><a th:href="@{/hotelroom/list}">룸리스트</a> </h5>
             </div>
         </div><!--상단 제목 나중에 수정 들어 갈수 있음-->
@@ -119,6 +119,7 @@
                 <tbody >
                 <tr id="memberTableBody" th:each="memberdata:${membersDTOs}">
                     <td><input type="checkbox"></td>
+                    <input type="number" name="memberNum" required/><br/><!--체크시 memberpk값을 가져 가야함-->
                     <td th:text="${memberdata.memberNum}">NO</td>
                     <td th:text="${memberdata.memberName}">이름</td>
                     <td th:text="${memberdata.memberEmail}">이메일</td>
