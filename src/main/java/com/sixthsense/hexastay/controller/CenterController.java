@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.BoardDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
