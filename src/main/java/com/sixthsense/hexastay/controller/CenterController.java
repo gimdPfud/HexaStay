@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -36,8 +38,10 @@ public class CenterController {
     }
 
     @GetMapping("/signup")
-    public String signUpCenterGet(){
+    public String signUpCenterGet(Model model){
         log.info("get 방식 center 등록 controller 진입");
+        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        model.addAttribute("centerDTOList", centerDTOList);
 
         return "center/signup";
     }

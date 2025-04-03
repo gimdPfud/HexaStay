@@ -23,7 +23,7 @@
         <!--브랜드-->
         <div class="mb-2">
             <label class="form-label">소속</label>
-            <select type="text" name="centerBrand" id="centerSelectedBrand" class="form-control">
+            <select type="text" id="centerSelectedBrand" class="form-control">
                 <option>본사</option>
                 <option>지사</option>
                 <option>지점</option>
@@ -34,7 +34,7 @@
             <input type="text" name="centerBrand" id="inputBrand" class="form-control">
         </div>
         <select type="text" id="selectedBrand" class="form-control" hidden>
-            <option>선택하세요.</option>
+            <option th:each="centerDTO : ${centerDTOList}" th:text="${centerDTO.centerName}" th:value="${centerDTO.centerNum}"></option>
         </select>
 
 
@@ -144,7 +144,7 @@
             let baseData = {
                 createDate: new Date().toISOString(),
                 modifyDate: new Date().toISOString(),
-                centerNum: document.getElementById("centerNum").value,
+                centerNum: document.getElementById("selectedBrand").value,
                 centerAddress: document.getElementById("centerAddress").value,
                 centerCeoName: document.getElementById("centerCeoName").value,
                 centerEmail: document.getElementById("email").value,
@@ -162,6 +162,7 @@
                     facilityPhone: baseData.centerPhone
                 };
 
+                console.log("파실리티")
                 fetch("/facilityinsert", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -188,6 +189,7 @@
                     branchPhone: baseData.centerPhone
                 };
 
+                console.log("브랜치")
                 fetch("/branchinsert", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
