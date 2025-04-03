@@ -28,7 +28,7 @@ public class Admin extends BaseEntity {
     private Integer adminEmployeeNum;
 
     //어드민 패스워드
-    private Long adminPassword;
+    private String adminPassword;
 
     //어드민 이름
     private String adminName;
