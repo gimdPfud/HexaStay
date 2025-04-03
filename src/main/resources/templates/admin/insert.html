@@ -64,7 +64,7 @@
                 <input type="text" id="phonePartTwo" class="form-control" style="width:30%"> -
                 <input type="text" id="phonePartThree" class="form-control" style="width:30%">
 
-                <input hidden name="adminPhone" id="phonePartFour" class="form-control" style="width:30%"
+                <input hidden name="adminPhone" id="phonePartFour" class="form-control" style="width:30%">
             </div>
 
             <div class="mb-2">
@@ -93,6 +93,7 @@
                             <option></option>
                         </select>
                     </div>
+                    <input hidden name="adminBrand" id="adminBrand" value="">
                 </div>
             </div>
 
@@ -111,62 +112,139 @@
     </form>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const adminChoice = document.getElementById("adminChoice");
-            const adminCenter = document.getElementById("adminCenter");
-            const adminBranchFacility = document.getElementById("adminBranchFacility");
-            const adminStore = document.getElementById("adminStore");
+        let adminChoice = document.getElementById("adminChoice");
+        let adminCenter = document.getElementById("adminCenter");
+        let adminBranchFacility = document.getElementById("adminBranchFacility");
+        let adminStore = document.getElementById("adminStore");
 
-            // 직책 선택에 따라 입력 활성화/비활성화
-            adminChoice.addEventListener("change", function () {
-                let choice = adminChoice.value;
+        // 소속 선택 시 다른 선택 박스 활성화/비활성화
+        adminChoice.addEventListener("change", function () {
+            adminBranchFacility.innerHTML = "<option value=''></option>";
 
-                resetSelectOptions(adminBranchFacility);
-                resetSelectOptions(adminStore);
-
-                adminCenter.disabled = false; // 센터는 항상 선택 가능
-                adminBranchFacility.disabled = choice === "본사"; // 본사면 지사 선택 불가
-                adminStore.disabled = choice !== "스토어"; // 스토어일 때만 지점 선택 가능
-            });
-
-            // 센터 선택 시 지사 목록 불러오기
-            adminCenter.addEventListener("change", function () {
-                if (!adminBranchFacility.disabled) {
-                    fetchData(`/searchbranch?centerName=${adminCenter.value}`, adminBranchFacility);
-                }
-            });
-
-            // 지사 또는 지점 선택 시 맞는 URL로 데이터 요청
-            adminBranchFacility.addEventListener("change", function () {
-                if (!adminStore.disabled) {
-                    let url = adminChoice.value === "지사"
-                        ? `/searchbranch?centerName=${adminBranchFacility.value}`
-                        : `/searchfacility?centerName=${adminBranchFacility.value}`;
-                    fetchData(url, adminStore);
-                }
-            });
-
-            function fetchData(url, targetSelect) {
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        resetSelectOptions(targetSelect);
-                        data.forEach(item => {
-                            let option = new Option(item.centerName, item.centerNum);
-                            targetSelect.appendChild(option);
-                        });
-                        targetSelect.disabled = false;
-                    })
-                    .catch(error => console.error("데이터 로드 실패:", error));
+            if (adminChoice.value === "본사") {
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = true;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                adminBranchFacility.disabled = false;
+                adminStore.disabled = true;
+            } else if (adminChoice.value === "스토어") {
+                adminBranchFacility.disabled = false;
+                adminStore.disabled = false;
             }
 
-            function resetSelectOptions(selectElement) {
-                selectElement.innerHTML = '<option value="">선택</option>';
-                selectElement.disabled = true;
+
+        adminCenter.addEventListener("change", function () {
+            adminBranchFacility.innerHTML = "<option value=''></option>";
+            adminStore.innerHTML = "<option value=''></option>";
+            let adminCenterValue = adminCenter.value;
+            let choiceValue = adminChoice.value;
+
+            if (choiceValue === "지사") {
+                fetch(`/searchbranch?centerName=${adminCenterValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.branchNum;
+                            option.textContent = item.branchName;
+                            adminBranchFacility.appendChild(option);
+                        });
+
+                        adminBranchFacility.disabled = false;
+                    })
+                    .catch(error => console.error("지사 데이터 불러오기 실패:", error));
+
+            } else if (choiceValue === "지점") {
+                fetch(`/searchfacility?centerName=${adminCenterValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.facilityNum;
+                            option.textContent = item.facilityName;
+                            adminBranchFacility.appendChild(option);
+                        });
+
+                        adminBranchFacility.disabled = false;
+                    })
+                    .catch(error => console.error("지점 데이터 불러오기 실패:", error));
+            } else {
+                fetch(`/searchbranchfacility?centerName=${adminCenterValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                    data.forEach(item => {
+                        let branchOption = document.createElement("option");
+                        branchOption.value = item.branchNum;
+                        branchOption.textContent = "[브랜치] " + item.branchName;
+                        document.querySelector("select").appendChild(branchOption);
+
+                        let facilityOption = document.createElement("option");
+                        facilityOption.value = item.facilityNum;
+                        facilityOption.textContent = "[시설] " + item.facilityName;
+                        document.querySelector("select").appendChild(facilityOption);
+                    });
+                })
             }
         });
 
 
+        adminBranchFacility.addEventListener("change", function () {
+            let choiceValue = adminChoice.value;
+            let branchfacilityValue = adminBranchFacility.value;
+
+            if (choiceValue === "지사") {
+                fetch(`/searchstore?branchName=${branchfacilityValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminStore.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.storeName;
+                            option.textContent = item.storeNum;
+                            adminStore.appendChild(option);
+                        });
+
+                        adminStore.disabled = false;
+                    })
+                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+
+            } else if (choiceValue === "지점") {
+                fetch(`/searchfacility?facilityName=${branchfacilityValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        adminStore.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let option = document.createElement("option");
+                            option.value = item.storeName;
+                            option.textContent = item.storeNum;
+                            adminStore.appendChild(option);
+                        });
+
+                        adminStore.disabled = false;
+                    })
+                    .catch(error => console.error("스토어 데이터 불러오기 실패:", error));
+            }
+        });
+
+
+        function submitForm() {
+            if (adminChoice.value === "본사") {
+                document.getElementById("adminBrand").value = adminCenter.value;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                document.getElementById("adminBrand").value = adminBranchFacility.value;
+            } else if (adminChoice.value === "스토어") {
+                document.getElementById("adminBrand").value = adminStore.value;
+            }
+
+        }
 
 
     </script>
