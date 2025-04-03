@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>외부업체 서비스 등록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="row mt-3">
+        <div class="col-2"></div><!-- 오른쪽 여백 -->
+        <div class="col-8">
+
+
+            <h1 class="text-center mb-4">상점을 선택해주세요</h1>
+            <form action="/store/menu/selected" method="get">
+                <div class="input-group mb-3">
+                    <select class="form-select" id="storeSelect" name="storeNum" onchange="toggleButton()">
+                        <option value="" selected disabled>상점을 선택하세요</option>
+                        <option th:each="store : ${list}" th:value="${store.storeNum}" th:text="${store.storeName}"></option>
+                    </select>
+                    <button type="submit" id="submitButton" class="btn text-dark" disabled
+                            style="background-color: #f8f9fa; border: 1px solid #ced4da; transition: 0.2s;"
+                            onmouseover="if(!this.disabled) { this.style.backgroundColor='#e9ecef'; this.style.borderColor='#adb5bd'; }"
+                            onmouseout="if(!this.disabled) { this.style.backgroundColor='#f8f9fa'; this.style.borderColor='#ced4da'; }">
+                        이 상점으로 계속하기
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                function toggleButton() {
+                    const selectBox = document.getElementById("storeSelect");
+                    const submitButton = document.getElementById("submitButton");
+                    submitButton.disabled = !selectBox.value; // 값이 없으면 비활성화, 있으면 활성화
+                }
+            </script>
+
+
+        </div><!-- 작업 영역 -->
+        <div class="col-2"></div><!-- 왼쪽 여백 -->
+    </div><!-- row 끝 -->
+</div><!-- container 끝 -->
+</body>
+</html>

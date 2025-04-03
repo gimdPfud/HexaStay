@@ -23,7 +23,9 @@ public interface StoremenuService {
 
     /*목록*/
     public Page<StoremenuDTO> list(Long storeNum, String status, Pageable pageable);
+    /*목록2 페이징없는 모든 목록*/
+    public Page<StoremenuDTO> list(Long storeNum, String status);
 
     /*삭제인척 하는 활성화->비활성화*/
-    public void delete(Long pk);
+    public Long delete(Long pk);
 }

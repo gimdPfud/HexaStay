@@ -85,7 +85,9 @@
 <script th:inline="javascript">
     let storemenulist = $(".storemenulist")
     let storenum = [[${data.storeNum}]]
-
+    document.addEventListener("DOMContentLoaded", function () {
+        showstoremenu([[${mainlist}]])
+    })
     /*
      * 메소드명 : showstoremenu
      * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
@@ -93,6 +95,7 @@
      * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
      * */
     function showstoremenu(list) {
+        console.log("실행시작...")
         let tagsstart = `<table class="table table-bordered text-center">
                 <thead class="table-light">
                 <tr>

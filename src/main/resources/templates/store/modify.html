@@ -16,7 +16,8 @@
             <div class="col-md-8 p-4 border rounded bg-light">
                 <div class="text-center mb-3">
                     <img src="/images/store-icon.png" alt="업체 이미지" class="img-fluid" style="width: 80px;">
-                    <input type="hidden" class="form-control" th:value="${data.storeNum}" name="storeNum">
+                    <input hidden class="form-control" th:value="${data.storeNum}" name="storeNum">
+                    <input hidden class="form-control" value="active" name="storeStatue">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">상호명</label>

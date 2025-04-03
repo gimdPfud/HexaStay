@@ -18,10 +18,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 @Log4j2
+@Transactional
 public class StoremenuServiceImpl implements StoremenuService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final StoremenuRepository storemenuRepository;
@@ -66,7 +68,7 @@ public class StoremenuServiceImpl implements StoremenuService {
         entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
         entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
         entity.setStoremenuName(storemenuDTO.getStoremenuName());
-        entity.setStoremenuStatus(storemenuDTO.getStoremenuStatus());
+        entity.setStoremenuStatus("active");
         return entity.getStoremenuNum();
     }
 
@@ -84,6 +86,11 @@ public class StoremenuServiceImpl implements StoremenuService {
         return storemenuDTOPage;
     }
 
+    @Override
+    public Page<StoremenuDTO> list(Long storeNum, String status) {
+        return null;
+    }
+
 
     /*
      * 메소드명 : delete
@@ -92,8 +99,9 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 inactive로 바꾼다.
      * */
     @Override
-    public void delete(Long pk) {
+    public Long delete(Long pk) {
         Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         storemenu.setStoremenuStatus("inactive");
+        return storemenu.getStore().getStoreNum();
     }
 }

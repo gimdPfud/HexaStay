@@ -9,7 +9,9 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.dto.StoremenuDTO;
+import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StoremenuService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +31,46 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/store/menu")
 public class StoremenuController {
     private final StoremenuService storemenuService;
+    private final StoreService storeService;
+
+    /*storeNum없이 바로 메뉴 등록하려고 할 때
+    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지
+    * todo (일단 새 페이지로... 나중에 모달로 바꾸든지 말든지)*/
+    @GetMapping("/insert")
+    public String insertPrevGet(HttpSession session, Model model){
+        session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
+        List<StoreDTO> list = storeService.getAllList();
+        model.addAttribute("list",list);
+        return "storemenu/selectstorenum";
+    }
+    @GetMapping("/list")
+    public String listPrevGet(HttpSession session, Model model){
+        session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
+        List<StoreDTO> list = storeService.getAllList();
+        model.addAttribute("list",list);
+        return "storemenu/selectstorenum";
+    }
+    @GetMapping("/selected")
+    public String insertPrevSelected(HttpSession session, Long storeNum, RedirectAttributes model){
+        log.info(storeNum);
+        int prevpage = (int) session.getAttribute("prevpage");
+        if(prevpage==1){
+            return "redirect:/store/menu/insert/"+storeNum;
+        } else if(prevpage==2){
+            return "redirect:/store/read/"+storeNum;
+        }
+        else {
+            log.info("뭔진모르겟는데 오류");
+            return null;
+        }
+    }
+    /*todo 그냥 storeNum없이 메뉴리스트를 보려면?? (사이드바에서 선택해서 보게된다면?)
+     *  한번 store를 선택하는 쿠션이 있어야 할 듯.*/
+
+
+
+
+
 
     /*
      * 메소드명 :
@@ -34,13 +79,13 @@ public class StoremenuController {
      * 기  능 :
      * */
     @GetMapping("/insert/{id}")
-    public String insert(@PathVariable Long id, Model model){
+    public String insertGet(@PathVariable Long id, Model model){
         log.info("등록 : "+id);
         model.addAttribute("storeNum",id);
         return "storemenu/insert";
     }
     @PostMapping("/insert")
-    public String insert(StoremenuDTO storemenuDTO){
+    public String insertPost(StoremenuDTO storemenuDTO){
         storemenuService.insert(storemenuDTO);
         return "redirect:/store/menu/insert/"+storemenuDTO.getStoreNum();
     }
@@ -48,7 +93,7 @@ public class StoremenuController {
 /*todo 이거 /store/read/{id}에 어떻게 넣는지 생각좀 해보기...*/
     @ResponseBody
     @GetMapping("/list/{id}")
-    public ResponseEntity list(@PathVariable Long id, Pageable pageable){
+    public ResponseEntity listGet(@PathVariable Long id, Pageable pageable){
         /*storeNum으로 Menu 가져오기...*/
         Page<StoremenuDTO> menulist = storemenuService.list(id, "active", pageable);
         menulist.forEach(log::info);
@@ -73,12 +118,14 @@ public class StoremenuController {
     }
     @PostMapping("/modify")
     public String modify(StoremenuDTO storemenuDTO){
-        storemenuService.modify(storemenuDTO);
-        return "redirect:/store/menu/read/";
+        Long storemenuNum = storemenuService.modify(storemenuDTO);
+        log.info(storemenuNum);
+        return "redirect:/store/menu/read/"+storemenuNum;
     }
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
-        return "redirect:/store/menu/list";
+        Long storeNum = storemenuService.delete(id);
+        return "redirect:/store/read/"+storeNum;
     }
 }

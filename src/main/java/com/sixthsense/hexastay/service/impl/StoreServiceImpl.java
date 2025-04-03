@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -70,6 +72,13 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreAddress(storeDTO.getStoreAddress());
         store.setStorePassword(storeDTO.getStorePassword());
         return store.getStoreNum();
+    }
+
+    @Override
+    public List<StoreDTO> getAllList() {
+        List<Store> storeList = storeRepository.findAll("active");
+        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data, StoreDTO.class)).toList();
+        return list;
     }
 
 
