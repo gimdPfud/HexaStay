@@ -13,9 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface StoremenuRepository extends JpaRepository<Storemenu, Long> {
     @Query("select a from Storemenu a")
     public Page<Storemenu> findAll(Pageable pageable);
+
+    /*storenum(fk)가 해당하는 menu들을 (활성화된것만) 전부 가져오기.*/
+    @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus='alive'")
+    public List<Storemenu> findAll(Long storeNum);
 
 
     /*활성화여부와 상위 가게 pk로...*/

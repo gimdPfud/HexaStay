@@ -11,6 +11,8 @@ import com.sixthsense.hexastay.dto.StoreDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface StoreService {
     /*등록*/
     public void insert(StoreDTO storeDTO);
@@ -21,6 +23,8 @@ public interface StoreService {
     /*수정*/
     public Long modify(StoreDTO storeDTO);
 
+    /*추가목록 : 전부 가져오기*/
+    public List<StoreDTO> getAllList();
     /*목록?
     * 활성화된 외부업체만 목록으로 보여주기
     * 모든 외부 업체 목록 보여주기*/
