@@ -31,7 +31,7 @@ public class BranchDTO {
 
     private String branchCeoName;           //대표명
 
-    private String centerBusinessNum;       //사업자등록번호
+    private String branchBusinessNum;       //사업자등록번호
 
     private LocalDateTime createDate; //등록일자
 
@@ -40,4 +40,6 @@ public class BranchDTO {
     private Long centerNum;            //센터 참조
 
     private String centerName;
+
+
 }

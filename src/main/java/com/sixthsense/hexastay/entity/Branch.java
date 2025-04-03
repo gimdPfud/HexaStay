@@ -39,8 +39,8 @@ public class Branch  extends BaseEntity {
     @Column(name = "branchCeoName")
     private String branchCeoName;           //대표자명
 
-    @Column(name = "centerBusinessNum")
-    private String centerBusinessNum;       //사업자등록번호
+    @Column(name = "branchBusinessNum")
+    private String branchBusinessNum;       //사업자등록번호
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")
