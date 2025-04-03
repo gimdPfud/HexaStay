@@ -11,6 +11,9 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -45,13 +48,19 @@ public class Admin extends BaseEntity {
     //어드민 전화번호
     private String adminPhone;
 
-    //어드민 직책
-    private String adminPosition;
+    //어드민 직급
+    private String adminRole;
 
     //어드민 Brand
     private String adminBrand;
 
     //어드민 승인여부
     private Boolean adminActive;
+
+    //어드민 직책
+    private String adminPosition;
+
+    //어드민 입사일
+    private LocalDate adminJoinDate;
 
 }

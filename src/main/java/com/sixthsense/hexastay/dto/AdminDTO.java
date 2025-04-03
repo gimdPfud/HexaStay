@@ -11,6 +11,7 @@ package com.sixthsense.hexastay.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -46,10 +47,13 @@ public class AdminDTO {
     private String adminPhone;
 
     //어드민 직책
-    private String adminPosition;
+    private String adminRole;
 
     //어드민 Brand
     private String adminBrand;
+
+    //어드민 입사일
+    private LocalDate adminJoinDate;
 
     //어드민 생성일
     private LocalDateTime createDate;
@@ -59,5 +63,8 @@ public class AdminDTO {
 
     //어드민 승인처리
     private Boolean adminActive;
+
+    //어드민 직급
+    private String adminPosition;
 
 }
