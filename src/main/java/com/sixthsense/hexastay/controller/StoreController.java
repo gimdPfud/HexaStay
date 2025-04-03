@@ -48,7 +48,7 @@ public class StoreController {
 
     @GetMapping("/list")
     public String list(Pageable pageable, Model model){
-        Page<StoreDTO> storeDTOPage = storeService.list("active", pageable);
+        Page<StoreDTO> storeDTOPage = storeService.list("alive", pageable);
         storeDTOPage.forEach(log::info);
         model.addAttribute("list",storeDTOPage);
         return "store/list";

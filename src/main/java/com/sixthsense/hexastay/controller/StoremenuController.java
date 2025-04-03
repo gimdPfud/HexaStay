@@ -14,7 +14,6 @@ import com.sixthsense.hexastay.service.StoremenuService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +94,7 @@ public class StoremenuController {
     @GetMapping("/list/{id}")
     public ResponseEntity listGet(@PathVariable Long id, Pageable pageable){
         /*storeNum으로 Menu 가져오기...*/
-        Page<StoremenuDTO> menulist = storemenuService.list(id, "active", pageable);
+        List<StoremenuDTO> menulist = storemenuService.list(id);
         menulist.forEach(log::info);
         return new ResponseEntity<>(menulist, HttpStatus.OK);
     }

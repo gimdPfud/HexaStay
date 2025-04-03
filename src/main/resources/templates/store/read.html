@@ -79,14 +79,47 @@
 
         <div class="col-md-2"></div>
 
+
     </div><!--외부업체가 제공하는 서비스 목록들-->
 </div>
 
+<!--&lt;!&ndash;todo 훔쳐온 내용&ndash;&gt;-->
+<!--fetch(`/searchbranch?centerName=${adminCenterValue}`)-->
+<!--.then(response => response.json())-->
+<!--.then(data => {-->
+<!--adminBranchFacility.innerHTML = "<option value=''></option>";-->
+
+<!--data.forEach(item => {-->
+<!--let option = document.createElement("option");-->
+<!--option.value = item.branchNum;-->
+<!--option.textContent = item.branchName;-->
+<!--adminBranchFacility.appendChild(option);-->
+<!--});-->
+
+<!--adminBranchFacility.disabled = false;-->
+<!--})-->
+<!--.catch(error => console.error("지사 데이터 불러오기 실패:", error));-->
+<!--&lt;!&ndash;todo 훔쳐온 내용 끝&ndash;&gt;-->
+
+
+
+
+
 <script th:inline="javascript">
-    let storemenulist = $(".storemenulist")
+    let storemenulist = document.querySelector(".storemenulist");
     let storenum = [[${data.storeNum}]]
     document.addEventListener("DOMContentLoaded", function () {
-        showstoremenu([[${mainlist}]])
+        console.log("페이지 로드 됨")
+
+        fetch(`/store/menu/list/${storenum}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("갔다옴")
+                showstoremenu(data)
+            })
+            .catch(error => console.error("오류!!!:", error));
+
+
     })
     /*
      * 메소드명 : showstoremenu
@@ -109,54 +142,22 @@
                 <tbody>`;
         let tagscontent = "";
         let tagsend = `</tbody>
-            </table>
-<!--페이징-->
-                <div class="row m-0 p-0 mt-3">
-                    <div class="col-3"></div>
-                    <ul class="col-6 pagination justify-content-center col">
-                        <!-- 처음 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/store/menu/list/'+${storenum}+'?page=0'}">처음</a>
-                        </li>
-
-                        <!-- 이전 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/store/menu/list'+${storenum}+'?page='+${list.number - 1}}">이전</a>
-                        </li>
-
-                        <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
-                        <li class="page-item"
-                            th:each="pageNum : ${#numbers.sequence(
-            (list.number - 4 > 0 ? list.number - 4 : 0),
-            (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1)
-        )}"
-                            th:classappend="${pageNum == list.number} ? 'active'">
-                            <a class="page-link" th:href="@{'/store/menu/list'+${storenum}+'?page='+${pageNum}}" th:text="${pageNum + 1}"></a>
-                        </li>
-
-                        <!-- 다음 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/store/menu/list'+${storenum}+'?page='+${list.number + 1}}">다음</a>
-                        </li>
-
-                        <!-- 마지막 페이지 버튼 -->
-                        <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/store/menu/list'+${storenum}+'?page='+${list.totalPages - 1}}">마지막</a>
-                        </li>
-                    </ul>
-                </div><!--페이지버튼끝-->`;
+            </table>`;
 
         for (let i=0; i<list.length;i++){
             tagscontent += `<tr>
-                    <td th:text="${list[i].storemenuName}"></td>
-                    <td th:text="${list[i].storemenuPrice}"></td>
-                    <td th:text="${list[i].storemenuContent}"></td>
-                    <td th:text="${list[i].storemenuCategory}"></td>
+                    <td>${list[i].storemenuName}</td>
+                    <td>${list[i].storemenuPrice}</td>
+                    <td>${list[i].storemenuContent}</td>
+                    <td>${list[i].storemenuCategory}</td>
                     <td>
-                        <a th:href="@{'/store/menu/read/'+${list[i].storemenuNum}}" class="btn btn-success btn-sm">상세보기</a>
+                        <a href="/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세보기</a>
                     </td>
                 </tr>`
         }
+        let totaltags = tagsstart + tagscontent + tagsend;
+
+        storemenulist.innerHTML=totaltags;
 
     }
 </script>

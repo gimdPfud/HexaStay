@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 @Log4j2
@@ -36,7 +38,7 @@ public class StoremenuServiceImpl implements StoremenuService {
      * */
     @Override
     public Long insert(StoremenuDTO storemenuDTO) {
-        storemenuDTO.setStoremenuStatus("active");
+        storemenuDTO.setStoremenuStatus("alive");
         Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
         storemenu = storemenuRepository.save(storemenu);
         return storemenu.getStoremenuNum();
@@ -68,7 +70,7 @@ public class StoremenuServiceImpl implements StoremenuService {
         entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
         entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
         entity.setStoremenuName(storemenuDTO.getStoremenuName());
-        entity.setStoremenuStatus("active");
+        entity.setStoremenuStatus("alive");
         return entity.getStoremenuNum();
     }
 
@@ -87,8 +89,10 @@ public class StoremenuServiceImpl implements StoremenuService {
     }
 
     @Override
-    public Page<StoremenuDTO> list(Long storeNum, String status) {
-        return null;
+    public List<StoremenuDTO> list(Long storeNum) {
+        List<Storemenu> storemenuList = storemenuRepository.findAll(storeNum);
+        List<StoremenuDTO> list = storemenuList.stream().map(data->modelMapper.map(data,StoremenuDTO.class)).toList();
+        return list;
     }
 
 
@@ -96,12 +100,12 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 메소드명 : delete
      * 인수 값 : Long
      * 리턴 값 : void
-     * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 inactive로 바꾼다.
+     * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 deleted로 바꾼다.
      * */
     @Override
     public Long delete(Long pk) {
         Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
-        storemenu.setStoremenuStatus("inactive");
+        storemenu.setStoremenuStatus("deleted");
         return storemenu.getStore().getStoreNum();
     }
 }
