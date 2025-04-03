@@ -95,5 +95,15 @@ public class CenterController {
     }
 
 
+    // 조직등록 - 센터
+
+    @PostMapping("/centerinsert")
+    @ResponseBody
+    public String centerInsertPost(CenterDTO centerDTO) {
+        centerService.centerInsert(centerDTO);
+        return "redirect:/center/list";
+    }
+
+
 
 }

@@ -20,7 +20,6 @@ public interface CenterRepository extends JpaRepository<Center, Long> {
     @Query("select a from Center a")
     public Page<Center> findAll(Pageable pageable);
 
-
     // 회원가입용
     public List<Center> findByCenterName (String centerName);
 }

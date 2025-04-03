@@ -39,6 +39,9 @@ public class Facility extends BaseEntity {
     @Column(name = "facilityCeoName")
     private String facilityCeoName;             //대표 이름
 
+    @Column(name = "facilityBusinessNum")
+    private String facilityBusinessNum;       //사업자등록번호
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")
     private Center center;              //본사 참조

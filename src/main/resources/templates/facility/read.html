@@ -20,40 +20,36 @@
 
   <div class="mb-2">
     <label class="form-label">브랜드명</label>
-    <p class="form-control" th:text="${branchDTO.centerBrand}"></p>
-  </div>
-  <div class="mb-2">
-    <label class="form-label">본사명</label>
-    <p class="form-control" th:text="${branchDTO.centerName}"></p>
+    <p class="form-control" th:text="${centerDTO.centerBrand}"></p>
   </div>
   <div class="mb-2">
     <label class="form-label">상호명</label>
-    <p class="form-control" th:text="${branchDTO.branchName}"></p>
+    <p class="form-control" th:text="${centerDTO.centerName}"></p>
   </div>
   <div class="mb-2">
     <label class="form-label">사업자등록번호</label>
-    <p class="form-control" th:text="${branchDTO.branchBusinessNum}"></p>
+    <p class="form-control" th:text="${centerDTO.centerBusinessNum}"></p>
   </div>
   <div class="mb-2">
     <label class="form-label">대표자명</label>
-    <p class="form-control" th:text="${branchDTO.branchCeoName}"></p>
+    <p class="form-control" th:text="${centerDTO.centerCeoName}"></p>
   </div>
   <div class="mb-2">
     <label class="form-label">전화번호</label>
-    <p class="form-control" th:text="${branchDTO.branchPhone}"></p>
+    <p class="form-control" th:text="${centerDTO.centerPhone}"></p>
   </div>
   <div class="mb-2">
     <label class="form-label">이메일</label>
-    <p class="form-control" th:text="${branchDTO.branchEmail}"></p>
+    <p class="form-control" th:text="${centerDTO.centerEmail}"></p>
   </div>
   <div class="mb-4">
     <label class="form-label">주소</label>
-    <p class="form-control" th:text="${branchDTO.branchAddress}"></p>
+    <p class="form-control" th:text="${centerDTO.centerAddress}"></p>
   </div>
   <div class="d-flex justify-content-center gap-3">
-    <a th:href="@{/branch/list}" class="btn btn-secondary">목록</a>
-    <a th:href="@{/branch/modify/{branchNum}(branchNum=${branchDTO.branchNum})}" class="btn btn-success">수정</a>
-    <form id="deleteForm" th:action="@{/branch/delete/{branchNum}(branchNum=${branchDTO.branchNum})}" method="post">
+    <a th:href="@{/center/list}" class="btn btn-secondary">목록</a>
+    <a th:href="@{/center/modify/{centerNum}(centerNum=${centerDTO.centerNum})}" class="btn btn-success">수정</a>
+    <form id="deleteForm" th:action="@{/center/delete/{centerNum}(centerNum=${centerDTO.centerNum})}" method="post">
       <button type="submit" class="btn btn-danger">삭제</button>
     </form>
   </div>

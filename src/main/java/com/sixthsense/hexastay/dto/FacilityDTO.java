@@ -30,6 +30,8 @@ public class FacilityDTO {
 
     private String facilityCeoName;             //대표 이름
 
+    private String facilityBusinessNum;       //사업자등록번호
+
     private LocalDateTime createDate; //등록일자
 
     private LocalDateTime modifyDate; //수정일자
@@ -37,4 +39,5 @@ public class FacilityDTO {
     private Long centerNum;              //본사 참조
 
     private String centerName;
+
 }
