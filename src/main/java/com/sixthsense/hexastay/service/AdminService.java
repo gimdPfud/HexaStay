@@ -1,9 +1,6 @@
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.BranchDTO;
-import com.sixthsense.hexastay.dto.CenterDTO;
-import com.sixthsense.hexastay.dto.FacilityDTO;
+import com.sixthsense.hexastay.dto.*;
 
 import java.util.List;
 
@@ -20,5 +17,5 @@ public interface AdminService {
     // 회원가입때 쓸 로직2
     List<BranchDTO> getBranchList (String CenterName);
     List<FacilityDTO> getFacilityList (String CenterName);
-
+    List<StoreDTO> getStoreList();
 }
