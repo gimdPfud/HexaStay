@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.Optional;
 
 @Service
@@ -57,16 +58,21 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      **************************************************/
 
     @Override
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable) {
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword) {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
-        Page<RoomMenu> roomMenus = roomMenuRepository.findAll(pageable);
+        //페이지정보
+        Page<RoomMenu> roomMenuPage;
+        if (type.equals("S") && keyword != null && !keyword.trim().isEmpty()) { // 구분이 제목이고, 검색어가 있으면
+            roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
 
-        roomMenus.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+        } else {
+            roomMenuPage = roomMenuRepository.findAll(pageable);
+        }
+        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenuList -> modelMapper.map(roomMenuList, RoomMenuDTO.class));
 
-        log.info("변환된 DTO" + roomMenus);
 
-        return roomMenus.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+        return roomMenuDTOList;
 
     }
 
@@ -117,6 +123,23 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             throw new RuntimeException("데이터 수정에 실패했습니다.", e);
         }
     }
+
+    @Override
+    public Page<RoomMenu> getMenuCategori(String categori, Pageable pageable) {
+
+            // 예시로 카테고리에 맞는 음식 목록을 필터링
+            if ("koreanfood".equals(categori)) {
+                return roomMenuRepository.findByRoomMenuCategory("koreanfood", pageable);
+            } else if ("chinafood".equals(categori)) {
+                return roomMenuRepository.findByRoomMenuCategory("chinafood", pageable);
+            } else if ("appetizer".equals(categori)) {
+                return roomMenuRepository.findByRoomMenuCategory("appetizer", pageable);
+            } else if ("usfood".equals(categori)) {
+                return roomMenuRepository.findByRoomMenuCategory("usfood", pageable);
+            } else {
+                return roomMenuRepository.findAll(pageable);
+            }
+        }
 
     /**************************************************
      * 룸서비스 메뉴 삭제

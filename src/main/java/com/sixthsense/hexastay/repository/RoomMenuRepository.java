@@ -14,6 +14,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
-    @Query("select a from RoomMenu a")
-    public Page<RoomMenu> findAll(Pageable pageable);
+//    @Query("select a from RoomMenu a")
+//    public Page<RoomMenu> findby(Pageable pageable);
+
+    Page<RoomMenu> findByRoomMenuCategory(String category, Pageable pageable);
+
+    // 검색기능
+    Page<RoomMenu> findByRoomMenuNameContaining(String roomMenuName, Pageable pageable);
 }

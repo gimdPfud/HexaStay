@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맛있는 피자 - 상세 페이지</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 20px; border-bottom: 2px solid #ddd; }
+        .menu-icon, .cart-icon { font-size: 24px; cursor: pointer; }
+        .food-image { width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px; }
+        .food-info { padding: 10px; }
+        .food-info h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .food-info p { font-size: 16px; color: #555; margin: 5px 0; }
+        .price { font-weight: bold; font-size: 20px; margin: 10px 0; }
+        .quantity-control { display: flex; align-items: center; margin-top: 20px; }
+        .quantity-btn { background-color: #ddd; border: none; padding: 5px 10px; cursor: pointer; }
+        .quantity-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .quantity { margin: 0 10px; font-size: 18px; }
+        .add-to-cart-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 18px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
+        .add-to-cart-btn:hover { background-color: #388E3C; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="menu-icon" onclick="goBack()">←</div>
+        <div>맛있는 피자</div>
+        <div class="cart-icon" onclick="goToCart()">🛒</div>
+    </div>
+
+    <img src="https://via.placeholder.com/600x400" alt="맛있는 피자 이미지" class="food-image">
+
+    <div class="food-info">
+        <h1>맛있는 피자</h1>
+        <p>이 피자는 신선한 토마토와 모짜렐라 치즈, 그리고 바삭한 도우로 만든 최고의 피자입니다. 맛을 보고 나면 계속 먹고 싶어질 거예요!</p>
+        <p class="price">30,000원</p>
+
+        <!-- 수량 조정 -->
+        <div class="quantity-control">
+            <button class="quantity-btn" onclick="updateQuantity(this, -1)">-</button>
+            <span class="quantity" id="quantity">1</span>
+            <button class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+        </div>
+
+        <!-- 장바구니 추가 버튼 -->
+        <button class="add-to-cart-btn" onclick="addToCart()">장바구니에 추가</button>
+    </div>
+</div>
+
+<script>
+    /****************************
+     * 수량 조정 기능
+     ****************************/
+    function updateQuantity(button, change) {
+        const quantityElement = document.getElementById('quantity');
+        let currentQuantity = parseInt(quantityElement.innerText);
+
+        // 수량을 변경
+        currentQuantity += change;
+
+        // 수량이 1보다 작아지지 않도록 처리
+        if (currentQuantity < 1) {
+            currentQuantity = 1;
+        }
+
+        // 수량을 UI에 반영
+        quantityElement.innerText = currentQuantity;
+    }
+
+    /****************************
+     * 장바구니에 추가 기능
+     ****************************/
+    function addToCart() {
+        const quantity = parseInt(document.getElementById('quantity').innerText);
+        const roomMenuNum = 1; // 피자의 ID (예시로 1번으로 설정)
+        const roomMenuPrice = 30000; // 가격
+
+        // 장바구니에 추가 API 호출
+        fetch(`/api/roommenu/orderpage?memberNum=1&roomMenuNum=${roomMenuNum}&amount=${quantity}&roomMenuPrice=${roomMenuPrice}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    alert('장바구니에 상품이 추가되었습니다!');
+                } else {
+                    alert('장바구니 추가에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                alert('장바구니 추가 중 오류가 발생했습니다.');
+            });
+    }
+
+    /****************************
+     * 돌아가기 및 장바구니 이동
+     ****************************/
+    function goBack() {
+        window.history.back(); // 이전 페이지로 돌아가기
+    }
+
+    function goToCart() {
+        window.location.href = '/cart'; // 장바구니 페이지로 이동
+    }
+</script>
+</body>
+</html>

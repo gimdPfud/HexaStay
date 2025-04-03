@@ -2,10 +2,12 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.entity.RoomMenuCart;
 
 public interface RoomMenuCartService {
 
-    public RoomMenuCartDTO roomMenuCartInsert(RoomMenuCartDTO roomMenuCartDTO);
+    // 장바구니 등록
 
-    public RoomMenuCartDTO getCartByMemberId(Long memberNum);
+    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
+
 }

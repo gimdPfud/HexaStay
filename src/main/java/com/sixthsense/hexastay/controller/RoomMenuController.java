@@ -14,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -97,12 +99,18 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/list")
-    public String RoomMenuList(Model model, Pageable pageable) {
+    public String RoomMenuList(Pageable pageable,
+                               @RequestParam(value="type", defaultValue = "") String type,
+                               @RequestParam(value="keyword", defaultValue = "") String keyword,
+                               Model model){
         log.info("리스트 컨트롤러 진입");
 
         Page<RoomMenuDTO> roomMenuDTOPage =
-                roomMenuService.RoomMenuList(pageable);
+                roomMenuService.RoomMenuList(pageable, type, keyword);
 
+        for (RoomMenuDTO roomMenuDTO : roomMenuDTOPage) {
+            log.info(roomMenuDTO.getRoomMenuName());
+        }
         model.addAttribute("list", roomMenuDTOPage);
 
         return "roommenu/list";
@@ -198,16 +206,10 @@ public class RoomMenuController {
      * 기능 : 주문 페이지로 이동
      **************************************************/
 
-//    @GetMapping("/roommenu/orderpage")
-//    public String orderpage(){
-//
-//        return "roommenu/orderpage";
-//    }
+    @GetMapping("/roommenu/testorder")
+    public String orderpage(){
 
-    @GetMapping("/roommenu/orderpage")
-    public String getMobileOrderPage(Model model, Pageable pageable) {
-        Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable);
-        model.addAttribute("roomMenuList", roomMenuList);  // roomMenuList를 모델에 추가
-        return "mobile-order";  // 모바일 주문 페이지 이름
+        return "roommenu/testorder";
     }
+
 }

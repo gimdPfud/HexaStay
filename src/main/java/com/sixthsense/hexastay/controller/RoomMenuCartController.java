@@ -1,16 +1,25 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
+import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
+import com.sixthsense.hexastay.service.RoomMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,32 +28,71 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RoomMenuCartController {
 
     private final RoomMenuCartService roomMenuCartService;
+    private final RoomMenuService roomMenuService;
 
-    @PostMapping("/roommenu/cart/")
-    public String createRoomMenuCart(RoomMenuCartDTO roomMenuCartDTO, Model model) {
-        // 장바구니 등록 서비스 호출
-        RoomMenuCartDTO menuCartDTO = roomMenuCartService.roomMenuCartInsert(roomMenuCartDTO);
+//    @GetMapping("/roommenu/orderpage")
+//    public ResponseEntity<RoomMenuCartDTO> addToCart(@RequestParam Long memberNum,
+//                                                     @RequestParam Long roomMenuNum,
+//                                                     @RequestParam Integer amount) {
+//        try {
+//            // 서비스에서 장바구니에 상품을 추가하고 결과 DTO를 반환
+//            RoomMenuCartDTO roomMenuCartDTO = roomMenuCartService.insertRoomMenuCart(memberNum, roomMenuNum, amount);
+//
+//            // 성공적으로 장바구니에 상품을 추가했다면 200 OK 반환
+//            return new ResponseEntity<>(roomMenuCartDTO, HttpStatus.OK);
+//
+//        } catch (Exception e) {
+//            // 예외 처리: 오류 발생 시 500 Internal Server Error 반환
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-        // 결과 반환
-        model.addAttribute("menuCartDTO", menuCartDTO);
-        return "roommenu/cart";  // 적절한 뷰로 리다이렉트 또는 포워드
+    @GetMapping("/roommenu/orderread")
+    public String orderread(){
+
+        return "roommenu/orderread";
     }
 
-    // 장바구니 등록 API
-    @PostMapping("/roommenu/testorder")
-    public ResponseEntity<RoomMenuCartDTO> addToCart(@RequestBody RoomMenuCartDTO roomMenuCartDTO) {
-        RoomMenuCartDTO createdCart = roomMenuCartService.roomMenuCartInsert(roomMenuCartDTO);
-        return ResponseEntity.ok(createdCart);
+    @GetMapping("/roommenu/orderpage")  //메소드명 연관
+    //()안에 입력인수 등록, 출력값이 있으면 model
+    public String orderList(@PageableDefault(page=1) Pageable pageable,
+                           @RequestParam(value="type", defaultValue = "") String type,
+                           @RequestParam(value="keyword", defaultValue = "") String keyword,
+                           Model model) {
+        //서비스연동
+        Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable, type, keyword);
+
+        //페이지정보 가공
+        //Map<String, Integer> pageInfo = pagenationUtil.Pagination(listDTOS);
+        Map<String, Integer> pageInfo = Pagination(roomMenuList);
+
+        //값전달(Model)
+        model.addAttribute("list", roomMenuList);
+        //조회정보전달
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        //페이지정보전달
+        model.addAllAttributes(pageInfo);
+
+        return "/roommenu/orderpage"; //String 연관
     }
 
-     // 장바구니 목록 조회 API
-    @GetMapping("/{memberId}")
-    public ResponseEntity<RoomMenuCartDTO> getCart(@PathVariable Long memberId) {
-        RoomMenuCartDTO cart = roomMenuCartService.getCartByMemberId(memberId);
-        return ResponseEntity.ok(cart);
-    }
 
 
 
+
+    /*@GetMapping("/roommenu/orderpage")
+    public String getMenu(Pageable pageable, String categori, Model model){
+
+
+        // 카테고리 별 분류
+        Page<RoomMenu> roomMenuList = roomMenuService.getMenuCategori(categori, pageable);
+
+        // 모델에 페이징된 메뉴 목록을 추가
+        model.addAttribute("roomMenuList", roomMenuList);
+
+        return "roommenu/orderpage";
+
+    }*/
 
 }
