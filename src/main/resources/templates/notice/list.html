@@ -29,7 +29,7 @@
   <div class="notice-header">공지사항</div>
 
   <!-- 검색 기능 -->
-  <form th:action="@{/board/list}" method="get">
+  <form th:action="@{/notice/list}" method="get">
     <div class="input-group mb-3">
       <select name="type" class="form-select">
         <option value="" th:selected="${type==null}">검색 조건</option>
@@ -42,7 +42,7 @@
       <input class="form-control" th:value="${keyword}" name="keyword" type="text">
       <button class="btn btn-primary" type="submit">검색</button>
       <button class="btn btn-secondary " type="reset">초기화</button>
-      <button class="btn btn-insert" type="button" th:onclick="|location.href='@{/board/insert}'|" >등록</button>
+      <button class="btn btn-insert" type="button" th:onclick="|location.href='@{/notice/insertnotice}'|">등록</button>
     </div>
   </form>
   <!--목록-->
@@ -55,52 +55,44 @@
       <th >제목</th>
       <th >작성자</th>
       <th >날짜</th>
-      <th >작업</th>
+      <th >수정</th>
     </tr>
     </thead>
+    <!-- 목록 -->
     <tbody>
     <tr th:each="data:${list}">
-      <td th:text="${data.boardNum}"></td>
-      <td th:text="${data.boardTitle}"></td>
-      <td th:text="${data.boardWriter}"></td>
+      <td th:text="${data.noticeNum}"></td>
+      <td th:text="${data.noticeTitle}"></td>
+      <td th:text="${data.noticeWriter}"></td>
       <td th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></td>
       <td>
-        <a th:href="@{/read(id=${data.id})}" class="btn btn-secondary">
-          <i class="bi-clipboard-check"></i>
+        <a th:href="@{|/notice/noticeread/${data.noticeNum}|}" class="btn btn-secondary">
+          <i class="bi-clipnotice-check"></i>
         </a>
       </td>
     </tr>
     </tbody>
   </table>
-  <!-- 공지사항 목록 -->
-  <ul class="notice-list">
-    <li th:each="data:${list}">
-      <span class="badge bg-danger" th:text="${data.boardNum}"></span>
-      <span th:text="${data.boardTitle}"></span>
-      <span class="text-muted" th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></span>
-    </li>
-  </ul>
-
   <!-- 페이징 -->
   <nav>
     <ul class="pagination">
       <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-        <a class="page-link" th:href="@{/board/list?page=0}">&laquo;</a>
+        <a class="page-link" th:href="@{/notice/list?page=0}">&laquo;</a>
       </li>
       <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-        <a class="page-link" th:href="@{/board/list?page={prev}(prev=${list.number - 1})}">이전</a>
+        <a class="page-link" th:href="@{/notice/list?page={prev}(prev=${list.number - 1})}">이전</a>
       </li>
       <li class="page-item" th:each="pageNum : ${#numbers.sequence(
             (list.number - 4 > 0 ? list.number - 4 : 0),
             (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
           th:classappend="${pageNum == list.number} ? 'active'">
-        <a class="page-link" th:href="@{/board/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+        <a class="page-link" th:href="@{/notice/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
       </li>
       <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-        <a class="page-link" th:href="@{/board/list?page={next}(next=${list.number + 1})}">다음</a>
+        <a class="page-link" th:href="@{/notice/list?page={next}(next=${list.number + 1})}">다음</a>
       </li>
       <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-        <a class="page-link" th:href="@{/board/list?page={last}(last=${list.totalPages - 1})}">&raquo;</a>
+        <a class="page-link" th:href="@{/notice/list?page={last}(last=${list.totalPages - 1})}">&raquo;</a>
       </li>
     </ul>
   </nav>

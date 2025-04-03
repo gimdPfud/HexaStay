@@ -96,33 +96,25 @@
     <div class="container-fluid">
         <div class="row mt-3 justify-content-center">
             <div class="col-12 col-sm-10 col-md-8 col-lg-7">
-                <form action="/insert" method="post">
+                <form action="/notice/insert" method="post"> <!-- (수정) -->
                     <div class="card shadow-sm">
                         <div class="card-header text-center bg-dark text-white"><b>게시글 등록</b></div>
                         <div class="card-body">
-                            <label for="category">카테고리:</label>
-                            <select id="category" name="category" class="form-select">
-                                <option value="공지">공지</option>
-                                <option value="자유">자유</option>
-                                <option value="문의">문의</option>
-                            </select>
+                            <input type="hidden" name="memberNum" th:value="${memberNum}"> <!-- (추가) -->
+                            <input type="hidden" name="noticeWriter" th:value="${noticeWriter}"> <!-- (추가) -->
+
                             <div class="mb-4">
-                                <label class="form-label">작성자:</label>
-                                <p class="form-control-plaintext">
-                                <b th:text="${membername}"></b></p>
+                                <label for="noticeTitle" class="form-label">제목:</label>
+                                <input type="text" class="form-control" id="noticeTitle" placeholder="제목을 입력하세요" name="noticeTitle" required>
                             </div>
                             <div class="mb-4">
-                                <label for="boardTitle" class="form-label">제목:</label>
-                                <input type="text" class="form-control" id="boardTitle" placeholder="제목을 입력하세요" name="boardTitle" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="boardContent">내용:</label>
-                                <textarea class="form-control" rows="5" id="boardContent" name="boardContent" required></textarea>
+                                <label for="noticeContent">내용:</label>
+                                <textarea class="form-control" rows="5" id="noticeContent" name="noticeContent" required></textarea>
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-center gap-3">
-                            <button type="button" onclick="location.href='/board/list'" class="btn btn-dark">목록</button>
-                            <button type="submit" onclick="location.href='/board/list'" class="btn btn-success">등록</button>
+                            <button type="button" onclick="location.href='/notice/list'" class="btn btn-dark">목록</button>
+                            <button type="submit" class="btn btn-success">등록</button> <!-- (수정) -->
                         </div>
                     </div>
                 </form>

@@ -7,8 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.Member;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,20 +18,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 //공지,QA
-public class BoardDTO {
-    private Long boardNum; // 번호
+public class NoticeDTO {
+    private Long noticeNum; // 번호
 
-    private String boardTitle; // 제목
+    private String noticeTitle; // 제목
 
-    private String boardContent; // 내용
+    private String noticeContent; // 내용
 
-    private String boardWriter; // 작성자
+    private String noticeWriter; // 작성자
 
     private LocalDateTime createDate; // 등록일자
 
     private LocalDateTime modifyDate; // 수정일자
 
-    private Integer boardView; // 조회수
+    private Integer noticeView; // 조회수
 
     private Long memberNum; // 회원 번호
 
