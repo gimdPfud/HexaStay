@@ -58,16 +58,22 @@ public class StoremenuController {
 
     @GetMapping("/read/{id}")
     public String read(@PathVariable Long id, Model model){
+        log.info("메뉴상세보기 메뉴Num: "+id);
+        StoremenuDTO data = storemenuService.read(id);
+        model.addAttribute("data",data);
         return "storemenu/read";
     }
 
 
     @GetMapping("/modify/{id}")
     public String modify(@PathVariable Long id, Model model){
+        StoremenuDTO data = storemenuService.read(id);
+        model.addAttribute("data",data);
         return "storemenu/modify";
     }
     @PostMapping("/modify")
-    public String modify(StoreDTO storeDTO){
+    public String modify(StoremenuDTO storemenuDTO){
+        storemenuService.modify(storemenuDTO);
         return "redirect:/store/menu/read/";
     }
 
