@@ -57,16 +57,16 @@
                 <th style="text-align: center; vertical-align: middle; width: 15%">직책</th>
                 <th style="text-align: center; vertical-align: middle; width: 20%">이름</th>
                 <th style="text-align: center; vertical-align: middle; width: 40%">소속</th>
-                <th style="text-align: center; vertical-align: middle; width: 10%">관리</th>
+                <th style="text-align: center; vertical-align: middle; width: 10%">입사일</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td style="text-align: center; vertical-align: middle;">사번</td>
-                <td style="text-align: center; vertical-align: middle;">직책</td>
-                <td style="text-align: center; vertical-align: middle;">이름</td>
-                <td style="text-align: center; vertical-align: middle;">소속</td>
-                <td style="text-align: center; vertical-align: middle;">
+            <tr th:each="adminDTO : ${adminDTOList}">
+                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminEmployeeNum}">사번</td>
+                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminPosition}">직책</td>
+                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminName}">이름</td>
+                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminBrand}">소속</td>
+                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.createDate}">소속</td>
                     <button class="btn btn-success" style="padding: 2px 10px; font-size: 0.8rem;">수정</button>
                 </td>
             </tr>
