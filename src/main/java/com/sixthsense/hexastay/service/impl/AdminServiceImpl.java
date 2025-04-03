@@ -42,6 +42,34 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
+    //어드민 리스트
+    public List<AdminDTO> getAdminList(){
+        List<Admin> adminList = adminRepository.findAll();
+        List<AdminDTO> adminDTOList = new ArrayList<>();
+        for (Admin admin : adminList) {
+            adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
+        }
+        return adminDTOList;
+    }
+
+    //가입대기 리스트
+    public List<AdminDTO> getWaitAdminList(){
+        List<Admin> adminList = adminRepository.findByAdminActive(false);
+        List<AdminDTO> adminDTOList = new ArrayList<>();
+        for (Admin admin : adminList) {
+            adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
+        }
+        return adminDTOList;
+    }
+
+    //가입 승인
+    public void setAdminActive(Long adminNum){
+        Admin admin = adminRepository.findByAdminNum(adminNum);
+        admin.setAdminActive(true);
+        adminRepository.save(admin);
+    }
+
+
     public List<BranchDTO> getBranchList(String centerName) {
         List<BranchDTO> branchDTOList = new ArrayList<>();
         List<Branch> branchList = branchRepository.findByCenter_CenterName(centerName);

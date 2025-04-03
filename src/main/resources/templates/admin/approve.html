@@ -61,23 +61,56 @@
                     <th style="text-align: center; vertical-align: middle; width: 10%">관리</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr>
-                    <td style="text-align: center; vertical-align: middle;">사번</td>
-                    <td style="text-align: center; vertical-align: middle;">직책</td>
-                    <td style="text-align: center; vertical-align: middle;">이름</td>
-                    <td style="text-align: center; vertical-align: middle;">소속</td>
+                <tr th:each="adminDTO : ${adminDTOList}">
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminEmployeeNum}">사번</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminPosition}">직책</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminName}">이름</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminBrand}">소속</td>
                     <td style="text-align: center; vertical-align: middle;">
-                        <button class="btn btn-success" style="padding: 2px 10px; font-size: 0.8rem;">승인</button>
-                        <button class="btn btn-danger" style="padding: 2px 10px; font-size: 0.8rem;">거절</button>
+                        <button id="activeBtn" class="btn btn-success" style="padding: 2px 10px; font-size: 0.8rem;" th:data-admin-num="${adminDTO.adminNum}">승인</button>
+                        <button id="cancelBtn" class="btn btn-danger" style="padding: 2px 10px; font-size: 0.8rem;">거절</button>
                     </td>
                 </tr>
-
                 </tbody>
+
+
+
             </table>
 
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.btn-success').forEach(button => {
+            button.addEventListener('click', function () {
+                if (confirm("승인 처리 하시겠습니까?")) {
+                    const adminNum = this.dataset.adminNum;
+                    console.log(adminNum);
+
+                    fetch('/approve?adminNum=' + adminNum, {
+                        method: 'POST',
+                    })
+                        .then(() => {
+                            this.textContent = "승인됨";
+                            this.classList.remove("btn-success");
+                            this.classList.add("btn-secondary");
+                            this.disabled = true;
+
+                            const row = this.closest('tr');
+                            const cancelBtn = row.querySelector('.btn-danger');
+                            if (cancelBtn) {
+                                cancelBtn.remove();
+                            }
+                        })
+                        .catch(error => console.error("에러 발생:", error));
+                }
+            });
+        });
+    </script>
+
+
 </div>
 
 </body>

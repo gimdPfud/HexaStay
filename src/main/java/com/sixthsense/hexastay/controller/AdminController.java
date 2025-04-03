@@ -9,10 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpClient;
 import java.util.List;
@@ -24,16 +21,26 @@ public class AdminController {
 
     private final AdminService adminService;
     private final CenterService centerService;
-    private final StoreService storeService;
 
     @GetMapping("/list")
-    public String list() {
+    public String list(Model model) {
+        List<AdminDTO> adminDTOList = adminService.getAdminList();
+        model.addAttribute("adminDTOList", adminDTOList);
         return "admin/list";
     }
 
     @GetMapping("/approve")
-    public String approve() {
+    public String approve(Model model) {
+        List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
+        model.addAttribute("adminDTOList", adminDTOList);
         return "admin/approve";
+    }
+
+    @PostMapping("/approve")
+    public ResponseEntity<Void> approve(@RequestParam Long adminNum){
+        log.info("끼끼" + adminNum);
+        adminService.setAdminActive(adminNum);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/insert")
@@ -45,7 +52,7 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(AdminDTO adminDTO) {
-        adminDTO.setAdminActive(true);
+        adminDTO.setAdminActive(false);
         adminService.insertAdmin(adminDTO);
         return "redirect:/list";
     }
