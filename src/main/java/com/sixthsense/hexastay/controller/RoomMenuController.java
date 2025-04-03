@@ -198,16 +198,16 @@ public class RoomMenuController {
      * 기능 : 주문 페이지로 이동
      **************************************************/
 
-//    @GetMapping("/roommenu/orderpage")
-//    public String orderpage(){
-//
-//        return "roommenu/orderpage";
-//    }
+    @GetMapping("/roommenu/testorder")
+    public String orderpage(){
+
+        return "roommenu/testorder";
+    }
 
     @GetMapping("/roommenu/orderpage")
     public String getMobileOrderPage(Model model, Pageable pageable) {
         Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable);
         model.addAttribute("roomMenuList", roomMenuList);  // roomMenuList를 모델에 추가
-        return "mobile-order";  // 모바일 주문 페이지 이름
+        return "roommenu/orderpage";  // 모바일 주문 페이지 이름
     }
 }

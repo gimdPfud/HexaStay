@@ -1,6 +1,8 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
+import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
@@ -22,19 +24,12 @@ import java.util.List;
 @Builder
 public class RoomMenuCartDTO {
 
-    private Long roomMenuCartNum; // 장바구니의 고유 번호
-    private Integer totalPrice;   // 장바구니의 총 가격
-    private Long memberNum;       // 사용자 ID (연관된 회원의 ID)
+    private Long roomMenuCartNum; // 장바구니의 pk
 
-    private List<RoomMenuCartItemDTO> roomMenuCartItems; // 장바구니 항목 리스트
+    private Integer roomMenuTotalPrice;  // 장바구니의 총 가격
 
-    public RoomMenuCartDTO(RoomMenuCart cart) {
-        this.roomMenuCartNum = cart.getRoomMenuCartNum();
-        this.totalPrice = cart.getTotalPrice();
-        this.memberNum = cart.getMember().getMemberNum();
-        this.roomMenuCartItems = cart.getRoomMenuCartItems().stream()
-                .map(roomMenuCartItem -> new RoomMenuCartItemDTO(roomMenuCartItem))
-                .toList();
+    private Member member;  // 사용자와 장바구니의 연관관계
+
+    private List<RoomMenuCartItemDTO> items;  // 장바구니 항목들
 
     }
-}

@@ -5,12 +5,13 @@ import lombok.*;
 /***************************************************
 
  * 클래스명 : RoomMenuCartItem
- * 기능 : 장바구니 항목을 나타내는 Entity 클래스
- *        하나의 장바구니 항목은 특정 상품(RoomMenu)과 수량 및 가격을 나타낸다.
- *        장바구니에 담긴 각 상품의 정보를 관리하며,
- *        해당 상품이 장바구니에 속하는 관계를 맺고 있다.
+ * 기능 : 장바구니 항목을 나타내는 엔티티 클래스
+ *        장바구니에 담긴 각 상품(RoomMenu)과 그 상품의 수량 및 가격을 관리하는 역할을 한다.
+ *        하나의 장바구니 항목은 특정 상품(RoomMenu)과 수량, 가격 정보를 가지며,
+ *        해당 상품이 특정 장바구니(RoomMenuCart)에 속하는 관계를 맺고 있다.
+ *
  * 작성자 : 김윤겸
- * 작성일 : 2025-04-02
+ * 작성일 : 2025-04-03
  * 수정일 : -
  * 테이블설계 : 김윤겸
  *
@@ -28,22 +29,20 @@ public class RoomMenuCartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "roomMenuCartItemNum")
     private Long roomMenuCartItemNum;  // 장바구니 항목의 고유 ID
 
-    private Integer roomMenuCartItemAmount;  // 상품 수량
-    private Integer roomMenuCartItemPrice;     // 해당 상품의 가격 (수량 * 가격)
+    private Integer roomMenuCartItemAmount; // 장바구니 수량
 
-    @ManyToOne
-    @JoinColumn(name = "roomMenuNum")  // 어떤 상품(메뉴)인지
-    private RoomMenu roomMenu;         // 해당 상품(메뉴)
+    @Column(name = "roomMenuCartItemPrice")
+    private Integer roomMenuCartItemPrice; // 항목 가격 (RoomMenu에서 가져올 수 있음)
 
-    @ManyToOne
-    @JoinColumn(name = "roomMenuCartNum")  // 어떤 장바구니에 속하는지
-    private RoomMenuCart roomMenuCart;     // 장바구니와의 연관 관계
+    @ManyToOne(fetch = FetchType.LAZY) // 다대일 관계
+    @JoinColumn(name = "roomMenuCart")
+    private RoomMenuCart roomMenuCart; // 카트를 참조
 
-    // 가격을 계산하는 메서드
-    public Integer calculatePrice() {
-        return roomMenu.getRoomMenuPrice() * this.roomMenuCartItemAmount;  // 가격 = 상품 가격 * 수량
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roomMenu")
+    private RoomMenu roomMenu; // 룸메뉴서비스를 참조
 
 }

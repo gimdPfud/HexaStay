@@ -1,6 +1,9 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuCart;
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
+import jakarta.persistence.*;
 import lombok.*;
 
 /***************************************************
@@ -21,19 +24,13 @@ import lombok.*;
 @Builder
 public class RoomMenuCartItemDTO {
 
-    private Long roomMenuCartItemNum;  // 장바구니 항목 고유 번호
-    private Integer roomMenuCartItemAmount;  // 상품 수량
-    private Integer roomMenuCartItemPrice;   // 상품 가격 (수량 * 가격)
+    private Long roomMenuCartItemNum;  // 장바구니 항목의 고유 ID
 
-    private Long roomMenuNum;   // 연관된 메뉴(상품)의 ID
-    private String roomMenuName; // 메뉴 이름
+    private Integer roomMenuCartItemAmount; // 장바구니 수량
 
-    // RoomMenuCartItem을 RoomMenuCartItemDTO로 변환하는 생성자
-    public RoomMenuCartItemDTO(RoomMenuCartItem item) {
-        this.roomMenuCartItemNum = item.getRoomMenuCartItemNum();
-        this.roomMenuCartItemAmount = item.getRoomMenuCartItemAmount();
-        this.roomMenuCartItemPrice = item.getRoomMenuCartItemPrice();
-        this.roomMenuNum = item.getRoomMenu().getRoomMenuNum();  // RoomMenuCartItem에서 연관된 RoomMenu 객체의 번호
-        this.roomMenuName = item.getRoomMenu().getRoomMenuName();  // RoomMenu의 이름
-    }
+    private Integer roomMenuCartItemPrice; // 항목 가격 (RoomMenu에서 가져올 수 있음)
+
+    private RoomMenuCart roomMenuCart; // 카트를 참조
+
+    private RoomMenu roomMenu; // 룸메뉴서비스를 참조, 해당 항목의 상품
 }

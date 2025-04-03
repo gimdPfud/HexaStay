@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RoomMenuCartRepository extends JpaRepository<RoomMenuCart, Long> {
     @Query("select r from RoomMenuCart r")
@@ -16,6 +18,7 @@ public interface RoomMenuCartRepository extends JpaRepository<RoomMenuCart, Long
     // 장바구니 번호로 장바구니 조회
     RoomMenuCart findByRoomMenuCartNum(Long roomMenuCartNum);
 
-    RoomMenuCart findByMember_MemberNum(Long memberNum);
+    // 유저찾기
+    Optional<RoomMenuCart> findByMember_MemberNum(Long memberNum);
 
 }

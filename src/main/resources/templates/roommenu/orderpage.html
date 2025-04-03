@@ -24,6 +24,10 @@
         .food-info p { margin: 2px 0; }
         .price { font-weight: bold; }
         .rating { color: #ff9800; }
+        .quantity-control { display: flex; align-items: center; }
+        .quantity-btn { background-color: #ddd; border: none; padding: 5px 10px; cursor: pointer; }
+        .quantity-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .quantity { margin: 0 10px; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -31,7 +35,7 @@
     <div class="header">
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
         <div>주문</div>
-        <div class="cart-icon" th:href="@{/roommenu/testorder}" >🛒</div>
+        <div class="cart-icon" th:href="@{/roommenu/cart}" >🛒</div>
     </div>
     <div id="search-container" class="search-container">
         <div class="search-box">
@@ -57,11 +61,23 @@
     <ul class="food-list">
         <li th:each="roomMenuDTOPage : ${roomMenuList}" class="food-item">
             <!-- 메뉴 이미지 -->
-            <img th:src="@{${roomMenuDTOPage.imageUrl}}" alt="메뉴 이미지">
+            <!--<img th:src="@{${roomMenuDTOPage.imageUrl}}" alt="메뉴 이미지">-->
             <div class="food-info">
-                <p th:text="${roomMenuList.roomMenuName}">맛있는 피자</p> <!-- 메뉴 이름 -->
-                <p class="price" th:text="${roomMenuList.roomMenuPrice + '원'}">30,000원</p> <!-- 가격 -->
-                <p class="rating">⭐ <span th:text="${roomMenuList.rating}">4.0</span></p> <!-- 평점 -->
+                <p th:text="${roomMenuDTOPage.roomMenuName}">맛있는 피자</p> <!-- 메뉴 이름 -->
+                <p class="price" th:text="${roomMenuDTOPage.roomMenuPrice + '원'}">30,000원</p> <!-- 가격 -->
+               <!-- <p class="rating">⭐ <span th:text="${roomMenuDTOPage.rating}">4.0</span></p>  평점 -->
+
+                <!-- 수량 및 가격 조정 -->
+                <div class="quantity-control">
+                    <button class="quantity-btn" onclick="updateQuantity(this, -1)">-</button>
+                    <span class="quantity" id="quantity-[[${roomMenuDTOPage.roomMenuNum}]]">1</span>
+                    <button class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+                </div>
+
+                <!-- 장바구니 추가 버튼 -->
+                <button class="add-to-cart-btn"
+                        th:data-room-menu-num="${roomMenuDTOPage.roomMenuNum}"
+                        th:data-room-menu-price="${roomMenuDTOPage.roomMenuPrice}">장바구니에 추가</button>
             </div>
         </li>
     </ul>
@@ -70,18 +86,67 @@
 
 <script>
     /****************************
-     기능 : 자바스크립트로 한식, 중식, 양식을 클릭했을 때 ative 변경
+     * 수량 조정 기능
      ****************************/
-    const tabs = document.querySelectorAll('.tab');
+    function updateQuantity(button, change) {
+        // 수량을 업데이트하는 부분
+        const quantityElement = button.parentElement.querySelector('.quantity');
+        let currentQuantity = parseInt(quantityElement.innerText);
 
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // 기존 active 클래스를 제거
-            tabs.forEach(tab => tab.classList.remove('active'));
+        // 수량을 변경
+        currentQuantity += change;
 
-            // 클릭한 탭에 active 클래스를 추가
-            this.classList.add('active');
+        // 수량이 1보다 작아지지 않도록 처리
+        if (currentQuantity < 1) {
+            currentQuantity = 1;
+        }
+
+        // 수량을 UI에 반영
+        quantityElement.innerText = currentQuantity;
+
+        // 가격도 변경
+        const priceElement = button.closest('.food-info').querySelector('.price');
+        const price = parseInt(priceElement.getAttribute('th:text').replace('원', '').trim());
+        priceElement.innerText = (price * currentQuantity) + '원';
+    }
+
+    /****************************
+     * 장바구니에 추가 기능
+     ****************************/
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const roomMenuNum = this.getAttribute('data-room-menu-num');
+            const roomMenuPrice = this.getAttribute('data-room-menu-price');
+            const amount = parseInt(this.closest('.food-info').querySelector('.quantity').innerText);
+
+            // 장바구니에 추가 API 호출
+            addToCart(roomMenuNum, amount, roomMenuPrice);
         });
     });
+
+    function addToCart(roomMenuNum, amount, roomMenuPrice) {
+        const memberNum = 1; // 현재 로그인한 사용자 번호 (적절히 설정)
+
+        fetch(`/api/roommenu/orderpage?memberNum=${memberNum}&roomMenuNum=${roomMenuNum}&amount=${amount}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    alert('장바구니에 상품이 추가되었습니다!');
+                } else {
+                    alert('장바구니 추가에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                alert('장바구니 추가 중 오류가 발생했습니다.');
+            });
+    }
 </script>
 </html>
