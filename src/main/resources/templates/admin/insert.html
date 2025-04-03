@@ -11,7 +11,7 @@
 <body class="w-100 vh-100 bg-light">
 <div layout:fragment="content">
 
-    <form>
+    <form method="post" action="/insert" enctype="multipart/form-data">
         <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
 
             <div class="d-flex w-100" style="justify-content: center;">
@@ -56,15 +56,15 @@
             </div>
             <div class="mb-2 row">
                 <label class="form-label">연락처</label>
-                <select class="form-select" id="phonePartOne" style="margin-left : 3.5%; width:30%">
+                <select class="form-select" id="adminPhonePartOne" style="margin-left : 3.5%; width:30%">
                     <option>010</option>
                     <option>011</option>
                     <option>017</option>
                 </select> -
-                <input type="text" id="phonePartTwo" class="form-control" style="width:30%"> -
-                <input type="text" id="phonePartThree" class="form-control" style="width:30%">
+                <input type="text" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
+                <input type="text" id="adminPhonePartThree" class="form-control" style="width:30%">
 
-                <input hidden name="adminPhone" id="phonePartFour" class="form-control" style="width:30%"
+                <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             </div>
 
             <div class="mb-2">
@@ -93,6 +93,9 @@
                             <option></option>
                         </select>
                     </div>
+
+                    <input hidden name="adminBrand" id="adminBrand" value="">
+
                 </div>
             </div>
 
@@ -111,60 +114,105 @@
     </form>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const adminChoice = document.getElementById("adminChoice");
-            const adminCenter = document.getElementById("adminCenter");
-            const adminBranchFacility = document.getElementById("adminBranchFacility");
-            const adminStore = document.getElementById("adminStore");
+        let adminChoice = document.getElementById("adminChoice");
+        let adminCenter = document.getElementById("adminCenter");
+        let adminBranchFacility = document.getElementById("adminBranchFacility");
+        let adminStore = document.getElementById("adminStore");
 
-            // 직책 선택에 따라 입력 활성화/비활성화
-            adminChoice.addEventListener("change", function () {
-                let choice = adminChoice.value;
+        // 소속 선택 시 다른 선택 박스 활성화/비활성화
+        adminChoice.addEventListener("change", function () {
+            adminBranchFacility.innerHTML = "<option value=''></option>";
 
-                resetSelectOptions(adminBranchFacility);
-                resetSelectOptions(adminStore);
+            if (adminChoice.value === "본사") {
+                adminCenter.disabled = false;
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = true;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                adminCenter.disabled = false;
+                adminBranchFacility.disabled = false;
+                adminStore.disabled = true;
+            } else if (adminChoice.value === "스토어") {
+                adminCenter.disabled = true;
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = false;
 
-                adminCenter.disabled = false; // 센터는 항상 선택 가능
-                adminBranchFacility.disabled = choice === "본사"; // 본사면 지사 선택 불가
-                adminStore.disabled = choice !== "스토어"; // 스토어일 때만 지점 선택 가능
-            });
+                    fetch(`/searchstore`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("왜안됨?")
+                            adminStore.innerHTML = "<option value=''></option>";
 
-            // 센터 선택 시 지사 목록 불러오기
+                            data.forEach(item => {
+                                let storeOption = document.createElement("option");
+                                storeOption.value = item.storeNum;
+                                storeOption.textContent = item.storeName;
+                                adminStore.appendChild(storeOption);
+                            });
+                        })
+                }
+
+
             adminCenter.addEventListener("change", function () {
-                if (!adminBranchFacility.disabled) {
-                    fetchData(`/searchbranch?centerName=${adminCenter.value}`, adminBranchFacility);
+                adminBranchFacility.innerHTML = "<option value=''></option>";
+                adminStore.innerHTML = "<option value=''></option>";
+                let adminCenterValue = adminCenter.value;
+                let choiceValue = adminChoice.value;
+
+                if (choiceValue === "지사") {
+                    fetch(`/searchbranch?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.branchNum;
+                                option.textContent = item.branchName;
+                                adminBranchFacility.appendChild(option);
+                            });
+
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지사 데이터 불러오기 실패:", error));
+
+                } else if (choiceValue === "지점") {
+                    fetch(`/searchfacility?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.facilityNum;
+                                option.textContent = item.facilityName;
+                                adminBranchFacility.appendChild(option);
+                            });
+
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지점 데이터 불러오기 실패:", error));
                 }
-            });
-
-            // 지사 또는 지점 선택 시 맞는 URL로 데이터 요청
-            adminBranchFacility.addEventListener("change", function () {
-                if (!adminStore.disabled) {
-                    let url = adminChoice.value === "지사"
-                        ? `/searchbranch?centerName=${adminBranchFacility.value}`
-                        : `/searchfacility?centerName=${adminBranchFacility.value}`;
-                    fetchData(url, adminStore);
-                }
-            });
-
-            function fetchData(url, targetSelect) {
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        resetSelectOptions(targetSelect);
-                        data.forEach(item => {
-                            let option = new Option(item.centerName, item.centerNum);
-                            targetSelect.appendChild(option);
-                        });
-                        targetSelect.disabled = false;
-                    })
-                    .catch(error => console.error("데이터 로드 실패:", error));
-            }
-
-            function resetSelectOptions(selectElement) {
-                selectElement.innerHTML = '<option value="">선택</option>';
-                selectElement.disabled = true;
-            }
+                    });
         });
+
+        function submitForm() {
+            if (adminChoice.value === "본사") {
+                document.getElementById("adminBrand").value = adminCenter.value;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                document.getElementById("adminBrand").value = adminBranchFacility.value;
+            } else if (adminChoice.value === "스토어") {
+                document.getElementById("adminBrand").value = adminStore.value;
+            }
+
+            document.getElementById('adminResidentNum').value =
+                document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
+
+            document.getElementById('adminPhone').value =
+                document.getElementById('adminPhonePartOne').value + "-" +
+                document.getElementById('adminPhonePartTwo').value + "-" +
+                document.getElementById('adminPhonePartThree').value
+
+        }
 
 
 

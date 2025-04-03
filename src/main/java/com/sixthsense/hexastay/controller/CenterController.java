@@ -86,18 +86,12 @@ public class CenterController {
     }
 
     @PostMapping("/delete/{centerNum}")
-    public ResponseEntity<String> deleteCenter(@PathVariable Long centerNum) {
+    public String deleteCenter(@PathVariable Long centerNum) {
         log.info("post 방식 center 삭제 controller 진입");
 
-        try {
-            centerService.centerDelete(centerNum);
+        centerService.centerDelete(centerNum);
 
-            return ResponseEntity.ok("삭제 성공");
-
-        } catch (Exception e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패 다시 시도해주세요");
-        }
+        return "redirect:/center/list";
     }
 
 

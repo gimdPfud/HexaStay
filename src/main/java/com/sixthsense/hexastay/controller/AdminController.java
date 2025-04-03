@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
+import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 @Controller
@@ -22,6 +24,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final CenterService centerService;
+    private final StoreService storeService;
 
     @GetMapping("/list")
     public String list() {
@@ -41,9 +44,10 @@ public class AdminController {
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<Void> insert(AdminDTO adminDTO) {
+    public String insert(AdminDTO adminDTO) {
         adminDTO.setAdminActive(true);
-        return ResponseEntity.ok().build();
+        adminService.insertAdmin(adminDTO);
+        return "redirect:/list";
     }
 
     @GetMapping("/mypage")
@@ -66,14 +70,17 @@ public class AdminController {
     @GetMapping("/searchfacility")
     @ResponseBody
     public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
-        log.info("헤헤"+centerName);
+        log.info("후후"+centerName);
         return adminService.getFacilityList(centerName);
     }
 
-//    @GetMapping("/searchstore")
-//    public List<StoreDTO> insertstore(@RequestParam String branchName, @RequestParam String facilityName) {
-//        if (branchName != null) {
-//            return adminService.getBranch(branchName);
-//    }
+    @GetMapping("/searchstore")
+    @ResponseBody
+    public List<StoreDTO> insertstore() {
+        log.info("허허");
+            return adminService.getStoreList();
+
+    }
+
 
 }

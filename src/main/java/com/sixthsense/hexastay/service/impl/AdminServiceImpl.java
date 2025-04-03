@@ -1,10 +1,7 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.*;
-import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Branch;
-import com.sixthsense.hexastay.entity.Center;
-import com.sixthsense.hexastay.entity.Facility;
+import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.AdminService;
 import lombok.Builder;
@@ -56,7 +53,7 @@ public class AdminServiceImpl implements AdminService {
         branchDTO.setBranchNum(branch.getBranchNum());
         branchDTO.setBranchPhone(branch.getBranchPhone());
         branchDTO.setBranchCeoName(branch.getBranchCeoName());
-        branchDTO.setCenterBusinessNum(branch.getCenterBusinessNum());
+        branchDTO.setBranchBusinessNum(branch.getBranchBusinessNum());
         branchDTO.setCreateDate(branch.getCreateDate());
         branchDTO.setModifyDate(branch.getModifyDate());
         branchDTO.setCenterNum(branch.getCenter().getCenterNum());
@@ -79,16 +76,15 @@ public class AdminServiceImpl implements AdminService {
         return facilityDTOList;
     }
 
-//    public List<StoreDTO> getStoreList(String branchName, String facilityName) {
-//
-//        List<StoreDTO> storeDTOList = new ArrayList<>();
-//        if (branchName != null) {
-//            storeRepository.findBy_(branchName);
-//        } else {
-//            facilityRepository.findByFacilityName(facilityName);
-//            return
-//        }
-//
-//        return null;
-//    }
+    public List<StoreDTO> getStoreList() {
+
+        List<StoreDTO> storeDTOList = new ArrayList<>();
+        List<Store> storeList = storeRepository.findAll();
+        for (Store store : storeList) {
+            StoreDTO storeDTO = new StoreDTO();
+            modelMapper.map(store, storeDTO);
+            storeDTOList.add(storeDTO);
+        }
+        return storeDTOList;
+    }
 }
