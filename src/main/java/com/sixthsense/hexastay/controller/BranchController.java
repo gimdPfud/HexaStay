@@ -113,9 +113,10 @@ public class BranchController {
     // 조직등록 - 지사
     @PostMapping("/branchinsert")
     @ResponseBody
-    public String facilityInsertPost(BranchDTO branchDTO) {
+    public ResponseEntity<Void> branchInsertPost(@RequestBody BranchDTO branchDTO) {
+        log.info(branchDTO.toString());
         branchService.branchInsert(branchDTO);
-        return "redirect:/branch/list";
+        return ResponseEntity.ok().build();
     }
 
 

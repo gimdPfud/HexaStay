@@ -5,6 +5,8 @@ import com.sixthsense.hexastay.dto.CenterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface BranchService {
 
     //branch 등록
@@ -22,5 +24,7 @@ public interface BranchService {
     //branch 삭제
     public void branchDelete(Long branchNum);
 
+    //조회용
+    public List<BranchDTO> allBranchList();
 
 }

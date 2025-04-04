@@ -114,9 +114,10 @@ public class FacilityController {
 
     @PostMapping("/facilityinsert")
     @ResponseBody
-    public String facilityInsertPost(FacilityDTO facilityDTO) {
+    public ResponseEntity<Void> facilityInsertPost(@RequestBody FacilityDTO facilityDTO) {
+        log.info(facilityDTO.toString());
         facilityService.facilityInsert(facilityDTO);
-        return "redirect:/center/list";
+        return ResponseEntity.ok().build();
     }
 
 

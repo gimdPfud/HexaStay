@@ -23,7 +23,7 @@ public interface CenterService {
     //center 삭제
     public void centerDelete(Long centerNum);
 
-    //가입용
+    //가입용, 조회용
     public List<CenterDTO> allCenterList();
 
 }

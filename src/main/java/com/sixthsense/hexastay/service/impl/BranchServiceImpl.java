@@ -15,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -28,12 +31,8 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public void branchInsert(BranchDTO branchDTO) {
         log.info("branch Insert Service 진입");
-
-        Center center = centerRepository.findById(branchDTO.getCenterNum()).orElseThrow(EntityNotFoundException::new);
-
         //branch 등록
         Branch branch = modelMapper.map(branchDTO, Branch.class);
-        branch.setCenter(center);
         branchRepository.save(branch);
 
         log.info("branchDTO를 Entity로 변환 완료 : " + branch);
@@ -88,4 +87,18 @@ public class BranchServiceImpl implements BranchService {
 
         log.info("삭제된 pk : " + branchNum);
     }
+
+    @Override
+    public List<BranchDTO> allBranchList() {
+        List<Branch> branchList = branchRepository.findAll();
+        List<BranchDTO> branchDTOList = new ArrayList<>();
+        for(Branch branch : branchList) {
+            BranchDTO branchDTO = modelMapper.map(branch, BranchDTO.class);
+            branchDTOList.add(branchDTO);
+        }
+        return branchDTOList;
+    }
+
+
+
 }

@@ -1,10 +1,15 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.dto.FacilityDTO;
+import com.sixthsense.hexastay.service.BranchService;
 import com.sixthsense.hexastay.service.CenterService;
+import com.sixthsense.hexastay.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.codehaus.groovy.transform.sc.transformers.RangeExpressionTransformer;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +29,8 @@ import java.util.List;
 public class CenterController {
 
     private final CenterService centerService;
+    private final BranchService branchService;
+    private final FacilityService facilityService;
 
     @GetMapping("/list")
     public String listCenter(Model model, Pageable pageable){
@@ -32,6 +39,7 @@ public class CenterController {
         Page<CenterDTO> centerDTOS = centerService.centerList(pageable);
 
         model.addAttribute("centerDTOS", centerDTOS);
+
 
         return "center/list";
     }
@@ -99,7 +107,6 @@ public class CenterController {
 
 
     // 조직등록 - 센터
-
     @PostMapping("/centerinsert")
     @ResponseBody
     public String centerInsertPost(CenterDTO centerDTO) {
@@ -107,6 +114,29 @@ public class CenterController {
         return "redirect:/center/list";
     }
 
+    // 조직 리스트 조회용
+    @PostMapping("/searchcenter")
+    @ResponseBody
+    public Page<CenterDTO> searchCenterPost(Model model, Pageable pageable) {
+        Page<CenterDTO> centerDTOS = centerService.centerList(pageable);
+        return centerDTOS;
+    }
+
+    // 조직 리스트 조회용 2
+    @PostMapping("/searchbranch")
+    @ResponseBody
+    public Page<BranchDTO> searchBranchPost(Model model, Pageable pageable) {
+        Page<BranchDTO> branchDTOS = branchService.branchList(pageable);
+        return branchDTOS;
+    }
+
+    // 조직 리스트 조회용 3
+    @PostMapping("/searchfacility")
+    @ResponseBody
+    public Page<FacilityDTO> searchFacilityPost(Model model, Pageable pageable) {
+        Page<FacilityDTO> facilityDTOS = facilityService.facilityList(pageable);
+        return facilityDTOS;
+    }
 
 
 }
