@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>외부업체 상세보기</title>
@@ -10,128 +13,106 @@
     <!--아이콘!!!... 추가-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body>
-<div class="container">
-    <div class="row mt-5">
-        <div class="col-md-2"></div>
-        <div class="col-md-8 p-4 border rounded bg-light">
-            <div class="text-center mb-3">
-                <img src="/images/store-icon.png" alt="업체 이미지" class="img-fluid" style="width: 80px;">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">상호명</label>
-                <input type="text" class="form-control" th:value="${data.storeName}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">대표 번호</label>
-                <input type="text" class="form-control" th:value="${data.storePhone}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">담당자명</label>
-                <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">이메일</label>
-                <input type="text" class="form-control" th:value="${data.storeEmail}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">사업장 주소</label>
-                <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">등록일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">수정일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="text-center mt-4">
-                <a th:href="@{/store/list}" class="btn btn-dark">목록</a>
-                <a th:href="@{'/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
-            </div>
-        </div>
-        <div class="col-md-2"></div>
-    </div><!--외부업체 정보-->
+<body class="w-100 vh-100 bg-light">
+    <div layout:fragment="content">
 
-    <!--외부업체가 제공하는 서비스 목록들-->
-    <div class="row mt-5 mb-5">
-        <div class="col-md-2"></div>
-        <div class="col-md-8 p-4 border rounded bg-light">
+        <div class="d-flex justify-content-center">
 
-            <div class="mb-3">
-                <h1 class="text-center">제공 서비스 목록
+            <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+                <div class="d-flex w-100" style="justify-content: center;">
+                    <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">상호명</label>
+                    <input type="text" class="form-control" th:value="${data.storeName}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">대표 번호</label>
+                    <input type="text" class="form-control" th:value="${data.storePhone}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">담당자명</label>
+                    <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">이메일</label>
+                    <input type="text" class="form-control" th:value="${data.storeEmail}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">사업장 주소</label>
+                    <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">등록일자</label>
+                    <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">수정일자</label>
+                    <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+                </div>
+                <div class="text-center mt-4 d-flex justify-content-between">
+                    <a th:href="@{/store/list}" class="btn btn-dark">목록보기</a>
+                    <a th:href="@{'/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
+                </div>
+            </div><!--외부업체 정보-->
+
+            <!--외부업체가 제공하는 서비스 목록들-->
+            <div class="container p-4 rounded shadow-sm w-100 h-100 mt-3" style="max-width: 400px;">
+                <div class="mb-3">
+                    <h1 class="text-center">제공 서비스 목록</h1>
                     <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
-                </h1>
-            </div><!--제목끝-->
-
-
-            <div class="text-center">
-                <!--텅~~~-->
-            </div><!--등록버튼끝-->
-
-            <div class="storemenulist mt-5"></div>
-
+                </div><!--제목끝-->
+                <div class="storemenulist mt-5"></div>
             </div><!--리스트가 비어있지 않다면 끝-->
 
-        </div><!--가운데 col-->
+        </div>
 
-        <div class="col-md-2"></div>
+        <script th:inline="javascript">
+            let storemenulist = document.querySelector(".storemenulist");
+            let storenum = [[${data.storeNum}]]
+            document.addEventListener("DOMContentLoaded", function () {
+                console.log("페이지 로드 됨")
+
+                fetch(`/store/menu/list/${storenum}`)
+                    .then(response => {
+                        if(!response.ok){
+                            if(response.status===404){
+                                return response.text()
+                                    .then(errmsg=> {
+                                        let error = new Error(errmsg)
+                                        error.status = 404;
+                                        throw error;
+                                    })
+                            }
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("갔다옴")
+                        showstoremenu(data)
+                    })
+                    .catch(error => {
+                        if(error.status===404){
+                            showemptymenu(error.message);
+                        }
+                        console.log(error)
+                    });
 
 
-    </div><!--외부업체가 제공하는 서비스 목록들-->
-</div>
-
-
-
-
-
-<script th:inline="javascript">
-    let storemenulist = document.querySelector(".storemenulist");
-    let storenum = [[${data.storeNum}]]
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log("페이지 로드 됨")
-
-        fetch(`/store/menu/list/${storenum}`)
-            .then(response => {
-                if(!response.ok){
-                    if(response.status===404){
-                        return response.text()
-                            .then(errmsg=> {
-                                let error = new Error(errmsg)
-                                error.status = 404;
-                                throw error;
-                            })
-                    }
-                }
-                return response.json();
             })
-            .then(data => {
-                console.log("갔다옴")
-                showstoremenu(data)
-            })
-            .catch(error => {
-                if(error.status===404){
-                    showemptymenu(error.message);
-                }
-                console.log(error)
-            });
-
-
-    })
 
 
 
 
-    /*
-     * 메소드명 : showstoremenu
-     * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
-     * 리턴 값 :
-     * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
-     * */
-    function showstoremenu(list) {
-        console.log("실행시작...1")
-        let tagsstart = `<table class="table table-bordered text-center">
+            /*
+             * 메소드명 : showstoremenu
+             * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
+             * 리턴 값 :
+             * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
+             * */
+            function showstoremenu(list) {
+                console.log("실행시작...1")
+                let tagsstart = `<table class="table table-bordered text-center">
                 <thead class="table-light">
                 <tr>
                     <th>메뉴 이름</th>
@@ -142,12 +123,12 @@
                 </tr>
                 </thead>
                 <tbody>`;
-        let tagscontent = "";
-        let tagsend = `</tbody>
+                let tagscontent = "";
+                let tagsend = `</tbody>
             </table>`;
 
-        for (let i=0; i<list.length;i++){
-            tagscontent += `<tr>
+                for (let i=0; i<list.length;i++){
+                    tagscontent += `<tr>
                     <td>${list[i].storemenuName}</td>
                     <td>${list[i].storemenuPrice}</td>
                     <td>${list[i].storemenuContent}</td>
@@ -156,27 +137,36 @@
                         <a href="/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세보기</a>
                     </td>
                 </tr>`
-        }
-        let totaltags = tagsstart + tagscontent + tagsend;
+                }
+                let totaltags = tagsstart + tagscontent + tagsend;
 
-        storemenulist.innerHTML=totaltags;
+                storemenulist.innerHTML=totaltags;
 
-    }
-
-
+            }
 
 
-    /*
-     * 메소드명 : showemptymenu
-     * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
-     * 리턴 값 :
-     * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
-     * */
-    function showemptymenu(msg) {
-        console.log("실행시작...2")
-        let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
-        storemenulist.innerHTML=tagscontent;
-    }
-</script>
+
+
+            /*
+             * 메소드명 : showemptymenu
+             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+             * 리턴 값 :
+             * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
+             * */
+            function showemptymenu(msg) {
+                console.log("실행시작...2")
+                let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+                storemenulist.innerHTML=tagscontent;
+            }
+        </script>
+
+    </div><!--레이아웃 content 끝-->
+
+
+
+
+
+
+
 </body>
 </html>
