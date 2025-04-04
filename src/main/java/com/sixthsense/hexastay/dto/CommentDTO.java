@@ -17,5 +17,5 @@ public class CommentDTO {
     private String createdAt;
     private String updatedAt;
 
-    private Long memberNum;
+    private Long adminName;
 }

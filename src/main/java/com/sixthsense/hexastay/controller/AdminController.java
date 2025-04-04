@@ -3,7 +3,6 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
-import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpClient;
 import java.util.List;
 
 @Controller
@@ -46,7 +44,7 @@ public class AdminController {
     public String insert(AdminDTO adminDTO) {
         adminDTO.setAdminActive(false);
         adminService.insertAdmin(adminDTO);
-        return "redirect:/list";
+        return "redirect:/admin/list";
     }
 
 
@@ -57,10 +55,10 @@ public class AdminController {
         model.addAttribute("adminDTOList", adminDTOList);
         return "admin/approve";
     }
+
     //승인 포스트
     @PostMapping("/approve")
-    public ResponseEntity<Void> approve(@RequestParam Long adminNum){
-        log.info("끼끼" + adminNum);
+    public ResponseEntity<Void> approve(@RequestParam Long adminNum) {
         adminService.setAdminActive(adminNum);
         return ResponseEntity.ok().build();
     }
@@ -68,7 +66,9 @@ public class AdminController {
 
     //마이페이지
     @GetMapping("/mypage")
-    public String mypage() {
+    public String mypage(Model model) {
+        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        model.addAttribute("centerDTOList", centerDTOList);
         return "admin/mypage";
     }
 
@@ -79,21 +79,16 @@ public class AdminController {
     }
 
 
-
-
-
     // 이하 가입창에서 레스트용
     @GetMapping("/searchbranch")
     @ResponseBody
     public List<BranchDTO> insertbranch(@RequestParam String centerName) {
-        log.info("헤헤"+centerName);
         return adminService.getBranchList(centerName);
     }
 
     @GetMapping("/searchfacility")
     @ResponseBody
     public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
-        log.info("후후"+centerName);
         return adminService.getFacilityList(centerName);
     }
 
@@ -101,25 +96,26 @@ public class AdminController {
     @ResponseBody
     public List<StoreDTO> insertstore() {
         log.info("허허");
-            return adminService.getStoreList();
+        return adminService.getStoreList();
 
     }
 
-
-    //직원 정보 변경용
-
+    // 회원정보 수정 (마이페이지 아님)
     @GetMapping("/edit/{adminNum}")
-    public String edit (Model model, @PathVariable(name="adminNum") Long adminNum) {
+    public String edit(Model model, @PathVariable(name = "adminNum") Long adminNum) {
         AdminDTO adminDTO = adminService.getAdmin(adminNum);
         model.addAttribute("adminDTO", adminDTO);
+        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        model.addAttribute("centerDTOList", centerDTOList);
         return "admin/edit";
 
     }
 
+
+    // 회원정보 수정 포스트
     @PostMapping("/edit")
-    public String editPost (AdminDTO adminDTO) {
+    public String editPost(AdminDTO adminDTO) {
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
     }
-
 }
