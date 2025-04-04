@@ -63,8 +63,6 @@ public class StoremenuController {
             return null;
         }
     }
-    /*todo 그냥 storeNum없이 메뉴리스트를 보려면?? (사이드바에서 선택해서 보게된다면?)
-     *  한번 store를 선택하는 쿠션이 있어야 할 듯.*/
 
 
 
@@ -86,17 +84,20 @@ public class StoremenuController {
     @PostMapping("/insert")
     public String insertPost(StoremenuDTO storemenuDTO){
         storemenuService.insert(storemenuDTO);
-        return "redirect:/store/menu/insert/"+storemenuDTO.getStoreNum();
+        return "redirect:/store/read/"+storemenuDTO.getStoreNum();
     }
 
-/*todo 이거 /store/read/{id}에 어떻게 넣는지 생각좀 해보기...*/
+
     @ResponseBody
     @GetMapping("/list/{id}")
     public ResponseEntity listGet(@PathVariable Long id, Pageable pageable){
         /*storeNum으로 Menu 가져오기...*/
         List<StoremenuDTO> menulist = storemenuService.list(id);
-        menulist.forEach(log::info);
-        return new ResponseEntity<>(menulist, HttpStatus.OK);
+        if(menulist.isEmpty()){
+            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(menulist, HttpStatus.OK);
+        }
     }
 
 

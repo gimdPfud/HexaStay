@@ -61,17 +61,16 @@
 
             <div class="mb-3">
                 <h1 class="text-center">제공 서비스 목록
-                    <a th:href="@{'/store/menu/list/'+${data.storeNum}}"><i class="bi bi-arrow-clockwise"></i></a>
+                    <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
                 </h1>
             </div><!--제목끝-->
 
 
             <div class="text-center">
-                <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary btn-lg">등록</a>
                 <!--텅~~~-->
             </div><!--등록버튼끝-->
 
-            <div class="storemenulist"></div>
+            <div class="storemenulist mt-5"></div>
 
             </div><!--리스트가 비어있지 않다면 끝-->
 
@@ -82,24 +81,6 @@
 
     </div><!--외부업체가 제공하는 서비스 목록들-->
 </div>
-
-<!--&lt;!&ndash;todo 훔쳐온 내용&ndash;&gt;-->
-<!--fetch(`/searchbranch?centerName=${adminCenterValue}`)-->
-<!--.then(response => response.json())-->
-<!--.then(data => {-->
-<!--adminBranchFacility.innerHTML = "<option value=''></option>";-->
-
-<!--data.forEach(item => {-->
-<!--let option = document.createElement("option");-->
-<!--option.value = item.branchNum;-->
-<!--option.textContent = item.branchName;-->
-<!--adminBranchFacility.appendChild(option);-->
-<!--});-->
-
-<!--adminBranchFacility.disabled = false;-->
-<!--})-->
-<!--.catch(error => console.error("지사 데이터 불러오기 실패:", error));-->
-<!--&lt;!&ndash;todo 훔쳐온 내용 끝&ndash;&gt;-->
 
 
 
@@ -112,15 +93,36 @@
         console.log("페이지 로드 됨")
 
         fetch(`/store/menu/list/${storenum}`)
-            .then(response => response.json())
+            .then(response => {
+                if(!response.ok){
+                    if(response.status===404){
+                        return response.text()
+                            .then(errmsg=> {
+                                let error = new Error(errmsg)
+                                error.status = 404;
+                                throw error;
+                            })
+                    }
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log("갔다옴")
                 showstoremenu(data)
             })
-            .catch(error => console.error("오류!!!:", error));
+            .catch(error => {
+                if(error.status===404){
+                    showemptymenu(error.message);
+                }
+                console.log(error)
+            });
 
 
     })
+
+
+
+
     /*
      * 메소드명 : showstoremenu
      * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
@@ -128,7 +130,7 @@
      * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
      * */
     function showstoremenu(list) {
-        console.log("실행시작...")
+        console.log("실행시작...1")
         let tagsstart = `<table class="table table-bordered text-center">
                 <thead class="table-light">
                 <tr>
@@ -159,6 +161,21 @@
 
         storemenulist.innerHTML=totaltags;
 
+    }
+
+
+
+
+    /*
+     * 메소드명 : showemptymenu
+     * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+     * 리턴 값 :
+     * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
+     * */
+    function showemptymenu(msg) {
+        console.log("실행시작...2")
+        let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+        storemenulist.innerHTML=tagscontent;
     }
 </script>
 </body>
