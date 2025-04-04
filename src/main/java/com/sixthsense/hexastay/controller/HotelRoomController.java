@@ -36,6 +36,12 @@ public class HotelRoomController {
         return "hotelroom/lista";
     }
 
+    @GetMapping("/insert")
+    public String insetHotelRoom() {
+
+        return "hotelroom/insert";
+    }
+
 
 
     //localhost:8090/hotelroom/insert

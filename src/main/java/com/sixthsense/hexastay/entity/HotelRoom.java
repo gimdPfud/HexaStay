@@ -11,6 +11,7 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 @Entity
@@ -21,7 +22,9 @@ import java.util.Collection;
 @AllArgsConstructor
 @Builder
 @Table(name = "hotelRoom")
-public class HotelRoom extends BaseEntity {
+
+public class HotelRoom extends BaseEntity{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hotelRoomNum")
@@ -36,27 +39,30 @@ public class HotelRoom extends BaseEntity {
     @Column(name = "hotelRoomType")
     private String hotelRoomType;               //종류 (싱글 더블 스위트 ..)
 
-    @Column(name = "hotelRoomQr")
-    private String hotelRoomQr;                 //Qr명
-
     @Column(name = "hotelRoomContent")
     private String hotelRoomContent;            //방 상세설명
-
-    @Column(name = "hotelRoomPrice")
-    private Integer hotelRoomPrice;              //가격
-
-    @Column(name = "hotelRoomPassword")
-    private String hotelRoomPassword;           //비밀번호
 
     @Column(name = "hotelRoomStatus")
     private boolean hotelRoomStatus;            //활성화 상태
 
-    @Column(name = "hotelRoomCheckIn")
-    private String hotelRoomCheckIn;            //체크인
+    @Column(name = "hotelRoomPrice")
+    private Integer hotelRoomPrice;              //가격
 
-    @Column(name = "hotelRoomCheckOut")
-    private String hotelRoomCheckOut;           //체크아웃
+               //체크인    - BaseEntity 로 대체
+             //체크아웃 -BaseEntity로 대체
 
+
+
+    //****룸의 비밀번호 설정 컬럼모음**********//
+    @Column(name = "hotelRoomQr")
+    private String hotelRoomQr;                 //Qr명
+
+    @Column(name = "hotelRoomPassword")
+    private String hotelRoomPassword;           //비밀번호
+    //****룸의 권한 설정 컬럼모음**********//
+
+
+    //*********참조 테이블 모음*********//
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branchNum")
     private Branch branch;             //지사 참조
@@ -68,4 +74,6 @@ public class HotelRoom extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberNum")
     private Member member;
+    //*********참조 테이블 모음*********//
+
 }

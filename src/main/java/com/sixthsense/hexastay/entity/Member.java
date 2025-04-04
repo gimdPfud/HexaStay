@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Member  extends BaseEntity {
+public class Member extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "memberNum")
@@ -41,16 +41,7 @@ public class Member  extends BaseEntity {
     private String memberEmail;                         //이메일
 
     @Column(name = "memberBirth")
-    private String memberBirth;                         //생년월일
+    private String memberBirth;                        //생년월일
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "memberGender")
-    private Gender memberGender;                        //성별
-
-    //멤버 체크인
-    private LocalDate checkInDate;
-
-    //멤버 체크아웃
-    private LocalDate checkOutDate;
 
 }

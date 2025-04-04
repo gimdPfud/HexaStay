@@ -34,17 +34,21 @@ public class OrderRoom  extends BaseEntity {
     private Long orderRoomTotalPrice;
 
 
-    //***참조 테이블************************
+
     //Room테이블 - HotelRoom
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotelRoomNum")
     private HotelRoom hotelRoom;
+    //todo:1. Room정보  hotelRoomName 방이름 가져오기
+    //todo:2. Room정보 hotelRoomPrice 룸의 가격 가져오기
 
 
     //멤버 테이블
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberNum")
     private Member member;
+    //todo:1.member정보 memberName
+    //***참조 테이블************************
 
 
 
