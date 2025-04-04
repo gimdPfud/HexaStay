@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.service.impl;
-
 import com.sixthsense.hexastay.dto.NoticeDTO;
 import com.sixthsense.hexastay.entity.Notice;
 import com.sixthsense.hexastay.entity.Member;
@@ -31,7 +30,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void noticeInsert(NoticeDTO noticeDTO) {
         // 임시 작성자 지정 (하드코딩된 값)
-        noticeDTO.setNoticeWriter("spit착맨"); // TODO: 로그인 사용자로 대체 예정
+//        noticeDTO.setNoticeWriter("spit착맨"); // TODO: 로그인 사용자로 대체 예정
         noticeDTO.setMemberNum(1L);           // TODO: 실제 로그인한 멤버 ID로 대체 예정
 
         // (1) 여기서 멤버 조회 및 예외 처리
@@ -61,12 +60,12 @@ public class NoticeServiceImpl implements NoticeService {
                 noticeList = noticeRepository.findByNoticeTitleContaining(keyword, temp);
             } else if ("C".equals(type)) {
                 noticeList = noticeRepository.findByNoticeContentContaining(keyword, temp);
-            } else if ("A".equals(type)) {
-                noticeList = noticeRepository.findByNoticeWriterContaining(keyword, temp);
+//            } else if ("A".equals(type)) {
+//                noticeList = noticeRepository.findByNoticeWriterContaining(keyword, temp);
             } else if ("SC".equals(type)) {
                 noticeList = noticeRepository.findByNoticeTitleContainingOrNoticeContentContaining(keyword, keyword, temp);
-            } else if ("SCA".equals(type)) {
-                noticeList = noticeRepository.findByNoticeWriterContainingOrNoticeTitleContainingOrNoticeContentContaining(keyword, keyword, keyword, temp);
+//            } else if ("SCA".equals(type)) {
+//                noticeList = noticeRepository.findByNoticeWriterContainingOrNoticeTitleContainingOrNoticeContentContaining(keyword, keyword, keyword, temp);
             } else {
                 noticeList = noticeRepository.findAll(temp); // 검색 조건이 없을 경우 전체 조회
             }

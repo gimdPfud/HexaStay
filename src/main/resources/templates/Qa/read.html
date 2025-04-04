@@ -21,28 +21,27 @@
                 <div class="card-header text-center"><b>게시글 읽기</b></div>
                 <div class="card-body">
                     <div class="mb-3 mt-3">
-                        <p>번호: <span th:text="${noticedata.noticeNum}"></span></p>
+                        <p>번호: <span th:text="${qadata.qaNum}"></span></p>
                     </div>
                     <div class="mb-3 mt-3">
-                        <p>제목: <span th:text="${noticedata.noticeTitle}"></span></p>
-                    </div>
-<!--                    <div class="mb-3 mt-3">-->
-<!--                        <p>작성자: <span th:text="${noticedata.noticeWriter}"></span></p>-->
-<!--                    </div>-->
-                    <div class="mb-3 mt-3">
-                        <p>내용: <span th:text="${noticedata.noticeContent}"></span></p>
+                        <p>제목: <span th:text="${qadata.qaTitle}"></span></p>
                     </div>
                     <div class="mb-3 mt-3">
-                        <p>날짜: <span th:text="${#temporals.format(noticedata.modifyDate,'yyyy-MM-dd')}"></span></p>
+                      <p>작성자: <span th:text="${qadata.qaWriter}"></span></p>
+                   </div>
+                    <div class="mb-3 mt-3">
+                        <p>내용: <span th:text="${qadata.qaContent}"></span></p>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <p>날짜: <span th:text="${#temporals.format(qadata.modifyDate,'yyyy-MM-dd')}"></span></p>
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-secondary">
+                    <button type="button" th:onclick="|location.href='@{/qa/list}'|" class="btn btn-secondary">
                         <i class="bi-caret-left"></i>
                     </button>
                     <div>
-                        <a th:href="@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-success">수정</a>
-                        <a th:href="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-danger">삭제</a>
+                        <a th:href="@{/qa/delete/{qaNum}(qaNum=${qadata.qaNum})}" class="btn btn-danger">삭제</a>
                     </div>
                 </div>
             </div>

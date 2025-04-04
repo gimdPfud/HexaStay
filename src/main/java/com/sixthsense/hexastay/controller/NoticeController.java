@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.controller;
-
 import com.sixthsense.hexastay.dto.NoticeDTO;
 import com.sixthsense.hexastay.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -54,19 +53,19 @@ public class NoticeController {
     }
     // 공지사항 등록 처리
     @PostMapping("/insert") // (수정)
-    public String insertPost(NoticeDTO noticeDTO) {
+    public String insertPost(NoticeDTO noticeDTO,Principal principal) {
         log.info("공지사항 등록 요청: " + noticeDTO);
-        try{
+        try {
             noticeService.noticeInsert(noticeDTO);
-        }catch(Exception e){
-            log.info("등록실패");
+        } catch(Exception e) {
+            log.error("공지사항 등록 실패", e);
+            return "redirect:/notice/insert?error=true"; // (예: 에러 메시지 전달)
         }
-
         log.info("요청완료");
         return "redirect:/notice/list"; // (수정)
     }
     //읽기
-    @GetMapping("/noticeread/{noticeNum}")
+    @GetMapping("/read/{noticeNum}")
     public String read(@PathVariable(name = "noticeNum") Long noticeNum, Model model){
         log.info("읽기 진입");
         //서비스처리
@@ -84,9 +83,14 @@ public class NoticeController {
         return "/notice/modify";
     }
     @PostMapping("/modify") // (수정)
-    public String modifyPost(NoticeDTO noticeDTO) {
+    public String modifyPost(NoticeDTO noticeDTO,Principal principal) {
         noticeService.noticeModify(noticeDTO);
         log.info("수정완료" + noticeDTO);
-        return "redirect:/notice/read"; // (수정)
+        return "redirect:/notice/read/" + noticeDTO.getNoticeNum();
+    }
+    @GetMapping("/delete/{noticeNum}") // ✅ (추가)
+    public String delete(@PathVariable Long noticeNum) {
+        noticeService.noticeDelete(noticeNum);
+        return "redirect:/notice/list";
     }
 }

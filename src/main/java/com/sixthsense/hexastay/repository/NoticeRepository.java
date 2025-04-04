@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     // 작성자로 조회
-    Page<Notice> findByNoticeWriterContaining(String noticeWriter, Pageable pageable);
+//    Page<Notice> findByNoticeWriterContaining(String noticeWriter, Pageable pageable);
 
     // 제목으로 조회
     Page<Notice> findByNoticeTitleContaining(String noticeTitle, Pageable pageable);
@@ -24,14 +24,14 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     (String noticeTitle, String noticeContent, Pageable pageable);
 
     // 제목+내용+작성자로 조회
-    Page<Notice> findByNoticeWriterContainingOrNoticeTitleContainingOrNoticeContentContaining
-    (String noticeWriter, String noticeTitle, String noticeContent, Pageable pageable);
+//    Page<Notice> findByNoticeWriterContainingOrNoticeTitleContainingOrNoticeContentContaining
+//    (String noticeWriter, String noticeTitle, String noticeContent, Pageable pageable);
 
     // 게시판 검색 기능 확인
     @Query("SELECT b FROM Notice b " +
             "WHERE b.noticeTitle LIKE CONCAT('%', :keyword, '%') " +
-            "OR b.noticeContent LIKE CONCAT('%', :keyword, '%') " +
-            "OR b.noticeWriter LIKE CONCAT('%', :keyword, '%')")
+            "OR b.noticeContent LIKE CONCAT('%', :keyword, '%') " )
+//            "OR b.noticeWriter LIKE CONCAT('%', :keyword, '%')")
     Page<Notice> Noticesearch(@Param("keyword") String keyword, Pageable pageable);;
 
 }

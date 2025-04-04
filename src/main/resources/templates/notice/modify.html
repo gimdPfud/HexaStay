@@ -13,32 +13,28 @@
     <div class="row mt-3">
         <div class="col-1"></div><!--오른쪽여백-->
         <div class="col-10">
-            <form th:action="@{/noticemodify}" method="post">
+            <form action="/notice/modify" method="post">
                 <!--카드형식으로 폼-->
                 <div class="card mb-3">
                     <div class="card-header text-center"><b>게시글 수정</b></div>
                     <div class="card-body">
-                        <input type="hidden" id="id" name="id" readonly th:value="${data.noticeNum}">
+                        <!-- (수정) name="noticeNum"으로 변경 -->
+                        <input type="hidden" id="noticeNum" name="noticeNum" readonly th:value="${noticedata.noticeNum}">
+                        <input type="hidden" id="noticeView" name="noticeView" readonly th:value="${noticedata.noticeView}">
 
                         <div class="mb-3 mt-3">
-                            <label for="subject" class="form-label">제목:</label>
-                            <input th:value="${data.subject}"
-                                   type="text" class="form-control" id="subject" placeholder="제목을 입력하세요" name="subject">
+                            <label for="noticeTitle" class="form-label">제목:</label>
+                            <input th:value="${noticedata.noticeTitle}"
+                                   type="text" class="form-control" id="noticeTitle" placeholder="제목을 입력하세요" name="noticeTitle">
                         </div>
                         <div class="mb-3 mt-3">
-                            <label for="author" class="form-label">작성자:</label>
-                            <input th:value="${data.author}"
-                                   type="text" class="form-control" id="author" placeholder="작성자를 입력하세요" name="author">
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label for="content">내용:</label>
+                            <label for="noticeContent">내용:</label>
                             <!--열고 닫는 태그들은 th:text. 하나로 쓰는 태그는 value.-->
-                            <textarea th:text="${data.content}" class="form-control" rows="5" id="content" name="content"></textarea>
+                            <textarea th:text="${noticedata.noticeContent}" class="form-control" rows="5" id="noticeContent" name="noticeContent"></textarea>
                         </div>
-
                     </div><!--입력양식-->
                     <div class="card-footer d-flex justify-content-between">
-                        <button th:onclick="|location.href='@{/detail(id=${data.id})}'|" class="btn btn-secondary">이전</button>
+                        <button th:onclick="|location.href='@{/notice/read/{id}(id=${noticedata.noticeNum})}'|" class="btn btn-secondary">이전</button>
                         <button type="submit" class="btn btn-success">수정</button>
                     </div>
                 </div>

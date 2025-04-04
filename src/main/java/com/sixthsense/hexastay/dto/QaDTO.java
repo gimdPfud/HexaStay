@@ -11,20 +11,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 //공지,QA
-public class NoticeDTO {
-    private Long noticeNum; // 번호
+public class QaDTO {
+    private Long qaNum; // 번호
 
-    private String noticeTitle; // 제목
+    private String qaTitle; // 제목
 
-    private String noticeContent; // 내용
+    private String qaContent; // 내용
 
-//    private String noticeWriter; // 작성자
+   private String qaWriter; // 작성자
 
     private LocalDateTime createDate; // 등록일자
 
     private LocalDateTime modifyDate; // 수정일자
 
-    private Integer noticeView; // 조회수
+    private Boolean qaAnswered;
+
+//    private Integer qaView; // 조회수
 
     private Long memberNum; // 회원 번호
 
