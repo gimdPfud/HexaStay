@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
 <head>
   <meta charset="UTF-8">
   <title>직원 관리</title>
@@ -7,134 +9,250 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-<div class="container mt-4">
-  <form class="row g-3">
-    <div class="col-md-3">
-      <label class="form-label">검색 조건</label>
-      <select class="form-select">
-        <option>전체</option>
-        <option>사번</option>
-        <option>직책</option>
-        <option>이름</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">브랜드</label>
-      <select class="form-select">
-        <option>전체</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">지사</label>
-      <select class="form-select">
-        <option>전체</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">지점</label>
-      <select class="form-select">
-        <option>전체</option>
-      </select>
-    </div>
-    <div class="col-md-9">
-      <input type="text" class="form-control" placeholder="검색어 입력">
-    </div>
-    <div class="col-md-3">
-      <button type="submit" class="btn btn-success w-100">조회</button>
-    </div>
-  </form>
+<div layout:fragment="content">
 
-  <table class="table table-bordered mt-4 text-center">
-    <thead>
-    <tr>
-      <th>브랜드명</th>
-      <th>본사명</th>
-      <th>지사명</th>
-      <th>지점명</th>
+  <div class="container mt-4">
+    <form class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">검색 조건</label>
+        <select class="form-select">
+          <option>전체</option>
+          <option>조직명</option>
+          <option>브랜드명</option>
+          <option>사업자번호</option>
 
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="centerDTOS : ${centerDTOS}">
-      <td th:text="${centerDTOS.centerBrand}"></td>
-      <td th:text="${centerDTOS.centerName}"></td>
-      <td th:text="${centerDTOS.centerBusinessNum}"></td>
-      <td th:text="${centerDTOS.centerCeoName}"></td>
-      <td th:text="${centerDTOS.centerPhone}"></td>
-      <td th:text="${centerDTOS.centerEmail}"></td>
-      <td th:text="${centerDTOS.centerAddress}"></td>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">소속</label>
+        <select class="form-select" id="choice">
+          <option>본사</option>
+          <option>지사</option>
+          <option>지점</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">브랜드</label>
+        <select class="form-select">
+          <option>전체</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">지점</label>
+        <select class="form-select">
+          <option>전체</option>
+        </select>
+      </div>
+      <div class="col-md-9">
+        <input type="text" class="form-control" placeholder="검색어 입력">
+      </div>
+      <div class="d-flex gap-3 col-md-3">
+        <button type="submit" class="btn btn-success w-50">조회</button>
+        <a href="/center/signup" class="btn btn-success w-50">등록</a>
+      </div>
+    </form>
 
-      <td>
-        <a th:href="@{/center/read/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">상세보기</a>
-      </td>
+    <table class="table table-bordered mt-4 text-center">
+      <thead>
+      <tr>
+        <th>브랜드명</th>
+        <th>본사명</th>
+        <th>지사명</th>
+        <th>지점명</th>
 
-    </tr>
-    </tbody>
-  </table>
+      </tr>
+      </thead>
 
-  <!--페이징-->
-  <div class="row m-0 p-0 mt-3">
-    <div class="col-3"></div>
-    <ul class="col-6 pagination justify-content-center col">
-      <!-- 처음 페이지 버튼 -->
-      <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page=0}">처음</a>
-      </li>
+      <tbody>
+      <tr th:each="centerDTOS : ${centerDTOS}">
+        <td th:text="${centerDTOS.centerBrand}"></td>
+        <td th:text="${centerDTOS.centerName}"></td>
+        <td th:text="${centerDTOS.centerBusinessNum}"></td>
+        <td th:text="${centerDTOS.centerCeoName}"></td>
+        <td th:text="${centerDTOS.centerPhone}"></td>
+        <td th:text="${centerDTOS.centerEmail}"></td>
+        <td th:text="${centerDTOS.centerAddress}"></td>
 
-      <!-- 이전 페이지 버튼 -->
-      <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>
-      </li>
+        <td>
+          <a th:href="@{/center/read/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">상세보기</a>
+        </td>
 
-      <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
-      <li class="page-item"
-          th:each="pageNum : ${#numbers.sequence(
+      </tr>
+      </tbody>
+    </table>
+
+    <!--페이징-->
+    <div class="row m-0 p-0 mt-3">
+      <div class="col-3"></div>
+      <ul class="col-6 pagination justify-content-center col">
+        <!-- 처음 페이지 버튼 -->
+        <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">
+          <a class="page-link" th:href="@{/freeboard?page=0}">처음</a>
+        </li>
+
+        <!-- 이전 페이지 버튼 -->
+        <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">
+          <a class="page-link" th:href="@{/freeboard?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>
+        </li>
+
+        <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
+        <li class="page-item"
+            th:each="pageNum : ${#numbers.sequence(
     (centerDTOS.number - 4 > 0 ? centerDTOS.number - 4 : 0),
     (centerDTOS.number + 5 < centerDTOS.totalPages - 1 ? centerDTOS.number + 5 : centerDTOS.totalPages - 1)
     )}"
-          th:classappend="${pageNum == centerDTOS.number} ? 'active'">
-        <a class="page-link" th:href="@{/freeboard?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-      </li>
+            th:classappend="${pageNum == centerDTOS.number} ? 'active'">
+          <a class="page-link" th:href="@{/center/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+        </li>
 
-      <!-- 다음 페이지 버튼 -->
-      <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={next}(next=${centerDTOS.number + 1})}">다음</a>
-      </li>
+        <!-- 다음 페이지 버튼 -->
+        <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">
+          <a class="page-link" th:href="@{/center/list?page={next}(next=${centerDTOS.number + 1})}">다음</a>
+        </li>
 
-      <!-- 마지막 페이지 버튼 -->
-      <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">
-        <a class="page-link" th:href="@{/freeboard?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>
-      </li>
+        <!-- 마지막 페이지 버튼 -->
+        <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">
+          <a class="page-link" th:href="@{/center/list?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>
+        </li>
 
-    </ul>
+      </ul>
 
-  </div>
+    </div>
 
-  <!-- 상세보기 모달 -->
-  <div class="modal fade" id="centerDetailModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">조직 상세 정보</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group">
-            <li class="list-group-item"><strong>브랜드명:</strong> <span id="modalCenterBrand"></span></li>
-            <li class="list-group-item"><strong>본사명:</strong> <span id="modalCenterName"></span></li>
-            <li class="list-group-item"><strong>지사명:</strong> <span id="modalCenterBusinessNum"></span></li>
-            <li class="list-group-item"><strong>지점명:</strong> <span id="modalCenterCeoName"></span></li>
-            <li class="list-group-item"><strong>전화번호:</strong> <span id="modalCenterPhone"></span></li>
-            <li class="list-group-item"><strong>이메일:</strong> <span id="modalCenterEmail"></span></li>
-            <li class="list-group-item"><strong>주소:</strong> <span id="modalCenterAddress"></span></li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+    <!-- 상세보기 모달 -->
+    <div class="modal fade" id="centerDetailModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">조직 상세 정보</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">
+              <li class="list-group-item"><strong>브랜드명:</strong> <span id="modalCenterBrand"></span></li>
+              <li class="list-group-item"><strong>본사명:</strong> <span id="modalCenterName"></span></li>
+              <li class="list-group-item"><strong>지사명:</strong> <span id="modalCenterBusinessNum"></span></li>
+              <li class="list-group-item"><strong>지점명:</strong> <span id="modalCenterCeoName"></span></li>
+              <li class="list-group-item"><strong>전화번호:</strong> <span id="modalCenterPhone"></span></li>
+              <li class="list-group-item"><strong>이메일:</strong> <span id="modalCenterEmail"></span></li>
+              <li class="list-group-item"><strong>주소:</strong> <span id="modalCenterAddress"></span></li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
+
+  <script>
+    const choice = document.getElementById("choice");
+
+    choice.addEventListener("change", function () {
+      let selected = choice.value;
+      let url = "";
+
+      if (selected === "본사") {
+        url = "/center/searchcenter";
+      } else if (selected === "지사") {
+        url = "/center/searchbranch";
+      } else if (selected === "지점") {
+        url = "/center/searchfacility";
+      }
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ page: 0, size: 10 }) // 기본 페이지
+      })
+              .then(res => res.json())
+              .then(data => {
+                updateTable(data.content); // 게시판 데이터
+                updatePagination(data);    // 페이징 관련
+              });
+    });
+
+    function updateTable(content) {
+      const tbody = document.querySelector("table tbody");
+      tbody.innerHTML = ""; // 기존 row 비우고
+
+      content.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${item.centerBrand || item.branchBrand || item.facilityBrand || ''}</td>
+        <td>${item.centerName || item.branchName || item.facilityName || ''}</td>
+        <td>${item.centerBusinessNum || item.branchBusinessNum || item.facilityBusinessNum || ''}</td>
+        <td>${item.centerCeoName || item.branchCeoName || item.facilityCeoName || ''}</td>
+        <td>${item.centerPhone || item.branchPhone || item.facilityPhone || ''}</td>
+        <td>${item.centerEmail || item.branchEmail || item.facilityEmail || ''}</td>
+        <td>${item.centerAddress || item.branchAddress || item.facilityAddress || ''}</td>
+        <td><a href="/center/read/${item.centerNum || item.branchNum || item.facilityNum}" class="btn btn-success">상세보기</a></td>
+      `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updatePagination(pageData) {
+      const pagination = document.querySelector(".pagination");
+      pagination.innerHTML = "";
+
+      const current = pageData.number;
+      const total = pageData.totalPages;
+
+      // 처음
+      pagination.innerHTML += `<li class="page-item ${current === 0 ? 'disabled' : ''}">
+      <a class="page-link" onclick="goToPage(0)">처음</a></li>`;
+
+      // 이전
+      pagination.innerHTML += `<li class="page-item ${!pageData.hasPrevious ? 'disabled' : ''}">
+      <a class="page-link" onclick="goToPage(${current - 1})">이전</a></li>`;
+
+      // 번호들
+      const start = Math.max(0, current - 4);
+      const end = Math.min(total - 1, current + 5);
+
+      for (let i = start; i <= end; i++) {
+        pagination.innerHTML += `<li class="page-item ${i === current ? 'active' : ''}">
+        <a class="page-link" onclick="goToPage(${i})">${i + 1}</a></li>`;
+      }
+
+      // 다음
+      pagination.innerHTML += `<li class="page-item ${!pageData.hasNext ? 'disabled' : ''}">
+      <a class="page-link" onclick="goToPage(${current + 1})">다음</a></li>`;
+
+      // 마지막
+      pagination.innerHTML += `<li class="page-item ${current === total - 1 ? 'disabled' : ''}">
+      <a class="page-link" onclick="goToPage(${total - 1})">마지막</a></li>`;
+    }
+
+    function goToPage(page) {
+      // 여기에 현재 선택된 셀렉션 따라 url 구하고, fetch 재요청하는 로직 넣기
+      const selected = document.getElementById("choice").value;
+      let url = "";
+
+      if (selected === "본사") url = "/center/searchcenter";
+      else if (selected === "지사") url = "/center/searchbranch";
+      else if (selected === "지점") url = "/center/searchfacility";
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ page: page, size: 10 })
+      })
+              .then(res => res.json())
+              .then(data => {
+                updateTable(data.content);
+                updatePagination(data);
+              });
+    }
+  </script>
+
 
 </div>
 </body>

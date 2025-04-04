@@ -31,11 +31,8 @@ public class FacilityServiceImpl implements FacilityService {
     public void facilityInsert(FacilityDTO facilityDTO) {
         log.info("Facility Insert Sercive 진입");
 
-        Center center = centerRepository.findById(facilityDTO.getCenterNum()).orElseThrow(EntityNotFoundException::new);
-
         //facility 등록
         Facility facility = modelMapper.map(facilityDTO, Facility.class);
-        facility.setCenter(center);
         facilityRepository.save(facility);
 
         log.info("facilityDTO를 Entity로 변환 완료 : " + facility);
