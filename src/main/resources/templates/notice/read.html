@@ -26,9 +26,9 @@
                     <div class="mb-3 mt-3">
                         <p>제목: <span th:text="${noticedata.noticeTitle}"></span></p>
                     </div>
-                    <div class="mb-3 mt-3">
-                        <p>작성자: <span th:text="${noticedata.noticeWriter}"></span></p>
-                    </div>
+<!--                    <div class="mb-3 mt-3">-->
+<!--                        <p>작성자: <span th:text="${noticedata.noticeWriter}"></span></p>-->
+<!--                    </div>-->
                     <div class="mb-3 mt-3">
                         <p>내용: <span th:text="${noticedata.noticeContent}"></span></p>
                     </div>
@@ -37,12 +37,12 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
+                    <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-secondary">
+                        <i class="bi-caret-left"></i>
+                    </button>
                     <div>
-                        <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-secondary"><i class="bi-caret-left"></i></button> <!-- (경로 수정) -->
-                    </div>
-                    <div>
-                        <a th:href="@{/notice/modify(noticeNum=${noticedata.noticeNum})}" class="btn btn-success">수정</a> <!-- (경로 수정) -->
-                        <a th:href="@{/notice/delete(noticeNum=${noticedata.noticeNum})}" class="btn btn-danger">삭제</a> <!-- (경로 수정) -->
+                        <a th:href="@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-success">수정</a>
+                        <a th:href="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-danger">삭제</a>
                     </div>
                 </div>
             </div>

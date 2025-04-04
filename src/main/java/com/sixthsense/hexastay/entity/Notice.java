@@ -24,8 +24,8 @@ public class Notice extends BaseEntity {
     @Column(name = "noticeContent", nullable = false, columnDefinition = "TEXT")
     private String noticeContent; // 내용
 
-    @Column(name = "noticeWriter", nullable = false, length = 20)
-    private String noticeWriter; // 작성자
+//    @Column(name = "noticeWriter", nullable = false, length = 20)
+//    private String noticeWriter; // 작성자
 
     @Column(name = "noticeView", nullable = false, columnDefinition = "INT default 0")
     private Integer noticeView; // 조회수

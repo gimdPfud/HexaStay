@@ -18,7 +18,7 @@ public class NoticeDTO {
 
     private String noticeContent; // 내용
 
-    private String noticeWriter; // 작성자
+//    private String noticeWriter; // 작성자
 
     private LocalDateTime createDate; // 등록일자
 

@@ -37,9 +37,9 @@
         <option value="" th:selected="${type==null}">검색 조건</option>
         <option value="S" th:selected="${type=='S'}">제목</option>
         <option value="C" th:selected="${type=='C'}"}>내용</option>
-        <option value="A" th:selected="${type=='A'}">작성자</option>
+<!--        <option value="A" th:selected="${type=='A'}">작성자</option>-->
         <option value="SC" th:selected="${type=='SC'}">제목+내용</option>
-        <option value="SCA" th:selected="${type=='SCA'}">제목+내용+작성자</option>
+<!--        <option value="SCA" th:selected="${type=='SCA'}">제목+내용+작성자</option>-->
       </select>
       <input class="form-control" th:value="${keyword}" name="keyword" type="text">
       <div class="d-flex justify-content-end mb-3">
@@ -61,7 +61,7 @@
     <tr><!--dto변수참고.-->
       <th >번호</th>
       <th >제목</th>
-      <th >작성자</th>
+<!--      <th >작성자</th>-->
       <th >날짜</th>
       <th >수정</th>
     </tr>
@@ -71,10 +71,10 @@
     <tr th:each="data:${list}">
       <td th:text="${data.noticeNum}"></td>
       <td th:text="${data.noticeTitle}"></td>
-      <td th:text="${data.noticeWriter}"></td>
+<!--      <td th:text="${data.noticeWriter}"></td>-->
       <td th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></td>
       <td>
-        <a th:href="@{|/notice/noticeread/${data.noticeNum}|}" class="btn btn-secondary">
+        <a th:href="@{|/notice/read/${data.noticeNum}|}" class="btn btn-secondary">
           <i class="bi bi-pencil-square"></i>
         </a>
       </td>
