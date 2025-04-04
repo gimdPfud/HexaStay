@@ -18,8 +18,6 @@ import java.util.List;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     @Query("select a from Admin a")
     public Page<Admin> findAll(Pageable pageable);
-
-
     public Admin findByAdminNum(Long adminNum);
     public List<Admin> findByAdminActive(Boolean active);
 }

@@ -89,7 +89,7 @@
                     const adminNum = this.dataset.adminNum;
                     console.log(adminNum);
 
-                    fetch('/approve?adminNum=' + adminNum, {
+                    fetch('/admin/approve?adminNum=' + adminNum, {
                         method: 'POST',
                     })
                         .then(() => {

@@ -69,6 +69,11 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
+    public AdminDTO getAdmin(Long adminNum) {
+        Admin admin = adminRepository.findByAdminNum(adminNum);
+        return modelMapper.map(admin, AdminDTO.class);
+    }
+
 
     public List<BranchDTO> getBranchList(String centerName) {
         List<BranchDTO> branchDTOList = new ArrayList<>();

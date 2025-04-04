@@ -106,4 +106,20 @@ public class AdminController {
     }
 
 
+    //직원 정보 변경용
+
+    @GetMapping("/edit/{adminNum}")
+    public String edit (Model model, @PathVariable(name="adminNum") Long adminNum) {
+        AdminDTO adminDTO = adminService.getAdmin(adminNum);
+        model.addAttribute("adminDTO", adminDTO);
+        return "admin/edit";
+
+    }
+
+    @PostMapping("/edit")
+    public String editPost (AdminDTO adminDTO) {
+        adminService.insertAdmin(adminDTO);
+        return "redirect:/admin/list";
+    }
+
 }
