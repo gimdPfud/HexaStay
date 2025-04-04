@@ -25,5 +25,5 @@ public interface StoremenuRepository extends JpaRepository<Storemenu, Long> {
 
 
     /*활성화여부와 상위 가게 pk로...*/
-    Page<Storemenu> findByStoreStoreNumAndStoremenuStatus(Long storeNum, String storemenuStatus, Pageable pageable);
+    List<Storemenu> findByStoreStoreNumAndStoremenuStatus(Long storeNum, String storemenuStatus);
 }

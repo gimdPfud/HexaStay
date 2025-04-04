@@ -32,7 +32,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">카테고리</label>
-                    <input type="text" class="form-control" th:value="${data.storemenuCategory}" name="storemenuCategory">
+                    <select class="form-select" name="storemenuCategory">
+                        <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
+                        <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
+                        <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
+                        <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
+                    </select>
                 </div>
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-primary">저장</button>

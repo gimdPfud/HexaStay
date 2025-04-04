@@ -16,9 +16,9 @@
 <body class="w-100 vh-100 bg-light">
     <div layout:fragment="content">
 
-        <div class="d-flex justify-content-center">
+        <div class="d-flex gap-1 m-4">
 
-            <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+            <div class="container rounded shadow-sm w-100 h-100 p-4" style="max-width: 400px;">
                 <div class="d-flex w-100" style="justify-content: center;">
                     <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
                 </div>
@@ -57,18 +57,32 @@
             </div><!--외부업체 정보-->
 
             <!--외부업체가 제공하는 서비스 목록들-->
-            <div class="container p-4 rounded shadow-sm w-100 h-100 mt-3" style="max-width: 400px;">
+            <div class="container rounded shadow-sm w-100 h-100 p-4" style="max-width: 800px;">
                 <div class="mb-3">
                     <h1 class="text-center">제공 서비스 목록</h1>
                     <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
                 </div><!--제목끝-->
                 <div class="storemenulist mt-5"></div>
+
+                <div class="mt-4">
+                    <button class="btn btn-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
+                        삭제된 항목
+                    </button>
+                </div>
+                <div class="collapse mt-3" id="deletedlist">
+                    <div class="card card-body">
+                        <h4 class="text-center text-secondary">삭제된 항목 목록</h4>
+                        <div class="deletedmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                    </div>
+                </div>
+
             </div><!--리스트가 비어있지 않다면 끝-->
 
         </div>
 
         <script th:inline="javascript">
             let storemenulist = document.querySelector(".storemenulist");
+            let deletedmenulist = document.querySelector(".deletedmenulist");
             let storenum = [[${data.storeNum}]]
             document.addEventListener("DOMContentLoaded", function () {
                 console.log("페이지 로드 됨")
@@ -88,7 +102,6 @@
                         return response.json();
                     })
                     .then(data => {
-                        console.log("갔다옴")
                         showstoremenu(data)
                     })
                     .catch(error => {
@@ -98,6 +111,29 @@
                         console.log(error)
                     });
 
+                fetch(`/store/menu/list/deleted/${storenum}`)
+                    .then(response => {
+                        if(!response.ok){
+                            if(response.status===404){
+                                return response.text()
+                                    .then(errmsg=> {
+                                        let error = new Error(errmsg)
+                                        error.status = 404;
+                                        throw error;
+                                    })
+                            }
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showdeletedmenu(data)
+                    })
+                    .catch(error => {
+                        if(error.status===404){
+                            showemptydeletedmenu(error.message);
+                        }
+                        console.log(error)
+                    });
 
             })
 
@@ -111,15 +147,14 @@
              * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
              * */
             function showstoremenu(list) {
-                console.log("실행시작...1")
                 let tagsstart = `<table class="table table-bordered text-center">
                 <thead class="table-light">
                 <tr>
-                    <th>메뉴 이름</th>
-                    <th>메뉴 가격</th>
-                    <th>메뉴 설명</th>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>설명</th>
                     <th>카테고리</th>
-                    <th>상세보기</th>
+                    <th>버튼</th>
                 </tr>
                 </thead>
                 <tbody>`;
@@ -128,19 +163,58 @@
             </table>`;
 
                 for (let i=0; i<list.length;i++){
+                    let categ = list[i].storemenuCategory;
                     tagscontent += `<tr>
                     <td>${list[i].storemenuName}</td>
                     <td>${list[i].storemenuPrice}</td>
                     <td>${list[i].storemenuContent}</td>
-                    <td>${list[i].storemenuCategory}</td>
+                    <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>
-                        <a href="/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세보기</a>
+                        <a href="/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세</a>
+                        <a href="/store/menu/delete/${list[i].storemenuNum}" class="btn btn-danger btn-sm">삭제</a>
                     </td>
                 </tr>`
                 }
                 let totaltags = tagsstart + tagscontent + tagsend;
 
                 storemenulist.innerHTML=totaltags;
+
+            }
+
+
+
+
+            function showdeletedmenu(list) {
+                let tagsstart = `<table class="table table-bordered text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>설명</th>
+                    <th>카테고리</th>
+                    <th>버튼</th>
+                </tr>
+                </thead>
+                <tbody>`;
+                let tagscontent = "";
+                let tagsend = `</tbody>
+            </table>`;
+
+                for (let i=0; i<list.length;i++){
+                    let categ = list[i].storemenuCategory;
+                    tagscontent += `<tr>
+                    <td>${list[i].storemenuName}</td>
+                    <td>${list[i].storemenuPrice}</td>
+                    <td>${list[i].storemenuContent}</td>
+                    <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
+                    <td>
+                        <a href="/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
+                    </td>
+                </tr>`
+                }
+                let totaltags = tagsstart + tagscontent + tagsend;
+
+                deletedmenulist.innerHTML=totaltags;
 
             }
 
@@ -154,9 +228,18 @@
              * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
              * */
             function showemptymenu(msg) {
-                console.log("실행시작...2")
                 let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
                 storemenulist.innerHTML=tagscontent;
+            }
+            /*
+             * 메소드명 : showemptydeletedmenu
+             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+             * 리턴 값 :
+             * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
+             * */
+            function showemptydeletedmenu(msg) {
+                let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+                deletedmenulist.innerHTML=tagscontent;
             }
         </script>
 

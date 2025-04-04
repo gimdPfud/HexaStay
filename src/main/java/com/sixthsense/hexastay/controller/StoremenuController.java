@@ -100,6 +100,18 @@ public class StoremenuController {
         }
     }
 
+    @ResponseBody
+    @GetMapping("/list/deleted/{id}")
+    public ResponseEntity deletedlistGet(@PathVariable Long id, Pageable pageable){
+        /*storeNum으로 Menu 가져오기...*/
+        List<StoremenuDTO> menulist = storemenuService.list(id,"deleted");
+        if(menulist.isEmpty()){
+            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(menulist, HttpStatus.OK);
+        }
+    }
+
 
     @GetMapping("/read/{id}")
     public String read(@PathVariable Long id, Model model){
@@ -126,6 +138,11 @@ public class StoremenuController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         Long storeNum = storemenuService.delete(id);
+        return "redirect:/store/read/"+storeNum;
+    }
+    @GetMapping("/restore/{id}")
+    public String restore(@PathVariable Long id){
+        Long storeNum = storemenuService.restore(id);
         return "redirect:/store/read/"+storeNum;
     }
 }

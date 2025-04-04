@@ -82,10 +82,10 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 기  능 : 활성화상태가 입력받은값과 동일하면서, fk가 해당되는 데이터만 page로 가져온다.
      * */
     @Override
-    public Page<StoremenuDTO> list(Long storeNum, String status, Pageable pageable) {
-        Page<Storemenu> storemenuPage = storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum,status, pageable);
-        Page<StoremenuDTO> storemenuDTOPage = storemenuPage.map(data -> modelMapper.map(data, StoremenuDTO.class));
-        return storemenuDTOPage;
+    public List<StoremenuDTO> list(Long storeNum, String status) {
+        List<Storemenu> storemenuList= storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum,status);
+        List<StoremenuDTO> list = storemenuList.stream().map(data -> modelMapper.map(data, StoremenuDTO.class)).toList();
+        return list;
     }
 
     @Override
@@ -106,6 +106,20 @@ public class StoremenuServiceImpl implements StoremenuService {
     public Long delete(Long pk) {
         Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         storemenu.setStoremenuStatus("deleted");
+        return storemenu.getStore().getStoreNum();
+    }
+
+
+    /*
+     * 메소드명 : restore
+     * 인수 값 : Long
+     * 리턴 값 : void
+     * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 alive로 바꾼다.
+     * */
+    @Override
+    public Long restore(Long pk) {
+        Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        storemenu.setStoremenuStatus("alive");
         return storemenu.getStore().getStoreNum();
     }
 }
