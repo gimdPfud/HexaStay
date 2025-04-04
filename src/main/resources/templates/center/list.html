@@ -12,23 +12,23 @@
 <div layout:fragment="content">
 
   <div class="container mt-4">
-    <form class="row g-3">
+    <form method="get" action="/center/listsearch" class="row g-3">
       <div class="col-md-3">
         <label class="form-label">검색 조건</label>
-        <select class="form-select">
+        <select name="select" class="form-select">
           <option>전체</option>
-          <option>조직명</option>
-          <option>브랜드명</option>
-          <option>사업자번호</option>
+          <option value="company">조직명</option>
+          <option value="brandName">브랜드명</option>
+          <option value="businessNum">사업자번호</option>
 
         </select>
       </div>
       <div class="col-md-3">
         <label class="form-label">소속</label>
-        <select class="form-select" id="choice">
-          <option>본사</option>
-          <option>지사</option>
-          <option>지점</option>
+        <select name="choice" class="form-select" id="choice">
+          <option value="center">본사</option>
+          <option value="branch">지사</option>
+          <option value="facility">지점</option>
         </select>
       </div>
       <div class="col-md-3">
@@ -44,9 +44,10 @@
         </select>
       </div>
       <div class="col-md-9">
-        <input type="text" class="form-control" placeholder="검색어 입력">
+        <input name="keyword" type="text" class="form-control" placeholder="검색어 입력">
       </div>
       <div class="d-flex gap-3 col-md-3">
+
         <button type="submit" class="btn btn-success w-50">조회</button>
         <a href="/center/signup" class="btn btn-success w-50">등록</a>
       </div>
@@ -64,58 +65,80 @@
       </thead>
 
       <tbody>
-      <tr th:each="centerDTOS : ${centerDTOS}">
-        <td th:text="${centerDTOS.centerBrand}"></td>
-        <td th:text="${centerDTOS.centerName}"></td>
-        <td th:text="${centerDTOS.centerBusinessNum}"></td>
-        <td th:text="${centerDTOS.centerCeoName}"></td>
-        <td th:text="${centerDTOS.centerPhone}"></td>
-        <td th:text="${centerDTOS.centerEmail}"></td>
-        <td th:text="${centerDTOS.centerAddress}"></td>
+      <!-- centerDTOS가 있을 때 -->
+      <tr th:if="${centerDTOS != null and !centerDTOS.isEmpty()}" th:each="item : ${centerDTOS}">
+        <td th:text="${item.centerBrand}"></td>
+        <td th:text="${item.centerName}"></td>
+        <td th:text="${item.centerBusinessNum}"></td>
+        <td th:text="${item.centerCeoName}"></td>
+        <td th:text="${item.centerPhone}"></td>
+        <td th:text="${item.centerEmail}"></td>
+        <td th:text="${item.centerAddress}"></td>
+        <td><a th:href="@{/center/read/{centerNum}(centerNum=${item.centerNum})}" class="btn btn-success">상세보기</a></td>
+      </tr>
 
-        <td>
-          <a th:href="@{/center/read/{centerNum}(centerNum=${centerDTOS.centerNum})}" class="btn btn-success">상세보기</a>
-        </td>
+      <!-- branchDTOS가 있을 때 -->
+      <tr th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" th:each="item : ${branchDTOS}">
+        <td th:text="${item.branchNum}"></td>
+        <td th:text="${item.branchName}"></td>
+        <td th:text="${item.branchBusinessNum}"></td>
+        <td th:text="${item.branchCeoName}"></td>
+        <td th:text="${item.branchPhone}"></td>
+        <td th:text="${item.branchEmail}"></td>
+        <td th:text="${item.branchAddress}"></td>
+        <td><a th:href="@{/branch/read/{branchNum}(branchNum=${item.branchNum})}" class="btn btn-success">상세보기</a></td>
+      </tr>
 
+      <!-- facilityDTOS가 있을 때 -->
+      <tr th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}" th:each="item : ${facilityDTOS}">
+        <td th:text="${item.facilityNum}"></td>
+        <td th:text="${item.facilityName}"></td>
+        <td th:text="${item.facilityBusinessNum}"></td>
+        <td th:text="${item.facilityCeoName}"></td>
+        <td th:text="${item.facilityPhone}"></td>
+        <td th:text="${item.facilityEmail}"></td>
+        <td th:text="${item.facilityAddress}"></td>
+        <td><a th:href="@{/facility/read/{facilityNum}(facilityNum=${item.facilityNum})}" class="btn btn-success">상세보기</a></td>
       </tr>
       </tbody>
+
     </table>
 
-    <!--페이징-->
-    <div class="row m-0 p-0 mt-3">
-      <div class="col-3"></div>
-      <ul class="col-6 pagination justify-content-center col">
-        <!-- 처음 페이지 버튼 -->
-        <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">
-          <a class="page-link" th:href="@{/freeboard?page=0}">처음</a>
-        </li>
+<!--    &lt;!&ndash;페이징&ndash;&gt;-->
+<!--    <div class="row m-0 p-0 mt-3">-->
+<!--      <div class="col-3"></div>-->
+<!--      <ul class="col-6 pagination justify-content-center col">-->
+<!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/center/list?page=0}">처음</a>-->
+<!--        </li>-->
 
-        <!-- 이전 페이지 버튼 -->
-        <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">
-          <a class="page-link" th:href="@{/freeboard?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>
-        </li>
+<!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/center/list?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>-->
+<!--        </li>-->
 
-        <!-- 현재 페이지 기준 앞 4개, 뒤 5개 -->
-        <li class="page-item"
-            th:each="pageNum : ${#numbers.sequence(
-    (centerDTOS.number - 4 > 0 ? centerDTOS.number - 4 : 0),
-    (centerDTOS.number + 5 < centerDTOS.totalPages - 1 ? centerDTOS.number + 5 : centerDTOS.totalPages - 1)
-    )}"
-            th:classappend="${pageNum == centerDTOS.number} ? 'active'">
-          <a class="page-link" th:href="@{/center/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-        </li>
+<!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
+<!--        <li class="page-item"-->
+<!--            th:each="pageNum : ${#numbers.sequence(-->
+<!--    (centerDTOS.number - 4 > 0 ? centerDTOS.number - 4 : 0),-->
+<!--    (centerDTOS.number + 5 < centerDTOS.totalPages - 1 ? centerDTOS.number + 5 : centerDTOS.totalPages - 1)-->
+<!--    )}"-->
+<!--            th:classappend="${pageNum == centerDTOS.number} ? 'active'">-->
+<!--          <a class="page-link" th:href="@{/center/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
+<!--        </li>-->
 
-        <!-- 다음 페이지 버튼 -->
-        <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">
-          <a class="page-link" th:href="@{/center/list?page={next}(next=${centerDTOS.number + 1})}">다음</a>
-        </li>
+<!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/center/list?page={next}(next=${centerDTOS.number + 1})}">다음</a>-->
+<!--        </li>-->
 
-        <!-- 마지막 페이지 버튼 -->
-        <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">
-          <a class="page-link" th:href="@{/center/list?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>
-        </li>
+<!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/center/list?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>-->
+<!--        </li>-->
 
-      </ul>
+<!--      </ul>-->
 
     </div>
 

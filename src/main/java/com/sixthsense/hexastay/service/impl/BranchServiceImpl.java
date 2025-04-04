@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.BranchDTO;
+import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;
 import com.sixthsense.hexastay.repository.BranchRepository;
@@ -99,6 +100,25 @@ public class BranchServiceImpl implements BranchService {
         return branchDTOList;
     }
 
+
+    //조직명 검색
+    @Override
+    public Page<BranchDTO> companyName(String keyword, Pageable pageable) {
+        Page<Branch> branchList = branchRepository.findByBranchNameContaining(keyword, pageable);
+        Page<BranchDTO> branchDTOList = branchList.map(branch -> modelMapper.map(branch, BranchDTO.class));
+
+        return branchDTOList;
+    }
+
+    // 브랜드명 검색
+    @Override
+    public Page<BranchDTO> brandName(String keyword, Pageable pageable){
+        Center center = centerRepository.findByCenterBrand(keyword);
+        Long centerNum = center.getCenterNum();
+        Page<Branch> branchList = branchRepository.findByCenter_CenterNum(centerNum, pageable);
+        Page<BranchDTO> brachDTOList = branchList.map(branch -> modelMapper.map(branch, BranchDTO.class));
+        return brachDTOList;
+    }
 
 
 }

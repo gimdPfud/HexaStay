@@ -104,4 +104,21 @@ public class CenterServiceImpl implements CenterService {
 
 
 
+    // 조직명 조회용
+    @Override
+    public Page<CenterDTO> companyName(String keyword, Pageable pageable){
+        Page<Center> centerList = centerRepository.findByCenterNameContaining(keyword, pageable);
+        Page<CenterDTO> centerDTOList = centerList.map(center -> modelMapper.map(center, CenterDTO.class));
+        return centerDTOList;
+    }
+
+    // 브랜드명 조회용
+    @Override
+    public Page<CenterDTO> brandName(String keyword, Pageable pageable){
+     Page<Center> centerPageList = centerRepository.findByCenterBrand(keyword, pageable);
+     Page<CenterDTO> centerDTOList = centerPageList.map(center -> modelMapper.map(center, CenterDTO.class));
+
+        return centerDTOList;
+    }
+
 }

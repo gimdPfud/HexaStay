@@ -27,4 +27,9 @@ public interface BranchService {
     //조회용
     public List<BranchDTO> allBranchList();
 
+    //조직명으로 조회
+    public Page<BranchDTO> companyName(String keyword, Pageable pageable);
+
+    // 브랜드로 조회
+    public Page<BranchDTO> brandName(String keyword, Pageable pageable);
 }

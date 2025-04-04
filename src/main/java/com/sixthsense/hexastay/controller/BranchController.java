@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/branch")
 public class BranchController {
 
+    private final CenterService centerService;
     private final BranchService branchService;
     private final CenterRepository centerRepository;
 

@@ -26,4 +26,10 @@ public interface CenterService {
     //가입용, 조회용
     public List<CenterDTO> allCenterList();
 
+    //조직명으로 조회
+    Page<CenterDTO> companyName(String keyword, Pageable pageable);
+
+    // 브랜드로 조회
+    Page<CenterDTO> brandName(String keyword, Pageable pageable);
+
 }

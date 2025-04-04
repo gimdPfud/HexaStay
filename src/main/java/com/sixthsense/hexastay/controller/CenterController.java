@@ -37,12 +37,71 @@ public class CenterController {
         log.info("get 방식 center 목록 controller 진입");
 
         Page<CenterDTO> centerDTOS = centerService.centerList(pageable);
-
         model.addAttribute("centerDTOS", centerDTOS);
 
 
         return "center/list";
     }
+
+    //검색용
+    @GetMapping("/listsearch")
+    public String listSearch(@RequestParam String select,
+                             @RequestParam String choice,
+                             @RequestParam String keyword,
+                             Pageable pageable,
+                             Model model) {
+
+        if (!keyword.isEmpty()) {
+            if (select.equals("company")) {
+                if (choice.equals("center")) {
+                    Page<CenterDTO> centerDTOList = centerService.companyName(keyword, pageable);
+                    model.addAttribute("centerDTOS", centerDTOList);
+                } else if (choice.equals("branch")) {
+                    Page<BranchDTO> branchDTOList = branchService.companyName(keyword, pageable);
+                    model.addAttribute("branchDTOS", branchDTOList);
+                } else if (choice.equals("facility")) {
+                    Page<FacilityDTO> facilityDTOList = facilityService.companyName(keyword, pageable);
+                    model.addAttribute("facilityDTOS", facilityDTOList);
+                }
+
+            } else if (select.equals("brandName")) {
+                if (choice.equals("center")) {
+                    Page<CenterDTO> centerDTOList = centerService.brandName(keyword, pageable);
+                    model.addAttribute("centerDTOS", centerDTOList);
+                } else if (choice.equals("branch")) {
+                    Page<BranchDTO> branchDTOList = branchService.brandName(keyword, pageable);
+                    model.addAttribute("branchDTOS", branchDTOList);
+                } else if (choice.equals("facility")) {
+                    Page<FacilityDTO> facilityDTOList = facilityService.brandName(keyword, pageable);
+                    model.addAttribute("facilityDTOS", facilityDTOList);
+                }
+
+
+                //브랜치 기준 --> 키워드를 가지고 -> 센터쪽에서 해당 브랜드 이름을 가지고 있는 센터Num 찾는다. ->
+                //그 센터Num을 가지고 브렌치에서 FK에 해당 센터넘을 가지고 있는놈들을 뽑는다
+
+
+
+            } else if (select.equals("businessNum")) {
+                if (choice.equals("center")) {
+                    Page<CenterDTO> centerDTOList = centerService.companyName(keyword, pageable);
+                    model.addAttribute("centerDTOS", centerDTOList);
+                } else if (choice.equals("branch")) {
+                    Page<BranchDTO> branchDTOList = branchService.companyName(keyword, pageable);
+                    model.addAttribute("branchDTOS", branchDTOList);
+                } else if (choice.equals("facility")) {
+                    Page<FacilityDTO> facilityDTOList = facilityService.companyName(keyword, pageable);
+                    model.addAttribute("facilityDTOS", facilityDTOList);
+                }
+            }
+        } else {
+            log.info("눌렀당");
+            Page<CenterDTO> centerDTOList = centerService.centerList(pageable);
+            model.addAttribute("centerDTOS", centerDTOList);
+        }
+        return "center/list"; // 무조건 템플릿 리턴!
+    }
+
 
     @GetMapping("/signup")
     public String signUpCenterGet(Model model){
@@ -104,7 +163,6 @@ public class CenterController {
 
         return "redirect:/center/list";
     }
-
 
     // 조직등록 - 센터
     @PostMapping("/centerinsert")
