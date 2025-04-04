@@ -35,4 +35,24 @@ public class OrderRoomDTO {
     private Long memberNum;
     //***참조 테이블 PK PK PK PK **************//
 
+    //todo : 참조 DTO들을 orderRoomDTO에 담기
+    //******HotelRoom********//
+    private HotelRoomDTO hotelRoomDTO;
+    public OrderRoomDTO setHotelRoomDTO(HotelRoomDTO hotelRoom) {
+
+        this.hotelRoomDTO = hotelRoomDTO;
+
+        return this;
+    }
+
+    //******Member********//
+    private MemberDTO memberDTO;
+
+    public OrderRoomDTO setMemberDTO(MemberDTO memberDTO) {
+
+        this.memberDTO = memberDTO;
+
+        return this;
+    }
+
 }

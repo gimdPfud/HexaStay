@@ -48,9 +48,15 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         //호텔룸 entity를 가져오기
         HotelRoom hotelRoom =
                 modelMapper.map(hotelRoomDTO, HotelRoom.class);
+        //***메소드 체이닝 으로 한번에 변환 하기 ****//
 
-        //참조 엔티티 가져오기
+        //참조 memberEntity 가져오기
+        Member memberEntity =
+                memberRepository.findById(1L).orElseThrow(EntityNotFoundException::new);
 
+        hotelRoom.setMember(memberEntity);
+
+        hotelRoomRepository.save(hotelRoom);
 
     }
 

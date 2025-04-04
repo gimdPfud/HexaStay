@@ -73,8 +73,7 @@ public class HotelRoomDTO {
 
         return this;
     }
-
-
+    //*****Member 테이블 참조******************//
 
 
 
