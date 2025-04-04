@@ -6,66 +6,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원 정보 변경</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>직원 정보 입력</title>
 </head>
-<body>
+<body class="w-100 vh-100 bg-light">
+<div layout:fragment="content">
 
-<div th:block th:fragment="leftside" class="container w-100 vh-100 bg-light p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+    <form method="post" action="/insert" enctype="multipart/form-data">
+        <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
 
-    <div class="d-flex w-100" style="justify-content: center;">
-        <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
-    </div>
+            <div class="d-flex w-100" style="justify-content: center;">
+                <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
+            </div>
+            <div class="d-flex w-100 ms-5 mt-3" style="justify-content: center;">
+                <input type="file" name="file" id="file">
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">사번</label>
+                <input type="text" name="adminEmployeeNum" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">이메일 (ID)</label>
+                <input type="text" name="adminEmail" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호</label>
+                <input type="text" name="adminPassword" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="text" id="adminPasswordTwo" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">이름</label>
+                <input type="text" name="adminName" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">주민등록번호</label>
+                <div class="row">
+                    <input type="text" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
+                    <input type="text" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
+                </div>
+            </div>
+            <input hidden name="adminResidentNum" id="adminResidentNum" value="">
+
+            <div class="mb-2">
+                <label class="form-label">주소</label>
+                <input type="text" name="adminAddress" class="form-control">
+            </div>
+            <div class="mb-2 row">
+                <label class="form-label">연락처</label>
+                <select class="form-select" id="adminPhonePartOne" style="margin-left : 3.5%; width:30%">
+                    <option>010</option>
+                    <option>011</option>
+                    <option>017</option>
+                </select> -
+                <input type="text" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
+                <input type="text" id="adminPhonePartThree" class="form-control" style="width:30%">
+
+                <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">소속</label>
+                <div class="row g-2">
+                    <div class="col-3">
+                        <select id="adminChoice" class="form-select">
+                            <option>본사</option>
+                            <option>지사</option>
+                            <option>지점</option>
+                            <option>스토어</option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <select name="adminCenter" id="adminCenter" class="form-select">
+                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <select name="adminStore" id="adminStore" class="form-select" disabled>
+                        </select>
+                    </div>
+                    <input hidden name="adminBrand" id="adminBrand" value="">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
+                <select class="form-select" id="adminCenterRank">
+                    <option>임원진</option>
+                    <option>관리직</option>
+                    <option>사원</option>
+                </select>
+                <select class="form-select" id="adminBranchFacilityRank" hidden>
+                    <option>운영 총괄</option>
+                    <option>관리직</option>
+                    <option>사원</option>
+                    <option>협력 업체</option>
+                </select>
+                <select class="form-select" id="adminStoreRank" hidden>
+                    <option>운영총괄</option>
+                    <option>부매니저</option>
+                    <option>매장 직원</option>
+                </select>
+
+                <input hidden name="adminRank" id="adminRank">
+
+            </div>
 
 
-    <div class="mb-2">
-        <label class="form-label">사번</label>
-        <input type="text" class="form-control" readonly>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">이름</label>
-        <input type="text" class="form-control" readonly>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">주민등록번호</label>
-        <input type="text" class="form-control" readonly>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">주소</label>
-        <input type="text" class="form-control">
-    </div>
-    <div class="mb-2">
-        <label class="form-label">연락처</label>
-        <input type="text" class="form-control">
-    </div>
-    <div class="mb-2">
-        <label class="form-label">소속</label>
-        <div class="row g-2">
-            <div class="col-4"><select type="text" class="form-select">
-                <option>asdasdsad</option>
-            </select></div>
-            <div class="col-4"><select type="text" class="form-select">
-                <option>asdasdsad</option>
-            </select></div>
-            <div class="col-4"><select type="text" class="form-select">
-                <option>asdasdsad</option>
-            </select></div>
+
+            <div class="mb-3">
+                <label class="form-label">직책</label>
+                <input type="text"  name="adminPosition" class="form-control">
+            </div>
+
+
+            <div class="mb-3">
+                <label class="form-label">입사일</label>
+                <input type="date" name="adminJoinDate" class="form-control">
+            </div>
+            <div class="d-flex justify-content-center gap-3">
+                <button type="submit" onclick="submitForm()" class="btn btn-success">등록</button>
+                <button class="btn btn-danger">취소</button>
+            </div>
         </div>
-    </div>
-    <div class="mb-2">
-        <label class="form-label">직책</label>
-        <input type="text" class="form-control" readonly>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">입사일</label>
-        <input type="date" class="form-control" readonly>
-    </div>
-    <div class="d-flex justify-content-between">
-        <button class="btn btn-primary">비밀번호 변경</button>
-        <button class="btn btn-success">등록</button>
-        <button class="btn btn-danger">취소</button>
-    </div>
+
+    </form>
+
+    <script>
+        const adminChoice = document.getElementById("adminChoice");
+        const adminCenter = document.getElementById("adminCenter");
+        const adminBranchFacility = document.getElementById("adminBranchFacility");
+        const adminStore = document.getElementById("adminStore");
+        const adminCenterRank = document.getElementById("adminCenterRank");
+        const adminBranchFacilityRank = document.getElementById("adminBranchFacilityRank");
+        const adminStoreRank = document.getElementById("adminStoreRank");
+
+
+        // 소속 선택 시 다른 선택 박스 활성화/비활성화
+        adminChoice.addEventListener("change", function () {
+            adminBranchFacility.innerHTML = "<option value=''></option>";
+
+            if (adminChoice.value === "본사") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
+                adminCenter.disabled = false;
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = true;
+
+                adminCenterRank.hidden = false;
+                adminBranchFacilityRank.hidden = true;
+                adminStoreRank.hidden = true;
+
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
+                adminCenter.disabled = false;
+                adminBranchFacility.disabled = false;
+                adminStore.disabled = true;
+
+                adminCenterRank.hidden = true;
+                adminBranchFacilityRank.hidden = false;
+                adminStoreRank.hidden = true;
+
+            } else if (adminChoice.value === "스토어") {
+                adminCenter.value="";
+                adminBranchFacility.value="";
+                adminStore.value="";
+                adminCenter.disabled = true;
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = false;
+
+                adminCenterRank.hidden = true;
+                adminBranchFacilityRank.hidden = true;
+                adminStoreRank.hidden = false;
+
+                fetch(`/searchstore`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("왜안됨?")
+                        adminStore.innerHTML = "<option value=''></option>";
+
+                        data.forEach(item => {
+                            let storeOption = document.createElement("option");
+                            storeOption.value = item.storeNum;
+                            storeOption.textContent = item.storeName;
+                            adminStore.appendChild(storeOption);
+                        });
+                    })
+            }
+
+
+            adminCenter.addEventListener("change", function () {
+                adminBranchFacility.innerHTML = "<option value=''></option>";
+                adminStore.innerHTML = "<option value=''></option>";
+                let adminCenterValue = adminCenter.value;
+                let choiceValue = adminChoice.value;
+
+                if (choiceValue === "지사") {
+                    fetch(`/searchbranch?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.branchNum;
+                                option.textContent = item.branchName;
+                                adminBranchFacility.appendChild(option);
+                            });
+
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지사 데이터 불러오기 실패:", error));
+
+                } else if (choiceValue === "지점") {
+                    fetch(`/searchfacility?centerName=${adminCenterValue}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            adminBranchFacility.innerHTML = "<option value=''></option>";
+
+                            data.forEach(item => {
+                                let option = document.createElement("option");
+                                option.value = item.facilityNum;
+                                option.textContent = item.facilityName;
+                                adminBranchFacility.appendChild(option);
+                            });
+
+                            adminBranchFacility.disabled = false;
+                        })
+                        .catch(error => console.error("지점 데이터 불러오기 실패:", error));
+                }
+            });
+        });
+
+        function submitForm() {
+            if (adminChoice.value === "본사") {
+                document.getElementById("adminBrand").value = adminCenter.value;
+                document.getElementById("adminRank").value = adminCenterRank.value;
+            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+                document.getElementById("adminBrand").value = adminBranchFacility.value;
+                document.getElementById("adminRank").value = adminBranchFacilityRank.value;
+            } else if (adminChoice.value === "스토어") {
+                document.getElementById("adminBrand").value = adminStore.value;
+                document.getElementById("adminRank").value = adminStoreRank.value;
+            }
+
+            document.getElementById('adminResidentNum').value =
+                document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
+
+            document.getElementById('adminPhone').value =
+                document.getElementById('adminPhonePartOne').value + "-" +
+                document.getElementById('adminPhonePartTwo').value + "-" +
+                document.getElementById('adminPhonePartThree').value
+
+
+
+        }
+
+
+
+
+    </script>
+
 </div>
 </body>
 </html>
