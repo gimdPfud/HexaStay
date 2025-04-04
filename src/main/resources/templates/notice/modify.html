@@ -22,9 +22,6 @@
                         <input type="hidden" id="noticeNum" name="noticeNum" readonly th:value="${noticedata.noticeNum}">
                         <input type="hidden" id="noticeView" name="noticeView" readonly th:value="${noticedata.noticeView}">
 
-
-
-
                         <div class="mb-3 mt-3">
                             <label for="noticeTitle" class="form-label">제목:</label>
                             <input th:value="${noticedata.noticeTitle}"
@@ -35,7 +32,6 @@
                             <!--열고 닫는 태그들은 th:text. 하나로 쓰는 태그는 value.-->
                             <textarea th:text="${noticedata.noticeContent}" class="form-control" rows="5" id="noticeContent" name="noticeContent"></textarea>
                         </div>
-
                     </div><!--입력양식-->
                     <div class="card-footer d-flex justify-content-between">
                         <button th:onclick="|location.href='@{/notice/read/{id}(id=${noticedata.noticeNum})}'|" class="btn btn-secondary">이전</button>
