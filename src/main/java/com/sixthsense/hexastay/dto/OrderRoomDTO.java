@@ -24,14 +24,15 @@ public class OrderRoomDTO {
     //호텔 숙박가격 총 매출액
     private Long orderRoomTotalPrice;
 
-    //호텔숙박매출일
+    //매출 발생 일자
     private LocalDateTime createDate;
 
-    //호텔숙박매출일자
-    private LocalDateTime modifyDate;
 
-    //***참조 테이블 PK************************
+    //***참조 테이블 PK PK PK PK **************//
     //Room테이블 - HotelRoom
     private Long hotelRoomNum;
+
+    private Long memberNum;
+    //***참조 테이블 PK PK PK PK **************//
 
 }

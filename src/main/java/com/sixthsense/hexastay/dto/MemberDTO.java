@@ -33,21 +33,11 @@ public class MemberDTO {
 
     private String memberBirth;                         //생년월일
 
-    private Gender memberGender;                        //성별
+
+    private LocalDateTime createDate;       //가입 일자
 
 
-    private LocalDateTime createDate; //등록일자
 
-
-    private LocalDateTime modifyDate; //수정일자
-
-    //멤버 체크인
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkInDate;
-
-    //멤버 체크아웃
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkOutDate;
 
 
 }
