@@ -87,4 +87,22 @@ public class FacilityServiceImpl implements FacilityService {
 
         log.info("삭제된 pk : " + facilityNum);
     }
+
+    @Override
+    public Page<FacilityDTO> companyName(String keyword, Pageable pageable) {
+        Page<Facility> facilityList = facilityRepository.findByFacilityNameContaining(keyword, pageable);
+        Page<FacilityDTO> facilityDTOList = facilityList.map(facility -> modelMapper.map(facility, FacilityDTO.class));
+
+        return facilityDTOList;
+    }
+
+    @Override
+    public Page<FacilityDTO> brandName(String keyword, Pageable pageable) {
+        Center center = centerRepository.findByCenterBrand(keyword);
+        Long centerNum = center.getCenterNum();
+        Page<Facility> facilityPage = facilityRepository.findByCenter_CenterNum(centerNum, pageable);
+        Page<FacilityDTO> facilityDTOS = facilityPage.map(facility -> modelMapper.map(facility, FacilityDTO.class));
+
+        return facilityDTOS;
+    }
 }

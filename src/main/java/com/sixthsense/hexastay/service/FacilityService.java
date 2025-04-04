@@ -22,5 +22,10 @@ public interface FacilityService {
     //facility 삭제
     public void facilityDelete(Long facilityNum);
 
+    //조직명으로 조회
+    public Page<FacilityDTO> companyName(String keyword, Pageable pageable);
+
+    //브랜드명으로 조회
+    public Page<FacilityDTO> brandName(String keyword, Pageable pageable);
 
 }
