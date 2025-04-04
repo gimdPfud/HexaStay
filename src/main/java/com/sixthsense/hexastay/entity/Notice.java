@@ -3,7 +3,6 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 @Entity
 @Getter
 @Setter
@@ -34,6 +33,4 @@ public class Notice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member")
     private Member member;
-
-
 }

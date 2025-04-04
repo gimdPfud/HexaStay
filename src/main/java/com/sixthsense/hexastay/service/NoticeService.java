@@ -15,5 +15,4 @@ public interface NoticeService {
     public void noticeModify(NoticeDTO noticeDTO);
     //삭제
     public void noticeDelete(Long noticeNum);
-
 }

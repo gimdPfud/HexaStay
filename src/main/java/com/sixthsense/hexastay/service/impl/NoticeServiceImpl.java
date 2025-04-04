@@ -30,11 +30,10 @@ public class NoticeServiceImpl implements NoticeService {
     //등록
     @Override
     public void noticeInsert(NoticeDTO noticeDTO){
-        noticeDTO.setNoticeWriter("세영바보");
+        noticeDTO.setNoticeWriter("spit착맨");
         noticeDTO.setMemberNum(1l);
 
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
-
         Member member =memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow();
         notice.setNoticeView(1);
         notice.setMember(member);
@@ -87,7 +86,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void noticeModify(NoticeDTO noticeDTO) {
         //기존 데이터를 조회를해서
-        Optional<Notice> temp = noticeRepository.findById(noticeDTO.getNoticeNum());
+        Optional<Notice> search = noticeRepository.findById(noticeDTO.getNoticeNum());
         //변환
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
         //SQL처리
@@ -97,11 +96,6 @@ public class NoticeServiceImpl implements NoticeService {
     //삭제
     @Override
     public void noticeDelete(Long noticeNum) {
-
+        noticeRepository.deleteById(noticeNum);
     }
-
-
-
-
-
 }
