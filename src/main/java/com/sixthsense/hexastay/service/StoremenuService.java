@@ -8,8 +8,6 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.StoremenuDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -24,10 +22,12 @@ public interface StoremenuService {
     public Long modify(StoremenuDTO storemenuDTO);
 
     /*목록*/
-    public Page<StoremenuDTO> list(Long storeNum, String status, Pageable pageable);
+    public List<StoremenuDTO> list(Long storeNum, String status);
     /*목록2 페이징없는 모든 목록*/
     public List<StoremenuDTO> list(Long storeNum);
 
     /*삭제인척 하는 활성화->비활성화*/
     public Long delete(Long pk);
+    /*비활성화->활성화*/
+    public Long restore(Long pk);
 }
