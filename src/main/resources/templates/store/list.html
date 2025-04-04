@@ -12,20 +12,24 @@
     <div class="row mt-3">
         <div class="col-1"></div>
         <div class="col-10">
-            <h1 class="text-center">외부업체 목록</h1>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="m-0">외부업체 목록</h1>
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#insertModal">
+                    등록
+                </button>
+            </div>
 
 <!--            <div class="mb-3">-->
 <!--                <label for="search" class="form-label">검색</label>-->
 <!--                <input type="text" id="search" class="form-control" placeholder="업체명을 입력하세요">-->
 <!--            </div>-->
 
-            <!--임시 링크-->
-            <a href="/store/insert" class="btn btn-primary btn-lg">등록</a>
-            <div class="text-center" th:if="${list.isEmpty()}">
-                <!--텅~~~-->
+
+            <div class="text-center mt-5" th:if="${list == null or list.empty}">
+                <h2 class="text-center text-secondary">목록을 불러올 수 없습니다.</h2>
             </div>
 
-            <div th:unless="${list.isEmpty()}">
+            <div th:if="${list != null and !list.empty}" class="mt-5">
                 <table class="table table-bordered text-center">
                     <thead class="table-light">
                     <tr>
@@ -97,5 +101,55 @@
         <div class="col-1"></div>
     </div>
 </div>
+
+
+
+
+
+<!-- 외부업체 등록 모달 -->
+<div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insertModalLabel">외부업체 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/store/insert" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">외부 업체 이름</label>
+                        <input type="text" class="form-control" name="storeName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">외부업체 이메일</label>
+                        <input type="email" class="form-control" name="storeEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">외부업체 폰 번호</label>
+                        <input type="text" class="form-control" name="storePhone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">외부 업체 주소</label>
+                        <input type="text" class="form-control" name="storeAddress">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">외부 업체 대표자명</label>
+                        <input type="text" class="form-control" name="storeCeoName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">외부 업체 패스워드</label>
+                        <input type="password" class="form-control" name="storePassword">
+                    </div>
+                    <input type="hidden" class="form-control" name="storeStatus" value="alive" readonly>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">등록</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

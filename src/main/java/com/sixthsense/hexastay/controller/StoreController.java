@@ -42,7 +42,7 @@ public class StoreController {
     public String insert(StoreDTO storeDTO){
         log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
-        return "store/list";
+        return "redirect:/store/list";
     }
 
 
