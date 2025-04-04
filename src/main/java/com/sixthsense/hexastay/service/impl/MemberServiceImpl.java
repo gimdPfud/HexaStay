@@ -43,7 +43,7 @@ public class MemberServiceImpl implements MemberService {
 
     //리스트 목록
     @Override
-    public Page<MemberDTO> memberList(Pageable page) {
+    public Page<MemberDTO> memberList( Pageable page) {
 
         //********페이지 처리 ************//
         //시작 페이지 설정

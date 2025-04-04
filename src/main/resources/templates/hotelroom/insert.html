@@ -34,54 +34,69 @@
         <div class="row g-3"><!--상단 시작-->
             <div class="col-md-6" >
                 <div class="card p-3" style="background: #d2f5ea">
-                    <label class="form-label">Brand브랜드명</label>
-                    <select class="form-select">
-                        <option>세령</option>
-                        <option>Hexa</option>
-                        <option>SixSense</option>
-                    </select>
-                    <label class="form-label mt-2">Branch지사명</label>
-                    <select class="form-select">
-                        <option>Hexa역곡지점</option>
-                        <option>세령 워터파크 부천점</option>
-                        <option>부천점</option>
-                    </select>
-                    <label class="form-label mt-2">가입경로</label>
-                    <div>
+                    <div class="row"><!--룸 소속 설정 시작점-->
+                        <div class="col">
+                            <label class="form-label">RoomDB_Brand</label>
+                            <select class="form-select">
+                                <option>세령</option>
+                                <option>Hexa</option>
+                                <option>SixSense</option>
+                            </select>
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label">RoomDB_Branch</label>
+                            <select class="form-select">
+                                <option>츄파츄스점</option>
+                                <option>역곡점</option>
+                                <option>슈퍼파워점</option>
+                            </select>
+
+                        </div>
+                        <div class="col">
+                            <label class="form-label">RoomDB_Facillity</label>
+                            <select class="form-select">
+                                <option>NoBrand</option>
+                                <option>블루워터파크</option>
+                                <option>ADIDAS</option>
+                            </select>
+                        </div>
+                    </div><!--Room 소속 설정 끝지점-->
+
+                    <label class="form-label mt-2">RoomDB_후에 추가예정_가입경로</label>
+                    <div >
                         <input type="radio" name="가입정보" id="전체" checked> <label for="전체">전체</label>
                         <input type="radio" name="가입정보" id="일반"> <label for="일반">일반</label>
                         <input type="radio" name="가입정보" id="카카오톡"> <label for="카카오톡">카카오톡</label>
                         <input type="radio" name="가입정보" id="네이버"> <label for="네이버">네이버</label>
                     </div>
-                    <label class="form-label mt-2">날짜 입력</label>
-                    <input type="date" class="form-control">
-
+                    <label class="form-label mt-2">RoomDB_CheckIn체크인</label>
+                    <input  type="date" class="form-control">
+                    <label class="form-label mt-2">RoomDB_CheckOut체크아웃</label>
+                    <input  type="date" class="form-control">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card p-3" style="background: #d2f5ea">
-                    <label class="form-label">Facillity지점명</label>
-                    <select class="form-select">
-                        <option>지점 선택</option>
-                        <option>세령호텔</option>
-                        <option>헥사호텔</option>
+                    <label class="form-label">RoomDB_OrderDB_호텔룸명</label>
+                    <select  class="form-select">
+                        <option >하트뿅뿅101호 : 12000원</option>
+                        <option >엽떡엽덕500호 : 30000원</option>
+                        <option >병아리3000호 : 200원</option>
                     </select>
-                    <label class="form-label mt-2">HotelRoom호텔룸명</label>
-                    <select class="form-select">
-                        <option>산울림101호</option>
-                        <option>숲속201호</option>
-                        <option>바다풍경101호</option>
-                    </select>
-                    <label class="form-label mt-2">배정상태</label>
-                    <div>
-                        <input type="radio" name="가입정보" id="전체" checked> <label for="전체">숙박중</label>
-                        <input type="radio" name="가입정보" id="일반"> <label for="일반">숙박종료</label>
+                    <label class="form-label mt-2">OrderDB_숙박일수</label>
+                    <input type="number" class="form-control" id="hotelRoomPrice" >
+
+                    <label class="form-label mt-2">RoomDB_배정상태</label>
+                    <div >
+                        <input value="1" type="radio" name="가입정보" id="전체" checked> <label for="전체">숙박중</label>
+                        <input value="2" type="radio" name="가입정보" id="일반"> <label for="일반">숙박종료</label>
 
                     </div>
-                    <label class="form-label mt-2">비밀번호</label>
+                    <label class="form-label mt-2">RoomDB_비밀번호</label>
                     <div class="row">
                         <div class="col-md-6">
-                            <input type="password" class="form-control" placeholder="비밀번호 입력">
+                            <input  type="password" class="form-control" placeholder="비밀번호 입력">
                         </div>
                         <div class="col-md-6">
                             <input type="password" class="form-control bg-secondary text-white" placeholder="비밀번호 확인">
@@ -100,6 +115,7 @@
             <button class="btn btn-warning">룸배정</button>
         </div><!--중단 버튼 종료-->
 
+
         <!--멤버 등록 정보 보여주기-->
         <div class="table-responsive"><!--하단 게시판 페이지 시작-->
             <table class="table table-bordered text-center">
@@ -110,22 +126,20 @@
                     <th>이름</th>
                     <th>이메일</th>
                     <th>연락처</th>
-                    <th>체크인</th>
-                    <th>체크아웃</th>
-                    <th>상태</th>
+                    <th>Room패스워드</th>
+                    <th>상태버튼</th>
 
                 </tr>
                 </thead>
                 <tbody >
-                <tr id="memberTableBody" th:each="memberdata:${membersDTOs}">
+                <tr id="memberTableBody" th:each="memberdata:${memberDTOS}">
                     <td><input type="checkbox"></td>
                     <input type="number" name="memberNum" required/><br/><!--체크시 memberpk값을 가져 가야함-->
-                    <td th:text="${memberdata.memberNum}">NO</td>
-                    <td th:text="${memberdata.memberName}">이름</td>
-                    <td th:text="${memberdata.memberEmail}">이메일</td>
-                    <td th:text="${memberdata.memberPhone}">연락처</td>
-                    <td th:text="${#temporals.format(memberdata.checkInDate,'yyyy-MM-dd')}">체크인</td>
-                    <td th:text="${#temporals.format(memberdata.checkOutDate,'yyyy-MM-dd')}">체크아웃</td>
+                    <td th:text="${memberdata.memberNum}"></td>
+                    <td th:text="${memberdata.memberName}"></td>
+                    <td th:text="${memberdata.memberEmail}"></td>
+                    <td th:text="${memberdata.memberPhone}"></td>
+                    <td th:text="${memberdata.memberPassword}"></td>
                     <td>
                         <form action="/member/delete" ><!--키워드 값 히든 으로 숨겨 놨음 -->
                             <input type="hidden" name="memberNum" th:value="${memberdata.memberNum}">
@@ -136,6 +150,22 @@
                 </tr>
                 </tbody>
             </table><!--하단 게시판 페이지 종료-->
+            <nav><!--페이지 내이션 시작점-->
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${memberDTOS.number == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/hotelroom/insert(page=${memberDTOS.number - 1})}">이전</a>
+                    </li>
+
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, memberDTOS.totalPages - 1)}"
+                        th:classappend="${memberDTOS.number == i} ? 'active'">
+                        <a class="page-link" th:href="@{/hotelroom/insert(page=${i})}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${memberDTOS.number + 1 >= memberDTOS.totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/hotelroom/insert(page=${memberDTOS.number + 1})}">다음</a>
+                    </li>
+                </ul>
+            </nav><!--페이지 내이션 끝점-->
         </div><!--하단페이지 종료-->
     </div><!--container 끝점-->
 
@@ -150,19 +180,14 @@
                 <!--회원 등록 페이지-->
                 <form id="registerForm" action="/hotelroom/insert" method="post">
                     <div class="modal-body"><!--호텔룸 이용 등록 modal form 태그-->
-                        <label class="form-label">이름</label>
-                        <input type="text" name="memberName" class="form-control" placeholder="브랜드명 입력">
+                        <label class="form-label">고객성함</label>
+                        <input type="text" name="memberName" class="form-control" placeholder="고객성함 입력">
                         <label class="form-label">아이디(이메일)</label>
-                        <input type="email" name="memberEmail"  class="form-control" placeholder="브랜드명 입력">
+                        <input type="email" name="memberEmail"  class="form-control" placeholder="이메일 입력">
                         <label class="form-label mt-2">전화번호</label>
-                        <input type="text" name="memberPhone"  class="form-control" placeholder="지사명 입력">
-                        <label class="form-label mt-2">패스워드</label>
-                        <input type="text" name="memberPassword" class="form-control" placeholder="호명 입력">
-                        <label class="form-label mt-2">숙박 시작일</label>
-                        <input type="date" name="checkInDate" id="checkInDate" class="form-control" required>
-
-                        <label class="form-label mt-2">숙박 종료일</label>
-                        <input type="date" name="checkOutDate" id="checkOutDate" class="form-control" required>
+                        <input type="text" name="memberPhone"  class="form-control" placeholder="전화번호 입력">
+                        <label class="form-label mt-2">룸 패스워드</label>
+                        <input type="text" name="memberPassword" class="form-control" placeholder="룸 패스워드 입력">
                     </div>
 
 
