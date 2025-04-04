@@ -22,7 +22,5 @@ public class CommentViewDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime updatedAt;
 
-    private Long memberNum;
-    private String memberName;
-    private String memberPicture;
+    private String adminName;
 }
