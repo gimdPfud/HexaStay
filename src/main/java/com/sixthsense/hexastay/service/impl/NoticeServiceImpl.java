@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.repository.NoticeRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.NoticeService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,30 +28,31 @@ public class NoticeServiceImpl implements NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper = new ModelMapper();
-    //등록
     @Override
-    public void noticeInsert(NoticeDTO noticeDTO){
-        noticeDTO.setNoticeWriter("세영바보");
-        noticeDTO.setMemberNum(1l);
+    public void noticeInsert(NoticeDTO noticeDTO) {
+        // 임시 작성자 지정 (하드코딩된 값)
+        noticeDTO.setNoticeWriter("spit착맨"); // TODO: 로그인 사용자로 대체 예정
+        noticeDTO.setMemberNum(1L);           // TODO: 실제 로그인한 멤버 ID로 대체 예정
 
+        // (1) 여기서 멤버 조회 및 예외 처리
+        Member memberOpt = memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
+
+        // (2) DTO → Entity 변환
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
-
-        Member member =memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow();
         notice.setNoticeView(1);
-        notice.setMember(member);
-        log.info(notice.toString());
-        notice = noticeRepository.save(notice);
-        log.info("보드"+ noticeDTO.getMemberNum());
-        noticeRepository.save(notice);
+        notice.setMember(memberOpt); // (중요)
+
+        // (3) 저장 및 로깅
+        log.info("Notice 저장 전: {}", notice.toString());
+        noticeRepository.save(notice); // 중복 저장 제거
+        log.info("Notice 저장 완료. 작성자 ID: {}", memberOpt.getMemberNum()               );
     }
     //목록
     @Override
     public Page<NoticeDTO> noticeList(Pageable pageable, Principal principal, String type, String keyword) {
         //String username = principal.getName(); // 로그인한 사용자 정보
-        int currentPage = pageable.getPageNumber() - 1;
-        int limits = 10;
-        Pageable temp = PageRequest.of(currentPage, limits, Sort.Direction.DESC, "noticeNum");
-
+        Pageable temp = PageRequest.of(pageable.getPageNumber(), 10, Sort.Direction.DESC, "noticeNum");
+        
         Page<Notice> noticeList;
 
         // 검색 조건이 있을 경우 필터링
@@ -87,7 +89,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void noticeModify(NoticeDTO noticeDTO) {
         //기존 데이터를 조회를해서
-        Optional<Notice> temp = noticeRepository.findById(noticeDTO.getNoticeNum());
+        Optional<Notice> search = noticeRepository.findById(noticeDTO.getNoticeNum());
         //변환
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
         //SQL처리
@@ -97,11 +99,6 @@ public class NoticeServiceImpl implements NoticeService {
     //삭제
     @Override
     public void noticeDelete(Long noticeNum) {
-
+        noticeRepository.deleteById(noticeNum);
     }
-
-
-
-
-
 }

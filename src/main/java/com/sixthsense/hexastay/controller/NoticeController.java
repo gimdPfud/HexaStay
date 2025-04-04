@@ -24,7 +24,7 @@ public class NoticeController {
     // 공지사항 목록
     @GetMapping("/list") // (수정)
     public String list(
-            @PageableDefault(page=1) Pageable pageable,
+            Pageable pageable,
             @RequestParam(value = "type",defaultValue = "") String type,
             @RequestParam(value = "keyword",defaultValue = "") String keyword,
             Model model, Principal principal) {
@@ -56,8 +56,12 @@ public class NoticeController {
     @PostMapping("/insert") // (수정)
     public String insertPost(NoticeDTO noticeDTO) {
         log.info("공지사항 등록 요청: " + noticeDTO);
+        try{
+            noticeService.noticeInsert(noticeDTO);
+        }catch(Exception e){
+            log.info("등록실패");
+        }
 
-        noticeService.noticeInsert(noticeDTO);
         log.info("요청완료");
         return "redirect:/notice/list"; // (수정)
     }

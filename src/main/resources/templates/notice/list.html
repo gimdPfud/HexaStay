@@ -7,6 +7,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Add jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
   <style>
     body { background-color: #f8f9fa; }
     .notice-container { max-width: 800px; margin: 50px auto; background: white; padding: 20px; border-radius: 10px; }
@@ -33,16 +35,22 @@
     <div class="input-group mb-3">
       <select name="type" class="form-select">
         <option value="" th:selected="${type==null}">검색 조건</option>
-        <option value="s" th:selected="${type=='s'}">제목</option>
-        <option value="c" th:selected="${type=='c'}">내용</option>
-        <option value="a" th:selected="${type=='a'}">작성자</option>
-        <option value="sc" th:selected="${type=='sc'}">제목+내용</option>
-        <option value="sca" th:selected="${type=='sca'}">제목+내용+작성자</option>
+        <option value="S" th:selected="${type=='S'}">제목</option>
+        <option value="C" th:selected="${type=='C'}"}>내용</option>
+        <option value="A" th:selected="${type=='A'}">작성자</option>
+        <option value="SC" th:selected="${type=='SC'}">제목+내용</option>
+        <option value="SCA" th:selected="${type=='SCA'}">제목+내용+작성자</option>
       </select>
       <input class="form-control" th:value="${keyword}" name="keyword" type="text">
-      <button class="btn btn-primary" type="submit">검색</button>
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary" type="submit">검색</button>
+      </div>
+      <div class="d-flex justify-content-end mb-3">
       <button class="btn btn-secondary " type="reset">초기화</button>
-      <button class="btn btn-insert" type="button" th:onclick="|location.href='@{/notice/insertnotice}'|">등록</button>
+      </div>
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-success" type="button" th:onclick="|location.href='@{/notice/insert}'|">공지사항 등록</button>
+      </div>
     </div>
   </form>
   <!--목록-->
@@ -67,7 +75,7 @@
       <td th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></td>
       <td>
         <a th:href="@{|/notice/noticeread/${data.noticeNum}|}" class="btn btn-secondary">
-          <i class="bi-clipnotice-check"></i>
+          <i class="bi bi-pencil-square"></i>
         </a>
       </td>
     </tr>
@@ -75,22 +83,27 @@
   </table>
   <!-- 페이징 -->
   <nav>
-    <ul class="pagination">
+    <ul class="pagination justify-content-center">
+      <!-- 첫 페이지 이동 -->
       <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page=0}">&laquo;</a>
       </li>
+      <!-- 이전 페이지 이동 -->
       <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page={prev}(prev=${list.number - 1})}">이전</a>
       </li>
+      <!-- 페이지 번호 -->
       <li class="page-item" th:each="pageNum : ${#numbers.sequence(
-            (list.number - 4 > 0 ? list.number - 4 : 0),
-            (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
+                (list.number - 4 > 0 ? list.number - 4 : 0),
+                (list.number + 4 < list.totalPages - 1 ? list.number + 4 : list.totalPages - 1))}"
           th:classappend="${pageNum == list.number} ? 'active'">
         <a class="page-link" th:href="@{/notice/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
       </li>
+      <!-- 다음 페이지 이동 -->
       <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page={next}(next=${list.number + 1})}">다음</a>
       </li>
+      <!-- 마지막 페이지 이동 -->
       <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page={last}(last=${list.totalPages - 1})}">&raquo;</a>
       </li>

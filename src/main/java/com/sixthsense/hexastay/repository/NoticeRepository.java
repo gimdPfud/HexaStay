@@ -1,4 +1,3 @@
-
 package com.sixthsense.hexastay.repository;
 import com.sixthsense.hexastay.entity.Notice;
 import org.springframework.data.domain.Page;
