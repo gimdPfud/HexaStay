@@ -21,4 +21,6 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 
     // 검색기능
     Page<RoomMenu> findByRoomMenuNameContaining(String roomMenuName, Pageable pageable);
+
+    Page<RoomMenu> findByRoomMenuPriceGreaterThan(Integer price, Pageable pageable);
 }

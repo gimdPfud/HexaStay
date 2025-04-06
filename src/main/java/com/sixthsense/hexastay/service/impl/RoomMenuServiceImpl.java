@@ -57,24 +57,30 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      *        해당 리스트를 DTO로 변환하여 반환
      **************************************************/
 
-    @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword) {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
-        //페이지정보
         Page<RoomMenu> roomMenuPage;
-        if (type.equals("S") && keyword != null && !keyword.trim().isEmpty()) { // 구분이 제목이고, 검색어가 있으면
+
+        if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
             roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
-
+        } else if ("P".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            try {
+                int price = Integer.parseInt(keyword);  // 가격을 숫자로 변환
+                roomMenuPage = roomMenuRepository.findByRoomMenuPriceGreaterThan(price, pageable);  // 정확한 가격 일치
+            } catch (NumberFormatException e) {
+                // 숫자가 아닌 값을 입력한 경우, 전체 검색
+                roomMenuPage = roomMenuRepository.findAll(pageable);
+            }
         } else {
-            roomMenuPage = roomMenuRepository.findAll(pageable);
+            roomMenuPage = roomMenuRepository.findAll(pageable);  // 기본 전체 조회
         }
+
         Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenuList -> modelMapper.map(roomMenuList, RoomMenuDTO.class));
-
-
         return roomMenuDTOList;
-
     }
+
+
 
     /**************************************************
      * 룸서비스 메뉴 상세 보기
