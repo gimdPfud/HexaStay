@@ -78,10 +78,10 @@
     <div id="search-container" class="search-container">
         <form th:action="@{/roommenu/orderpage}" method="get"> <!-- 검색창 시작 -->
         <div class="search-box">
-            <select id="search-option">
-                <option value="" th:selected="${type==null}">전체</option>
-                <option value="S" th:selected="${type=='S'}">이름</option>
-                <option value="P" th:selected="${type=='P'}">가격</option>
+            <select id="search-option" name="type">
+                <option value="" th:selected="${type == ''}">전체</option>
+                <option value="S" th:selected="${type == 'S'}">이름</option>
+                <option value="P" th:selected="${type == 'P'}">가격</option>
             </select>
             <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
             <button type="submit" style="height: 26.36px">검색</button>
@@ -105,15 +105,16 @@
 
 
     <!-- 메뉴 목록 동적으로 생성 -->
+    [[${list}]]
     <ul class="food-list">
         <!-- 동적으로 메뉴 아이템 추가 -->
-        <li th:each="roomMenuList : ${list}" class="food-item">
+        <li th:each="roomMenuDTO : ${list}" class="food-item">
             <!-- 메뉴 이미지 -->
             <p>메뉴이미지</p>
             <div class="food-info">
-                <p th:text="${roomMenuList.roomMenuName}"></p> <!-- 메뉴 이름 -->
-                <p class="price" th:text="${roomMenuList.roomMenuPrice + '원'}"></p> <!-- 가격 -->
-                <p th:text="${roomMenuList.roomMenuCategory}"></p> <!-- 카테고리 이름 -->
+                <p th:text="${roomMenuDTO.roomMenuName}"></p> <!-- 메뉴 이름 -->
+                <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
+                <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 이름 -->
                 <p>평점</p>
             </div>
             <!-- "추가" 버튼 -->

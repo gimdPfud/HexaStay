@@ -55,16 +55,22 @@ public class RoomMenuCartController {
 
     @GetMapping("/roommenu/orderpage")  //메소드명 연관
     //()안에 입력인수 등록, 출력값이 있으면 model
-    public String orderList(@PageableDefault(page=1) Pageable pageable,
+    public String orderList(@PageableDefault(page = 0) Pageable pageable,
                            @RequestParam(value="type", defaultValue = "") String type,
                            @RequestParam(value="keyword", defaultValue = "") String keyword,
                            Model model) {
+        log.info("주문페이지 컨트롤러 리스트 진입");
+
         //서비스연동
         Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable, type, keyword);
 
         //페이지정보 가공
         //Map<String, Integer> pageInfo = pagenationUtil.Pagination(listDTOS);
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
+
+        for (RoomMenuDTO roomMenuDTO : roomMenuList) {
+            log.info(roomMenuDTO.getRoomMenuName());
+        }
 
         //값전달(Model)
         model.addAttribute("list", roomMenuList);
@@ -76,23 +82,5 @@ public class RoomMenuCartController {
 
         return "/roommenu/orderpage"; //String 연관
     }
-
-
-
-
-
-    /*@GetMapping("/roommenu/orderpage")
-    public String getMenu(Pageable pageable, String categori, Model model){
-
-
-        // 카테고리 별 분류
-        Page<RoomMenu> roomMenuList = roomMenuService.getMenuCategori(categori, pageable);
-
-        // 모델에 페이징된 메뉴 목록을 추가
-        model.addAttribute("roomMenuList", roomMenuList);
-
-        return "roommenu/orderpage";
-
-    }*/
 
 }
