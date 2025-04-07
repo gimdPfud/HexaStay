@@ -51,19 +51,24 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     }
 
     /**************************************************
-     * 룸서비스 메뉴 리스트 조회
+     * 룸서비스 메뉴 리스트 조회와 검색
      * 기능 : 룸서비스 메뉴의 목록을 페이지네이션 처리하여 반환
      * 설명 : Pageable을 사용하여 페이지 단위로 메뉴 리스트를 조회하고,
      *        해당 리스트를 DTO로 변환하여 반환
+     *        수정일자 : 2025-04-07
      **************************************************/
 
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword) {
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
         Page<RoomMenu> roomMenuPage;
 
-        if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+        if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
+            // 카테고리로 검색
+            roomMenuPage = roomMenuRepository.findByRoomMenuCategory(category, pageable);
+        }else if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
             roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
+
         } else if ("P".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
             try {
                 int price = Integer.parseInt(keyword);  // 가격을 숫자로 변환
@@ -72,7 +77,30 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                 // 숫자가 아닌 값을 입력한 경우, 전체 검색
                 roomMenuPage = roomMenuRepository.findAll(pageable);
             }
-        } else {
+        } else if ("A".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            try {
+                // 재고량으로 검색 (재고량이 특정 값보다 큰 데이터)
+                int amount = Integer.parseInt(keyword);
+                roomMenuPage = roomMenuRepository.findByRoomMenuAmountGreaterThan(amount, pageable);
+            } catch (NumberFormatException e) {
+                // 잘못된 입력 처리 (전체 검색)
+                roomMenuPage = roomMenuRepository.findAll(pageable);
+            }
+        } else if ("N".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            // 이름 또는 가격으로 검색 (이름 부분 일치 또는 가격보다 큰 값)
+            try {
+                int price = Integer.parseInt(keyword);
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceGreaterThan(keyword, price, pageable);
+            } catch (NumberFormatException e) {
+                // 가격이 아니라면, 이름만으로 검색
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
+            }
+
+        }else if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
+            // 카테고리로 검색
+            roomMenuPage = roomMenuRepository.findByRoomMenuCategory(category, pageable);
+        }
+        else { // 그것이 아니라면..
             roomMenuPage = roomMenuRepository.findAll(pageable);  // 기본 전체 조회
         }
 

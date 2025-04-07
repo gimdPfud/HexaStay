@@ -58,11 +58,12 @@ public class RoomMenuCartController {
     public String orderList(@PageableDefault(page = 0) Pageable pageable,
                            @RequestParam(value="type", defaultValue = "") String type,
                            @RequestParam(value="keyword", defaultValue = "") String keyword,
+                           String category,
                            Model model) {
         log.info("주문페이지 컨트롤러 리스트 진입");
 
         //서비스연동
-        Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable, type, keyword);
+        Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable, type, keyword, category);
 
         //페이지정보 가공
         //Map<String, Integer> pageInfo = pagenationUtil.Pagination(listDTOS);
@@ -77,6 +78,7 @@ public class RoomMenuCartController {
         //조회정보전달
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
         //페이지정보전달
         model.addAllAttributes(pageInfo);
 
