@@ -40,4 +40,8 @@ public class FacilityDTO {
 
     private String centerName;
 
+    private String centerBrand;
+
+    private String branchName;
+
 }

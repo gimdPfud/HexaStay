@@ -52,54 +52,57 @@ public class CenterController {
                              Model model) {
 
         if (!keyword.isEmpty()) {
+            // 🔍 키워드가 있을 때 - 검색 조건 분기
             if (select.equals("company")) {
                 if (choice.equals("center")) {
-                    Page<CenterDTO> centerDTOList = centerService.companyName(keyword, pageable);
-                    model.addAttribute("centerDTOS", centerDTOList);
+                    model.addAttribute("centerDTOS", centerService.companyName(keyword, pageable));
                 } else if (choice.equals("branch")) {
-                    Page<BranchDTO> branchDTOList = branchService.companyName(keyword, pageable);
-                    model.addAttribute("branchDTOS", branchDTOList);
+                    model.addAttribute("branchDTOS", branchService.companyName(keyword, pageable));
                 } else if (choice.equals("facility")) {
-                    Page<FacilityDTO> facilityDTOList = facilityService.companyName(keyword, pageable);
-                    model.addAttribute("facilityDTOS", facilityDTOList);
+                    model.addAttribute("facilityDTOS", facilityService.companyName(keyword, pageable));
                 }
 
             } else if (select.equals("brandName")) {
                 if (choice.equals("center")) {
-                    Page<CenterDTO> centerDTOList = centerService.brandName(keyword, pageable);
-                    model.addAttribute("centerDTOS", centerDTOList);
+                    model.addAttribute("centerDTOS", centerService.brandName(keyword, pageable));
                 } else if (choice.equals("branch")) {
-                    Page<BranchDTO> branchDTOList = branchService.brandName(keyword, pageable);
-                    model.addAttribute("branchDTOS", branchDTOList);
+                    model.addAttribute("branchDTOS", branchService.brandName(keyword, pageable));
                 } else if (choice.equals("facility")) {
-                    Page<FacilityDTO> facilityDTOList = facilityService.brandName(keyword, pageable);
-                    model.addAttribute("facilityDTOS", facilityDTOList);
+                    model.addAttribute("facilityDTOS", facilityService.brandName(keyword, pageable));
                 }
-
-
-                //브랜치 기준 --> 키워드를 가지고 -> 센터쪽에서 해당 브랜드 이름을 가지고 있는 센터Num 찾는다. ->
-                //그 센터Num을 가지고 브렌치에서 FK에 해당 센터넘을 가지고 있는놈들을 뽑는다
-
-
 
             } else if (select.equals("businessNum")) {
                 if (choice.equals("center")) {
-                    Page<CenterDTO> centerDTOList = centerService.companyName(keyword, pageable);
-                    model.addAttribute("centerDTOS", centerDTOList);
+                    model.addAttribute("centerDTOS", centerService.companyName(keyword, pageable));
                 } else if (choice.equals("branch")) {
-                    Page<BranchDTO> branchDTOList = branchService.companyName(keyword, pageable);
-                    model.addAttribute("branchDTOS", branchDTOList);
+                    model.addAttribute("branchDTOS", branchService.companyName(keyword, pageable));
                 } else if (choice.equals("facility")) {
-                    Page<FacilityDTO> facilityDTOList = facilityService.companyName(keyword, pageable);
-                    model.addAttribute("facilityDTOS", facilityDTOList);
+                    model.addAttribute("facilityDTOS", facilityService.companyName(keyword, pageable));
                 }
             }
+
         } else {
-            log.info("눌렀당");
-            Page<CenterDTO> centerDTOList = centerService.centerList(pageable);
-            model.addAttribute("centerDTOS", centerDTOList);
+            // 🔄 키워드가 비어 있을 때 - 전체 리스트
+            if (choice.equals("center")) {
+                model.addAttribute("centerDTOS", centerService.centerList(pageable));
+            } else if (choice.equals("branch")) {
+                model.addAttribute("branchDTOS", branchService.branchList(pageable));
+            } else if (choice.equals("facility")) {
+                model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
+            }
         }
-        return "center/list"; // 무조건 템플릿 리턴!
+
+        if (select.equals("전체")) {
+            if (choice.equals("center")) {
+                model.addAttribute("centerDTOS", centerService.centerList(pageable));
+            } else if (choice.equals("branch")) {
+                model.addAttribute("branchDTOS", branchService.branchList(pageable));
+            } else if (choice.equals("facility")) {
+                model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
+            }
+        }
+
+        return "center/list";
     }
 
 
