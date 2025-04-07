@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -41,7 +42,7 @@ public class AdminController {
 
     // 등록 포스트
     @PostMapping("/insert")
-    public String insert(AdminDTO adminDTO) {
+    public String insert (AdminDTO adminDTO) throws IOException {
         adminDTO.setAdminActive(false);
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
@@ -114,7 +115,7 @@ public class AdminController {
 
     // 회원정보 수정 포스트
     @PostMapping("/edit")
-    public String editPost(AdminDTO adminDTO) {
+    public String editPost(AdminDTO adminDTO) throws IOException {
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
     }

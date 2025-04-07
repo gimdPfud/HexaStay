@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.entity;
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,5 +63,8 @@ public class Admin extends BaseEntity {
 
     //어드민 입사일
     private LocalDate adminJoinDate;
+
+    // 어드민 사진
+    private String adminProfileMeta;
 
 }
