@@ -15,7 +15,7 @@
     <form method="get" action="/center/listsearch" class="row g-3">
       <div class="col-md-3">
         <label class="form-label">검색 조건</label>
-        <select name="select" class="form-select">
+        <select name="select" class="form-select" id="select">
           <option>전체</option>
           <option value="company">조직명</option>
           <option value="brandName">브랜드명</option>
@@ -60,6 +60,7 @@
         <th>본사명</th>
         <th>지사명</th>
         <th>지점명</th>
+        <th>전화번호</th>
 
       </tr>
       </thead>
@@ -69,35 +70,29 @@
       <tr th:if="${centerDTOS != null and !centerDTOS.isEmpty()}" th:each="item : ${centerDTOS}">
         <td th:text="${item.centerBrand}"></td>
         <td th:text="${item.centerName}"></td>
-        <td th:text="${item.centerBusinessNum}"></td>
-        <td th:text="${item.centerCeoName}"></td>
+        <td>-</td>
+        <td>-</td>
         <td th:text="${item.centerPhone}"></td>
-        <td th:text="${item.centerEmail}"></td>
-        <td th:text="${item.centerAddress}"></td>
         <td><a th:href="@{/center/read/{centerNum}(centerNum=${item.centerNum})}" class="btn btn-success">상세보기</a></td>
       </tr>
 
       <!-- branchDTOS가 있을 때 -->
       <tr th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" th:each="item : ${branchDTOS}">
-        <td th:text="${item.branchNum}"></td>
+        <td th:text="${item.centerBrand}"></td>
+        <td th:text="${item.centerName}"></td>
         <td th:text="${item.branchName}"></td>
-        <td th:text="${item.branchBusinessNum}"></td>
-        <td th:text="${item.branchCeoName}"></td>
+        <td>-</td>
         <td th:text="${item.branchPhone}"></td>
-        <td th:text="${item.branchEmail}"></td>
-        <td th:text="${item.branchAddress}"></td>
         <td><a th:href="@{/branch/read/{branchNum}(branchNum=${item.branchNum})}" class="btn btn-success">상세보기</a></td>
       </tr>
 
       <!-- facilityDTOS가 있을 때 -->
       <tr th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}" th:each="item : ${facilityDTOS}">
-        <td th:text="${item.facilityNum}"></td>
+        <td th:text="${item.centerBrand}"></td>
+        <td th:text="${item.centerName}"></td>
+        <td th:text="${item.branchName}"></td>
         <td th:text="${item.facilityName}"></td>
-        <td th:text="${item.facilityBusinessNum}"></td>
-        <td th:text="${item.facilityCeoName}"></td>
         <td th:text="${item.facilityPhone}"></td>
-        <td th:text="${item.facilityEmail}"></td>
-        <td th:text="${item.facilityAddress}"></td>
         <td><a th:href="@{/facility/read/{facilityNum}(facilityNum=${item.facilityNum})}" class="btn btn-success">상세보기</a></td>
       </tr>
       </tbody>
@@ -140,35 +135,8 @@
 
 <!--      </ul>-->
 
-    </div>
-
-    <!-- 상세보기 모달 -->
-    <div class="modal fade" id="centerDetailModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalTitle">조직 상세 정보</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group">
-              <li class="list-group-item"><strong>브랜드명:</strong> <span id="modalCenterBrand"></span></li>
-              <li class="list-group-item"><strong>본사명:</strong> <span id="modalCenterName"></span></li>
-              <li class="list-group-item"><strong>지사명:</strong> <span id="modalCenterBusinessNum"></span></li>
-              <li class="list-group-item"><strong>지점명:</strong> <span id="modalCenterCeoName"></span></li>
-              <li class="list-group-item"><strong>전화번호:</strong> <span id="modalCenterPhone"></span></li>
-              <li class="list-group-item"><strong>이메일:</strong> <span id="modalCenterEmail"></span></li>
-              <li class="list-group-item"><strong>주소:</strong> <span id="modalCenterAddress"></span></li>
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
+</div>
 
   <script>
     const choice = document.getElementById("choice");
