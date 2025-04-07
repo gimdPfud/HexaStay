@@ -1,0 +1,26 @@
+/***********************************************
+ * 클래스명 : Storecart
+ * 기능 :
+ * 작성자 :
+ * 작성일 : 2025-04-07
+ * 수정 : 2025-04-07
+ * ***********************************************/
+package com.sixthsense.hexastay.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Storecart {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long storecartNum;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_num")
+    private Member member;
+}

@@ -66,6 +66,12 @@ public class StoreClientController {
 
 /* 4. 스토어메뉴 상세 보기
         get. */
+    @GetMapping("/menu/read/{storemenuNum}")
+    public String menuRead(@PathVariable Long storemenuNum, Model model){
+        StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum);
+        model.addAttribute("data",storemenuDTO);
+        return "mobilestore/menuread";
+    }
 
 /* 5. 장바구니페이지 이동해서 보기.
            ??......get?*/
