@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 
 @Controller
 @RequiredArgsConstructor
@@ -100,18 +103,25 @@ public class RoomMenuController {
 
     @GetMapping("/roommenu/list")
     public String RoomMenuList(Pageable pageable,
-                               @RequestParam(value="type", defaultValue = "") String type,
-                               @RequestParam(value="keyword", defaultValue = "") String keyword,
-                               Model model){
+                               @RequestParam(value="type", required = false, defaultValue = "") String type,
+                               @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+                               @RequestParam(value = "category", required = false) String category, // @RequestParam 추가
+                               Model model) {
         log.info("리스트 컨트롤러 진입");
 
         Page<RoomMenuDTO> roomMenuDTOPage =
-                roomMenuService.RoomMenuList(pageable, type, keyword);
+                roomMenuService.RoomMenuList(pageable, type, keyword, category);
+
+        Map<String, Integer> pageInfo = Pagination(roomMenuDTOPage);
 
         for (RoomMenuDTO roomMenuDTO : roomMenuDTOPage) {
             log.info(roomMenuDTO.getRoomMenuName());
         }
         model.addAttribute("list", roomMenuDTOPage);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
+        model.addAllAttributes(pageInfo);
 
         return "roommenu/list";
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>룸서비스 메뉴 목록</title>
@@ -8,27 +8,106 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
+<!-- 스타일시트 -->
+
+<style>
+    .search-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        max-width: 600px;
+        margin: 20px auto;
+    }
+
+    .search-box select,
+    .search-box input,
+    .search-box button {
+        border-radius: 5px;
+        padding: 5px 10px;
+    }
+
+    .search-box select {
+        width: 220px;
+    }
+
+    .search-box input {
+        width: 220px;
+    }
+
+    .search-box button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-box button:hover {
+        background-color: #0056b3;
+    }
+
+     #category-option {
+         display: none;
+     }
+</style>
+
+<!-- 스타일시트 끝 -->
+
 <body>
 
 [[${list}]]
 <div class="container mt-4">
     <h1>룸서비스 메뉴 목록</h1>
 
-    <!-- 메뉴 등록 버튼 -->
-    <div class="mb-3">
-        <a href="/roommenu/insert" class="btn btn-success">메뉴 등록</a>
+    <!-- 검색창 -->
+
+    <div class="container">
+            <!-- 검색창 시작 -->
+            <div class="container">
+                <form th:action="@{/roommenu/list}" method="get">
+                    <!-- 검색창 시작 -->
+                    <div class="search-box">
+                        <select id="search-option" name="type" class="form-select">
+                            <option value="S" th:selected="${type == 'S'}">이름</option>
+                            <option value="P" th:selected="${type == 'P'}">가격</option>
+                            <option value="A" th:selected="${type == 'A'}">재고량</option>
+                            <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                            <option value="C" th:selected="${type == 'C'}">카테고리 선택</option> <!-- 카테고리 선택 -->
+                        </select>
+
+
+                        <!-- 카테고리 선택 -->
+                        <select id="category-select" name="category" class="form-select" disabled>
+                            <option value="">카테고리 선택</option>
+                            <option value="한식" th:selected="${category == '한식'}">한식</option>
+                            <option value="양식" th:selected="${category == '양식'}">양식</option>
+                            <option value="중식" th:selected="${category == '중식'}">중식</option>
+                            <option value="에피타이저" th:selected="${category == '에피타이저'}">에피타이저</option>
+                            <!-- 추가적인 카테고리도 여기에 추가 -->
+                        </select>
+
+                        <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
+                        <button type="submit">검색</button>
+                    </div>
+                </form> <!-- 검색창 끝 -->
+            </div>
     </div>
 
     <!-- 메뉴 목록 테이블 -->
-    <table class="table table-bordered">
+    <table class="table table-bordered mt-4">
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">메뉴 이름</th>
-            <th scope="col">가격</th>
-            <th scope="col">수량</th>
+            <th scope="col">메뉴이름</th>
+            <th scope="col">상품가격</th>
+            <th scope="col">재고량</th>
             <th scope="col">카테고리</th>
-            <th scope="col">상태</th>
+            <th scope="col">품절여부</th>
             <th scope="col">기능</th>
         </tr>
         </thead>
@@ -67,4 +146,30 @@
     </nav>
 </div>
 </body>
+
+<script>
+    /*카테고리 드롭다운 활성화*/
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchOptionSelect = document.getElementById("search-option");
+        const categorySelect = document.getElementById("category-select");
+
+        // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
+        searchOptionSelect.addEventListener("change", function() {
+            if (searchOptionSelect.value === "C") {
+                categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
+            } else {
+                categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
+                categorySelect.value = "";  // 카테고리 선택 초기화
+            }
+        });
+
+        // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
+        if (searchOptionSelect.value === "C") {
+            categorySelect.disabled = false;
+        }
+    });
+</script>
+
+
 </html>

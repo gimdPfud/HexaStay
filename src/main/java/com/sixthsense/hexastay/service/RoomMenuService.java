@@ -11,7 +11,7 @@ public interface RoomMenuService {
     public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO);
 
     // 목록
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword);
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
 
     // 상세보기
     public RoomMenuDTO read(Long num);

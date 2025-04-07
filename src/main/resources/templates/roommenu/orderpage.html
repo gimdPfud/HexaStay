@@ -5,33 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모바일 주문 페이지</title>
     <style>
+        /* 기본 스타일: 모든 요소에 기본 마진, 패딩 제거 및 박스 크기 설정 */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f9f9f9; }
-        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 20px; border-bottom: 2px solid #ddd; }
-        .menu-icon, .cart-icon { font-size: 24px; cursor: pointer; }
-        .search-container { display: none; padding: 10px; background: #f1f1f1; border-bottom: 2px solid #ddd; }
-        .search-box { display: flex; align-items: center; justify-content: space-between; }
-        .search-box input { width: 300px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        .search-box button { background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px 10px; }
-        .category-tabs { display: flex; justify-content: space-around; padding: 10px; }
-        .category-tab { cursor: pointer; padding: 5px 10px; font-size: 14px; background: #ddd; border-radius: 5px; }
-        .tabs { display: flex; justify-content: space-around; padding: 10px; border-bottom: 2px solid #ddd; }
-        .tab { cursor: pointer; padding: 5px 10px; }
-        .tab.active { font-weight: bold; border-bottom: 2px solid black; }
-        .food-list { list-style: none; padding: 10px; }
-        .food-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; position: relative; }
-        .food-item img { width: 60px; height: 60px; border-radius: 10px; margin-right: 10px; }
-        .food-info { flex-grow: 1; }
-        .food-info p { margin: 2px 0; }
-        .price { font-weight: bold; }
-        .rating { color: #ff9800; }
+        body { background-color: #f9f9f9; } /* 배경 색상 설정 */
 
-        /* "추가" 버튼 스타일 */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto; /* 화면 중앙 정렬 */
+            background: white;
+            padding: 10px; /* 내부 여백 설정 */
+        }
+
+        /* Header: 상단 메뉴 */
+        .header {
+            display: flex; /* 플렉스박스를 사용하여 요소 배치 */
+            justify-content: space-between; /* 좌우 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 2px solid #ddd; /* 하단 구분선 */
+        }
+        .menu-icon, .cart-icon { font-size: 24px; cursor: pointer; } /* 아이콘 크기 및 클릭 가능 스타일 */
+
+        /* 검색창 */
+        .search-container {
+            display: none;
+            padding: 10px;
+            background: #f1f1f1;
+            border-bottom: 2px solid #ddd;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-box input {
+            width: 250px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px; /* 입력 필드 둥근 모서리 */
+        }
+        .search-box button {
+            background-color: #4CAF50; /* 버튼 배경색 */
+            color: white;
+            border: none;
+            border-radius: 5px; /* 버튼 둥근 모서리 */
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        /* 카테고리 탭 */
+        .category-tabs {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #f1f1f1;
+            border-bottom: 2px solid #ddd;
+        }
+        .category-tab {
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 14px;
+            background: #ddd;
+            border-radius: 5px; /* 카테고리 탭의 둥근 모서리 */
+        }
+
+        /* 탭 메뉴 스타일 */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #f8f8f8;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .tab:hover {
+            background-color: #007bff; /* 호버시 배경색 변경 */
+            color: white;
+        }
+        .tab.active {
+            font-weight: bold;
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* 음식 목록 */
+        .food-list { list-style: none; padding: 10px; }
+        .food-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            position: relative; /* 상대 위치로 "추가" 버튼 배치 */
+        }
+        .food-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            margin-right: 10px; /* 이미지와 텍스트 사이에 간격 추가 */
+        }
+        .food-info {
+            flex-grow: 1; /* 남는 공간을 채우도록 설정 */
+        }
+        .food-info p { margin: 2px 0; }
+        .price { font-weight: bold; } /* 가격 강조 */
+        .rating { color: #ff9800; } /* 평점 색상 설정 */
+
+        /* "추가" 버튼 */
         .add-btn {
             position: absolute;
             right: 10px;
-            background-color: #ffeb3b; /* 노란색 */
+            background-color: #ffeb3b;
             color: black;
             border: none;
             border-radius: 5px;
@@ -40,21 +130,21 @@
             font-weight: bold;
         }
 
-        /* 사이드바 스타일 */
+        /* 장바구니 사이드바 */
         #cart-sidebar {
             position: fixed;
             top: 0;
-            right: -300px; /* 사이드바 기본 위치는 화면 밖 */
+            right: -300px; /* 사이드바 기본 위치 */
             width: 300px;
             height: 100%;
             background-color: white;
-            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
+            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            transition: right 0.3s ease; /* 애니메이션 효과 */
             padding: 20px;
             z-index: 1000;
         }
         #cart-sidebar.active {
-            right: 0; /* 활성화 시 사이드바가 화면에 보이도록 */
+            right: 0; /* 사이드바 활성화 시 화면에 보이도록 설정 */
         }
         #cart-sidebar .close-btn {
             position: absolute;
@@ -64,58 +154,60 @@
             cursor: pointer;
         }
         #cart-sidebar .cart-content {
-            margin-top: 60px; /* 버튼과 내용 간의 간격 */
+            margin-top: 60px;
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- 헤더: 메뉴와 장바구니 아이콘 -->
     <div class="header">
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
         <div>주문</div>
         <div class="cart-icon" onclick="openCartSidebar()">🛒</div>
     </div>
+
+    <!-- 검색창 -->
     <div id="search-container" class="search-container">
-        <form th:action="@{/roommenu/orderpage}" method="get"> <!-- 검색창 시작 -->
-        <div class="search-box">
-            <select id="search-option" name="type">
-                <option value="" th:selected="${type == ''}">전체</option>
-                <option value="S" th:selected="${type == 'S'}">이름</option>
-                <option value="P" th:selected="${type == 'P'}">가격</option>
-            </select>
-            <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
-            <button type="submit" style="height: 26.36px">검색</button>
-        </div>
+        <form th:action="@{/roommenu/orderpage}" method="get">
+            <div class="search-box">
+                <select id="search-option" name="type" class="form-select">
+                    <option value="S" th:selected="${type == 'S'}">이름</option>
+                    <option value="P" th:selected="${type == 'P'}">가격</option>
+                    <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                </select>
+                <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
+                <button type="submit" style="height: 26.36px">검색</button>
+            </div>
         </form> <!-- 검색창 끝 -->
-        <div class="category-tabs">
-            <div class="category-tab">김치찌개</div>
-            <div class="category-tab">호떡</div>
-            <div class="category-tab">케이크</div>
-            <div class="category-tab">짜장면</div>
+        <div class="tabs">
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=S&keyword=김치찌개'">김치찌개</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=S&keyword=호떡'">호떡</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=S&keyword=케이크'">케이크</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=S&keyword=짜장면'">짜장면</div>
         </div>
     </div>
+
+
+    <!-- 카테고리 탭 -->
     <div class="tabs">
-        <div class="tab active" onclick="filterMenu('전체보기')">전체보기</div>
-        <div class="tab" onclick="filterMenu('koreanfood')">한식</div>
-        <div class="tab" onclick="filterMenu('usfood')">양식</div>
-        <div class="tab" onclick="filterMenu('chinafood')">중식</div>
-        <div class="tab" onclick="filterMenu('appetizer')">에피타이저</div>
+        <div class="tab" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
+        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
+        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
+        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
+        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
     </div>
 
-
-
-    <!-- 메뉴 목록 동적으로 생성 -->
-    [[${list}]]
+    <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
     <ul class="food-list">
-        <!-- 동적으로 메뉴 아이템 추가 -->
         <li th:each="roomMenuDTO : ${list}" class="food-item">
             <!-- 메뉴 이미지 -->
             <p>메뉴이미지</p>
             <div class="food-info">
                 <p th:text="${roomMenuDTO.roomMenuName}"></p> <!-- 메뉴 이름 -->
                 <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
-                <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 이름 -->
-                <p>평점</p>
+                <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 -->
+                <p>평점</p> <!-- 평점 표시 -->
             </div>
             <!-- "추가" 버튼 -->
             <button class="add-btn">추가</button>
@@ -128,86 +220,40 @@
     <div class="close-btn" onclick="closeCartSidebar()">✖</div>
     <div class="cart-content">
         <h3>장바구니</h3>
-        <p>장바구니가 비어 있습니다.</p> <!-- 여기에 장바구니 내용이 동적으로 들어갈 수 있도록 합니다. -->
+        <p>장바구니가 비어 있습니다.</p>
     </div>
 </div>
-</body>
+
+<!-- 페이지 네비게이션 -->
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" href="#">이전</a></li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">다음</a></li>
+    </ul>
+</nav>
 
 <script>
-    /****************************
-     * 검색창 토글
-     ****************************/
+    /* 검색창 토글 */
     function toggleSearch() {
         const searchContainer = document.getElementById('search-container');
         searchContainer.style.display = searchContainer.style.display === 'none' || searchContainer.style.display === '' ? 'block' : 'none';
     }
 
-    /****************************
-     * 사이드바 열기
-     ****************************/
+    /* 장바구니 사이드바 열기 */
     function openCartSidebar() {
         const sidebar = document.getElementById('cart-sidebar');
         sidebar.classList.add('active');
     }
 
-    /****************************
-     * 사이드바 닫기
-     ****************************/
+    /* 장바구니 사이드바 닫기 */
     function closeCartSidebar() {
         const sidebar = document.getElementById('cart-sidebar');
         sidebar.classList.remove('active');
     }
-
-    /****************************
-     * 장바구니 페이지로 이동
-     ****************************/
-    function goToCart() {
-        window.location.href = "http://localhost:8090/roommenu/orderread"; // 장바구니 상세 페이지로 이동
-    }
-
-
-    /****************************
-     * 장바구니에 음식 추가
-     ****************************/
-    function addToCart(menuId) {
-        alert("음식이 장바구니에 추가되었습니다: " + menuId);
-        // 여기에서 실제 장바구니에 추가하는 API 호출이나, 상태 관리 로직을 넣을 수 있습니다.
-    }
-
-
-
-
-
-
-
-
-
-    function filterMenu(category) {
-        const menuItems = document.querySelectorAll('.food-item'); // 모든 메뉴 항목을 선택
-        const tabs = document.querySelectorAll('.tab'); // 모든 탭을 선택
-
-        // 모든 메뉴 항목을 숨기고
-        menuItems.forEach(item => {
-            // 클릭된 카테고리와 일치하는 음식만 보이게 함
-            if (category === '전체보기' || item.classList.contains(category)) {
-                item.style.display = 'flex'; // 해당 카테고리 메뉴만 보이게 함
-            } else {
-                item.style.display = 'none'; // 다른 카테고리 메뉴는 숨김
-            }
-        });
-
-        // 탭 활성화 상태 업데이트
-        tabs.forEach(tab => {
-            tab.classList.remove('active'); // 모든 탭의 'active' 클래스 제거
-        });
-
-        // 클릭된 탭에 'active' 클래스 추가
-        const activeTab = Array.from(tabs).find(tab => tab.textContent === category);
-        if (activeTab) {
-            activeTab.classList.add('active');
-        }
-    }
-
-
 </script>
+
+</body>
 </html>
