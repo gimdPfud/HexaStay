@@ -53,36 +53,36 @@ public class RoomMenuCartController {
         return "roommenu/orderread";
     }
 
-    @GetMapping("/roommenu/orderpage")  //메소드명 연관
-    //()안에 입력인수 등록, 출력값이 있으면 model
+    @GetMapping("/roommenu/orderpage")
     public String orderList(@PageableDefault(page = 0) Pageable pageable,
-                           @RequestParam(value="type", defaultValue = "") String type,
-                           @RequestParam(value="keyword", defaultValue = "") String keyword,
-                           String category,
-                           Model model) {
+                            @RequestParam(value = "type", defaultValue = "") String type,
+                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                            @RequestParam(value = "category", defaultValue = "") String category,
+                            Model model) {
         log.info("주문페이지 컨트롤러 리스트 진입");
+        log.info("type: {}", type);
+        log.info("keyword: {}", keyword);
+        log.info("category: {}", category);
 
-        //서비스연동
-        Page<RoomMenuDTO> roomMenuList = roomMenuService.RoomMenuList(pageable, type, keyword, category);
+        // 서비스 연동: 전달된 파라미터로 메뉴 리스트 필터링
+        Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category);
 
-        //페이지정보 가공
-        //Map<String, Integer> pageInfo = pagenationUtil.Pagination(listDTOS);
+        // 페이지 정보 가공
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
 
+        // 로깅: 메뉴 이름 출력
         for (RoomMenuDTO roomMenuDTO : roomMenuList) {
-            log.info(roomMenuDTO.getRoomMenuName());
+            log.info("이것은 룸카드컨트롤러" + roomMenuDTO.getRoomMenuName());
         }
 
-        //값전달(Model)
+        // 값 전달 (Model)
         model.addAttribute("list", roomMenuList);
-        //조회정보전달
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("category", category);
-        //페이지정보전달
+        model.addAttribute("category", category);  // 카테고리 필터링 값 전달
         model.addAllAttributes(pageInfo);
 
-        return "/roommenu/orderpage"; //String 연관
+        return "/roommenu/orderpage";  // orderpage를 반환하여 뷰를 렌더링
     }
 
 }

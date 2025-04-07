@@ -73,7 +73,6 @@
                     <!-- 검색창 시작 -->
                     <div class="search-box">
                         <select id="search-option" name="type" class="form-select">
-                            <option value="" th:selected="${type == ''}">전체</option>
                             <option value="S" th:selected="${type == 'S'}">이름</option>
                             <option value="P" th:selected="${type == 'P'}">가격</option>
                             <option value="A" th:selected="${type == 'A'}">재고량</option>
@@ -95,7 +94,7 @@
                         <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
                         <button type="submit">검색</button>
                     </div>
-                </form>
+                </form> <!-- 검색창 끝 -->
             </div>
     </div>
 

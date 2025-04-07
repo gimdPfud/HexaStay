@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
+import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,8 +32,8 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
 
     private final RoomMenuCartRepository roomMenuCartRepository;
+    private final RoomMenuRepository roomMenuRepository;
     private RoomMenuCartItemRepository roomMenuCartItemRepository;
-    private RoomMenuRepository roomMenuRepository;
     private MemberRepository memberRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -86,6 +89,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
     }
 
+
     // 장바구니 총 가격 계산
     private void updateCartTotalPrice(RoomMenuCart roomMenuCart) {
         int totalPrice = roomMenuCartItemRepository.findAllByRoomMenuCart(roomMenuCart).stream()
@@ -94,5 +98,60 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         roomMenuCart.setRoomMenuTotalPrice(totalPrice);
         roomMenuCartRepository.save(roomMenuCart);
+    }
+
+
+
+
+
+
+
+    @Override
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
+        log.info("룸서비스 상품 리스트 서비스 진입");
+
+        Page<RoomMenu> roomMenuPage;
+
+        // 카테고리 선택 시 검색
+        if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
+            roomMenuPage = roomMenuRepository.findByRoomMenuCategory(category, pageable);
+        } else if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            // 이름 검색
+            roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
+        } else if ("P".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            // 가격 검색
+            try {
+                int price = Integer.parseInt(keyword);  // 가격을 숫자로 변환
+                roomMenuPage = roomMenuRepository.findByRoomMenuPriceGreaterThan(price, pageable);  // 가격보다 큰 값 검색
+            } catch (NumberFormatException e) {
+                // 숫자가 아닌 값을 입력한 경우, 전체 검색
+                roomMenuPage = roomMenuRepository.findAll(pageable);
+            }
+        } else if ("A".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            // 재고량 검색
+            try {
+                int amount = Integer.parseInt(keyword);  // 재고량을 숫자로 변환
+                roomMenuPage = roomMenuRepository.findByRoomMenuAmountGreaterThan(amount, pageable);  // 재고량보다 큰 값 검색
+            } catch (NumberFormatException e) {
+                // 잘못된 입력 처리, 전체 검색
+                roomMenuPage = roomMenuRepository.findAll(pageable);
+            }
+        } else if ("N".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+            // 이름 + 가격 검색
+            try {
+                int price = Integer.parseInt(keyword);
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceGreaterThan(keyword, price, pageable);
+            } catch (NumberFormatException e) {
+                // 가격이 아니라면 이름만으로 검색
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
+            }
+        } else {
+            // 기본 전체 검색
+            roomMenuPage = roomMenuRepository.findAll(pageable);
+        }
+
+        // DTO로 변환
+        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+        return roomMenuDTOList;
     }
 }
