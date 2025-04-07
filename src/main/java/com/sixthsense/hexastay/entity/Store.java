@@ -47,4 +47,6 @@ public class Store extends BaseEntity {
 
     //추가 : 카테고리 ( 한식 중식 일식 아시안 양식 패스트푸드 카페  중 1택.)
     private String storeCategory;
+
+    private String storeProfileMeta; //가게 대표 사진
 }

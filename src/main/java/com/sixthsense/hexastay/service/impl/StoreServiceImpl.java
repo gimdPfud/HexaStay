@@ -7,7 +7,9 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.ReviewRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
@@ -20,6 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -37,7 +43,21 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : Store 등록 후 등록한 객체의 pk 반환
      * */
     @Override
-    public void insert(StoreDTO storeDTO) {
+    public void insert(StoreDTO storeDTO) throws IOException {
+        if(storeDTO.getStoreProfile()!=null&& !storeDTO.getStoreProfile().isEmpty()){
+            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+            String fileFirstName = storeDTO.getStoreName() + "_" + storeDTO.getStoreNum();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storeDTO.setStoreProfileMeta("/store/"+fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+        }
         Store store = modelMapper.map(storeDTO, Store.class);
         storeRepository.save(store);
     }

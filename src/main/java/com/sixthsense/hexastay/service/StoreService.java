@@ -11,11 +11,12 @@ import com.sixthsense.hexastay.dto.StoreDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface StoreService {
     /*등록*/
-    public void insert(StoreDTO storeDTO);
+    public void insert(StoreDTO storeDTO) throws IOException;
 
     /*읽기*/
     public StoreDTO read(Long pk);

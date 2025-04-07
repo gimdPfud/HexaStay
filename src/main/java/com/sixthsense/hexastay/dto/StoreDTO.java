@@ -9,6 +9,7 @@
 package com.sixthsense.hexastay.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -53,4 +54,10 @@ public class StoreDTO {
     private String storeCategory;//가게 카테고리 (한식 중식 일식 아시안 양식 패푸 카페)
 
     private Double storeRating; //가게 전체 리뷰 별점의 통계... 0.0 형태로 보여주고싶음.
+
+
+    private MultipartFile storeProfile; //가게 사진 이미지
+
+    private String storeProfileMeta; //가게 사진정보
+
 }
