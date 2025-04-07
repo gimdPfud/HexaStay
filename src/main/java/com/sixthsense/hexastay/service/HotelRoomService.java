@@ -12,9 +12,11 @@ import java.util.Optional;
 
 public interface HotelRoomService {
 
-    //등록
-    //void 방식의 등록 메서드
     public void insertMemberHoterl(HotelRoomDTO hotelRoomDTO);
+
+    //3.hotel룸 읽기 페이지 member 에 정보를 가져 오는 페이지
+    public HotelRoomDTO findRoomWithMembers(Long roomNum);
+
 
 
     //todo기본 로직 만 만들었음 - 참조 pk 가져 오실분은 등록만 수정 보시면 됩니다.

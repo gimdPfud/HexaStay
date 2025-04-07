@@ -25,4 +25,6 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     //
     @Query("SELECT h.member FROM HotelRoom h WHERE h.hotelRoomNum = :hotelRoomNum")
     public Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
 }

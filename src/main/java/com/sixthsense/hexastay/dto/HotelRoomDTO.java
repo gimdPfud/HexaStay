@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,6 +45,8 @@ public class HotelRoomDTO {
     private LocalDateTime checkOutDate; //체크아웃
 
 
+
+
     //****룸의 비밀번호 설정 컬럼모음**********//
     private String hotelRoomQr;                 //Qr명
 
@@ -65,6 +68,8 @@ public class HotelRoomDTO {
      //*****Member 테이블 참조******************//참조 클래스
     //필드 에서 MemberDTO가 처음 부터 HotelDTO가 가지고 가는 방식의 메소드 로직
     private MemberDTO memberDTO;
+
+    private List<MemberDTO> memberDTOList;  //여러 멤버 저장
 
     //ModelMapper를 이용해서 한번에 참조 값을 변환 하기 위한 메서드
     public HotelRoomDTO setMember(MemberDTO memberDTO) {

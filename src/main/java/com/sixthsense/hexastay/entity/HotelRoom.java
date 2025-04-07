@@ -12,7 +12,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -74,6 +76,17 @@ public class HotelRoom extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberNum")
     private Member member;
+
+    // 🔹 일대다 관계 설정 (기존 ManyToOne 제거)
+
+
+    public void setMember(Member memberEntity) {
+    }
+
+    public Object getMember() {
+
+        return null;
+    }
     //*********참조 테이블 모음*********//
 
 }
