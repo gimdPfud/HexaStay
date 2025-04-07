@@ -42,13 +42,13 @@ public class AdminServiceImpl implements AdminService {
 
     // 회원 등록
     public void insertAdmin(AdminDTO adminDTO) throws IOException {
-        if (adminDTO.getAdminProfile() != null) {
+        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
             String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
             String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
-            adminDTO.setAdminProfileMeta("profile/" + fileName);
+            adminDTO.setAdminProfileMeta("/profile/" + fileName);
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
             Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
             if (!Files.exists(createPath)) {

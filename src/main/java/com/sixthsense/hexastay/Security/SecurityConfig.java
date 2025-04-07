@@ -1,6 +1,7 @@
 //package com.sixthsense.hexastay.Security;
 //
 //import com.example.pz1teamganttchart.repository.MemberRepository;
+//import com.sixthsense.hexastay.repository.AdminRepository;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,11 @@
 //@RequiredArgsConstructor
 //public class SecurityConfig {
 //
-//    private final MemberRepository memberRepository;
+//    private final AdminRepository adminRepository;
 //
 //    @Bean
 //    public UserDetailsService userDetailsService() {
-//        return new CustomUserDetailsService(memberRepository);
+//        return new CustomUserDetailsService(adminRepository);
 //    }
 //
 //     @Bean
@@ -53,8 +54,8 @@
 //                )
 //                .formLogin(login -> login
 //                        .loginPage("/login")
-//                        .usernameParameter("memberId")
-//                        .passwordParameter("memberPassword")
+//                        .usernameParameter("adminEmail")
+//                        .passwordParameter("adminPassword")
 //                        .defaultSuccessUrl("/main", true)
 //                        .permitAll()
 //                )
