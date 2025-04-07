@@ -12,5 +12,8 @@ public class WebConfig implements WebMvcConfigurer {
         // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함
         registry.addResourceHandler("/profile/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/profile/");
+
+        registry.addResourceHandler("/store/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/store/");
     }
 }

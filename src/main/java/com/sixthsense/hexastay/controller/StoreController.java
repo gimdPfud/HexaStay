@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -39,7 +41,7 @@ public class StoreController {
         return "store/insert";
     }
     @PostMapping("/insert")
-    public String insert(StoreDTO storeDTO){
+    public String insert(StoreDTO storeDTO) throws IOException {
         log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
         return "redirect:/store/list";
