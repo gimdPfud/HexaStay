@@ -95,6 +95,13 @@ public class StoremenuServiceImpl implements StoremenuService {
         return list;
     }
 
+    @Override
+    public List<StoremenuDTO> list(Long storeNum, String category, String status) {
+        List<Storemenu> storemenuList= storemenuRepository.findCateg(storeNum, category, status);
+        List<StoremenuDTO> list = storemenuList.stream().map(data -> modelMapper.map(data, StoremenuDTO.class)).toList();
+        return list;
+    }
+
 
     /*
      * 메소드명 : delete

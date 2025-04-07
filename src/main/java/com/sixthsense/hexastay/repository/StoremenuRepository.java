@@ -23,6 +23,9 @@ public interface StoremenuRepository extends JpaRepository<Storemenu, Long> {
     @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus='alive'")
     public List<Storemenu> findAll(Long storeNum);
 
+    @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus=:status and s.storemenuCategory=:category")
+    public List<Storemenu> findCateg(Long storeNum, String category, String status);
+
 
     /*활성화여부와 상위 가게 pk로...*/
     List<Storemenu> findByStoreStoreNumAndStoremenuStatus(Long storeNum, String storemenuStatus);

@@ -25,6 +25,8 @@ public interface StoremenuService {
     public List<StoremenuDTO> list(Long storeNum, String status);
     /*목록2 페이징없는 모든 목록*/
     public List<StoremenuDTO> list(Long storeNum);
+    /*목록3 카테고리별 목록*/
+    public List<StoremenuDTO> list(Long storeNum, String category, String status);
 
     /*삭제인척 하는 활성화->비활성화*/
     public Long delete(Long pk);

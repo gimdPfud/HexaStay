@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Store;
+import com.sixthsense.hexastay.repository.ReviewRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -70,6 +72,7 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreStatus(storeDTO.getStoreStatus());
         store.setStoreCeoName(storeDTO.getStoreCeoName());
         store.setStoreAddress(storeDTO.getStoreAddress());
+        store.setStoreCategory(storeDTO.getStoreCategory());
         store.setStorePassword(storeDTO.getStorePassword());
         return store.getStoreNum();
     }
@@ -109,6 +112,17 @@ public class StoreServiceImpl implements StoreService {
         return storeDTOPage;
     }
 
+    @Override
+    public Page<StoreDTO> clientlist(Pageable pageable) {
+        Page<Store> storePage = storeRepository.findByStoreStatus("alive", pageable);
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data, StoreDTO.class));
+        storeDTOPage.map(data -> {
+            /* todo 리뷰를 넣어 말어? 말어?*/
+            return data;
+        });
+        return storeDTOPage;
+    }
+
 
     /*
      * 메소드명 : delete
@@ -120,5 +134,16 @@ public class StoreServiceImpl implements StoreService {
     public void delete(Long pk) {
         Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         store.setStoreStatus("deleted");
+    }
+    /*
+     * 메소드명 : restore
+     * 인수 값 : Long
+     * 리턴 값 : void
+     * 기  능 : pk를 받아 해당하는 Store 객체의 활성화 컬럼 데이터를 alive 로 바꾼다.
+     * */
+    @Override
+    public void restore(Long pk) {
+        Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        store.setStoreStatus("alive");
     }
 }

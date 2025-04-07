@@ -120,10 +120,41 @@
                                 <input type="text" class="form-control" name="storeCeoName" required>
                             </div>
                             <div class=" mb-3">
-                                <label class="form-label">비밀번호</label>
+                                <label class="form-label">패스워드</label>
                                 <input type="password" class="form-control" name="storePassword" required>
                             </div>
                             <input type="hidden" name="storeStatus" value="alive">
+                            <div class="mb-3">
+                                <label class="form-label d-block">카테고리</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
+                                    <label class="form-check-label" for="korean">한식</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
+                                    <label class="form-check-label" for="chinese">중식</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
+                                    <label class="form-check-label" for="japanese">일식</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
+                                    <label class="form-check-label" for="asian">아시안</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
+                                    <label class="form-check-label" for="western">양식</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
+                                    <label class="form-check-label" for="fastfood">패스트푸드</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
+                                    <label class="form-check-label" for="cafe">카페</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">

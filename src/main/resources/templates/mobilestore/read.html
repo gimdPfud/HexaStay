@@ -5,7 +5,7 @@
 
 
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,46 +35,90 @@
 
 <!-- 매장 정보 -->
 <div class="store-header text-center">
-    <h5 class="mb-2">피자집 역곡점</h5>
-    <small>⭐ 4.0</small>
-    <div class="mt-3">
-        <button class="btn btn-primary">지도?</button>
-    </div>
+    <h5 class="mb-2" th:text="${data.storeName}"></h5>
+    <small>리뷰넣어말어!!!</small>
+    <!-- 지도 영역: 지도 API가 여기에 들어갈 예정 -->
+    <div id="map" style="width:500px;height:400px;"></div>
 </div>
 
 <!-- 카테고리 -->
 <div class="category-bar d-flex border-bottom">
-    <span class="text-primary">카테1</span>
-    <span>카테2</span>
-    <span>카테3</span>
-    <span>카테4</span>
+    <span class="text-primary">메인</span>
+    <span>사이드</span>
+    <span>음료</span>
+    <span>추가</span>
 </div>
 
 <!-- 메뉴 리스트 -->
 <div class="container mt-3">
-    <div class="list-group">
-        <div class="list-group-item d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <img src="https://via.placeholder.com/60" class="me-3">
-                <div>
-                    <strong>피자 피자</strong><br>
-                    <small>38,000원</small>
-                </div>
-            </div>
-            <i class="fas fa-shopping-cart cart-icon"></i>
-        </div>
-        <div class="list-group-item d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <img src="https://via.placeholder.com/60" class="me-3">
-                <div>
-                    <strong>피자 스테이크</strong><br>
-                    <small>38,500원</small>
-                </div>
-            </div>
-            <i class="fas fa-shopping-cart cart-icon"></i>
-        </div>
-    </div>
+    <div class="list-group storemenulist"></div>
 </div>
+
+<script th:inline="javascript">
+    let storemenulist = document.querySelector(".storemenulist");
+    let storenum = [[${data.storeNum}]]
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("페이지 로드 됨")
+
+        fetch(`/order/store/menu/list/${storenum}`)
+            .then(response => {
+                if(!response.ok){
+                    if(response.status===404){
+                        return response.text()
+                            .then(errmsg=> {
+                                let error = new Error(errmsg)
+                                error.status = 404;
+                                throw error;
+                            })
+                    }
+                }
+                return response.json();
+            })
+            .then(data => {
+                showstoremenu(data)
+            })
+            .catch(error => {
+                if(error.status===404) {
+                    showemptymenu(error.message);
+                } else {
+                    console.log(error)
+                }
+            });
+    })
+
+
+
+    /*
+             * 메소드명 : showstoremenu
+             * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
+             * 리턴 값 :
+             * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
+             * */
+    function showstoremenu(list) {
+        let tagscontent = "";
+        for (let i=0; i<list.length;i++){
+            tagscontent += `<div class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <img src="https://via.placeholder.com/60" class="me-3">
+                <div>
+                    <strong>${list[i].storemenuName}</strong><br>
+                    <small>${list[i].storemenuPrice} 원</small>
+                </div>
+            </div>
+        </div>`
+        }
+        storemenulist.innerHTML=tagscontent;
+    }
+    /*
+             * 메소드명 : showemptymenu
+             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+             * 리턴 값 :
+             * 기  능 : 선언될 때 메시지를 로그로 출력함
+             * */
+    function showemptymenu(msg) {
+        console.log(msg)
+    }
+</script>
 
 </body>
 </html>

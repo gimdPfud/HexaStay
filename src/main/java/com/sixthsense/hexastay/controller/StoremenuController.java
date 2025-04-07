@@ -90,7 +90,7 @@ public class StoremenuController {
 
     @ResponseBody
     @GetMapping("/list/{id}")
-    public ResponseEntity listGet(@PathVariable Long id, Pageable pageable){
+    public ResponseEntity listGet(@PathVariable Long id){
         /*storeNum으로 Menu 가져오기...*/
         List<StoremenuDTO> menulist = storemenuService.list(id);
         if(menulist.isEmpty()){
@@ -102,7 +102,7 @@ public class StoremenuController {
 
     @ResponseBody
     @GetMapping("/list/deleted/{id}")
-    public ResponseEntity deletedlistGet(@PathVariable Long id, Pageable pageable){
+    public ResponseEntity deletedlistGet(@PathVariable Long id){
         /*storeNum으로 Menu 가져오기...*/
         List<StoremenuDTO> menulist = storemenuService.list(id,"deleted");
         if(menulist.isEmpty()){

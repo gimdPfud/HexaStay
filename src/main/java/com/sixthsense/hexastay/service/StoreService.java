@@ -31,6 +31,11 @@ public interface StoreService {
     public Page<StoreDTO> list(String status, Pageable pageable);
     public Page<StoreDTO> list(Pageable pageable);
 
+    /*todo 목록인데 리뷰가 있는 목록. 근데 리뷰별점을 넣을지말지 고민중...*/
+    public Page<StoreDTO> clientlist(Pageable pageable);
+
     /*삭제: 활성화->비활성화 바꾸기*/
     public void delete(Long pk);
+    public void restore(Long pk);
+
 }
