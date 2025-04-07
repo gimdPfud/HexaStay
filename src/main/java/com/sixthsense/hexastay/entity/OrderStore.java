@@ -11,6 +11,9 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -24,32 +27,15 @@ public class OrderStore extends BaseEntity {
     @Column(name = "orderStoreNum")
     private Long orderStoreNum;
 
-    //외부업체 판매수량
-    private Long orderStoreAmount;
-
-    //외부업체 상품가격
-    private Long orderStorePrice;
-
-    //외부업체 상품 총금액
-    private Long orderStoreTotalPrice;
-
     //외부업체 결재 (이체/카드/현금 사용여부)
     private String orderStorePay;
 
     //외부업체 상품 서비스를 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "storemenuNum")
-    private Storemenu storemenu;
-
-
-    //멤버 정보를 가져올 참조 테이블
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberNum")
+    @JoinColumn(name = "member_num")
     private Member member;
 
-
-
-
-
-
+    @OneToMany(mappedBy = "orderStore", cascade = CascadeType.ALL)
+    private List<Orderstoreitem> orderstoreitemList
+            = new ArrayList<>();
 }
