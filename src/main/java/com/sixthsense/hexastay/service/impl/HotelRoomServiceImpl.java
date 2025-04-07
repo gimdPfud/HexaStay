@@ -41,7 +41,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
 
     //******************************//
-    //void 방식의 메서드 체이닝을 이용한 등록 메서드
+    //1.void 방식의 메서드 체이닝을 이용한 등록 메서드
     @Override
     public void insertMemberHoterl(HotelRoomDTO hotelRoomDTO) {
 
@@ -60,10 +60,38 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     }
 
+    @Override
+    public HotelRoomDTO findRoomWithMembers(Long roomNum) {
+        return null;
+    }
+
+    //2.호텔룸 리스트 - MemberDTO를 가지고 있는 HotelRoomDTO 서비스 메서드
+    public Page<HotelRoomDTO> roomMemberPage(Pageable pageable) {
+
+        // HotelRoom Entity 페이지 처리
+        Page<HotelRoom> hotelRoomPage = hotelRoomRepository.findAll(pageable);
+
+        // HotelRoom DTO 변환 및 반환
+        Page<HotelRoomDTO> hotelRoomDTOPage = hotelRoomPage.map(hotelRoom -> {
+            HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
+
+            //MemberDTO를 다시 hotelroomDTO에 set 해주기 최종적으로 ho
+            if (hotelRoom.getMember() != null) {
+                hotelRoomDTO.setMember(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
+            }
+
+            return hotelRoomDTO; // null이 아니라 변환된 DTO 반환
+        });
+
+        return hotelRoomDTOPage;
+    }
+
+    //3.
 
 
 
-    // 호텔룸 등록 (회원 정보 포함)
+
+    // 호텔룸 등록 (회원 정보 포함) - Return 타입의 등록 메서드
     @Override
     public HotelRoomDTO insertHotelRoomMember(HotelRoomDTO hotelRoomDTO, Long memberNum) {
 
@@ -83,7 +111,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         return modelMapper.map(savedHotelRoom, HotelRoomDTO.class);
     }
 
-    // 호텔룸과 배정된 회원 정보 조회
+    // 호텔룸과 배정된 회원 정보 조회 - Long 타입을 받는 리스트 목록
     @Override
     public Optional<HotelRoomDTO> getHotelRoomWithMember(Long hotelRoomNum) {
         return hotelRoomRepository.findById(hotelRoomNum)

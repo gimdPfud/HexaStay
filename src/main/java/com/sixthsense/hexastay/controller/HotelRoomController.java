@@ -9,9 +9,10 @@ import com.sixthsense.hexastay.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Controller
 @Log4j2
-@RequestMapping("/hotelroom")
+
 @RequiredArgsConstructor
 public class HotelRoomController {
 
@@ -32,7 +33,7 @@ public class HotelRoomController {
 
     //리스트 페이지 보여주기
     //todo:localhost:8090/hotelroom/list
-    @GetMapping("/list")
+    @GetMapping("/hotelroom/list")
     public String listHotelRoome(){
 
         return "hotelroom/lista";
@@ -40,8 +41,8 @@ public class HotelRoomController {
 
 
     //todo:localhost:8090/hotelroom/insert
-    /*리스트 페이지 컨트롤러*/
-    @GetMapping("/insert")
+    /*리스트 페이지 컨트롤러 Member 리스트 페이지*/
+    @GetMapping("/hotelroom/insert")
     public String insertListHotelRoom(Model model,
                                       @PageableDefault(page=1)Pageable pageable
 
@@ -80,31 +81,66 @@ public class HotelRoomController {
     }
 
     //********호텔룸 등록 테스트 페이지*****//
-    // 호텔룸 등록
-    @GetMapping("/register")
-    public String showRegisterHotelRoomForm(Model model) {
+    //Test 호텔룸 등록 - GET
+    @GetMapping("/hotelroom/register")
+    public String showRegisterHotelRoomForm() {
 
-        model.addAttribute("hotelRoomDTO", new HotelRoomDTO());
 
-        return "hotelroom/register";
+
+        return "hotelroom/hotelroominsert";
     }
 
-    // 호텔룸 등록 처리
-    @PostMapping("/register")
+    //Test 호텔룸 등록 처리 -Post
+    @PostMapping("/hotelroom/register")
     public String registerHotelRoom(@ModelAttribute HotelRoomDTO hotelRoomDTO, @RequestParam Long memberNum) {
         hotelRoomService.insertHotelRoomMember(hotelRoomDTO, memberNum);
         return "redirect:/hotelroom/register";
     }
 
+    //2.List
+    //todo:http://localhost:8090/hotelroom/room
+    @GetMapping("hotelroom/room")
+    public String getRooms(Model model,
+                           @PageableDefault(page=1)Pageable pageable)
+    {
+
+        Page<HotelRoomDTO> roomPage
+                = hotelRoomService.hotelroomList(pageable);
+        model.addAttribute("roomPage", roomPage);
+        return "hotelroom/hotelroom"; // hotelroom.html
+    }
+
+    @GetMapping("hotelroom/rooma")
+    public String getRoomsa(Model model,
+                            @PageableDefault(page=1)Pageable pageable)
+    {
+
+        Page<HotelRoomDTO> roomPage
+                = hotelRoomService.hotelroomList(pageable);
+        model.addAttribute("roomPage", roomPage);
+        return "hotelroom/hotelrooma"; // hotelrooma.html
+    }
+
+
+    //3.호텔룸 클릭시 멤버 정보 가져오기
+    @GetMapping("/hotelroom/members/{roomNum}")
+    public String getRoomMembers(@PathVariable Long roomNum, Model model) {
+        HotelRoomDTO roomDTO = hotelRoomService.findRoomWithMembers(roomNum);
+        model.addAttribute("room", roomDTO);
+        return "hotelroom/memberinfo"; // member-info.html 렌더링
+    }
 
 
 
-    @GetMapping("/{hotelRoomNum}")
+
+
+
+    @GetMapping("/hotelroom/{hotelRoomNum}")
     public String showHotelRoomDetail(@PathVariable Long hotelRoomNum, Model model) {
         hotelRoomService.getHotelRoomWithMember(hotelRoomNum).ifPresent(hotelRoomDTO -> {
             model.addAttribute("hotelRoom", hotelRoomDTO);
         });
-        return "hotelRoomDetail";
+        return "hotelroom/hotelroomdetail";
     }
 
     @GetMapping("/members")
@@ -113,6 +149,9 @@ public class HotelRoomController {
         model.addAttribute("members", members);
         return "hotelRoomMembers"; // 해당 정보를 보여줄 HTML 페이지
     }
+
+
+
 
 
 

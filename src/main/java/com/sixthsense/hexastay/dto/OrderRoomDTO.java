@@ -15,14 +15,17 @@ public class OrderRoomDTO {
 
     private Long orderRoomNum;
 
+
     //숙박일수
     private Long orderRoomAmount;
 
     //호텔숙박가격
     private Long orderRoomPrice;
 
-    //호텔 숙박가격 총 매출액
-    private Long orderRoomTotalPrice;
+    //호텔 수박가격 총 매출액
+    private Long orderRoomTotalPrice;;
+
+
 
     //매출 발생 일자
     private LocalDateTime createDate;

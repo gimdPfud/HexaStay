@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.MemberDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,8 +14,9 @@ public interface MemberService {
     //리스트
     public Page<MemberDTO> memberList(Pageable page);
 
-    //읽기
+    //3-1.읽기
     public MemberDTO memberRead(Long memberNum);
+
 
     //수정
     public void memberModify(MemberDTO memberDTO);

@@ -7,13 +7,11 @@
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
-import com.sixthsense.hexastay.constant.Gender;
+
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -42,6 +40,11 @@ public class Member extends BaseEntity{
 
     @Column(name = "memberBirth")
     private String memberBirth;                        //생년월일
+
+
+    // 🔹 ManyToOne 추가 (여러 Member가 하나의 HotelRoom을 가짐)
+
+
 
 
 }
