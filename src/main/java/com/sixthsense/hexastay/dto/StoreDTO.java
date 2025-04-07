@@ -3,7 +3,7 @@
  * 기능 : Union DTO
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-04-07 필드 수정 및 추가 : 김예령
  * ***********************************************/
 
 package com.sixthsense.hexastay.dto;
@@ -50,4 +50,7 @@ public class StoreDTO {
 
     private String storeStatus; //활성화 상태
 
+    private String storeCategory;//가게 카테고리 (한식 중식 일식 아시안 양식 패푸 카페)
+
+    private Double storeRating; //가게 전체 리뷰 별점의 통계... 0.0 형태로 보여주고싶음.
 }

@@ -5,7 +5,7 @@
 
 
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,25 +35,16 @@
 <!-- 매장 리스트 -->
 <div class="container mt-3">
     <div class="list-group">
-        <a href="store.html" class="list-group-item list-group-item-action d-flex align-items-center">
+        <a th:each="data:${list}" th:href="@{'/order/store/read/'+${data.storeNum}}" class="list-group-item list-group-item-action d-flex align-items-center">
             <img src="https://via.placeholder.com/60" class="me-3">
             <div>
-                <strong>피자집 역곡점</strong><br>
-                <small>15m ⭐ 4.0</small>
-            </div>
-        </a>
-        <a href="store.html" class="list-group-item list-group-item-action d-flex align-items-center">
-            <img src="https://via.placeholder.com/60" class="me-3">
-            <div>
-                <strong>고기전문점</strong><br>
-                <small>25m ⭐ 4.7</small>
-            </div>
-        </a>
-        <a href="store.html" class="list-group-item list-group-item-action d-flex align-items-center">
-            <img src="https://via.placeholder.com/60" class="me-3">
-            <div>
-                <strong>밥집 부천점</strong><br>
-                <small>3m ⭐ 3.9</small>
+                <strong th:text="${data.storeName}"></strong><br>
+                <small>일단 : [[${data.storeAddress}]]</small><!--
+                todo
+                    현재 위치 <-> data의 위치 의 거리를 구해야함.
+                    관련 카카오맵 api...??
+                    주소(문자열)과 현재위치로 거리 빼오기. int로 가져오기?
+                -->
             </div>
         </a>
     </div>
