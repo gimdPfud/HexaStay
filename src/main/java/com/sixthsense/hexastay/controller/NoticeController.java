@@ -12,14 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-
 @Log4j2
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/notice")
 public class NoticeController {
     private final NoticeService noticeService;
-    private final ModelMapper modelMapper = new ModelMapper();
     // 공지사항 목록
     @GetMapping("/list") // (수정)
     public String list(
