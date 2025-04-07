@@ -2,12 +2,13 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface AdminService {
 
     // 어드민 등록
-    void insertAdmin(AdminDTO adminDTO);
+    void insertAdmin (AdminDTO adminDTO) throws IOException;
 
     // 어드민 목록
     List<AdminDTO> getAdminList();

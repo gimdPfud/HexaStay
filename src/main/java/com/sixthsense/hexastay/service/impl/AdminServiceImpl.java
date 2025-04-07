@@ -10,6 +10,10 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +41,23 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 회원 등록
-    public void insertAdmin(AdminDTO adminDTO) {
+    public void insertAdmin(AdminDTO adminDTO) throws IOException {
+        if (adminDTO.getAdminProfile() != null) {
+            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            adminDTO.setAdminProfileMeta("profile/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+                    adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
+
+        }
+
         Admin admin = modelMapper.map(adminDTO, Admin.class);
         adminRepository.save(admin);
     }

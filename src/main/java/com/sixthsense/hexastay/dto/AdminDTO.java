@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.dto;
 
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,5 +67,11 @@ public class AdminDTO {
 
     //어드민 직급
     private String adminPosition;
+
+    // 어드민 사진
+    private MultipartFile adminProfile;
+
+    // 어드민 사진정보
+    private String adminProfileMeta;
 
 }
