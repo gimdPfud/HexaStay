@@ -42,6 +42,5 @@ public class FacilityDTO {
 
     private String centerBrand;
 
-    private String branchName;
 
 }

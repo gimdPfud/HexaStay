@@ -20,7 +20,7 @@
             <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
         </div>
 
-        <form th:action="@{/center/update}" method="post">
+        <form th:action="@{/center/modify/{centerNum}(centerNum=${centerDTO.centerNum})}" method="post">
             <input type="hidden" name="centerNum" th:value="${centerDTO.centerNum}">
             <div class="mb-2">
                 <label class="form-label">브랜드명</label>
