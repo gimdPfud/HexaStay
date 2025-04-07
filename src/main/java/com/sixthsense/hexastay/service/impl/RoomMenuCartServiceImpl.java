@@ -49,29 +49,44 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         return roomMenuCartRepository.save(newCart);
     }
 
+    // 장바구니 총 가격 계산
+    private void updateCartTotalPrice(RoomMenuCart roomMenuCart) {
+        // 모든 아이템의 가격을 합산하여 총 가격 계산
+        int totalPrice = roomMenuCartItemRepository.findAllByRoomMenuCart(roomMenuCart).stream()
+                .mapToInt(RoomMenuCartItem::getRoomMenuCartItemPrice)
+                .sum();
+
+        // 장바구니의 총 가격 업데이트
+        roomMenuCart.setRoomMenuTotalPrice(totalPrice);
+
+        // 변경된 장바구니 객체 저장
+        roomMenuCartRepository.save(roomMenuCart);
+    }
+
 
     @Override
     public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount) {
         log.info("장바구니 추가");
 
+        // 장바구니가 존재하는지 확인, 없으면 새로 생성
         RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
                 .orElseGet(() -> createNewCartForMember(memberNum)); // 장바구니가 없으면 새로 생성
 
-        // 상품 조회
+        // 아이템 조회
         RoomMenu roomMenu = roomMenuRepository.findById(roomMenuNum)
-                .orElseThrow(() -> new RuntimeException("넘버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("아이템을 찾을 수 없습니다."));
 
-        // 기존 항목이 있는지 확인
+        // 장바구니에 이미 해당 아이템이 존재하는지 확인
         Optional<RoomMenuCartItem> existingItemOpt = roomMenuCartItemRepository.findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu);
 
         RoomMenuCartItem roomMenuCartItem;
         if (existingItemOpt.isPresent()) {
-            // 기존 항목이 있으면 수량만 추가하고 가격 갱신
+            // 기존 항목이 있으면 수량 추가 및 가격 갱신
             roomMenuCartItem = existingItemOpt.get();
             roomMenuCartItem.setRoomMenuCartItemAmount(roomMenuCartItem.getRoomMenuCartItemAmount() + amount);
             roomMenuCartItem.setRoomMenuCartItemPrice(roomMenuCartItem.getRoomMenuCartItemAmount() * roomMenu.getRoomMenuPrice());
         } else {
-            // 새로운 항목이면 새로 생성
+            // 새로운 항목이라면 새로 추가
             roomMenuCartItem = new RoomMenuCartItem();
             roomMenuCartItem.setRoomMenuCart(roomMenuCart);
             roomMenuCartItem.setRoomMenu(roomMenu);
@@ -85,24 +100,9 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         // 장바구니 총 가격 업데이트
         updateCartTotalPrice(roomMenuCart);
 
-        // 장바구니 DTO로 반환
+        // 장바구니 DTO 반환
         return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
     }
-
-
-    // 장바구니 총 가격 계산
-    private void updateCartTotalPrice(RoomMenuCart roomMenuCart) {
-        int totalPrice = roomMenuCartItemRepository.findAllByRoomMenuCart(roomMenuCart).stream()
-                .mapToInt(RoomMenuCartItem::getRoomMenuCartItemPrice)
-                .sum();
-
-        roomMenuCart.setRoomMenuTotalPrice(totalPrice);
-        roomMenuCartRepository.save(roomMenuCart);
-    }
-
-
-
-
 
 
 
@@ -154,4 +154,12 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
         return roomMenuDTOList;
     }
-}
+
+    @Override
+        public RoomMenuCartDTO getCartByMember(Long memberNum) {
+            RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
+                    .orElseThrow(() -> new RuntimeException("장바구니를 찾을 수 없습니다."));
+
+            return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
+        }
+    }

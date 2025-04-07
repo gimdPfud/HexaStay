@@ -1,114 +1,210 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>맛있는 피자 - 상세 페이지</title>
+    <title>아이템 상세보기</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
-        .container { width: 100%; max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 20px; border-bottom: 2px solid #ddd; }
-        .menu-icon, .cart-icon { font-size: 24px; cursor: pointer; }
-        .food-image { width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px; }
-        .food-info { padding: 10px; }
-        .food-info h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .food-info p { font-size: 16px; color: #555; margin: 5px 0; }
-        .price { font-weight: bold; font-size: 20px; margin: 10px 0; }
-        .quantity-control { display: flex; align-items: center; margin-top: 20px; }
-        .quantity-btn { background-color: #ddd; border: none; padding: 5px 10px; cursor: pointer; }
-        .quantity-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-        .quantity { margin: 0 10px; font-size: 18px; }
-        .add-to-cart-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 18px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
-        .add-to-cart-btn:hover { background-color: #388E3C; }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .item-details {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .item-details h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .item-details p {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff5733;
+            margin-bottom: 15px;
+        }
+
+        /* 이미지 스타일 */
+        .item-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option-section {
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .option-section select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quantity-section button {
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .quantity-section input {
+            width: 50px;
+            text-align: center;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- 헤더: 제목과 뒤로가기 버튼 -->
     <div class="header">
-        <div class="menu-icon" onclick="goBack()">←</div>
-        <div>맛있는 피자</div>
-        <div class="cart-icon" onclick="goToCart()">🛒</div>
+        <div onclick="goBack()">🔙 뒤로가기</div>
+        <div>아이템 상세보기</div>
+        <div></div>
     </div>
 
-    <img src="https://via.placeholder.com/600x400" alt="맛있는 피자 이미지" class="food-image">
+    <!-- 아이템 상세 정보 -->
+    <div class="item-details">
+        <!-- 대표 이미지 -->
+        <img th:src="@{/image/김치찌개.png}" class="card-img-top" alt="상품 이미지">
 
-    <div class="food-info">
-        <h1>맛있는 피자</h1>
-        <p>이 피자는 신선한 토마토와 모짜렐라 치즈, 그리고 바삭한 도우로 만든 최고의 피자입니다. 맛을 보고 나면 계속 먹고 싶어질 거예요!</p>
-        <p class="price">30,000원</p>
+        <h2 id="item-name">아이템 이름</h2>
+        <p id="item-description">아이템 상세 설명</p>
+        <p class="price" id="item-price">0원</p>
 
-        <!-- 수량 조정 -->
-        <div class="quantity-control">
-            <button class="quantity-btn" onclick="updateQuantity(this, -1)">-</button>
-            <span class="quantity" id="quantity">1</span>
-            <button class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+        <!-- 옵션 섹션 -->
+        <div class="option-section">
+            <label for="item-option">옵션 선택</label>
+            <select id="item-option">
+                <option value="option1">옵션 1</option>
+                <option value="option2">옵션 2</option>
+                <option value="option3">옵션 3</option>
+            </select>
         </div>
 
-        <!-- 장바구니 추가 버튼 -->
-        <button class="add-to-cart-btn" onclick="addToCart()">장바구니에 추가</button>
+        <!-- 수량 섹션 -->
+        <div class="quantity-section">
+            <button onclick="changeQuantity(-1)">-</button>
+            <input type="number" id="quantity" value="1" min="1" onchange="updatePrice()">
+            <button onclick="changeQuantity(1)">+</button>
+        </div>
+
+        <!-- 장바구니 담기 버튼 -->
+        <button class="add-to-cart-btn" onclick="addToCart()">장바구니 담기</button>
     </div>
 </div>
 
 <script>
-    /****************************
-     * 수량 조정 기능
-     ****************************/
-    function updateQuantity(button, change) {
-        const quantityElement = document.getElementById('quantity');
-        let currentQuantity = parseInt(quantityElement.innerText);
+    // 아이템 정보를 미리 설정해 놓고, 이 값을 통해 페이지를 동적으로 업데이트 할 수 있습니다.
+    const item = {
+        name: '김치찌개',
+        description: '매운 김치와 돼지고기가 들어간 국물 요리',
+        price: 8000,
+        options: ['옵션 1', '옵션 2', '옵션 3'],
+        imageUrl: 'https://via.placeholder.com/400x250?text=Kimchi+Stew'  // 아이템 이미지 URL
+    };
 
-        // 수량을 변경
-        currentQuantity += change;
+    // 페이지 로딩 시 아이템 정보 업데이트
+    document.getElementById('item-name').textContent = item.name;
+    document.getElementById('item-description').textContent = item.description;
+    document.getElementById('item-price').textContent = `${item.price}원`;
 
-        // 수량이 1보다 작아지지 않도록 처리
+    // 아이템 이미지 업데이트
+    const itemImage = document.querySelector('.item-image');
+    itemImage.src = item.imageUrl;
+
+    const optionSelect = document.getElementById('item-option');
+    item.options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        optionSelect.appendChild(optionElement);
+    });
+
+    // 수량 변경 함수
+    function changeQuantity(amount) {
+        const quantityInput = document.getElementById('quantity');
+        let currentQuantity = parseInt(quantityInput.value);
+        currentQuantity += amount;
         if (currentQuantity < 1) {
             currentQuantity = 1;
         }
-
-        // 수량을 UI에 반영
-        quantityElement.innerText = currentQuantity;
+        quantityInput.value = currentQuantity;
+        updatePrice();  // 수량 변경 후 가격 업데이트
     }
 
-    /****************************
-     * 장바구니에 추가 기능
-     ****************************/
+    // 가격 업데이트 함수
+    function updatePrice() {
+        const quantity = document.getElementById('quantity').value;
+        const totalPrice = item.price * quantity;
+        document.getElementById('item-price').textContent = `${totalPrice}원`;
+    }
+
+    // 장바구니에 아이템 추가 함수
     function addToCart() {
-        const quantity = parseInt(document.getElementById('quantity').innerText);
-        const roomMenuNum = 1; // 피자의 ID (예시로 1번으로 설정)
-        const roomMenuPrice = 30000; // 가격
+        const quantity = document.getElementById('quantity').value;
+        const selectedOption = document.getElementById('item-option').value;
 
-        // 장바구니에 추가 API 호출
-        fetch(`/api/roommenu/orderpage?memberNum=1&roomMenuNum=${roomMenuNum}&amount=${quantity}&roomMenuPrice=${roomMenuPrice}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    alert('장바구니에 상품이 추가되었습니다!');
-                } else {
-                    alert('장바구니 추가에 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('Error adding to cart:', error);
-                alert('장바구니 추가 중 오류가 발생했습니다.');
-            });
+        // 장바구니에 아이템을 추가하는 로직을 작성합니다.
+        alert(`${item.name}을(를) ${quantity}개, ${selectedOption} 옵션으로 장바구니에 추가했습니다!`);
+
+        // 실제 서버와 연동하려면 여기서 API 요청을 보내거나, 로컬 저장소에 데이터를 저장할 수 있습니다.
     }
 
-    /****************************
-     * 돌아가기 및 장바구니 이동
-     ****************************/
+    // 뒤로가기 함수
     function goBack() {
-        window.history.back(); // 이전 페이지로 돌아가기
-    }
-
-    function goToCart() {
-        window.location.href = '/cart'; // 장바구니 페이지로 이동
+        window.history.back();  // 페이지를 뒤로 돌아가게 합니다.
     }
 </script>
+
 </body>
 </html>

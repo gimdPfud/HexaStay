@@ -19,8 +19,6 @@ public interface RoomMenuService {
     // 수정하기
     public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO);
 
-    public Page<RoomMenu> getMenuCategori(String categori, Pageable pageable);
-
-
+    // 삭제하기
     public void delete(Long num);
 }

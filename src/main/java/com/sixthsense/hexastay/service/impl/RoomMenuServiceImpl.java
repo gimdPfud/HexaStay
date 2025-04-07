@@ -156,22 +156,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         }
     }
 
-    @Override
-    public Page<RoomMenu> getMenuCategori(String categori, Pageable pageable) {
-
-            // 예시로 카테고리에 맞는 음식 목록을 필터링
-            if ("koreanfood".equals(categori)) {
-                return roomMenuRepository.findByRoomMenuCategory("koreanfood", pageable);
-            } else if ("chinafood".equals(categori)) {
-                return roomMenuRepository.findByRoomMenuCategory("chinafood", pageable);
-            } else if ("appetizer".equals(categori)) {
-                return roomMenuRepository.findByRoomMenuCategory("appetizer", pageable);
-            } else if ("usfood".equals(categori)) {
-                return roomMenuRepository.findByRoomMenuCategory("usfood", pageable);
-            } else {
-                return roomMenuRepository.findAll(pageable);
-            }
-        }
 
     /**************************************************
      * 룸서비스 메뉴 삭제

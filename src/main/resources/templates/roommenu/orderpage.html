@@ -163,8 +163,8 @@
     <!-- 헤더: 메뉴와 장바구니 아이콘 -->
     <div class="header">
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
-        <div>주문</div>
-        <div class="cart-icon" onclick="openCartSidebar()">🛒</div>
+        <div>목록페이지</div>
+        <div class="cart-icon" onclick="submitPostRequest()">🛒</div>
     </div>
 
     <!-- 검색창 -->
@@ -209,8 +209,8 @@
                 <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 -->
                 <p>평점</p> <!-- 평점 표시 -->
             </div>
-            <!-- "추가" 버튼 -->
-            <button class="add-btn">추가</button>
+            <!-- roomMenuNum을 JavaScript 함수에 전달  추가버튼-->
+            <button class="add-btn" type="button" th:onclick="'addToCart(' + ${roomMenuDTO.roomMenuNum} + '); openCartSidebar()'">추가</button>
         </li>
     </ul>
 </div>
@@ -242,16 +242,87 @@
         searchContainer.style.display = searchContainer.style.display === 'none' || searchContainer.style.display === '' ? 'block' : 'none';
     }
 
-    /* 장바구니 사이드바 열기 */
+
     function openCartSidebar() {
         const sidebar = document.getElementById('cart-sidebar');
         sidebar.classList.add('active');
+        updateCartSidebar();  // 장바구니 사이드바 업데이트
     }
 
-    /* 장바구니 사이드바 닫기 */
+    // 장바구니 사이드바 닫기
     function closeCartSidebar() {
         const sidebar = document.getElementById('cart-sidebar');
         sidebar.classList.remove('active');
+    }
+
+    // 장바구니에 상품 추가
+    function addToCart(roomMenuNum) {
+        const memberNum = 1; // 예시로 회원 번호를 1로 설정, 실제로는 로그인한 회원 정보를 사용해야 합니다.
+        const amount = 1; // 기본 수량 1로 설정, 나중에 UI에서 수량을 조정할 수 있도록 할 수도 있습니다.
+
+        // 장바구니에 아이템을 추가하는 API 요청
+        fetch(`/roommenu/cart?memberNum=${memberNum}&roomMenuNum=${roomMenuNum}&amount=${amount}`, {
+            method: 'POST',
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 성공적으로 추가된 경우
+                if (data) {
+                    alert('장바구니에 추가되었습니다!');
+                    updateCartSidebar();  // 장바구니 사이드바 업데이트
+                }
+            })
+            .catch(error => {
+                console.error('장바구니 추가 오류:', error);
+                alert('장바구니 추가에 실패했습니다.');
+            });
+    }
+
+    // 장바구니 사이드바 업데이트
+    function updateCartSidebar() {
+        fetch('/roommenu/cart/1')  // 회원 번호 1을 사용하여 장바구니 정보를 가져옵니다.
+            .then(response => response.json())
+            .then(data => {
+                const cartContent = document.querySelector('.cart-content');
+                cartContent.innerHTML = '';
+
+                if (data && data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const cartItem = document.createElement('p');
+                        cartItem.textContent = `${item.name} - ${item.amount}개`;
+                        cartContent.appendChild(cartItem);
+                    });
+                } else {
+                    cartContent.innerHTML = '<p>장바구니가 비어 있습니다.</p>';
+                }
+            });
+    }
+
+    /* 장바구니 아이콘 누르면 읽기 페이지로 이동 */
+
+    function submitPostRequest() {
+        // POST 요청을 보내기 위한 데이터
+        const data = {
+            key: 'value'  // 예시로 보내고 싶은 데이터
+        };
+
+        // fetch로 POST 요청 보내기
+        fetch('http://localhost:8090/roommenu/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'  // JSON 형식으로 보내기
+            },
+            body: JSON.stringify(data)  // 데이터를 JSON 형식으로 변환하여 보냄
+        })
+            .then(response => response.json())  // 서버의 응답을 처리
+            .then(data => {
+                console.log('Success:', data);
+                // 성공 후 사용자에게 처리 결과를 알려줄 수 있음
+                window.location.href = 'http://localhost:8090/roommenu/cart'; // 응답을 받은 후 페이지 이동
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 </script>
 
