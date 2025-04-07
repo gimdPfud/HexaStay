@@ -26,6 +26,6 @@ public class NoticeDTO {
 
     private Integer noticeView; // 조회수
 
-    private Long memberNum; // 회원 번호
+    private Long memberNum; // 관리자
 
 }
