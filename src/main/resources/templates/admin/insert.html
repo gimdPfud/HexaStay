@@ -118,15 +118,14 @@
                     <option>매장 직원</option>
                 </select>
 
-                <input hidden name="adminRank" id="adminRank">
+                <input hidden name="adminRole" id="adminRole">
 
             </div>
 
 
-
             <div class="mb-3">
                 <label class="form-label">직책</label>
-                <input type="text"  name="adminPosition" class="form-control">
+                <input type="text" name="adminPosition" class="form-control">
             </div>
 
 
@@ -254,13 +253,13 @@
         function submitForm() {
             if (adminChoice.value === "본사") {
                 document.getElementById("adminBrand").value = adminCenter.value;
-                document.getElementById("adminRank").value = adminCenterRank.value;
+                document.getElementById("adminRole").value = adminCenterRank.value;
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
                 document.getElementById("adminBrand").value = adminBranchFacility.value;
-                document.getElementById("adminRank").value = adminBranchFacilityRank.value;
+                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
             } else if (adminChoice.value === "스토어") {
                 document.getElementById("adminBrand").value = adminStore.value;
-                document.getElementById("adminRank").value = adminStoreRank.value;
+                document.getElementById("adminRole").value = adminStoreRank.value;
             }
 
             document.getElementById('adminResidentNum').value =
@@ -272,6 +271,7 @@
                 document.getElementById('adminPhonePartThree').value
 
 
+            document.getElementById('')
 
         }
 

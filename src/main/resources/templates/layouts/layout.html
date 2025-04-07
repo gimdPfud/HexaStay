@@ -87,6 +87,29 @@
         localStorage.setItem('sidebarCollapsed', isCollapsed);
     });
 
+    // 사진 확대
+        document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll("img").forEach((img) => {
+            img.addEventListener('click', () => {
+                const image = new Image();
+                image.src = img.src;
+
+                image.onload = () => {
+                    const width = image.naturalWidth;
+                    const height = image.naturalHeight;
+
+                    const left = (window.screen.width - width) / 2;
+                    const top = (window.screen.height - height) / 2;
+
+                    window.open(
+                        img.src,
+                        '_blank',
+                        `width=${width},height=${height},left=${left},top=${top}`
+                    );
+                };
+            });
+        });
+    });
 </script>
 
 
