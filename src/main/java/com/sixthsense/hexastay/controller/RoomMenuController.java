@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.controller;
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,6 +33,7 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuController {
 
     private final RoomMenuService roomMenuService;
+    private final RoomMenuCartService roomMenuCartService;
 
     /**************************************************
      * 메인 페이지
@@ -64,9 +66,25 @@ public class RoomMenuController {
 
     @GetMapping("/roommenu/cart")
     public String cart() {
-        log.info("cartA");
+        log.info("roommenuCart Get 방식 진입");
 
         return "roommenu/cart";
+    }
+
+    // todo : 오더페이지 상세 만들어야함
+    // fixme : 따로 컨트롤러 만들어서 해야할것같음.
+    // 오더페이지 상세페이지
+    @GetMapping("/roomMenu/read")
+    public String roomMenuReadA(Long num, Model model) {
+        log.info("상세보기 컨트롤러 진입" + num);
+
+        RoomMenuDTO roomMenuDTO = roomMenuService.read(num);
+
+        model.addAttribute("roomMenuDTO", roomMenuDTO);
+        log.info("모델로 받은 dto" + roomMenuDTO);
+
+        return "roommenu/read";
+
     }
 
     /**************************************************
@@ -97,8 +115,10 @@ public class RoomMenuController {
     }
 
     /**************************************************
-     * 룸서비스 메뉴 리스트 페이지
-     * 기능 : 룸서비스 메뉴 리스트를 페이지네이션 처리하여 조회
+     * 룸서비스 메뉴 리스트 조회 페이지
+     * 기능: 룸서비스 메뉴 목록을 검색 조건(type, keyword, category)과
+     *       페이지네이션을 적용하여 조회하는 기능을 구현
+     *       수정일 : 2025-04-07
      **************************************************/
 
     @GetMapping("/roommenu/list")
@@ -220,6 +240,57 @@ public class RoomMenuController {
     public String orderpage(){
 
         return "roommenu/testorder";
+    }
+
+    /**************************************************
+     * 룸서비스 리드 페이지
+     * 기능 : 리드 페이지로 이동
+     **************************************************/
+
+    @GetMapping("/roommenu/orderread")
+    public String orderread(){
+
+        return "roommenu/orderread";
+    }
+
+    /**************************************************
+     * 주문 페이지 조회 및 필터링
+     * 기능: 사용자로부터 전달받은 검색 조건(type, keyword, category)을 기준으로
+     *       룸서비스 메뉴 목록을 조회하고, 페이지네이션을 적용하여 화면에 표시
+     *       등록일 : 2025-04-07
+     *       수정일 : 2025-04-07
+     **************************************************/
+
+    @GetMapping("/roommenu/orderpage")
+    public String orderList(@PageableDefault(page = 0) Pageable pageable,
+                            @RequestParam(value = "type", defaultValue = "") String type,
+                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                            @RequestParam(value = "category", defaultValue = "") String category,
+                            Model model) {
+        log.info("주문페이지 컨트롤러 리스트 진입");
+        log.info("type: {}", type);
+        log.info("keyword: {}", keyword);
+        log.info("category: {}", category);
+
+        // 서비스 연동: 전달된 파라미터로 메뉴 리스트 필터링
+        Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category);
+
+        // 페이지 정보 가공
+        Map<String, Integer> pageInfo = Pagination(roomMenuList);
+
+        // 로깅: 메뉴 이름 출력
+        for (RoomMenuDTO roomMenuDTO : roomMenuList) {
+            log.info("이것은 룸카드컨트롤러" + roomMenuDTO.getRoomMenuName());
+        }
+
+        // 값 전달 (Model)
+        model.addAttribute("list", roomMenuList);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);  // 카테고리 필터링 값 전달
+        model.addAllAttributes(pageInfo);
+
+        return "/roommenu/orderpage";  // orderpage를 반환하여 뷰를 렌더링
     }
 
 

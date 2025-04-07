@@ -1,75 +1,151 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장바구니</title>
+    <title>모바일 주문 페이지</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f9f9f9; }
-        .container { max-width: 400px; margin: auto; background: white; padding: 10px; border-radius: 10px; }
-        .cart-item { display: flex; align-items: center; border-bottom: 1px solid #ddd; padding: 10px; }
-        .cart-item img { width: 50px; height: 50px; margin-right: 10px; border-radius: 5px; }
-        .item-info { flex-grow: 1; }
-        .quantity { display: flex; align-items: center; }
-        .quantity button { padding: 5px; margin: 0 5px; }
-        .total { font-weight: bold; margin-top: 10px; }
-        .order-btn { display: block; width: 100%; padding: 10px; background: green; color: white; text-align: center; margin-top: 10px; border-radius: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .food-list { list-style: none; padding: 10px; }
+        .food-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            position: relative;
+        }
+        .food-info { flex-grow: 1; }
+        .food-info p { margin: 2px 0; }
+        .price { font-weight: bold; }
+
+        .add-btn {
+            position: absolute;
+            right: 10px;
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        #cart-sidebar.active {
+            right: 0;
+        }
+
+        #cart-sidebar .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #cart-sidebar .cart-content {
+            margin-top: 60px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>장바구니</h2>
-    <div id="cart-items"></div>
-    <div class="total">총 결제금액: <span id="total-price">0</span>원</div>
-    <button class="order-btn" onclick="placeOrder()">주문하기</button>
+    <!-- 헤더: 메뉴와 장바구니 아이콘 -->
+    <div class="header">
+        <div>주문</div>
+        <div class="cart-icon" onclick="openCartSidebar()">🛒</div>
+    </div>
+
+    <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
+    <ul class="food-list" id="food-list">
+        <!-- 메뉴 항목은 JavaScript를 통해 추가됨 -->
+    </ul>
+</div>
+
+<!-- 장바구니 사이드바 -->
+<div id="cart-sidebar">
+    <div class="close-btn" onclick="closeCartSidebar()">✖</div>
+    <div class="cart-content">
+        <h3>장바구니</h3>
+        <p>장바구니가 비어 있습니다.</p>
+    </div>
 </div>
 
 <script>
-    let cart = [
-        { id: 1, name: "호텔 피자", price: 38000, quantity: 1, image: "pizza.jpg", discount: 3600 }
+    // 장바구니 사이드바 열기
+    function openCartSidebar() {
+        const sidebar = document.getElementById('cart-sidebar');
+        sidebar.classList.add('active');
+        updateCartSidebar();  // 장바구니 사이드바 업데이트
+    }
+
+    // 장바구니 사이드바 닫기
+    function closeCartSidebar() {
+        const sidebar = document.getElementById('cart-sidebar');
+        sidebar.classList.remove('active');
+    }
+
+    // 메뉴 데이터 샘플
+    const menuItems = [
+        { id: 1, name: '김치찌개', price: 8000, category: '한식' },
+        { id: 2, name: '호떡', price: 3000, category: '디저트' },
+        { id: 3, name: '짜장면', price: 6000, category: '중식' },
     ];
 
-    function updateCart() {
-        const cartItemsContainer = document.getElementById("cart-items");
-        const totalPriceElement = document.getElementById("total-price");
-        cartItemsContainer.innerHTML = "";
-        let total = 0;
+    // 메뉴 목록을 페이지에 추가하는 함수
+    function loadMenuItems() {
+        const foodList = document.getElementById('food-list');
+        menuItems.forEach(item => {
+            const li = document.createElement('li');
+            li.classList.add('food-item');
 
-        cart.forEach(item => {
-            let finalPrice = (item.price - item.discount) * item.quantity;
-            total += finalPrice;
+            li.innerHTML = `
+                <div class="food-info">
+                    <p>${item.name}</p>
+                    <p class="price">${item.price}원</p>
+                    <p>${item.category}</p>
+                </div>
+                <button class="add-btn" onclick="addToCart(${item.id})">추가</button>
+            `;
 
-            cartItemsContainer.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="item-info">
-                            <p>${item.name}</p>
-                            <p>${item.price}원 - 할인 ${item.discount}원</p>
-                            <div class="quantity">
-                                <button onclick="changeQuantity(${item.id}, -1)">-</button>
-                                <span>${item.quantity}</span>
-                                <button onclick="changeQuantity(${item.id}, 1)">+</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            foodList.appendChild(li);
         });
-        totalPriceElement.textContent = total;
     }
 
-    function changeQuantity(id, delta) {
-        const item = cart.find(i => i.id === id);
-        if (item) {
-            item.quantity = Math.max(1, item.quantity + delta);
-            updateCart();
-        }
-    }
-
-    function placeOrder() {
-        alert("주문이 완료되었습니다!");
-    }
-
-    updateCart();
+    // 페이지 로딩 시 메뉴 아이템을 불러옵니다
+    loadMenuItems();
 </script>
+
 </body>
 </html>

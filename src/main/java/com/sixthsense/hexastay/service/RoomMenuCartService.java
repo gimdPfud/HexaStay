@@ -14,4 +14,6 @@ public interface RoomMenuCartService {
 
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
 
+    public RoomMenuCartDTO getCartByMember(Long memberNum);
+
 }
