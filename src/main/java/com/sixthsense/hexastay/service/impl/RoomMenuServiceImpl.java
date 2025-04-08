@@ -13,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -34,21 +38,62 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      **************************************************/
 
     @Override
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) {
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException {
         log.info("룸서비스 아이템 등록 서비스 진입" + roomMenuDTO);
 
         // 모델맵퍼로 dto 변환
-        RoomMenu roomMenu =modelMapper.map(roomMenuDTO, RoomMenu.class);
+        RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
 
         roomMenu = roomMenuRepository.save(roomMenu);
+
+        // 이미지 파일 처리
+        if (roomMenuDTO.getRoomMenuImage() != null && !roomMenuDTO.getRoomMenuImage().isEmpty()) {
+            // 1. 파일 이름 생성
+            String fileOriginalName = roomMenuDTO.getRoomMenuImage().getOriginalFilename();
+
+            if (fileOriginalName != null && fileOriginalName.lastIndexOf(".") > 0) {
+                // 2. 상호명_저장된pk
+                String fileFirstName = roomMenuDTO.getRoomMenuName() + "_" + roomMenu.getRoomMenuNum();
+                // 3. 확장자 추출
+                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+                // 4. 파일 이름
+                String fileName = fileFirstName + fileSubName;
+
+                // 파일 메타 정보 설정
+                roomMenuDTO.setRoomMenuImageMeta("/roommenu/" + fileName);
+
+                // 5. 저장할 경로 설정
+                Path uploadPath = Paths.get("path/to/store", "roommenu", fileName);  // 시스템에 맞는 경로로 변경
+                Path createPath = Paths.get("path/to/store", "roommenu");
+
+                // 저장할 디렉토리가 없으면 생성
+                if (!Files.exists(createPath)) {
+                    Files.createDirectories(createPath);
+                }
+
+                // 파일을 저장
+                try {
+                    roomMenuDTO.getRoomMenuImage().transferTo(uploadPath.toFile());
+                } catch (IOException e) {
+                    log.error("파일 저장 중 오류 발생", e);
+                    throw new IOException("파일 저장 중 오류가 발생했습니다.", e);
+                }
+            }
+        }
+
+        // 파일 메타데이터 저장
+        roomMenu.setRoomMenuImageMeta(roomMenuDTO.getRoomMenuImageMeta());
+
+        // 엔티티 업데이트 (두 번째 save 불필요, 첫 번째 저장으로 충분)
+//        roomMenu = roomMenuRepository.save(roomMenu);
 
         // 다시 DTO로 변환
         roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
 
         log.info("디티오로 변환된 등록 값" + roomMenuDTO);
         return roomMenuDTO;
-
     }
+
 
     /**************************************************
      * 룸서비스 메뉴 리스트 조회와 검색

@@ -130,31 +130,43 @@
             font-weight: bold;
         }
 
-        /* 장바구니 사이드바 */
-        #cart-sidebar {
-            position: fixed;
-            top: 0;
-            right: -300px; /* 사이드바 기본 위치 */
-            width: 300px;
-            height: 100%;
-            background-color: white;
-            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-            transition: right 0.3s ease; /* 애니메이션 효과 */
-            padding: 20px;
-            z-index: 1000;
+        /* 카테고리 텍스트를 꾸미는 스타일 */
+        .category-label {
+            display: inline-block;
+            background-color: #f1fdf1; /* 배경 색상 */
+            color: #333; /* 텍스트 색상 */
+            font-weight: bold; /* 텍스트 굵게 */
+            padding: 5px 10px; /* 여백 */
+            border-radius: 12px; /* 둥근 모서리 */
+            border: 1px solid #ddd; /* 테두리 */
+            font-size: 16px; /* 텍스트 크기 */
+            margin: 10px ; /* 위 아래 여백 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            transition: background-color 0.3s ease; /* 호버 시 색상 변경 효과 */
         }
-        #cart-sidebar.active {
-            right: 0; /* 사이드바 활성화 시 화면에 보이도록 설정 */
+
+        .category-label:hover {
+            background-color: #ffeb3b; /* 호버 시 배경 색상 */
+            color: #000; /* 호버 시 텍스트 색상 */
+            border-color: #fdd835; /* 호버 시 테두리 색상 */
         }
-        #cart-sidebar .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
+
+        .food-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
-        #cart-sidebar .cart-content {
-            margin-top: 60px;
+
+        /* 메뉴 이미지 스타일 */
+        .food-image {
+            width: 100px; /* 이미지 크기 설정 */
+            height: 100px;
+            object-fit: cover;
+            margin-right: 30px; /* 오른쪽 여백 */
+        }
+
+        .food-info {
+            flex-grow: 1;
         }
     </style>
 </head>
@@ -202,43 +214,27 @@
     <ul class="food-list">
         <li th:each="roomMenuDTO : ${list}" class="food-item">
             <!-- 메뉴 이미지 -->
-            <p>메뉴이미지</p>
+            <p class="food-image">메뉴이미지</p>
             <div class="food-info">
+                <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p> <!-- 카테고리 -->
                 <p>
                     <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                       th:text="${roomMenuDTO.roomMenuName}">
+                       th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
                     </a>
                 </p>
-                <p th:text="${roomMenuDTO.roomMenuName}"></p> <!-- 메뉴 이름 -->
                 <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
-                <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 -->
-                <p>평점</p> <!-- 평점 표시 -->
+                <p class="rating">
+                    <!-- 더미 평점 -->
+                    <span class="stars">
+                    &#9733;&#9733;&#9733;&#9733;&#9734; <!-- 4개 채워진 별, 1개 빈 별 -->
+                </span>
+                    <span class="rating-text">4.0</span> <!-- 평점 텍스트 -->
+                </p>
             </div>
-            <!-- roomMenuNum을 JavaScript 함수에 전달  추가버튼-->
-            <button class="add-btn" type="button" th:onclick="'addToCart(' + ${roomMenuDTO.roomMenuNum} + '); openCartSidebar()'">추가</button>
         </li>
     </ul>
 </div>
 
-<!-- 장바구니 사이드바 -->
-<div id="cart-sidebar">
-    <div class="close-btn" onclick="closeCartSidebar()">✖</div>
-    <div class="cart-content">
-        <h3>장바구니</h3>
-        <p>장바구니가 비어 있습니다.</p>
-    </div>
-</div>
-
-<!-- 페이지 네비게이션 -->
-<nav>
-    <ul class="pagination justify-content-center">
-        <li class="page-item"><a class="page-link" href="#">이전</a></li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">다음</a></li>
-    </ul>
-</nav>
 
 <script>
     const email = /*[[${email}]]*/ '';  // Thymeleaf 변수를 JavaScript 변수로 전달

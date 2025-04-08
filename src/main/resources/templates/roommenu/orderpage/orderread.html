@@ -101,6 +101,52 @@
         .add-to-cart-btn:hover {
             background-color: #fdd835;
         }
+
+        <style>
+             /* 주문수량 섹션 꾸미기 */
+         .quantity-input {
+             display: flex;
+             align-items: center;
+             border-radius: 5px;
+             border: 1px solid #ddd;
+             padding: 5px;
+             background-color: #f9f9f9;
+         }
+
+        .quantity-input button {
+            background-color: #ffeb3b;
+            border: none;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .quantity-input button:hover {
+            background-color: #fdd835;
+        }
+
+        .quantity-input input {
+            width: 60px;
+            height: 35px;
+            text-align: center;
+            border: none;
+            font-size: 16px;
+            margin: 0 10px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        .quantity-input input:focus {
+            outline: none;
+            border: 1px solid #ffeb3b;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
     </style>
 </head>
 <body>
@@ -131,11 +177,18 @@
             </select>
         </div>
 
-        <!-- 수량 섹션 -->
-        <div class="quantity-section">
-            <button onclick="changeQuantity(-1)">-</button>
-            <input type="number" id="quantity" value="1" min="1" onchange="updatePrice()">
-            <button onclick="changeQuantity(1)">+</button>
+        <div class="container mt-4">
+            <div class="row mb-3">
+                <label for="count" class="col-sm-4 col-form-label">주문수량</label>
+                <div class="col-8">
+                    <!-- 수량 입력 필드 -->
+                    <div class="quantity-input">
+                        <button type="button" onclick="decreaseQuantity()">-</button>
+                        <input type="number" min="1" value="1" name="count" id="count" class="form-control" required>
+                        <button type="button" onclick="increaseQuantity()">+</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 장바구니 담기 버튼 -->
@@ -203,6 +256,21 @@
     // 뒤로가기 함수
     function goBack() {
         window.history.back();  // 페이지를 뒤로 돌아가게 합니다.
+    }
+
+    <!-- 자바스크립트 추가: 수량 변경 -->
+        function increaseQuantity() {
+        var countInput = document.getElementById('count');
+        var currentCount = parseInt(countInput.value);
+        countInput.value = currentCount + 1;
+    }
+
+        function decreaseQuantity() {
+        var countInput = document.getElementById('count');
+        var currentCount = parseInt(countInput.value);
+        if (currentCount > 1) {
+        countInput.value = currentCount - 1;
+    }
     }
 </script>
 

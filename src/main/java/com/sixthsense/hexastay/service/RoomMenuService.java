@@ -5,10 +5,12 @@ import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
+
 public interface RoomMenuService {
 
     // 등록하기
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO);
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException;
 
     // 목록
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
