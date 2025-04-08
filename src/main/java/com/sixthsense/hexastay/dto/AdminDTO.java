@@ -49,6 +49,7 @@ public class AdminDTO {
 
     //어드민 직책
     private String adminRole;
+//    private AdminRole adminRole;
 
     //어드민 Brand
     private String adminBrand;
@@ -85,5 +86,4 @@ public class AdminDTO {
     private String branchName;
     private String facilityName;
     private String storeName;
-
 }
