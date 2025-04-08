@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -28,6 +30,12 @@ public class MemberController {
     @PostMapping("/login")
     public String loginPost() {
         return "/member/login";
+    }
+
+    @GetMapping("/main")
+    public String main(Principal principal) {
+        log.info(principal.getName());
+        return "/member/main";
     }
 
     @GetMapping("/signup")
