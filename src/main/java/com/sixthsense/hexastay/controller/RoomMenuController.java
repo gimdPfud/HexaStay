@@ -254,9 +254,12 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/testorder")
-    public String orderpage(){
+    public String orderpage(Principal principal, Model model){
 
-        return "roommenu/testorder";
+        if (principal != null) {
+            model.addAttribute("email", principal.getName());
+        }
+        return "roommenu/orderpage"; // HTML 페이지로 넘어감
     }
 
     /**************************************************

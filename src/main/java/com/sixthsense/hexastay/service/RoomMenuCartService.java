@@ -14,7 +14,7 @@ public interface RoomMenuCartService {
 
     // 장바구니 등록
 
-    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
+//    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
 
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
 
