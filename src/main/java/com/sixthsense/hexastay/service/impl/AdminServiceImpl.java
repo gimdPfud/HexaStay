@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final StoreRepository storeRepository;
     private final FacilityRepository facilityRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final PasswordEncoder passwordEncoder;
 
     public List<CenterDTO> getCenterList(String centerName) {
         List<CenterDTO> centerDTOList = new ArrayList<>();
@@ -42,6 +44,9 @@ public class AdminServiceImpl implements AdminService {
 
     // 회원 등록
     public void insertAdmin(AdminDTO adminDTO) throws IOException {
+
+        adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
+
         if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
             String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
             String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();

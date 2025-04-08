@@ -14,6 +14,9 @@ public class CustomUserDetails implements UserDetails {
 
     private Admin admin;
 
+    public CustomUserDetails(Admin admin) {
+        this.admin = admin;
+    }
 
     @Override
     public String getUsername() {

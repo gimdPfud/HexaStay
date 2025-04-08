@@ -23,6 +23,23 @@ public class AdminController {
     private final CenterService centerService;
 
 
+    //로그인
+    @GetMapping("/login")
+    public String login(){
+        return "admin/login";
+    }
+
+    @PostMapping("/login")
+    public String loginPost(){
+        return "admin/login";
+    }
+
+    @GetMapping("/main")
+    public String main(){
+        return "admin/main";
+    }
+
+
     //리스트
     @GetMapping("/list")
     public String list(Model model) {
