@@ -20,7 +20,7 @@ public class CustomMemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
-        System.out.println("입력된 adminEmail: " + memberEmail);
+        System.out.println("입력된 memberEmail: " + memberEmail);
         Member member = memberRepository.findByMemberEmail(memberEmail);
 
 

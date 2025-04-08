@@ -27,8 +27,8 @@ public interface AdminService {
     List<CenterDTO> getCenterList (String CenterName);
 
     // 회원 가입때 쓸 로직2
-    List<BranchDTO> getBranchList (String CenterName);
-    List<FacilityDTO> getFacilityList (String CenterName);
+    List<BranchDTO> getBranchList (Long CenterNum);
+    List<FacilityDTO> getFacilityList (Long CenterNum);
     List<StoreDTO> getStoreList();
 
 }
