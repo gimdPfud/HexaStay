@@ -130,21 +130,21 @@
             font-weight: bold;
         }
 
-        /* 장바구니 사이드바 */
+        /*!* 장바구니 사이드바 *!
         #cart-sidebar {
             position: fixed;
             top: 0;
-            right: -300px; /* 사이드바 기본 위치 */
+            right: -300px; !* 사이드바 기본 위치 *!
             width: 300px;
             height: 100%;
             background-color: white;
-            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-            transition: right 0.3s ease; /* 애니메이션 효과 */
+            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1); !* 그림자 효과 *!
+            transition: right 0.3s ease; !* 애니메이션 효과 *!
             padding: 20px;
             z-index: 1000;
         }
         #cart-sidebar.active {
-            right: 0; /* 사이드바 활성화 시 화면에 보이도록 설정 */
+            right: 0; !* 사이드바 활성화 시 화면에 보이도록 설정 *!
         }
         #cart-sidebar .close-btn {
             position: absolute;
@@ -155,7 +155,7 @@
         }
         #cart-sidebar .cart-content {
             margin-top: 60px;
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -206,10 +206,9 @@
             <div class="food-info">
                 <p>
                     <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                       th:text="${roomMenuDTO.roomMenuName}">
+                       th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
                     </a>
                 </p>
-                <p th:text="${roomMenuDTO.roomMenuName}"></p> <!-- 메뉴 이름 -->
                 <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
                 <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 -->
                 <p>평점</p> <!-- 평점 표시 -->
@@ -220,14 +219,14 @@
     </ul>
 </div>
 
-<!-- 장바구니 사이드바 -->
+<!-- 장바구니 사이드바
 <div id="cart-sidebar">
     <div class="close-btn" onclick="closeCartSidebar()">✖</div>
     <div class="cart-content">
         <h3>장바구니</h3>
         <p>장바구니가 비어 있습니다.</p>
     </div>
-</div>
+</div>-->
 
 <!-- 페이지 네비게이션 -->
 <nav>

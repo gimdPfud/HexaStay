@@ -18,7 +18,7 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 10px;
             font-size: 20px;
@@ -37,85 +37,125 @@
         .food-info p { margin: 2px 0; }
         .price { font-weight: bold; }
 
-        .add-btn {
-            position: absolute;
-            right: 10px;
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 15px;
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 14px;
             cursor: pointer;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+        }
+
+        .action-btn:hover {
+            background-color: #ddd;
+        }
+
+        .request-section {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .request-section label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .request-section textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            height: 100px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            resize: none;
+        }
+
+        /* 할인금액과 최종결제금액 표시 */
+        .pricing-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pricing-section div {
+            font-size: 16px;
+        }
+
+        .pricing-section .discount {
+            color: red;
+        }
+
+        .pricing-section .final-total {
             font-weight: bold;
         }
 
-        #cart-sidebar {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100%;
-            background-color: white;
-            box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
-            padding: 20px;
-            z-index: 1000;
-        }
-
-        #cart-sidebar.active {
-            right: 0;
-        }
-
-        #cart-sidebar .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
+        /* 버튼 스타일 */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            margin-top: 20px;
         }
 
-        #cart-sidebar .cart-content {
-            margin-top: 60px;
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
+
+        .back-btn {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .back-btn:hover {
+            background-color: #ccc;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- 헤더: 메뉴와 장바구니 아이콘 -->
+    <!-- 헤더: 메뉴 제목 -->
     <div class="header">
         <div>주문</div>
-        <div class="cart-icon" onclick="openCartSidebar()">🛒</div>
     </div>
 
     <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
     <ul class="food-list" id="food-list">
         <!-- 메뉴 항목은 JavaScript를 통해 추가됨 -->
     </ul>
-</div>
 
-<!-- 장바구니 사이드바 -->
-<div id="cart-sidebar">
-    <div class="close-btn" onclick="closeCartSidebar()">✖</div>
-    <div class="cart-content">
-        <h3>장바구니</h3>
-        <p>장바구니가 비어 있습니다.</p>
+    <!-- 요청사항 입력 섹션 -->
+    <div class="request-section">
+        <label for="request-input">요청사항</label>
+        <textarea id="request-input" placeholder="요청사항을 입력하세요..."></textarea>
     </div>
+
+    <!-- 할인금액과 최종결제금액 표시 -->
+    <div class="pricing-section">
+        <div class="discount">할인금액: 0원</div>
+        <div class="final-total">최종결제금액: 0원</div>
+    </div>
+
+    <!-- 결제하기 및 목록으로 버튼 -->
+    <button class="btn add-to-cart-btn" onclick="processPayment()">결제하기</button>
+    <button class="btn back-btn" onclick="goBack()">목록으로</button>
 </div>
 
 <script>
-    // 장바구니 사이드바 열기
-    function openCartSidebar() {
-        const sidebar = document.getElementById('cart-sidebar');
-        sidebar.classList.add('active');
-        updateCartSidebar();  // 장바구니 사이드바 업데이트
-    }
-
-    // 장바구니 사이드바 닫기
-    function closeCartSidebar() {
-        const sidebar = document.getElementById('cart-sidebar');
-        sidebar.classList.remove('active');
-    }
-
     // 메뉴 데이터 샘플
     const menuItems = [
         { id: 1, name: '김치찌개', price: 8000, category: '한식' },
@@ -123,24 +163,65 @@
         { id: 3, name: '짜장면', price: 6000, category: '중식' },
     ];
 
+    // 장바구니 데이터
+    let cart = [];
+    let discount = 0; // 기본 할인금액
+    let totalAmount = 0;
+
     // 메뉴 목록을 페이지에 추가하는 함수
     function loadMenuItems() {
         const foodList = document.getElementById('food-list');
         menuItems.forEach(item => {
             const li = document.createElement('li');
             li.classList.add('food-item');
-
             li.innerHTML = `
                 <div class="food-info">
                     <p>${item.name}</p>
                     <p class="price">${item.price}원</p>
                     <p>${item.category}</p>
                 </div>
-                <button class="add-btn" onclick="addToCart(${item.id})">추가</button>
+                <div class="action-btns">
+                    <button class="action-btn" onclick="editItem(${item.id})">수정</button>
+                    <button class="action-btn" onclick="deleteItem(${item.id})">삭제</button>
+                </div>
             `;
-
             foodList.appendChild(li);
         });
+    }
+
+    // 수정 버튼 클릭 시
+    function editItem(itemId) {
+        alert(`아이템 ${itemId}을(를) 수정합니다.`);
+        // 여기에서 수정 로직을 구현할 수 있습니다.
+    }
+
+    // 삭제 버튼 클릭 시
+    function deleteItem(itemId) {
+        const itemIndex = menuItems.findIndex(item => item.id === itemId);
+        if (itemIndex !== -1) {
+            menuItems.splice(itemIndex, 1); // 해당 아이템 삭제
+            updateMenuList();  // 메뉴 목록을 갱신합니다.
+        }
+    }
+
+    // 메뉴 목록 갱신 함수
+    function updateMenuList() {
+        const foodList = document.getElementById('food-list');
+        foodList.innerHTML = '';  // 기존 목록을 지우고
+        loadMenuItems();  // 새로운 목록을 다시 불러옵니다
+    }
+
+    // 결제하기 함수
+    function processPayment() {
+        const request = document.getElementById('request-input').value;
+
+        // 결제 처리 로직
+        alert(`결제하겠습니다. 요청사항: ${request}`);
+    }
+
+    // 목록으로 돌아가기
+    function goBack() {
+        window.history.back();
     }
 
     // 페이지 로딩 시 메뉴 아이템을 불러옵니다

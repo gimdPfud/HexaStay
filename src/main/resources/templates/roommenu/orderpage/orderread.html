@@ -131,11 +131,20 @@
             </select>
         </div>
 
-        <!-- 수량 섹션 -->
-        <div class="quantity-section">
-            <button onclick="changeQuantity(-1)">-</button>
-            <input type="number" id="quantity" value="1" min="1" onchange="updatePrice()">
-            <button onclick="changeQuantity(1)">+</button>
+        <div class="option-section">
+            <label for="quantity-select">수량 선택</label>
+            <select id="quantity-select" name="quantity" class="form-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
         </div>
 
         <!-- 장바구니 담기 버튼 -->
