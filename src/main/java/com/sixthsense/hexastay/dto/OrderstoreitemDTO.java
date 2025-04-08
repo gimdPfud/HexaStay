@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderStoreitemDTO {
+public class OrderstoreitemDTO {
 
     private Long orderstoreitemNum; //pk
 
