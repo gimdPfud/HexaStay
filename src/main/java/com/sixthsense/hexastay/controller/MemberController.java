@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/login")
@@ -26,6 +28,18 @@ public class MemberController {
     @PostMapping("/login")
     public String loginPost() {
         return "/member/login";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "/member/signup";
+    }
+
+    @PostMapping("/signup")
+    public String signupPost(MemberDTO memberDTO) {
+        memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
+        memberService.memberinsert(memberDTO);
+        return "/member/signup";
     }
 
 
