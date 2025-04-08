@@ -107,7 +107,7 @@ public class RoomMenuController {
 
     @GetMapping("/roommenu/insert")
     public String RoomServiceItemGet() {
-        log.info("등록페이지 get 진입");
+        log.info("등록페이지 get 컨트롤러 진입");
 
         return "roommenu/insert";
     }
@@ -120,7 +120,7 @@ public class RoomMenuController {
 
     @PostMapping("/roommenu/insert")
     public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
-        log.info("등록페이지 post 진입");
+        log.info("등록페이지 post 컨트롤러 진입");
 
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
         log.info("로그인한 사용자: " + memberName);
