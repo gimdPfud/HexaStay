@@ -41,6 +41,8 @@ public class Member extends BaseEntity{
     @Column(name = "memberBirth")
     private String memberBirth;                        //생년월일
 
+    private String memberRole;                          //시큐리티용 맴버롤
+
 
     // 🔹 ManyToOne 추가 (여러 Member가 하나의 HotelRoom을 가짐)
 

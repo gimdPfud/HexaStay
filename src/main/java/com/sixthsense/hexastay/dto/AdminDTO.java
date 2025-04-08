@@ -27,7 +27,7 @@ public class AdminDTO {
     private Long adminNum;
 
     //어드민 사번
-    private Integer adminEmployeeNum;
+    private String adminEmployeeNum;
 
     //어드민 패스워드
     private String adminPassword;
@@ -73,5 +73,17 @@ public class AdminDTO {
 
     // 어드민 사진정보
     private String adminProfileMeta;
+
+    // 어드민 FK 출력용
+
+    private Long centerNum;
+    private Long branchNum;
+    private Long facilityNum;
+    private Long storeNum;
+
+    private String centerName;
+    private String branchName;
+    private String facilityName;
+    private String storeName;
 
 }

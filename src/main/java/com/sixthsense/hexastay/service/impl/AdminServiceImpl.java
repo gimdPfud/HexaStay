@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,14 +70,25 @@ public class AdminServiceImpl implements AdminService {
     }
 
     //어드민 리스트
-    public List<AdminDTO> getAdminList(){
-        List<Admin> adminList = adminRepository.findAll();
-        List<AdminDTO> adminDTOList = new ArrayList<>();
-        for (Admin admin : adminList) {
-            adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
-        }
-        return adminDTOList;
+    public Page<AdminDTO> getAdminList(Pageable pageable){
+
+        Page<Admin> adminList = adminRepository.findAllWithJoins(pageable);
+        return adminList.map(admin -> {
+                    AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+                    if (admin.getCenter() != null)
+                        dto.setCenterName(admin.getCenter().getCenterName());
+                    if (admin.getBranch() != null)
+                        dto.setBranchName(admin.getBranch().getBranchName());
+                    if (admin.getFacility() != null)
+                        dto.setFacilityName(admin.getFacility().getFacilityName());
+                    if (admin.getStore() != null)
+                        dto.setStoreName(admin.getStore().getStoreName());
+            return dto;
+                });
     }
+
+
+
 
     //가입대기 리스트
     public List<AdminDTO> getWaitAdminList(){
@@ -100,9 +113,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-    public List<BranchDTO> getBranchList(String centerName) {
+    public List<BranchDTO> getBranchList(Long centerNum) {
         List<BranchDTO> branchDTOList = new ArrayList<>();
-        List<Branch> branchList = branchRepository.findByCenter_CenterName(centerName);
+        List<Branch> branchList = branchRepository.findByCenter_CenterNum(centerNum);
         for (Branch branch : branchList) {
         BranchDTO branchDTO = new BranchDTO();
         branchDTO.setBranchAddress(branch.getBranchAddress());
@@ -125,9 +138,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-    public List<FacilityDTO> getFacilityList(String centerName) {
+    public List<FacilityDTO> getFacilityList(Long centerNum) {
         List<FacilityDTO> facilityDTOList = new ArrayList<>();
-        List<Facility> facilityList = facilityRepository.findByCenter_CenterName(centerName);
+        List<Facility> facilityList = facilityRepository.findByCenter_CenterNum(centerNum);
         for (Facility facility : facilityList) {
             facilityDTOList.add(modelMapper.map(facility, FacilityDTO.class));
         }

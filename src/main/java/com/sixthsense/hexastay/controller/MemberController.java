@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +16,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
     private final MemberService memberService;
+
+
+    @GetMapping("/login")
+    public String login() {
+        return "/member/login";
+    }
+
+    @PostMapping("/login")
+    public String loginPost() {
+        return "/member/login";
+    }
 
 
     //멤버 테이블 삭제 버튼

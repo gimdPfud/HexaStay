@@ -1,0 +1,50 @@
+package com.sixthsense.hexastay.config.Security;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+    @Configuration
+
+    public class AdminSecurityConfig {
+
+        private final CustomAdminDetailsService adminDetailsService;
+
+        public AdminSecurityConfig(CustomAdminDetailsService adminDetailsService) {
+            this.adminDetailsService = adminDetailsService;
+        }
+
+        @Bean(name = "adminSecurityFilterChain")
+        @Order(1)
+        public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .securityMatcher("/admin/**")
+                    .authorizeHttpRequests(authz -> authz
+                            .anyRequest().permitAll()
+                    )
+                    .formLogin(form -> form
+                            .loginPage("/admin/login")
+                            .defaultSuccessUrl("/admin/main")
+                            .failureUrl("/admin/login?error")
+                            .usernameParameter("adminEmail")
+                            .passwordParameter("adminPassword")
+                            .permitAll()
+                    )
+                    .userDetailsService(adminDetailsService)
+                      .csrf().disable();
+
+            return http.build();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+}

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomAdminDetailsService implements UserDetailsService {
 
     private final AdminRepository adminRepository;
 
@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
 
-        return new CustomUserDetails(admin);
+        return new CustomAdminDetails(admin);
 
     }
 }
