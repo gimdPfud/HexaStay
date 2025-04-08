@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Map;
 
 import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
@@ -74,6 +73,18 @@ public class RoomMenuController {
 
     // todo : 오더페이지 상세 만들어야함
     // fixme : 따로 컨트롤러 만들어서 해야할것같음.
+    /***************************************************
+     * 메소드명   : roomMenuReadA
+     * 기능      : 특정 메뉴 아이템의 상세 정보를 조회하여 화면에 전달
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-06
+     * 수정일    :
+     * 설명      : 전달된 `num` 파라미터를 통해 메뉴 아이템의 상세 정보를 조회하고
+     *            `roommenu/read` 뷰를 반환
+     * 파라미터   : `num` - 메뉴 아이템의 ID (Long)
+     * 반환값     : String - `roommenu/read` 뷰 이름
+     ****************************************************/
+
     // 오더페이지 상세페이지
     @GetMapping("/roomMenu/read")
     public String roomMenuReadA(Long num, Model model) {
@@ -152,16 +163,39 @@ public class RoomMenuController {
         return "roommenu/list";
     }
 
-    /**************************************************
-     * 룸서비스 메뉴 상세 보기 페이지
-     * 기능 : 특정 메뉴의 상세 정보를 보여줌
-     **************************************************/
+    /***************************************************
+     *
+     * 메소드명   : roomMenuOrderRead
+     * 기능      : 장바구니에서 특정 메뉴 아이템의 상세 정보를 조회하여 화면에 전달
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-06
+     * 수정일    :
+     *
+     * 설명      : 클라이언트로부터 전달된 `num` 파라미터(메뉴 아이템의 ID)를 통해
+     *            해당 아이템의 상세 정보를 조회하여 모델에 추가하고,
+     *            `orderpage/orderread` 뷰를 반환합니다.
+     *
+     * 파라미터   : `num` - 조회할 메뉴 아이템의 ID (Long)
+     * 반환값     : String - `orderpage/orderread` 뷰 이름
+     *
+     ****************************************************/
+
+    @GetMapping("/roommenu/orderpage/orderread")
+    public String roomMenuOrderRead(@RequestParam Long num, Model model) {
+        log.info("상세보기 컨트롤러 진입: " + num);
+
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num);
+        model.addAttribute("roomMenuDTO", roomMenuDTO);
+        log.info("모델로 받은 dto: " + roomMenuDTO);
+
+        return "roommenu/orderpage/orderread"; // 뷰 이름
+    }
+
 
     @GetMapping("/roommenu/read")
     public String roomMenuRead(Long num, Model model) {
-        log.info("상세보기 컨트롤러 진입" + num);
 
-        RoomMenuDTO roomMenuDTO = roomMenuService.read(num);
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num);
 
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         log.info("모델로 받은 dto" + roomMenuDTO);
@@ -248,16 +282,6 @@ public class RoomMenuController {
 
     }
 
-    /**************************************************
-     * 룸서비스 주문 페이지
-     * 기능 : 주문 페이지로 이동
-     **************************************************/
-
-    @GetMapping("/roommenu/testorder")
-    public String orderpage(){
-
-        return "roommenu/testorder";
-    }
 
     /**************************************************
      * 룸서비스 리드 페이지
@@ -294,11 +318,6 @@ public class RoomMenuController {
 
         // 페이지 정보 가공
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
-
-        // 로깅: 메뉴 이름 출력
-        for (RoomMenuDTO roomMenuDTO : roomMenuList) {
-            log.info("이것은 룸카드컨트롤러" + roomMenuDTO.getRoomMenuName());
-        }
 
         // 값 전달 (Model)
         model.addAttribute("list", roomMenuList);

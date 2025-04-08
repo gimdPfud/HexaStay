@@ -34,77 +34,9 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     private final RoomMenuCartRepository roomMenuCartRepository;
     private final RoomMenuRepository roomMenuRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
     private RoomMenuCartItemRepository roomMenuCartItemRepository;
     private MemberRepository memberRepository;
-    private final ModelMapper modelMapper = new ModelMapper();
-
-    private RoomMenuCart createNewCartForMember(Long memberNum) {
-        log.info("장바구니 생성");
-        Member member = memberRepository.findById(memberNum)
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
-
-        RoomMenuCart newCart = new RoomMenuCart();
-        newCart.setMember(member);
-        newCart.setRoomMenuTotalPrice(0); // 초기 가격은 0으로 설정
-
-        return roomMenuCartRepository.save(newCart);
-    }
-
-    // 장바구니 총 가격 계산
-    private void updateCartTotalPrice(RoomMenuCart roomMenuCart) {
-        // 모든 아이템의 가격을 합산하여 총 가격 계산
-        int totalPrice = roomMenuCartItemRepository.findAllByRoomMenuCart(roomMenuCart).stream()
-                .mapToInt(RoomMenuCartItem::getRoomMenuCartItemPrice)
-                .sum();
-
-        // 장바구니의 총 가격 업데이트
-        roomMenuCart.setRoomMenuTotalPrice(totalPrice);
-
-        // 변경된 장바구니 객체 저장
-        roomMenuCartRepository.save(roomMenuCart);
-    }
-
-
-    @Override
-    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount) {
-        log.info("장바구니 추가");
-
-        // 장바구니가 존재하는지 확인, 없으면 새로 생성
-        RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
-                .orElseGet(() -> createNewCartForMember(memberNum)); // 장바구니가 없으면 새로 생성
-
-        // 아이템 조회
-        RoomMenu roomMenu = roomMenuRepository.findById(roomMenuNum)
-                .orElseThrow(() -> new RuntimeException("아이템을 찾을 수 없습니다."));
-
-        // 장바구니에 이미 해당 아이템이 존재하는지 확인
-        Optional<RoomMenuCartItem> existingItemOpt = roomMenuCartItemRepository.findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu);
-
-        RoomMenuCartItem roomMenuCartItem;
-        if (existingItemOpt.isPresent()) {
-            // 기존 항목이 있으면 수량 추가 및 가격 갱신
-            roomMenuCartItem = existingItemOpt.get();
-            roomMenuCartItem.setRoomMenuCartItemAmount(roomMenuCartItem.getRoomMenuCartItemAmount() + amount);
-            roomMenuCartItem.setRoomMenuCartItemPrice(roomMenuCartItem.getRoomMenuCartItemAmount() * roomMenu.getRoomMenuPrice());
-        } else {
-            // 새로운 항목이라면 새로 추가
-            roomMenuCartItem = new RoomMenuCartItem();
-            roomMenuCartItem.setRoomMenuCart(roomMenuCart);
-            roomMenuCartItem.setRoomMenu(roomMenu);
-            roomMenuCartItem.setRoomMenuCartItemAmount(amount);
-            roomMenuCartItem.setRoomMenuCartItemPrice(amount * roomMenu.getRoomMenuPrice());
-        }
-
-        // 장바구니 항목 저장
-        roomMenuCartItemRepository.save(roomMenuCartItem);
-
-        // 장바구니 총 가격 업데이트
-        updateCartTotalPrice(roomMenuCart);
-
-        // 장바구니 DTO 반환
-        return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
-    }
-
 
     @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
@@ -177,7 +109,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     @Override
     public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
-        log.info("장바구니 추가 시스템 도입" + roomMenuCartNum);
+        log.info("장바구니 추가 시스템 도입, 회원 이메일: {}", email);
 
         // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.
         RoomMenu roomMenu =
@@ -363,5 +295,89 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             return new EntityNotFoundException("아이템이 삭제되었습니다.");
         });
 
+//    private RoomMenuCart createNewCartForMember(Long memberNum) {
+//        log.info("장바구니 생성");
+//        Member member = memberRepository.findById(memberNum)
+//                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+//
+//        RoomMenuCart newCart = new RoomMenuCart();
+//        newCart.setMember(member);
+//        newCart.setRoomMenuTotalPrice(0); // 초기 가격은 0으로 설정
+//
+//        return roomMenuCartRepository.save(newCart);
+//    }
+//
+//    // 장바구니 총 가격 계산
+//    private void updateCartTotalPrice(RoomMenuCart roomMenuCart) {
+//        // 모든 아이템의 가격을 합산하여 총 가격 계산
+//        int totalPrice = roomMenuCartItemRepository.findAllByRoomMenuCart(roomMenuCart).stream()
+//                .mapToInt(RoomMenuCartItem::getRoomMenuCartItemPrice)
+//                .sum();
+//
+//        // 장바구니의 총 가격 업데이트
+//        roomMenuCart.setRoomMenuTotalPrice(totalPrice);
+//
+//        // 변경된 장바구니 객체 저장
+//        roomMenuCartRepository.save(roomMenuCart);
+//    }
+//
+//
+//    @Override
+//    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount) {
+//        log.info("장바구니 추가");
+//
+//        // 장바구니가 존재하는지 확인, 없으면 새로 생성
+//        RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
+//                .orElseGet(() -> createNewCartForMember(memberNum)); // 장바구니가 없으면 새로 생성
+//
+//        // 아이템 조회
+//        RoomMenu roomMenu = roomMenuRepository.findById(roomMenuNum)
+//                .orElseThrow(() -> new RuntimeException("아이템을 찾을 수 없습니다."));
+//
+//        // 장바구니에 이미 해당 아이템이 존재하는지 확인
+//        Optional<RoomMenuCartItem> existingItemOpt = roomMenuCartItemRepository.findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu);
+//
+//        RoomMenuCartItem roomMenuCartItem;
+//        if (existingItemOpt.isPresent()) {
+//            // 기존 항목이 있으면 수량 추가 및 가격 갱신
+//            roomMenuCartItem = existingItemOpt.get();
+//            roomMenuCartItem.setRoomMenuCartItemAmount(roomMenuCartItem.getRoomMenuCartItemAmount() + amount);
+//            roomMenuCartItem.setRoomMenuCartItemPrice(roomMenuCartItem.getRoomMenuCartItemAmount() * roomMenu.getRoomMenuPrice());
+//        } else {
+//            // 새로운 항목이라면 새로 추가
+//            roomMenuCartItem = new RoomMenuCartItem();
+//            roomMenuCartItem.setRoomMenuCart(roomMenuCart);
+//            roomMenuCartItem.setRoomMenu(roomMenu);
+//            roomMenuCartItem.setRoomMenuCartItemAmount(amount);
+//            roomMenuCartItem.setRoomMenuCartItemPrice(amount * roomMenu.getRoomMenuPrice());
+//        }
+//
+//        // 장바구니 항목 저장
+//        roomMenuCartItemRepository.save(roomMenuCartItem);
+//
+//        // 장바구니 총 가격 업데이트
+//        updateCartTotalPrice(roomMenuCart);
+//
+//        // 장바구니 DTO 반환
+//        return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
+//    }
+
+
+
     }
-}
+
+    // 상세보기
+    @Override
+    public RoomMenuDTO read(Long num) {
+        log.info("상세보기 페이지 서비스 진입" + num);
+
+        Optional<RoomMenu> optionalRoomMenu =
+                roomMenuRepository.findById(num);
+
+        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
+        log.info("변환된 dto read service의 값" + menuDTO);
+
+        return menuDTO;
+
+        }
+    }

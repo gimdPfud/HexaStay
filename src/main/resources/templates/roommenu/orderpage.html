@@ -204,6 +204,11 @@
             <!-- 메뉴 이미지 -->
             <p>메뉴이미지</p>
             <div class="food-info">
+                <p>
+                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                       th:text="${roomMenuDTO.roomMenuName}">
+                    </a>
+                </p>
                 <p th:text="${roomMenuDTO.roomMenuName}"></p> <!-- 메뉴 이름 -->
                 <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
                 <p th:text="${roomMenuDTO.roomMenuCategory}"></p> <!-- 카테고리 -->
@@ -236,6 +241,12 @@
 </nav>
 
 <script>
+    const email = /*[[${email}]]*/ '';  // Thymeleaf 변수를 JavaScript 변수로 전달
+
+    function getCurrentUserEmail() {
+        return email;  // 서버에서 넘겨준 'email' 변수를 반환
+    }
+
     /* 검색창 토글 */
     function toggleSearch() {
         const searchContainer = document.getElementById('search-container');
@@ -255,21 +266,35 @@
         sidebar.classList.remove('active');
     }
 
-    // 장바구니에 상품 추가
-    function addToCart(roomMenuNum) {
-        const memberNum = 1; // 예시로 회원 번호를 1로 설정, 실제로는 로그인한 회원 정보를 사용해야 합니다.
-        const amount = 1; // 기본 수량 1로 설정, 나중에 UI에서 수량을 조정할 수 있도록 할 수도 있습니다.
 
-        // 장바구니에 아이템을 추가하는 API 요청
-        fetch(`/roommenu/cart?memberNum=${memberNum}&roomMenuNum=${roomMenuNum}&amount=${amount}`, {
+
+    // 장바구니 추가
+    function addToCart(roomMenuNum) {
+        const email = getCurrentUserEmail();  // 서버에서 넘겨준 이메일 변수 사용
+        if (!email) {
+            alert('로그인 후 사용 가능합니다.');
+            return;
+        }
+
+        const roomMenuCartNum = getUserCartNum(email);  // 로그인한 사용자의 장바구니 번호
+
+        const roomMenuCartItemDTO = {
+            roomMenuNum: roomMenuNum,
+            amount: 1  // 예시로 수량을 1로 설정
+        };
+
+        fetch(`/orderpage`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(roomMenuCartItemDTO)
         })
             .then(response => response.json())
             .then(data => {
-                // 성공적으로 추가된 경우
                 if (data) {
                     alert('장바구니에 추가되었습니다!');
-                    updateCartSidebar();  // 장바구니 사이드바 업데이트
+                    updateCartSidebar(); // 사이드바 업데이트
                 }
             })
             .catch(error => {
@@ -278,25 +303,10 @@
             });
     }
 
-    // 장바구니 사이드바 업데이트
-    function updateCartSidebar() {
-        fetch('/roommenu/cart/1')  // 회원 번호 1을 사용하여 장바구니 정보를 가져옵니다.
-            .then(response => response.json())
-            .then(data => {
-                const cartContent = document.querySelector('.cart-content');
-                cartContent.innerHTML = '';
 
-                if (data && data.items && data.items.length > 0) {
-                    data.items.forEach(item => {
-                        const cartItem = document.createElement('p');
-                        cartItem.textContent = `${item.name} - ${item.amount}개`;
-                        cartContent.appendChild(cartItem);
-                    });
-                } else {
-                    cartContent.innerHTML = '<p>장바구니가 비어 있습니다.</p>';
-                }
-            });
-    }
+
+
+
 
     /* 장바구니 아이콘 누르면 읽기 페이지로 이동 */
 
