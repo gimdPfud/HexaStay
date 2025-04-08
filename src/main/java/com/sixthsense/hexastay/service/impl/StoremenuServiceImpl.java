@@ -43,22 +43,25 @@ public class StoremenuServiceImpl implements StoremenuService {
     @Override
     public Long insert(StoremenuDTO storemenuDTO) throws IOException {
         storemenuDTO.setStoremenuStatus("alive");
+        Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
+        storemenu = storemenuRepository.save(storemenu);
+
         if(storemenuDTO.getStoremenuImg()!=null&& !storemenuDTO.getStoremenuImg().isEmpty()){
             String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
-            String fileFirstName = storemenuDTO.getStoremenuNum() + "_" + storemenuDTO.getStoreNum();
+            String fileFirstName = storemenu.getStoremenuNum() + "_" + storemenuDTO.getStoreNum();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
             storemenuDTO.setStoremenuImgMeta("/store/menu/"+fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu"+fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu");
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
             if(!Files.exists(createPath)){
                 Files.createDirectory(createPath);
             }
             storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
         }
-        Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
-        storemenu = storemenuRepository.save(storemenu);
+        storemenu.setStoremenuImgMeta(storemenuDTO.getStoremenuImgMeta());
+        storemenuRepository.save(storemenu);
         return storemenu.getStoremenuNum();
     }
 
