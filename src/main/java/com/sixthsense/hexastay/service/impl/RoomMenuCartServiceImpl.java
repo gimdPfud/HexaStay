@@ -365,4 +365,19 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
 
     }
-}
+
+    // 상세보기
+    @Override
+    public RoomMenuDTO read(Long num) {
+        log.info("상세보기 페이지 서비스 진입" + num);
+
+        Optional<RoomMenu> optionalRoomMenu =
+                roomMenuRepository.findById(num);
+
+        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
+        log.info("변환된 dto read service의 값" + menuDTO);
+
+        return menuDTO;
+
+        }
+    }

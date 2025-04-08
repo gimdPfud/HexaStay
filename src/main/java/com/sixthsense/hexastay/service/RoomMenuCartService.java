@@ -16,8 +16,10 @@ public interface RoomMenuCartService {
 
 //    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
 
+    // 리스트
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
 
+    // ?
     public RoomMenuCartDTO getCartByMember(Long memberNum);
 
     // 장바구니 추가
@@ -32,6 +34,9 @@ public interface RoomMenuCartService {
     // 장바구니의 업데이트 수량을 업데이트 하는 매소드
     public void updateRoomMenuCartItemAmount(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount);
 
+    // 장바구니를 삭제하는 매소드
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
+
+    public RoomMenuDTO read(Long num);
 
 }

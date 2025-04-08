@@ -57,9 +57,9 @@ public class RoomMenuCartController {
      ****************************************************/
 
     @PostMapping("/orderpage")
-    public ResponseEntity order( @Valid RoomMenuCartItemDTO roomMenuCartItemDTO ,
-                                 BindingResult bindingResult ,
-                                 Principal principal) {
+    public ResponseEntity order(@Valid RoomMenuCartItemDTO roomMenuCartItemDTO,
+                                BindingResult bindingResult,
+                                Principal principal) {
         // 유효성 검사
         if (bindingResult.hasErrors()) {
             log.info("장바구니 유효성검사 에러");
@@ -171,6 +171,7 @@ public class RoomMenuCartController {
      * 기능      : 장바구니에서 특정 아이템을 삭제
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
+     * 수정일    :
      *
      ****************************************************/
 
@@ -184,8 +185,7 @@ public class RoomMenuCartController {
         }
     }
 
-
-
+}
 
 
 //    // 장바구니에 아이템 추가
@@ -212,6 +212,3 @@ public class RoomMenuCartController {
 //    public RoomMenuCartDTO getRoomMenuCart(@PathVariable Long memberNum) {
 //        return roomMenuCartService.getCartByMember(memberNum);
 //    }
-
-
-}
