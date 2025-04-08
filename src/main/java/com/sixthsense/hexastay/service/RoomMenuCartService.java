@@ -27,6 +27,11 @@ public interface RoomMenuCartService {
     public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable);
 
     // 장바구니 유효성 검사 (누구 카트인가?)
-    public boolean verificationRoomCartItem(Long cardItemId, String email);
+    public boolean verificationRoomMenuCartItem(Long RoomMenuCartItemNum, String email);
+
+    // 장바구니의 업데이트 수량을 업데이트 하는 매소드
+    public void updateRoomMenuCartItemAmount(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount);
+
+    public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
 
 }

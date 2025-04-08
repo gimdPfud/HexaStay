@@ -165,7 +165,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     /***************************************************
      *
-     * 클래스명   : RoomMenuCartInsert
+     * 메소드명   : RoomMenuCartInsert
      * 기능      : 룸서비스 장바구니에 아이템을 추가하거나 기존 아이템의 수량을 업데이트하는 서비스 메소드
      *            - 장바구니가 존재하지 않으면 새로 생성
      *            - 아이템이 이미 장바구니에 있으면 수량을 추가
@@ -242,27 +242,126 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     /***************************************************
      *
-     * 클래스명   : RoomMenuCartItemList
-     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템 목록을 페이지 단위로 조회하는 서비스 메소드
-     *            - 특정 회원의 장바구니 아이템을 이메일을 기준으로 조회
-     *            - 페이징 처리된 결과를 반환
+     * 메소드명   : RoomMenuCartItemList
+     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템 목록을 조회하고, 해당 아이템이
+     *            특정 회원의 카트에 속하는지 검증하는 서비스 메소드
+     *            - 특정 카트 아이템을 카트 소유자와 비교하여, 해당 아이템이 로그인한 회원의 카트에 속하는지 확인
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
      * 수정일    : -
      *
      ****************************************************/
+
     @Override
     public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable) {
+        log.info("특정 회원 아이템 목록 조회 서비스 진입" + email);
         Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage =
                 roomMenuCartItemRepository.findByRoomMenuCart_Member_MemberEmail(email, pageable);
 
         return roomMenuCartItemDTOPage;
     }
 
+
+    /***************************************************
+     *
+     * 클래스명   : verificationRoomMenuCartItem
+     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템이 해당 회원의 카트에 속하는지 확인하는 서비스 메소드
+     *            - 주어진 이메일을 기준으로 로그인한 회원 정보를 조회
+     *            - 카트 아이템 번호를 기준으로 아이템을 조회하고, 해당 아이템이 로그인한 회원의 카트에 속하는지 검증
+     *            - 동일한 회원의 카트에 속하면 true를, 아니면 false를 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     *
+     ****************************************************/
+
     @Override
-    public boolean verificationRoomCartItem(Long cardItemId, String email) {
-        return false;
+    public boolean verificationRoomMenuCartItem(Long RoomMenuCartItemNum, String email) {
+        // 특정 회원의 아이템 목록을 조회하는 서비스가 진입한 것을 로그로 출력
+        log.info("특정 회원 아이템 목록 조회 서비스 진입: {}", email);
+
+        // 주어진 이메일을 사용하여 현재 로그인한 회원의 정보를 조회
+        Member member = memberRepository.findByMemberEmail(email);
+
+        // 카트 아이템 번호를 기준으로 카트 아이템을 조회
+        Optional<RoomMenuCartItem> roomMenuCartItem =
+                roomMenuCartItemRepository.findById(RoomMenuCartItemNum);
+
+        // 카트 아이템이 존재하지 않으면 예외를 던짐
+        RoomMenuCartItem menuCartItem =
+                roomMenuCartItem.orElseThrow(EntityNotFoundException::new);
+
+        // 카트 아이템이 속한 카트를 조회
+        RoomMenuCart roomMenuCart = menuCartItem.getRoomMenuCart();
+
+        // 카트에 연결된 회원 정보 조회
+        Member cartMember = roomMenuCart.getMember();
+
+        // 로그인한 사용자와 카트 소유자가 동일한지 비교
+        if (member.getMemberNum() == cartMember.getMemberNum()) {
+            // 동일한 회원일 경우 true 반환
+            log.info("로그인한 회원과 카트 소유자가 동일함: {}", member.getMemberEmail());
+            return true;
+        } else {
+            // 다른 회원일 경우 false 반환
+            log.info("로그인한 회원과 카트 소유자가 다름: {} vs {}", member.getMemberEmail(), cartMember.getMemberEmail());
+            return false;
+        }
     }
 
+    /***************************************************
+     *
+     * 메소드명   : updateRoomCartItemCount
+     * 기능      : 룸서비스 장바구니 아이템의 수량을 업데이트하는 서비스 메소드
+     *            - 특정 장바구니 아이템의 수량을 업데이트
+     *            - 장바구니 아이템이 존재하지 않으면 예외를 던짐
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     *
+     ****************************************************/
 
+    @Override
+    public void updateRoomMenuCartItemAmount(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount) {
+        log.info("장바구니 수량 업데이트 서비스 진입");
+        log.info("아이템의 pk" + RoomMenuCartItemNum);
+        log.info("아이템의 수량" + roomMenuCartItemAmount);
+        RoomMenuCartItem roomMenuCartItem =
+                roomMenuCartItemRepository.findById(RoomMenuCartItemNum).orElseThrow(EntityNotFoundException::new);
+
+        roomMenuCartItem.setRoomMenuCartItemAmount(roomMenuCartItemAmount);
+
+    }
+
+    /***************************************************
+     *
+     * 매소드명   : RoomCartMenuCartItemDelete
+     * 기능      : 룸서비스 장바구니에서 특정 아이템을 삭제하는 서비스 메소드
+     *            - 주어진 아이템 번호를 기준으로 장바구니 아이템을 찾아 삭제 처리
+     *            - 삭제 후 해당 아이템을 조회하여 삭제 확인
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     *
+     ****************************************************/
+
+    @Override
+    public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum) {
+        log.info("서비스로 들어온 pk: {}", roomMenuCartItemNum);
+
+        // 주어진 roomMenuCartItemNum을 기반으로 장바구니 아이템을 조회
+        RoomMenuCartItem roomMenuCartItem =
+                roomMenuCartItemRepository.findById(roomMenuCartItemNum).orElseThrow(EntityNotFoundException::new);
+
+        // 장바구니 아이템을 삭제
+        roomMenuCartItemRepository.delete(roomMenuCartItem);
+        log.info("아이템 삭제 완료: {}", roomMenuCartItemNum);
+
+        // 삭제 후 해당 아이템이 존재하는지 확인 (아이템이 존재하면 예외가 발생)
+        roomMenuCartItemRepository.findById(roomMenuCartItemNum).orElseThrow(() -> {
+            log.info("삭제된 아이템은 더 이상 존재하지 않습니다: {}", roomMenuCartItemNum);
+            return new EntityNotFoundException("아이템이 삭제되었습니다.");
+        });
+
+    }
 }
