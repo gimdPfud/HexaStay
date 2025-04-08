@@ -47,8 +47,11 @@ public class HotelRoom extends BaseEntity{
     @Column(name = "hotelRoomStatus")
     private boolean hotelRoomStatus;            //활성화 상태
 
+    @Column(name = "hotelRoomLodgment")
+    private Integer hotelRoomLodgment;              //숙박일수
+
     @Column(name = "hotelRoomPrice")
-    private Integer hotelRoomPrice;              //가격
+    private Integer hotelRoomPrice;              //호텔방 가격
 
                //체크인    - BaseEntity 로 대체
              //체크아웃 -BaseEntity로 대체

@@ -41,57 +41,78 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
 
     //******************************//
-    //1.void 방식의 메서드 체이닝을 이용한 등록 메서드
+    //1-1.void 방식의 메서드 체이닝을 이용한 등록 메서드
     @Override
-    public void insertMemberHoterl(HotelRoomDTO hotelRoomDTO) {
+    public HotelRoomDTO insertHotelRoomMember(HotelRoomDTO hotelRoomDTO) {
 
-        //호텔룸 entity를 가져오기
-        HotelRoom hotelRoom =
-                modelMapper.map(hotelRoomDTO, HotelRoom.class);
-        //***메소드 체이닝 으로 한번에 변환 하기 ****//
+        // 🟢 hotelRoomDTO 내부에서 memberNum 가져오기
+        Long memberNum = hotelRoomDTO.getMemberNum();
 
-        //참조 memberEntity 가져오기
-        Member memberEntity =
-                memberRepository.findById(1L).orElseThrow(EntityNotFoundException::new);
+        if (memberNum == null) {
+            throw new RuntimeException("회원 번호가 누락되었습니다.");
+        }
 
-        hotelRoom.setMember(memberEntity);
+        // 🟢 회원 정보 가져오기
+        Member member = memberRepository.findById(memberNum)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
-        hotelRoomRepository.save(hotelRoom);
+        // 🟢 DTO → Entity 변환
+        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
+        hotelRoom.setMember(member);  // 회원 정보 설정
 
+        // 🟢 저장 후 DTO 변환하여 반환
+        HotelRoom savedHotelRoom = hotelRoomRepository.save(hotelRoom);
+        return modelMapper.map(savedHotelRoom, HotelRoomDTO.class);
     }
 
-    @Override
-    public HotelRoomDTO findRoomWithMembers(Long roomNum) {
-        return null;
-    }
 
-    //2.호텔룸 리스트 - MemberDTO를 가지고 있는 HotelRoomDTO 서비스 메서드
+    //2-1.호텔룸 리스트 - MemberDTO를 가지고 있는 HotelRoomDTO 서비스 메서드
+    @Override
     public Page<HotelRoomDTO> roomMemberPage(Pageable pageable) {
-
-        // HotelRoom Entity 페이지 처리
         Page<HotelRoom> hotelRoomPage = hotelRoomRepository.findAll(pageable);
 
-        // HotelRoom DTO 변환 및 반환
         Page<HotelRoomDTO> hotelRoomDTOPage = hotelRoomPage.map(hotelRoom -> {
             HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
 
-            //MemberDTO를 다시 hotelroomDTO에 set 해주기 최종적으로 ho
             if (hotelRoom.getMember() != null) {
-                hotelRoomDTO.setMember(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
+                MemberDTO memberDTO = modelMapper.map(hotelRoom.getMember(), MemberDTO.class);
+                hotelRoomDTO.setMemberDTO(memberDTO);
+                log.info("매핑된 멤버 정보: {}", memberDTO);
+            } else {
+                log.info("회원 정보 없음 - 호텔룸 번호: {}", hotelRoom.getHotelRoomNum());
             }
 
-            return hotelRoomDTO; // null이 아니라 변환된 DTO 반환
+            return hotelRoomDTO;
         });
 
         return hotelRoomDTOPage;
     }
 
-    //3.
+    //3-1.
+    @Override
+    public HotelRoomDTO findRoomWithMembers(Long roomNum) {
+        return null;
+    }
+
+
+    //A. optional 타입 - 참조 member가져와서 등록 가능 메서드
+    @Override
+    public Optional<HotelRoomDTO> getHotelRoomWithMember(Long hotelRoomNum) {
+        return hotelRoomRepository.findById(hotelRoomNum)
+                .map(hotelRoom -> {
+                    HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
+                    if (hotelRoom.getMember() != null) {
+                        hotelRoomDTO.setMemberDTO(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
+                        hotelRoomRepository.save(hotelRoom);    //호텔룸 테이블에 저장
+                    }
+                    return hotelRoomDTO;
+                });
+    }
 
 
 
 
-    // 호텔룸 등록 (회원 정보 포함) - Return 타입의 등록 메서드
+    //B.member 호텔룸 등록 (회원 정보 포함) - Return 타입의 등록 메서드 -Long 타입을 받는 메서드
     @Override
     public HotelRoomDTO insertHotelRoomMember(HotelRoomDTO hotelRoomDTO, Long memberNum) {
 
@@ -111,20 +132,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         return modelMapper.map(savedHotelRoom, HotelRoomDTO.class);
     }
 
-    // 호텔룸과 배정된 회원 정보 조회 - Long 타입을 받는 리스트 목록
-    @Override
-    public Optional<HotelRoomDTO> getHotelRoomWithMember(Long hotelRoomNum) {
-        return hotelRoomRepository.findById(hotelRoomNum)
-                .map(hotelRoom -> {
-                    HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
-                    if (hotelRoom.getMember() != null) {
-                        hotelRoomDTO.setMemberDTO(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
-                    }
-                    return hotelRoomDTO;
-                });
-    }
 
-    // 호텔룸에 배정된 회원 정보 리스트 조회
+
+    // C.Member의 정보를 가지고 있는 호텔룸 정보 가져 오기 - List타입
     @Override
     public List<MemberDTO> getAllMembersInHotelRooms() {
         return hotelRoomRepository.findAll().stream()
@@ -137,15 +147,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
 
-    @Override
-    public Optional<MemberDTO> getMemberByHotelRoomNum(Long hotelRoomNum) {
-        return hotelRoomRepository.findMemberByHotelRoomNum(hotelRoomNum)
-                .map(member -> modelMapper.map(member, MemberDTO.class));
-    }
 
 
-
-
+    //************단일 호텔룸 CRRUD 메소드*************//
     //1.등록
     @Override
     public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) {
@@ -157,7 +161,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoomRepository.save(hotelRoom);
 
     }
-
 
 
     //2.리스트
@@ -228,8 +231,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoomRepository.deleteById(hotelRoomNum);
 
     }
-
-    //추가
 
 
 

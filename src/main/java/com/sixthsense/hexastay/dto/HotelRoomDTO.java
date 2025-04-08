@@ -34,15 +34,19 @@ public class HotelRoomDTO {
 
     private boolean hotelRoomStatus;            //활성화 상태
 
-    private Integer hotelRoomPrice;              //가격
+    private Integer hotelRoomLodgment;              //숙박일수
+
+    private Integer hotelRoomPrice;              //호텔 방 가격
+
+
 
 
     //*********숙박 일정 필드명********//
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime checkInDate; //체크인
+    private LocalDate checkInDate; //체크인
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime checkOutDate; //체크아웃
+    private LocalDate checkOutDate; //체크아웃
 
 
 
