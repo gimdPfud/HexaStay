@@ -20,6 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -37,8 +41,22 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 기  능 : DTO를 받아 데이터베이스에 추가하고, 등록한 객체의 pk를 반환함.
      * */
     @Override
-    public Long insert(StoremenuDTO storemenuDTO) {
+    public Long insert(StoremenuDTO storemenuDTO) throws IOException {
         storemenuDTO.setStoremenuStatus("alive");
+        if(storemenuDTO.getStoremenuImg()!=null&& !storemenuDTO.getStoremenuImg().isEmpty()){
+            String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
+            String fileFirstName = storemenuDTO.getStoremenuNum() + "_" + storemenuDTO.getStoreNum();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storemenuDTO.setStoremenuImgMeta("/store/menu/"+fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
+        }
         Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
         storemenu = storemenuRepository.save(storemenu);
         return storemenu.getStoremenuNum();
