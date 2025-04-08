@@ -34,4 +34,10 @@ public interface CenterService {
 
     //사업자등록번호로 조회
     Page<CenterDTO> centerBusinessNum(String keyword, Pageable pageable);
+
+    //브랜드 목록 중복없이 가져오기
+    List<String> findDistinctCenterBrand();
+
+    //본사명 목록 중복없이 가져오기
+    List<String> findDistinctCenterName();
 }

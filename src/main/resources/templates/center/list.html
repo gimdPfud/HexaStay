@@ -59,35 +59,43 @@
           </tr>
           </thead>
           <tbody>
+
           <!-- 본사 -->
-          <tr th:if="${centerDTOS != null and !centerDTOS.isEmpty()}" th:each="item : ${centerDTOS}">
-            <td th:text="${item.centerBrand}"></td>
-            <td th:text="${item.centerName}"></td>
-            <td>-</td>
-            <td>-</td>
-            <td th:text="${item.centerPhone}"></td>
-            <td><a th:href="@{/center/read/{centerNum}(centerNum=${item.centerNum})}" class="btn btn-success">상세보기</a></td>
-          </tr>
+          <th:block th:if="${centerDTOS != null and !centerDTOS.isEmpty()}">
+            <tr th:each="item : ${centerDTOS}">
+              <td th:text="${item.centerBrand}"></td>
+              <td th:text="${item.centerName}"></td>
+              <td>-</td>
+              <td>-</td>
+              <td th:text="${item.centerPhone}"></td>
+              <td><a th:href="@{/center/read/{centerNum}(centerNum=${item.centerNum})}" class="btn btn-success">상세보기</a></td>
+            </tr>
+          </th:block>
 
           <!-- 지사 -->
-          <tr th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" th:each="item : ${branchDTOS}">
-            <td th:text="${item.centerBrand}"></td>
-            <td th:text="${item.centerName}"></td>
-            <td th:text="${item.branchName}"></td>
-            <td>-</td>
-            <td th:text="${item.branchPhone}"></td>
-            <td><a th:href="@{/branch/read/{branchNum}(branchNum=${item.branchNum})}" class="btn btn-success">상세보기</a></td>
-          </tr>
+          <th:block th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" >
+            <tr th:each="item : ${branchDTOS}">
+              <td th:text="${item.centerBrand}"></td>
+              <td th:text="${item.centerName}"></td>
+              <td th:text="${item.branchName}"></td>
+              <td>-</td>
+              <td th:text="${item.branchPhone}"></td>
+              <td><a th:href="@{/branch/read/{branchNum}(branchNum=${item.branchNum})}" class="btn btn-success">상세보기</a></td>
+            </tr>
+          </th:block>
 
           <!-- 지점 -->
-          <tr th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}" th:each="item : ${facilityDTOS}">
-            <td th:text="${item.centerBrand}"></td>
-            <td th:text="${item.centerName}"></td>
-            <td>-</td>
-            <td th:text="${item.facilityName}"></td>
-            <td th:text="${item.facilityPhone}"></td>
-            <td><a th:href="@{/facility/read/{facilityNum}(facilityNum=${item.facilityNum})}" class="btn btn-success">상세보기</a></td>
-          </tr>
+          <th:block th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}">
+            <tr th:each="item : ${facilityDTOS}">
+              <td th:text="${item.centerBrand}"></td>
+              <td th:text="${item.centerName}"></td>
+              <td>-</td>
+              <td th:text="${item.facilityName}"></td>
+              <td th:text="${item.facilityPhone}"></td>
+              <td><a th:href="@{/facility/read/{facilityNum}(facilityNum=${item.facilityNum})}" class="btn btn-success">상세보기</a></td>
+            </tr>
+          </th:block>
+
           </tbody>
         </table>
       </div>
@@ -151,7 +159,12 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ page: 0, size: 10 }) // 기본 페이지
+        body: JSON.stringify({
+          page: 0,
+          size: 10,
+          select: document.querySelector('select[name="select"]').value,
+          keyword: document.querySelector('input[name="keyword"]').value
+        }) // 기본 페이지
       })
               .then(res => res.json())
               .then(data => {
@@ -227,7 +240,12 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ page: page, size: 10 })
+        body: JSON.stringify({
+          page: page,
+          size: 10,
+          select: document.querySelector('select[name="select"]').value,
+          keyword: document.querySelector('input[name="keyword"]').value
+        })
       })
               .then(res => res.json())
               .then(data => {

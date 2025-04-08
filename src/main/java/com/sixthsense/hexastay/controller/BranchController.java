@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -81,15 +83,23 @@ public class BranchController {
         }
 
         BranchDTO branchDTO = branchService.branchRead(branchNum);
+        //브랜드명, 본사명 리스트 가져오기
+        List<String> centerBrandList = centerRepository.findDistinctCenterBrand();
+        List<String> centerNameList = centerRepository.findDistinctCenterName();
+        log.info("centerBrandList 갖고 왔나? : " + centerBrandList );
+        log.info("centerNameList 갖고 왔나? : " + centerNameList );
+
         model.addAttribute("branchDTO", branchDTO);
+        model.addAttribute("centerBrandList", centerBrandList);
+        model.addAttribute("centerNameList", centerNameList);
 
         return "branch/modify";
     }
 
-    @PostMapping("/modify")
-    public String modifyBranchPost(BranchDTO branchDTO){
+    @PostMapping("/modify/{branchNum}")
+    public String modifyBranchPost(@ModelAttribute BranchDTO branchDTO){
         log.info("Post 방식 branch 수정 controller 진입");
-        branchService.branchInsert(branchDTO);
+        branchService.branchModify(branchDTO);
 
         return "redirect:/center/list";
     }
@@ -108,8 +118,6 @@ public class BranchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패 다시 시도해주세요");
         }
     }
-
-
 
     // 조직등록 - 지사
     @PostMapping("/branchinsert")

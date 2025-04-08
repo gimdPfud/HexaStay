@@ -11,7 +11,7 @@
 
 <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
   <div class="d-flex justify-content-center">
-    <h2 class="text-center mb-4">본사 상세보기</h2>
+    <h2 class="text-center mb-4">지사 상세보기</h2>
   </div>
 
   <div class="d-flex w-100" style="justify-content: center;">
@@ -51,7 +51,7 @@
     <p class="form-control" th:text="${branchDTO.branchAddress}"></p>
   </div>
   <div class="d-flex justify-content-center gap-3">
-    <a th:href="@{/branch/list}" class="btn btn-secondary">목록</a>
+    <a th:href="@{/center/list}" class="btn btn-secondary">목록</a>
     <a th:href="@{/branch/modify/{branchNum}(branchNum=${branchDTO.branchNum})}" class="btn btn-success">수정</a>
     <form id="deleteForm" th:action="@{/branch/delete/{branchNum}(branchNum=${branchDTO.branchNum})}" method="post">
       <button type="submit" class="btn btn-danger">삭제</button>
@@ -62,7 +62,7 @@
 <script>
   function deleteCenter() {
     if (confirm("정말 삭제하시겠습니까?")) {
-      let centerNum = "[[${centerDTO.centerNum}]]"; // Thymeleaf 변수 바인딩
+      let centerNum = "[[${branchDTO.centerNum}]]"; // Thymeleaf 변수 바인딩
       fetch(`/center/delete/${centerNum}`, {
         method: "POST", // DELETE 메서드도 가능하지만, 일부 브라우저 지원 문제로 POST 사용
         headers: {

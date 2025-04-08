@@ -65,10 +65,13 @@ public class BranchServiceImpl implements BranchService {
     public void branchModify(BranchDTO branchDTO) {
         log.info("branch Modify Service 진입");
 
-        //branch 수정
+        //branch 수정(지사 Entity 조회)
         Branch branch = branchRepository.findById(branchDTO.getBranchNum()).orElseThrow();
 
-        branch.setBranchNum(branchDTO.getBranchNum());
+        //center Entity 조회
+        Center center = centerRepository.findById(branchDTO.getCenterNum()).orElseThrow();
+
+        //지사 정보 업데이트
         branch.setBranchName(branchDTO.getBranchName());
         branch.setBranchPhone(branchDTO.getBranchPhone());
         branch.setBranchEmail(branchDTO.getBranchEmail());
@@ -76,7 +79,12 @@ public class BranchServiceImpl implements BranchService {
         branch.setBranchCeoName(branchDTO.getBranchCeoName());
         branch.setBranchBusinessNum(branchDTO.getBranchBusinessNum());
 
+        //본사 정보 업데이트
+        center.setCenterBrand(branchDTO.getCenterBrand());
+        center.setCenterName(branchDTO.getCenterName());
+
         branchRepository.save(branch);
+        centerRepository.save(center);
 
         log.info("수정 반영된 내용 : " + branch);
     }

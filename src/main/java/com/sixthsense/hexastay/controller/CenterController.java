@@ -141,10 +141,16 @@ public class CenterController {
     }
 
     @GetMapping("/read/{centerNum}")
-    public String readCenter(@PathVariable("centerNum") Long centerNum, Model model) {
+    public String readCenter(@PathVariable("centerNum") Long centerNum, Model model, RedirectAttributes redirectAttributes) {
         log.info("get 방식 center 상세보기 controller 진입");
 
         CenterDTO centerDTO = centerService.centerRead(centerNum);
+
+        if(centerDTO == null){
+            redirectAttributes.addFlashAttribute("msg", "해당 본사 정보를 찾을 수 없습니다.");
+            return "redirect:/center/list";
+        }
+
         model.addAttribute("centerDTO", centerDTO);
 
         return "center/read";
@@ -166,8 +172,8 @@ public class CenterController {
         return "center/modify";
     }
 
-    @PostMapping("/modify")
-    public String modifyCenterPost(CenterDTO centerDTO) {
+    @PostMapping("/modify/{centerNum}")
+    public String modifyCenterPost(@ModelAttribute CenterDTO centerDTO) {
         log.info("post 방식 center 수정 controller 진입");
         centerService.centerModify(centerDTO);
 
