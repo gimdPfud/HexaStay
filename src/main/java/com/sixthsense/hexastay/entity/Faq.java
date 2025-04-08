@@ -24,7 +24,10 @@ public class Faq extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String faqContent;
 
+    @Column(nullable = false, length = 50)
+    private String faqCategory;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member")
+    @JoinColumn(name = "member_num")
     private Member member;
 }
