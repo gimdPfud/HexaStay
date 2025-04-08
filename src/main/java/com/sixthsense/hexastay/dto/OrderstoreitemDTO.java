@@ -1,9 +1,9 @@
 /********************************************
- * 클래스명 : OrderStoreDTO
- * 기능 : OrderStoreDTO
- * 작성자 : 김부환
- * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 클래스명 : OrderStoreitemDTO
+ * 기능 : OrderStoreitemDTO
+ * 작성자 : 김예령
+ * 작성일 : 2025-04-08
+ * 수정 : 2025-04-08
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
@@ -17,14 +17,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderStoreDTO {
+public class OrderstoreitemDTO {
 
+    private Long orderstoreitemNum; //pk
 
-    //외부업체 판매수량
-    private Long orderStoreAmount;
+    private Long orderstoreitemAmount;      //주문한 메뉴 양
 
-    //외부업체 상품가격
-    private Long orderStorePrice;
+    private Long orderstoreitemPrice;       //주문한 메뉴 가격
+
+    private Long orderstoreitemTotalPrice;  //주문한 메뉴들의 총가격
 
     //외부업체 상품판매일
     private LocalDateTime createDate;
@@ -32,20 +33,11 @@ public class OrderStoreDTO {
     //외부업체 상품 수정일자
     private LocalDateTime modifyDate;
 
-    //외부업체 상품 총금액
-    private Long orderStoreTotalPrice;
-
-    //외부업체 결재 (이체/카드/현금 사용여부)
-    private String orderStorePay;
-
     //*********************************
     //외부업체 상품 가져올 PK - Storemenu
     private Long storemenuNum;
 
     //**********************************
-    //멤버 정보를 가져올 PK - member
-    private Long memberNum;
-
-
-
+    //멤버 정보를 가져올 PK - orderstoreNum
+    private Long orderstoreNum;
 }

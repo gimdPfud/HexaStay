@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.repository;
 
+import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.entity.Review;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
@@ -27,5 +28,14 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
 
     // RoomMenuCart와 RoomMenu를 기반으로 RoomMenuCartItem을 찾는 메서드
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
+
+    // roommenucartitem의 카트 고유 id와, roommenu의 고유 id를 찾는 매소드
+    RoomMenuCartItem findByRoomMenuCartItemNumAndRoomMenu_RoomMenuNum(Long roomMenuCartItemNum, Long roomMenuNum);
+
+    // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
+    Page<RoomMenuCartItemDTO> findByRoomMenuCart_Member_MemberEmail(String memberEmail, Pageable pageable);
+
+
+
 }
 

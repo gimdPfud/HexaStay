@@ -1,6 +1,6 @@
 /***********************************************
- * 클래스명 : OrderStore
- * 기능 : OrderStore 엔티티
+ * 클래스명 : Orderstore
+ * 기능 : Orderstore 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
  * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
@@ -20,12 +20,11 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class OrderStore extends BaseEntity {
+public class Orderstore extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderStoreNum")
-    private Long orderStoreNum;
+    @Column(name = "orderstoreNum")
+    private Long orderstoreNum;
 
     //외부업체 결재 (이체/카드/현금 사용여부)
     private String orderStorePay;
@@ -35,7 +34,7 @@ public class OrderStore extends BaseEntity {
     @JoinColumn(name = "member_num")
     private Member member;
 
-    @OneToMany(mappedBy = "orderStore", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "orderstore", cascade = CascadeType.ALL)
     private List<Orderstoreitem> orderstoreitemList
             = new ArrayList<>();
 }

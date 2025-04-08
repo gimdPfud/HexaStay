@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -102,11 +103,16 @@ public class RoomMenuController {
     /**************************************************
      * 룸서비스 메뉴 등록 처리 (POST)
      * 기능 : 사용자가 작성한 메뉴 등록 정보를 처리하여 저장
+     * 수정일 : 2025-04-08
      **************************************************/
 
     @PostMapping("/roommenu/insert")
-    public String RoomServicePost(RoomMenuDTO roomMenuDTO) {
+    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) {
         log.info("등록페이지 post 진입");
+
+        String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
+        log.info("로그인한 사용자: " + memberName);
+        log.info(principal.toString());
 
         // 서비스를 통해 내부처리
         roomMenuService.insert(roomMenuDTO);
@@ -196,10 +202,15 @@ public class RoomMenuController {
     /**************************************************
      * 룸서비스 메뉴 수정 처리 (POST)
      * 기능 : 메뉴 수정 정보를 처리하여 업데이트
+     * 수정일 : 2025-04-08 - 프린시퀄 추가
      **************************************************/
 
     @PostMapping("/roommenu/modify")
-    public String roomMenuModifyPost(Long num, RoomMenuDTO roomMenuDTO) {
+    public String roomMenuModifyPost(Long num, RoomMenuDTO roomMenuDTO, Principal principal) {
+
+        String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
+        log.info("로그인한 사용자: " + memberName);
+        log.info(principal.toString());
 
         try {
             log.info("Post 수정 컨트롤러 진입: " + roomMenuDTO.getRoomMenuNum());
@@ -219,13 +230,19 @@ public class RoomMenuController {
     /**************************************************
      * 룸서비스 메뉴 삭제
      * 기능 : 특정 메뉴를 삭제
+     * 수정일 : 2025-04-08 (프린시퀄 추가)
      **************************************************/
 
     @PostMapping("/roommenu/delete")
-    public String roomMenuDelete(Long num){
+    public String roomMenuDelete(Long num, Principal principal){
         log.info("삭제 컨트롤러 진입" + num);
 
+        String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
+        log.info("로그인한 사용자: " + memberName);
+        log.info(principal.toString());
+
         roomMenuService.delete(num);
+        log.info("삭제한 사용자" + memberName);
 
         return "redirect:/roommenu/list";
 

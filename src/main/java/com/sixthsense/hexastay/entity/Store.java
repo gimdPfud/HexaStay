@@ -27,10 +27,7 @@ public class Store extends BaseEntity {
     //외부 업체 이름
     private String storeName;
 
-    //외부업체 이메일
-    private String storeEmail;
-
-    //외부업체 폰 번호
+    //외부업체 매장번호
     private String storePhone;
 
     //외부 업체주소

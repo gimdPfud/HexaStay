@@ -44,13 +44,27 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public void insert(StoreDTO storeDTO) throws IOException {
+        //들어온 DTO -> Entity 변환
+        Store store = modelMapper.map(storeDTO, Store.class);
+        //일단 저장 해서 pk 생성. (저장 안하면 pk 없으니까)
+        store = storeRepository.save(store);
+
+        //들어온 DTO에 사진에 대한 정보가 있다면
         if(storeDTO.getStoreProfile()!=null&& !storeDTO.getStoreProfile().isEmpty()){
+            //저장할 때 필요한 데이터들을 설정한다.
+            //  1. 파일 이름 가져옴
             String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
-            String fileFirstName = storeDTO.getStoreName() + "_" + storeDTO.getStoreNum();
+            //  2. 상호명_저장된pk
+            String fileFirstName = storeDTO.getStoreName() + "_" + store.getStoreNum();
+            //  3. 확장자 (온점 포함)
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            //  4. 파일이름 = 상호명_저장된pk.확장자
             String fileName = fileFirstName + fileSubName;
 
+            //파일은  /store/상호명_저장된pk.확장자  임.
             storeDTO.setStoreProfileMeta("/store/"+fileName);
+
+            //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
             Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/"+fileName);
             Path createPath = Paths.get(System.getProperty("user.dir" ),"store/");
             if(!Files.exists(createPath)){
@@ -58,7 +72,9 @@ public class StoreServiceImpl implements StoreService {
             }
             storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
         }
-        Store store = modelMapper.map(storeDTO, Store.class);
+        //파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
+        store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
+        //다시 저장 (이때, 이미 pk를 가지고 있으므로 update쿼리가 나간다.)
         storeRepository.save(store);
     }
 
@@ -87,7 +103,6 @@ public class StoreServiceImpl implements StoreService {
     public Long modify(StoreDTO storeDTO) {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
         store.setStoreName(storeDTO.getStoreName());
-        store.setStoreEmail(storeDTO.getStoreEmail());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
         store.setStoreCeoName(storeDTO.getStoreCeoName());
