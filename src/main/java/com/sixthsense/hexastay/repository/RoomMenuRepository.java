@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
+import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,9 @@ import org.springframework.data.jpa.repository.Query;
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 //    @Query("select a from RoomMenu a")
 //    public Page<RoomMenu> findby(Pageable pageable);
+
+    // 사용자를 찾기
+
 
     /* 카테고리 별로 검색 */
     Page<RoomMenu> findByRoomMenuCategory(String category, Pageable pageable);
@@ -34,6 +38,7 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 
     /*아무거나 검색*/
     Page<RoomMenu> findByRoomMenuNameLikeOrRoomMenuPriceGreaterThanOrRoomMenuCategoryLikeOrRoomMenuAmountGreaterThanOrRoomMenuStatusLike(String roomMenuName, Integer roomMenuPrice, String roomMenuCategory, Integer roomMenuAmount, String roomMenuStatus, Pageable pageable);
+
 
 
 
