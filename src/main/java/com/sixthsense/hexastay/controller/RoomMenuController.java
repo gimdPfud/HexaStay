@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
@@ -118,12 +119,17 @@ public class RoomMenuController {
      **************************************************/
 
     @PostMapping("/roommenu/insert")
-    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) {
+    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
         log.info("등록페이지 post 진입");
 
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
         log.info("로그인한 사용자: " + memberName);
         log.info(principal.toString());
+
+        if (principal == null) {
+            // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+            return "redirect:/admin/login";  // 로그인 페이지 URL로 변경
+        }
 
         // 서비스를 통해 내부처리
         roomMenuService.insert(roomMenuDTO);

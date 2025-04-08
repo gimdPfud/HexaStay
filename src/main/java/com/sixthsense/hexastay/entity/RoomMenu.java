@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.entity;
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Getter
@@ -42,6 +43,11 @@ public class RoomMenu extends BaseEntity {
 
     @Column(name = "roomMenuStatus")
     private String roomMenuStatus;              //품절여부
+
+
+    @Column(name = "roomMenuImageMeta")
+    private String roomMenuImageMeta; //룸 메뉴 대표 이미지
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotelRoomNum")

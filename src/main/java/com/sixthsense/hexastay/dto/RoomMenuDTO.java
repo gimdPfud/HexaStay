@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +37,10 @@ public class RoomMenuDTO {
     private String roomMenuCategory;             //카테고리
 
     private String roomMenuStatus;              //품절여부
+
+    private MultipartFile roomMenuImage; // 룸 메뉴 이미지
+
+    private String roomMenuImageMeta; //룸 메뉴 사진 정보
 
     private LocalDateTime createDate;    //등록일자
 
