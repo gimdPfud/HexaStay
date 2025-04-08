@@ -1,81 +1,160 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>자주 묻는 질문</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <!-- Add jQuery -->
-  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>  <style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    .header-banner {
+      background-color: #3a83f1;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 500;
+      border-radius: 10px 10px 0 0;
+    }
+    .sidebar {
+      background-color: #fff;
+      border-right: 1px solid #dee2e6;
+      padding: 20px;
+      height: 100%;
+    }
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      font-weight: 500;
+      color: #333;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #eaf2ff;
+      color: #3a83f1;
+      font-weight: bold;
+    }
+    .faq-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .accordion-button {
+      background-color: #fff;
+      font-weight: 600;
+    }
+    .accordion-item {
+      border: none;
+      border-bottom: 1px solid #dee2e6;
+      border-radius: 0;
+    }
     .accordion-button:not(.collapsed) {
-      background-color: #dbeafe;
+      background-color: #f1f8ff;
+      color: #3a83f1;
+    }
+    .faq-footer {
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .accordion-button {
+      transition: all 0.2s ease;
+      border: 1px solid #ddd !important;
+    }
+    .accordion-button:hover {
+      background-color: #f8f9fc;
+    }
+    .accordion-button:not(.collapsed) {
+      background-color: #eef4ff;
+      color: #3a83f1;
+      font-weight: bold;
+      border-bottom: none !important;
+    }
+    .accordion-body {
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+      }
     }
   </style>
 </head>
-<div class="accordion" id="faqAccordion">
-  <div class="accordion-item" th:each="faq : ${faqList}">
-    <h2 class="accordion-header" th:attr="id='heading-' + ${faq.faqNum}">
-      <button class="accordion-button collapsed" type="button"
-              data-bs-toggle="collapse"
-              th:attr="data-bs-target='#collapse-' + ${faq.faqNum}"
-              aria-expanded="false"
-              th:attrappend="aria-controls='collapse-' + ${faq.faqNum}">
-        <span th:text="${faq.faqTitle}">제목</span>
-      </button>
-    </h2>
-    <div class="accordion-collapse collapse"
-         th:attr="id='collapse-' + ${faq.faqNum}"
-         th:attrappend="aria-labelledby='heading-' + ${faq.faqNum}"
-         data-bs-parent="#faqAccordion">
-      <div class="accordion-body">
+<body>
 
-        <!-- ✅ 기본 보기 영역 -->
-        <div th:id="'viewMode-' + ${faq.faqNum}">
-          <p th:text="${faq.faqContent}">내용</p>
-          <div class="text-end mt-2">
-            <button class="btn btn-sm btn-outline-secondary"
-                    th:attr="onclick='enableEdit(' + ${faq.faqNum} + ')'"
-            >수정</button>
+<!-- 전체 가운데 정렬된 박스 -->
+<div class="container my-5" style="max-width: 960px;">
+
+  <!-- 상단 배너 -->
+  <div class="header-banner">
+    도움이 필요하신가요? 곁에서 도와드립니다!
+  </div>
+
+  <!-- 본문 박스 -->
+  <div class="card border-0 shadow-sm rounded-bottom">
+    <div class="row g-0">
+
+      <!-- 좌측 사이드바 -->
+      <nav class="col-md-4 col-lg-3 sidebar">
+        <a th:href="@{/faq/list(category='예약')}" th:classappend="${category == '예약'} ? ' active'">예약 정보</a>
+        <a th:href="@{/faq/list(category='결제')}" th:classappend="${category == '결제'} ? ' active'">결제/환불 정보</a>
+        <a th:href="@{/faq/list(category='취소')}" th:classappend="${category == '취소'} ? ' active'">예약 취소</a>
+      </nav>
+
+      <!-- 우측 FAQ 본문 -->
+      <main class="col-md-8 col-lg-9 p-4">
+        <div class="faq-title">자주 묻는 질문</div>
+
+        <!-- FAQ 아코디언 시작 -->
+        <div class="accordion" id="faqAccordion">
+          <div th:each="faq : ${faqList}" class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header" th:attr="id='heading' + ${faq.faqNum}">
+              <button class="accordion-button collapsed py-3 px-2 bg-white text-dark fw-medium border rounded"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      th:attr="data-bs-target='#collapse' + ${faq.faqNum}"
+                      aria-expanded="false">
+                <i class="bi bi-question-circle-fill me-2 text-primary"></i>
+                <span th:text="${faq.faqTitle}">질문 제목</span>
+              </button>
+            </h2>
+            <div class="accordion-collapse collapse"
+                 th:attr="id='collapse' + ${faq.faqNum}, aria-labelledby='heading' + ${faq.faqNum}"
+                 data-bs-parent="#faqAccordion">
+              <div class="accordion-body bg-light border-top px-3 py-2 rounded-bottom">
+                <p class="mb-2" th:text="${faq.faqContent}">답변 내용</p>
+
+                <!-- 관리자 권한 버튼 -->
+                <div class="text-end mt-2" sec:authorize="hasRole('ADMIN')">
+                  <a th:href="@{/faq/modify/{faqNum}(faqNum=${faq.faqNum})}" class="btn btn-sm btn-outline-primary me-2">
+                    <i class="bi bi-pencil"></i> 수정
+                  </a>
+                  <a th:href="@{/faq/delete/{faqNum}(faqNum=${faq.faqNum})}"
+                     class="btn btn-sm btn-outline-danger"
+                     onclick="return confirm('정말 삭제하시겠습니까?')">
+                    <i class="bi bi-trash"></i> 삭제
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <!-- FAQ 아코디언 끝 -->
 
-        <!-- ✅ 수정 영역 -->
-        <form th:action="@{/faq/modify}" method="post"
-              th:id="'editForm-' + ${faq.faqNum}"
-              th:object="${faq}" style="display:none;">
-          <input type="hidden" name="faqNum" th:value="${faq.faqNum}" />
-          <div class="mb-2">
-            <textarea class="form-control" name="faqContent" rows="3"
-                      th:text="${faq.faqContent}"></textarea>
-          </div>
-          <div class="text-end">
-            <button type="submit" class="btn btn-sm btn-primary">저장</button>
-            <button type="button" class="btn btn-sm btn-secondary"
-                    th:attr="onclick='cancelEdit(' + ${faq.faqNum} + ')'"
-            >취소</button>
-          </div>
-        </form>
-        <form th:action="@{/faq/delete}" method="post" class="d-inline">
-          <input type="hidden" name="faqNum" th:value="${faq.faqNum}" />
-          <button class="btn btn-sm btn-danger">삭제</button>
-        </form>
-      </div>
+        <!-- 하단 도움말 -->
+        <div class="faq-footer mt-4 text-muted">
+          도움이 되었나요? <a href="#" class="text-decoration-underline">더 많은 도움말 보기</a>
+        </div>
+      </main>
     </div>
   </div>
 </div>
-<script>
-  function enableEdit(faqNum) {
-    document.getElementById('viewMode-' + faqNum).style.display = 'none';
-    document.getElementById('editForm-' + faqNum).style.display = 'block';
-  }
 
-  function cancelEdit(faqNum) {
-    document.getElementById('editForm-' + faqNum).style.display = 'none';
-    document.getElementById('viewMode-' + faqNum).style.display = 'block';
-  }
-</script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

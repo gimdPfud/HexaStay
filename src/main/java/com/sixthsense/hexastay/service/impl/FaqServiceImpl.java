@@ -1,7 +1,9 @@
 package com.sixthsense.hexastay.service.impl;
 import com.sixthsense.hexastay.dto.FaqDTO;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Faq;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.FaqRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.FaqService;
@@ -26,12 +28,15 @@ public class FaqServiceImpl implements FaqService {
     private final FaqRepository faqRepository; // (유지)
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final AdminRepository adminRepository;
+
     //등록
     @Override
     public void faqInsert(FaqDTO faqDTO, Principal principal) {
         //String email = principal.getName();
         // (1) 여기서 멤버 조회 및 예외 처리
-        Member member = memberRepository.findById(faqDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
+        log.info("DTo"+faqDTO);
+        Member member = memberRepository.findById(1l).orElseThrow(EntityNotFoundException::new);
 //        if (!member.getRole().equals("ADMIN")) {
 //            throw new RuntimeException("관리자만 FAQ를 등록할 수 있습니다.");
 //        }
@@ -46,15 +51,12 @@ public class FaqServiceImpl implements FaqService {
     }
 
     //목록
-    @Override
-    public List<FaqDTO> faqList() {
-        //내림차순 정렬
-        List<Faq> faqList = faqRepository.findAll(Sort.by(Sort.Direction.DESC, "faqNum"));
-        log.info("목록 진입");
+    public List<FaqDTO> faqList(String category) {
+        log.info("faqList() 실행 - 카테고리: {}", category);
+        List<Faq> faqList = faqRepository.findByFaqCategory(category);
         return faqList.stream()
-                .map(faq -> modelMapper.map(faq, FaqDTO.class)) // (수정: ModelMapper 사용)
+                .map(faq -> modelMapper.map(faq, FaqDTO.class))
                 .collect(Collectors.toList());
-
     }
 
     // 단건 조회
@@ -62,7 +64,7 @@ public class FaqServiceImpl implements FaqService {
     public FaqDTO faqRead(Long faqNum) {
         log.info("보기");
         Faq faq = faqRepository.findById(faqNum)
-                .orElseThrow(() -> new RuntimeException("FAQ를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("faqNum=" + "FaqDTO()" + "에 해당하는 FAQ가 없습니다."));
         return modelMapper.map(faq, FaqDTO.class); // (수정: ModelMapper 사용)
     }
 
@@ -87,5 +89,11 @@ public class FaqServiceImpl implements FaqService {
 //        }
         faqRepository.deleteById(faqNum);
         log.info("삭제완료");
+    }
+    @Override
+    public String AdminRole(Principal principal) {
+        String adminEmail = principal.getName();
+        Admin admin = adminRepository.findByAdminEmail(adminEmail); // 변수 오타 수정
+        return admin.getAdminRole(); // ex: admin, wait 등
     }
 }

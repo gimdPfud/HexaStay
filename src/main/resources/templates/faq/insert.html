@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -16,26 +17,27 @@
     <div class="accordion" id="faqAccordion">
         <div class="container mt-5">
             <h2 class="mb-4">FAQ 등록</h2>
-            <form th:action="/faq/insert" method="post">
+            <form th:action="@{/faq/insert}" method="post">
                 <div class="mb-3">
-                    <label for="faqTitle">제목</label>
-                    <input type="text" name="faqTitle" id="faqTitle" class="form-control" required />
+                    <label>카테고리</label>
+                    <select name="faqCategory" class="form-select">
+                        <option value="예약">예약</option>
+                        <option value="결제">결제</option>
+                        <option value="취소">취소</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>제목</label>
+                    <input type="text" name="faqTitle" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label>내용</label>
-                    <textarea name="faqContent" class="form-control" rows="4" required></textarea>
+                    <textarea name="faqContent" class="form-control" rows="5" required></textarea>
                 </div>
-                <div class="mb-3">
-                    <label>분류</label>
-                    <select name="faqCategory" class="form-select">
-                        <option value="이용안내">이용안내</option>
-                        <option value="결제">결제</option>
-                    </select>
+                <div class="card-footer d-flex justify-content-center gap-3">
+                    <button type="button" onclick="history.back()" class="btn btn-dark">목록</button>
+                    <button type="submit" class="btn btn-success">등록</button>
                 </div>
-
-                <button class="btn btn-success" type="button" th:onclick="|location.href='@{/faq/insert}'|">등록</button>
-                <button type="submit" class="btn btn-primary">등록</button>
-                <a th:href="@{/faq/list}" class="btn btn-secondary">취소</a>
             </form>
         </div>
     </div>

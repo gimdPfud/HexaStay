@@ -44,7 +44,7 @@ public class NoticeController {
         log.info("공지사항 작성 페이지");
 
         if (principal != null) {
-            model.addAttribute("memberNum", principal.getName()); // (수정)
+            model.addAttribute("memberNum", 1); // (수정)
         }
 
         return "/notice/insert"; // (수정)
