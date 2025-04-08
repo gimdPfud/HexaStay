@@ -15,13 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Builder
 @Entity
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
