@@ -7,11 +7,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class CustomMemberDetails implements UserDetails {
+public class CustomMemberDetails implements UserDetails, Principal {
 
     private final Member member;
 
@@ -53,5 +54,10 @@ public class CustomMemberDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return getUsername();  // getUsername()을 반환하여 사용자 이메일을 이름으로 사용
     }
 }
