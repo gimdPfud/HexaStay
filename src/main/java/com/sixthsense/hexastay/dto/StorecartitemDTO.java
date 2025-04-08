@@ -25,5 +25,5 @@ public class StorecartitemDTO {
     private Long storecartitemNum;
     private Long storecartNum;
     private Long storemenuNum;
-    private int storecartitemCount;          //장바구니에 담은 수량
+    private Integer storecartitemCount;          //장바구니에 담은 수량
 }

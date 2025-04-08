@@ -18,6 +18,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StorecartitemViewDTO {
-    private Long storecartitemNum;
-    private String storemenuName;
+    private Long storecartitemNum;      //번호pk
+    private String storemenuName;       //상품이름
+    private Integer storemenuPrice;     //상품가격
+    private Integer storemenuCount;     //상품개수
+    private String imgName;             //이미지
 }

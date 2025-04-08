@@ -70,12 +70,10 @@ public class StoreController {
     @GetMapping("/read")
     public String readA(Principal principal, Model model){
         /*todo principal로 admin 찾아서 그 어드민이 갖고있는 store fk로 스토어서비스.read(fk) 해줄거임 */
-        principal.getName();//이건 됨.
-
-
+//        principal.getName();//이건 됨.
 //        StoreDTO data = storeService.read(id);
 //        model.addAttribute("data",data);
-        return "store/read";
+        return "store/list";
     }
 
 
