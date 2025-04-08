@@ -32,4 +32,5 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     // 브랜드 조회용
     Page<Branch> findByCenter_CenterNum (Long centerNum, Pageable pageable);
+
 }

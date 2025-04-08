@@ -36,68 +36,78 @@ public class CenterController {
     public String listCenter(Model model, Pageable pageable){
         log.info("get 방식 center 목록 controller 진입");
 
+        //페이지네이션된 본사 목록 가져와서 Page<CenterDTO> 형태로 반환
         Page<CenterDTO> centerDTOS = centerService.centerList(pageable);
+        //model을 통해 view에 전달
         model.addAttribute("centerDTOS", centerDTOS);
-
 
         return "center/list";
     }
 
-    //검색용
+    //검색용 - 검색 조건과 검색어를 받아서 처리
     @GetMapping("/listsearch")
-    public String listSearch(@RequestParam String select,
-                             @RequestParam String choice,
-                             @RequestParam String keyword,
+    public String listSearch(@RequestParam String select,   //검색 조건
+                             @RequestParam String choice,   //선택한 항목 종류(소속)(center, branch, facility)
+                             @RequestParam String keyword,  //검색어
                              Pageable pageable,
                              Model model) {
 
         if (!keyword.isEmpty()) {
-            // 🔍 키워드가 있을 때 - 검색 조건 분기
-            if (select.equals("company")) {
-                if (choice.equals("center")) {
+            // 키워드가 있을 때 - 검색 조건
+            if (select.equals("company")) {     //검색 조건이 조직명이며
+                if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
+                    //본사 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("centerDTOS", centerService.companyName(keyword, pageable));
-                } else if (choice.equals("branch")) {
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                    //지사 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("branchDTOS", branchService.companyName(keyword, pageable));
-                } else if (choice.equals("facility")) {
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                    //지점 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("facilityDTOS", facilityService.companyName(keyword, pageable));
                 }
 
-            } else if (select.equals("brandName")) {
-                if (choice.equals("center")) {
+            } else if (select.equals("brandName")) {    //검색 조건이 브랜드명이며
+                if (choice.equals("center")) {          //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
+                    //본사 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("centerDTOS", centerService.brandName(keyword, pageable));
-                } else if (choice.equals("branch")) {
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                    //지사 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("branchDTOS", branchService.brandName(keyword, pageable));
-                } else if (choice.equals("facility")) {
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                    //지점 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("facilityDTOS", facilityService.brandName(keyword, pageable));
                 }
 
-            } else if (select.equals("businessNum")) {
-                if (choice.equals("center")) {
-                    model.addAttribute("centerDTOS", centerService.companyName(keyword, pageable));
-                } else if (choice.equals("branch")) {
-                    model.addAttribute("branchDTOS", branchService.companyName(keyword, pageable));
-                } else if (choice.equals("facility")) {
-                    model.addAttribute("facilityDTOS", facilityService.companyName(keyword, pageable));
+            } else if (select.equals("businessNum")) {  //검색 조건이 사업자등록번호이며
+                if (choice.equals("center")) {          //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
+                    //본사 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
+                    model.addAttribute("centerDTOS", centerService.centerBusinessNum(keyword, pageable));
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                    //지사 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
+                    model.addAttribute("branchDTOS", branchService.branchBusinessNum(keyword, pageable));
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                    //지점 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
+                    model.addAttribute("facilityDTOS", facilityService.facilityBusinessNum(keyword, pageable));
                 }
             }
 
         } else {
-            // 🔄 키워드가 비어 있을 때 - 전체 리스트
-            if (choice.equals("center")) {
+            // 키워드가 비어있으며
+            if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 본사 전체 목록을 불러와서 보여줌
                 model.addAttribute("centerDTOS", centerService.centerList(pageable));
-            } else if (choice.equals("branch")) {
+            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 지사 전체 목록을 불러와서 보여줌
                 model.addAttribute("branchDTOS", branchService.branchList(pageable));
-            } else if (choice.equals("facility")) {
+            } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 지점 전체 목록을 불러와서 보여줌
                 model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
             }
         }
 
-        if (select.equals("전체")) {
-            if (choice.equals("center")) {
+        if (select.equals("전체")) {  //검색 조건이 전체이며
+            if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 본사 전체 목록을 불러와서 보여줌
                 model.addAttribute("centerDTOS", centerService.centerList(pageable));
-            } else if (choice.equals("branch")) {
+            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 지사 전체 목록을 불러와서 보여줌
                 model.addAttribute("branchDTOS", branchService.branchList(pageable));
-            } else if (choice.equals("facility")) {
+            } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 지점 전체 목록을 불러와서 보여줌
                 model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
             }
         }
@@ -105,10 +115,11 @@ public class CenterController {
         return "center/list";
     }
 
-
     @GetMapping("/signup")
     public String signUpCenterGet(Model model){
         log.info("get 방식 center 등록 controller 진입");
+
+        //get 등록
         List<CenterDTO> centerDTOList = centerService.allCenterList();
         model.addAttribute("centerDTOList", centerDTOList);
 
