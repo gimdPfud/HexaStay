@@ -120,5 +120,15 @@ public class BranchServiceImpl implements BranchService {
         return brachDTOList;
     }
 
+    @Override
+    public Page<BranchDTO> branchBusinessNum(String keyword, Pageable pageable) {
+        //검색하면 사업자등록번호를 포함하는 정보를 Page타입 Entity로 불러와서 담기
+        Page<Branch> branchPage = branchRepository.findByBranchNameContaining(keyword, pageable);
+        //Entity를 DTO로 변환하여 Page타입 DTO로 불러와서 담기
+        Page<BranchDTO> brachDTOList = branchPage.map(branch -> modelMapper.map(branch, BranchDTO.class));
+        //Page타입 DTO를 반환
+        return brachDTOList;
+    }
+
 
 }

@@ -28,4 +28,6 @@ public interface FacilityService {
     //브랜드명으로 조회
     public Page<FacilityDTO> brandName(String keyword, Pageable pageable);
 
+    //사업자번호로 조회
+    public Page<FacilityDTO> facilityBusinessNum(String keyword, Pageable pageable);
 }

@@ -19,20 +19,20 @@ import java.util.List;
 
 public interface CenterRepository extends JpaRepository<Center, Long> {
     @Query("select a from Center a")
-    Page<Center> findAll(Pageable pageable);
+    public Page<Center> findAll(Pageable pageable);
 
     // 회원가입용
-    List<Center> findByCenterName (String centerName);
+    public List<Center> findByCenterName (String centerName);
 
-    //조직명으로 조회
-    Page<Center> findByCenterNameContaining (String centerName, Pageable pageable);
+    //본사명으로 조회
+    public Page<Center> findByCenterNameContaining (String centerName, Pageable pageable);
 
     //브랜드명으로 조회
-    Page<Center> findByCenterBrand (String keyword, Pageable pageable);
-    Center findByCenterBrand(String keyword);
+    public Page<Center> findByCenterBrand (String keyword, Pageable pageable);
+    public Center findByCenterBrand(String keyword);
 
-    //사업자번호로 조회
-    Page<Center> findByCenterBusinessNum (String centerBusinessNum, Pageable pageable);
+    //본사 사업자등록번호로 조회
+    public Page<Center> findByCenterBusinessNum (String centerBusinessNum, Pageable pageable);
 
 
 }
