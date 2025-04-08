@@ -5,6 +5,8 @@ import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,8 +44,8 @@ public class AdminController {
 
     //리스트
     @GetMapping("/list")
-    public String list(Model model) {
-        List<AdminDTO> adminDTOList = adminService.getAdminList();
+    public String list(Model model, Pageable pageable) {
+        Page<AdminDTO> adminDTOList = adminService.getAdminList(pageable);
         model.addAttribute("adminDTOList", adminDTOList);
         return "admin/list";
     }
@@ -100,14 +102,14 @@ public class AdminController {
     // 이하 가입창에서 레스트용
     @GetMapping("/searchbranch")
     @ResponseBody
-    public List<BranchDTO> insertbranch(@RequestParam String centerName) {
-        return adminService.getBranchList(centerName);
+    public List<BranchDTO> insertbranch(@RequestParam Long centerNum) {
+        return adminService.getBranchList(centerNum);
     }
 
     @GetMapping("/searchfacility")
     @ResponseBody
-    public List<FacilityDTO> insertfacility(@RequestParam String centerName) {
-        return adminService.getFacilityList(centerName);
+    public List<FacilityDTO> insertfacility(@RequestParam Long centerNum) {
+        return adminService.getFacilityList(centerNum);
     }
 
     @GetMapping("/searchstore")

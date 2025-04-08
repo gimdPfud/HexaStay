@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.config.Security;
 
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,48 +11,28 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class CustomUserDetails implements UserDetails {
+public class CustomMemberDetails implements UserDetails {
 
-    private Admin admin;
+    private final Member member;
 
-    public CustomUserDetails(Admin admin) {
-        this.admin = admin;
+    public CustomMemberDetails(Member member) {
+        this.member = member;
     }
 
     @Override
     public String getUsername() {
-        return admin.getAdminEmail();
+        return member.getMemberEmail();
     }
 
     @Override
     public String getPassword() {
-        return admin.getAdminPassword();
-    }
-
-    public String getAdminPosition(){
-        return admin.getAdminPosition();
-}
-
-    public String getAdminName(){
-        return admin.getAdminName();
-    }
-
-    public Integer getAdminEmployeeNum(){
-        return admin.getAdminEmployeeNum();
-    }
-
-    public String getAdminBrand(){
-        return admin.getAdminBrand();
-    }
-
-    public String getAdminProfileMeta(){
-        return admin.getAdminProfileMeta();
+        return member.getMemberPassword();
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + admin.getAdminRole()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole()));
     }
 
     @Override

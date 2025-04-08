@@ -84,7 +84,7 @@
                     </div>
                     <div class="col-3">
                         <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
+                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:value="${centerList.centerNum}"></option>
                         </select>
                     </div>
                     <div class="col-3">
@@ -102,20 +102,20 @@
             <div class="mb-3">
                 <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
                 <select class="form-select" id="adminCenterRank">
-                    <option>임원진</option>
-                    <option>관리직</option>
-                    <option>사원</option>
+                    <option value="exec">임원진</option>
+                    <option value="head">관리직</option>
+                    <option value="crew">사원</option>
                 </select>
                 <select class="form-select" id="adminBranchFacilityRank" hidden>
-                    <option>운영 총괄</option>
-                    <option>관리직</option>
-                    <option>사원</option>
-                    <option>협력 업체</option>
+                    <option value="gm">총괄 책임자</option>
+                    <option value="sv">관리직</option>
+                    <option value="crew">사원</option>
+                    <option value="partner">협력 업체</option>
                 </select>
                 <select class="form-select" id="adminStoreRank" hidden>
-                    <option>운영총괄</option>
-                    <option>부매니저</option>
-                    <option>매장 직원</option>
+                    <option value="mgr">매니저</option>
+                    <option value="submgr">부매니저</option>
+                    <option value="staff">매장 직원</option>
                 </select>
 
                 <input hidden name="adminRole" id="adminRole">
@@ -138,6 +138,11 @@
                 <button class="btn btn-danger">취소</button>
             </div>
         </div>
+
+        <input hidden name="centerNum" id="centerNum">
+        <input hidden name="branchNum" id="branchNum">
+        <input hidden name="facilityNum" id="facilityNum">
+        <input hidden name="facilityNum" id="storeNum">
 
     </form>
 
@@ -214,7 +219,7 @@
                 let choiceValue = adminChoice.value;
 
                 if (choiceValue === "지사") {
-                    fetch(`/admin/searchbranch?centerName=${adminCenterValue}`)
+                    fetch(`/admin/searchbranch?centerNum=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
@@ -231,7 +236,7 @@
                         .catch(error => console.error("지사 데이터 불러오기 실패:", error));
 
                 } else if (choiceValue === "지점") {
-                    fetch(`/admin/searchfacility?centerName=${adminCenterValue}`)
+                    fetch(`/admin/searchfacility?centerNum=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
@@ -252,13 +257,29 @@
 
         function submitForm() {
             if (adminChoice.value === "본사") {
-                document.getElementById("adminBrand").value = adminCenter.value;
+                document.getElementById("centerNum").value = adminCenter.value;
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = "";
+                document.getElementById("storeNum").value = "";
                 document.getElementById("adminRole").value = adminCenterRank.value;
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                document.getElementById("adminBrand").value = adminBranchFacility.value;
+            } else if (adminChoice.value === "지사") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = adminBranchFacility.value;
+                document.getElementById("facilityNum").value = ""
+                document.getElementById("storeNum").value = "";
                 document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-            } else if (adminChoice.value === "스토어") {
-                document.getElementById("adminBrand").value = adminStore.value;
+            } else if (adminChoice.value === "지점") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = adminBranchFacility.value;
+                document.getElementById("storeNum").value = "";
+                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
+            }
+            else if (adminChoice.value === "스토어") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = "";
+                document.getElementById("storeNum").value = adminStore.value;
                 document.getElementById("adminRole").value = adminStoreRank.value;
             }
 
@@ -269,10 +290,6 @@
                 document.getElementById('adminPhonePartOne').value + "-" +
                 document.getElementById('adminPhonePartTwo').value + "-" +
                 document.getElementById('adminPhonePartThree').value
-
-
-            document.getElementById('')
-
         }
 
 

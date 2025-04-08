@@ -1,6 +1,8 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,8 +13,9 @@ public interface AdminService {
     void insertAdmin (AdminDTO adminDTO) throws IOException;
 
     // 어드민 목록
-    List<AdminDTO> getAdminList();
+    Page<AdminDTO> getAdminList(Pageable pageable);
     AdminDTO getAdmin(Long adminNum);
+
 
     // 가입 대기자 목록
     List<AdminDTO> getWaitAdminList();

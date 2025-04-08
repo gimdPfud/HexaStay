@@ -1,9 +1,11 @@
 package com.sixthsense.hexastay.config.Security;
 
 import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,32 +19,29 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+@Order(2)
+public class MemberSecurityConfig {
 
-    private final AdminRepository adminRepository;
+    private final MemberRepository memberRepository;
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new com.sixthsense.hexastay.config.Security.CustomUserDetailsService(adminRepository);
-    }
-
-     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public UserDetailsService memberDetailsService() {
+        return new CustomMemberDetailsService(memberRepository);
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
+    public AuthenticationManager memberAuthenticationManager(
+            UserDetailsService memberDetailsService, PasswordEncoder passwordEncoder) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        provider.setUserDetailsService(memberDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean(name = "memberSecurityFilterChain")
+    public SecurityFilterChain memberSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/member/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**" ).permitAll()
 //                        .requestMatchers("/main").hasAnyRole("wait", "active", "admin")
@@ -52,22 +51,22 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        .loginPage("/admin/login")
-                        .usernameParameter("adminEmail")
-                        .passwordParameter("adminPassword")
-                        .defaultSuccessUrl("/admin/main", true)
+                        .loginPage("/member/login")
+                        .usernameParameter("memberEmail")
+                        .passwordParameter("memberPassword")
+                        .defaultSuccessUrl("/member/main", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/admin/login")
+                        .logoutSuccessUrl("/member/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendRedirect("/admin/main");
+                            response.sendRedirect("/member/main");
                         })
                 )
                 .csrf(csrf -> csrf.disable()); // CSRF
