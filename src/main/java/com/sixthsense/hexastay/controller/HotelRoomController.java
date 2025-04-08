@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -80,75 +80,10 @@ public class HotelRoomController {
         return "hotelroom/insert";
     }
 
-    //********호텔룸 등록 테스트 페이지*****//
-    //Test 호텔룸 등록 - GET
-    @GetMapping("/hotelroom/register")
-    public String showRegisterHotelRoomForm() {
-
-
-
-        return "hotelroom/hotelroominsert";
-    }
-
-    //Test 호텔룸 등록 처리 -Post
-    @PostMapping("/hotelroom/register")
-    public String registerHotelRoom(@ModelAttribute HotelRoomDTO hotelRoomDTO, @RequestParam Long memberNum) {
-        hotelRoomService.insertHotelRoomMember(hotelRoomDTO, memberNum);
-        return "redirect:/hotelroom/register";
-    }
-
-    //2.List
-    //todo:http://localhost:8090/hotelroom/room
-    @GetMapping("hotelroom/room")
-    public String getRooms(Model model,
-                           @PageableDefault(page=1)Pageable pageable)
-    {
-
-        Page<HotelRoomDTO> roomPage
-                = hotelRoomService.hotelroomList(pageable);
-        model.addAttribute("roomPage", roomPage);
-        return "hotelroom/hotelroom"; // hotelroom.html
-    }
-
-    @GetMapping("hotelroom/rooma")
-    public String getRoomsa(Model model,
-                            @PageableDefault(page=1)Pageable pageable)
-    {
-
-        Page<HotelRoomDTO> roomPage
-                = hotelRoomService.hotelroomList(pageable);
-        model.addAttribute("roomPage", roomPage);
-        return "hotelroom/hotelrooma"; // hotelrooma.html
-    }
-
-
-    //3.호텔룸 클릭시 멤버 정보 가져오기
-    @GetMapping("/hotelroom/members/{roomNum}")
-    public String getRoomMembers(@PathVariable Long roomNum, Model model) {
-        HotelRoomDTO roomDTO = hotelRoomService.findRoomWithMembers(roomNum);
-        model.addAttribute("room", roomDTO);
-        return "hotelroom/memberinfo"; // member-info.html 렌더링
-    }
 
 
 
 
-
-
-    @GetMapping("/hotelroom/{hotelRoomNum}")
-    public String showHotelRoomDetail(@PathVariable Long hotelRoomNum, Model model) {
-        hotelRoomService.getHotelRoomWithMember(hotelRoomNum).ifPresent(hotelRoomDTO -> {
-            model.addAttribute("hotelRoom", hotelRoomDTO);
-        });
-        return "hotelroom/hotelroomdetail";
-    }
-
-    @GetMapping("/members")
-    public String showHotelRoomMembers(Model model) {
-        List<MemberDTO> members = hotelRoomService.getAllMembersInHotelRooms();
-        model.addAttribute("members", members);
-        return "hotelRoomMembers"; // 해당 정보를 보여줄 HTML 페이지
-    }
 
 
 

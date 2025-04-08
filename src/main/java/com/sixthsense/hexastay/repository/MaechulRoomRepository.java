@@ -7,9 +7,10 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.OrderRoom;
+import com.sixthsense.hexastay.entity.MaechulRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderRoomRepository extends JpaRepository<OrderRoom, Long> {
+public interface MaechulRoomRepository extends JpaRepository<MaechulRoom, Long> {
+
 
 }

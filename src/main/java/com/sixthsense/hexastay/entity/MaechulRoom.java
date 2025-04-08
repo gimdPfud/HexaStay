@@ -18,20 +18,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRoom extends BaseEntity {
+public class MaechulRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orderRoomNum")
-    private Long orderRoomNum;
+    @Column(name = "maechulRoomNum")
+    private Long maechulRoomNum;
 
-    //숙박일수
-    private Long orderRoomAmount;
 
-    //호텔숙박가격
-    private Long orderRoomPrice;
 
-    //호텔 수박가격 총 매출액
-    private Long orderRoomTotalPrice;
+    //호텔 숙박 가격 총 매출액
+    private Long maechulRoomTotalPrice;
 
 
 
@@ -43,12 +39,11 @@ public class OrderRoom extends BaseEntity {
     //todo:2. Room정보 hotelRoomPrice 룸의 가격 가져오기
 
 
-    //멤버 테이블
+    //Room테이블 - HotelRoom
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberNum")
     private Member member;
-    //todo:1.member정보 memberName
-    //***참조 테이블************************
+
 
 
 

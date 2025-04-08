@@ -1,6 +1,6 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.OrderRoomDTO;
+import com.sixthsense.hexastay.dto.MaechulRoomDTO;
 import com.sixthsense.hexastay.service.impl.OrderRoomImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,9 +23,9 @@ public class MaechulRoomController {
     }
 
     @PostMapping("/insert")
-    public String insertOrderPost(OrderRoomDTO orderRoomDTO) {
+    public String insertOrderPost(MaechulRoomDTO maechulRoomDTO) {
 
-        orderRoom.insertOrderMemRoom(orderRoomDTO);
+        orderRoom.insertOrderMemRoom(maechulRoomDTO);
 
 
         return "hotelroom/orderroom";

@@ -11,19 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRoomDTO {
+public class MaechulRoomDTO {
 
     private Long orderRoomNum;
 
 
-    //숙박일수
-    private Long orderRoomAmount;
-
-    //호텔숙박가격
-    private Long orderRoomPrice;
-
     //호텔 수박가격 총 매출액
-    private Long orderRoomTotalPrice;;
+    private Long orderRoomTotalPrice;
 
 
 
@@ -41,7 +35,7 @@ public class OrderRoomDTO {
     //todo : 참조 DTO들을 orderRoomDTO에 담기
     //******HotelRoom********//
     private HotelRoomDTO hotelRoomDTO;
-    public OrderRoomDTO setHotelRoomDTO(HotelRoomDTO hotelRoom) {
+    public MaechulRoomDTO setHotelRoomDTO(HotelRoomDTO hotelRoom) {
 
         this.hotelRoomDTO = hotelRoomDTO;
 
@@ -51,7 +45,7 @@ public class OrderRoomDTO {
     //******Member********//
     private MemberDTO memberDTO;
 
-    public OrderRoomDTO setMemberDTO(MemberDTO memberDTO) {
+    public MaechulRoomDTO setMemberDTO(MemberDTO memberDTO) {
 
         this.memberDTO = memberDTO;
 
