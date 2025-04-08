@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -58,10 +59,10 @@ public class CenterController {
                 if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
                     //본사 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("centerDTOS", centerService.companyName(keyword, pageable));
-                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때
                     //지사 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("branchDTOS", branchService.companyName(keyword, pageable));
-                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때
                     //지점 중 상호명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("facilityDTOS", facilityService.companyName(keyword, pageable));
                 }
@@ -70,10 +71,10 @@ public class CenterController {
                 if (choice.equals("center")) {          //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
                     //본사 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("centerDTOS", centerService.brandName(keyword, pageable));
-                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때
                     //지사 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("branchDTOS", branchService.brandName(keyword, pageable));
-                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때
                     //지점 중 브랜드명이 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("facilityDTOS", facilityService.brandName(keyword, pageable));
                 }
@@ -82,10 +83,10 @@ public class CenterController {
                 if (choice.equals("center")) {          //소속 설정이 본사일 때, model을 통해 목록을 불러와서 보여줌
                     //본사 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("centerDTOS", centerService.centerBusinessNum(keyword, pageable));
-                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("branch")) {   //소속 설정이 지사일 때
                     //지사 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("branchDTOS", branchService.branchBusinessNum(keyword, pageable));
-                } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 목록을 불러와서 보여줌
+                } else if (choice.equals("facility")) { //소속 설정이 지점일 때
                     //지점 중 사업자등록번호가 검색어를 포함하는(containing) 목록을 검색
                     model.addAttribute("facilityDTOS", facilityService.facilityBusinessNum(keyword, pageable));
                 }
@@ -95,9 +96,9 @@ public class CenterController {
             // 키워드가 비어있으며
             if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 본사 전체 목록을 불러와서 보여줌
                 model.addAttribute("centerDTOS", centerService.centerList(pageable));
-            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 지사 전체 목록을 불러와서 보여줌
+            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때
                 model.addAttribute("branchDTOS", branchService.branchList(pageable));
-            } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 지점 전체 목록을 불러와서 보여줌
+            } else if (choice.equals("facility")) { //소속 설정이 지점일 때
                 model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
             }
         }
@@ -105,12 +106,16 @@ public class CenterController {
         if (select.equals("전체")) {  //검색 조건이 전체이며
             if (choice.equals("center")) {  //소속 설정이 본사일 때, model을 통해 본사 전체 목록을 불러와서 보여줌
                 model.addAttribute("centerDTOS", centerService.centerList(pageable));
-            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때, model을 통해 지사 전체 목록을 불러와서 보여줌
+            } else if (choice.equals("branch")) {   //소속 설정이 지사일 때
                 model.addAttribute("branchDTOS", branchService.branchList(pageable));
-            } else if (choice.equals("facility")) { //소속 설정이 지점일 때, model을 통해 지점 전체 목록을 불러와서 보여줌
+            } else if (choice.equals("facility")) { //소속 설정이 지점일 때
                 model.addAttribute("facilityDTOS", facilityService.facilityList(pageable));
             }
         }
+
+        model.addAttribute("select", select);
+        model.addAttribute("choice", choice);
+        model.addAttribute("keyword", keyword);
 
         return "center/list";
     }
@@ -119,7 +124,7 @@ public class CenterController {
     public String signUpCenterGet(Model model){
         log.info("get 방식 center 등록 controller 진입");
 
-        //get 등록
+        //get 등록 (본사 전체 목록을 불러옴(검색하기 전에) DTO에 담아 model을 통해 보여준다.)
         List<CenterDTO> centerDTOList = centerService.allCenterList();
         model.addAttribute("centerDTOList", centerDTOList);
 
@@ -136,10 +141,16 @@ public class CenterController {
     }
 
     @GetMapping("/read/{centerNum}")
-    public String readCenter(@PathVariable("centerNum") Long centerNum, Model model) {
+    public String readCenter(@PathVariable("centerNum") Long centerNum, Model model, RedirectAttributes redirectAttributes) {
         log.info("get 방식 center 상세보기 controller 진입");
 
         CenterDTO centerDTO = centerService.centerRead(centerNum);
+
+        if(centerDTO == null){
+            redirectAttributes.addFlashAttribute("msg", "해당 본사 정보를 찾을 수 없습니다.");
+            return "redirect:/center/list";
+        }
+
         model.addAttribute("centerDTO", centerDTO);
 
         return "center/read";
@@ -161,8 +172,8 @@ public class CenterController {
         return "center/modify";
     }
 
-    @PostMapping("/modify")
-    public String modifyCenterPost(CenterDTO centerDTO) {
+    @PostMapping("/modify/{centerNum}")
+    public String modifyCenterPost(@ModelAttribute CenterDTO centerDTO) {
         log.info("post 방식 center 수정 controller 진입");
         centerService.centerModify(centerDTO);
 

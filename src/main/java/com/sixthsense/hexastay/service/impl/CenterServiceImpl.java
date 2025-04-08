@@ -55,7 +55,12 @@ public class CenterServiceImpl implements CenterService {
         log.info("center Read Service 진입");
 
         //center 상세보기 (pk로 Entity 찾기)
-        Center center = centerRepository.findById(centerNum).get();
+        Center center = centerRepository.findById(centerNum).orElse(null);
+
+        if(center == null){
+            return null;
+        }
+
         //Entity를 DTO로 변환 후 DTO 반환
         CenterDTO centerDTO = modelMapper.map(center, CenterDTO.class);
         //DTO를 반환
@@ -138,6 +143,18 @@ public class CenterServiceImpl implements CenterService {
         Page<CenterDTO> centerDTOList = centerPageList.map(center -> modelMapper.map(center, CenterDTO.class));
         //Page타입 DTO를 반환
         return centerDTOList;
+    }
+
+    @Override
+    public List<String> findDistinctCenterBrand() {
+
+        return centerRepository.findDistinctCenterBrand();
+    }
+
+    @Override
+    public List<String> findDistinctCenterName() {
+
+        return centerRepository.findDistinctCenterName();
     }
 
 

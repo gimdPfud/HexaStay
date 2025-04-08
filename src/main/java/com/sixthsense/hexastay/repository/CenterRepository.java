@@ -34,5 +34,12 @@ public interface CenterRepository extends JpaRepository<Center, Long> {
     //본사 사업자등록번호로 조회
     public Page<Center> findByCenterBusinessNum (String centerBusinessNum, Pageable pageable);
 
+    //브랜드명 중복없이 가져오기
+    @Query("select distinct c.centerBrand from Center c")
+    public List<String> findDistinctCenterBrand();
+
+    //본사명 중복없이 가져오기
+    @Query("select distinct c.centerName from Center c")
+    public List<String> findDistinctCenterName();
 
 }

@@ -11,49 +11,69 @@
 
 <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
     <div class="d-flex justify-content-center">
-        <h2 class="text-center mb-4">본사 수정</h2>
+        <h2 class="text-center mb-4">지사 수정</h2>
     </div>
 
     <div class="d-flex w-100" style="justify-content: center;">
         <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
     </div>
 
-    <form th:action="@{/center/update}" method="post">
-        <input type="hidden" name="centerNum" th:value="${centerDTO.centerNum}">
+    <form th:action="@{/center/modify/{centerNum}(centerNum=${branchDTO.centerNum})}" method="post">
+        <input type="hidden" name="centerNum" th:value="${branchDTO.centerNum}">
         <div class="mb-2">
             <label class="form-label">브랜드명</label>
-            <input type="text" name="centerBrand" id="centerBrand" class="form-control" th:value="${centerDTO.centerBrand}">
+            <select name="centerBrand" class="form-select">
+                <option value="">선택하세요</option>
+                <option th:each="brand : ${centerBrandList}"
+                        th:value="${brand}"
+                        th:text="${brand}"
+                        th:selected="${brand == branchDTO.centerBrand}">
+                </option>
+            </select>
+        </div>
+
+        <!-- 본사명 -->
+        <div class="mb-2">
+            <label class="form-label">본사명</label>
+            <select name="centerName" class="form-select">
+                <option value="">선택하세요</option>
+                <option th:each="name : ${centerNameList}"
+                        th:value="${name}"
+                        th:text="${name}"
+                        th:selected="${name == branchDTO.centerName}">
+                </option>
+            </select>
         </div>
         <div class="mb-2">
             <label class="form-label">상호명</label>
-            <input type="text" name="centerName" id="centerName" class="form-control" th:value="${centerDTO.centerName}">
+            <input type="text" name="branchName" id="branchName" class="form-control" th:value="${branchDTO.branchName}">
         </div>
         <div class="mb-2">
             <label class="form-label">사업자등록번호</label>
             <div class="row g-2">
                <div class="col">
-                    <input type="text" id="centerBusinessNumOne" class="form-control" readonly style="background: #cccccc">
+                    <input type="text" id="branchBusinessNumOne" class="form-control" readonly style="background: #cccccc">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumTwo" class="form-control" readonly style="background: #cccccc">
+                    <input type="text" id="branchBusinessNumTwo" class="form-control" readonly style="background: #cccccc">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerBusinessNumThree" class="form-control" readonly style="background: #cccccc">
+                    <input type="text" id="branchBusinessNumThree" class="form-control" readonly style="background: #cccccc">
                 </div>
-                <input hidden type="text" id="centerBusinessNum" name="centerBusinessNum" th:value="${centerDTO.centerBusinessNum}">
+                <input hidden type="text" id="branchBusinessNum" name="branchBusinessNum" th:value="${branchDTO.branchBusinessNum}">
             </div>
         </div>
         <div class="mb-2">
             <label class="form-label">대표자명</label>
-            <input type="text" name="centerCeoName" id="centerCeoName" class="form-control" th:value="${centerDTO.centerCeoName}">
+            <input type="text" name="branchCeoName" id="branchCeoName" class="form-control" th:value="${branchDTO.branchCeoName}">
         </div>
         <div class="mb-2">
             <label class="form-label">전화번호</label>
             <div class="row g-2">
                 <div class="col">
-                    <select id="centerPhoneone" class="form-select">
+                    <select id="branchPhoneone" class="form-select">
                         <option>02</option>
                         <option>031</option>
                         <option>032</option>
@@ -62,23 +82,23 @@
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerPhonetwo" class="form-control">
+                    <input type="text" id="branchPhonetwo" class="form-control">
                 </div>
                 <div class="col-auto">-</div>
                 <div class="col">
-                    <input type="text" id="centerPhonethree" class="form-control">
+                    <input type="text" id="branchPhonethree" class="form-control">
                 </div>
-                <input hidden name="centerPhone" id="centerPhone" th:value="${centerDTO.centerPhone}">
+                <input hidden name="branchPhone" id="branchPhone" th:value="${branchDTO.branchPhone}">
             </div>
         </div>
 
         <div class="mb-2">
             <label class="form-label">이메일</label>
-            <input type="email" name="centerEmail" id="email" class="form-control" th:value="${centerDTO.centerEmail}">
+            <input type="email" name="branchEmail" id="email" class="form-control" th:value="${branchDTO.branchEmail}">
         </div>
         <div class="mb-4">
             <label class="form-label">주소</label>
-            <input name="centerAddress" type="text" id="centerAddress" class="form-control" th:value="${centerDTO.centerAddress}">
+            <input name="branchAddress" type="text" id="branchAddress" class="form-control" th:value="${branchDTO.branchAddress}">
         </div>
         <div class="d-flex justify-content-center gap-3">
             <a th:href="@{/center/list}" class="btn btn-secondary">취소</a>
@@ -91,34 +111,34 @@
         function submitForm() {
             // 사업자등록번호 합체
             // 폰번호 합체
-            document.getElementById('centerPhone').value = document.getElementById('centerPhoneone').value + "-" + document.getElementById('centerPhonetwo').value + "-" + document.getElementById('centerPhonethree').value;
+            document.getElementById('branchPhone').value = document.getElementById('branchPhoneone').value + "-" + document.getElementById('branchPhonetwo').value + "-" + document.getElementById('branchPhonethree').value;
         }
 
         // 사업자번호 표기용
-        let centerBusinessNum = document.getElementById("centerBusinessNum").value;
+        let branchBusinessNum = document.getElementById("branchBusinessNum").value;
 
         // "-" 기준으로 나누기
-        let BusinessParts = centerBusinessNum.split("-");
+        let BusinessParts = branchBusinessNum.split("-");
 
         // 변수에 각각 저장
-        document.getElementById("centerBusinessNumOne").value = BusinessParts[0];  // 첫 번째 3자리 숫자
-        document.getElementById("centerBusinessNumTwo").value = BusinessParts[1];  // 두 번째 2자리 숫자
-        document.getElementById("centerBusinessNumThree").value = BusinessParts[2]; // 세 번째 5자리 숫자
+        document.getElementById("branchBusinessNumOne").value = BusinessParts[0];  // 첫 번째 3자리 숫자
+        document.getElementById("branchrBusinessNumTwo").value = BusinessParts[1];  // 두 번째 2자리 숫자
+        document.getElementById("branchBusinessNumThree").value = BusinessParts[2]; // 세 번째 5자리 숫자
 
 
         // 사업자번호 표기용
-        let centerPhoneNum = document.getElementById("centerPhone").value;
+        let branchPhoneNum = document.getElementById("branchPhone").value;
 
         // "-" 기준으로 나누기
-        let PhoneParts = centerPhoneNum.split("-");
+        let PhoneParts = branchPhoneNum.split("-");
 
-        let selectBox = document.getElementById("centerPhoneone");
+        let selectBox = document.getElementById("branchPhoneone");
         let phoneValue = PhoneParts[0];
 
 
-        document.getElementById("centerPhoneone").value = PhoneParts[0];  // 1번째
-        document.getElementById("centerPhonetwo").value = PhoneParts[1];  // 2번째
-        document.getElementById("centerPhonethree").value = PhoneParts[2]; // 3번째
+        document.getElementById("branchPhoneone").value = PhoneParts[0];  // 1번째
+        document.getElementById("branchPhonetwo").value = PhoneParts[1];  // 2번째
+        document.getElementById("branchPhonethree").value = PhoneParts[2]; // 3번째
 
     </script>
 
