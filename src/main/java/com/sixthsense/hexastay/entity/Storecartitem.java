@@ -31,5 +31,5 @@ public class Storecartitem {
     @JoinColumn(name = "storemenu_num")
     private Storemenu storemenu;
 
-    private int count;          //장바구니에 담은 수량
+    private Integer storecartitemCount;          //장바구니에 담은 수량
 }

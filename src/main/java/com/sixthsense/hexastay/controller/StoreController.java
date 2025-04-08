@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ import java.security.Principal;
 @RequestMapping("/store")
 public class StoreController {
     private final StoreService storeService;
+    private final AdminService adminService;
 
     /*
      * 메소드명 :
@@ -63,6 +66,14 @@ public class StoreController {
         StoreDTO data = storeService.read(id);
         model.addAttribute("data",data);
         return "store/read";
+    }
+    @GetMapping("/read")
+    public String readA(Principal principal, Model model){
+        /*todo principal로 admin 찾아서 그 어드민이 갖고있는 store fk로 스토어서비스.read(fk) 해줄거임 */
+//        principal.getName();//이건 됨.
+//        StoreDTO data = storeService.read(id);
+//        model.addAttribute("data",data);
+        return "store/list";
     }
 
 

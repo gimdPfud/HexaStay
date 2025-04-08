@@ -13,8 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
     @Query("select a from Orderstore a")
     public Page<Orderstore> findAll(Pageable pageable);
+
+    Page<Orderstore> findByMember_MemberEmail (String email, Pageable pageable);
+    List<Orderstore> findByMember_MemberEmail (String email);
 
 }

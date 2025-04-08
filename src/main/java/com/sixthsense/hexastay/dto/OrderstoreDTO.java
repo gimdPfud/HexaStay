@@ -30,6 +30,8 @@ public class OrderstoreDTO {
     //외부업체 결재 (이체/카드/현금 사용여부)
     private String orderstorePay;
 
+    private String orderstoreStatus; // 주문 상태. alive, cancel ?
+
     //**********************************
     //멤버 정보를 가져올 PK - member
     private Long memberNum;

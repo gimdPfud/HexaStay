@@ -27,7 +27,7 @@ public class Storemenu extends BaseEntity {
     private String storemenuName;
 
     //룸서비스외부 업체상품 가격
-    private Long storemenuPrice;
+    private Integer storemenuPrice;
 
     //룸서비스외부 업체상품 설명
     private String storemenuContent;

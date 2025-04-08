@@ -27,7 +27,9 @@ public class Orderstore extends BaseEntity {
     private Long orderstoreNum;
 
     //외부업체 결재 (이체/카드/현금 사용여부)
-    private String orderStorePay;
+    private String orderstorePay;
+
+    private String orderstoreStatus; // 주문 상태. alive, cancel ?
 
     //외부업체 상품 서비스를 참조
     @ManyToOne(fetch = FetchType.LAZY)
