@@ -16,9 +16,9 @@
 <body class="w-100 vh-100 bg-light">
     <div layout:fragment="content">
 
-        <div class="d-flex gap-1 m-4">
+        <div class="d-flex gap-1 m-3">
 
-            <div class="container rounded shadow-sm w-100 h-100 p-4" style="max-width: 400px;">
+            <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 400px;">
                 <div class="d-flex w-100" style="justify-content: center;">
                     <img th:if="${data.storeProfileMeta != null}"
                          th:src="@{${data.storeProfileMeta}}"
@@ -57,13 +57,12 @@
                     <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
                 </div>
                 <div class="text-center mt-4 d-flex justify-content-between">
-                    <a th:href="@{/store/list}" class="btn btn-dark">목록보기</a>
                     <a th:href="@{'/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
                 </div>
             </div><!--외부업체 정보-->
 
             <!--외부업체가 제공하는 서비스 목록들-->
-            <div class="container rounded shadow-sm w-100 h-100 p-4" style="max-width: 800px;">
+            <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 800px;">
                 <div class="mb-3">
                     <h1 class="text-center">제공 서비스 목록</h1>
                     <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
@@ -160,7 +159,7 @@
                     <th>이름</th>
                     <th>가격</th>
                     <th>설명</th>
-                    <th>카테고리</th>
+                    <th>분류</th>
                     <th>버튼</th>
                 </tr>
                 </thead>
