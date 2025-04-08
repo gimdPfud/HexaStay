@@ -52,22 +52,22 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        .loginPage("/login")
+                        .loginPage("/admin/login")
                         .usernameParameter("adminEmail")
                         .passwordParameter("adminPassword")
-                        .defaultSuccessUrl("/main", true)
+                        .defaultSuccessUrl("/admin/main", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("/admin/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendRedirect("/main");
+                            response.sendRedirect("/admin/main");
                         })
                 )
                 .csrf(csrf -> csrf.disable()); // CSRF

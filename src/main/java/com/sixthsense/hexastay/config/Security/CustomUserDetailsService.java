@@ -23,6 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
 
-        return new CustomUserDetails();
+        return new CustomUserDetails(admin);
+
     }
 }

@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.dto;
 
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -46,6 +47,10 @@ public class StoremenuDTO {
 
     //참조 테이블 - Store 테이블 Pk 참조
     private Long storeNum;
+
+    private MultipartFile storemenuImg; //가게 사진 이미지
+
+    private String storemenuImgMeta; //가게 사진정보
 
 
 }

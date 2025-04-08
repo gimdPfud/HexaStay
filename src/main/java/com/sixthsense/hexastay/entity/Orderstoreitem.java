@@ -24,9 +24,13 @@ public class Orderstoreitem {
     @JoinColumn(name = "orderstore_num")
     private OrderStore orderStore;      //스토어주문 연결
 
-    private Long orderstoreAmount;      //주문한 메뉴 양
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storemenu_num")
+    private Storemenu storemenu;        //메뉴랑 연결
 
-    private Long orderstorePrice;       //주문한 메뉴 가격
+    private Long orderstoreitemAmount;      //주문한 메뉴 양
 
-    private Long orderstoreTotalPrice;  //주문한 메뉴들의 총가격
+    private Long orderstoreitemPrice;       //주문한 메뉴 가격
+
+    private Long orderstoreitemTotalPrice;  //주문한 메뉴들의 총가격
 }

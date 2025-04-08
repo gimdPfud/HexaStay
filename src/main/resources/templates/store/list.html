@@ -51,11 +51,11 @@
                 <td style="text-align: center;">
                     <img th:if="${data.storeProfileMeta != null}"
                          th:src="@{${data.storeProfileMeta}}"
-                         style="width: 60px; height: 80px;">
+                         style="width: 80px; height: 80px;">
 
                     <img th:unless="${data.storeProfileMeta != null}"
-                         th:src="@{/profile/default.png}"
-                         style="width: 60px; height: 80px;">
+                         th:src="@{/store/default.png}"
+                         style="width: 80px; height: 80px;">
                 </td>
 
                 <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>

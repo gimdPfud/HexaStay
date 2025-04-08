@@ -18,7 +18,15 @@
         <div class="col-md-2"></div>
         <div class="col-md-8 p-4 border rounded bg-light">
             <div class="text-center mb-3">
-                <img src="/images/store-icon.png" alt="상품 이미지" class="img-fluid" style="width: 80px;">
+                <div class="d-flex w-100" style="justify-content: center;">
+                    <img th:if="${data.storemenuImgMeta != null}"
+                         th:src="@{${data.storemenuImgMeta}}"
+                         class="rounded" style="width: 133px; height: 133px;">
+
+                    <img th:unless="${data.storemenuImgMeta != null}"
+                         th:src="@{/store/menu/default.png}"
+                         class="rounded" style="width: 133px; height: 133px;">
+                </div>
             </div>
             <div class="mb-3">
                 <label class="form-label">상품명</label>
