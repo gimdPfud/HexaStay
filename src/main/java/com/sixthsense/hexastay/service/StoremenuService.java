@@ -9,11 +9,12 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.StoremenuDTO;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface StoremenuService {
     /*등록*/
-    public Long insert(StoremenuDTO storemenuDTO);
+    public Long insert(StoremenuDTO storemenuDTO) throws IOException;
 
     /*상세보기*/
     public StoremenuDTO read(Long pk);

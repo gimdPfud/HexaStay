@@ -43,5 +43,6 @@ public class Storemenu extends BaseEntity {
     @JoinColumn(name = "storeNum")
     private Store store;
 
+    private String storemenuImgMeta; //메뉴 대표 사진
 
 }

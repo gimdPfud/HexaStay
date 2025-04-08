@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -82,7 +83,7 @@ public class StoremenuController {
         return "storemenu/insert";
     }
     @PostMapping("/insert")
-    public String insertPost(StoremenuDTO storemenuDTO){
+    public String insertPost(StoremenuDTO storemenuDTO) throws IOException {
         storemenuService.insert(storemenuDTO);
         return "redirect:/store/read/"+storemenuDTO.getStoreNum();
     }

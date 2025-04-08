@@ -20,7 +20,6 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class OrderStore extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
