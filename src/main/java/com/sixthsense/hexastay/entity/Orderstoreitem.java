@@ -22,7 +22,7 @@ public class Orderstoreitem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderstore_num")
-    private OrderStore orderStore;      //스토어주문 연결
+    private Orderstore orderstore;      //스토어주문 연결
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storemenu_num")
