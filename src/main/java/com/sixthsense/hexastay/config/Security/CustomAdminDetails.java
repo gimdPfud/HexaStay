@@ -6,11 +6,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class CustomAdminDetails implements UserDetails {
+public class CustomAdminDetails implements UserDetails, Principal {
 
     private final Admin admin;
 
@@ -73,4 +74,10 @@ public class CustomAdminDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Override
+    public String getName() {
+        return getUsername();  // getUsername()을 반환하면 됩니다.
+    }
+
 }

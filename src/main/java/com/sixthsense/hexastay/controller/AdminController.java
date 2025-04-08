@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CenterService;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -44,7 +46,7 @@ public class AdminController {
 
     //리스트
     @GetMapping("/list")
-    public String list(Model model, Pageable pageable) {
+    public String list(Model model, Pageable pageable, Principal principal) {
         Page<AdminDTO> adminDTOList = adminService.getAdminList(pageable);
         model.addAttribute("adminDTOList", adminDTOList);
         return "admin/list";
