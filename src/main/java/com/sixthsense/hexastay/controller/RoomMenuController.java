@@ -72,8 +72,6 @@ public class RoomMenuController {
         return "roommenu/cart";
     }
 
-    // todo : 오더페이지 상세 만들어야함
-    // fixme : 따로 컨트롤러 만들어서 해야할것같음.
     /***************************************************
      * 메소드명   : roomMenuReadA
      * 기능      : 특정 메뉴 아이템의 상세 정보를 조회하여 화면에 전달
@@ -106,9 +104,8 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/insert")
-    public String RoomServiceItemGet() {
+    public String RoomServiceItemGet(Principal principal) {
         log.info("등록페이지 get 컨트롤러 진입");
-
         return "roommenu/insert";
     }
 
@@ -121,10 +118,9 @@ public class RoomMenuController {
     @PostMapping("/roommenu/insert")
     public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
         log.info("등록페이지 post 컨트롤러 진입");
-
+        log.info("로그인 : " + principal.getName());
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
-        log.info("로그인한 사용자: " + memberName);
-        log.info(principal.toString());
+
 
         if (principal == null) {
             // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
