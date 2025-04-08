@@ -30,6 +30,9 @@ public interface BranchService {
     //조직명으로 조회
     public Page<BranchDTO> companyName(String keyword, Pageable pageable);
 
-    // 브랜드로 조회
+    //브랜드로 조회
     public Page<BranchDTO> brandName(String keyword, Pageable pageable);
+
+    //지사 사업자등록번호로 조회
+    public Page<BranchDTO> branchBusinessNum(String keyword, Pageable pageable);
 }

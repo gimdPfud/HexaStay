@@ -29,7 +29,7 @@ public class Admin extends BaseEntity {
     private Long adminNum;
 
     //어드민 사번
-    private Integer adminEmployeeNum;
+    private String adminEmployeeNum;
 
     //어드민 패스워드
     private String adminPassword;
@@ -52,9 +52,6 @@ public class Admin extends BaseEntity {
     //어드민 직급
     private String adminRole;
 
-    //어드민 Brand
-    private String adminBrand;
-
     //어드민 승인여부
     private Boolean adminActive;
 
@@ -66,5 +63,22 @@ public class Admin extends BaseEntity {
 
     // 어드민 사진
     private String adminProfileMeta;
+
+    // FK 소속
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "centerNum")
+    private Center center;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branchNum")
+    private Branch branch;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "facilityNum")
+    private Facility facility;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeNum")
+    private Store store;
 
 }

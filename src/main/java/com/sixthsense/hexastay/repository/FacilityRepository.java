@@ -31,6 +31,10 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
 
     //브랜드 조회용
     public Page<Facility> findByCenter_CenterNum (Long centerNum, Pageable pageable);
+    public List<Facility> findByCenter_CenterNum (Long centerNum);
+
+    //지사 사업자등록번호로 조회
+    public Page<Facility> findByCenter_CenterNameContaining (String keyword, Pageable pageable);
 
 
 }

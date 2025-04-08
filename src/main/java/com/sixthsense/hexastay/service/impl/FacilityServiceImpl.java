@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;
@@ -103,6 +104,16 @@ public class FacilityServiceImpl implements FacilityService {
         Page<Facility> facilityPage = facilityRepository.findByCenter_CenterNum(centerNum, pageable);
         Page<FacilityDTO> facilityDTOS = facilityPage.map(facility -> modelMapper.map(facility, FacilityDTO.class));
 
+        return facilityDTOS;
+    }
+
+    @Override
+    public Page<FacilityDTO> facilityBusinessNum(String keyword, Pageable pageable) {
+        //검색하면 사업자등록번호를 포함하는 정보를 Page타입 Entity로 불러와서 담기
+        Page<Facility> facilityPage = facilityRepository.findByCenter_CenterNameContaining(keyword, pageable);
+        //Entity를 DTO로 변환하여 Page타입 DTO로 불러와서 담기
+        Page<FacilityDTO> facilityDTOS = facilityPage.map(facility -> modelMapper.map(facility, FacilityDTO.class));
+        //Page타입 DTO를 반환
         return facilityDTOS;
     }
 }

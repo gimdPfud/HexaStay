@@ -19,10 +19,36 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     @Query("select a from Admin a")
     public Page<Admin> findAll(Pageable pageable);
+
     public Admin findByAdminNum(Long adminNum);
     public List<Admin> findByAdminActive(Boolean active);
 
 
     // 시큐리티용
     Admin findByAdminEmail(String adminEmail);
+
+
+    //FK
+    @Query("""
+    select a from Admin a
+    left join fetch a.center
+    left join fetch a.branch
+    left join fetch a.facility
+    left join fetch a.store
+    """)
+    Page<Admin> findAllWithJoins(Pageable pageable);
+
+    //FK 순환 조회용
+//    @Query("select a from Admin a join fetch a.center c")
+//    Page<Admin> findAllWithCenter(Pageable pageable);
+//
+//    @Query("select a from Admin a join fetch a.branch b")
+//    Page<Admin> findAllWithBranch(Pageable pageable);
+//
+//    @Query("select a from Admin a join fetch a.facility f")
+//    Page<Admin> findAllWithFacility(Pageable pageable);
+//
+//    @Query("select a from Admin a join fetch a.store s")
+//    Page<Admin> findAllWithStore(Pageable pageable);
+
 }

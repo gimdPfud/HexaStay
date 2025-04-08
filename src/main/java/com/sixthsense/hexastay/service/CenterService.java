@@ -29,7 +29,9 @@ public interface CenterService {
     //조직명으로 조회
     Page<CenterDTO> companyName(String keyword, Pageable pageable);
 
-    // 브랜드로 조회
+    //브랜드로 조회
     Page<CenterDTO> brandName(String keyword, Pageable pageable);
 
+    //사업자등록번호로 조회
+    Page<CenterDTO> centerBusinessNum(String keyword, Pageable pageable);
 }
