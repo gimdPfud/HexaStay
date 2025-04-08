@@ -35,7 +35,8 @@ public class FaqServiceImpl implements FaqService {
     public void faqInsert(FaqDTO faqDTO, Principal principal) {
         //String email = principal.getName();
         // (1) 여기서 멤버 조회 및 예외 처리
-        Member member = memberRepository.findById(faqDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
+        log.info("DTo"+faqDTO);
+        Member member = memberRepository.findById(1l).orElseThrow(EntityNotFoundException::new);
 //        if (!member.getRole().equals("ADMIN")) {
 //            throw new RuntimeException("관리자만 FAQ를 등록할 수 있습니다.");
 //        }

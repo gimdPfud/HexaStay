@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
   <meta charset="UTF-8">
   <title>공지사항</title>
@@ -46,9 +48,6 @@
         <button class="btn btn-primary" type="submit">검색</button>
       </div>
       <div class="d-flex justify-content-end mb-3">
-      <button class="btn btn-secondary " type="reset">초기화</button>
-      </div>
-      <div class="d-flex justify-content-end mb-3">
         <button class="btn btn-success" type="button" th:onclick="|location.href='@{/notice/insert}'|">등록</button>
       </div>
     </div>
@@ -63,7 +62,6 @@
       <th >제목</th>
 <!--      <th >작성자</th>-->
       <th >날짜</th>
-      <th >수정</th>
     </tr>
     </thead>
     <!-- 목록 -->
@@ -73,11 +71,6 @@
       <td><a th:href="@{/notice/read/{noticeNum}(noticeNum=${data.noticeNum})}" th:text="${data.noticeTitle}"></a></td>
 <!--      <td th:text="${data.noticeWriter}"></td>-->
       <td th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></td>
-      <td>
-        <a th:href="@{|/notice/read/${data.noticeNum}|}" class="btn btn-secondary">
-          <i class="bi bi-pencil-square"></i>
-        </a>
-      </td>
     </tr>
     </tbody>
   </table>

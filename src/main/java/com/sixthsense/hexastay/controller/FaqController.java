@@ -38,9 +38,8 @@ public class FaqController {
 
     // (2) FAQ 등록 폼 (관리자만)
     @GetMapping("/insert")
-    public String faqInsertForm(Model model) {
+    public String faqInsertForm() {
         log.info("FAQ 등록 폼 진입");
-        model.addAttribute("faqDTO", new FaqDTO()); // 폼 바인딩용
         return "faq/insert";
     }
 
@@ -48,16 +47,21 @@ public class FaqController {
     @PostMapping("/insert")
     public String faqInsert(@ModelAttribute FaqDTO faqDTO, Principal principal) {
         log.info("FAQ 등록 요청 수신 - 제목: {}", faqDTO.getFaqTitle());
-        faqService.faqInsert(faqDTO, principal);
+        try {
+            faqService.faqInsert(faqDTO, principal);
+        } catch(Exception e) {
+            log.error("공지사항 등록 실패", e);
+            return "redirect:/faq/insert?error=true"; // (예: 에러 메시지 전달)
+        }
+        log.info("요청완료");
         return "redirect:/faq/list";
     }
-
     // (4) FAQ 수정 처리 (AJAX/모달 또는 POST 방식)
     @PostMapping("/modify")
     public String faqModify(@ModelAttribute FaqDTO faqDTO) {
         log.info("FAQ 수정 요청 - 번호: {}, 제목: {}", faqDTO.getFaqNum(), faqDTO.getFaqTitle());
         faqService.faqModify(faqDTO);
-        return "redirect:/faq/list";
+        return "redirect:/faq/list" + faqDTO.getFaqNum();
     }
 
     // (5) FAQ 삭제 처리
