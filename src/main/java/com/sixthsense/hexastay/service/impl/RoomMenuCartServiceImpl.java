@@ -12,6 +12,7 @@ import com.sixthsense.hexastay.repository.RoomMenuCartItemRepository;
 import com.sixthsense.hexastay.repository.RoomMenuCartRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -105,7 +106,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     }
 
 
-
     @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
         log.info("룸서비스 상품 리스트 서비스 진입");
@@ -156,10 +156,113 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     }
 
     @Override
-        public RoomMenuCartDTO getCartByMember(Long memberNum) {
-            RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
-                    .orElseThrow(() -> new RuntimeException("장바구니를 찾을 수 없습니다."));
+    public RoomMenuCartDTO getCartByMember(Long memberNum) {
+        RoomMenuCart roomMenuCart = roomMenuCartRepository.findByMember_MemberNum(memberNum)
+                .orElseThrow(() -> new RuntimeException("장바구니를 찾을 수 없습니다."));
 
-            return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
+        return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
+    }
+
+    /***************************************************
+     *
+     * 클래스명   : RoomMenuCartInsert
+     * 기능      : 룸서비스 장바구니에 아이템을 추가하거나 기존 아이템의 수량을 업데이트하는 서비스 메소드
+     *            - 장바구니가 존재하지 않으면 새로 생성
+     *            - 아이템이 이미 장바구니에 있으면 수량을 추가
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     *
+     ****************************************************/
+
+    @Override
+    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
+        log.info("장바구니 추가 시스템 도입" + roomMenuCartNum);
+
+        // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.
+        RoomMenu roomMenu =
+                roomMenuRepository.findById(roomMenuCartItemDTO.getRoomMenuCartItemNum())
+                        .orElseThrow(EntityNotFoundException::new);
+
+        // 누가 샀는가?
+        Member member =
+                memberRepository.findByMemberEmail(email);
+
+        // 내 장바구니 구현
+        RoomMenuCart roomMenuCart =
+                roomMenuCartRepository.findByMember_MemberEmail(email);
+
+        if (roomMenuCart == null) {
+            log.info("회원의 장바구니가 존재하지 않습니다.");
+            RoomMenuCart insertCart = new RoomMenuCart();
+            insertCart.setMember(member);
+            roomMenuCart =
+                    roomMenuCartRepository.save(insertCart);     // 장바구니가 없다면 새로 만들기
+        }
+        //장바구니에 담겨진 아이템 찾기
+        RoomMenuCartItem roomMenuCartItem =
+                roomMenuCartItemRepository.
+                        findByRoomMenuCartItemNumAndRoomMenu_RoomMenuNum
+                                (roomMenuCart.getRoomMenuCartNum()
+                                        , roomMenu.getRoomMenuNum());
+
+        if (roomMenuCartItem == null) {
+            //장바구니에 아이템이 담겨있지 않다면
+            if (roomMenuCartItemDTO.getRoomMenuCartItemAmount() <= 0) {
+                throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
+            }
+
+            RoomMenuCartItem insertCartItem = new RoomMenuCartItem();
+            insertCartItem.setRoomMenuCart(roomMenuCart); // 장바구니
+            // todo : (2) 여기 이상할지도 모름
+            // fixme : 레포지토리에 추가 안될지도 모름.
+            insertCartItem.setRoomMenuCartItemNum(null);  // ID는 자동 생성되므로 null로 설정
+            insertCartItem.setRoomMenu(roomMenu); // 장바구니 아이템에 roomMenu 객체를 연결
+            insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); //수량
+
+            // 아이템을 저장하자.
+            roomMenuCartItem =
+                    roomMenuCartItemRepository.save(insertCartItem);
+
+            // 장바구니에 아이템이 추가된 후 로그 출력
+            log.info("장바구니에 아이템 추가됨: " + roomMenu.getRoomMenuNum());
+
+
+            // 리턴값 반환
+            return roomMenuCartItem.getRoomMenuCartItemNum();
+        } else {
+            //장바구니에 동일한 아이템이 있다면
+            //장바구니아이템의 수량을 기존수량 + 입력받은 수량 으로 수정해준다.
+            roomMenuCartItem.setRoomMenuCartItemAmount(
+                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount()
+            );
+            return roomMenuCartItem.getRoomMenuCartItemNum();
         }
     }
+
+    /***************************************************
+     *
+     * 클래스명   : RoomMenuCartItemList
+     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템 목록을 페이지 단위로 조회하는 서비스 메소드
+     *            - 특정 회원의 장바구니 아이템을 이메일을 기준으로 조회
+     *            - 페이징 처리된 결과를 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     *
+     ****************************************************/
+    @Override
+    public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable) {
+        Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage =
+                roomMenuCartItemRepository.findByRoomMenuCart_Member_MemberEmail(email, pageable);
+
+        return roomMenuCartItemDTOPage;
+    }
+
+    @Override
+    public boolean verificationRoomCartItem(Long cardItemId, String email) {
+        return false;
+    }
+
+
+}

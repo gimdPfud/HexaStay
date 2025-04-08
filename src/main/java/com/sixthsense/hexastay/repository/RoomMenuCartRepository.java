@@ -21,4 +21,6 @@ public interface RoomMenuCartRepository extends JpaRepository<RoomMenuCart, Long
     // 유저찾기
     Optional<RoomMenuCart> findByMember_MemberNum(Long memberNum);
 
+    public RoomMenuCart findByMember_MemberEmail(String email);
+
 }

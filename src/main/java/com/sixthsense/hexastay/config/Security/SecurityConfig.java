@@ -44,10 +44,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/idcheck/**", "/mypage/**" , "/signup", "/signup/**" , "/file/**", "/font/**", "/js/**", "/image/**").permitAll()
-                        .requestMatchers("/main").hasAnyRole("wait", "active", "admin")
-                        .requestMatchers("/memberList").hasRole("admin")
-                        .requestMatchers("/**").hasAnyRole("active","admin")
+                        .requestMatchers("/**" ).permitAll()
+//                        .requestMatchers("/main").hasAnyRole("wait", "active", "admin")
+//                        .requestMatchers("/memberList").hasRole("admin")
+//                        .requestMatchers("/**").hasAnyRole("active","admin")
 
                         .anyRequest().authenticated()
                 )
