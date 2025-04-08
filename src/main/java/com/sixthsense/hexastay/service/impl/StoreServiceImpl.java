@@ -103,7 +103,6 @@ public class StoreServiceImpl implements StoreService {
     public Long modify(StoreDTO storeDTO) {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
         store.setStoreName(storeDTO.getStoreName());
-        store.setStoreEmail(storeDTO.getStoreEmail());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
         store.setStoreCeoName(storeDTO.getStoreCeoName());
