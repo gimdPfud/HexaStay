@@ -20,7 +20,7 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         background-color: #f8f9fa;
-        max-width: 600px;
+        max-width: 800px;
         margin: 20px auto;
     }
 
@@ -51,9 +51,23 @@
         background-color: #0056b3;
     }
 
-     #category-option {
-         display: none;
-     }
+    #category-option {
+        display: none;
+    }
+
+    /* ✅ 테이블 모든 셀 가운데 정렬 */
+    table th,
+    table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* ✅ 이미지 가운데 정렬 */
+    table img {
+        display: block;
+        margin: 0 auto;
+    }
+
 </style>
 
 <!-- 스타일시트 끝 -->
@@ -92,13 +106,19 @@
                         </select>
 
                         <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
-                        <button type="submit">검색</button>
+
+                        <!-- 검색버튼 -->
+                        <button type="submit" style="width: 95px; height: 40px; padding: 0; font-size: 16px; text-align: center; line-height: 40px; margin-right: 10px;">
+                            검색
+                        </button>
+                        <!-- 검색버튼 끝 -->
 
                         <!-- 메뉴등록 버튼 시작 -->
-                        <a href="/roommenu/insert" class="btn btn-primary" style="margin-left: 15px; padding: 10px 20px; font-size: 16px;">
+                        <a href="/roommenu/insert" class="btn btn-warning" style="width: 95px; height: 40px; padding: 0; font-size: 16px; display: inline-block; text-align: center; line-height: 40px;">
                             메뉴등록
                         </a>
                         <!-- 메뉴등록 버튼 끝 -->
+
                     </div>
                 </form> <!-- 검색창 끝 -->
             </div>
@@ -109,6 +129,7 @@
         <thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col">이미지</th>
             <th scope="col">메뉴이름</th>
             <th scope="col">상품가격</th>
             <th scope="col">재고량</th>
@@ -120,6 +141,17 @@
         <tbody>
         <tr th:each="roomMenuDTO : ${list}">
             <th scope="row" th:text="${roomMenuDTO.roomMenuNum}"></th>
+
+            <td>
+                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                     style="width: 60px; height: 80px;">
+
+                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     style="width: 60px; height: 80px;">
+            </td>
+
             <td>
                 <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTO.roomMenuNum}}"
                    th:text="${roomMenuDTO.roomMenuName}">
@@ -153,7 +185,7 @@
 </div>
 </body>
 
-<script>
+    <script>
     /*카테고리 드롭다운 활성화*/
 
     document.addEventListener("DOMContentLoaded", function() {

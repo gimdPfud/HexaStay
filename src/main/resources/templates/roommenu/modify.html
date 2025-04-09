@@ -32,7 +32,9 @@
             <h4 th:text="${roomMenuDTO.roomMenuName}">메뉴 이름</h4>
         </div>
         <div class="card-body">
-            <form th:action="@{/roommenu/modify}" method="post">
+            <form th:action="@{/roommenu/modify}" method="post" enctype="multipart/form-data">
+
+
                 <div class="row">
                     <div class="col-4">
                         <div class="mb-3">
@@ -76,8 +78,24 @@
 
                     </div>
                     <div class="col-4">
-                        <div class="card" style="width: 18rem; border: 2px solid #ccc;">
-                            <img th:src="@{/image/사탕.png}" class="card-img-top" alt="상품 이미지">
+                        <!-- 이미지 파일 -->
+                        <div class="card" style="width: 25rem; border: 2px solid #ccc;">
+                            <div class="mb-3 user-box text-center mt-5">
+                                <!-- 기존 이미지 경로 유지용 -->
+                                <input type="hidden" name="originalImageMeta" th:value="${menuDTO.roomMenuImageMeta}">
+                                <!-- 기존 이미지 경로 유지 끝 -->
+                                <!-- 기존 이미지가 있는 경우 표시 -->
+                                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
+                                    <img th:if="${menuDTO.roomMenuImageMeta != null}" th:src="@{${menuDTO.roomMenuImageMeta}}" id="pictureTemp"
+                                         style="width: 100%; height: 100%; object-fit: contain;">
+                                </div>
+                                <!-- 기존 이미지 끝 -->
+                                <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
+                                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                                <input hidden type="file" id="menuImage" name="roomMenuImage" class="btn btn-light form-control rounded-pill"
+                                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                            </div> <!-- 이미지 파일 끝 -->
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="roomMenuContent" class="form-label">상품 설명</label>
@@ -98,4 +116,47 @@
     </div>
 </div>
 </body>
+
+<script>
+
+    // 프로필 사진
+
+    document.getElementById('menuImage').addEventListener('change', function () {
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+        const filePath = this.value;
+        const errorMessage = document.getElementById('fileError');
+        const previewImage = document.getElementById('pictureTemp');
+        const file = this.files[0];
+
+        if (!allowedExtensions.exec(filePath)) {
+            this.value = '';
+            errorMessage.classList.remove('d-none');
+            previewImage.classList.add('d-none');
+        } else {
+            errorMessage.classList.add('d-none');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+
+
+    document.getElementById('PictureBtn').addEventListener('click', function () {
+        document.getElementById('menuImage').click();
+    });
+
+
+    document.getElementById('menuImage').addEventListener('change', function () {
+        let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+        document.querySelector('.file-name').textContent = fileName;
+    });
+
+</script>
+
 </html>
