@@ -16,6 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +34,24 @@ public class BranchServiceImpl implements BranchService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public void branchInsert(BranchDTO branchDTO) {
+    public void branchInsert(BranchDTO branchDTO) throws IOException {
         log.info("branch Insert Service 진입");
+
+        if (branchDTO.getCompanyPicture() != null && !branchDTO.getCompanyPicture().isEmpty()) {
+            String fileOriginalName = branchDTO.getCompanyPicture().getOriginalFilename();
+            String fileFirstName = branchDTO.getBranchNum() + "_" + branchDTO.getBranchName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            branchDTO.setCompanyPictureMeta("/branch/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "branch/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "branch/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            branchDTO.getCompanyPicture().transferTo(uploadPath.toFile());
+        }
+
         //branch 등록
         Branch branch = modelMapper.map(branchDTO, Branch.class);
         branchRepository.save(branch);
@@ -51,11 +71,11 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public BranchDTO branchRead(Long branchNum) {
+    public BranchDTO branchRead(Long id) {
         log.info("branch Read Service 진입");
 
         //branch 상세보기
-        Branch branch = branchRepository.findById(branchNum).get();
+        Branch branch = branchRepository.findById(id).get();
         BranchDTO branchDTO = modelMapper.map(branch, BranchDTO.class);
 
         return branchDTO;
@@ -67,8 +87,10 @@ public class BranchServiceImpl implements BranchService {
 
         //branch 수정(지사 Entity 조회)
         Branch branch = branchRepository.findById(branchDTO.getBranchNum()).orElseThrow();
+        log.info("수정할 branchNum : " + branchDTO.getBranchNum());
 
         //center Entity 조회
+        log.info("수정할 centerNum : " + branchDTO.getCenterNum());
         Center center = centerRepository.findById(branchDTO.getCenterNum()).orElseThrow();
 
         //지사 정보 업데이트
@@ -80,11 +102,9 @@ public class BranchServiceImpl implements BranchService {
         branch.setBranchBusinessNum(branchDTO.getBranchBusinessNum());
 
         //본사 정보 업데이트
-        center.setCenterBrand(branchDTO.getCenterBrand());
-        center.setCenterName(branchDTO.getCenterName());
+        branch.setCenter(center);
 
         branchRepository.save(branch);
-        centerRepository.save(center);
 
         log.info("수정 반영된 내용 : " + branch);
     }
@@ -107,7 +127,6 @@ public class BranchServiceImpl implements BranchService {
         }
         return branchDTOList;
     }
-
 
     //조직명 검색
     @Override

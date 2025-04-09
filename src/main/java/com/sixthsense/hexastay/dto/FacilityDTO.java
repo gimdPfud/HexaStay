@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -41,6 +42,10 @@ public class FacilityDTO {
     private String centerName;
 
     private String centerBrand;
+
+    private String companyPictureMeta;
+
+    private MultipartFile companyPicture;
 
 
 }

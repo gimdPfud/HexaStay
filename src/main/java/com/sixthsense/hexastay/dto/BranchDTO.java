@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.dto;
 
 import jakarta.persistence.Column;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -42,6 +43,10 @@ public class BranchDTO {
     private String centerName;          //본사명
 
     private String centerBrand;         //브랜드명
+
+    private String companyPictureMeta;
+
+    private MultipartFile companyPicture;
 
 
 }

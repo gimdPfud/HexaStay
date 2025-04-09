@@ -1,7 +1,9 @@
 package com.sixthsense.hexastay.service.impl;
 
 import ch.qos.logback.core.model.Model;
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.dto.FacilityDTO;
 import com.sixthsense.hexastay.entity.Center;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.BranchRepository;
@@ -16,6 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +39,25 @@ public class CenterServiceImpl implements CenterService {
 
 
     @Override
-    public void centerInsert(CenterDTO centerDTO) {
+    public void centerInsert(CenterDTO centerDTO) throws IOException {
         log.info("center Insert Service 진입");
+
+        if (centerDTO.getCompanyPicture() != null && !centerDTO.getCompanyPicture().isEmpty()) {
+            String fileOriginalName = centerDTO.getCompanyPicture().getOriginalFilename();
+            String fileFirstName = centerDTO.getCenterNum() + "_" + centerDTO.getCenterName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            centerDTO.setCompanyPictureMeta("/center/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "center/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "center/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            centerDTO.getCompanyPicture().transferTo(uploadPath.toFile());
+
+        }
+
 
         //center 등록 (DTO를 Entity로 변환해서 Entity에 담고)
         Center center = modelMapper.map(centerDTO, Center.class);
@@ -43,6 +66,8 @@ public class CenterServiceImpl implements CenterService {
 
         log.info("centerDTO를 Entity로 변환 완료 : " + center);
     }
+
+
 
     @Override
     public Page<CenterDTO> centerList(Pageable pageable) {
@@ -57,11 +82,11 @@ public class CenterServiceImpl implements CenterService {
     }
 
     @Override
-    public CenterDTO centerRead(Long centerNum) {
+    public CenterDTO centerRead(Long id) {
         log.info("center Read Service 진입");
 
         //center 상세보기 (pk로 Entity 찾기)
-        Center center = centerRepository.findById(centerNum).orElse(null);
+        Center center = centerRepository.findById(id).orElse(null);
 
         if(center == null){
             return null;
@@ -101,7 +126,7 @@ public class CenterServiceImpl implements CenterService {
         log.info("center Delete Service 진입");
 
         //참조하고있는 admin 먼저 삭제 (pk로 Entity 찾아서 삭제)
-
+        adminRepository.deleteByCenter_CenterNum(centerNum);
 
         //참조하고있는 branch 먼저 삭제 (pk로 Entity 찾아서 삭제)
         branchRepository.deleteByCenter_CenterNum(centerNum);

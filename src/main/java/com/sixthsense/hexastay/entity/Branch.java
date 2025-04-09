@@ -45,4 +45,6 @@ public class Branch  extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")
     private Center center;            //센터 참조
+
+    private String companyPictureMeta;
 }

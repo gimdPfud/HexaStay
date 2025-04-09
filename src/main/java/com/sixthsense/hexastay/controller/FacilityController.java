@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.entity.Center;
 import com.sixthsense.hexastay.entity.Facility;
 import com.sixthsense.hexastay.repository.CenterRepository;
 import com.sixthsense.hexastay.repository.FacilityRepository;
+import com.sixthsense.hexastay.service.CenterService;
 import com.sixthsense.hexastay.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -28,6 +31,7 @@ public class FacilityController {
 
     private final FacilityService facilityService;
     private final CenterRepository centerRepository;
+    private final CenterService centerService;
 
     @GetMapping("/list")
     public String listFacility(Pageable pageable, Model model) {
@@ -68,7 +72,7 @@ public class FacilityController {
         FacilityDTO facilityDTO = facilityService.facilityRead(facilityNum);
         model.addAttribute("facilityDTO", facilityDTO);
 
-        return "facility/read";
+        return "center/read";
     }
 
     @GetMapping("/modify/{facilityNum}")
@@ -80,18 +84,21 @@ public class FacilityController {
             return "redirect:/facility/list";
         }
 
+        List<CenterDTO> centerDTO = centerService.allCenterList();
         FacilityDTO facilityDTO = facilityService.facilityRead(facilityNum);
+        model.addAttribute("centerDTOSelect", centerDTO);
         model.addAttribute("facilityDTO", facilityDTO);
 
-        return "facility/modify";
+        return "center/modify";
     }
 
-    @PostMapping("/modify")
-    public String modifyFacilityPost(FacilityDTO facilityDTO){
-        log.info("Post 방식 Facility 수정 controller 진입");
-        facilityService.facilityInsert(facilityDTO);
-
-        return "redirect:/facility/list";
+    @PostMapping("/modify/{facilityNum}")
+    public String modifyFacilityPost(@PathVariable Long facilityNum,
+                                     @RequestParam("centerNumBrand") Long centerNum,
+                                     FacilityDTO facilityDTO) {
+        facilityDTO.setCenterNum(centerNum); // 셀렉트박스에서 선택한 값
+        facilityService.facilityModify(facilityDTO);
+        return "redirect:/center/list";
     }
 
     @PostMapping("/delete/{facilityNum}")
@@ -111,7 +118,6 @@ public class FacilityController {
 
 
     // 조직등록 - 지점
-
     @PostMapping("/facilityinsert")
     @ResponseBody
     public ResponseEntity<Void> facilityInsertPost(@RequestBody FacilityDTO facilityDTO) {

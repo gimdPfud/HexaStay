@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -132,7 +133,7 @@ public class CenterController {
     }
 
     @PostMapping("/signup")
-    public String signUpCenterPost(CenterDTO centerDTO){
+    public String signUpCenterPost(CenterDTO centerDTO) throws IOException {
         log.info("post 방식 center 등록 controller 진입");
 
         centerService.centerInsert(centerDTO);
@@ -156,34 +157,74 @@ public class CenterController {
         return "center/read";
     }
 
-    @GetMapping("/modify/{centerNum}")
-    public String modifyCenterGet(@PathVariable("centerNum") Long centerNum, Model model) {
-        log.info("get 방식 center 수정 controller 진입");
+    @GetMapping("/{type}/modify/{id}")
+    public String modifyOrg(@PathVariable("type") String type,
+                            @PathVariable("id") Long id,
+                            Model model) {
+        log.info("get 방식 조직 수정 controller 진입: type={}, id={}", type, id);
 
-        if(centerNum == null){
-            log.info("centerNum을 찾을 수 없음");
-            return "redirect:/center/list";
+        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        model.addAttribute("centerDTOList", centerDTOList);
+
+        model.addAttribute("type", type);
+        model.addAttribute("id", id); // 또는 branch/facility에 따라
+
+        switch (type) {
+            case "center":
+                CenterDTO centerDTO = centerService.centerRead(id);
+                model.addAttribute("centerDTO", centerDTO);
+                model.addAttribute("id", centerDTO.getCenterNum());
+                break;
+            case "branch":
+                BranchDTO branchDTO = branchService.branchRead(id);
+                model.addAttribute("branchDTO", branchDTO);
+                model.addAttribute("id", branchDTO.getBranchNum());
+                break;
+            case "facility":
+                FacilityDTO facilityDTO = facilityService.facilityRead(id);
+                model.addAttribute("facilityDTO", facilityDTO);
+                model.addAttribute("id", facilityDTO.getFacilityNum());
+                break;
         }
-
-        CenterDTO centerDTO = centerService.centerRead(centerNum);
-
-        model.addAttribute("centerDTO", centerDTO);
 
         return "center/modify";
     }
 
-    @PostMapping("/modify/{centerNum}")
-    public String modifyCenterPost(@ModelAttribute CenterDTO centerDTO) {
-        log.info("post 방식 center 수정 controller 진입");
-        centerService.centerModify(centerDTO);
+    @PostMapping("/modify/{type}/{id}")
+    public String modifyOrgPost(@PathVariable("type") String type,
+                                @PathVariable("id") Long id,
+                                @ModelAttribute CenterDTO centerDTO,
+                                @ModelAttribute BranchDTO branchDTO,
+                                @ModelAttribute FacilityDTO facilityDTO,
+                                @RequestParam Long centerNumBrand) throws IOException {
+
+        switch (type) {
+            case "center":
+                centerDTO.setCenterNum(id);
+
+                centerService.centerModify(centerDTO);
+                break;
+            case "branch":
+                branchDTO.setBranchNum(id);
+                branchDTO.setCenterNum(centerNumBrand);
+
+                branchService.branchModify(branchDTO);
+                break;
+            case "facility":
+                facilityDTO.setFacilityNum(id);
+                facilityDTO.setCenterNum(centerNumBrand);
+
+                facilityService.facilityModify(facilityDTO);
+                break;
+        }
 
         return "redirect:/center/list";
     }
 
-    @PostMapping("/delete/{centerNum}")
-    public String deleteCenter(@PathVariable Long centerNum) {
-        log.info("post 방식 center 삭제 controller 진입");
 
+    @PostMapping("/delete/{centerNum}")
+    public String deleteCenter(@PathVariable("centerNum") Long centerNum) {
+        log.info("post 방식 center 삭제 controller 진입");
 
         centerService.centerDelete(centerNum);
 
@@ -193,7 +234,7 @@ public class CenterController {
     // 조직등록 - 센터
     @PostMapping("/centerinsert")
     @ResponseBody
-    public String centerInsertPost(CenterDTO centerDTO) {
+    public String centerInsertPost(CenterDTO centerDTO) throws IOException {
         centerService.centerInsert(centerDTO);
         return "redirect:/center/list";
     }

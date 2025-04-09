@@ -5,12 +5,13 @@ import com.sixthsense.hexastay.dto.CenterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface BranchService {
 
     //branch 등록
-    public void branchInsert(BranchDTO branchDTO);
+    public void branchInsert(BranchDTO branchDTO) throws IOException;
 
     //branch 목록
     public Page<BranchDTO> branchList(Pageable pageable);
