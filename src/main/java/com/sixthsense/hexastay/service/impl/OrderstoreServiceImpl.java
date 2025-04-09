@@ -7,9 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
-import com.sixthsense.hexastay.dto.OrderstoreitemDTO;
-import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.OrderstoreRepository;
@@ -74,7 +72,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     }
 
     @Override
-    public void delete(Long orderId) {
+    public void cancel(Long orderId) {
         Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
         orderstore.setOrderstoreStatus("cancel");
     }
@@ -95,5 +93,18 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             viewOrderList.add(orderstoreViewDTO);
         }
         return new PageImpl<>(viewOrderList, pageable, orderlist.getTotalElements());
+    }
+
+    @Override
+    public List<OrderstoreDTO> getAllList() {
+        List<Orderstore> orderstoreList = orderstoreRepository.findAll();
+        List<OrderstoreDTO> list = orderstoreList.stream().map(data -> {
+            OrderstoreDTO dto = modelMapper.map(data, OrderstoreDTO.class);
+            dto.setOrderstoreitemDTOList(
+                    data.getOrderstoreitemList().stream().map(a->modelMapper.map(a,OrderstoreitemDTO.class)).toList()
+            );
+            return dto;
+        }).toList();
+        return list;
     }
 }

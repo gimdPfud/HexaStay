@@ -20,6 +20,9 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
     @Query("select a from Orderstore a")
     public Page<Orderstore> findAll(Pageable pageable);
 
+    @Query("select a from Orderstore a where a.orderstoreStatus='alive'")
+    public List<Orderstore> findAll();
+
     /*페이지로 가져오기*/
     Page<Orderstore> findByMember_MemberEmail (String email, Pageable pageable);
     /*리스트로 가져오기. 근데 주문내역이면........... 계속 나오지않나*/

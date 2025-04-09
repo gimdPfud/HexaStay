@@ -1,15 +1,17 @@
 /********************************************
  * 클래스명 : OrderstoreDTO
- * 기능 : OrderstoreDTO
- * 작성자 : 김부환
- * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 기능 : 스토어 매출 용 DTO
+ * 작성자 : 김예령
+ * 작성일 : 2025-04-09
+ * 수정 : 2025-04-09
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,4 +37,6 @@ public class OrderstoreDTO {
     //**********************************
     //멤버 정보를 가져올 PK - member
     private Long memberNum;
+
+    private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 }

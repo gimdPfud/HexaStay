@@ -20,12 +20,12 @@ import java.time.LocalDateTime;
 public class OrderstoreitemDTO {
 
     private Long orderstoreitemNum; //pk
-
-    private Long orderstoreitemAmount;      //주문한 메뉴 양
-
-    private Long orderstoreitemPrice;       //주문한 메뉴 가격
-
-    private Long orderstoreitemTotalPrice;  //주문한 메뉴들의 총가격
+    //주문한 메뉴 양
+    private Long orderstoreitemAmount;
+    //주문한 메뉴 가격
+    private Long orderstoreitemPrice;
+    //주문한 메뉴들의 총가격
+    private Long orderstoreitemTotalPrice;
 
     //외부업체 상품판매일
     private LocalDateTime createDate;
