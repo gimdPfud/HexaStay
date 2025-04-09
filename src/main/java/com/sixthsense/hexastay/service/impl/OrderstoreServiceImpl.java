@@ -7,6 +7,8 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
+import com.sixthsense.hexastay.dto.OrderstoreitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.MemberRepository;
@@ -17,7 +19,9 @@ import com.sixthsense.hexastay.service.OrderstoreService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     private final MemberRepository memberRepository;
     private final StoremenuRepository storemenuRepository;
     private final StorecartitemRepository storecartitemRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
     public boolean validOrder(Long orderId, String email) {
@@ -64,15 +69,31 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             storecartitemRepository.delete(cartItem);
             itemlist.add(orderItem);
         }
+        order.setOrderstoreitemList(itemlist);
+        orderstoreRepository.save(order);
     }
 
     @Override
     public void delete(Long orderId) {
-
+        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        orderstore.setOrderstoreStatus("cancel");
     }
 
+
+    /* 고객한테 보여줄때는 페이지로 보여주면 되지~~롱*/
     @Override
-    public Page<StorecartitemViewDTO> getOrderList(String email, Pageable pageable) {
-        return null;
+    public Page<OrderstoreViewDTO> getOrderList(String email, Pageable pageable) {
+        Page<Orderstore> orderlist = orderstoreRepository.findByMember_MemberEmail(email,pageable);
+        List<OrderstoreViewDTO> viewOrderList = new ArrayList<>();
+        for (Orderstore orderstore : orderlist){
+            OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
+            List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
+            itemlist.forEach(data->{
+                OrderstoreitemDTO dto = modelMapper.map(data,OrderstoreitemDTO.class);
+                orderstoreViewDTO.addOrderstoreitemDTOList(dto);
+            });
+            viewOrderList.add(orderstoreViewDTO);
+        }
+        return new PageImpl<>(viewOrderList, pageable, orderlist.getTotalElements());
     }
 }

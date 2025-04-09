@@ -41,12 +41,12 @@ public class StoreController {
      * */
     @GetMapping("/insert")
     public String insert(){
-        log.info("등록");
+//        log.info("등록");
         return "store/insert";
     }
     @PostMapping("/insert")
     public String insert(StoreDTO storeDTO) throws IOException {
-        log.info("등록post : "+storeDTO);
+//        log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
         return "redirect:/store/list";
     }
@@ -55,7 +55,7 @@ public class StoreController {
     @GetMapping("/list")
     public String list(Pageable pageable, Model model){
         Page<StoreDTO> storeDTOPage = storeService.list("alive", pageable);
-        storeDTOPage.forEach(log::info);
+//        storeDTOPage.forEach(log::info);
         model.addAttribute("list",storeDTOPage);
         return "store/list";
     }

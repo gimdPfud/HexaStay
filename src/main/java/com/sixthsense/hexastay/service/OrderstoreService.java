@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,6 @@ public interface OrderstoreService {
     /*3. 주문취소*/
     public void delete(Long orderId);
 
-    /*4. 주문내역*/
-    Page<StorecartitemViewDTO> getOrderList(String email, Pageable pageable);
+    /*4. 주문내역 고객에게 보여주기*/
+    Page<OrderstoreViewDTO> getOrderList(String email, Pageable pageable);
 }
