@@ -40,27 +40,6 @@
             margin-bottom: 15px;
         }
 
-        .price {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ff5733;
-            margin-bottom: 15px;
-        }
-
-        /* 이미지 스타일 */
-        .item-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .option-section {
-            margin: 15px 0;
-            text-align: left;
-        }
-
         .option-section select {
             width: 100%;
             padding: 8px;
@@ -68,11 +47,6 @@
             font-size: 16px;
         }
 
-        .quantity-section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
 
         .quantity-section button {
             padding: 8px 12px;
@@ -102,7 +76,6 @@
             background-color: #fdd835;
         }
 
-        <style>
              /* 주문수량 섹션 꾸미기 */
          .quantity-input {
              display: flex;
@@ -142,11 +115,6 @@
             outline: none;
             border: 1px solid #ffeb3b;
         }
-
-        .form-label {
-            font-weight: bold;
-        }
-    </style>
     </style>
 </head>
 <body>
@@ -161,24 +129,22 @@
     <!-- 아이템 상세 정보 -->
     <div class="item-details">
         <!-- 대표 이미지 -->
-        <img th:src="@{/image/김치찌개.png}" class="card-img-top" alt="상품 이미지">
+        <td>
+            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                 style="width: 60px; height: 80px;">
 
-        <h2 id="item-name">아이템 이름</h2>
-        <p id="item-description">아이템 상세 설명</p>
-        <p class="price" id="item-price">0원</p>
+            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                 th:src="@{/profile/default.png}"
+                 style="width: 60px; height: 80px;">
+        </td>
 
-        <!-- 옵션 섹션 -->
-        <div class="option-section">
-            <label for="item-option">옵션 선택</label>
-            <select id="item-option">
-                <option value="option1">옵션 1</option>
-                <option value="option2">옵션 2</option>
-                <option value="option3">옵션 3</option>
-            </select>
-        </div>
+        <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품 이름</h2>
+        <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</p>
+        <p class="col-sm-9">가격 : <span th:text="${roomMenuDTO.roomMenuPrice}"></span></p>
 
 
-        <div class="container mt-4">
+        <div class="container mt-4" style="text-align: center">
             <div class="row mb-3">
                 <label for="count" class="col-sm-4 col-form-label">주문수량</label>
                 <div class="col-8">
@@ -198,117 +164,30 @@
 </div>
 
 <script>
-
-    function getParameterByName(name) {
-        const url = window.location.href;
-        const paramName = name.replace(/[\[\]]/g, '\\$&');
-        const regex = new RegExp('[?&]' + paramName + '(=([^&#]*)|&|#|$)');
-        const results = regex.exec(url);
-        if (!results || !results[2]) return null;
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuId = getParameterByName('roomMenuNum');  // ← URL에서 가져오기
-        if (!menuId) {
-            alert("잘못된 접근입니다.");
-            return;
-        }
+    // 초기 가격
+    const unitPrice = parseInt('${roomMenuDTO.roomMenuPrice}'); // 서버에서 가격을 받아오기
 
 
-    // 아이템 정보를 미리 설정해 놓고, 이 값을 통해 페이지를 동적으로 업데이트 할 수 있습니다.
-        fetch(`/roommenu/orderpage/orderread?roomMenuNum=${menuId}`)
-            .then(response => response.json())
-            .then(roommenuDTO => {
-                console.log("받은 아이템 정보:", item);
-                document.getElementById('item-name').innerText = roommenuDTO.roomMenuName;
-                document.getElementById('item-description').innerText = iroommenuDTOtem.roomMenuContent;
-                document.getElementById('item-price').innerText = roommenuDTO.roomMenuPrice + '원';
-                document.querySelector('.card-img-top').src = roommenuDTO.roomMenuImageMeta || '/image/default.png';
+        let count = $("#count"); // 수량 input
+        let price = [[${roomMenuDTO.roomMenuPrice}]]; // 가격을 숫자 값으로 받아옴 (단일 값)
 
-                const optionSelect = document.getElementById('item-option');
-                optionSelect.innerHTML = '';
+        $(document).ready(function () {
+        // 수량이 변경될 때마다 가격을 업데이트
+        $("#count").on("change", function () {
+            let quantity = $(this).val();  // 변경된 수량 값
+            let total = quantity * price;  // 가격 계산
 
-                const options = ['기본', '곱빼기', '덜맵게'];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt;
-                    option.text = opt;
-                    optionSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error("룸메뉴 정보를 불러오는 중 오류:", error);
-            });
+            // 계산된 가격을 화면에 표시
+            $("#totalPrice").text(total + '원');
+        });
     });
 
 
-    // 페이지 로딩 시 아이템 정보 업데이트
-    document.getElementById('item-name').textContent = item.name;
-    document.getElementById('item-description').textContent = item.description;
-    document.getElementById('item-price').textContent = `${item.price}원`;
+// 장바구니 담기 함수 (예시로 구현)
+function addToCart() {
+alert("장바구니에 담겼습니다!");
+}
 
-    // 아이템 이미지 업데이트
-    const itemImage = document.querySelector('.item-image');
-    itemImage.src = item.imageUrl;
-
-    const optionSelect = document.getElementById('item-option');
-    item.options.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option;
-        optionElement.textContent = option;
-        optionSelect.appendChild(optionElement);
-    });
-
-    // 수량 변경 함수
-    function changeQuantity(amount) {
-        const quantityInput = document.getElementById('quantity');
-        let currentQuantity = parseInt(quantityInput.value);
-        currentQuantity += amount;
-        if (currentQuantity < 1) {
-            currentQuantity = 1;
-        }
-        quantityInput.value = currentQuantity;
-        updatePrice();  // 수량 변경 후 가격 업데이트
-    }
-
-    // 가격 업데이트 함수
-    function updatePrice() {
-        const quantity = document.getElementById('quantity').value;
-        const totalPrice = item.price * quantity;
-        document.getElementById('item-price').textContent = `${totalPrice}원`;
-    }
-
-    // 장바구니에 아이템 추가 함수
-    function addToCart() {
-        const quantity = document.getElementById('quantity').value;
-        const selectedOption = document.getElementById('item-option').value;
-
-        // 장바구니에 아이템을 추가하는 로직을 작성합니다.
-        alert(`${item.name}을(를) ${quantity}개, ${selectedOption} 옵션으로 장바구니에 추가했습니다!`);
-
-        // 실제 서버와 연동하려면 여기서 API 요청을 보내거나, 로컬 저장소에 데이터를 저장할 수 있습니다.
-    }
-
-    // 뒤로가기 함수
-    function goBack() {
-        window.history.back();  // 페이지를 뒤로 돌아가게 합니다.
-    }
-
-    <!-- 자바스크립트 추가: 수량 변경 -->
-        function increaseQuantity() {
-        var countInput = document.getElementById('count');
-        var currentCount = parseInt(countInput.value);
-        countInput.value = currentCount + 1;
-    }
-
-        function decreaseQuantity() {
-        var countInput = document.getElementById('count');
-        var currentCount = parseInt(countInput.value);
-        if (currentCount > 1) {
-        countInput.value = currentCount - 1;
-    }
-    }
 </script>
 
 </body>
