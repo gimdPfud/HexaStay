@@ -8,8 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <!--@@@@스타일@@@@-->
-    <style>
+    <style th:fragment="sidebarStyle">
         body {
             margin: 0;
             padding: 0;
@@ -120,7 +121,7 @@
 </head>
 <body>
 <!--@@@@상단 네비게이션@@@@-->
-<nav class="navbar navbar-expand-sm navbar-dark custom-navbar">
+<nav th:fragment="navbar" class="navbar navbar-expand-sm navbar-dark custom-navbar">
     <button class="toggle-btn me-3" onclick="toggleSidebar()">☰</button>
     <a class="navbar-brand logo-center" href="/">
         <img src="/images/logo.png" alt="HexaStay 로고" height="75">
@@ -128,7 +129,7 @@
 </nav>
 
 <!--@@@@사이드바@@@@-->
-<div class="sidebar" id="sidebar">
+<div th:fragment="sidebar" class="sidebar" id="sidebar">
     <!-- 로그인 정보 (추가) -->
     <div class="user-info">
         <div><strong>ID</strong> : testID2</div>
@@ -186,20 +187,21 @@
 </div>
 
 <!--@@@@본문 콘텐츠@@@@-->
-<div class="main-content">
-    <div class="container-fluid">
-        <div class="card shadow p-4 stretch">
-            <div class="card-body">
-                내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용<br>
-                내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>
-                내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>
+<div th:fragment="content(layoutContent)">
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="card shadow p-4 stretch">
+                <div class="card-body">
+                    내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용<br>
+                    내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>
+                    내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>내용<br>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <!--@@@@사이드바 스크립트@@@@-->
-<script>
+<script th:fragment="sidebarScript">
     function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("show");
     }
