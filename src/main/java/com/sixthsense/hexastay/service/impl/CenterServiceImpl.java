@@ -3,7 +3,10 @@ package com.sixthsense.hexastay.service.impl;
 import ch.qos.logback.core.model.Model;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.entity.Center;
+import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.repository.BranchRepository;
 import com.sixthsense.hexastay.repository.CenterRepository;
+import com.sixthsense.hexastay.repository.FacilityRepository;
 import com.sixthsense.hexastay.service.CenterService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,9 @@ import java.util.List;
 public class CenterServiceImpl implements CenterService {
 
     private final CenterRepository centerRepository;
+    private final BranchRepository branchRepository;
+    private final FacilityRepository facilityRepository;
+    private final AdminRepository adminRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
 
@@ -93,6 +99,15 @@ public class CenterServiceImpl implements CenterService {
     @Override
     public void centerDelete(Long centerNum) {
         log.info("center Delete Service 진입");
+
+        //참조하고있는 admin 먼저 삭제 (pk로 Entity 찾아서 삭제)
+
+
+        //참조하고있는 branch 먼저 삭제 (pk로 Entity 찾아서 삭제)
+        branchRepository.deleteByCenter_CenterNum(centerNum);
+
+        //참조하고있는 facility 먼저 삭제 (pk로 Entity 찾아서 삭제)
+        facilityRepository.deleteByCenter_CenterNum(centerNum);
 
         //center 삭제 (pk로 Entity 찾아서 삭제)
         centerRepository.deleteById(centerNum);

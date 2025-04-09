@@ -61,7 +61,7 @@ import org.springframework.security.web.SecurityFilterChain;
         @Order(3)
         public SecurityFilterChain sharedFilterChain(HttpSecurity http) throws Exception {
             http
-                    .securityMatcher("/roommenu/**") // 공통 경로
+                    .securityMatcher("/**") // 공통 경로
                     .authorizeHttpRequests(auth -> auth
                             .anyRequest().authenticated()
                     )
