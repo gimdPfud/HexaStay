@@ -28,9 +28,9 @@ public class Orderstoreitem {
     @JoinColumn(name = "storemenu_num")
     private Storemenu storemenu;        //메뉴랑 연결
 
-    private Long orderstoreitemAmount;      //주문한 메뉴 양
+    private Integer orderstoreitemAmount;      //주문한 메뉴 양
 
-    private Long orderstoreitemPrice;       //주문한 메뉴 가격
+    private Integer orderstoreitemPrice;       //주문한 메뉴 가격
 
-    private Long orderstoreitemTotalPrice;  //주문한 메뉴들의 총가격
+    private Integer orderstoreitemTotalPrice;  //주문한 메뉴들의 총가격
 }
