@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <meta charset="UTF-8">
+    <!--부트 스트랩-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--부트 스트랩 스타일시트(HTML 속성)-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--부트스트랩에 효과(자바스크립트)-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!--부트스트랩 아이콘-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <title>Title</title>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">회원 및 호텔 룸 등록</h2>
+
+    <form id="registerForm">
+        <!-- 회원 정보 입력 -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">회원 정보</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">이름</label>
+                    <input type="text" class="form-control" name="memberName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" name="memberPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="text" class="form-control" name="memberPhone" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-control" name="memberEmail" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- 호텔 룸 정보 입력 -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">호텔 룸 정보</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">방 이름</label>
+                    <input type="text" class="form-control" name="hotelRoomName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">방 전화번호</label>
+                    <input type="text" class="form-control" name="hotelRoomPhone">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">방 종류</label>
+                    <select class="form-select" name="hotelRoomType" required>
+                        <option value="Single">싱글</option>
+                        <option value="Double">더블</option>
+                        <option value="Suite">스위트</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">상세 설명</label>
+                    <textarea class="form-control" name="hotelRoomContent" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">숙박 가능 일수</label>
+                    <input type="number" class="form-control" name="hotelRoomLodgment" min="1" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">방 가격</label>
+                    <input type="number" class="form-control" name="hotelRoomPrice" min="0" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">체크인 날짜</label>
+                    <input type="date" class="form-control" name="checkInDate" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">체크아웃 날짜</label>
+                    <input type="date" class="form-control" name="checkOutDate" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- 버튼 -->
+        <button type="submit" class="btn btn-primary w-100">등록하기</button>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#registerForm").submit(function(event) {
+            event.preventDefault(); // 기본 제출 방지
+
+            var formData = {
+                memberName: $("input[name='memberName']").val(),
+                memberPassword: $("input[name='memberPassword']").val(),
+                memberPhone: $("input[name='memberPhone']").val(),
+                memberEmail: $("input[name='memberEmail']").val(),
+                hotelRoomName: $("input[name='hotelRoomName']").val(),
+                hotelRoomPhone: $("input[name='hotelRoomPhone']").val(),
+                hotelRoomType: $("select[name='hotelRoomType']").val(),
+                hotelRoomContent: $("textarea[name='hotelRoomContent']").val(),
+                hotelRoomLodgment: $("input[name='hotelRoomLodgment']").val(),
+                hotelRoomPrice: $("input[name='hotelRoomPrice']").val(),
+                checkInDate: $("input[name='checkInDate']").val(),
+                checkOutDate: $("input[name='checkOutDate']").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/member/register",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert("회원 및 호텔 룸이 등록되었습니다!");
+                    $("#registerForm")[0].reset();
+                },
+                error: function(xhr, status, error) {
+                    alert("등록 실패: " + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

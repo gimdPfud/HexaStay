@@ -38,8 +38,7 @@ public class Member extends BaseEntity{
     @Column(name = "memberEmail")
     private String memberEmail;                         //이메일
 
-    @Column(name = "memberBirth")
-    private String memberBirth;                        //생년월일
+
 
     private String memberRole;                          //시큐리티용 맴버롤
 

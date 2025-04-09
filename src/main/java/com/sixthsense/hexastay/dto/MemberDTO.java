@@ -7,17 +7,11 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.constant.Gender;
-import com.sixthsense.hexastay.entity.Branch;
-import com.sixthsense.hexastay.entity.Center;
-import com.sixthsense.hexastay.entity.Facility;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import lombok.*;
+
+
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -37,7 +31,7 @@ public class MemberDTO {
 
     private String memberEmail;                         //이메일
 
-    private String memberBirth;                         //생년월일
+
 
 
     private LocalDateTime createDate;       //가입 일자
@@ -52,6 +46,18 @@ public class MemberDTO {
 
     private Long facilityNum;
 
+    private Long hotelRoomNum;
+
+
+    //*******************//
+    private HotelRoomDTO hotelRoomDTO;
+
+    public MemberDTO setHotelRoomDTO(HotelRoomDTO hotelRoomDTO) {
+
+        this.hotelRoomDTO = hotelRoomDTO;
+
+        return this;
+    }
 
 
 }

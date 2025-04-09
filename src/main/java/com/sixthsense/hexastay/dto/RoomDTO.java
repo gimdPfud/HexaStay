@@ -19,8 +19,18 @@ public class RoomDTO {
         //2.HotelRoom
         private Long hotelRoomNum;
 
+        // 새로운 필드 추가 (호텔 룸 정보)
+        private String hotelRoomName;
+        private String hotelRoomPhone;
+
+        // 새로운 필드 추가 (멤버 정보)
+        private String memberName;
+        private String memberEmail;
 
 
+        private MemberDTO memberDTO;
+
+        private HotelRoomDTO hotelRoomDTO;
 
 
 }
