@@ -67,5 +67,7 @@ public class StoreCartController {
         return "mobilestore/cart/list";
     }
     /*3. 장바구니 수정 (수정)*/
+    @GetMapping("/modify")
+    public void cartModify(){}
     /*4. 장바구니 삭제 (삭제)*/
 }
