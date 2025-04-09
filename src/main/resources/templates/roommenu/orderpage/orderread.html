@@ -219,12 +219,12 @@
     // 아이템 정보를 미리 설정해 놓고, 이 값을 통해 페이지를 동적으로 업데이트 할 수 있습니다.
         fetch(`/roommenu/orderpage/orderread?roomMenuNum=${menuId}`)
             .then(response => response.json())
-            .then(item => {
+            .then(roommenuDTO => {
                 console.log("받은 아이템 정보:", item);
-                document.getElementById('item-name').innerText = item.roomMenuName;
-                document.getElementById('item-description').innerText = item.roomMenuContent;
-                document.getElementById('item-price').innerText = item.roomMenuPrice + '원';
-                document.querySelector('.card-img-top').src = item.roomMenuImageMeta || '/image/default.png';
+                document.getElementById('item-name').innerText = roommenuDTO.roomMenuName;
+                document.getElementById('item-description').innerText = iroommenuDTOtem.roomMenuContent;
+                document.getElementById('item-price').innerText = roommenuDTO.roomMenuPrice + '원';
+                document.querySelector('.card-img-top').src = roommenuDTO.roomMenuImageMeta || '/image/default.png';
 
                 const optionSelect = document.getElementById('item-option');
                 optionSelect.innerHTML = '';
