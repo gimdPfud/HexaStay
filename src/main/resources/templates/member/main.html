@@ -5,14 +5,17 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>직원 정보 변경</title>
+    <title>매니지먼트 시스템</title>
 </head>
-<body class="w-100 vh-100 bg-light">
-<div layout:fragment="content">
+<body style="background-color: #f8f9fa;">
 
-    <div th:text=""></div>
+<div layout:fragment="content" class="container mt-4">
+
+
+    <p th:text="${#authentication.principal.member.memberName}"></p>
+
 
 </div>
+
 </body>
 </html>
