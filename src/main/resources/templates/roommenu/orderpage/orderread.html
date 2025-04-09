@@ -177,6 +177,7 @@
             </select>
         </div>
 
+
         <div class="container mt-4">
             <div class="row mb-3">
                 <label for="count" class="col-sm-4 col-form-label">주문수량</label>
@@ -197,14 +198,50 @@
 </div>
 
 <script>
+
+    function getParameterByName(name) {
+        const url = window.location.href;
+        const paramName = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + paramName + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results || !results[2]) return null;
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuId = getParameterByName('roomMenuNum');  // ← URL에서 가져오기
+        if (!menuId) {
+            alert("잘못된 접근입니다.");
+            return;
+        }
+
+
     // 아이템 정보를 미리 설정해 놓고, 이 값을 통해 페이지를 동적으로 업데이트 할 수 있습니다.
-    const item = {
-        name: '김치찌개',
-        description: '매운 김치와 돼지고기가 들어간 국물 요리',
-        price: 8000,
-        options: ['옵션 1', '옵션 2', '옵션 3'],
-        imageUrl: 'https://via.placeholder.com/400x250?text=Kimchi+Stew'  // 아이템 이미지 URL
-    };
+        fetch(`/roommenu/orderpage/orderread?roomMenuNum=${menuId}`)
+            .then(response => response.json())
+            .then(item => {
+                console.log("받은 아이템 정보:", item);
+                document.getElementById('item-name').innerText = item.roomMenuName;
+                document.getElementById('item-description').innerText = item.roomMenuContent;
+                document.getElementById('item-price').innerText = item.roomMenuPrice + '원';
+                document.querySelector('.card-img-top').src = item.roomMenuImageMeta || '/image/default.png';
+
+                const optionSelect = document.getElementById('item-option');
+                optionSelect.innerHTML = '';
+
+                const options = ['기본', '곱빼기', '덜맵게'];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    optionSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("룸메뉴 정보를 불러오는 중 오류:", error);
+            });
+    });
+
 
     // 페이지 로딩 시 아이템 정보 업데이트
     document.getElementById('item-name').textContent = item.name;
