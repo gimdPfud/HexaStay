@@ -37,6 +37,5 @@ public class Orderstore extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "orderstore", cascade = CascadeType.ALL)
-    private List<Orderstoreitem> orderstoreitemList
-            = new ArrayList<>();
+    private List<Orderstoreitem> orderstoreitemList = new ArrayList<>();
 }

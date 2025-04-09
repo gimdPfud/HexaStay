@@ -11,19 +11,20 @@
 <div class="container">
     <h1 class="mt-4">룸서비스 메뉴 등록</h1>
 
-    <div class="mb-3 user-box text-center">
-        <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-            <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
-        </div>
-        <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
-        <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-        <input hidden type="file" id="menuImage" name="storemenuImg" class="btn btn-light form-control rounded-pill"
-               accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-        <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-    </div>
-
     <!-- 메뉴 등록/수정 폼 -->
-    <form action="/roommenu/insert" method="post">
+    <form action="/roommenu/insert" method="post" enctype="multipart/form-data">
+        <!-- 이미지 파일 -->
+        <div class="mb-3 user-box text-center">
+            <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+            </div>
+            <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
+            <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+            <input hidden type="file" id="menuImage" name="roomMenuImage" class="btn btn-light form-control rounded-pill"
+                   accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+            <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+        </div> <!-- 이미지 파일 끝 -->
+
         <div class="mb-3">
             <label for="roomMenuName" class="form-label">메뉴 이름</label>
             <input type="text" class="form-control" id="roomMenuName" name="roomMenuName" required>

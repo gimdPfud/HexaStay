@@ -21,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -119,6 +120,7 @@ public class RoomMenuController {
     public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
         log.info("등록페이지 post 컨트롤러 진입");
         log.info("로그인 : " + principal.getName());
+        log.info("ㅇㅇ"+ roomMenuDTO.getRoomMenuImage().getOriginalFilename());
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
 
 
@@ -153,9 +155,6 @@ public class RoomMenuController {
 
         Map<String, Integer> pageInfo = Pagination(roomMenuDTOPage);
 
-        for (RoomMenuDTO roomMenuDTO : roomMenuDTOPage) {
-            log.info(roomMenuDTO.getRoomMenuName());
-        }
         model.addAttribute("list", roomMenuDTOPage);
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
@@ -238,11 +237,11 @@ public class RoomMenuController {
     /**************************************************
      * 룸서비스 메뉴 수정 처리 (POST)
      * 기능 : 메뉴 수정 정보를 처리하여 업데이트
-     * 수정일 : 2025-04-08 - 프린시퀄 추가
+     * 수정일 : 2025-04-08 - 프린시퀄 추가, 2025-04-09 : 기본 이미지 설정
      **************************************************/
 
     @PostMapping("/roommenu/modify")
-    public String roomMenuModifyPost(Long num, RoomMenuDTO roomMenuDTO, Principal principal) {
+    public String roomMenuModifyPost(Long num, RoomMenuDTO roomMenuDTO, Principal principal, RedirectAttributes redirectAttributes) {
 
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
         log.info("로그인한 사용자: " + memberName);
@@ -251,10 +250,14 @@ public class RoomMenuController {
         try {
             log.info("Post 수정 컨트롤러 진입: " + roomMenuDTO.getRoomMenuNum());
 
+            roomMenuService.modify(roomMenuDTO); // 서비스 호출
+            redirectAttributes.addFlashAttribute("msg", "수정 완료");
+
             roomMenuService.modify(roomMenuDTO);
 
         } catch (Exception e) {
 
+            redirectAttributes.addFlashAttribute("msg", "수정 실패: " + e.getMessage());
             log.info("업데이트 POST 컨트롤러 실패");
             return "redirect:/roommenu/list";
 

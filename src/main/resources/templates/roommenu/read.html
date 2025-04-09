@@ -62,8 +62,18 @@
                     <dd class="col-sm-9" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}">등록일자</dd>
                 </div>
                 <div class="col-4">
-                    <div class="card" style="width: 18rem; border: 2px solid #ccc;">
-                        <img src="#" th:src="@{/image/사탕.png}" class="card-img-top" alt="상품 이미지"> <!-- static/image/샘플이미지.png 경로 -->
+                    <div class="card" style="width: 25rem; text-align: center; border: 2px solid #ccc;">
+
+                        <td style="text-align: center;"> <!-- 이미지 불러오기 -->
+                            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                 style="width: 194px; height: 172px;">
+
+                            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                                 th:src="@{/profile/default.png}"
+                                 style="width: 60px; height: 80px;">
+                        </td> <!-- 이미지 불러오기 끝 -->
+
                         <div class="card-body">
                             <dd class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</dd>
                         </div>

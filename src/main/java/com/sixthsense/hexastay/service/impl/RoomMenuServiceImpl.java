@@ -40,7 +40,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     @Override
     public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException {
         log.info("룸서비스 아이템 등록 서비스 진입" + roomMenuDTO);
-
+        log.info("파일" + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
         // 모델맵퍼로 dto 변환
         RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
 
@@ -58,14 +58,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                 String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
                 // 4. 파일 이름
                 String fileName = fileFirstName + fileSubName;
-
                 // 파일 메타 정보 설정
                 roomMenuDTO.setRoomMenuImageMeta("/roommenu/" + fileName);
+                log.info("파일" + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
 
                 // 5. 저장할 경로 설정
-                Path uploadPath = Paths.get("path/to/store", "roommenu", fileName);  // 시스템에 맞는 경로로 변경
-                Path createPath = Paths.get("path/to/store", "roommenu");
-
+                Path uploadPath = Paths.get(System.getProperty("user.dir"), "roommenu/" + fileName);
+                Path createPath = Paths.get(System.getProperty("user.dir"), "roommenu/");
                 // 저장할 디렉토리가 없으면 생성
                 if (!Files.exists(createPath)) {
                     Files.createDirectories(createPath);
@@ -180,6 +179,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      * 기능 : 룸서비스 메뉴 정보를 수정
      * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하고, 해당 메뉴를 수정한 후,
      *        수정된 엔티티를 다시 DTO로 변환하여 반환
+     * 수정일 : 2025-04-09
      **************************************************/
 
     @Override
@@ -189,14 +189,44 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         try {
             RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
 
+            // 새 이미지가 있으면 저장
+            if (roomMenuDTO.getRoomMenuImage() != null && !roomMenuDTO.getRoomMenuImage().isEmpty()) {
+                String fileOriginalName = roomMenuDTO.getRoomMenuImage().getOriginalFilename();
+
+                if (fileOriginalName != null && fileOriginalName.lastIndexOf(".") > 0) {
+                    String fileFirstName = roomMenuDTO.getRoomMenuName() + "_" + roomMenuDTO.getRoomMenuNum();
+                    String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+                    String fileName = fileFirstName + fileSubName;
+
+                    String metaPath = "/roommenu/" + fileName;
+                    roomMenuDTO.setRoomMenuImageMeta(metaPath);
+
+                    Path uploadPath = Paths.get(System.getProperty("user.dir"), "roommenu", fileName);
+                    Path createPath = Paths.get(System.getProperty("user.dir"), "roommenu");
+                    if (!Files.exists(createPath)) {
+                        Files.createDirectories(createPath);
+                    }
+
+                    try {
+                        roomMenuDTO.getRoomMenuImage().transferTo(uploadPath.toFile());
+                    } catch (IOException e) {
+                        log.error("이미지 저장 실패", e);
+                        throw new RuntimeException("이미지 저장 실패", e);
+                    }
+                }
+            } else {
+                // 이미지 변경이 없으면 기존 이미지 유지
+                roomMenuDTO.setRoomMenuImageMeta(roomMenuDTO.getOriginalImageMeta());
+            }
+
+            // 이미지 메타 설정 후 저장
+            roomMenu.setRoomMenuImageMeta(roomMenuDTO.getRoomMenuImageMeta());
             roomMenu = roomMenuRepository.save(roomMenu);
 
-            RoomMenuDTO updatedMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
-
-            return updatedMenuDTO;
+            return modelMapper.map(roomMenu, RoomMenuDTO.class);
 
         } catch (Exception e) {
-            log.error("데이터 수정에 실패함: " + e.getMessage(), e);  //
+            log.error("데이터 수정 실패: " + e.getMessage(), e);
             throw new RuntimeException("데이터 수정에 실패했습니다.", e);
         }
     }

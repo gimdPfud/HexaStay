@@ -41,10 +41,6 @@
                     <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">이메일</label>
-                    <input type="text" class="form-control" th:value="${data.storeEmail}" readonly>
-                </div>
-                <div class="mb-3">
                     <label class="form-label">사업장 주소</label>
                     <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
                 </div>
@@ -57,7 +53,7 @@
                     <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
                 </div>
                 <div class="text-center mt-4 d-flex justify-content-between">
-                    <a th:href="@{'/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
+                    <a th:href="@{'/admin/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
                 </div>
             </div><!--외부업체 정보-->
 
@@ -65,7 +61,7 @@
             <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 800px;">
                 <div class="mb-3">
                     <h1 class="text-center">제공 서비스 목록</h1>
-                    <a th:href="@{'/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
+                    <a th:href="@{'/admin/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
                 </div><!--제목끝-->
                 <div class="storemenulist mt-5"></div>
 
@@ -92,7 +88,7 @@
             document.addEventListener("DOMContentLoaded", function () {
                 console.log("페이지 로드 됨")
 
-                fetch(`/store/menu/list/${storenum}`)
+                fetch(`/admin/store/menu/list/${storenum}`)
                     .then(response => {
                         if(!response.ok){
                             if(response.status===404){
@@ -116,7 +112,7 @@
                         console.log(error)
                     });
 
-                fetch(`/store/menu/list/deleted/${storenum}`)
+                fetch(`/admin/store/menu/list/deleted/${storenum}`)
                     .then(response => {
                         if(!response.ok){
                             if(response.status===404){
@@ -182,8 +178,8 @@
                     <td>${list[i].storemenuContent}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>
-                        <a href="/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세</a>
-                        <a href="/store/menu/delete/${list[i].storemenuNum}" class="btn btn-danger btn-sm">삭제</a>
+                        <a href="/admin/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세</a>
+                        <a href="/admin/store/menu/delete/${list[i].storemenuNum}" class="btn btn-danger btn-sm">삭제</a>
                     </td>
                 </tr>`
                 }
@@ -220,7 +216,7 @@
                     <td>${list[i].storemenuContent}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>
-                        <a href="/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
+                        <a href="/admin/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
                     </td>
                 </tr>`
                 }

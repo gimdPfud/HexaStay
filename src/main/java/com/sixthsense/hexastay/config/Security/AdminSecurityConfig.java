@@ -57,6 +57,18 @@ import org.springframework.security.web.SecurityFilterChain;
             return http.build();
         }
 
+        @Bean
+        @Order(3)
+        public SecurityFilterChain sharedFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .securityMatcher("/**") // 공통 경로
+                    .authorizeHttpRequests(auth -> auth
+                            .anyRequest().authenticated()
+                    )
+                    .csrf().disable();
+            return http.build();
+        }
+
 
         @Bean
         public PasswordEncoder passwordEncoder() {

@@ -214,7 +214,15 @@
     <ul class="food-list">
         <li th:each="roomMenuDTO : ${list}" class="food-item">
             <!-- 메뉴 이미지 -->
-            <p class="food-image">메뉴이미지</p>
+            <td style="text-align: center;">
+                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                     style="width: 135px; height: 125px;">
+
+                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     style="width: 60px; height: 80px;">
+            </td>
             <div class="food-info">
                 <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p> <!-- 카테고리 -->
                 <p>
