@@ -45,4 +45,6 @@ public class Facility extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "centerNum")
     private Center center;              //본사 참조
+
+    private String companyPictureMeta;
 }

@@ -33,7 +33,10 @@ public class FacilityServiceImpl implements FacilityService {
         log.info("Facility Insert Sercive 진입");
 
         //facility 등록
+
+        Center center = centerRepository.findById(facilityDTO.getCenterNum()).orElseThrow();
         Facility facility = modelMapper.map(facilityDTO, Facility.class);
+        facility.setCenter(center);
         facilityRepository.save(facility);
 
         log.info("facilityDTO를 Entity로 변환 완료 : " + facility);
@@ -51,11 +54,11 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
-    public FacilityDTO facilityRead(Long facilityNum) {
+    public FacilityDTO facilityRead(Long id) {
         log.info("Facility Read Sercive 진입");
 
         //Facility 상세보기
-        Facility facility = facilityRepository.findById(facilityNum).get();
+        Facility facility = facilityRepository.findById(id).get();
         FacilityDTO facilityDTO = modelMapper.map(facility, FacilityDTO.class);
 
         return facilityDTO;
@@ -67,7 +70,7 @@ public class FacilityServiceImpl implements FacilityService {
 
         //Facility 수정
         Facility facility = facilityRepository.findById(facilityDTO.getFacilityNum()).orElseThrow();
-
+        Center center = centerRepository.findById(facilityDTO.getCenterNum()).orElseThrow();
         facility.setFacilityNum(facilityDTO.getFacilityNum());
         facility.setFacilityName(facilityDTO.getFacilityName());
         facility.setFacilityPhone(facilityDTO.getFacilityPhone());
@@ -75,7 +78,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setFacilityAddress(facilityDTO.getFacilityAddress());
         facility.setFacilityCeoName(facilityDTO.getFacilityCeoName());
         facility.setFacilityBusinessNum(facilityDTO.getFacilityBusinessNum());
-
+        facility.setCenter(center);
         facilityRepository.save(facility);
 
         log.info("수정 반영된 내용 : " + facility);

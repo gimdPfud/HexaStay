@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.BranchDTO;
+import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;
@@ -17,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -53,7 +56,7 @@ public class BranchController {
     }
 
     @PostMapping("/signup")
-    public String signUpBranchPost(BranchDTO branchDTO){
+    public String signUpBranchPost(BranchDTO branchDTO) throws IOException {
         log.info("post 방식 branch 등록 controller 진입");
         log.info("branchDTO 갖고왔나요? : " + branchDTO);
         log.info("CenterNum 갖고왔나요? : " + branchDTO.getCenterNum());
@@ -70,39 +73,9 @@ public class BranchController {
         BranchDTO branchDTO = branchService.branchRead(branchNum);
         model.addAttribute("branchDTO", branchDTO);
 
-        return "branch/read";
+        return "center/read";
     }
 
-    @GetMapping("/modify/{branchNum}")
-    public String modifyBranch(@PathVariable("branchNum") Long branchNum, Model model){
-        log.info("get 방식 branch 수정 controller 진입");
-
-        if(branchNum == null){
-            log.info("branchNum을 찾을 수 없음");
-            return "redirect:/center/list";
-        }
-
-        BranchDTO branchDTO = branchService.branchRead(branchNum);
-        //브랜드명, 본사명 리스트 가져오기
-        List<String> centerBrandList = centerRepository.findDistinctCenterBrand();
-        List<String> centerNameList = centerRepository.findDistinctCenterName();
-        log.info("centerBrandList 갖고 왔나? : " + centerBrandList );
-        log.info("centerNameList 갖고 왔나? : " + centerNameList );
-
-        model.addAttribute("branchDTO", branchDTO);
-        model.addAttribute("centerBrandList", centerBrandList);
-        model.addAttribute("centerNameList", centerNameList);
-
-        return "branch/modify";
-    }
-
-    @PostMapping("/modify/{branchNum}")
-    public String modifyBranchPost(@ModelAttribute BranchDTO branchDTO){
-        log.info("Post 방식 branch 수정 controller 진입");
-        branchService.branchModify(branchDTO);
-
-        return "redirect:/center/list";
-    }
 
     @PostMapping("/delete/{branchNum}")
     public ResponseEntity<String> deleteBranch(@PathVariable("branchNum") Long branchNum){
@@ -122,8 +95,9 @@ public class BranchController {
     // 조직등록 - 지사
     @PostMapping("/branchinsert")
     @ResponseBody
-    public ResponseEntity<Void> branchInsertPost(@RequestBody BranchDTO branchDTO) {
-        log.info(branchDTO.toString());
+    public ResponseEntity<Void> branchInsertPost(@RequestBody BranchDTO branchDTO, MultipartFile companyPicture) throws IOException {
+        branchDTO.setCompanyPicture(companyPicture);
+        log.info("아옿" + branchDTO.getCompanyPicture().getOriginalFilename());
         branchService.branchInsert(branchDTO);
         return ResponseEntity.ok().build();
     }

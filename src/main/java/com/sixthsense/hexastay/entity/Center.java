@@ -44,4 +44,6 @@ public class Center extends BaseEntity {
 
     @Column(name = "centerBusinessNum")
     private String centerBusinessNum;       //사업자등록번호
+
+    private String companyPictureMeta;
 }

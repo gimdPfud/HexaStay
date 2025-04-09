@@ -26,7 +26,7 @@
 
       <div class="col-md-3">
         <label class="form-label">소속</label>
-        <select name="choice" class="form-select">
+        <select name="choice" id="choice" class="form-select" onchange="document.getElementById('searchBtn').click()">
           <option value="center" th:selected="${choice == 'center'}">본사</option>
           <option value="branch" th:selected="${choice == 'branch'}">지사</option>
           <option value="facility" th:selected="${choice == 'facility'}">지점</option>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="col-md-2 d-flex gap-2">
-        <button type="submit" class="btn btn-success w-50">조회</button>
+        <button type="submit" id="searchBtn" class="btn btn-success w-50">조회</button>
         <a href="/center/signup" class="btn btn-outline-success w-50">등록</a>
       </div>
     </form>
@@ -50,6 +50,7 @@
         <table class="table table-bordered text-center mb-0">
           <thead class="table-light">
           <tr>
+            <th style="text-align: center; vertical-align: middle; width: 10%">프로필 사진</th>
             <th style="width: 16%;">브랜드명</th>
             <th style="width: 16%;">본사명</th>
             <th style="width: 16%;">지사명</th>
@@ -63,6 +64,17 @@
           <!-- 본사 -->
           <th:block th:if="${centerDTOS != null and !centerDTOS.isEmpty()}">
             <tr th:each="item : ${centerDTOS}">
+
+              <td style="text-align: center;">
+                <img th:if="${item.companyPictureMeta != null}"
+                     th:src="@{${item.companyPictureMeta}}"
+                     style="width: 60px; height: 80px;">
+
+                <img th:unless="${item.companyPictureMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     style="width: 60px; height: 80px;">
+              </td>
+
               <td th:text="${item.centerBrand}"></td>
               <td th:text="${item.centerName}"></td>
               <td>-</td>
@@ -75,6 +87,17 @@
           <!-- 지사 -->
           <th:block th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" >
             <tr th:each="item : ${branchDTOS}">
+
+              <td style="text-align: center;">
+                <img th:if="${item.companyPictureMeta != null}"
+                     th:src="@{${item.companyPictureMeta}}"
+                     style="width: 60px; height: 80px;">
+
+                <img th:unless="${item.companyPictureMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     style="width: 60px; height: 80px;">
+              </td>
+
               <td th:text="${item.centerBrand}"></td>
               <td th:text="${item.centerName}"></td>
               <td th:text="${item.branchName}"></td>
@@ -87,6 +110,17 @@
           <!-- 지점 -->
           <th:block th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}">
             <tr th:each="item : ${facilityDTOS}">
+
+              <td style="text-align: center;">
+                <img th:if="${item.companyPictureMeta != null}"
+                     th:src="@{${item.companyPictureMeta}}"
+                     style="width: 60px; height: 80px;">
+
+                <img th:unless="${item.companyPictureMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     style="width: 60px; height: 80px;">
+              </td>
+
               <td th:text="${item.centerBrand}"></td>
               <td th:text="${item.centerName}"></td>
               <td>-</td>
@@ -142,36 +176,8 @@
   <script>
     const choice = document.getElementById("choice");
 
-    choice.addEventListener("change", function () {
-      let selected = choice.value;
-      let url = "";
 
-      if (selected === "본사") {
-        url = "/center/searchcenter";
-      } else if (selected === "지사") {
-        url = "/center/searchbranch";
-      } else if (selected === "지점") {
-        url = "/center/searchfacility";
-      }
 
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          page: 0,
-          size: 10,
-          select: document.querySelector('select[name="select"]').value,
-          keyword: document.querySelector('input[name="keyword"]').value
-        }) // 기본 페이지
-      })
-              .then(res => res.json())
-              .then(data => {
-                updateTable(data.content); // 게시판 데이터
-                updatePagination(data);    // 페이징 관련
-              });
-    });
 
     function updateTable(content) {
       const tbody = document.querySelector("table tbody");

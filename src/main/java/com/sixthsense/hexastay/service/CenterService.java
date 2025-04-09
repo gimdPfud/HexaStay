@@ -1,15 +1,18 @@
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
+import com.sixthsense.hexastay.dto.FacilityDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface CenterService {
 
     //center 등록
-    public void centerInsert(CenterDTO centerDTO);
+    public void centerInsert(CenterDTO centerDTO) throws IOException;
 
     //center 목록
     public Page<CenterDTO> centerList(Pageable pageable);
@@ -40,4 +43,5 @@ public interface CenterService {
 
     //본사명 목록 중복없이 가져오기
     List<String> findDistinctCenterName();
+
 }
