@@ -36,5 +36,8 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
     //지사 사업자등록번호로 조회
     public Page<Facility> findByCenter_CenterNameContaining (String keyword, Pageable pageable);
 
+    //center 삭제 시 참조하고있는 facility 찾아서 삭제
+    public void deleteByCenter_CenterNum (Long centerNum);
+
 
 }
