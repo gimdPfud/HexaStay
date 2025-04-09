@@ -28,7 +28,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/order/store")
+@RequestMapping("/member/store")/*지금 일단 로그인때문에... 멤버 밑에다 껴둠.*/
 public class StoreClientController {
     private final StoreService storeService;
     private final StoremenuService storemenuService;

@@ -65,8 +65,8 @@
                 <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center; vertical-align: middle;">
-                    <a th:href="@{/store/read/super/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
-                    <a th:href="@{'/store/delete/'+${data.storeNum}}" class="btn btn-danger">삭제</a>
+                    <a th:href="@{/admin/store/read/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
+                    <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger">삭제</a>
                 </td>
             </tr>
             </tbody>
@@ -81,21 +81,21 @@
     <div class="row mt-3" th:if="${list != null and !list.empty}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/store/list?page=0}">처음</a>
+                <a class="page-link" th:href="@{/admin/store/list?page=0}">처음</a>
             </li>
             <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                <a class="page-link" th:href="@{/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
+                <a class="page-link" th:href="@{/admin/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
             </li>
             <li class="page-item"
                 th:each="pageNum : ${#numbers.sequence((list.number - 4 > 0 ? list.number - 4 : 0), (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
                 th:classappend="${pageNum == list.number} ? 'active'">
-                <a class="page-link" th:href="@{/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+                <a class="page-link" th:href="@{/admin/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
             </li>
             <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                <a class="page-link" th:href="@{/store/list?page={next}(next=${list.number + 1})}">다음</a>
+                <a class="page-link" th:href="@{/admin/store/list?page={next}(next=${list.number + 1})}">다음</a>
             </li>
             <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
+                <a class="page-link" th:href="@{/admin/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
             </li>
         </ul>
     </div>
@@ -108,9 +108,21 @@
                     <h5 class="modal-title" id="insertModalLabel">외부업체 등록</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <form action="/store/insert" method="post">
+                <form action="/admin/store/insert" method="post">
                     <div class="modal-body">
                         <div class="col">
+                            <div class="mb-3 user-box text-center">
+                                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                                </div>
+                                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                                <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
+                                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                                <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                            </div>
+
+
                             <div class="mb-3">
                                 <label class="form-label">업체명</label>
                                 <input type="text" class="form-control" name="storeName" required>
@@ -178,6 +190,47 @@
         </div>
     </div>
 
+
+    <script>
+        // 프로필 사진
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('adminProfile').click();
+        });
+
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+
+    </script>
 
 </div>
 </body>

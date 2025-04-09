@@ -17,9 +17,19 @@
             <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
         </div>
 
-        <form action="/store/modify" method="post">
+        <form action="/admin/store/modify" method="post">
             <input type="hidden" class="form-control" th:value="${data.storeNum}" name="storeNum">
             <input type="hidden" class="form-control" value="alive" name="storeStatus">
+
+            <div class="d-flex w-100" style="justify-content: center;">
+                <img th:if="${data.storeProfileMeta != null}"
+                     th:src="@{${data.storeProfileMeta}}"
+                     class="rounded" style="width: 133px; height: 133px;">
+
+                <img th:unless="${data.storeProfileMeta != null}"
+                     th:src="@{/store/default.png}"
+                     class="rounded" style="width: 133px; height: 133px;">
+            </div>
 
             <div class="mb-3">
                 <label class="form-label">상호명</label>
@@ -49,7 +59,7 @@
             <div class="d-flex justify-content-between mt-4">
                 <div>
                     <button type="submit" class="btn btn-primary">저장</button>
-                    <a th:href="@{'/store/read/'+${data.storeNum}}" class="btn btn-secondary">취소</a>
+                    <a th:href="@{'/admin/store/read/'+${data.storeNum}}" class="btn btn-secondary">취소</a>
                 </div>
             </div>
         </form>

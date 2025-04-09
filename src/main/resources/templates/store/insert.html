@@ -15,7 +15,7 @@
 <div layout:fragment="content">
     <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
         <h1 class="text-center mb-4">외부업체 등록</h1>
-        <form action="/store/insert" method="post" enctype="multipart/form-data">
+        <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
 
             <div class="mb-3 user-box text-center">
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -25,7 +25,7 @@
                 <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
                 <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
             </div>
 
             <div class="mb-3">
@@ -87,7 +87,7 @@
 
             <div class="d-flex justify-content-center gap-3">
                 <button type="submit" class="btn btn-success">등록</button>
-                <a href="/store/list" class="btn btn-danger">취소</a>
+                <a href="/admin/store/list" class="btn btn-danger">취소</a>
             </div>
         </form>
     </div>
