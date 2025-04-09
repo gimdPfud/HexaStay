@@ -24,10 +24,14 @@ public interface OrderstoreService {
 
     /*3. 주문취소*/
     public void cancel(Long orderId);
+    /*3-1. 주문완료*/
+    public void end(Long orderId);
 
-    /*4. 고객용 주문 목록*/
+    /*4. 고객용 주문내역 목록*/
     Page<OrderstoreViewDTO> getOrderList(String email, Pageable pageable);
 
-    /*5. 매출용 주문 목록? : 취소되지 않은 주문들만 전부 DTO리스트로 내보내는 메소드*/
+    /*5. 매출용 주문 목록? : 완료된 주문들만 전부 DTO리스트로 내보내는 메소드*/
     List<OrderstoreDTO> getAllList();
+    /*6. 스토어관리자용 : 들어온 주문 내역만 확인하기. (근데 진짜 이걸 만들어야한다고? 그냥 호텔관리시스템인데?)*/
+    List<OrderstoreDTO> getOrderedList(Long storeNum);
 }

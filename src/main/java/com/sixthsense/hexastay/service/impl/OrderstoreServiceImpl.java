@@ -77,6 +77,12 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         orderstore.setOrderstoreStatus("cancel");
     }
 
+    @Override
+    public void end(Long orderId) {
+        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        orderstore.setOrderstoreStatus("end");
+    }
+
 
     /* 고객한테 보여줄때는 페이지로 보여주면 되지~~롱*/
     @Override
@@ -106,5 +112,13 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             return dto;
         }).toList();
         return list;
+    }
+
+    @Override
+    public List<OrderstoreDTO> getOrderedList(Long storeNum) {
+        List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
+        list.forEach(log::info);
+        List<OrderstoreDTO> result = list.stream().map(data->modelMapper.map(data, OrderstoreDTO.class)).toList();
+        return result;
     }
 }

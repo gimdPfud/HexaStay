@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.Orderstore;
+import com.sixthsense.hexastay.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,12 +21,21 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
     @Query("select a from Orderstore a")
     public Page<Orderstore> findAll(Pageable pageable);
 
-    @Query("select a from Orderstore a where a.orderstoreStatus='alive'")
+    @Query("select a from Orderstore a where a.orderstoreStatus='end'")
     public List<Orderstore> findAll();
 
     /*페이지로 가져오기*/
     Page<Orderstore> findByMember_MemberEmail (String email, Pageable pageable);
     /*리스트로 가져오기. 근데 주문내역이면........... 계속 나오지않나*/
     List<Orderstore> findByMember_MemberEmail (String email);
+
+    /*스토어넘버로 가져오기*/
+    /*fixme 친구가 만들어준거*/
+    @Query("SELECT DISTINCT o FROM Orderstore o " +
+            "JOIN o.orderstoreitemList oi " +
+            "JOIN oi.storemenu sm " +
+            "JOIN sm.store s " +
+            "WHERE s.storeNum = :storeNum")
+    List<Orderstore> findByStoreNum(Long storeNum);
 
 }
