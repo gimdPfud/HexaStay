@@ -226,6 +226,7 @@ public class CenterController {
     public String deleteCenter(@PathVariable("centerNum") Long centerNum) {
         log.info("post 방식 center 삭제 controller 진입");
 
+
         centerService.centerDelete(centerNum);
 
         return "redirect:/center/list";
