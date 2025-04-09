@@ -34,7 +34,7 @@ public class RoomMenuOrderController {
 
     private final RoomMenuService roomMenuService;
 
-    @GetMapping("/roommenu/orderpage/orderread")
+    @GetMapping("/roommenu/orderpage/read
     @ResponseBody
     public RoomMenuDTO getRoomMenu(@RequestParam Long roomMenuNum) {
         log.info("AJAX용 룸메뉴 상세 JSON 요청: {}", roomMenuNum);
