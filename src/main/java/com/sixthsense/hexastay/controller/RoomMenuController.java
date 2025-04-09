@@ -153,9 +153,6 @@ public class RoomMenuController {
 
         Map<String, Integer> pageInfo = Pagination(roomMenuDTOPage);
 
-        for (RoomMenuDTO roomMenuDTO : roomMenuDTOPage) {
-            log.info(roomMenuDTO.getRoomMenuName());
-        }
         model.addAttribute("list", roomMenuDTOPage);
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
