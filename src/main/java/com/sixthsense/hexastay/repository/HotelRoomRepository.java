@@ -22,9 +22,7 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     @Query("select a from HotelRoom a")
     public Page<HotelRoom> findAll(Pageable pageable);
 
-    //
-    @Query("SELECT h.member FROM HotelRoom h WHERE h.hotelRoomNum = :hotelRoomNum")
-    public Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
 
 
 }

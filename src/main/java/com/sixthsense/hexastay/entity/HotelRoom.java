@@ -76,9 +76,7 @@ public class HotelRoom extends BaseEntity{
     @JoinColumn(name = "facilityNum")
     private Facility facility;         //시설 참조
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberNum")
-    private Member member;
+
 
     // 🔹 일대다 관계 설정 (기존 ManyToOne 제거)
 

@@ -20,10 +20,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@Controller
+
 @Log4j2
+@Controller
 @RequiredArgsConstructor
-@RequestMapping("/test")
+@RequestMapping("/member")
 public class TestController {
 
 
@@ -36,23 +37,27 @@ public class TestController {
 
 
     //********호텔룸 등록 테스트 페이지*****//
-    //Test 호텔룸 등록 - GET
-    @GetMapping("/hotelinsert")
-    public String hotelRoomInsertForm(Model model) {
-        model.addAttribute("hotelRoomDTO", new HotelRoomDTO()); // 🔹 DTO 추가
-        return "test/hotelroominsert";  // Thymeleaf 템플릿 이름
+    // 회원을 기준으로 호텔룸 등록 페이지
+    @GetMapping("/register-hotelroom")
+    public String showRegisterHotelRoomPage(Model model) {
+        model.addAttribute("memberDTO", new MemberDTO());
+        model.addAttribute("hotelRoomDTO", new HotelRoomDTO());
+        return "test/hotelroominsert";
     }
 
-    // (추가) 호텔룸 등록 처리
-    @PostMapping("/hotelinsert")
-    public String insertHotelRoom(@ModelAttribute HotelRoomDTO hotelRoomDTO,
-                                  RedirectAttributes redirectAttributes)
-    {
-        log.info("호텔룸 등록 요청 - 방 이름: {}", hotelRoomDTO.getHotelRoomName());
-
-        roomServiceimpl.insertHotelRoomAndAssignMember(hotelRoomDTO);
-        redirectAttributes.addFlashAttribute("message", "호텔룸 및 배정 정보가 등록되었습니다.");
-        return "redirect:/test/hotelroomlist";
+    // 회원을 기준으로 호텔룸 등록 처리
+    @PostMapping("/register-hotelroom")
+    public String registerHotelRoomForMember(@ModelAttribute MemberDTO memberDTO,
+                                             @ModelAttribute HotelRoomDTO hotelRoomDTO,
+                                             RedirectAttributes redirectAttributes) {
+        try {
+            roomServiceimpl.registerHotelRoomForMember(memberDTO, hotelRoomDTO);
+            redirectAttributes.addFlashAttribute("message", "회원 기준 호텔룸이 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            log.error("회원 기준 호텔룸 등록 실패: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "회원 기준 호텔룸 등록에 실패했습니다.");
+        }
+        return "redirect:/member/register-hotelroom";
     }
 
     // 호텔룸 목록 페이지 (member 정보 포함)
