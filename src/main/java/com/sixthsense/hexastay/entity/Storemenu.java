@@ -38,6 +38,9 @@ public class Storemenu extends BaseEntity {
     //룸서비스외부 업체상품 서비스 활성화 여부
     private String storemenuStatus;
 
+    //룸서비스외부
+    private String storemenuOut;
+
     //참조 테이블 - Store 테이블 Pk 참조
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storeNum")

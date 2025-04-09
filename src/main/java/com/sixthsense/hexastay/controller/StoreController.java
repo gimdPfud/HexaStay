@@ -31,7 +31,7 @@ import java.util.Arrays;
 @RequestMapping("/store")
 public class StoreController {
     private final StoreService storeService;
-    private final AdminService adminService;
+    private final AdminService adminService; //adminRepository에는 email로 찾아오는게 있는데.. 여긴 없음.
 
     /*
      * 메소드명 :
@@ -41,12 +41,12 @@ public class StoreController {
      * */
     @GetMapping("/insert")
     public String insert(){
-        log.info("등록");
+//        log.info("등록");
         return "store/insert";
     }
     @PostMapping("/insert")
     public String insert(StoreDTO storeDTO) throws IOException {
-        log.info("등록post : "+storeDTO);
+//        log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
         return "redirect:/store/list";
     }
@@ -55,25 +55,30 @@ public class StoreController {
     @GetMapping("/list")
     public String list(Pageable pageable, Model model){
         Page<StoreDTO> storeDTOPage = storeService.list("alive", pageable);
-        storeDTOPage.forEach(log::info);
+//        storeDTOPage.forEach(log::info);
         model.addAttribute("list",storeDTOPage);
         return "store/list";
     }
 
 
-    @GetMapping("/read/{id}")
+    @GetMapping("/read/super/{id}")/*todo 접근권한 설정 가능한가??*/
     public String read(@PathVariable Long id, Model model){
         StoreDTO data = storeService.read(id);
         model.addAttribute("data",data);
         return "store/read";
     }
+
     @GetMapping("/read")
     public String readA(Principal principal, Model model){
-        /*todo principal로 admin 찾아서 그 어드민이 갖고있는 store fk로 스토어서비스.read(fk) 해줄거임 */
-//        principal.getName();//이건 됨.
-//        StoreDTO data = storeService.read(id);
-//        model.addAttribute("data",data);
-        return "store/list";
+        /*todo principal로 admin 찾아서
+           그 어드민이 갖고있는 store fk로
+           스토어서비스.read(fk) 해줄거임 */
+
+//todo        Admin admin = adminService.findByEmail(principal.getName());
+//todo        Long id = admin.getStoreNum();
+//todo        StoreDTO data = storeService.read(id);
+//todo        model.addAttribute("data",data);
+        return "store/read";
     }
 
 

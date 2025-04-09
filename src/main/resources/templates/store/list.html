@@ -38,6 +38,7 @@
         <table class="table table-bordered table-sm" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
             <thead style="background-color: #f1f1f1;">
             <tr>
+                <th style="text-align: center; vertical-align: middle;">이미지</th>
                 <th style="text-align: center; vertical-align: middle;">업체명</th>
                 <th style="text-align: center; vertical-align: middle;">이메일</th>
                 <th style="text-align: center; vertical-align: middle;">전화번호</th>
@@ -64,7 +65,8 @@
                 <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center; vertical-align: middle;">
-                    <a th:href="@{/store/read/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
+                    <a th:href="@{/store/read/super/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
+                    <a th:href="@{'/store/delete/'+${data.storeNum}}" class="btn btn-danger">삭제</a>
                 </td>
             </tr>
             </tbody>
