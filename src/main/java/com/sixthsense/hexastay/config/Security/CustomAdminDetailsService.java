@@ -9,9 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
 @Log4j2
+@Service("customAdminDetailsService")
 public class CustomAdminDetailsService implements UserDetailsService {
 
     private final AdminRepository adminRepository;
