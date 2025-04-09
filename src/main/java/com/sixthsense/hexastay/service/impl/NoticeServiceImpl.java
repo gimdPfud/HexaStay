@@ -31,7 +31,7 @@ public class NoticeServiceImpl implements NoticeService {
     public void noticeInsert(NoticeDTO noticeDTO) {
         // 임시 작성자 지정 (하드코딩된 값)
 //        noticeDTO.setNoticeWriter("spit착맨"); // TODO: 로그인 사용자로 대체 예정
-        noticeDTO.setMemberNum(1L);           // TODO: 실제 로그인한 멤버 ID로 대체 예정
+//        noticeDTO.setMemberNum(1L);           // TODO: 실제 로그인한 멤버 ID로 대체 예정
 
         // (1) 여기서 멤버 조회 및 예외 처리
         Member memberOpt = memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
@@ -91,7 +91,7 @@ public class NoticeServiceImpl implements NoticeService {
         Optional<Notice> search = noticeRepository.findById(noticeDTO.getNoticeNum());
         //변환
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
-        //SQL처리
+        //SQL 처리
         noticeRepository.save(notice);
     }
 
