@@ -19,18 +19,22 @@ import java.util.List;
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("select a from Branch a")
-    Page<Branch> findAll(Pageable pageable);
+    public Page<Branch> findAll(Pageable pageable);
 
-    List<Branch> findByCenter_CenterNum(Long centerNum);
+    public List<Branch> findByCenter_CenterNum(Long centerNum);
 
     // 회원가입용
-    List<Branch> findByBranchName(String branchName);
-    List<Branch> findByCenter_CenterName (String centerName);
+    public List<Branch> findByBranchName(String branchName);
+    public List<Branch> findByCenter_CenterName (String centerName);
 
     //조직조회용
-    Page<Branch> findByBranchNameContaining (String keyword, Pageable pageable);
+    public Page<Branch> findByBranchNameContaining (String keyword, Pageable pageable);
 
     // 브랜드 조회용
-    Page<Branch> findByCenter_CenterNum (Long centerNum, Pageable pageable);
+    public Page<Branch> findByCenter_CenterNum (Long centerNum, Pageable pageable);
+
+    //center 삭제 시 참조하고있는 branch 찾아서 삭제
+    public void deleteByCenter_CenterNum (Long centerNum);
+
 
 }
