@@ -24,11 +24,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/order/store")
+@RequestMapping("/member/store")/*지금 일단 로그인때문에... 멤버 밑에다 껴둠.*/
 public class StoreClientController {
     private final StoreService storeService;
     private final StoremenuService storemenuService;
@@ -72,10 +73,4 @@ public class StoreClientController {
         model.addAttribute("data",storemenuDTO);
         return "mobilestore/menuread";
     }
-
-/* 5. 장바구니페이지 이동해서 보기.
-           ??......get?*/
-
-/* 6. 결제하기
-        get? post? */
 }

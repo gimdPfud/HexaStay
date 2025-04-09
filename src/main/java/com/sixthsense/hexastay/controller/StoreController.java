@@ -28,7 +28,7 @@ import java.util.Arrays;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/store")
+@RequestMapping("/admin/store")
 public class StoreController {
     private final StoreService storeService;
     private final AdminService adminService; //adminRepository에는 email로 찾아오는게 있는데.. 여긴 없음.
@@ -48,7 +48,7 @@ public class StoreController {
     public String insert(StoreDTO storeDTO) throws IOException {
 //        log.info("등록post : "+storeDTO);
         storeService.insert(storeDTO);
-        return "redirect:/store/list";
+        return "redirect:/admin/store/list";
     }
 
 
@@ -61,7 +61,7 @@ public class StoreController {
     }
 
 
-    @GetMapping("/read/super/{id}")/*todo 접근권한 설정 가능한가??*/
+    @GetMapping("/read/{id}")/*todo 접근권한 설정 가능한가??*/
     public String read(@PathVariable Long id, Model model){
         StoreDTO data = storeService.read(id);
         model.addAttribute("data",data);
@@ -91,13 +91,13 @@ public class StoreController {
     @PostMapping("/modify")
     public String modify(StoreDTO storeDTO){
         Long storeNum = storeService.modify(storeDTO);
-        return "redirect:/store/read/"+storeNum;
+        return "redirect:/admin/store/read/"+storeNum;
     }
 
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         storeService.delete(id);
-        return "redirect:/store/list";
+        return "redirect:/admin/store/list";
     }
 }

@@ -28,7 +28,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/store/menu")
+@RequestMapping("/admin/store/menu")
 public class StoremenuController {
     private final StoremenuService storemenuService;
     private final StoreService storeService;
@@ -55,9 +55,9 @@ public class StoremenuController {
         log.info(storeNum);
         int prevpage = (int) session.getAttribute("prevpage");
         if(prevpage==1){
-            return "redirect:/store/menu/insert/"+storeNum;
+            return "redirect:/admin/store/menu/insert/"+storeNum;
         } else if(prevpage==2){
-            return "redirect:/store/read/"+storeNum;
+            return "redirect:/admin/store/read/"+storeNum;
         }
         else {
             log.info("뭔진모르겟는데 오류");
@@ -85,7 +85,7 @@ public class StoremenuController {
     @PostMapping("/insert")
     public String insertPost(StoremenuDTO storemenuDTO) throws IOException {
         storemenuService.insert(storemenuDTO);
-        return "redirect:/store/read/"+storemenuDTO.getStoreNum();
+        return "redirect:/admin/store/read/"+storemenuDTO.getStoreNum();
     }
 
 
@@ -133,17 +133,17 @@ public class StoremenuController {
     public String modify(StoremenuDTO storemenuDTO){
         Long storemenuNum = storemenuService.modify(storemenuDTO);
         log.info(storemenuNum);
-        return "redirect:/store/menu/read/"+storemenuNum;
+        return "redirect:/admin/store/menu/read/"+storemenuNum;
     }
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         Long storeNum = storemenuService.delete(id);
-        return "redirect:/store/read/"+storeNum;
+        return "redirect:/admin/store/read/"+storeNum;
     }
     @GetMapping("/restore/{id}")
     public String restore(@PathVariable Long id){
         Long storeNum = storemenuService.restore(id);
-        return "redirect:/store/read/"+storeNum;
+        return "redirect:/admin/store/read/"+storeNum;
     }
 }
