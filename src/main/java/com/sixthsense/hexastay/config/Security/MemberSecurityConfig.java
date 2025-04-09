@@ -27,8 +27,16 @@ import org.springframework.security.web.SecurityFilterChain;
         @Bean(name = "memberSecurityFilterChain")
         @Order(2)
         public SecurityFilterChain memberFilterChain(HttpSecurity http) throws Exception {
+            DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+            provider.setUserDetailsService(memberDetailsService);
+            provider.setPasswordEncoder(passwordEncoder());
+
+            AuthenticationManager authManager = new ProviderManager(provider);
+
             http
                     .securityMatcher("/member/**")
+                    .authenticationManager(authManager)
+                    .userDetailsService(memberDetailsService)
                     .authorizeHttpRequests(authz -> authz
                             .anyRequest().permitAll()
                     )
@@ -44,5 +52,9 @@ import org.springframework.security.web.SecurityFilterChain;
                     .csrf().disable();
 
             return http.build();
+        }
+
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
         }
     }

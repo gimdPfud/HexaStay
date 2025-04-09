@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.config.Security;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +56,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
             return http.build();
         }
+
 
         @Bean
         public PasswordEncoder passwordEncoder() {
