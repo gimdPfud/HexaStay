@@ -209,13 +209,13 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable) {
+    public Page<RoomMenuCartDetailDTO> RoomMenuCartItemList(String email, Pageable pageable) {
         log.info("특정 회원 아이템 목록 조회 서비스 진입" + email);
 
-        Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage =
-                roomMenuCartItemRepository.findByRoomMenuCart_Member_MemberEmail(email, pageable);
+        Page<RoomMenuCartDetailDTO> roomMenuCartDetailDTOPage =
+                roomMenuCartItemRepository.findByCartDetailDTOList(email);
 
-        return roomMenuCartItemDTOPage;
+        return roomMenuCartDetailDTOPage;
     }
 
 
@@ -334,14 +334,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         return menuDTO;
 
-    }
-
-    @Override
-    public List<RoomMenuCartDetailDTO> RoomMenuCartList(String email) {
-        List<RoomMenuCartDetailDTO > roomMenuCartItemDetailList
-                = roomMenuCartItemRepository.findByCartDetailDTOList(email);
-
-        return roomMenuCartItemDetailList;
     }
 
 }

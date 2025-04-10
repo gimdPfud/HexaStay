@@ -10,4 +10,9 @@ import java.util.List;
 public interface AdminService {
 
 
+
+    // 리스트 검색용
+    Page<AdminDTO> getAdminSearch(String type, String keyword, Pageable pageable);
+
+
 }
