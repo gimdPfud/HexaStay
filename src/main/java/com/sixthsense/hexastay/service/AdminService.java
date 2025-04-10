@@ -24,7 +24,7 @@ public interface AdminService {
     void setAdminActive(Long adminNum);
 
     // 회원 가입떄 쓸 로직
-    List<CenterDTO> getCenterList (String CenterName);
+    List<CompanyDTO> getCenterList (String CenterName);
 
     // 회원 가입때 쓸 로직2
     List<BranchDTO> getBranchList (Long CenterNum);

@@ -3,7 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.AdminService;
-import com.sixthsense.hexastay.service.CenterService;
+import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
-    private final CenterService centerService;
+    private final CompanyService companyService;
 
 
     // 시큐리티 체크
@@ -79,7 +79,7 @@ public class AdminController {
     // 등록
     @GetMapping("/insert")
     public String insert(Model model) {
-        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        List<CompanyDTO> centerDTOList = companyService.allCompanyList();
         model.addAttribute("centerDTOList", centerDTOList);
         return "admin/insert";
     }
@@ -112,7 +112,7 @@ public class AdminController {
     //마이페이지
     @GetMapping("/mypage")
     public String mypage(Model model) {
-        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        List<CompanyDTO> centerDTOList = companyService.allCompanyList();
         model.addAttribute("centerDTOList", centerDTOList);
         return "admin/mypage";
     }
@@ -150,7 +150,7 @@ public class AdminController {
     public String edit(Model model, @PathVariable(name = "adminNum") Long adminNum) {
         AdminDTO adminDTO = adminService.getAdmin(adminNum);
         model.addAttribute("adminDTO", adminDTO);
-        List<CenterDTO> centerDTOList = centerService.allCenterList();
+        List<CompanyDTO> centerDTOList = companyService.allCompanyList();
         model.addAttribute("centerDTOList", centerDTOList);
         return "admin/edit";
 

@@ -1,9 +1,7 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.BranchDTO;
-import com.sixthsense.hexastay.dto.CenterDTO;
-import com.sixthsense.hexastay.dto.FacilityDTO;
-import com.sixthsense.hexastay.service.CenterService;
+
+import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
