@@ -49,11 +49,11 @@ public class RoomMenuCartController {
 
     /***************************************************
      *
-     * 메소드명   : addRoomMenuCartItem
-     * 기능      : 장바구니에 메뉴 아이템을 추가하거나 수량을 업데이트
+     * 메소드명   : RoomMenuCartItem
+     * 기능      : 장바구니에 메뉴 아이템을 추가
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @PostMapping("/orderpage/orderread")
@@ -117,7 +117,7 @@ public class RoomMenuCartController {
      * 기능      : 로그인한 회원의 장바구니 아이템 목록을 조회
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @GetMapping("/orderpage/cartlist")
@@ -153,7 +153,7 @@ public class RoomMenuCartController {
      * 기능      : 특정 회원의 장바구니 아이템이 해당 회원의 카트에 속하는지 검증
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @GetMapping("/verify/{roomMenuCartItemNum}")
@@ -173,7 +173,7 @@ public class RoomMenuCartController {
      * 기능      : 장바구니 아이템의 수량을 업데이트
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @PutMapping("/cart/modify/{roomMenuCartItemNum}/{roomMenuCartItemAmount}")
@@ -213,7 +213,7 @@ public class RoomMenuCartController {
      * 기능      : 장바구니에서 특정 아이템을 삭제
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     * 수정일    :
+     * 수정일    : 2025-04-10
      *
      ****************************************************/
 
