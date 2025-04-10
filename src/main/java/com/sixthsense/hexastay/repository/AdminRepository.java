@@ -40,17 +40,8 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     void deleteByCenter_CenterNum(Long centerNum);
 
-    //FK 순환 조회용
-//    @Query("select a from Admin a join fetch a.center c")
-//    Page<Admin> findAllWithCenter(Pageable pageable);
-//
-//    @Query("select a from Admin a join fetch a.branch b")
-//    Page<Admin> findAllWithBranch(Pageable pageable);
-//
-//    @Query("select a from Admin a join fetch a.facility f")
-//    Page<Admin> findAllWithFacility(Pageable pageable);
-//
-//    @Query("select a from Admin a join fetch a.store s")
-//    Page<Admin> findAllWithStore(Pageable pageable);
+
+
+    Page<Admin> findByAdminSearchKeyword(String type, String keyword, Pageable pageable);
 
 }
