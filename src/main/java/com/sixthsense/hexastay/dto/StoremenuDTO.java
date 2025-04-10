@@ -55,5 +55,5 @@ public class StoremenuDTO {
 
     private String storemenuImgMeta; //가게 사진정보
 
-    private List<StoremenuOptionDTO> storemenuOptionDTOList = new ArrayList<>();
+    private List<StoremenuOptionDTO> storemenuOptionDTOList = new ArrayList<>(); //옵션 리스트
 }

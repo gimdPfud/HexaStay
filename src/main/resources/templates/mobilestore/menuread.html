@@ -51,7 +51,12 @@
     <h4 th:text="${data.storemenuName}">메뉴 이름</h4>
     <p><strong>설명: </strong><span th:text="${data.storemenuContent}"></span></p>
     <p><strong>가격:</strong> <span th:text="${data.storemenuPrice}">10000</span>원</p>
-    <a href="javascript:history.back()" class="btn btn-outline-primary mt-3 w-100">뒤로가기</a>
+
+    <form action="/member/store/cart/insert">
+        <input th:value="${data.storemenuNum}" name="storemenuNum" hidden type="hidden" readonly>
+        <input name="storecartitemCount" type="number"><!--몇개살건지-->
+        <button type="submit" class="btn btn-outline-primary mt-3 w-100">뒤로가기</button>
+    </form>
 </div>
 
 </body>
