@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
+import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
@@ -42,5 +43,7 @@ public interface RoomMenuCartService {
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
 
     public RoomMenuDTO read(Long num);
+
+    public List<RoomMenuCartDetailDTO> RoomMenuCartList(String email);
 
 }
