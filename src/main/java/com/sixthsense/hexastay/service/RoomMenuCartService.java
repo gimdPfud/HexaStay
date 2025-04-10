@@ -27,7 +27,7 @@ public interface RoomMenuCartService {
     public RoomMenuCartDTO getCartByMember(Long memberNum);
 
     // 장바구니 추가
-    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuDTO roomMenuDTO);
+    public Long RoomMenuCartInsert(String email, RoomMenuDTO roomMenuDTO);
 
     // 장바구니 리스트
     public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable);

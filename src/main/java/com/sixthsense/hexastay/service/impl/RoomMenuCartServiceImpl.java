@@ -101,7 +101,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     @Override
     public RoomMenuDTO RoomMenuCartRead(String email) {
         RoomMenu roomMenu =
-                roomMenuRepository.findByHotelRoom_Member_MemberEmail(email);
+                roomMenuRepository.findByRoom_Member_MemberEmail(email);
 
         log.info(email);
 
@@ -133,7 +133,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuDTO roomMenuDTO) {
+    public Long RoomMenuCartInsert(String email, RoomMenuDTO roomMenuDTO) {
         log.info("장바구니 추가 시스템 도입, 회원 이메일: {}", email);
 
         // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.

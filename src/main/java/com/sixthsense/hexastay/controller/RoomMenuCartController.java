@@ -46,7 +46,6 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuCartController {
 
     private final RoomMenuCartService roomMenuCartService;
-    private final RoomMenuService roomMenuService;
 
     /***************************************************
      *
@@ -57,8 +56,8 @@ public class RoomMenuCartController {
      *
      ****************************************************/
 
-    @PostMapping("/cart")
-    public ResponseEntity order(@Valid RoomMenuDTO roomMenuDTO,
+    @PostMapping("/orderpage/orderread")
+    public ResponseEntity RoomMenuCartItem(@Valid RoomMenuDTO roomMenuDTO,
                                 BindingResult bindingResult,
                                 Principal principal) {
         // 유효성 검사
@@ -91,7 +90,7 @@ public class RoomMenuCartController {
 
         try {
             // RoomMenuCartInsert 메서드 호출 시, 이메일과 DTO만 전달
-            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(roomCartItemNum, memberEmail, roomMenuDTO);
+            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(memberEmail, roomMenuDTO);
         } catch (EntityNotFoundException e) {
             // 예외 발생 시 처리
             log.error("장바구니에 아이템을 추가할 수 없습니다. : " + e.getMessage());

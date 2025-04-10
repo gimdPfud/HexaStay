@@ -245,71 +245,12 @@
 
 
 <script>
-    const email = /*[[${email}]]*/ '';  // Thymeleaf 변수를 JavaScript 변수로 전달
-
-    function getCurrentUserEmail() {
-        return email;  // 서버에서 넘겨준 'email' 변수를 반환
-    }
 
     /* 검색창 토글 */
     function toggleSearch() {
         const searchContainer = document.getElementById('search-container');
         searchContainer.style.display = searchContainer.style.display === 'none' || searchContainer.style.display === '' ? 'block' : 'none';
     }
-
-
-    function openCartSidebar() {
-        const sidebar = document.getElementById('cart-sidebar');
-        sidebar.classList.add('active');
-        updateCartSidebar();  // 장바구니 사이드바 업데이트
-    }
-
-    // 장바구니 사이드바 닫기
-    function closeCartSidebar() {
-        const sidebar = document.getElementById('cart-sidebar');
-        sidebar.classList.remove('active');
-    }
-
-
-
-    // 장바구니 추가
-    function addToCart(roomMenuNum) {
-        const email = getCurrentUserEmail();  // 서버에서 넘겨준 이메일 변수 사용
-        if (!email) {
-            alert('로그인 후 사용 가능합니다.');
-            return;
-        }
-
-        const roomMenuCartNum = getUserCartNum(email);  // 로그인한 사용자의 장바구니 번호
-
-        const roomMenuCartItemDTO = {
-            roomMenuNum: roomMenuNum,
-            amount: 1  // 예시로 수량을 1로 설정
-        };
-
-        fetch(`/orderpage`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(roomMenuCartItemDTO)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    alert('장바구니에 추가되었습니다!');
-                    updateCartSidebar(); // 사이드바 업데이트
-                }
-            })
-            .catch(error => {
-                console.error('장바구니 추가 오류:', error);
-                alert('장바구니 추가에 실패했습니다.');
-            });
-    }
-
-
-
-
 
 
     /* 장바구니 아이콘 누르면 읽기 페이지로 이동 */
@@ -321,7 +262,7 @@
         };
 
         // fetch로 POST 요청 보내기
-        fetch('http://localhost:8090/roommenu/cart', {
+        fetch('http://localhost:8090/roommenu/cartlist', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'  // JSON 형식으로 보내기
@@ -332,7 +273,7 @@
             .then(data => {
                 console.log('Success:', data);
                 // 성공 후 사용자에게 처리 결과를 알려줄 수 있음
-                window.location.href = 'http://localhost:8090/roommenu/cart'; // 응답을 받은 후 페이지 이동
+                window.location.href = 'http://localhost:8090/roommenu/cartlist'; // 응답을 받은 후 페이지 이동
             })
             .catch(error => {
                 console.error('Error:', error);

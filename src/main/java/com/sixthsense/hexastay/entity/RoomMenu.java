@@ -48,9 +48,18 @@ public class RoomMenu extends BaseEntity {
     @Column(name = "roomMenuImageMeta")
     private String roomMenuImageMeta; //룸 메뉴 대표 이미지
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotelRoomNum")
     private HotelRoom hotelRoom;                    //방 참조
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member")
+    private Member member;   // 회원 참조
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room")
+    private Room room;   // 룸(방)의 정보 참조
+
+
 
 }
