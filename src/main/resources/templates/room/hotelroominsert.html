@@ -17,17 +17,17 @@
         <span th:text="${errorMessage}"></span>
     </div>
 
-    <form th:action="@{/member/register-hotelroom}" th:object="${hotelRoomDTO}" method="post" class="row g-3">
+    <form th:action="@{/register-hotelroom}" th:object="${hotelRoomDTO}" method="post" class="row g-3">
 
         <!-- 회원 정보 입력 -->
         <div class="col-md-6">
-            <label class="form-label">회원 번호:</label>
+            <label class="form-label">Member_PK:</label>
             <input type="number" class="form-control" th:field="*{memberNum}" required />
         </div>
 
         <div class="col-md-6">
             <label class="form-label">회원 이름:</label>
-            <input type="text" class="form-control" th:field="*{memberDTO.memberName}" required />
+            <input type="text" class="form-control" th:field="*{memberDTO.memberName}" disabled />
         </div>
 
         <!-- 호텔룸 정보 입력 -->
@@ -76,8 +76,9 @@
         </div>
 
         <div class="col-12">
-            <button type="submit" class="btn btn-primary">호텔룸 등록</button>
-            <a th:href="@{/member/hotelroomlist}" class="btn btn-secondary">호텔룸 목록</a>
+            <button type="submit" class="btn btn-primary btn-lg">MemberPK_등록</button>
+            <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">HotelRommPk_룸배정</a>
+            <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">호텔룸 목록</a>
         </div>
 
     </form>
