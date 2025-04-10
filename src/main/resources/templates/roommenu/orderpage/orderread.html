@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:margin-bottom="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,57 +41,21 @@
             margin-bottom: 15px;
         }
 
-        .option-section select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-
-        .quantity-section button {
-            padding: 8px 12px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .quantity-section input {
-            width: 50px;
-            text-align: center;
-            font-size: 16px;
-            margin: 0 10px;
-        }
-
-        .add-to-cart-btn {
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
+        .quantity-input {
+            display: flex;
+            align-items: center;
             border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: #f9f9f9;
+            justify-content: center; /* 가운데 정렬 */
         }
-
-        .add-to-cart-btn:hover {
-            background-color: #fdd835;
-        }
-
-             /* 주문수량 섹션 꾸미기 */
-         .quantity-input {
-             display: flex;
-             align-items: center;
-             border-radius: 5px;
-             border: 1px solid #ddd;
-             padding: 5px;
-             background-color: #f9f9f9;
-         }
 
         .quantity-input button {
             background-color: #ffeb3b;
             border: none;
             padding: 8px 12px;
-            font-size: 16px;
+            font-size: 20px;
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s;
@@ -115,9 +80,45 @@
             outline: none;
             border: 1px solid #ffeb3b;
         }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
+
+        .back-to-list-btn {
+            background-color: #4CAF50;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .back-to-list-btn:hover {
+            background-color: #fdd835;
+        }
+
     </style>
 </head>
 <body>
+
+<input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
+
 <div class="container">
     <!-- 헤더: 제목과 뒤로가기 버튼 -->
     <div class="header">
@@ -132,61 +133,127 @@
         <td>
             <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                  th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                 style="width: 60px; height: 80px;">
+                 style="width: 200px; height: 140px;">
 
             <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                  th:src="@{/profile/default.png}"
-                 style="width: 60px; height: 80px;">
+                 style="width: 200px; height: 140px;">
         </td>
+    </div>
 
-        <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품 이름</h2>
-        <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</p>
-        <p class="col-sm-9">가격 : <span th:text="${roomMenuDTO.roomMenuPrice}"></span></p>
+    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품 이름</h2>
+    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</p>
+    <p class="col-sm-9">가격 : <span th:text="${roomMenuDTO.roomMenuPrice}"></span></p>
 
-
-        <div class="container mt-4" style="text-align: center">
-            <div class="row mb-3">
-                <label for="count" class="col-sm-4 col-form-label">주문수량</label>
-                <div class="col-8">
-                    <!-- 수량 입력 필드 -->
-                    <div class="quantity-input">
-                        <button type="button" onclick="decreaseQuantity()">-</button>
-                        <input type="number" min="1" value="1" name="count" id="count" class="form-control" required>
-                        <button type="button" onclick="increaseQuantity()">+</button>
-                    </div>
+    <!-- 수량 입력 필드 -->
+    <div class="container mt-4" style="text-align: center;">
+        <div class="row mb-3">
+            <label for="count" class="col-sm-4 col-form-label">주문수량</label>
+            <div class="col-8">
+                <div class="quantity-input">
+                    <button type="button" onclick="decreaseQuantity()">-</button>
+                    <input type="number" min="1" value="1" name="count" id="count" class="form-control" required>
+                    <button type="button" onclick="increaseQuantity()">+</button>
                 </div>
             </div>
         </div>
 
-        <!-- 장바구니 담기 버튼 -->
-        <button class="add-to-cart-btn" onclick="addToCart()">장바구니 담기</button>
+        <!-- 가격 변동을 표시할 부분 -->
+        <p>총 가격 : <span id="totalPrice">가격</span> 원</p>
+
+
+        <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}">장바구니 담기</button>
+        <!-- 목록으로 돌아가기 버튼 추가 -->
+
+        <button class="back-to-list-btn" onclick="window.location.href='http://localhost:8090/roommenu/orderpage'">목록으로 돌아가기</button>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // 초기 가격
-    const unitPrice = parseInt('${roomMenuDTO.roomMenuPrice}'); // 서버에서 가격을 받아오기
+    let cartAdd = $(".add-to-cart-btn"); // 장바구니 담기 버튼
+    let count = $("#count");  // 수량 input
+    let price = [[${roomMenuDTO.roomMenuPrice}]]
+    let roomMenuNum = cartAdd.val();  // cartAdd.val()이 유효한 ID 값인지 확인
+    console.log('pk값 : roomMenuNum:', roomMenuNum);
+    let paramData = {
+        roomMenuNum: cartAdd.val(), // cartAdd.val()이 실제 roomMenuNum 값을 가지고 있는지 확인
+        count: count.val()
+    }
+    console.log(paramData);  // 실제로 값이 제대로 전달되는지 확인
 
+    $(document).ready(function () {
 
-        let count = $("#count"); // 수량 input
-        let price = [[${roomMenuDTO.roomMenuPrice}]]; // 가격을 숫자 값으로 받아옴 (단일 값)
-
-        $(document).ready(function () {
-        // 수량이 변경될 때마다 가격을 업데이트
         $("#count").on("change", function () {
-            let quantity = $(this).val();  // 변경된 수량 값
-            let total = quantity * price;  // 가격 계산
 
-            // 계산된 가격을 화면에 표시
-            $("#totalPrice").text(total + '원');
+            let count =  $(this).val();
+            let total = count * price;
+
+            $("#totalPrice").text(total+'원')
+
+        })
+        cartAdd.on("click", function () {
+            cart()
+        })
+    })
+
+    // 장바구니 담기
+
+    function cart() {
+        let paramData = {
+            roomMenuNum: cartAdd.val(),  // 버튼의 value 속성에서 roomMenuNum 값 가져오기
+            count: count.val()
+        };
+        console.log(paramData);  // paramData가 잘 구성되어 있는지 확인
+
+        $.ajax({
+            url: "/roommenu/orderpage/orderread",
+            type: "post",
+            data: paramData,
+            dataType: "json", // 반환타입
+            success: function (data) {
+                console.log(data);
+                alert("아이템이 담겼습니다.");
+            },
+            error: function (jqXHR, status, error) {
+                if (jqXHR.status == 401) {
+                    alert("로그인 후 이용해주세요");
+                    location.href = "/member/login"; // 로그인 페이지로 이동
+                } else {
+                    console.log(jqXHR.responseText); // 에러 내용 출력
+                }
+            }
         });
-    });
+    }
 
+    // 수량 감소 함수
+    function decreaseQuantity() {
+        let quantity = parseInt($("#count").val());
+        if (quantity > 1) {
+            quantity--;
+            $("#count").val(quantity);
+            updatePrice(quantity);
+        }
+    }
 
-// 장바구니 담기 함수 (예시로 구현)
-function addToCart() {
-alert("장바구니에 담겼습니다!");
-}
+    // 수량 증가 함수
+    function increaseQuantity() {
+        let quantity = parseInt($("#count").val());
+        quantity++;
+        $("#count").val(quantity);
+        updatePrice(quantity);
+    }
+
+    // 가격 업데이트 함수
+    function updatePrice(quantity) {
+        let total = quantity * price;
+        $("#totalPrice").text(total + '원');
+    }
+
+    // 뒤로가기
+    function goBack() {
+        window.history.back();  // 브라우저의 이전 페이지로 돌아감
+    }
 
 </script>
 

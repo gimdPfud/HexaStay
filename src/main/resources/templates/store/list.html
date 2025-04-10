@@ -11,7 +11,7 @@
 </head>
 <body style="background-color: #f8f9fa;">
 
-<div layout:fragment="content" class="container mt-4">
+<div layout:fragment="content">
 
     <!-- 검색 조건 및 등록 버튼 -->
     <form class="row g-3 mb-4">
@@ -40,7 +40,6 @@
             <tr>
                 <th style="text-align: center; vertical-align: middle;">이미지</th>
                 <th style="text-align: center; vertical-align: middle;">업체명</th>
-                <th style="text-align: center; vertical-align: middle;">이메일</th>
                 <th style="text-align: center; vertical-align: middle;">전화번호</th>
                 <th style="text-align: center; vertical-align: middle;">주소</th>
                 <th style="text-align: center; vertical-align: middle;">대표자</th>
@@ -60,7 +59,6 @@
                 </td>
 
                 <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
-                <td th:text="${data.storeEmail}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>

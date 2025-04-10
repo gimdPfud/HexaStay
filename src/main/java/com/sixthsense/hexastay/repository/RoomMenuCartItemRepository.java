@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.repository;
 
+import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.entity.Review;
 import com.sixthsense.hexastay.entity.RoomMenu;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,12 +32,17 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
 
     // roommenucartitem의 카트 고유 id와, roommenu의 고유 id를 찾는 매소드
-    RoomMenuCartItem findByRoomMenuCartItemNumAndRoomMenu_RoomMenuNum(Long roomMenuCartItemNum, Long roomMenuNum);
+    RoomMenuCartItem findByRoomMenuCart_RoomMenuCartNumAndRoomMenuCartItemNum(Long roomMenuCartNum, Long roomMenuCartItemNum);
 
-    // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
+     // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
     Page<RoomMenuCartItemDTO> findByRoomMenuCart_Member_MemberEmail(String memberEmail, Pageable pageable);
 
-
+    @Query("select new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
+            " from RoomMenuCartItem rmci " +
+            " join RoomMenu rmi on rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
+            " where rmci.roomMenuCart.member.memberEmail = :email " +
+            " order by rmci.roomMenuCartItemNum desc")
+    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(String email);
 
 }
 

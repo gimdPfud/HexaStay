@@ -156,76 +156,72 @@
 </div>
 
 <script>
-    // 메뉴 데이터 샘플
-    const menuItems = [
-        { id: 1, name: '김치찌개', price: 8000, category: '한식' },
-        { id: 2, name: '호떡', price: 3000, category: '디저트' },
-        { id: 3, name: '짜장면', price: 6000, category: '중식' },
-    ];
+    document.addEventListener('DOMContentLoaded', function () {
+        const email = getLoggedInEmail(); // 로그인한 이메일 가져오기 (아래 설명)
 
-    // 장바구니 데이터
-    let cart = [];
-    let discount = 0; // 기본 할인금액
-    let totalAmount = 0;
+        fetch(`/roommenu/orderpage/cartlist?email=${email}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data); // 데이터 구조를 확인
+                const list = document.getElementById('food-list');
+                list.innerHTML = ''; // 기존 비우기
 
-    // 메뉴 목록을 페이지에 추가하는 함수
-    function loadMenuItems() {
-        const foodList = document.getElementById('food-list');
-        menuItems.forEach(item => {
-            const li = document.createElement('li');
-            li.classList.add('food-item');
-            li.innerHTML = `
-                <div class="food-info">
-                    <p>${item.name}</p>
-                    <p class="price">${item.price}원</p>
-                    <p>${item.category}</p>
-                </div>
-                <div class="action-btns">
-                    <button class="action-btn" onclick="editItem(${item.id})">수정</button>
-                    <button class="action-btn" onclick="deleteItem(${item.id})">삭제</button>
-                </div>
-            `;
-            foodList.appendChild(li);
-        });
-    }
+                data.content.forEach(item => {
+                    const li = document.createElement('li');
+                    li.classList.add('food-item');
+                    li.innerHTML = `
+            <div>
+                <h4>${item.roomMenuName}</h4>
+                <p>수량: ${item.roomMenuCartItemAmount}</p>
+                <p>가격: ${item.roomMenuPrice}원</p>
+            </div>
+        `;
+                    list.appendChild(li);
+                });
 
-    // 수정 버튼 클릭 시
-    function editItem(itemId) {
-        alert(`아이템 ${itemId}을(를) 수정합니다.`);
-        // 여기에서 수정 로직을 구현할 수 있습니다.
-    }
+                // TODO: 할인금액/최종금액 계산해서 넣기
+            })
+            .catch(err => {
+                console.error('장바구니 로딩 실패', err);
+            });
 
-    // 삭제 버튼 클릭 시
-    function deleteItem(itemId) {
-        const itemIndex = menuItems.findIndex(item => item.id === itemId);
-        if (itemIndex !== -1) {
-            menuItems.splice(itemIndex, 1); // 해당 아이템 삭제
-            updateMenuList();  // 메뉴 목록을 갱신합니다.
+        function getLoggedInEmail() {
+            // 서버에서 principal.getName()으로 이메일 확인하니까
+            // 클라이언트에서도 세션 등에서 이메일 가져와야 함
+            // 또는 서버에서 Thymeleaf로 email 값을 넘겨주는 방식 추천
+            return sessionStorage.getItem('userEmail');  // 예시
         }
-    }
 
-    // 메뉴 목록 갱신 함수
-    function updateMenuList() {
-        const foodList = document.getElementById('food-list');
-        foodList.innerHTML = '';  // 기존 목록을 지우고
-        loadMenuItems();  // 새로운 목록을 다시 불러옵니다
-    }
+        // 수정 버튼 클릭 시
+        function editItem(itemId) {
+            alert(`아이템 ${itemId}을(를) 수정합니다.`);
+            // 여기에서 수정 로직을 구현할 수 있습니다.
+        }
 
-    // 결제하기 함수
-    function processPayment() {
-        const request = document.getElementById('request-input').value;
+        // 삭제 버튼 클릭 시
+        function deleteItem(itemId) {
+            const itemIndex = menuItems.findIndex(item => item.id === itemId);
+            if (itemIndex !== -1) {
+                menuItems.splice(itemIndex, 1); // 해당 아이템 삭제
+                updateMenuList();  // 메뉴 목록을 갱신합니다.
+            }
+        }
 
-        // 결제 처리 로직
-        alert(`결제하겠습니다. 요청사항: ${request}`);
-    }
+        // 메뉴 목록 갱신 함수
+        function updateMenuList() {
+            const foodList = document.getElementById('food-list');
+            foodList.innerHTML = '';  // 기존 목록을 지우고
+            loadMenuItems();  // 새로운 목록을 다시 불러옵니다
+        }
 
-    // 목록으로 돌아가기
-    function goBack() {
-        window.history.back();
-    }
 
-    // 페이지 로딩 시 메뉴 아이템을 불러옵니다
-    loadMenuItems();
+        // 목록으로 돌아가기
+        function goBack() {
+            window.history.back();
+        }
+
+        // 페이지 로딩 시 메뉴 아이템을 불러옵니다
+        loadMenuItems();
 </script>
 
 </body>

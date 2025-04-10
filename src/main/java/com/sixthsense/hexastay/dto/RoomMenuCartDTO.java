@@ -26,10 +26,6 @@ public class RoomMenuCartDTO {
 
     private Long roomMenuCartNum; // 장바구니의 pk
 
-    private Integer roomMenuTotalPrice;  // 장바구니의 총 가격
-
     private Member member;  // 사용자와 장바구니의 연관관계
 
-    private List<RoomMenuCartItemDTO> items;  // 장바구니 항목들
-
-    }
+}

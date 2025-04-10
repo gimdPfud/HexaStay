@@ -7,6 +7,7 @@ import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
  * 입출력 변수 설계 : 김윤겸
  **************************************************/
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/roommenu")
 @Log4j2
@@ -45,25 +46,29 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuCartController {
 
     private final RoomMenuCartService roomMenuCartService;
-    private final RoomMenuService roomMenuService;
 
     /***************************************************
      *
-     * 메소드명   : addRoomMenuCartItem
-     * 기능      : 장바구니에 메뉴 아이템을 추가하거나 수량을 업데이트
+     * 메소드명   : RoomMenuCartItem
+     * 기능      : 장바구니에 메뉴 아이템을 추가
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
-    @PostMapping("/orderpage")
-    public ResponseEntity order(@Valid RoomMenuCartItemDTO roomMenuCartItemDTO,
-                                BindingResult bindingResult,
-                                Principal principal) {
+    @PostMapping("/orderpage/orderread")
+    public ResponseEntity RoomMenuCartItem(@Valid RoomMenuDTO roomMenuDTO,
+                                           BindingResult bindingResult,
+                                           Principal principal) {
+        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
+        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
+        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
+
         // 유효성 검사
         if (bindingResult.hasErrors()) {
             log.info("장바구니 유효성검사 에러");
             log.info(bindingResult.getAllErrors());
+
             List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -90,7 +95,7 @@ public class RoomMenuCartController {
 
         try {
             // RoomMenuCartInsert 메서드 호출 시, 이메일과 DTO만 전달
-            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(roomCartItemNum, memberEmail, roomMenuCartItemDTO);
+            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(memberEmail, roomMenuDTO);
         } catch (EntityNotFoundException e) {
             // 예외 발생 시 처리
             log.error("장바구니에 아이템을 추가할 수 없습니다. : " + e.getMessage());
@@ -112,17 +117,34 @@ public class RoomMenuCartController {
      * 기능      : 로그인한 회원의 장바구니 아이템 목록을 조회
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @GetMapping("/orderpage/cartlist")
-    public ResponseEntity<Page<RoomMenuCartItemDTO>> getRoomMenuCartItems(@RequestParam String email, Pageable pageable) {
-        try {
-            Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage = roomMenuCartService.RoomMenuCartItemList(email, pageable);
-            return ResponseEntity.ok(roomMenuCartItemDTOPage);  // 200 OK 응답 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // 예외 발생 시 400 Bad Request 반환
-        }
+    public String getRoomMenuCartItems(Principal principal, Model model, Pageable pageable) {
+        log.info("장바구니 리스트 컨트롤러 진입");
+
+        model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
+
+        return "roommenu/orderpage/cartlist";
+
+
+//        if (principal == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 로그인되지 않은 경우 401 Unauthorized 응답 반환
+//        }
+//
+//        String email = principal.getName();  // 로그인된 사용자의 이메일
+//        log.info("로그인된 사용자의 이메일" + principal.getName());
+//        if (email == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // 이메일이 없는 경우 400 Bad Request 반환
+//        }
+//
+//        try {
+//            Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage = roomMenuCartService.RoomMenuCartItemList(email, pageable);
+//            return ResponseEntity.ok(roomMenuCartItemDTOPage);  // 200 OK 응답 반환
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // 예외 발생 시 400 Bad Request 반환
+//        }
     }
 
     /***************************************************
@@ -131,7 +153,7 @@ public class RoomMenuCartController {
      * 기능      : 특정 회원의 장바구니 아이템이 해당 회원의 카트에 속하는지 검증
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
     @GetMapping("/verify/{roomMenuCartItemNum}")
@@ -147,44 +169,80 @@ public class RoomMenuCartController {
 
     /***************************************************
      *
-     * 메소드명   : updateRoomMenuCartItemAmount
+     * 메소드명   : modifyRoomMenuCartItemAmount
      * 기능      : 장바구니 아이템의 수량을 업데이트
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     *
+     * 수정일    : 2025-04-10
      ****************************************************/
 
-    @PutMapping("/update/{roomMenuCartItemNum}")
-    public ResponseEntity<Void> updateRoomMenuCartItemAmount(@PathVariable Long roomMenuCartItemNum,
-                                                             @RequestParam Integer roomMenuCartItemAmount) {
-        try {
-            roomMenuCartService.updateRoomMenuCartItemAmount(roomMenuCartItemNum, roomMenuCartItemAmount);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();  // 204 No Content 응답 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  // 예외 발생 시 400 Bad Request 반환
+    @PutMapping("/cart/modify/{roomMenuCartItemNum}/{roomMenuCartItemAmount}")
+    public ResponseEntity modifyRoomMenuCartItemAmount(
+            @PathVariable("roomMenuCartItemNum") Long roomMenuCartItemNum,
+            @PathVariable("roomMenuCartItemAmount") Integer roomMenuCartItemAmount,
+            Principal principal) {
+        log.info("장바구니 수량 변경 컨트롤러 진입" + roomMenuCartItemNum);
+        log.info("해당 장바구니의 아이템 번호" + roomMenuCartItemNum);
+        log.info("장바구니에 있는 해당 수량" + roomMenuCartItemAmount);
+
+        // 수량이 0 이하일 경우 예외 처리
+        if (roomMenuCartItemAmount <= 0) {
+            return new ResponseEntity<String>("최소 1개 이상 담아주세요", HttpStatus.BAD_REQUEST);
         }
+
+        // 로그인 정보 확인
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // 현재 카트가 나의 것인지 확인
+        if (!roomMenuCartService.verificationRoomMenuCartItem(roomMenuCartItemNum, principal.getName())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);  // 권한이 없으면 접근 금지
+        }
+
+        // 카트 아이템의 수량을 변경
+        roomMenuCartService.RoomMenuCartItemAmountUpdate(roomMenuCartItemNum, roomMenuCartItemAmount);
+
+        return new ResponseEntity<>(HttpStatus.OK);  // 수량 변경이 성공적으로 완료되었으면 OK 반환
+
     }
 
     /***************************************************
      *
-     * 메소드명   : removeRoomMenuCartItem
+     * 메소드명   : RoomMenuCartItemDeleteItem
      * 기능      : 장바구니에서 특정 아이템을 삭제
      * 작성자    : 김윤겸
      * 작성일    : 2025-04-08
-     * 수정일    :
+     * 수정일    : 2025-04-10
      *
      ****************************************************/
 
-    @DeleteMapping("/remove/{roomMenuCartItemNum}")
-    public ResponseEntity<Void> removeRoomMenuCartItem(@PathVariable Long roomMenuCartItemNum) {
-        try {
-            roomMenuCartService.RoomCartMenuCartItemDelete(roomMenuCartItemNum);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();  // 204 No Content 응답 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  // 예외 발생 시 400 Bad Request 반환
-        }
-    }
+    @DeleteMapping("/roomMenuCartItemDelete")
+    public ResponseEntity RoomMenuCartItemDeleteItem (Long roomCartItemNum, Principal principal) {
+        log.info("장바구니 삭제 컨트롤러 진입" + roomCartItemNum);
 
+        if (principal == null){
+            return new ResponseEntity(
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        // 현재 카트가 나의 것이냐?
+        if ( ! roomMenuCartService.verificationRoomMenuCartItem(roomCartItemNum, principal.getName())){
+            // 일치하지 않으면 실행해라. 일치하지 않으면 false 이기 때문에 ! 을 붙여줘야함
+            // 니꺼 아니니까 다시 페이지로 이동해
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+
+        }
+
+        try {
+            roomMenuCartService.RoomCartMenuCartItemDelete(roomCartItemNum);
+
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 
 

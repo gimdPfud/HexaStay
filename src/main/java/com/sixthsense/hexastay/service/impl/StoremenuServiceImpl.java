@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.StoremenuDTO;
 import com.sixthsense.hexastay.entity.Storemenu;
+import com.sixthsense.hexastay.entity.StoremenuOption;
 import com.sixthsense.hexastay.repository.StoremenuRepository;
 import com.sixthsense.hexastay.service.StoremenuService;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,6 +45,19 @@ public class StoremenuServiceImpl implements StoremenuService {
     public Long insert(StoremenuDTO storemenuDTO) throws IOException {
         storemenuDTO.setStoremenuStatus("alive");
         Storemenu storemenu = modelMapper.map(storemenuDTO, Storemenu.class);
+        /*옵션 리스트 변환*/
+        if(storemenuDTO.getStoremenuOptionDTOList()!=null&&!storemenuDTO.getStoremenuOptionDTOList().isEmpty()){
+            Storemenu finalStoremenu = storemenu;
+            storemenu.setStoremenuOptionList(
+                    storemenuDTO.getStoremenuOptionDTOList().stream()
+                            .map(data-> {
+                                StoremenuOption optionEntity = modelMapper.map(data, StoremenuOption.class);
+                                optionEntity.setStoremenu(finalStoremenu);
+                                return optionEntity;
+                            })
+                            .toList()
+            );
+        }
         storemenu = storemenuRepository.save(storemenu);
 
         if(storemenuDTO.getStoremenuImg()!=null&& !storemenuDTO.getStoremenuImg().isEmpty()){

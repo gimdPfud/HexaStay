@@ -53,6 +53,10 @@ public class HotelRoom extends BaseEntity{
     @Column(name = "hotelRoomPrice")
     private Integer hotelRoomPrice;              //호텔방 가격
 
+    private String hotelRoomProfileMeta;      //이미지 경로 저장용 컬럼
+
+
+
                //체크인    - BaseEntity 로 대체
              //체크아웃 -BaseEntity로 대체
 
@@ -68,13 +72,6 @@ public class HotelRoom extends BaseEntity{
 
 
     //*********참조 테이블 모음*********//
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branchNum")
-    private Branch branch;             //지사 참조
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "facilityNum")
-    private Facility facility;         //시설 참조
 
 
 

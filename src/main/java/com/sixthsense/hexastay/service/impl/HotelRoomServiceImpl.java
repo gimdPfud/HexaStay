@@ -18,6 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -88,71 +92,13 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         return hotelRoomDTOPage;
     }
 
-    //3-1.
-    @Override
-    public HotelRoomDTO findRoomWithMembers(Long roomNum) {
-        return null;
-    }
-
-
-    //A. optional 타입 - 참조 member가져와서 등록 가능 메서드
-    @Override
-    public Optional<HotelRoomDTO> getHotelRoomWithMember(Long hotelRoomNum) {
-        return hotelRoomRepository.findById(hotelRoomNum)
-                .map(hotelRoom -> {
-                    HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
-                    if (hotelRoom.getMember() != null) {
-                        hotelRoomDTO.setMemberDTO(modelMapper.map(hotelRoom.getMember(), MemberDTO.class));
-                        hotelRoomRepository.save(hotelRoom);    //호텔룸 테이블에 저장
-                    }
-                    return hotelRoomDTO;
-                });
-    }
-
-
-
-
-    //B.member 호텔룸 등록 (회원 정보 포함) - Return 타입의 등록 메서드 -Long 타입을 받는 메서드
-    @Override
-    public HotelRoomDTO insertHotelRoomMember(HotelRoomDTO hotelRoomDTO, Long memberNum) {
-
-        //member 정보를 가져 오기
-        Member member = memberRepository.findById(memberNum)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
-
-        //룸 DB에 member 테이블 합쳐 주기
-
-        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
-        hotelRoom.setMember(member); // 회원 정보 설정
-
-        //DB에 저장 설정
-        HotelRoom savedHotelRoom = hotelRoomRepository.save(hotelRoom);
-
-        //HotelRoom DTO 에 반환 하기
-        return modelMapper.map(savedHotelRoom, HotelRoomDTO.class);
-    }
-
-
-
-    // C.Member의 정보를 가지고 있는 호텔룸 정보 가져 오기 - List타입
-    @Override
-    public List<MemberDTO> getAllMembersInHotelRooms() {
-        return hotelRoomRepository.findAll().stream()
-                .map(HotelRoom::getMember)
-                .filter(Objects::nonNull)
-                .map(member -> modelMapper.map(member, MemberDTO.class))
-                .collect(Collectors.toList());
-    }
-
-
-
-
 
 
     //************단일 호텔룸 CRRUD 메소드*************//
-    //1.등록
+    //1.등록 - 이미지 까지 같이 등록 되는 메서드
     @Override
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) {
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException {
+        log.info("HotelRoom Service 진입 했습니다. ");
 
         //변환 - Memem만 DTO 타입으로 변환
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
@@ -160,7 +106,44 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         //처리
         hotelRoomRepository.save(hotelRoom);
 
+
+        //들어온 DTO에 사진에 대한 정보가 있다면
+        if(hotelRoomDTO.getHotelRoomProfile() !=null&& !hotelRoomDTO.getHotelRoomProfile().isEmpty()){
+            log.info(hotelRoomDTO.getHotelRoomProfile() + "이미지 값이 들어는 왓니 ????");
+
+            //저장할 때 필요한 데이터들을 설정한다.
+            //  1. 파일 이름 가져옴
+            String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
+            //  2. 상호명_저장된pk
+            String fileFirstName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoom.getHotelRoomNum();
+            //  3. 확장자 (온점 포함)
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            //  4. 파일이름 = 상호명_저장된pk.확장자
+            String fileName = fileFirstName + fileSubName;
+
+            //파일은  /store/상호명_저장된pk.확장자  임.
+            hotelRoom.setHotelRoomProfileMeta("/hotelroom/"+fileName);
+
+            //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"hotelroom/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"hotelroom/");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            hotelRoomDTO.getHotelRoomProfile().transferTo(uploadPath.toFile());
+        }
+        //파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
+        hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
+        //다시 저장 (이때, 이미 pk를 가지고 있으므로 update쿼리가 나간다.)
+        hotelRoomRepository.save(hotelRoom);
+
     }
+
+
+
+
+
+
 
 
     //2.리스트

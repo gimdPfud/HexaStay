@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
+import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.Member;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,8 +37,8 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final RoomMenuCartRepository roomMenuCartRepository;
     private final RoomMenuRepository roomMenuRepository;
     private final ModelMapper modelMapper = new ModelMapper();
-    private RoomMenuCartItemRepository roomMenuCartItemRepository;
-    private MemberRepository memberRepository;
+    private final RoomMenuCartItemRepository roomMenuCartItemRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
@@ -54,7 +56,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             // 가격 검색
             try {
                 int price = Integer.parseInt(keyword);  // 가격을 숫자로 변환
-                roomMenuPage = roomMenuRepository.findByRoomMenuPriceGreaterThan(price, pageable);  // 가격보다 큰 값 검색
+                roomMenuPage = roomMenuRepository.findByRoomMenuPriceLessThanEqual(price, pageable);  // 가격보다 큰 값 검색
             } catch (NumberFormatException e) {
                 // 숫자가 아닌 값을 입력한 경우, 전체 검색
                 roomMenuPage = roomMenuRepository.findAll(pageable);
@@ -72,7 +74,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             // 이름 + 가격 검색
             try {
                 int price = Integer.parseInt(keyword);
-                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceGreaterThan(keyword, price, pageable);
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(keyword, price, pageable);
             } catch (NumberFormatException e) {
                 // 가격이 아니라면 이름만으로 검색
                 roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
@@ -86,6 +88,30 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
         return roomMenuDTOList;
     }
+
+    /***************************************************
+     *
+     * 메소드명   : RoomMenuCartRead
+     * 기능      : 이메일을 사용하여 룸서비스 메뉴 정보를 조회하고, 해당 정보를 DTO로 변환하여 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-08
+     * 수정일    : -
+     * 상세 설명 : 이 메소드는 사용자의 이메일을 기반으로 해당 사용자의 룸서비스 메뉴 정보를 조회
+     *
+     ****************************************************/
+    @Override
+    public RoomMenuDTO RoomMenuCartRead(String email) {
+        RoomMenu roomMenu =
+                roomMenuRepository.findByRoom_Member_MemberEmail(email);
+
+        log.info(email);
+
+        RoomMenuDTO roomMenuDTO =
+                modelMapper.map(roomMenu, RoomMenuDTO.class);
+
+        return roomMenuDTO;
+    }
+
 
     @Override
     public RoomMenuCartDTO getCartByMember(Long memberNum) {
@@ -108,17 +134,20 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
+    public Long RoomMenuCartInsert(String email, RoomMenuDTO roomMenuDTO) {
         log.info("장바구니 추가 시스템 도입, 회원 이메일: {}", email);
 
         // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.
         RoomMenu roomMenu =
-                roomMenuRepository.findById(roomMenuCartItemDTO.getRoomMenuCartItemNum())
+                roomMenuRepository.findById(roomMenuDTO.getRoomMenuNum())
                         .orElseThrow(EntityNotFoundException::new);
 
+        log.info("여기까진 오냐?");
+        log.info("누가 산 장바구니?" + email);
+
         // 누가 샀는가?
-        Member member =
-                memberRepository.findByMemberEmail(email);
+        Member member = memberRepository.findByMemberEmail(email);
+        log.info("멤버 찾음" + member);
 
         // 내 장바구니 구현
         RoomMenuCart roomMenuCart =
@@ -133,24 +162,19 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         }
         //장바구니에 담겨진 아이템 찾기
         RoomMenuCartItem roomMenuCartItem =
-                roomMenuCartItemRepository.
-                        findByRoomMenuCartItemNumAndRoomMenu_RoomMenuNum
-                                (roomMenuCart.getRoomMenuCartNum()
-                                        , roomMenu.getRoomMenuNum());
+                roomMenuCartItemRepository
+                        .findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu)
+                        .orElse(null);
 
         if (roomMenuCartItem == null) {
             //장바구니에 아이템이 담겨있지 않다면
-            if (roomMenuCartItemDTO.getRoomMenuCartItemAmount() <= 0) {
-                throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
-            }
-
             RoomMenuCartItem insertCartItem = new RoomMenuCartItem();
             insertCartItem.setRoomMenuCart(roomMenuCart); // 장바구니
             // todo : (2) 여기 이상할지도 모름
             // fixme : 레포지토리에 추가 안될지도 모름.
             insertCartItem.setRoomMenuCartItemNum(null);  // ID는 자동 생성되므로 null로 설정
             insertCartItem.setRoomMenu(roomMenu); // 장바구니 아이템에 roomMenu 객체를 연결
-            insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); //수량
+            insertCartItem.setRoomMenuCartItemAmount(roomMenuDTO.getRoomMenuAmount()); //수량
 
             // 아이템을 저장하자.
             roomMenuCartItem =
@@ -159,14 +183,14 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             // 장바구니에 아이템이 추가된 후 로그 출력
             log.info("장바구니에 아이템 추가됨: " + roomMenu.getRoomMenuNum());
 
-
             // 리턴값 반환
             return roomMenuCartItem.getRoomMenuCartItemNum();
         } else {
+            log.info("이미 장바구니에 동일한 아이템이 있습니다.");
             //장바구니에 동일한 아이템이 있다면
             //장바구니아이템의 수량을 기존수량 + 입력받은 수량 으로 수정해준다.
             roomMenuCartItem.setRoomMenuCartItemAmount(
-                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount()
+                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuDTO.getRoomMenuAmount()
             );
             return roomMenuCartItem.getRoomMenuCartItemNum();
         }
@@ -185,12 +209,13 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable) {
+    public Page<RoomMenuCartDetailDTO> RoomMenuCartItemList(String email, Pageable pageable) {
         log.info("특정 회원 아이템 목록 조회 서비스 진입" + email);
-        Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage =
-                roomMenuCartItemRepository.findByRoomMenuCart_Member_MemberEmail(email, pageable);
 
-        return roomMenuCartItemDTOPage;
+        Page<RoomMenuCartDetailDTO> roomMenuCartDetailDTOPage =
+                roomMenuCartItemRepository.findByCartDetailDTOList(email);
+
+        return roomMenuCartDetailDTOPage;
     }
 
 
@@ -254,7 +279,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public void updateRoomMenuCartItemAmount(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount) {
+    public void RoomMenuCartItemAmountUpdate(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount) {
         log.info("장바구니 수량 업데이트 서비스 진입");
         log.info("아이템의 pk" + RoomMenuCartItemNum);
         log.info("아이템의 수량" + roomMenuCartItemAmount);
@@ -294,6 +319,24 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             log.info("삭제된 아이템은 더 이상 존재하지 않습니다: {}", roomMenuCartItemNum);
             return new EntityNotFoundException("아이템이 삭제되었습니다.");
         });
+    }
+
+    // 상세보기
+    @Override
+    public RoomMenuDTO read(Long num) {
+        log.info("상세보기 페이지 서비스 진입" + num);
+
+        Optional<RoomMenu> optionalRoomMenu =
+                roomMenuRepository.findById(num);
+
+        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
+        log.info("변환된 dto read service의 값" + menuDTO);
+
+        return menuDTO;
+
+    }
+
+}
 
 //    private RoomMenuCart createNewCartForMember(Long memberNum) {
 //        log.info("장바구니 생성");
@@ -361,23 +404,3 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 //        // 장바구니 DTO 반환
 //        return modelMapper.map(roomMenuCart, RoomMenuCartDTO.class);
 //    }
-
-
-
-    }
-
-    // 상세보기
-    @Override
-    public RoomMenuDTO read(Long num) {
-        log.info("상세보기 페이지 서비스 진입" + num);
-
-        Optional<RoomMenu> optionalRoomMenu =
-                roomMenuRepository.findById(num);
-
-        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
-        log.info("변환된 dto read service의 값" + menuDTO);
-
-        return menuDTO;
-
-        }
-    }
