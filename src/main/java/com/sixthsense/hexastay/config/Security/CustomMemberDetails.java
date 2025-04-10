@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.config.Security;
 
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class CustomMemberDetails implements UserDetails, Principal {
@@ -22,18 +22,40 @@ public class CustomMemberDetails implements UserDetails, Principal {
 
     @Override
     public String getUsername() {
-        return member.getMemberEmail();
+        return Optional.ofNullable(member)
+                .map(Member::getMemberEmail)
+                .orElse(null);
     }
 
     @Override
     public String getPassword() {
-        return member.getMemberPassword();
+        return Optional.ofNullable(member)
+                .map(Member::getMemberPassword)
+                .orElse(null);
+    }
+
+    public String getMemberName() {
+        return Optional.ofNullable(member)
+                .map(Member::getMemberName)
+                .orElse(null);
+    }
+
+    public String getMemberRole() {
+        return Optional.ofNullable(member)
+                .map(Member::getMemberRole)
+                .orElse(null);
+    }
+
+    public String getMemberPhone() {
+        return Optional.ofNullable(member)
+                .map(Member::getMemberPhone)
+                .orElse(null);
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + getMemberRole()));
     }
 
     @Override
@@ -58,6 +80,6 @@ public class CustomMemberDetails implements UserDetails, Principal {
 
     @Override
     public String getName() {
-        return getUsername();  // getUsername()을 반환하여 사용자 이메일을 이름으로 사용
+        return getUsername();  // null-safe 처리됨
     }
 }

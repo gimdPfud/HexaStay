@@ -39,7 +39,6 @@ public class Member extends BaseEntity{
     private String memberEmail;                         //이메일
 
 
-
     private String memberRole;                          //시큐리티용 맴버롤
 
 

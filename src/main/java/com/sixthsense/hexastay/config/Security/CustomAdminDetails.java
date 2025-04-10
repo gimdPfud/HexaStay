@@ -1,6 +1,9 @@
 package com.sixthsense.hexastay.config.Security;
 
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Branch;
+import com.sixthsense.hexastay.entity.Center;
+import com.sixthsense.hexastay.entity.Facility;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class CustomAdminDetails implements UserDetails, Principal {
@@ -21,38 +25,72 @@ public class CustomAdminDetails implements UserDetails, Principal {
 
     @Override
     public String getUsername() {
-        return admin.getAdminEmail();
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminEmail)
+                .orElse(null);
     }
 
     @Override
     public String getPassword() {
-        return admin.getAdminPassword();
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminPassword)
+                .orElse(null);
     }
 
-    public String getAdminPosition(){
-        return admin.getAdminPosition();
-}
-
-    public String getAdminName(){
-        return admin.getAdminName();
+    public String getAdminPosition() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminPosition)
+                .orElse(null);
     }
 
-    public String getAdminEmployeeNum(){
-        return admin.getAdminEmployeeNum();
+    public String getAdminName() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminName)
+                .orElse(null);
     }
 
-    public Long getCenterNum(){
-        return admin.getCenter().getCenterNum();
+    public String getAdminRole() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminRole)
+                .orElse(null);
     }
 
-    public String getAdminProfileMeta(){
-        return admin.getAdminProfileMeta();
+    public String getAdminEmployeeNum() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminEmployeeNum)
+                .orElse(null);
     }
 
+    public Long getCenterNum() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getCenter)
+                .map(Center::getCenterNum)
+                .orElse(null);
+    }
+
+    public Long getBranchNum() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getBranch)
+                .map(Branch::getBranchNum)
+                .orElse(null);
+    }
+
+    public Long getFacilityNum() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getFacility)
+                .map(Facility::getFacilityNum)
+                .orElse(null);
+    }
+
+    public String getAdminProfileMeta() {
+        return Optional.ofNullable(admin)
+                .map(Admin::getAdminProfileMeta)
+                .orElse(null);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + admin.getAdminRole()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + getAdminRole()));
     }
 
     @Override
@@ -77,7 +115,6 @@ public class CustomAdminDetails implements UserDetails, Principal {
 
     @Override
     public String getName() {
-        return getUsername();  // getUsername()을 반환하면 됩니다.
+        return getUsername();
     }
-
 }
