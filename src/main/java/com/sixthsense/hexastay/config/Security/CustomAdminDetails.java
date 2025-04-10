@@ -1,9 +1,7 @@
 package com.sixthsense.hexastay.config.Security;
 
 import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Branch;
-import com.sixthsense.hexastay.entity.Center;
-import com.sixthsense.hexastay.entity.Facility;
+import com.sixthsense.hexastay.entity.Company;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -61,26 +59,13 @@ public class CustomAdminDetails implements UserDetails, Principal {
                 .orElse(null);
     }
 
-    public Long getCenterNum() {
+    public Long getCompanyNum() {
         return Optional.ofNullable(admin)
-                .map(Admin::getCenter)
-                .map(Center::getCenterNum)
+                .map(Admin::getCompany)
+                .map(Company::getCompanyNum)
                 .orElse(null);
     }
 
-    public Long getBranchNum() {
-        return Optional.ofNullable(admin)
-                .map(Admin::getBranch)
-                .map(Branch::getBranchNum)
-                .orElse(null);
-    }
-
-    public Long getFacilityNum() {
-        return Optional.ofNullable(admin)
-                .map(Admin::getFacility)
-                .map(Facility::getFacilityNum)
-                .orElse(null);
-    }
 
     public String getAdminProfileMeta() {
         return Optional.ofNullable(admin)
