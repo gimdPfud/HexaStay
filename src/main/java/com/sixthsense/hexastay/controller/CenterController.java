@@ -221,7 +221,6 @@ public class CenterController {
         return "redirect:/center/list";
     }
 
-
     @PostMapping("/delete/{centerNum}")
     public String deleteCenter(@PathVariable("centerNum") Long centerNum) {
         log.info("post 방식 center 삭제 controller 진입");

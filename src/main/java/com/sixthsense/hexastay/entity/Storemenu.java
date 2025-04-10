@@ -11,10 +11,12 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -48,4 +50,7 @@ public class Storemenu extends BaseEntity {
 
     private String storemenuImgMeta; //메뉴 대표 사진
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "storemenu", cascade = CascadeType.ALL)
+    private List<StoremenuOption> storemenuOptionList = new ArrayList<>();
 }
