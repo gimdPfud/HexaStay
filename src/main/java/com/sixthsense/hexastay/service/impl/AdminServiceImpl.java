@@ -61,7 +61,7 @@ public class AdminServiceImpl implements AdminService {
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
-                    adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
+            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
 
         }
 
@@ -70,28 +70,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     //어드민 리스트
-    public Page<AdminDTO> getAdminList(Pageable pageable){
+    public Page<AdminDTO> getAdminList(Pageable pageable) {
 
         Page<Admin> adminList = adminRepository.findAllWithJoins(pageable);
         return adminList.map(admin -> {
-                    AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
-                    if (admin.getCenter() != null)
-                        dto.setCenterName(admin.getCenter().getCenterName());
-                    if (admin.getBranch() != null)
-                        dto.setBranchName(admin.getBranch().getBranchName());
-                    if (admin.getFacility() != null)
-                        dto.setFacilityName(admin.getFacility().getFacilityName());
-                    if (admin.getStore() != null)
-                        dto.setStoreName(admin.getStore().getStoreName());
+            AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+            if (admin.getCenter() != null)
+                dto.setCenterName(admin.getCenter().getCenterName());
+            if (admin.getBranch() != null)
+                dto.setBranchName(admin.getBranch().getBranchName());
+            if (admin.getFacility() != null)
+                dto.setFacilityName(admin.getFacility().getFacilityName());
+            if (admin.getStore() != null)
+                dto.setStoreName(admin.getStore().getStoreName());
             return dto;
-                });
+        });
     }
 
 
-
-
     //가입대기 리스트
-    public List<AdminDTO> getWaitAdminList(){
+    public List<AdminDTO> getWaitAdminList() {
         List<Admin> adminList = adminRepository.findByAdminActive(false);
         List<AdminDTO> adminDTOList = new ArrayList<>();
         for (Admin admin : adminList) {
@@ -101,7 +99,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     //가입 승인
-    public void setAdminActive(Long adminNum){
+    public void setAdminActive(Long adminNum) {
         Admin admin = adminRepository.findByAdminNum(adminNum);
         admin.setAdminActive(true);
         adminRepository.save(admin);
@@ -117,20 +115,20 @@ public class AdminServiceImpl implements AdminService {
         List<BranchDTO> branchDTOList = new ArrayList<>();
         List<Branch> branchList = branchRepository.findByCenter_CenterNum(centerNum);
         for (Branch branch : branchList) {
-        BranchDTO branchDTO = new BranchDTO();
-        branchDTO.setBranchAddress(branch.getBranchAddress());
-        branchDTO.setBranchName(branch.getBranchName());
-        branchDTO.setBranchEmail(branch.getBranchEmail());
-        branchDTO.setBranchNum(branch.getBranchNum());
-        branchDTO.setBranchPhone(branch.getBranchPhone());
-        branchDTO.setBranchCeoName(branch.getBranchCeoName());
-        branchDTO.setBranchBusinessNum(branch.getBranchBusinessNum());
-        branchDTO.setCreateDate(branch.getCreateDate());
-        branchDTO.setModifyDate(branch.getModifyDate());
-        branchDTO.setCenterNum(branch.getCenter().getCenterNum());
-        branchDTO.setCenterName(branch.getCenter().getCenterName());
+            BranchDTO branchDTO = new BranchDTO();
+            branchDTO.setBranchAddress(branch.getBranchAddress());
+            branchDTO.setBranchName(branch.getBranchName());
+            branchDTO.setBranchEmail(branch.getBranchEmail());
+            branchDTO.setBranchNum(branch.getBranchNum());
+            branchDTO.setBranchPhone(branch.getBranchPhone());
+            branchDTO.setBranchCeoName(branch.getBranchCeoName());
+            branchDTO.setBranchBusinessNum(branch.getBranchBusinessNum());
+            branchDTO.setCreateDate(branch.getCreateDate());
+            branchDTO.setModifyDate(branch.getModifyDate());
+            branchDTO.setCenterNum(branch.getCenter().getCenterNum());
+            branchDTO.setCenterName(branch.getCenter().getCenterName());
 
-        branchDTOList.add(branchDTO);
+            branchDTOList.add(branchDTO);
 
 
         }
@@ -158,4 +156,12 @@ public class AdminServiceImpl implements AdminService {
         }
         return storeDTOList;
     }
+
+
+    // 리스트 검색용
+    public Page<AdminDTO> getAdminSearch(String type, String keyword, Pageable pageable) {
+            Page<Admin> adminList = adminRepository.findByAdminSearchKeyword(type, keyword, pageable);
+        return adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
+    }
+
 }

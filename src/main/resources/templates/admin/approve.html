@@ -15,8 +15,19 @@
     <div  class="container mt-4 w-100 vh-100 bg-light">
         <!-- 검색 조건 -->
         <div class="row mb-3">
+
             <div class="col-md-2">
-                <select class="form-select" style="height: 30px; font-size: 0.9rem;">
+                <select class="form-select" style="height: 35px; font-size: 0.9rem;">
+                    <option>전체</option>
+                    <option>센터</option>
+                    <option>지사</option>
+                    <option>지점</option>
+                    <option>스토어</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" style="height: 35px; font-size: 0.9rem;">
                     <option selected>검색 조건</option>
                     <option value="사번">사번</option>
                     <option value="직책">직책</option>
@@ -24,28 +35,11 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" placeholder="검색어 입력" style="height: 30px; font-size: 0.9rem;">
+                <input type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
             </div>
+
             <div class="col-md-2">
-                <select class="form-select" style="height: 30px; font-size: 0.9rem;">
-                    <option selected>브랜드</option>
-                    <option>전체</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select" style="height: 30px; font-size: 0.9rem;">
-                    <option selected>지사</option>
-                    <option>전체</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select" style="height: 30px; font-size: 0.9rem;">
-                    <option selected>지점</option>
-                    <option>전체</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-success w-100" style="height: 30px; font-size: 0.9rem;">조회</button>
+                <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
             </div>
         </div>
 

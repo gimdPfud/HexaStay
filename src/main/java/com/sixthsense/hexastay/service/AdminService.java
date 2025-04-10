@@ -31,4 +31,9 @@ public interface AdminService {
     List<FacilityDTO> getFacilityList (Long CenterNum);
     List<StoreDTO> getStoreList();
 
+
+    // 리스트 검색용
+    Page<AdminDTO> getAdminSearch(String type, String keyword, Pageable pageable);
+
+
 }
