@@ -12,8 +12,22 @@
 <div layout:fragment="content" class="container mt-4">
 
 
-    <p th:text="${#authentication.principal.admin.adminName}"></p>
-    <p th:text="${#authentication.principal.admin.adminPosition}"></p>
+    <p th:text="${#authentication.principal.admin.adminName}">이름</p>
+    <p th:text="${#authentication.principal.admin.adminPosition}">직책</p>
+    <p th:text="${#authentication.principal.admin.adminEmail}">이메일</p>
+    <p th:text="${#authentication.principal.admin.adminRole}">직급</p>
+
+
+    사진
+    <td style="text-align: center;">
+        <img th:if="${#authentication.principal.adminProfileMeta != null}"
+             th:src="@{${#authentication.principal.adminProfileMeta}}"
+             style="width: 60px; height: 80px;">
+
+        <img th:unless="${#authentication.principal.adminProfileMeta != null}"
+             th:src="@{/profile/default.png}"
+             style="width: 60px; height: 80px;">
+    </td>
 
 
 
