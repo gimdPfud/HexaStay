@@ -110,10 +110,14 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
         Page<RoomMenu> roomMenuPage;
-
+        //type=C&category=한식&keyword=밪
         // 카테고리 선택 시 검색
         if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
-            roomMenuPage = roomMenuRepository.findByRoomMenuCategory(category, pageable);
+            if(keyword != null) {
+                roomMenuPage = roomMenuRepository.findByRoomMenuCategoryAndRoomMenuNameContaining(category,keyword,pageable);
+            } else {
+                roomMenuPage = roomMenuRepository.findByRoomMenuCategory(category,pageable);
+            }
         } else if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
             // 이름 검색
             roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
@@ -121,7 +125,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             // 가격 검색
             try {
                 int price = Integer.parseInt(keyword);  // 가격을 숫자로 변환
-                roomMenuPage = roomMenuRepository.findByRoomMenuPriceGreaterThan(price, pageable);  // 가격보다 큰 값 검색
+                roomMenuPage = roomMenuRepository.findByRoomMenuPriceLessThanEqual(price, pageable);  // 가격보다 큰 값 검색
             } catch (NumberFormatException e) {
                 // 숫자가 아닌 값을 입력한 경우, 전체 검색
                 roomMenuPage = roomMenuRepository.findAll(pageable);
@@ -139,7 +143,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             // 이름 + 가격 검색
             try {
                 int price = Integer.parseInt(keyword);
-                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceGreaterThan(keyword, price, pageable);
+                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(keyword, price, pageable);
             } catch (NumberFormatException e) {
                 // 가격이 아니라면 이름만으로 검색
                 roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
