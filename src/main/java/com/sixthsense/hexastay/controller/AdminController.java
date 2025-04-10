@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
@@ -52,17 +53,17 @@ public class AdminController {
 
     //로그인
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "admin/login";
     }
 
     @PostMapping("/login")
-    public String loginPost(){
+    public String loginPost() {
         return "admin/login";
     }
 
     @GetMapping("/main")
-    public String main(){
+    public String main() {
         return "admin/main";
     }
 
@@ -86,7 +87,7 @@ public class AdminController {
 
     // 등록 포스트
     @PostMapping("/insert")
-    public String insert (AdminDTO adminDTO) throws IOException {
+    public String insert(AdminDTO adminDTO) throws IOException {
         adminDTO.setAdminActive(false);
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
@@ -163,4 +164,16 @@ public class AdminController {
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
     }
+
+
+    // 리스트 검색용
+
+    @GetMapping("/listsearch")
+    public Page<AdminDTO> listsearch(@RequestParam String type, @RequestParam String keyword, Pageable pageable) {
+        Page<AdminDTO> adminDTOList = adminService.getAdminSearch(type, keyword, pageable);
+        return adminDTOList;
+    }
+
+
+
 }
