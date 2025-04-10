@@ -42,16 +42,20 @@ public class StoreCartController {
     public ResponseEntity cartInsert(StorecartitemDTO dto, Principal principal){
         /*todo DTO 유효성 확인*/
         if(principal==null){
+            log.info("로그인안됨");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         String email = principal.getName();
         Long cartItemId = null;
         try {
             cartItemId = storecartService.addCart(dto, email);
+            log.info("카트 담김");
             return new ResponseEntity<>(cartItemId, HttpStatus.OK);
         }catch (EntityNotFoundException e){
+            log.info("카트저장불가능:메뉴못찾음");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.info("알수없는오류");
             throw new RuntimeException(e);
         }
     }
