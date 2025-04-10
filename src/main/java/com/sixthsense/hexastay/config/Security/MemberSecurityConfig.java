@@ -34,7 +34,10 @@ import org.springframework.security.web.SecurityFilterChain;
             AuthenticationManager authManager = new ProviderManager(provider);
 
             http
-                    .securityMatcher("/member/**")
+                    .securityMatcher("/member/**", "/branch/**", "/center/",
+                            "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
+                            "/notice/**", "/review/**", "/room/**", "/roommenu/**",
+                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
                     .authenticationManager(authManager)
                     .userDetailsService(memberDetailsService)
                     .authorizeHttpRequests(authz -> authz

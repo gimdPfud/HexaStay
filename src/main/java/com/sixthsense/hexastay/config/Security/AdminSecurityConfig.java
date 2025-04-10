@@ -37,7 +37,10 @@ import org.springframework.security.web.SecurityFilterChain;
             AuthenticationManager authManager = new ProviderManager(provider);
 
             http
-                    .securityMatcher("/admin/**")
+                    .securityMatcher("/admin/**", "/branch/**", "/center/",
+                            "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
+                            "/notice/**", "/review/**", "/room/**", "/roommenu/**",
+                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)
                     .authorizeHttpRequests(authz -> authz
@@ -54,21 +57,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
                       .csrf().disable();
 
-            return http.build();
-        }
-
-        @Bean
-        @Order(3)
-        public SecurityFilterChain sharedFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .securityMatcher("/branch/**", "/center/",
-                            "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
-                            "/notice/**", "/review/**", "/room/**", "/roommenu/**",
-                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**") // 공통 경로
-                    .authorizeHttpRequests(auth -> auth
-                            .anyRequest().authenticated()
-                    )
-                    .csrf().disable();
             return http.build();
         }
 

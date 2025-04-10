@@ -36,6 +36,7 @@ public class Orderstore extends BaseEntity {
     @JoinColumn(name = "member_num")
     private Member member;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "orderstore", cascade = CascadeType.ALL)
     private List<Orderstoreitem> orderstoreitemList = new ArrayList<>();
 }

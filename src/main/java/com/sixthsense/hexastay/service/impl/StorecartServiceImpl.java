@@ -41,26 +41,42 @@ public class StorecartServiceImpl implements StorecartService {
 
     @Override
     public Long addCart(StorecartitemDTO dto, String email) {
+        log.info(dto);
+        log.info(dto.getStorecartitemCount());
         Storemenu storemenu = storemenuRepository.findById(dto.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
         Member member = memberRepository.findByMemberEmail(email);
         Storecart storecart = storecartRepository.findByMember_MemberEmail(email);
+        log.info("메뉴, 멤버, 카트 찾음.");
+        log.info(storemenu);
+        log.info(member);
+        log.info(storecart);
         if(storecart==null){
             Storecart newcart = new Storecart();
             newcart.setMember(member);
             storecart = storecartRepository.save(newcart);
+            log.info("카트 없어서 새로 만들기");
+            log.info(storecart);
         }
         Storecartitem storecartitem
                 = storecartitemRepository
                 .findByStorecart_StorecartNumAndStoremenu_StoremenuNum(
                         storecart.getStorecartNum(), storemenu.getStoremenuNum()
                 );
+        log.info(storecartitem);
         if(storecartitem==null){
+            log.info("카트아이템 없어서 새로 만들어야함");
             Storecartitem newitem = new Storecartitem();
             newitem.setStorecart(storecart);
             newitem.setStoremenu(storemenu);
-            newitem.setStorecartitemCount(dto.getStorecartitemCount());
+            log.info(newitem.getStorecart());
+            log.info(newitem.getStoremenu());
+            newitem.setStorecartitemCount(dto.getStorecartitemCount());//여기서 문제 발생?
+            log.info(dto.getStorecartitemCount());
+            log.info(newitem.getStorecartitemCount());
             storecartitem = storecartitemRepository.save(newitem);
+            log.info(storecartitem.getStorecartitemCount());
         } else {
+            log.info("카트아이템 이미 있음");
             storecartitem.setStorecartitemCount(storecartitem.getStorecartitemCount() + dto.getStorecartitemCount());
         }
         return storecartitem.getStorecartitemNum();
