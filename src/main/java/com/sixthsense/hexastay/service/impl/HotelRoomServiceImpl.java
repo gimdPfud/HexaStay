@@ -109,6 +109,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         //들어온 DTO에 사진에 대한 정보가 있다면
         if(hotelRoomDTO.getHotelRoomProfile() !=null&& !hotelRoomDTO.getHotelRoomProfile().isEmpty()){
+            log.info(hotelRoomDTO.getHotelRoomProfile() + "이미지 값이 들어는 왓니 ????");
+
             //저장할 때 필요한 데이터들을 설정한다.
             //  1. 파일 이름 가져옴
             String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
