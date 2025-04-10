@@ -46,11 +46,10 @@ public class StoreCartController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         String email = principal.getName();
-        Long cartItemId = null;
         try {
-            cartItemId = storecartService.addCart(dto, email);
+            storecartService.addCart(dto, email);
             log.info("카트 담김");
-            return new ResponseEntity<>(cartItemId, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }catch (EntityNotFoundException e){
             log.info("카트저장불가능:메뉴못찾음");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
