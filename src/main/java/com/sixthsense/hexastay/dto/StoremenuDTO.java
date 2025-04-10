@@ -8,10 +8,13 @@
 package com.sixthsense.hexastay.dto;
 
 
+import com.sixthsense.hexastay.entity.StoremenuOption;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -52,5 +55,5 @@ public class StoremenuDTO {
 
     private String storemenuImgMeta; //가게 사진정보
 
-
+    private List<StoremenuOptionDTO> storemenuOptionDTOList = new ArrayList<>(); //옵션 리스트
 }

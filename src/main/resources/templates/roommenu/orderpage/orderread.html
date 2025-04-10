@@ -97,6 +97,22 @@
             background-color: #fdd835;
         }
 
+        .back-to-list-btn {
+            background-color: #4CAF50;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .back-to-list-btn:hover {
+            background-color: #fdd835;
+        }
+
     </style>
 </head>
 <body>
@@ -147,6 +163,9 @@
 
 
         <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}">장바구니 담기</button>
+        <!-- 목록으로 돌아가기 버튼 추가 -->
+
+        <button class="back-to-list-btn" onclick="window.location.href='http://localhost:8090/roommenu/orderpage'">목록으로 돌아가기</button>
     </div>
 </div>
 

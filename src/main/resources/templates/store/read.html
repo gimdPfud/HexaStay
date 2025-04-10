@@ -196,6 +196,7 @@
                 let tagsstart = `<table class="table table-bordered text-center">
                 <thead class="table-light">
                 <tr>
+                    <th>이미지</th>
                     <th>이름</th>
                     <th>가격</th>
                     <th>설명</th>
@@ -207,10 +208,16 @@
                 let tagscontent = "";
                 let tagsend = `</tbody>
             </table>`;
-
+                let imageTag = "";
                 for (let i=0; i<list.length;i++){
+                    if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                        imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 80px; height: 80px;">`;
+                    } else {
+                        imageTag = `<img src="/store/menu/default.png" style="width: 80px; height: 80px;">`;
+                    }
                     let categ = list[i].storemenuCategory;
                     tagscontent += `<tr>
+                    <td style="text-align: center;">${imageTag}</td>
                     <td>${list[i].storemenuName}</td>
                     <td>${list[i].storemenuPrice}</td>
                     <td>${list[i].storemenuContent}</td>

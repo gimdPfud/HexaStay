@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
+import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
@@ -36,11 +37,13 @@ public interface RoomMenuCartService {
     public boolean verificationRoomMenuCartItem(Long RoomMenuCartItemNum, String email);
 
     // 장바구니의 업데이트 수량을 업데이트 하는 매소드
-    public void updateRoomMenuCartItemAmount(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount);
+    public void RoomMenuCartItemAmountUpdate(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount);
 
     // 장바구니를 삭제하는 매소드
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
 
     public RoomMenuDTO read(Long num);
+
+    public List<RoomMenuCartDetailDTO> RoomMenuCartList(String email);
 
 }
