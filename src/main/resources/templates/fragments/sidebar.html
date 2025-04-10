@@ -10,35 +10,37 @@
 
     <button onclick="toggleMenu('orgMenu')"><strong>조직관리</strong></button>
     <div id="orgMenu" class="submenu">
-        <a href="#">- 조직 조회</a>
-        <a href="/center/signup">- 조직 등록</a>
+        <a href="/company/list">- 조직 목록</a>
+        <a href="/company/insert">- 조직 등록</a>
     </div>
 
     <button onclick="toggleMenu('extMenu')"><strong>외부업체관리</strong></button>
     <div id="extMenu" class="submenu">
-        <a href="/store/list">- 외부업체 목록</a>
+        <a href="/admin/store/list">- 외부업체 목록</a>
+        <a href="/admin/store/insert">- 외부업체 등록</a>
     </div>
 
-    <button onclick="toggleMenu('extServiceMenu')"><strong>외부업체 서비스 관리</strong></button>
+    <button onclick="toggleMenu('extServiceMenu')"><strong>외부업체 서비스관리</strong></button>
     <div id="extServiceMenu" class="submenu">
-        <a href="/store/menu/insert">- 서비스 목록</a>
-        <a href="/store/menu/modify">- 서비스 등록</a>
+        <a href="/admin/store/menu/list">- 서비스 목록</a>
+        <a href="/admin/store/menu/insert">- 서비스 등록</a>
     </div>
 
-    <button onclick="toggleMenu('centerMenu')"><strong>센터 관리</strong></button>
-    <div id="centerMenu" class="submenu">
-        <a href="/center/list">- 센터 리스트</a>
-        <a href="/center/signup">- 조직 등록</a>
-    </div>
-
-    <button onclick="toggleMenu('roomListMenu')"><strong>호텔룸 리스트</strong></button>
+    <button onclick="toggleMenu('roomListMenu')"><strong>호텔 객실 관리</strong></button>
     <div id="roomListMenu" class="submenu">
-        <a href="/hotelroom/list">- 센터 리스트</a>
+        <a href="/hotelroom/list">- 호텔 객실 목록 </a>
+        <a href="/hotelroom/insert">- 호텔 객실 등록 </a>
     </div>
 
-    <button onclick="toggleMenu('roomMenu')"><strong>호텔룸</strong></button>
+    <button onclick="toggleMenu('roomMenu')"><strong>룸 예약 관리</strong></button>
     <div id="roomMenu" class="submenu">
-        <a href="/roomlist">- 호텔룸 배정 리스트</a>
-        <a href="/register-hotelroom">- 호텔룸 배정 등록</a>
+        <a href="/roomlist">- 룸 예약 목록</a>
+        <a href="/register-hotelroom">- 룸 예약 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('roomService')"><strong>룸 서비스</strong></button>
+    <div id="roomService" class="submenu">
+        <a href="/roommenu/orderpage">- 룸 서비스 목록</a>
+        <a href="/roommenu/insert">- 룸 서비스 등록</a>
     </div>
 </div>
