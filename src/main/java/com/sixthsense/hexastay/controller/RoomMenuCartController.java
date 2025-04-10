@@ -120,13 +120,13 @@ public class RoomMenuCartController {
      * 수정일    : 2025-04-10
      ****************************************************/
 
-    @GetMapping("/orderpage/cartlist")
+    @GetMapping("/cartlist")
     public String getRoomMenuCartItems(Principal principal, Model model, Pageable pageable) {
         log.info("장바구니 리스트 컨트롤러 진입");
 
         model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
 
-        return "roommenu/orderpage/cartlist";
+        return "roommenu/cartlist";
 
 
 //        if (principal == null) {

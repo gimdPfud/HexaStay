@@ -37,12 +37,19 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
      // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
     Page<RoomMenuCartItemDTO> findByRoomMenuCart_Member_MemberEmail(String memberEmail, Pageable pageable);
 
-    @Query("select new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
-            " from RoomMenuCartItem rmci " +
-            " join RoomMenu rmi on rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
-            " where rmci.roomMenuCart.member.memberEmail = :email " +
-            " order by rmci.roomMenuCartItemNum desc")
-    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(String email);
+//    @Query("select new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
+//            " from RoomMenuCartItem rmci " +
+//            " join RoomMenu rmi on rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
+//            " where rmci.roomMenuCart.member.memberEmail = :email " +
+//            " order by rmci.roomMenuCartItemNum desc")
+//    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(String email);
+
+    @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
+            "FROM RoomMenuCartItem rmci " +
+            "JOIN RoomMenu rmi ON rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
+            "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
+            "ORDER BY rmci.roomMenuCartItemNum DESC")
+    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
 
 }
 

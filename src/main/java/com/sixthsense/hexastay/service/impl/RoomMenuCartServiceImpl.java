@@ -213,7 +213,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         log.info("특정 회원 아이템 목록 조회 서비스 진입" + email);
 
         Page<RoomMenuCartDetailDTO> roomMenuCartDetailDTOPage =
-                roomMenuCartItemRepository.findByCartDetailDTOList(email);
+                roomMenuCartItemRepository.findByCartDetailDTOList(email, pageable);
 
         return roomMenuCartDetailDTOPage;
     }
