@@ -3,6 +3,8 @@ package com.sixthsense.hexastay.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter@Setter@ToString
 @AllArgsConstructor @NoArgsConstructor
 @Builder
@@ -26,6 +28,7 @@ public class RoomDTO {
         // 새로운 필드 추가 (멤버 정보)
         private String memberName;
         private String memberEmail;
+        private LocalDateTime membereDate;
 
 
         private MemberDTO memberDTO;

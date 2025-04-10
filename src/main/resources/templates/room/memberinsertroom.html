@@ -18,7 +18,7 @@
         <span th:text="${error}"></span>
     </div>
 
-    <form th:action="@{/member/register}" th:object="${memberDTO}" method="post" class="row g-3">
+    <form th:action="@{/member-insertroom}" th:object="${memberDTO}" method="post" class="row g-3">
         <!-- 호텔룸 정보 -->
         <div class="col-md-6">
             <label class="form-label fw-bold">호텔룸 번호 (PK):</label>
@@ -45,8 +45,9 @@
 
         <!-- 등록 버튼 -->
         <div class="col-12 text-center mt-3">
-            <button type="submit" class="btn btn-primary btn-lg">등록</button>
-            <a href="/" class="btn btn-secondary btn-lg">홈으로</a>
+            <button type="submit" class="btn btn-primary btn-lg">HotelRommPk_등록</button>
+            <a th:href="@{/register-hotelroom}" class="btn btn-warning btn-lg">MemberPk_룸배정</a>
+            <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">룸배정목록</a>
         </div>
 
     </form>
