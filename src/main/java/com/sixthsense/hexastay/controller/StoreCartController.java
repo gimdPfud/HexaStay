@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -38,7 +35,7 @@ public class StoreCartController {
     /* 5. 장바구니페이지 이동해서 보기.
            ??......get?*/
     /*1. 장바구니에 담기 (등록)*/
-    @GetMapping("/insert")
+    @PostMapping("/insert")
     public ResponseEntity cartInsert(StorecartitemDTO dto, Principal principal){
         /*todo DTO 유효성 확인*/
         if(principal==null){
@@ -46,11 +43,10 @@ public class StoreCartController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         String email = principal.getName();
-        Long cartItemId = null;
         try {
-            cartItemId = storecartService.addCart(dto, email);
+            storecartService.addCart(dto, email);
             log.info("카트 담김");
-            return new ResponseEntity<>(cartItemId, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }catch (EntityNotFoundException e){
             log.info("카트저장불가능:메뉴못찾음");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

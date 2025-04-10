@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.dto;
 import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +39,12 @@ public class HotelRoomDTO {
 
     private Integer hotelRoomPrice;              //호텔 방 가격
 
+    private MultipartFile hotelRoomProfile;      //이미지 경로 저장용 컬럼
+
+    private String hotelRoomProfileMeta; //가게 사진정보
+
+
+
 
 
 
@@ -60,9 +67,7 @@ public class HotelRoomDTO {
 
     //todo:참조 참조 구분 하기 편하게
     //*********참조 PK PK PK PK 모음************//
-    private Long branchNum;             //지사 참조
 
-    private Long facilityNum;         //시설 참조
 
     private Long memberNum;  //Member 참조    -pk
     //*********참조 PK PK PK PK 모음************//

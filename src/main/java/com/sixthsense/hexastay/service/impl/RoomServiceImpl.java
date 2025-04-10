@@ -25,39 +25,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class RoomServiceImpl {
+    //todo: DB 명 _ Room
 
     private final HotelRoomRepository hotelRoomRepository;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    //todo: [[MemberFK]]  FK 기준으로 HotelRoomFK 를 등록 하는 메서드
-    //MemberRoomController
-    public void registerMemberForHotelRoom(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
-        // 1️⃣ 호텔룸 정보 조회
-        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
-                .orElseThrow(() -> new EntityNotFoundException("호텔룸 정보 없음 - 호텔룸 번호: " + hotelRoomDTO.getHotelRoomNum()));
 
-        // 2️⃣ 회원 저장 (호텔룸과 연결)
-        Member member = modelMapper.map(memberDTO, Member.class);
-        member = memberRepository.save(member);
-        log.info("회원 저장 완료 - 번호: {}", member.getMemberNum());
-
-        // 3️⃣ 호텔룸과 회원 연결 후 저장
-        hotelRoom.setMember(member);
-        hotelRoom = hotelRoomRepository.save(hotelRoom);
-        log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
-
-        // 4️⃣ Room 엔티티 저장 (HotelRoom과 Member 관계 저장)
-        Room room = Room.builder()
-                .hotelRoom(hotelRoom)
-                .member(member)
-                .build();
-        roomRepository.save(room);
-        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
-    }
-
-
+    //todo: [[Member_PK]] 기준으로 hotelroom FK 를 등록 하는 메서드
+    //RoomController
     @Transactional
     public void registerHotelRoomForMember(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) {
         // 1️⃣ 회원 정보 조회
@@ -78,6 +55,37 @@ public class RoomServiceImpl {
         roomRepository.save(room);
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
     }
+
+
+    //todo: [[HotelRoom_PK]] 기준으로 member FK 를 등록 하는 메서드
+    //RoomController
+    public void registerMemberForHotelRoom(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
+        // 1️⃣ 호텔룸 정보 조회
+        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
+                .orElseThrow(() -> new EntityNotFoundException("호텔룸 정보 없음 - 호텔룸 번호: " + hotelRoomDTO.getHotelRoomNum()));
+
+        // 2️⃣ 회원 저장 (호텔룸과 연결)
+        Member member = modelMapper.map(memberDTO, Member.class);
+        member = memberRepository.save(member);
+        log.info("회원 저장 완료 - 번호: {}", member.getMemberNum());
+
+        // 3️⃣ 호텔룸과 회원 연결 후 저장
+        hotelRoom.setMember(member);
+        hotelRoom = hotelRoomRepository.save(hotelRoom);
+        log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+
+        // 4️⃣ Room 엔티티 저장 (HotelRoom과 Member 관계 저장)
+        Room room = Room.builder()
+                .hotelRoom(hotelRoom)
+                .member(member)
+
+                .build();
+        roomRepository.save(room);
+        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+    }
+
+
+
     //Room 페이지에 있는 정보를 가져 List 메서드
     public Page<RoomDTO> getRooms(Pageable pageable) {
         Page<Room> rooms = roomRepository.findAll(pageable);
@@ -94,6 +102,7 @@ public class RoomServiceImpl {
             if (room.getMember() != null) {
                 roomDTO.setMemberName(room.getMember().getMemberName());
                 roomDTO.setMemberEmail(room.getMember().getMemberEmail());
+                roomDTO.setMembereDate(room.getMember().getCreateDate());
             }
 
             return roomDTO;
@@ -134,22 +143,5 @@ public class RoomServiceImpl {
 
 
 
-
-    //RoomDB 에서 hotelroom FK을 따라가서 member에 정보를 가져 오는 서비스 메서드
-    public RoomDTO getRoomByHotelRoomNum(Long hotelRoomNum) {
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelRoomNum)
-                .orElseThrow(() -> new RuntimeException("해당 호텔룸에 대한 Room 정보가 없습니다."));
-
-        return modelMapper.map(room, RoomDTO.class);
-    }
-
-    public RoomDTO getRoomInfoByHotelRoomId(Long roomId) {
-        log.info("Room 정보 조회 - HotelRoom ID: {}", roomId);
-
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(roomId)
-                .orElseThrow(() -> new RuntimeException("해당 방 정보를 찾을 수 없습니다."));
-
-        return modelMapper.map(room, RoomDTO.class);
-    }
 
 }

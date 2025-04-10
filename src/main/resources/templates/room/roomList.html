@@ -17,9 +17,9 @@
     <title>Title</title>
 </head>
 <body>
-[[${rooms}]]
+
 <div class="container mt-4">
-    <h2>Room 목록</h2>
+    <h2>Room 배정 목록</h2>
     <table class="table">
         <thead>
         <tr>
@@ -28,6 +28,7 @@
             <th>룸 전화번호</th>
             <th>회원 이름</th>
             <th>회원 이메일</th>
+            <th>멤버 룸배정일자</th>
         </tr>
         </thead>
         <tbody>
@@ -45,29 +46,40 @@
                 </a>
             </td>
             <td th:text="${room.memberEmail}"></td>
+            <td th:text="${#temporals.format(room.membereDate, 'yy/MM/dd')}"></td>
         </tr>
         </tbody>
     </table>
+    <div>
+        <a th:href="@{/register-hotelroom}" class="btn btn-dark btn-lg">HotelRommPk_룸배정</a>
+        <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">memberPk_룸배정</a>
+    </div>
 
     <!-- 페이지네이션 -->
     <div>
-        <span th:text="'현재 페이지: ' + ${rooms.number + 1} + ' / ' + ${rooms.totalPages}"></span>
+        <span th:text="'현재 페이지: ' + (${rooms.number + 1}) + ' / ' + (${rooms.totalPages})"></span>
 
         <nav>
             <ul class="pagination">
-                <li th:classappend="${rooms.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomList(page=${rooms.number - 1})}">이전</a>
+                <!-- 이전 버튼 -->
+                <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
+                    <a class="page-link" th:if="${!rooms.first}" th:href="@{/roomlist(page=${rooms.number - 1})}">이전</a>
+                    <span class="page-link" th:if="${rooms.first}">이전</span>
                 </li>
+
+                <!-- 페이지 번호 -->
                 <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
-                    th:classappend="${rooms.number == i} ? 'active'">
-                    <a class="page-link" th:href="@{/roomList(page=${i})}" th:text="${i + 1}"></a>
+                    class="page-item" th:classappend="${rooms.number == i} ? 'active'">
+                    <a class="page-link" th:href="@{/roomlist(page=${i})}" th:text="${i + 1}"></a>
                 </li>
-                <li th:classappend="${rooms.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomList(page=${rooms.number + 1})}">다음</a>
+
+                <!-- 다음 버튼 -->
+                <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
+                    <a class="page-link" th:if="${!rooms.last}" th:href="@{/roomlist(page=${rooms.number + 1})}">다음</a>
+                    <span class="page-link" th:if="${rooms.last}">다음</span>
                 </li>
             </ul>
         </nav>
     </div>
-</div>
 </body>
 </html>
