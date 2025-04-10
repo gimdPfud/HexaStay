@@ -39,8 +39,8 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     /*아무거나 검색*/
     Page<RoomMenu> findByRoomMenuNameLikeOrRoomMenuPriceGreaterThanOrRoomMenuCategoryLikeOrRoomMenuAmountGreaterThanOrRoomMenuStatusLike(String roomMenuName, Integer roomMenuPrice, String roomMenuCategory, Integer roomMenuAmount, String roomMenuStatus, Pageable pageable);
 
-
-
+    // 호텔 룸에 있는 멤버의 이메일 조회
+    RoomMenu findByHotelRoom_Member_MemberEmail(String memberEmail);
 
     /*평점별로 검색*/
 

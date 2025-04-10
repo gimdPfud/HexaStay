@@ -26,11 +26,9 @@ public class RoomMenuCartItemDTO {
 
     private Long roomMenuCartItemNum;  // 장바구니 항목의 고유 ID
 
-    private Integer roomMenuCartItemAmount; // 장바구니 수량
-
-    private Integer roomMenuCartItemPrice; // 항목 가격 (RoomMenu에서 가져올 수 있음)
-
     private RoomMenuCart roomMenuCart; // 카트를 참조
 
-    private RoomMenu roomMenu; // 룸메뉴서비스를 참조, 해당 항목의 상품
+    private Integer roomMenuCartItemAmount; // 장바구니의 수량
+
+    private RoomMenu roomMenu; // 메뉴를 참조
 }

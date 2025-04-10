@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.service;
 import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
 import org.springframework.data.domain.Page;
@@ -19,11 +20,14 @@ public interface RoomMenuCartService {
     // 리스트
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
 
+    // 장바구니 읽기 (read)
+    public RoomMenuDTO RoomMenuCartRead(String email);
+
     // ?
     public RoomMenuCartDTO getCartByMember(Long memberNum);
 
     // 장바구니 추가
-    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuCartItemDTO roomMenuCartItemDTO);
+    public Long RoomMenuCartInsert(Long roomMenuCartNum, String email, RoomMenuDTO roomMenuDTO);
 
     // 장바구니 리스트
     public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable);

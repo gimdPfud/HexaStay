@@ -7,6 +7,7 @@ import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
  * 입출력 변수 설계 : 김윤겸
  **************************************************/
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/roommenu")
 @Log4j2
@@ -56,8 +57,8 @@ public class RoomMenuCartController {
      *
      ****************************************************/
 
-    @PostMapping("/orderpage")
-    public ResponseEntity order(@Valid RoomMenuCartItemDTO roomMenuCartItemDTO,
+    @PostMapping("/cart")
+    public ResponseEntity order(@Valid RoomMenuDTO roomMenuDTO,
                                 BindingResult bindingResult,
                                 Principal principal) {
         // 유효성 검사
@@ -90,7 +91,7 @@ public class RoomMenuCartController {
 
         try {
             // RoomMenuCartInsert 메서드 호출 시, 이메일과 DTO만 전달
-            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(roomCartItemNum, memberEmail, roomMenuCartItemDTO);
+            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(roomCartItemNum, memberEmail, roomMenuDTO);
         } catch (EntityNotFoundException e) {
             // 예외 발생 시 처리
             log.error("장바구니에 아이템을 추가할 수 없습니다. : " + e.getMessage());
@@ -115,8 +116,18 @@ public class RoomMenuCartController {
      *
      ****************************************************/
 
-    @GetMapping("/orderpage/cartlist")
-    public ResponseEntity<Page<RoomMenuCartItemDTO>> getRoomMenuCartItems(@RequestParam String email, Pageable pageable) {
+    @GetMapping("/cartlist")
+    public ResponseEntity<Page<RoomMenuCartItemDTO>> getRoomMenuCartItems(Principal principal, Pageable pageable) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 로그인되지 않은 경우 401 Unauthorized 응답 반환
+        }
+
+        String email = principal.getName();  // 로그인된 사용자의 이메일
+        log.info("로그인된 사용자의 이메일" + principal.getName());
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // 이메일이 없는 경우 400 Bad Request 반환
+        }
+
         try {
             Page<RoomMenuCartItemDTO> roomMenuCartItemDTOPage = roomMenuCartService.RoomMenuCartItemList(email, pageable);
             return ResponseEntity.ok(roomMenuCartItemDTOPage);  // 200 OK 응답 반환
@@ -154,8 +165,8 @@ public class RoomMenuCartController {
      *
      ****************************************************/
 
-    @PutMapping("/update/{roomMenuCartItemNum}")
-    public ResponseEntity<Void> updateRoomMenuCartItemAmount(@PathVariable Long roomMenuCartItemNum,
+    @PutMapping("/modify/{roomMenuCartItemNum}")
+    public ResponseEntity<Void> modifyRoomMenuCartItemAmount(@PathVariable Long roomMenuCartItemNum,
                                                              @RequestParam Integer roomMenuCartItemAmount) {
         try {
             roomMenuCartService.updateRoomMenuCartItemAmount(roomMenuCartItemNum, roomMenuCartItemAmount);
