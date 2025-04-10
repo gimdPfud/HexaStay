@@ -46,20 +46,20 @@ public class BranchController {
     }
 
     @GetMapping("/signup")
-    public String signUpBranchGet(Long centerNum, Model model, Pageable pageable){
+    public String signUpBranchGet(Long centerNum, Model model){
         log.info("get 방식 branch 등록 controller 진입");
 
-        Page<Center> centerPage = centerRepository.findAll(pageable);
-        model.addAttribute("centerPage", centerPage);
+        List<BranchDTO> branchDTOList = branchService.allBranchList();
+        model.addAttribute("branchDTOList", branchDTOList);
 
-        return "branch/signUp";
+        return "redirect:/center/signup";
     }
 
     @PostMapping("/signup")
     public String signUpBranchPost(BranchDTO branchDTO) throws IOException {
         log.info("post 방식 branch 등록 controller 진입");
-        log.info("branchDTO 갖고왔나요? : " + branchDTO);
-        log.info("CenterNum 갖고왔나요? : " + branchDTO.getCenterNum());
+        log.info("branchDTO 갖고왔나? : " + branchDTO);
+        log.info("CenterNum 갖고왔요? : " + branchDTO.getCenterNum());
 
         branchService.branchInsert(branchDTO);
 
@@ -75,7 +75,6 @@ public class BranchController {
 
         return "center/read";
     }
-
 
     @PostMapping("/delete/{branchNum}")
     public ResponseEntity<String> deleteBranch(@PathVariable("branchNum") Long branchNum){

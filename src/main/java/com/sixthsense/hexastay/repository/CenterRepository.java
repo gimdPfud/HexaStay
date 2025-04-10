@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.entity.Branch;
 import com.sixthsense.hexastay.entity.Center;

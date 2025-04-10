@@ -20,17 +20,16 @@
 
         <form id="signupForm" action="/center/signup" method="post" enctype="multipart/form-data">
 
-        <div class="mb-3 user-box text-center">
-            <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+            <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                </div>
+                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                <button id="pictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                <input hidden type="file" id="adminProfile" name="companyPicture" class="btn btn-light form-control rounded-pill"
+                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
             </div>
-            <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
-            <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-            <input hidden type="file" id="adminProfile" name="companyPicture" class="btn btn-light form-control rounded-pill"
-                   accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-            <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-        </div>
-
 
             <!--브랜드-->
             <div class="mb-2">
@@ -126,9 +125,6 @@
                 console.log(document.getElementById('centerPhone').value);
             }
 
-
-
-
             // 셀렉티드 스위칭
             centerSelectedBrand = document.getElementById("centerSelectedBrand");
             inputBrand = document.getElementById("inputBrand");
@@ -151,89 +147,72 @@
                 }
             })
 
-
-
             document.getElementById("signupForm").addEventListener("submit", function (e) {
+                document.getElementById('centerBusinessNum').value =
+                    document.getElementById('centerBusinessNumOne').value + "-" +
+                    document.getElementById('centerBusinessNumTwo').value + "-" +
+                    document.getElementById('centerBusinessNumThree').value;
 
-                // 주민번호 합체
-                document.getElementById('centerBusinessNum').value = document.getElementById('centerBusinessNumOne').value + "-" + document.getElementById('centerBusinessNumTwo').value + "-" + document.getElementById('centerBusinessNumThree').value;
-                // 폰번호 합체
-                document.getElementById('centerPhone').value = document.getElementById('centerPhoneone').value + "-" + document.getElementById('centerPhonetwo').value + "-" + document.getElementById('centerPhonethree').value;
-                console.log(document.getElementById('centerPhone').value);
+                document.getElementById('centerPhone').value =
+                    document.getElementById('centerPhoneone').value + "-" +
+                    document.getElementById('centerPhonetwo').value + "-" +
+                    document.getElementById('centerPhonethree').value;
 
-                if (centerSelectedBrand.value === "본사") {
-                    return;  // 본사는 기본 폼 제출
+                const selectedType = centerSelectedBrand.value;
+
+                if (selectedType === "본사") {
+                    return; // 그냥 폼 제출
                 }
 
-                e.preventDefault(); // 기본 폼 제출 막기 (지점, 지사 선택 시)
+                e.preventDefault(); // 기본 제출 막기
 
-                let baseData = {
-                    centerBrand: document.getElementById("selectedBrand").value,
-                    centerAddress: document.getElementById("centerAddress").value,
-                    centerCeoName: document.getElementById("centerCeoName").value,
-                    centerEmail: document.getElementById("centerEmail").value,
-                    centerName: document.getElementById("centerName").value,
-                    centerPhone: document.getElementById("centerPhone").value,
-                    centerBusinessNum : document.getElementById("centerBusinessNum").value
-                };
+                const formData = new FormData();
+                const fileInput = document.getElementById("adminProfile");
 
-                if (centerSelectedBrand.value === "지점") {
-                    let facilityData = {
-                        ...baseData,
-                        facilityAddress: baseData.centerAddress,
-                        facilityCeoName: baseData.centerCeoName,
-                        facilityEmail: baseData.centerEmail,
-                        facilityName: baseData.centerName,
-                        facilityPhone: baseData.centerPhone,
-                        facilityBusinessNum : baseData.centerBusinessNum,
-                        facilityBrandNum : baseData.centerBrand,
-                        centerNum : selectedBrand.value
-                    };
-                    console.log(facilityData);
-                    console.log("파실리티")
-                    fetch("/facility/facilityinsert", {
+                formData.append("centerNum", document.getElementById("selectedBrand").value);
+                formData.append("companyPicture", fileInput.files.length > 0 ? fileInput.files[0] : new Blob());
+
+                if (selectedType === "지점") {
+                    formData.append("facilityName", document.getElementById("centerName").value);
+                    formData.append("facilityEmail", document.getElementById("centerEmail").value);
+                    formData.append("facilityPhone", document.getElementById("centerPhone").value);
+                    formData.append("facilityAddress", document.getElementById("centerAddress").value);
+                    formData.append("facilityCeoName", document.getElementById("centerCeoName").value);
+                    formData.append("facilityBusinessNum", document.getElementById("centerBusinessNum").value);
+                    formData.append("facilityBrandNum", document.getElementById("selectedBrand").value);
+
+                    fetch("/facility/signup", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(facilityData)
-                    })
-                        .then(data => {
-                            console.log("서버 응답:", data);
+                        body: formData
+                    }).then(res => res.text())
+                        .then(() => {
                             alert("지점 등록 성공!");
                             window.location.href = "/center/list";
-                        })
-                        .catch(error => {
-                            console.error("에러 발생:", error);
-                            alert("등록 실패! 다시 시도해주세요.");
-                        });
+                        }).catch(err => {
+                        alert("지점 등록 실패");
+                        console.error(err);
+                    });
 
-                } else if (centerSelectedBrand.value === "지사") {
-                    let branchData = {
-                        ...baseData,
-                        branchAddress: baseData.centerAddress,
-                        branchCeoName: baseData.centerCeoName,
-                        branchEmail: baseData.centerEmail,
-                        branchName: baseData.centerName,
-                        branchPhone: baseData.centerPhone,
-                        branchBusinessNum : baseData.centerBusinessNum,
-                        branchBrandNum : baseData.centerBrand,
-                        centerNum : selectedBrand.value
-                    };
-                    console.log(branchData);
-                    console.log("브랜치")
-                    fetch("/branch/branchinsert", {
+                } else if (selectedType === "지사") {
+                    formData.append("branchName", document.getElementById("centerName").value);
+                    formData.append("branchEmail", document.getElementById("centerEmail").value);
+                    formData.append("branchPhone", document.getElementById("centerPhone").value);
+                    formData.append("branchAddress", document.getElementById("centerAddress").value);
+                    formData.append("branchCeoName", document.getElementById("centerCeoName").value);
+                    formData.append("branchBusinessNum", document.getElementById("centerBusinessNum").value);
+                    formData.append("branchBrandNum", document.getElementById("selectedBrand").value);
+
+                    fetch("/branch/signup", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(branchData)
-                    })
-                        .then(data => {
-                            console.log("서버 응답:", data);
+                        body: formData
+                    }).then(res => res.text())
+                        .then(() => {
                             alert("지사 등록 성공!");
                             window.location.href = "/center/list";
-                        })
-                        .catch(error => {
-                            console.error("에러 발생:", error);
-                            alert("등록 실패! 다시 시도해주세요.");
-                        });
+                        }).catch(err => {
+                        alert("지사 등록 실패");
+                        console.error(err);
+                    });
                 }
             });
 
@@ -265,7 +244,7 @@
             });
 
 
-            document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('pictureBtn').addEventListener('click', function () {
                 document.getElementById('adminProfile').click();
             });
 

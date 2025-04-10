@@ -1,9 +1,12 @@
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
 import com.sixthsense.hexastay.entity.Facility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface FacilityService {
 
@@ -21,6 +24,9 @@ public interface FacilityService {
 
     //facility 삭제
     public void facilityDelete(Long facilityNum);
+
+    //조회용
+    public List<FacilityDTO> allFacilityList();
 
     //조직명으로 조회
     public Page<FacilityDTO> companyName(String keyword, Pageable pageable);
