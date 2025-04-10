@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.BranchDTO;
 import com.sixthsense.hexastay.dto.CenterDTO;
 import com.sixthsense.hexastay.dto.FacilityDTO;
 import com.sixthsense.hexastay.entity.Branch;
@@ -17,6 +18,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +94,17 @@ public class FacilityServiceImpl implements FacilityService {
         facilityRepository.deleteById(facilityNum);
 
         log.info("삭제된 pk : " + facilityNum);
+    }
+
+    @Override
+    public List<FacilityDTO> allFacilityList() {
+        List<Facility> facilityList = facilityRepository.findAll();
+        List<FacilityDTO> facilityDTOList = new ArrayList<>();
+        for(Facility facility : facilityList) {
+            FacilityDTO facilityDTO = modelMapper.map(facility, FacilityDTO.class);
+            facilityDTOList.add(facilityDTO);
+        }
+        return facilityDTOList;
     }
 
     @Override
