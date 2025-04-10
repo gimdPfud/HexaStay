@@ -28,20 +28,5 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     Admin findByAdminEmail(String adminEmail);
 
 
-    //FK
-    @Query("""
-    select a from Admin a
-    left join fetch a.center
-    left join fetch a.branch
-    left join fetch a.facility
-    left join fetch a.store
-    """)
-    Page<Admin> findAllWithJoins(Pageable pageable);
-
-    void deleteByCenter_CenterNum(Long centerNum);
-
-
-
-    Page<Admin> findByAdminSearchKeyword(String type, String keyword, Pageable pageable);
 
 }

@@ -1,13 +1,13 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.companyDTO;
+
 import com.sixthsense.hexastay.dto.CompanyDTO;
-import com.sixthsense.hexastay.entity.Center;
+
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
-import com.sixthsense.hexastay.repository.CenterRepository;
+
 import com.sixthsense.hexastay.repository.CompanyRepository;
-import com.sixthsense.hexastay.service.CenterService;
+
 import com.sixthsense.hexastay.service.CompanyService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
