@@ -1,0 +1,54 @@
+<!-- fragments/sidebar.html -->
+<div id="sidebar" class="sidebar" th:fragment="sidebar">
+    <div class="user-info">
+        <div><strong>ID</strong> : testID2</div>
+        <div><strong>소속</strong> : AS호텔</div>
+        <div><strong>직책</strong> : 호텔매니저</div>
+    </div>
+
+    <div class="d-flex justify-content-around mb-3 mt-2">
+        <a href="/admin/mypage" class="btn btn-outline-light btn-sm btn-sm-custom">마이페이지</a>
+        <a href="/logout" class="btn btn-outline-light btn-sm btn-sm-custom">로그아웃</a>
+    </div>
+
+    <button onclick="toggleMenu('memberMenu')"><strong>회원관리</strong></button>
+    <div id="memberMenu" class="submenu">
+        <a href="/admin/list">- 회원 목록</a>
+        <a href="/admin/approve">- 회원 승인</a>
+        <a href="/admin/insert">- 회원 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('orgMenu')"><strong>조직관리</strong></button>
+    <div id="orgMenu" class="submenu">
+        <a href="#">- 조직 조회</a>
+        <a href="/center/signup">- 조직 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('extMenu')"><strong>외부업체관리</strong></button>
+    <div id="extMenu" class="submenu">
+        <a href="/store/list">- 외부업체 목록</a>
+    </div>
+
+    <button onclick="toggleMenu('extServiceMenu')"><strong>외부업체 서비스 관리</strong></button>
+    <div id="extServiceMenu" class="submenu">
+        <a href="/store/menu/insert">- 서비스 목록</a>
+        <a href="/store/menu/modify">- 서비스 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('centerMenu')"><strong>센터 관리</strong></button>
+    <div id="centerMenu" class="submenu">
+        <a href="/center/list">- 센터 리스트</a>
+        <a href="/center/signup">- 조직 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('roomListMenu')"><strong>호텔룸 리스트</strong></button>
+    <div id="roomListMenu" class="submenu">
+        <a href="/hotelroom/list">- 센터 리스트</a>
+    </div>
+
+    <button onclick="toggleMenu('roomMenu')"><strong>호텔룸</strong></button>
+    <div id="roomMenu" class="submenu">
+        <a href="/hotelroom/list">- 호텔룸 리스트</a>
+        <a href="/hotelroom/insert">- 호텔룸 등록</a>
+    </div>
+</div>
