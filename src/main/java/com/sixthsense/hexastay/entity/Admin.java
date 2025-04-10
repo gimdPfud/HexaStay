@@ -66,16 +66,8 @@ public class Admin extends BaseEntity {
 
     // FK 소속
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "centerNum")
-    private Center center;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branchNum")
-    private Branch branch;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "facilityNum")
-    private Facility facility;
+    @JoinColumn(name = "companyNum")
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storeNum")

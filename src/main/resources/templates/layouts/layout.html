@@ -48,8 +48,29 @@
             color: white;
         }
 
-        .text-white.small > div {
+        .text-white.small > .d-flex {
             align-items: center;
+        }
+
+        .d-flex {
+            display: flex;
+            align-items: center;
+
+        }
+        .d-flex.justify-content-between {
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .flex-gap-right {
+            margin-right: 20px;
+        }
+
+        .flex-half {
+            flex: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .sidebar {
@@ -110,10 +131,12 @@
 
 
         }
+
         .card.stretch {
             max-width: 100%;
             width: 100%;
         }
+
         .container-inner {
             max-width: 1200px;
             margin: 0 auto;
@@ -133,10 +156,11 @@
                 left: 0;
             }
         }
+
         .dropdown-toggle img {
             cursor: pointer;
         }
-        /* 사용자 정보 텍스트 정렬 */
+
         .profile-img {
             width: 65px;
             height: 65px;
@@ -144,6 +168,7 @@
             object-fit: cover;
             cursor: pointer;
         }
+
         .dropdown-menu {
             font-size: 14px; /* 텍스트 크기 */
             padding: 10px 10px; /* 상하 여백 */
@@ -154,10 +179,10 @@
             display: none;
             z-index: 100;
         }
+
         .dropdown-item{
             padding: 10px 10px;
         }
-
 
         .btn-sm-custom {
             font-size: 0.75rem;
@@ -208,7 +233,7 @@
         </a>
     </div>
     <!-- 사용자 고정 정보 + 토글 프로필 -->
-    <div class="d-flex align-items-center gap-5">
+    <div class="d-flex align-items-center gap-3">
         <!-- 프로필 이미지 드롭다운 -->
         <div class="dropdown">
             <button class="btn " type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -226,19 +251,19 @@
         </div>
         <!-- 사용자 정보 (고정 표시) -->
         <div class="text-white small text">
-            <div class="d-flex gap-4">
-                <div>
+            <div class="d-flex mb-1">
+                <div class="flex-half">
                     <span th:text="${#authentication.principal.admin.adminName}">이름</span>
                 </div>
-                <div>
+                <div class="flex-half ">
                     <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
                 </div>
             </div>
-            <div class="d-flex gap-4">
-                <div>
+            <div class="d-flex">
+                <div class="flex-half">
                     <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
                 </div>
-                <div>
+                <div class="flex-half">
                     <span th:text="${#authentication.principal.admin.adminRole}">직급</span>
                 </div>
             </div>
