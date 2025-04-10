@@ -31,7 +31,7 @@ public interface RoomMenuCartService {
     public Long RoomMenuCartInsert(String email, RoomMenuDTO roomMenuDTO);
 
     // 장바구니 리스트
-    public Page<RoomMenuCartItemDTO> RoomMenuCartItemList(String email, Pageable pageable);
+    public Page<RoomMenuCartDetailDTO> RoomMenuCartItemList(String email, Pageable pageable);
 
     // 장바구니 유효성 검사 (누구 카트인가?)
     public boolean verificationRoomMenuCartItem(Long RoomMenuCartItemNum, String email);
@@ -43,7 +43,5 @@ public interface RoomMenuCartService {
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
 
     public RoomMenuDTO read(Long num);
-
-    public List<RoomMenuCartDetailDTO> RoomMenuCartList(String email);
 
 }
