@@ -45,13 +45,13 @@ public class FacilityController {
     }
 
     @GetMapping("/signup")
-    public String signupFacilityGet(Long centerNum, Model model, Pageable pageable) {
+    public String signupFacilityGet(Long centerNum, Model model) {
         log.info("get 방식 facility 등록 controller 진입");
 
-        Page<Center> centerPage = centerRepository.findAll(pageable);
-        model.addAttribute("centerPage", centerPage);
+        List<FacilityDTO> facilityDTOS = facilityService.allFacilityList();
+        model.addAttribute("facilityDTOS", facilityDTOS);
 
-        return "facility/signup";
+        return "redirect:/center/signup";
     }
 
     @PostMapping("/signup")
@@ -62,7 +62,7 @@ public class FacilityController {
 
         facilityService.facilityInsert(facilityDTO);
 
-        return "redirect:/facility/list";
+        return "redirect:/center/list";
     }
 
     @GetMapping("/read/{facilityNum}")
