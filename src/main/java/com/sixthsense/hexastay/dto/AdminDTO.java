@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.dto;
  * ***********************************************/
 
 
+import com.sixthsense.hexastay.enums.AdminRole;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,4 +87,8 @@ public class AdminDTO {
     private String branchName;
     private String facilityName;
     private String storeName;
+
+    public String getAdminRoleKorean() {
+        return AdminRole.displayNameFromCode(adminRole);
+    }
 }
