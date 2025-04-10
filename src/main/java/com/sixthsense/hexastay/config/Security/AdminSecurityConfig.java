@@ -61,7 +61,6 @@ import org.springframework.security.web.SecurityFilterChain;
         }
 
 
-
         @Bean
         public PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();

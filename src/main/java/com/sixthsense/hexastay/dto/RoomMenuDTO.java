@@ -53,4 +53,11 @@ public class RoomMenuDTO {
 
     private Room room; // 룸을 참조
 
+    public Integer getRoomMenuAmount() {
+        if (this.roomMenuAmount == null) {
+            return 0; // 기본값으로 0을 반환
+        }
+        return this.roomMenuAmount;
+    }
+
 }

@@ -150,7 +150,6 @@
             position: absolute;
             top: 20px; /* 버튼 바로 아래 */
             center: 0;  /* 오른쪽 정렬 */
-
             min-width: 0;
             display: none;
             z-index: 100;
@@ -160,6 +159,41 @@
         }
 
 
+        .btn-sm-custom {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+        }
+
+        .user-info {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #666;
+        }
+
+        #content {
+            transition: all 0.3s ease-in-out;
+            margin-left: 180px; /* 사이드바가 있을 때 기본 여백 */
+            padding: 30px;
+        }
+
+        .container-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            #content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                left: -180px;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+        }
     </style>
 </head>
 
