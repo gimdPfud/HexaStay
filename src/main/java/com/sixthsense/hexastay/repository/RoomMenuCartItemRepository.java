@@ -30,11 +30,11 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
 
     // roommenucartitem의 카트 고유 id와, roommenu의 고유 id를 찾는 매소드
-    RoomMenuCartItem findByRoomMenuCartItemNumAndRoomMenu_RoomMenuNum(Long roomMenuCartItemNum, Long roomMenuNum);
+    RoomMenuCartItem findByRoomMenuCart_RoomMenuCartNumAndRoomMenuCartItemNum(Long roomMenuCartNum, Long roomMenuCartItemNum);
+
 
     // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
     Page<RoomMenuCartItemDTO> findByRoomMenuCart_Member_MemberEmail(String memberEmail, Pageable pageable);
-
 
 
 }

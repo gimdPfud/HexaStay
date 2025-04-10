@@ -11,6 +11,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -66,12 +67,12 @@ public class RoomMenuController {
      * 기능 : 장바구니 페이지로 이동
      **************************************************/
 
-    @GetMapping("/roommenu/cart")
-    public String cart() {
-        log.info("roommenuCart Get 방식 진입");
-
-        return "roommenu/cart";
-    }
+//    @GetMapping("/roommenu/cartlist")
+//    public String cart() {
+//        log.info("roommenuCart Get 방식 진입");
+//
+//        return "roommenu/cartlist";
+//    }
 
     /***************************************************
      * 메소드명   : roomMenuReadA
@@ -289,14 +290,35 @@ public class RoomMenuController {
 
 
     /**************************************************
-     * 룸서비스 리드 페이지
-     * 기능 : 리드 페이지로 이동
+     * 룸서비스 주문 페이지
+     * 기능 : 주문 페이지로 이동 및 상품 정보 조회
      **************************************************/
 
-    @GetMapping("/roommenu/orderread")
-    public String orderread(){
+    @GetMapping("/roommenu/orderpage/read")
+    public String roomMenuOrderpageRead(String email, Model model ,RedirectAttributes redirectAttributes) {
+        log.info("상품정보 페이지" + email);
+        // email을 통해서 상품 정보를 가져오자.
 
-        return "roommenu/orderread";
+        if (email == null) {
+            return "redirect:member/login";
+        }
+
+        //정보가져오기
+        try {
+            RoomMenuDTO roomMenuDTO =
+                    roomMenuCartService.RoomMenuCartRead(email);
+            //가져온 상품 보기
+            log.info("상품정보" + roomMenuDTO);
+
+            model.addAttribute("roomMenuDTO", roomMenuDTO);
+
+            return "roommenu/orderpage/orderread";
+
+        } catch (EntityNotFoundException e) {
+
+            redirectAttributes.addFlashAttribute("msg", "존재하지 않는 상품입니다.");
+            return "redirect:/roommenu/orderpage";
+        }
     }
 
     /**************************************************

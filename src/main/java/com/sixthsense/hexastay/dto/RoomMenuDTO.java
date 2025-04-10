@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.Room;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,5 +50,7 @@ public class RoomMenuDTO {
     private LocalDateTime modifyDate;    //수정일자
 
     private Long hotelRoomNum;         //방 참조
+
+    private Room room; // 룸을 참조
 
 }
