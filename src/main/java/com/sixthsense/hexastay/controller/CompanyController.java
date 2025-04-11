@@ -35,6 +35,11 @@ public class CompanyController {
         log.info("choice : " + choice);
         log.info("select : " + select);
         log.info("keyword : " + keyword);
+        log.info("pageable : " + pageable.getPageNumber(), pageable.getPageSize());
+
+        if (choice == null || choice.trim().isEmpty()) {
+            choice = "center";
+        }
 
         Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, pageable);
 

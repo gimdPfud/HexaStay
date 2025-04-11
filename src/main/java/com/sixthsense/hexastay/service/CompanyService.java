@@ -18,4 +18,5 @@ public interface CompanyService {
 
     public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable);
 
+
 }

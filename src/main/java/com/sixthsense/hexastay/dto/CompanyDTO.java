@@ -46,4 +46,8 @@ public class CompanyDTO {
     private MultipartFile companyPicture;    //이미지 경로
 
     private Long companyParent;
+
+    private String companyParentName;         // 본사명
+    private String branchName;                // 지사명
+    private String facilityName;              // 지점명
 }
