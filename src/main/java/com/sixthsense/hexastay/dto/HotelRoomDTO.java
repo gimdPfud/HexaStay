@@ -43,6 +43,10 @@ public class HotelRoomDTO {
 
     private String hotelRoomProfileMeta; //가게 사진정보
 
+    //브랜드 BRAND 등록 예정 키워드
+
+    //Branch 및 퍼실리티 등록 예정
+
 
 
 

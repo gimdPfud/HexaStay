@@ -105,6 +105,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         //처리
         hotelRoomRepository.save(hotelRoom);
+        log.info(hotelRoomDTO.getHotelRoomProfile() + "저아자이ㅏㅓ리ㅏㅓ이ㅏㅓ  ");
 
 
         //들어온 DTO에 사진에 대한 정보가 있다면
@@ -122,7 +123,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             String fileName = fileFirstName + fileSubName;
 
             //파일은  /store/상호명_저장된pk.확장자  임.
-            hotelRoom.setHotelRoomProfileMeta("/hotelroom/"+fileName);
+            hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/"+fileName);
 
             //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
             Path uploadPath = Paths.get(System.getProperty("user.dir"),"hotelroom/"+fileName);
@@ -138,12 +139,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoomRepository.save(hotelRoom);
 
     }
-
-
-
-
-
-
 
 
     //2.리스트

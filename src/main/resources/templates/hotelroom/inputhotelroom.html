@@ -12,6 +12,60 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <title>Title</title>
+  <style>
+    /* From Uiverse.io by Nawsome */
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+    }
+
+    .slider {
+      overflow: hidden;
+      background-color: white;
+      margin: 0 15px;
+      height: 80px;
+      width: 20px;
+      border-radius: 30px;
+      box-shadow: 15px 15px 20px rgba(0, 0, 0, 0.1), -15px -15px 30px #fff,
+      inset -5px -5px 10px rgba(0, 0, 255, 0.1),
+      inset 5px 5px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      border-radius: 100%;
+      box-shadow: inset 0px 0px 0px rgba(0, 0, 0, 0.3), 0px 420px 0 400px #2697f3,
+      inset 0px 0px 0px rgba(0, 0, 0, 0.1);
+      animation: animate_2 2.5s ease-in-out infinite;
+      animation-delay: calc(-0.5s * var(--i));
+    }
+
+    @keyframes animate_2 {
+      0% {
+        transform: translateY(250px);
+        filter: hue-rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(250px);
+        filter: hue-rotate(180deg);
+      }
+    }
+
+
+  </style>
 </head>
 <body>
 <!--객체정렬
@@ -20,7 +74,24 @@
 정렬 : start(오른쪽), center(중앙), end(왼쪽)-->
 
 <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
-  <h1 class="text-center mb-4">외부업체 등록</h1>
+
+  <section class="loader">
+
+    <div class="slider" style="--i:0">
+    </div>
+    <div class="slider" style="--i:1">
+    </div>
+    <div class="slider" style="--i:2">
+    </div>
+    <div class="slider" style="--i:3">
+    </div>
+    <div class="slider" style="--i:4">
+    </div>
+  </section>
+
+
+
+  <h1 class="text-center mb-4">HOTEL_ROOM등록</h1>
   <form action="/admin/hotelroom/input" method="post" enctype="multipart/form-data">
 
     <div class="mb-3 user-box text-center"><!--사진 들록 시작 지점-->
@@ -29,10 +100,39 @@
       </div>
       <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
       <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-      <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
+      <input hidden type="file" id="adminProfile" name="hotelRoomProfile" class="btn btn-light form-control rounded-pill"
              accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
       <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
     </div><!--사진 등록 끝 지점-->
+
+    <div class="mb-3">
+
+      <div class="row">
+        <div class="col-6">
+          <div class="mb-3 mt-3">
+            <label for="hotelRoomType" class="form-label">미정_Brand 등록:</label>
+            <select class="form-select" id="hotelRoomType" name="#">
+              <option value="#">SixSense</option>
+              <option value="#">HeXA</option>
+
+            </select>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="mb-3 mt-3">
+            <label for="hotelRoomStatus" class="form-label">미정_Branch:</label>
+            <select class="form-select" id="hotelRoomStatus"  name="#">
+
+              <option value="#">NO_BRAND</option>
+              <option value="#">한옥마을</option>
+
+            </select>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="mb-3">
       <label class="form-label">HotelRoom_등록</label>
@@ -44,6 +144,10 @@
     </div>
     <div class="mb-3">
       <label class="form-label">호텔 방 가격</label>
+      <input type="number" class="form-control" name="hotelRoomPrice" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">QR 등록</label>
       <input type="number" class="form-control" name="hotelRoomPrice" required>
     </div>
     <div class="mb-3">
@@ -59,11 +163,10 @@
           <div class="mb-3 mt-3">
             <label for="hotelRoomType" class="form-label">룸종류:</label>
             <select class="form-select" id="hotelRoomType" name="hotelRoomType">
-              <option value="1">싱글</option>
-              <option value="2">더블</option>
-              <option value="3">트월킹</option>
-              <option value="3">스위트룸</option>
-
+              <option value="single">싱글</option>
+              <option value="double">더블</option>
+              <option value="twin">트윈</option>
+              <option value="suite">스위트룸</option>
             </select>
           </div>
         </div>
