@@ -32,8 +32,6 @@ public class RoomMenuCartItem {
     @Column(name = "roomMenuCartItemNum")
     private Long roomMenuCartItemNum;  // 장바구니 항목의 고유 ID
 
-    private Integer roomMenuCartItemAmount; // 장바구니의 수량
-
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
     @JoinColumn(name = "roomMenuCart")
     private RoomMenuCart roomMenuCart; // 카트를 참조
@@ -41,5 +39,7 @@ public class RoomMenuCartItem {
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
     @JoinColumn(name = "roomMenu")
     private RoomMenu roomMenu; // 메뉴를 참조
+
+    private Integer roomMenuCartItemAmount; // 카트 아이템의 수량
 
 }
