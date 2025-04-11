@@ -44,12 +44,12 @@ public class StoreCartController {
         }
         String email = principal.getName();
         try {
-            storecartService.addCart(dto, email);
-            log.info("카트 담김");
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (EntityNotFoundException e){
-            log.info("카트저장불가능:메뉴못찾음");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            Long result = storecartService.addCart(dto, email);
+            if(result!=null){
+                log.info("카트 담김");
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//다른가게의 메뉴 담으려고 했음
         } catch (Exception e) {
             log.info("알수없는오류");
             throw new RuntimeException(e);
@@ -93,5 +93,20 @@ public class StoreCartController {
         }
         storecartService.deleteCartItem(cartItemId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    /*5. 장바구니 비우기*/
+    @PostMapping("/clear")
+    public ResponseEntity cartClear(StorecartitemDTO dto, Principal principal){
+        if(principal==null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            storecartService.clearCartItems(principal.getName());
+            cartInsert(dto,principal);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch (Exception e){
+            log.info("장바구니를 비울 수 없습니다.");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

@@ -27,4 +27,7 @@ public interface StorecartService {
 
     /*5. 카트 삭제*/
     public void deleteCartItem(Long storeCartItemId);
+
+    /*6. 카트 비우기*/
+    public void clearCartItems(String email);
 }
