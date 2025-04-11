@@ -133,18 +133,18 @@
         <div>주문</div>
     </div>
 
-    <div class="item-details"> <!-- todo(4): 이미지 작업 해야함 -->
-        <!-- 대표 이미지 -->
-        <td>
-            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                 style="width: 200px; height: 140px;">
+<!--    <div class="item-details"> &lt;!&ndash; todo(4): 이미지 작업 해야함 &ndash;&gt;-->
+<!--        &lt;!&ndash; 대표 이미지 &ndash;&gt;-->
+<!--        <td>-->
+<!--            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"-->
+<!--                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"-->
+<!--                 style="width: 200px; height: 140px;">-->
 
-            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{/profile/default.png}"
-                 style="width: 200px; height: 140px;">
-        </td>
-    </div>
+<!--            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"-->
+<!--                 th:src="@{/profile/default.png}"-->
+<!--                 style="width: 200px; height: 140px;">-->
+<!--        </td>-->
+<!--    </div>-->
 
     <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
     <ul class="food-list">

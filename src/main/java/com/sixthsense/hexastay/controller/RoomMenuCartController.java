@@ -142,6 +142,7 @@ public class RoomMenuCartController {
 
         // 로그인된 사용자의 이메일로 장바구니 아이템 조회
         model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
+//        model.addAttribute("roomMenuDTO", roomMenuDTO); // todo(5) : 로직 넣어줘야함
         log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
         log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
