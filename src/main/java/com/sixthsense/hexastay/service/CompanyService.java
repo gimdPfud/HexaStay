@@ -15,6 +15,7 @@ public interface CompanyService {
 
     List<CompanyDTO> companyList ();
     Page<CompanyDTO> companyList (Pageable pageable);
-    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword);
+
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable);
 
 }

@@ -36,7 +36,7 @@ public class CompanyController {
         log.info("select : " + select);
         log.info("keyword : " + keyword);
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword);
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, pageable);
 
         model.addAttribute("companyDTOS", companyDTOS);
         model.addAttribute("choice", choice);
@@ -53,9 +53,6 @@ public class CompanyController {
 
         return null;
     }
-
-
-
 
     @GetMapping("/insert")
     public String insertCompanyGet(Model model){

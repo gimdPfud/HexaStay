@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -82,10 +83,16 @@ public class CompanyServiceImpl implements CompanyService {
 
     // 검색용
     @Override
-    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword) {
-        companyRepository.listSelectSearch(select, choice, keyword);
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable) {
+        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, pageable);
+        Page<CompanyDTO> companyDTOPage = companyPage.map(company -> modelMapper.map(company, CompanyDTO.class));
 
-        return null;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return companyRepository.findAll(pageable)
+                    .map(c -> modelMapper.map(c, CompanyDTO.class));
+        }
+
+        return companyDTOPage;
     }
 
     @Override
