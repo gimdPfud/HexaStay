@@ -50,8 +50,6 @@ public class Company extends BaseEntity {
 
     private String companyPictureMeta;      //등록 이미지
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "companyParent")
-    private Company companyParent;
+    private Long companyParent;
 
 }

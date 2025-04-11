@@ -13,12 +13,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("select a from Company a")
-    public Page<Company> findAll(Pageable pageable);
+    Page<Company> findAll(Pageable pageable);
+
+    List<Company> findByCompanyType(String companyType);
+
+
+    @Query("SELECT c FROM Company c " +
+            "WHERE (:choice IS NULL OR c.companyType = :choice) " +
+            "AND (" +
+            "(:select = '조직명' AND c.companyName LIKE %:keyword%) OR " +
+            "(:select = '브랜드명' AND c.companyBrand LIKE %:keyword%) OR " +
+            "(:select = '사업자번호' AND c.companyBusinessNum LIKE %:keyword%)" +
+            ")")
+    List<Company> listSelectSearch(@Param("select") String select,
+                                   @Param("choice") String choice,
+                                   @Param("keyword") String keyword);
+
 
 
 
