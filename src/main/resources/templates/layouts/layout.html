@@ -235,39 +235,39 @@
     <!-- 사용자 고정 정보 + 토글 프로필 -->
     <div class="d-flex align-items-center gap-3">
         <!-- 프로필 이미지 드롭다운 -->
-        <div class="dropdown">
-            <button class="btn " type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img class="profile-img" style="pointer-events: none;"
-                     th:if="${#authentication.principal.adminProfileMeta != null}"
-                     th:src="@{${#authentication.principal.adminProfileMeta}}" />
-                <img class="profile-img" style="pointer-events: none;"
-                     th:unless="${#authentication.principal.adminProfileMeta != null}"
-                     th:src="@{/profile/default.png}" />
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="profileDropdown">
-                <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>
-                <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
-            </ul>
-        </div>
+<!--        <div class="dropdown">-->
+<!--            <button class="btn " type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">-->
+<!--                <img class="profile-img" style="pointer-events: none;"-->
+<!--                     th:if="${#authentication.principal.adminProfileMeta != null}"-->
+<!--                     th:src="@{${#authentication.principal.adminProfileMeta}}" />-->
+<!--                <img class="profile-img" style="pointer-events: none;"-->
+<!--                     th:unless="${#authentication.principal.adminProfileMeta != null}"-->
+<!--                     th:src="@{/profile/default.png}" />-->
+<!--            </button>-->
+<!--            <ul class="dropdown-menu" aria-labelledby="profileDropdown">-->
+<!--                <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>-->
+<!--                <li><a class="dropdown-item" href="/logout">로그아웃</a></li>-->
+<!--            </ul>-->
+<!--        </div>-->
         <!-- 사용자 정보 (고정 표시) -->
-        <div class="text-white small text">
-            <div class="d-flex mb-1">
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>
-                </div>
-                <div class="flex-half ">
-                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
-                </div>
-            </div>
-            <div class="d-flex">
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
-                </div>
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>
-                </div>
-            </div>
-        </div>
+<!--        <div class="text-white small text">-->
+<!--            <div class="d-flex mb-1">-->
+<!--                <div class="flex-half">-->
+<!--                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>-->
+<!--                </div>-->
+<!--                <div class="flex-half ">-->
+<!--                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="d-flex">-->
+<!--                <div class="flex-half">-->
+<!--                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>-->
+<!--                </div>-->
+<!--                <div class="flex-half">-->
+<!--                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </nav>
 
