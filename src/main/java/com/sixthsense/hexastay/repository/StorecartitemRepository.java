@@ -19,6 +19,9 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
     //장바구니에 상품이 있는지 확인하기.
     Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNum(Long cartNum, Long menuNum);
 
+    //장바구니의 아무 아이템 가져오기
+    List<Storecartitem> findByStorecart_StorecartNum(Long storecartStorecartNum);
+
 
     //StorecartitemViewDTO 보여줄 쿼리 만들자...
     @Query("select new com.sixthsense.hexastay.dto.StorecartitemViewDTO(" +

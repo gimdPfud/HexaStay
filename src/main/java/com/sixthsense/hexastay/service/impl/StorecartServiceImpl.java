@@ -41,13 +41,18 @@ public class StorecartServiceImpl implements StorecartService {
     public Long addCart(StorecartitemDTO dto, String email) {
         log.info(dto);
         log.info(dto.getStorecartitemCount());
+
+        //1. 메뉴 조회
         Storemenu storemenu = storemenuRepository.findById(dto.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
+        //2. 멤버 조회
         Member member = memberRepository.findByMemberEmail(email);
+        //3. 장바구니 조회
         Storecart storecart = storecartRepository.findByMember_MemberEmail(email);
         log.info("메뉴, 멤버, 카트 찾음.");
         log.info(storemenu);
         log.info(member);
         log.info(storecart);
+        //4. 장바구니가 없으면 하나 만들기.
         if(storecart==null){
             Storecart newcart = new Storecart();
             newcart.setMember(member);
@@ -55,12 +60,26 @@ public class StorecartServiceImpl implements StorecartService {
             log.info("카트 없어서 새로 만들기");
             log.info(storecart);
         }
+        //4-2. 장바구니 있음.
+        //8. 넣으려는 장바구니아이템의 가게번호를 가져옴.
+        Long newItemStoreNum = storemenu.getStore().getStoreNum();
+        //9. 장바구니의 아무 장바구니아이템의 가게번호를 가져옴.
+        List<Storecartitem> list = storecartitemRepository.findByStorecart_StorecartNum(storecart.getStorecartNum());
+        if(list!=null&&!list.isEmpty()){
+            Long itemStoreNum = list.getFirst().getStoremenu().getStore().getStoreNum();
+            if(!itemStoreNum.equals(newItemStoreNum)){
+                return null;
+            }
+        }
+
+        //5. 장바구니아이템 조회
         Storecartitem storecartitem
                 = storecartitemRepository
                 .findByStorecart_StorecartNumAndStoremenu_StoremenuNum(
                         storecart.getStorecartNum(), storemenu.getStoremenuNum()
                 );
         log.info(storecartitem);
+        //6. 장바구니아이템이 없다면 새로만들기
         if(storecartitem==null){
             log.info("카트아이템 없어서 새로 만들어야함");
             Storecartitem newitem = new Storecartitem();
@@ -73,7 +92,9 @@ public class StorecartServiceImpl implements StorecartService {
             log.info(newitem.getStorecartitemCount());
             storecartitem = storecartitemRepository.save(newitem);
             log.info(storecartitem.getStorecartitemCount());
-        } else {
+        }
+        //7. 장바구니아이템이 있음, 개수 조정
+        else {
             log.info("카트아이템 이미 있음");
             storecartitem.setStorecartitemCount(storecartitem.getStorecartitemCount() + dto.getStorecartitemCount());
         }
@@ -104,5 +125,12 @@ public class StorecartServiceImpl implements StorecartService {
     @Override
     public void deleteCartItem(Long storeCartItemId) {
         storecartitemRepository.deleteById(storeCartItemId);
+    }
+
+    @Override
+    public void clearCartItems(String email) {
+        Storecart cart = storecartRepository.findByMember_MemberEmail(email);
+        List<Storecartitem> list = storecartitemRepository.findByStorecart_StorecartNum(cart.getStorecartNum());
+        storecartitemRepository.deleteAll(list);
     }
 }
