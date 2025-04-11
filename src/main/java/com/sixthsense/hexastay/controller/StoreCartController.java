@@ -59,9 +59,9 @@ public class StoreCartController {
     @GetMapping("/list")
     public String cartList(Principal principal, Model model){
         if(principal==null){
-//            return "redirect:/member/login";
+            return "redirect:/member/login";
             /*로그인안되면.........*/
-            return null;
+//            return null;
         }
         List<StorecartitemViewDTO> list = storecartService.getCartList(principal.getName());
         model.addAttribute("list",list);
@@ -79,8 +79,8 @@ public class StoreCartController {
         if(!storecartService.validCartItemOwner(cartItemId,principal.getName())){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        storecartService.updateCount(cartItemId,count);
-        return new ResponseEntity<>(HttpStatus.OK);
+        count = storecartService.updateCount(cartItemId,count);
+        return new ResponseEntity<>(count, HttpStatus.OK);
     }
     /*4. 장바구니 삭제 (진짜삭제)*/
     @GetMapping("/delete/{cartItemId}")
