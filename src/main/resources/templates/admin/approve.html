@@ -6,42 +6,46 @@
 <head>
     <meta charset="UTF-8">
     <title>회원 승인 페이지</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
+
     <div  class="container mt-4 w-100 vh-100 bg-light">
         <!-- 검색 조건 -->
+        <form method="post" action="/admin/list">
         <div class="row mb-3">
 
-            <div class="col-md-2">
-                <select class="form-select" style="height: 35px; font-size: 0.9rem;">
-                    <option>전체</option>
-                    <option>센터</option>
-                    <option>지사</option>
-                    <option>지점</option>
-                    <option>스토어</option>
-                </select>
-            </div>
 
-            <div class="col-md-2">
-                <select class="form-select" style="height: 35px; font-size: 0.9rem;">
-                    <option selected>검색 조건</option>
-                    <option value="사번">사번</option>
-                    <option value="직책">직책</option>
-                    <option value="이름">이름</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
-            </div>
+                <div class="col-md-2">
+                    <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;">
+                        <option>전체</option>
+                        <option>센터</option>
+                        <option>지사</option>
+                        <option>지점</option>
+                        <option>스토어</option>
+                    </select>
+                </div>
 
-            <div class="col-md-2">
-                <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
-            </div>
+                <div class="col-md-2">
+                    <select name="choice" class="form-select" style="height: 35px; font-size: 0.9rem;">
+                        <option selected>검색 조건</option>
+                        <option>사번</option>
+                        <option>직책</option>
+                        <option>이름</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="keyword" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success approve-btn w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
+                </div>
+
+
         </div>
+        </form>
 
         <!-- 테이블 -->
         <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
@@ -63,7 +67,7 @@
                     <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminName}">이름</td>
                     <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminBrand}">소속</td>
                     <td style="text-align: center; vertical-align: middle;">
-                        <button id="activeBtn" class="btn btn-success" style="padding: 2px 10px; font-size: 0.8rem;" th:data-admin-num="${adminDTO.adminNum}">승인</button>
+                        <button id="activeBtn" class="btn btn-success btn-active" style="padding: 2px 10px; font-size: 0.8rem;" th:data-admin-num="${adminDTO.adminNum}">승인</button>
                         <button id="cancelBtn" class="btn btn-danger" style="padding: 2px 10px; font-size: 0.8rem;">거절</button>
                     </td>
                 </tr>
@@ -77,7 +81,7 @@
     </div>
 
     <script>
-        document.querySelectorAll('.btn-success').forEach(button => {
+        document.querySelectorAll('.btn-active').forEach(button => {
             button.addEventListener('click', function () {
                 if (confirm("승인 처리 하시겠습니까?")) {
                     const adminNum = this.dataset.adminNum;
