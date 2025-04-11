@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -45,13 +46,19 @@ public class HotelRoomController {
 
     //todo:http://localhost:8090/admin/hotelroom/input
     @PostMapping("/input")
-    public String inputHotelRoomPost(HotelRoomDTO hotelRoomDTO
-
-    ) throws IOException
+    public String inputHotelRoomPost( HotelRoomDTO hotelRoomDTO,
+                                     RedirectAttributes redirectAttributes) throws IOException
     {
-        log.info(hotelRoomDTO + " hotelroom 이미지 등록 페이지에 들어 왓니 ");
+        if (hotelRoomDTO == null) {
+            redirectAttributes.addFlashAttribute("error", "잘못된 요청입니다.");
+            return "redirect:/admin/hotelroom/input";
+        }
+
+        log.info("호텔룸 등록 요청: {}", hotelRoomDTO);
         hotelRoomService.hotelroomInsert(hotelRoomDTO);
-        return "hotelroom/inputhotelroom";
+
+        redirectAttributes.addFlashAttribute("message", "호텔룸이 성공적으로 등록되었습니다.");
+        return "redirect:/admin/hotelroom/input"; // 등록 후 목록으로 이동
     }
 
 
