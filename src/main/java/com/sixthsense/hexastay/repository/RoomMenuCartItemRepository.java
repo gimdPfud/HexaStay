@@ -26,14 +26,6 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     // RoomMenuCart와 RoomMenu를 기반으로 RoomMenuCartItem을 찾는 메서드
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
 
-
-//    @Query("select new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
-//            " from RoomMenuCartItem rmci " +
-//            " join RoomMenu rmi on rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
-//            " where rmci.roomMenuCart.member.memberEmail = :email " +
-//            " order by rmci.roomMenuCartItemNum desc")
-//    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(String email);
-
     @Query("SELECT DISTINCT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
             "FROM RoomMenuCartItem rmci " +
             "JOIN RoomMenu rmi ON rmci.roomMenu.roomMenuNum = rmi.roomMenuNum " +
