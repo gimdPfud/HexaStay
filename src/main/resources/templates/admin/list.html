@@ -12,38 +12,43 @@
 <body style="background-color: #f8f9fa;">
 
 <div layout:fragment="content" class="container mt-4">
-    <!-- 검색 조건 -->
-    <div class="row mb-3">
+
+    <form action="/admin/list" method="post">
+        <!-- 검색 조건 -->
+        <div class="row mb-3">
 
 
-        <div class="col-md-2">
-            <select class="form-select" style="height: 35px; font-size: 0.9rem;">
-                <option>전체</option>
-                <option>센터</option>
-                <option>지사</option>
-                <option>지점</option>
-                <option>스토어</option>
-            </select>
+            <div class="col-md-2">
+                <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;" th:value="${select}">
+                    <option value="all">전체</option>
+                    <option value="center">센터</option>
+                    <option value="branch">지사</option>
+                    <option value="facility">지점</option>
+                    <option value="store">스토어</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="choice" class="form-select" style="height: 35px; font-size: 0.9rem;"  th:value="${choice}">
+                    <option selected>검색 조건</option>
+                    <option value="adminEmployeeNum">사번</option>
+                    <option value="adminRole">직급</option>
+                    <option value="adminPosition">직책</option>
+                    <option value="adminName">이름</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;"
+                       th:value="${keyword}">
+            </div>
+
+
+
+            <div class="col-md-2">
+                <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
+            </div>
         </div>
-
-        <div class="col-md-2">
-            <select class="form-select" style="height: 35px; font-size: 0.9rem;">
-                <option selected>검색 조건</option>
-                <option value="사번">사번</option>
-                <option value="직책">직책</option>
-                <option value="이름">이름</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
-        </div>
-
-
-
-        <div class="col-md-2">
-            <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
-        </div>
-    </div>
+    </form>
 
     <!-- 테이블 -->
     <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">

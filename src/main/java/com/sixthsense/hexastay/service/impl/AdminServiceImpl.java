@@ -32,7 +32,6 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
 
 
-
     // 가입
     @Override
     public void insertAdmin(AdminDTO adminDTO) throws IOException {
@@ -60,14 +59,21 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-
-//리스트
+    //리스트
     @Override
-    public Page<AdminDTO> list (Pageable pageable) {
+    public Page<AdminDTO> list(Pageable pageable) {
 
         Page<Admin> adminList = adminRepository.findAll(pageable);
         Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
 
+        return adminDTOList;
+    }
+
+    // 리스트 검색용
+    @Override
+    public Page<AdminDTO> searchAdmins(String select, String choice, String keyword, Pageable pageable) {
+        Page<Admin> adminList = adminRepository.listAdminSearch(select, choice, keyword, pageable);
+        Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
         return adminDTOList;
     }
 

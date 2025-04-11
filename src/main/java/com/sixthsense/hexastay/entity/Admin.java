@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Table(name = "admin")
 public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

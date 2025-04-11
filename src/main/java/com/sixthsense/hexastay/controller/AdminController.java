@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
@@ -51,9 +52,6 @@ public class AdminController {
     }
 
 
-
-
-
     @GetMapping("/login")
     public String adminLogin () {
         return "/admin/login";
@@ -90,6 +88,24 @@ public class AdminController {
         return "/admin/list";
     }
 
+    @PostMapping("/list")
+    public String adminListSearch(@RequestParam("select") String select,
+                                  @RequestParam("choice") String choice,
+                                  @RequestParam("keyword") String keyword,
+                                  Pageable pageable,
+                                  Model model) {
+
+
+        Page<AdminDTO> adminPage = adminService.searchAdmins(select, choice, keyword, pageable);
+
+        model.addAttribute("adminDTOList", adminPage);
+        model.addAttribute("select", select);
+        model.addAttribute("choice", choice);
+        model.addAttribute("keyword", keyword);
+
+        return "/admin/list";
+    }
+
     //승인
     @GetMapping("/approve")
     public String approve(Model model) {
@@ -104,7 +120,6 @@ public class AdminController {
         adminService.setAdminActive(adminNum);
         return ResponseEntity.ok().build();
     }
-
 
     //마이페이지
     @GetMapping("/mypage")
