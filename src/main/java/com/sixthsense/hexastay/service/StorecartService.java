@@ -9,7 +9,6 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.StorecartitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
-import com.sixthsense.hexastay.entity.Storecartitem;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public interface StorecartService {
     public boolean validCartItemOwner(Long storeCartItemId, String email);
 
     /*4. 수정 (카트 수량 변경)*/
-    public void updateCount(Long storeCartItemId, Integer count);
+    public Integer updateCount(Long storeCartItemId, Integer count);
 
     /*5. 카트 삭제*/
     public void deleteCartItem(Long storeCartItemId);

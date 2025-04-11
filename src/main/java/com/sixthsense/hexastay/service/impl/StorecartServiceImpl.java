@@ -19,9 +19,7 @@ import com.sixthsense.hexastay.repository.StorecartitemRepository;
 import com.sixthsense.hexastay.repository.StoremenuRepository;
 import com.sixthsense.hexastay.service.StorecartService;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,9 +95,10 @@ public class StorecartServiceImpl implements StorecartService {
     }
 
     @Override
-    public void updateCount(Long storeCartItemId, Integer count) {
+    public Integer updateCount(Long storeCartItemId, Integer count) {
         Storecartitem itemEntity = storecartitemRepository.findById(storeCartItemId).orElseThrow(EntityNotFoundException::new);
         itemEntity.setStorecartitemCount(count);
+        return itemEntity.getStorecartitemCount();
     }
 
     @Override
