@@ -38,6 +38,8 @@ public class MemberDTO {
 
     private String memberRole;
 
+    private String hotelRoomType;   //0411
+
     
     // FK용
     private Long centerNum;

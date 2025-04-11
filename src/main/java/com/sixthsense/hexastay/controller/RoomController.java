@@ -81,7 +81,7 @@ public class RoomController {
             return "redirect:/member-insertroom";
         }
     }
-/******************Room 등록 페이지 종료*********************/
+    /******************Room 등록 페이지 종료*********************/
 
 
     //전체 페이지 보여 주는 로직

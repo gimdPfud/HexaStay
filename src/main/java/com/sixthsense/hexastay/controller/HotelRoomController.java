@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,17 @@ public class HotelRoomController {
 
     //호텔 룸 서비스 가져오기
     private final HotelRoomService hotelRoomService;
+
+
+    //0411
+    @GetMapping("/latest")
+    @ResponseBody
+    public ResponseEntity<HotelRoomDTO> getLatestHotelRoom(@RequestParam String roomType) {
+        HotelRoomDTO hotelRoomDTO = hotelRoomService.getLatestHotelRoomByType(roomType);
+        log.info(hotelRoomDTO.toString() + "dkdkdlkfjlkdsjdlfkjlkdjfdlkjlk");
+        return hotelRoomDTO != null ? ResponseEntity.ok(hotelRoomDTO) : ResponseEntity.notFound().build();
+    }
+
 
     //호텔룸 등록
 
