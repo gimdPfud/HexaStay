@@ -22,20 +22,10 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     @Query("select r from RoomMenuCartItem r")
     public Page<RoomMenuCartItem> findAll(Pageable pageable);
 
-    // 장바구니 항목 번호로 항목 조회
-    RoomMenuCartItem findByRoomMenuCartItemNum(Long roomMenuCartItemNum);
-
-    // 장바구니에 속하는 모든 장바구니 항목 조회
-    List<RoomMenuCartItem> findAllByRoomMenuCart(RoomMenuCart roomMenuCart);
 
     // RoomMenuCart와 RoomMenu를 기반으로 RoomMenuCartItem을 찾는 메서드
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
 
-    // roommenucartitem의 카트 고유 id와, roommenu의 고유 id를 찾는 매소드
-    RoomMenuCartItem findByRoomMenuCart_RoomMenuCartNumAndRoomMenuCartItemNum(Long roomMenuCartNum, Long roomMenuCartItemNum);
-
-     // 회원의 장바구니에 담긴 아이템 목록을 페이지 단위로 조회
-    Page<RoomMenuCartItemDTO> findByRoomMenuCart_Member_MemberEmail(String memberEmail, Pageable pageable);
 
 //    @Query("select new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
 //            " from RoomMenuCartItem rmci " +
@@ -44,12 +34,13 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
 //            " order by rmci.roomMenuCartItemNum desc")
 //    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(String email);
 
-    @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
+    @Query("SELECT DISTINCT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount) " +
             "FROM RoomMenuCartItem rmci " +
-            "JOIN RoomMenu rmi ON rmci.roomMenuCart.roomMenuCartNum = rmi.roomMenuNum " +
+            "JOIN RoomMenu rmi ON rmci.roomMenu.roomMenuNum = rmi.roomMenuNum " +
             "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
             "ORDER BY rmci.roomMenuCartItemNum DESC")
     public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
+
 
 }
 

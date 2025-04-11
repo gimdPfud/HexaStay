@@ -29,17 +29,16 @@ public class RoomMenuCartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "roomMenuCartItemNum")
     private Long roomMenuCartItemNum;  // 장바구니 항목의 고유 ID
 
-    @ManyToOne(fetch = FetchType.LAZY)  //다대일
-    @JoinColumn(name = "roomMenuCart")
-    private RoomMenuCart roomMenuCart; // 카트를 참조
+    private Integer roomMenuCartItemAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
-    @JoinColumn(name = "roomMenu")
-    private RoomMenu roomMenu; // 메뉴를 참조
+    @JoinColumn(name = "cart_id")
+    private RoomMenuCart roomMenuCart; // 카트참조
 
-    private Integer roomMenuCartItemAmount; // 카트 아이템의 수량
+    @ManyToOne(fetch = FetchType.LAZY)  //다대일
+    @JoinColumn(name = "item_id")
+    private RoomMenu roomMenu; // 아이템 참조
 
 }

@@ -134,15 +134,14 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      ****************************************************/
 
     @Override
-    public Long RoomMenuCartInsert(String email, RoomMenuDTO roomMenuDTO) {
+    public Long RoomMenuCartInsert(String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
         log.info("장바구니 추가 시스템 도입, 회원 이메일: {}", email);
 
         // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.
         RoomMenu roomMenu =
-                roomMenuRepository.findById(roomMenuDTO.getRoomMenuNum())
+                roomMenuRepository.findById(roomMenuCartItemDTO.getRoomMenuCartItemNum())
                         .orElseThrow(EntityNotFoundException::new);
-
-        log.info("여기까진 오냐?");
+        log.info("roomMenuCartItemDTO.getRoomMenuCartItemNum() = {}", roomMenuCartItemDTO.getRoomMenuCartItemNum());
         log.info("누가 산 장바구니?" + email);
 
         // 누가 샀는가?
@@ -172,16 +171,17 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             insertCartItem.setRoomMenuCart(roomMenuCart); // 장바구니
             // todo : (2) 여기 이상할지도 모름
             // fixme : 레포지토리에 추가 안될지도 모름.
-            insertCartItem.setRoomMenuCartItemNum(null);  // ID는 자동 생성되므로 null로 설정
-            insertCartItem.setRoomMenu(roomMenu); // 장바구니 아이템에 roomMenu 객체를 연결
-            insertCartItem.setRoomMenuCartItemAmount(roomMenuDTO.getRoomMenuAmount()); //수량
-
+            log.info(" RoomMenuCart 연결됨 - cartId: {}", roomMenuCart.getRoomMenuCartNum());
+            insertCartItem.setRoomMenu(roomMenu); // 장바구니에 담길 아이템
+            log.info(" 아이템메뉴 설정됨 - pk : roommenunum: {}, roommenu: {}", roomMenu.getRoomMenuNum(), roomMenu.getRoomMenuName());
+            insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); // 수량
+            log.info(" 수량 설정됨 - amount: {}", roomMenuCartItemDTO.getRoomMenuCartItemAmount());
             // 아이템을 저장하자.
             roomMenuCartItem =
                     roomMenuCartItemRepository.save(insertCartItem);
 
             // 장바구니에 아이템이 추가된 후 로그 출력
-            log.info("장바구니에 아이템 추가됨: " + roomMenu.getRoomMenuNum());
+            log.info("장바구니에 아이템 추가됨 장바구니에 추가된 pk 넘버: " + roomMenu.getRoomMenuNum());
 
             // 리턴값 반환
             return roomMenuCartItem.getRoomMenuCartItemNum();
@@ -190,7 +190,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             //장바구니에 동일한 아이템이 있다면
             //장바구니아이템의 수량을 기존수량 + 입력받은 수량 으로 수정해준다.
             roomMenuCartItem.setRoomMenuCartItemAmount(
-                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuDTO.getRoomMenuAmount()
+                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount()
             );
             return roomMenuCartItem.getRoomMenuCartItemNum();
         }
