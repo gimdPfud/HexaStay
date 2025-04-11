@@ -52,4 +52,67 @@ public class AdminController {
 
 
 
+
+
+    @GetMapping("/login")
+    public String adminLogin () {
+        return "/admin/login";
+    }
+
+    @PostMapping("/login")
+    public String adminLoginPost () {
+        return "/admin/login";
+    }
+
+
+    @GetMapping("/main")
+    public String adminMain (Model model) {
+        return "/admin/main";
+    }
+
+
+    @GetMapping("/insert")
+    public String adminInsert (Model model) {
+
+        return "/admin/insert";
+    }
+
+    @PostMapping("/insert")
+    public String insert(AdminDTO adminDTO) throws IOException {
+        adminDTO.setAdminActive(false);
+        adminService.insertAdmin(adminDTO);
+        return "redirect:/admin/list";
+    }
+
+    @GetMapping("/list")
+    public String adminList (Pageable pageable, Model model) {
+        model.addAttribute("adminDTOList", adminService.list(pageable));
+        return "/admin/list";
+    }
+
+    //승인
+    @GetMapping("/approve")
+    public String approve(Model model) {
+        List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
+        model.addAttribute("adminDTOList", adminDTOList);
+        return "admin/approve";
+    }
+
+    //승인 포스트
+    @PostMapping("/approve")
+    public ResponseEntity<Void> approve(@RequestParam Long adminNum) {
+        adminService.setAdminActive(adminNum);
+        return ResponseEntity.ok().build();
+    }
+
+
+    //마이페이지
+    @GetMapping("/mypage")
+    public String mypage(Model model) {
+        List<CompanyDTO> centerDTOList = companyService.companyList();
+        model.addAttribute("centerDTOList", centerDTOList);
+        return "admin/mypage";
+    }
+
+
 }
