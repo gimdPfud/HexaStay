@@ -44,4 +44,6 @@ public class CompanyDTO {
     private String companyPictureMeta;       //등록 이미지
 
     private MultipartFile companyPicture;    //이미지 경로
+
+    private Long companyParent;
 }

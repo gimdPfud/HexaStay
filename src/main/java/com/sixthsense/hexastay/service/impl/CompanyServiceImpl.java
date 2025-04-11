@@ -36,8 +36,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public void centerInsert(CompanyDTO companyDTO) throws IOException {
-        log.info("center Insert Service 진입");
+    public void companyInsert(CompanyDTO companyDTO) throws IOException {
 
         if (companyDTO.getCompanyPicture() != null && !companyDTO.getCompanyPicture().isEmpty()) {
             String fileOriginalName = companyDTO.getCompanyPicture().getOriginalFilename();
@@ -45,9 +44,9 @@ public class CompanyServiceImpl implements CompanyService {
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
-            companyDTO.setCompanyPictureMeta("/center/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "center/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "center/");
+            companyDTO.setCompanyPictureMeta("/company/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "company/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -55,9 +54,11 @@ public class CompanyServiceImpl implements CompanyService {
 
         }
 
-
         //center 등록 (DTO를 Entity로 변환해서 Entity에 담고)
+
         Company company = modelMapper.map(companyDTO, Company.class);
+
+
         //Entity에 저장
         company = companyRepository.save(company);
 
@@ -65,6 +66,36 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
 
+    // 전체 리스트 조회용
+    @Override
+    public List<CompanyDTO> companyList () {
+        List<Company> companyList = companyRepository.findByCompanyType("center");
+        List<CompanyDTO> companyDTOList = new ArrayList<>();
+        for (Company company : companyList) {
+            CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
+            companyDTOList.add(companyDTO);
+        }
+
+        return companyDTOList;
+    }
+
+
+    // 검색용
+    @Override
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword) {
+        companyRepository.listSelectSearch(select, choice, keyword);
+
+        return null;
+    }
+
+    @Override
+    public Page<CompanyDTO> companyList(Pageable pageable) {
+
+        Page<Company> companyList = companyRepository.findAll(pageable);
+        Page<CompanyDTO> companyDTOS = companyList.map(company -> modelMapper.map(company, CompanyDTO.class));
+
+        return companyDTOS;
+    }
 
 
 }
