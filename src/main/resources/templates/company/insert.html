@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}">
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layouts/layout.html}">-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
             <h2 class="text-center mb-4">등록</h2>
         </div>
 
-        <form id="signupForm" action="/center/signup" method="post" enctype="multipart/form-data">
+        <form id="insertForm" action="/company/insert" method="post" enctype="multipart/form-data">
 
             <div class="mb-3 user-box text-center">
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -34,51 +34,55 @@
             <!--브랜드-->
             <div class="mb-2">
                 <label class="form-label">소속</label>
-                <select type="text" id="centerSelectedBrand" class="form-control">
-                    <option>본사</option>
-                    <option>지사</option>
-                    <option>지점</option>
+                <select type="text" id="companySelectedBrand" class="form-control" name="companyType">
+                    <option value="center">본사</option>
+                    <option value="branch">지사</option>
+                    <option value="facility">지점</option>
                 </select>
             </div>
+
             <div class="mb-2">
                 <label class="form-label" id="brandLabel">브랜드명</label>
-                <input type="text" name="centerBrand" id="inputBrand" class="form-control">
+                <input type="text" name="companyBrand" id="inputBrand" class="form-control">
             </div>
-            <select type="text" id="selectedBrand" class="form-control" hidden>
-                <option th:each="centerDTO : ${centerDTOList}" th:text="${centerDTO.centerName}" th:value="${centerDTO.centerNum}"></option>
+
+            <label class="form-label" for="companyParent" id="companyParentLabel" hidden>소속 본사 선택</label>
+            <select type="text" id="companyParent" class="form-control" name="companyParent" hidden>
+                <option th:each="companyDTO : ${company}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
             </select>
+
 
 
             <div class="mb-2">
                 <label class="form-label">상호명</label>
-                <input type="text" name="centerName" id="centerName" class="form-control">
+                <input type="text" name="companyName" id="companyName" class="form-control">
             </div>
             <div class="mb-2">
                 <label class="form-label">사업자등록번호</label>
                 <div class="row g-2">
                     <div class="col">
-                        <input type="number" id="centerBusinessNumOne" class="form-control">
+                        <input type="number" id="companyBusinessNumOne" class="form-control">
                     </div>
                     <div class="col-auto">-</div>
                     <div class="col">
-                        <input type="number" id="centerBusinessNumTwo" class="form-control">
+                        <input type="number" id="companyBusinessNumTwo" class="form-control">
                     </div>
                     <div class="col-auto">-</div>
                     <div class="col">
-                        <input type="number" id="centerBusinessNumThree" class="form-control">
+                        <input type="number" id="companyBusinessNumThree" class="form-control">
                     </div>
-                    <input hidden name="centerBusinessNum" id="centerBusinessNum">
+                    <input hidden name="companyBusinessNum" id="companyBusinessNum">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="form-label">대표자명</label>
-                <input type="text" name="centerCeoName" id="centerCeoName" class="form-control">
+                <input type="text" name="companyCeoName" id="companyCeoName" class="form-control">
             </div>
             <div class="mb-2">
                 <label class="form-label">전화번호</label>
                 <div class="row g-2">
                     <div class="col">
-                        <select id="centerPhoneone" class="form-select">
+                        <select id="companyPhoneone" class="form-select">
                             <option>02</option>
                             <option>031</option>
                             <option>032</option>
@@ -87,22 +91,22 @@
                     </div>
                     <div class="col-auto">-</div>
                     <div class="col">
-                        <input type="number" id="centerPhonetwo" class="form-control">
+                        <input type="number" id="companyPhonetwo" class="form-control">
                     </div>
                     <div class="col-auto">-</div>
                     <div class="col">
-                        <input type="number" id="centerPhonethree" class="form-control">
+                        <input type="number" id="companyPhonethree" class="form-control">
                     </div>
-                    <input hidden name="centerPhone" id="centerPhone">
+                    <input hidden name="companyPhone" id="companyPhone">
                 </div>
             </div>
             <div class="mb-2">
                 <label class="form-label">이메일</label>
-                <input type="email" name="centerEmail" id="centerEmail" class="form-control">
+                <input type="email" name="companyEmail" id="companyEmail" class="form-control">
             </div>
             <div class="mb-4">
                 <label class="form-label">주소</label>
-                <input name="centerAddress" type="text" id="centerAddress" class="form-control">
+                <input name="companyAddress" type="text" id="companyAddress" class="form-control">
             </div>
             <div class="d-flex justify-content-center gap-3">
                 <button type="submit" class="btn btn-success" onclick="submitForm()">등록</button>
@@ -119,102 +123,56 @@
             // 가입양식 관련
             function submitForm() {
                 // 주민번호 합체
-                document.getElementById('centerBusinessNum').value = document.getElementById('centerBusinessNumOne').value + "-" + document.getElementById('centerBusinessNumTwo').value + "-" + document.getElementById('centerBusinessNumThree').value;
+                document.getElementById('companyBusinessNum').value = document.getElementById('companyBusinessNumOne').value + "-" + document.getElementById('companyBusinessNumTwo').value + "-" + document.getElementById('companyBusinessNumThree').value;
                 // 폰번호 합체
-                document.getElementById('centerPhone').value = document.getElementById('centerPhoneone').value + "-" + document.getElementById('centerPhonetwo').value + "-" + document.getElementById('centerPhonethree').value;
-                console.log(document.getElementById('centerPhone').value);
+                document.getElementById('companyPhone').value = document.getElementById('companyPhoneone').value + "-" + document.getElementById('companyPhonetwo').value + "-" + document.getElementById('companyPhonethree').value;
+                console.log(document.getElementById('companyPhone').value);
             }
 
-            // 셀렉티드 스위칭
-            centerSelectedBrand = document.getElementById("centerSelectedBrand");
-            inputBrand = document.getElementById("inputBrand");
-            selectedBrand = document.getElementById("selectedBrand");
-            brandLabel = document.getElementById("brandLabel");
+                // 소속용
+            companySelectedBrand = document.getElementById("companySelectedBrand")
+            companyParent = document.getElementById("companyParent")
+            companyParentLabel = document.getElementById("companyParentLabel")
+            brandLabel = document.getElementById("brandLabel")
+            inputBrand = document.getElementById("inputBrand")
 
-            centerSelectedBrand.addEventListener("change", function () {
-                if (centerSelectedBrand.value === "본사") {
-                    inputBrand.disabled = false;
+            companySelectedBrand.addEventListener('change', function () {
+                if (companySelectedBrand.value === "본사") {
+                    companyParent.hidden = true;
+                    companyParentLabel.hidden = true;
+                    brandLabel.hidden = false;
                     inputBrand.hidden = false;
-                    selectedBrand.disabled = true;
-                    selectedBrand.hidden = true;
-                    brandLabel.textContent = "브랜드명";
-                } else if (centerSelectedBrand.value === "지사" || centerSelectedBrand.value === "지점") {
-                    inputBrand.disabled = true;
+
+                } else if (companySelectedBrand.value === "지사") {
+                    companyParent.hidden = false;
+                    companyParentLabel.hidden = false;
+                    brandLabel.hidden = true;
                     inputBrand.hidden = true;
-                    selectedBrand.disabled = false;
-                    selectedBrand.hidden = false;
-                    brandLabel.textContent = "본사 선택";
+                    inputBrand.value = "";
+
+
+                } else if (companySelectedBrand.value === "지점"){
+                    companyParent.hidden = false;
+                    companyParentLabel.hidden = false;
+                    brandLabel.hidden = true;
+                    inputBrand.hidden = true;
+                    inputBrand.value = "";
+
+
                 }
             })
 
-            document.getElementById("signupForm").addEventListener("submit", function (e) {
-                document.getElementById('centerBusinessNum').value =
-                    document.getElementById('centerBusinessNumOne').value + "-" +
-                    document.getElementById('centerBusinessNumTwo').value + "-" +
-                    document.getElementById('centerBusinessNumThree').value;
 
-                document.getElementById('centerPhone').value =
-                    document.getElementById('centerPhoneone').value + "-" +
-                    document.getElementById('centerPhonetwo').value + "-" +
-                    document.getElementById('centerPhonethree').value;
 
-                const selectedType = centerSelectedBrand.value;
 
-                if (selectedType === "본사") {
-                    return; // 그냥 폼 제출
-                }
 
-                e.preventDefault(); // 기본 제출 막기
 
-                const formData = new FormData();
-                const fileInput = document.getElementById("adminProfile");
 
-                formData.append("centerNum", document.getElementById("selectedBrand").value);
-                formData.append("companyPicture", fileInput.files.length > 0 ? fileInput.files[0] : new Blob());
 
-                if (selectedType === "지점") {
-                    formData.append("facilityName", document.getElementById("centerName").value);
-                    formData.append("facilityEmail", document.getElementById("centerEmail").value);
-                    formData.append("facilityPhone", document.getElementById("centerPhone").value);
-                    formData.append("facilityAddress", document.getElementById("centerAddress").value);
-                    formData.append("facilityCeoName", document.getElementById("centerCeoName").value);
-                    formData.append("facilityBusinessNum", document.getElementById("centerBusinessNum").value);
-                    formData.append("facilityBrandNum", document.getElementById("selectedBrand").value);
 
-                    fetch("/facility/signup", {
-                        method: "POST",
-                        body: formData
-                    }).then(res => res.text())
-                        .then(() => {
-                            alert("지점 등록 성공!");
-                            window.location.href = "/center/list";
-                        }).catch(err => {
-                        alert("지점 등록 실패");
-                        console.error(err);
-                    });
 
-                } else if (selectedType === "지사") {
-                    formData.append("branchName", document.getElementById("centerName").value);
-                    formData.append("branchEmail", document.getElementById("centerEmail").value);
-                    formData.append("branchPhone", document.getElementById("centerPhone").value);
-                    formData.append("branchAddress", document.getElementById("centerAddress").value);
-                    formData.append("branchCeoName", document.getElementById("centerCeoName").value);
-                    formData.append("branchBusinessNum", document.getElementById("centerBusinessNum").value);
-                    formData.append("branchBrandNum", document.getElementById("selectedBrand").value);
 
-                    fetch("/branch/signup", {
-                        method: "POST",
-                        body: formData
-                    }).then(res => res.text())
-                        .then(() => {
-                            alert("지사 등록 성공!");
-                            window.location.href = "/center/list";
-                        }).catch(err => {
-                        alert("지사 등록 실패");
-                        console.error(err);
-                    });
-                }
-            });
+
 
             // 프로필 사진
 

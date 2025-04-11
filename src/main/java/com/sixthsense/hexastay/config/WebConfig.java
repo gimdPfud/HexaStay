@@ -17,17 +17,17 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/store/");
 
 
-        registry.addResourceHandler("/center/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/center/");
-
-        registry.addResourceHandler("/branch/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/branch/");
-
-        registry.addResourceHandler("/facility/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/facility/");
+        registry.addResourceHandler("/company/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/company/");
 
         registry.addResourceHandler("/roommenu/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/roommenu/");
+
+        registry.addResourceHandler("/hotelroom/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
+
+
+
 
     }
 }

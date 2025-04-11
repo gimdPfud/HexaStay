@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}">
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layouts/layout.html}">-->
 <head>
   <meta charset="UTF-8">
   <title>직원 관리</title>
@@ -13,7 +13,18 @@
 
   <div class="container mt-4">
     <!-- 검색 폼 -->
-    <form method="get" action="/center/listsearch" class="row g-3 align-items-end">
+    <form method="get" action="/company/list" class="row g-3 align-items-end">
+
+      <div class="col-md-3">
+        <label class="form-label">소속</label>
+        <select name="choice" id="choice" class="form-select" onchange="this.form.submit()">
+          <option value="company" th:selected="${choice} == 'company'">본사</option>
+          <option value="branch" th:selected="${choice} == 'branch'">지사</option>
+          <option value="facility" th:selected="${choice} == 'facility'">지점</option>
+        </select>
+      </div>
+
+
       <div class="col-md-3">
         <label class="form-label">검색 조건</label>
         <select name="select" class="form-select">
@@ -24,15 +35,6 @@
         </select>
       </div>
 
-      <div class="col-md-3">
-        <label class="form-label">소속</label>
-        <select name="choice" id="choice" class="form-select" onchange="document.getElementById('searchBtn').click()">
-          <option value="center" th:selected="${choice == 'center'}">본사</option>
-          <option value="branch" th:selected="${choice == 'branch'}">지사</option>
-          <option value="facility" th:selected="${choice == 'facility'}">지점</option>
-        </select>
-      </div>
-
       <div class="col-md-4">
         <label class="form-label">검색어</label>
         <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" th:value="${keyword}">
@@ -40,14 +42,14 @@
 
       <div class="col-md-2 d-flex gap-2">
         <button type="submit" id="searchBtn" class="btn btn-success w-50">조회</button>
-        <a href="/center/signup" class="btn btn-outline-success w-50">등록</a>
+        <a href="/company/insert" class="btn btn-outline-success w-50">등록</a>
       </div>
     </form>
 
     <!-- 결과 테이블 -->
     <div class="row mt-4">
       <div class="col-12">
-        <table class="table table-bordered text-center mb-0">
+        <table class="table table-bordered text-company mb-0">
           <thead class="table-light">
           <tr>
             <th style="text-align: center; vertical-align: middle; width: 10%">프로필 사진</th>
@@ -62,8 +64,7 @@
           <tbody>
 
           <!-- 본사 -->
-          <th:block th:if="${centerDTOS != null and !centerDTOS.isEmpty()}">
-            <tr th:each="item : ${centerDTOS}">
+            <tr th:each="item : ${companyDTOS}">
 
               <td style="text-align: center;">
                 <img th:if="${item.companyPictureMeta != null}"
@@ -75,60 +76,13 @@
                      style="width: 60px; height: 80px;">
               </td>
 
-              <td th:text="${item.centerBrand}"></td>
-              <td th:text="${item.centerName}"></td>
+              <td th:text="${item.companyBrand}"></td>
+              <td th:text="${item.companyName}"></td>
               <td>-</td>
               <td>-</td>
-              <td th:text="${item.centerPhone}"></td>
-              <td><a th:href="@{/templates/company/read/{centerNum}(centerNum=${item.centerNum})}" class="btn btn-success">상세보기</a></td>
+              <td th:text="${item.companyPhone}"></td>
+              <td><a th:href="@{/templates/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a></td>
             </tr>
-          </th:block>
-
-          <!-- 지사 -->
-          <th:block th:if="${branchDTOS != null and !branchDTOS.isEmpty()}" >
-            <tr th:each="item : ${branchDTOS}">
-
-              <td style="text-align: center;">
-                <img th:if="${item.companyPictureMeta != null}"
-                     th:src="@{${item.companyPictureMeta}}"
-                     style="width: 60px; height: 80px;">
-
-                <img th:unless="${item.companyPictureMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     style="width: 60px; height: 80px;">
-              </td>
-
-              <td th:text="${item.centerBrand}"></td>
-              <td th:text="${item.centerName}"></td>
-              <td th:text="${item.branchName}"></td>
-              <td>-</td>
-              <td th:text="${item.branchPhone}"></td>
-              <td><a th:href="@{/branch/read/{branchNum}(branchNum=${item.branchNum})}" class="btn btn-success">상세보기</a></td>
-            </tr>
-          </th:block>
-
-          <!-- 지점 -->
-          <th:block th:if="${facilityDTOS != null and !facilityDTOS.isEmpty()}">
-            <tr th:each="item : ${facilityDTOS}">
-
-              <td style="text-align: center;">
-                <img th:if="${item.companyPictureMeta != null}"
-                     th:src="@{${item.companyPictureMeta}}"
-                     style="width: 60px; height: 80px;">
-
-                <img th:unless="${item.companyPictureMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     style="width: 60px; height: 80px;">
-              </td>
-
-              <td th:text="${item.centerBrand}"></td>
-              <td th:text="${item.centerName}"></td>
-              <td>-</td>
-              <td th:text="${item.facilityName}"></td>
-              <td th:text="${item.facilityPhone}"></td>
-              <td><a th:href="@{/facility/read/{facilityNum}(facilityNum=${item.facilityNum})}" class="btn btn-success">상세보기</a></td>
-            </tr>
-          </th:block>
 
           </tbody>
         </table>
@@ -139,126 +93,42 @@
 <!--    &lt;!&ndash;페이징&ndash;&gt;-->
 <!--    <div class="row m-0 p-0 mt-3">-->
 <!--      <div class="col-3"></div>-->
-<!--      <ul class="col-6 pagination justify-content-center col">-->
+<!--      <ul class="col-6 pagination justify-content-company col">-->
 <!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${centerDTOS.number == 0} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/center/list?page=0}">처음</a>-->
+<!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
 <!--        </li>-->
 
 <!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${!centerDTOS.hasPrevious()} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/center/list?page={prev}(prev=${centerDTOS.number - 1})}">이전</a>-->
+<!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
 <!--        </li>-->
 
 <!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
 <!--        <li class="page-item"-->
 <!--            th:each="pageNum : ${#numbers.sequence(-->
-<!--    (centerDTOS.number - 4 > 0 ? centerDTOS.number - 4 : 0),-->
-<!--    (centerDTOS.number + 5 < centerDTOS.totalPages - 1 ? centerDTOS.number + 5 : centerDTOS.totalPages - 1)-->
+<!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
+<!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
 <!--    )}"-->
-<!--            th:classappend="${pageNum == centerDTOS.number} ? 'active'">-->
-<!--          <a class="page-link" th:href="@{/center/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
+<!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
 <!--        </li>-->
 
 <!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${!centerDTOS.hasNext()} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/center/list?page={next}(next=${centerDTOS.number + 1})}">다음</a>-->
+<!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
 <!--        </li>-->
 
 <!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${centerDTOS.number == centerDTOS.totalPages - 1} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/center/list?page={last}(last=${centerDTOS.totalPages - 1})}">마지막</a>-->
+<!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
 <!--        </li>-->
 
 <!--      </ul>-->
 
 
   <script>
-    const choice = document.getElementById("choice");
-
-
-
-
-    function updateTable(content) {
-      const tbody = document.querySelector("table tbody");
-      tbody.innerHTML = ""; // 기존 row 비우고
-
-      content.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-        <td>${item.centerBrand || item.branchBrand || item.facilityBrand || ''}</td>
-        <td>${item.centerName || item.branchName || item.facilityName || ''}</td>
-        <td>${item.centerBusinessNum || item.branchBusinessNum || item.facilityBusinessNum || ''}</td>
-        <td>${item.centerCeoName || item.branchCeoName || item.facilityCeoName || ''}</td>
-        <td>${item.centerPhone || item.branchPhone || item.facilityPhone || ''}</td>
-        <td>${item.centerEmail || item.branchEmail || item.facilityEmail || ''}</td>
-        <td>${item.centerAddress || item.branchAddress || item.facilityAddress || ''}</td>
-        <td><a href="/center/read/${item.centerNum || item.branchNum || item.facilityNum}" class="btn btn-success">상세보기</a></td>
-      `;
-        tbody.appendChild(row);
-      });
-    }
-
-    function updatePagination(pageData) {
-      const pagination = document.querySelector(".pagination");
-      pagination.innerHTML = "";
-
-      const current = pageData.number;
-      const total = pageData.totalPages;
-
-      // 처음
-      pagination.innerHTML += `<li class="page-item ${current === 0 ? 'disabled' : ''}">
-      <a class="page-link" onclick="goToPage(0)">처음</a></li>`;
-
-      // 이전
-      pagination.innerHTML += `<li class="page-item ${!pageData.hasPrevious ? 'disabled' : ''}">
-      <a class="page-link" onclick="goToPage(${current - 1})">이전</a></li>`;
-
-      // 번호들
-      const start = Math.max(0, current - 4);
-      const end = Math.min(total - 1, current + 5);
-
-      for (let i = start; i <= end; i++) {
-        pagination.innerHTML += `<li class="page-item ${i === current ? 'active' : ''}">
-        <a class="page-link" onclick="goToPage(${i})">${i + 1}</a></li>`;
-      }
-
-      // 다음
-      pagination.innerHTML += `<li class="page-item ${!pageData.hasNext ? 'disabled' : ''}">
-      <a class="page-link" onclick="goToPage(${current + 1})">다음</a></li>`;
-
-      // 마지막
-      pagination.innerHTML += `<li class="page-item ${current === total - 1 ? 'disabled' : ''}">
-      <a class="page-link" onclick="goToPage(${total - 1})">마지막</a></li>`;
-    }
-
-    function goToPage(page) {
-      // 여기에 현재 선택된 셀렉션 따라 url 구하고, fetch 재요청하는 로직 넣기
-      const selected = document.getElementById("choice").value;
-      let url = "";
-
-      if (selected === "본사") url = "/center/searchcenter";
-      else if (selected === "지사") url = "/center/searchbranch";
-      else if (selected === "지점") url = "/center/searchfacility";
-
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          page: page,
-          size: 10,
-          select: document.querySelector('select[name="select"]').value,
-          keyword: document.querySelector('input[name="keyword"]').value
-        })
-      })
-              .then(res => res.json())
-              .then(data => {
-                updateTable(data.content);
-                updatePagination(data);
-              });
-    }
+    
   </script>
 
 

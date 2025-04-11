@@ -26,18 +26,49 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("/list")
-    public String listCenter(Model model, Pageable pageable){
+    public String listCompany(@RequestParam(required = false) String choice,
+                              @RequestParam(required = false) String select,
+                              @RequestParam(required = false) String keyword,
+                              Model model,
+                              Pageable pageable) {
 
-        return "center/list";
+        log.info("choice : " + choice);
+        log.info("select : " + select);
+        log.info("keyword : " + keyword);
+
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, pageable);
+
+        model.addAttribute("companyDTOS", companyDTOS);
+        model.addAttribute("choice", choice);
+        model.addAttribute("select", select);
+        model.addAttribute("keyword", keyword);
+
+        return "company/list";
     }
 
+    @PostMapping("/list")
+    public String listPost (@RequestParam("select") String select, @RequestParam("choice") String choice, @RequestParam ("keyword") String keyword) {
 
-    @GetMapping("/signup")
-    public String signUpCenterGet(Model model){
 
-        return "center/signup";
+
+        return null;
     }
 
+    @GetMapping("/insert")
+    public String insertCompanyGet(Model model){
+
+        model.addAttribute("company", companyService.companyList());
+
+        return "company/insert";
+    }
+
+    @PostMapping("/insert")
+    public String insertCompanyPost(CompanyDTO companyDTO) throws IOException {
+
+        companyService.companyInsert(companyDTO);
+
+        return "redirect:/company/list";
+    }
 
 
     @GetMapping("/{type}/modify/{id}")
@@ -45,7 +76,7 @@ public class CompanyController {
                             @PathVariable("id") Long id,
                             Model model) {
 
-        return "center/modify";
+        return "company/modify";
     }
 
 

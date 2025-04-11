@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}">
+      xmlns:th="http://www.thymeleaf.org">
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layouts/layout.html}"-->
+>
 <head>
     <meta charset="UTF-8">
     <title>외부업체 목록</title>
@@ -106,7 +107,7 @@
                     <h5 class="modal-title" id="insertModalLabel">외부업체 등록</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <form action="/admin/store/insert" method="post">
+                <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="col">
                             <div class="mb-3 user-box text-center">
@@ -124,10 +125,6 @@
                             <div class="mb-3">
                                 <label class="form-label">업체명</label>
                                 <input type="text" class="form-control" name="storeName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">이메일</label>
-                                <input type="email" class="form-control" name="storeEmail" required>
                             </div>
                             <div class=" mb-3">
                                 <label class="form-label">전화번호</label>
