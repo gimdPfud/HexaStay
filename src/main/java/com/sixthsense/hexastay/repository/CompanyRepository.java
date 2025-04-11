@@ -27,13 +27,17 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("SELECT c FROM Company c " +
             "WHERE (:choice IS NULL OR c.companyType = :choice) " +
             "AND (" +
-            "(:select = '조직명' AND c.companyName LIKE %:keyword%) OR " +
-            "(:select = '브랜드명' AND c.companyBrand LIKE %:keyword%) OR " +
-            "(:select = '사업자번호' AND c.companyBusinessNum LIKE %:keyword%)" +
+            "(:select = '전체') OR " +
+            "(:select = 'company' AND c.companyName LIKE CONCAT('%', :keyword, '%')) OR " +
+            "(:select = 'brandName' AND c.companyBrand LIKE CONCAT('%', :keyword, '%')) OR " +
+            "(:select = 'businessNum' AND c.companyBusinessNum LIKE CONCAT('%', :keyword, '%'))" +
             ")")
-    List<Company> listSelectSearch(@Param("select") String select,
+
+    Page<Company> listSelectSearch(@Param("select") String select,
                                    @Param("choice") String choice,
-                                   @Param("keyword") String keyword);
+                                   @Param("keyword") String keyword,
+                                   Pageable pageable);
+
 
 
 
