@@ -137,8 +137,8 @@
     <ul class="food-list">
         <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item">
             <div class="food-info">
-                <p th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}"></p>
-                <span th:data-price="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}" th:id="${'price_' + roomMenuCartDTO.roomMenuCartDetailNum}" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}">가격</span>
+                <p th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}"></p> <!-- 상품명 -->
+                <p th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></p> <!-- 가격 -->
             </div>
         </li>
     </ul>
@@ -161,7 +161,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    /*document.addEventListener('DOMContentLoaded', function () {
         const email = getLoggedInEmail(); // 로그인한 이메일 가져오기 (아래 설명)
 
         fetch(`/roommenu/orderpage/cartlist?email=${email}`)
@@ -188,7 +188,7 @@
             })
             .catch(err => {
                 console.error('장바구니 로딩 실패', err);
-            });
+            });*/
 
         function getLoggedInEmail() {
             // 서버에서 principal.getName()으로 이메일 확인하니까

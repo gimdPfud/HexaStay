@@ -58,12 +58,13 @@ public class RoomMenuCartController {
      ****************************************************/
 
     @PostMapping("/orderpage/orderread")
-    public ResponseEntity RoomMenuCartItem(@Valid RoomMenuDTO roomMenuDTO,
-                                           BindingResult bindingResult,
-                                           Principal principal) {
-        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
-        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
-        log.info("장바구니 카트 컨트롤러 진입" + roomMenuDTO);
+    public ResponseEntity RoomMenuCartItem(
+            @RequestBody @Valid RoomMenuCartItemDTO roomMenuCartItemDTO,
+            BindingResult bindingResult,
+            Principal principal) {
+        log.info("장바구니 카트 컨트롤러 진입" + roomMenuCartItemDTO);
+        log.info(" 받은 DTO: {}", roomMenuCartItemDTO);
+        log.info(" 수량: {}", roomMenuCartItemDTO.getRoomMenuCartItemAmount());//이게 널로 나오지 말아야함 OK
 
         // 유효성 검사
         if (bindingResult.hasErrors()) {
@@ -96,7 +97,7 @@ public class RoomMenuCartController {
 
         try {
             // RoomMenuCartInsert 메서드 호출 시, 이메일과 DTO만 전달
-            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(memberEmail, roomMenuDTO);
+            roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(memberEmail, roomMenuCartItemDTO);
         } catch (EntityNotFoundException e) {
             // 예외 발생 시 처리
             log.error("장바구니에 아이템을 추가할 수 없습니다. : " + e.getMessage());
@@ -122,7 +123,7 @@ public class RoomMenuCartController {
      ****************************************************/
 
     @GetMapping("/cartlist")
-    public String getRoomMenuCartItems(Principal principal,String email, Model model, Pageable pageable) {
+    public String getRoomMenuCartItems(Principal principal, Model model, Pageable pageable) {
         log.info("장바구니 리스트 컨트롤러 진입");
         log.info("로그인한 사용자" + principal.getName());
 
@@ -132,14 +133,22 @@ public class RoomMenuCartController {
             return "redirect:/member/login"; // 또는 로그인 페이지 경로로 리턴
         }
 
+        String email = "nice@1";
+
           Page<RoomMenuCartDetailDTO> cartDetailDTOList
                     = roomMenuCartService.RoomMenuCartItemList(email, pageable);
 
+
+        log.info(cartDetailDTOList.getContent());
+
         // 로그인된 사용자의 이메일로 장바구니 아이템 조회
         model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
+        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
+        log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
+        log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
 
-        log.info("장바구니 아이템 수: {}", cartDetailDTOList.getTotalElements());
-        for (RoomMenuCartDetailDTO dto : cartDetailDTOList) {
+
+        for (RoomMenuCartDetailDTO dto : cartDetailDTOList.getContent()) {
             log.info("메뉴 이름: {}, 가격: {}", dto.getRoomMenuCartDetailMenuItemName(), dto.getRoomMenuCartDetailMenuItemPrice());
         }
 
