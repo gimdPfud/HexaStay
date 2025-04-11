@@ -138,6 +138,7 @@ public class RoomMenuCartController {
           Page<RoomMenuCartDetailDTO> cartDetailDTOList
                     = roomMenuCartService.RoomMenuCartItemList(email, pageable);
 
+
         log.info(cartDetailDTOList.getContent());
 
         // 로그인된 사용자의 이메일로 장바구니 아이템 조회
@@ -145,6 +146,7 @@ public class RoomMenuCartController {
         log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
         log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
+
 
         for (RoomMenuCartDetailDTO dto : cartDetailDTOList.getContent()) {
             log.info("메뉴 이름: {}, 가격: {}", dto.getRoomMenuCartDetailMenuItemName(), dto.getRoomMenuCartDetailMenuItemPrice());
