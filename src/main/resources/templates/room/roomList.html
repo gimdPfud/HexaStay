@@ -34,19 +34,25 @@
         <tbody>
         <tr th:each="room : ${rooms.content}">  <!-- 🔥 rooms.content로 리스트 가져오기 -->
             <td th:text="${room.roomNum}"></td>
-            <td>
-                <a th:href="@{/membersByHotelRoom/{hotelRoomNum}(hotelRoomNum=${room.hotelRoomNum})}"
-                   th:text="${room.hotelRoomName}" class="text-decoration-none">
+            <td><!--팝업 창으로도 변경 가믄-->
+                <a href="javascript:void(0);"
+                   onclick="openMemberPopup(this)"
+                   target="_blank"
+                   th:text="${room.hotelRoomName}" class="text-decoration-none"
+                   th:attr="data-hotelRoomNum=${room.hotelRoomNum}">
                 </a>
             </td>
             <td th:text="${room.hotelRoomPhone}"></td>
             <td>
-                <a th:href="@{/hotelRoomsByMember/{memberNum}(memberNum=${room.memberNum})}"
-                   th:text="${room.memberName}" class="text-decoration-none">
+                <a href="javascript:void(0);"
+                   onclick="openMemberPopupByMember(this)"
+                   th:text="${room.memberName}" class="text-decoration-none"
+                   th:attr="data-memberNum=${room.memberNum}">
                 </a>
             </td>
             <td th:text="${room.memberEmail}"></td>
             <td th:text="${#temporals.format(room.membereDate, 'yy/MM/dd')}"></td>
+            <input hidden th:value="${room.hotelRoomNum}"></input>
         </tr>
         </tbody>
     </table>
@@ -81,5 +87,41 @@
             </ul>
         </nav>
     </div>
+
+    <script th:inline="javascript">
+
+        /*호텔룸 클릭 했을때 hotelRoomNum 기준*/
+        function openMemberPopup(element) {
+            var hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+            console.log("호텔룸 번호:", hotelRoomNum);
+
+            if (!hotelRoomNum) {
+                alert("호텔룸 번호를 가져올 수 없습니다!");
+                return;
+            }
+
+            var popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
+            var popupOption = "width=600,height=500,scrollbars=yes,resizable=yes";
+            window.open(popupUrl, "room/membersByHotelRoom", popupOption);
+        }
+
+        /*멤버  클릭 했을때 memberNum 기준*/
+        function openMemberPopupByMember(element) {
+            var memberNum = element.getAttribute("data-memberNum");  // 🔥 `data-memberNum` 값 가져오기
+            console.log("회원 번호:", memberNum);
+
+            if (!memberNum) {
+                alert("회원 번호를 가져올 수 없습니다!");
+                return;
+            }
+
+            var popupUrl = "/hotelRoomsByMember/" + memberNum;
+            var popupOption = "width=600,height=500,scrollbars=yes,resizable=yes";
+            window.open(popupUrl, "room/hotelRoomsByMembe", popupOption);
+        }
+
+    </script>
+
+</div>
 </body>
 </html>

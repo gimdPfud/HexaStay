@@ -24,5 +24,13 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
 
 
 
+    // 방 타입을 기준으로 가장 최신의 HotelRoom 가져오기
+    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotelRoomType = :roomType ORDER BY hr.hotelRoomNum DESC LIMIT 1")
+    Optional<HotelRoom> findLatestRoomByType(@Param("roomType") String roomType);
+
+
+
+
+
 
 }

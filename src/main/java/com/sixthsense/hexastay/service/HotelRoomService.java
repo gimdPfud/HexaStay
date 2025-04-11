@@ -20,7 +20,8 @@ public interface HotelRoomService {
     public Page<HotelRoomDTO> roomMemberPage(Pageable pageable);
 
 
-
+    //0411
+    public HotelRoomDTO getLatestHotelRoomByType(String roomType);
 
 
 

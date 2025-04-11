@@ -92,6 +92,19 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         return hotelRoomDTOPage;
     }
 
+    //0411_특정 호텔 룸 정보만 가져 오는는 메서드
+    /**
+     * 선택한 방 타입에 대한 최신 HotelRoom 정보 조회
+     */
+    @Override
+    public HotelRoomDTO getLatestHotelRoomByType(String roomType) {
+
+        HotelRoom hotelRoom = hotelRoomRepository.findLatestRoomByType(roomType).orElseThrow();
+        HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
+        return hotelRoomDTO;
+    }
+
+
 
 
     //************단일 호텔룸 CRRUD 메소드*************//

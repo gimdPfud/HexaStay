@@ -84,6 +84,9 @@ public class HotelRoomDTO {
 
     private List<MemberDTO> memberDTOList;  //여러 멤버 저장
 
+    public HotelRoomDTO(Long hotelRoomNum, String hotelRoomName, String hotelRoomType) {
+    }
+
     //ModelMapper를 이용해서 한번에 참조 값을 변환 하기 위한 메서드
     public HotelRoomDTO setMember(MemberDTO memberDTO) {
 
