@@ -33,4 +33,62 @@ public class AdminServiceImpl implements AdminService {
 
 
 
+    // 가입
+    @Override
+    public void insertAdmin(AdminDTO adminDTO) throws IOException {
+
+        adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
+
+        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
+            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            adminDTO.setAdminProfileMeta("/profile/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
+
+        }
+
+        Admin admin = modelMapper.map(adminDTO, Admin.class);
+        adminRepository.save(admin);
+    }
+
+
+
+//리스트
+    @Override
+    public Page<AdminDTO> list (Pageable pageable) {
+
+        Page<Admin> adminList = adminRepository.findAll(pageable);
+        Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
+
+        return adminDTOList;
+    }
+
+
+    //가입대기 리스트
+    public List<AdminDTO> getWaitAdminList() {
+        List<Admin> adminList = adminRepository.findByAdminActive(false);
+        List<AdminDTO> adminDTOList = new ArrayList<>();
+        for (Admin admin : adminList) {
+            adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
+        }
+        return adminDTOList;
+    }
+
+
+    //가입 승인
+    public void setAdminActive(Long adminNum) {
+        Admin admin = adminRepository.findByAdminNum(adminNum);
+        admin.setAdminActive(true);
+        adminRepository.save(admin);
+    }
+
+
 }
