@@ -134,8 +134,13 @@
     </div>
 
     <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
-    <ul class="food-list" id="food-list">
-        <!-- 메뉴 항목은 JavaScript를 통해 추가됨 -->
+    <ul class="food-list">
+        <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item">
+            <div class="food-info">
+                <p th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}"></p>
+                <span th:data-price="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}" th:id="${'price_' + roomMenuCartDTO.roomMenuCartDetailNum}" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}">가격</span>
+            </div>
+        </li>
     </ul>
 
     <!-- 요청사항 입력 섹션 -->
