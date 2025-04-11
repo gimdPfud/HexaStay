@@ -135,13 +135,11 @@ public class RoomMenuCartController {
           Page<RoomMenuCartDetailDTO> cartDetailDTOList
                     = roomMenuCartService.RoomMenuCartItemList(email, pageable);
 
-        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
-
         // 로그인된 사용자의 이메일로 장바구니 아이템 조회
         model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
 
-        log.info("장바구니 아이템 수: {}", cartDetailDTOList.size());
-        for (RoomMenuCartDetailDTO dto : list) {
+        log.info("장바구니 아이템 수: {}", cartDetailDTOList.getTotalElements());
+        for (RoomMenuCartDetailDTO dto : cartDetailDTOList) {
             log.info("메뉴 이름: {}, 가격: {}", dto.getRoomMenuCartDetailMenuItemName(), dto.getRoomMenuCartDetailMenuItemPrice());
         }
 
