@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
-<!--      layout:decorate="~{layouts/layout.html}">-->
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,8 +50,6 @@
             <select type="text" id="companyParent" class="form-control" name="companyParent" hidden>
                 <option th:each="companyDTO : ${company}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
             </select>
-
-
 
             <div class="mb-2">
                 <label class="form-label">상호명</label>
@@ -137,30 +135,20 @@
             inputBrand = document.getElementById("inputBrand")
 
             companySelectedBrand.addEventListener('change', function () {
-                if (companySelectedBrand.value === "본사") {
+                if (companySelectedBrand.value === "center") {
                     companyParent.hidden = true;
                     companyParentLabel.hidden = true;
                     brandLabel.hidden = false;
                     inputBrand.hidden = false;
 
-                } else if (companySelectedBrand.value === "지사") {
+                } else if (companySelectedBrand.value === "branch" || companySelectedBrand.value === "facility") {
                     companyParent.hidden = false;
                     companyParentLabel.hidden = false;
                     brandLabel.hidden = true;
                     inputBrand.hidden = true;
                     inputBrand.value = "";
-
-
-                } else if (companySelectedBrand.value === "지점"){
-                    companyParent.hidden = false;
-                    companyParentLabel.hidden = false;
-                    brandLabel.hidden = true;
-                    inputBrand.hidden = true;
-                    inputBrand.value = "";
-
-
                 }
-            })
+            });
 
 
 

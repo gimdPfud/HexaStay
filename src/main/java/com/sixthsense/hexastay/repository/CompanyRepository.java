@@ -21,7 +21,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("select a from Company a")
     Page<Company> findAll(Pageable pageable);
 
-    List<Company> findByCompanyType(String companyType);
+    Page<Company> findByCompanyType(String companyType, Pageable pageable);
 
 
     @Query("SELECT c FROM Company c " +

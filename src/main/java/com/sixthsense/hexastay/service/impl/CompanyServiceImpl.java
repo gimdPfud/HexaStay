@@ -15,6 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void companyInsert(CompanyDTO companyDTO) throws IOException {
 
+        //프로필 이미지 처리
         if (companyDTO.getCompanyPicture() != null && !companyDTO.getCompanyPicture().isEmpty()) {
             String fileOriginalName = companyDTO.getCompanyPicture().getOriginalFilename();
             String fileFirstName = companyDTO.getCompanyNum() + "_" + companyDTO.getCompanyName();
@@ -52,47 +55,117 @@ public class CompanyServiceImpl implements CompanyService {
                 Files.createDirectory(createPath);
             }
             companyDTO.getCompanyPicture().transferTo(uploadPath.toFile());
-
         }
 
-        //center 등록 (DTO를 Entity로 변환해서 Entity에 담고)
+        // 2. 지사/지점일 경우 → 소속 본사로부터 브랜드명 세팅
+        if ("branch".equals(companyDTO.getCompanyType()) || "facility".equals(companyDTO.getCompanyType())) {
+            Optional<Company> parentCompanyOpt = companyRepository.findById(companyDTO.getCompanyParent());
 
+            if (parentCompanyOpt.isPresent()) {
+                companyDTO.setCompanyBrand(parentCompanyOpt.get().getCompanyBrand());
+            } else {
+                throw new IllegalArgumentException("소속 본사를 찾을 수 없습니다. [id=" + companyDTO.getCompanyParent() + "]");
+            }
+        }
+
+        //DTO를 Entity로 변환
         Company company = modelMapper.map(companyDTO, Company.class);
-
 
         //Entity에 저장
         company = companyRepository.save(company);
-
         log.info("companyDTO를 Entity로 변환 완료 : " + company);
     }
 
-
-    // 전체 리스트 조회용
     @Override
-    public List<CompanyDTO> companyList () {
-        List<Company> companyList = companyRepository.findByCompanyType("center");
+    public List<CompanyDTO> companyList() {
+        Pageable pageable = PageRequest.of(0, 10); // 페이지 0, size 10으로 고정
+        Page<Company> companyPage = companyRepository.findAll(pageable);
+
         List<CompanyDTO> companyDTOList = new ArrayList<>();
-        for (Company company : companyList) {
-            CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
-            companyDTOList.add(companyDTO);
+
+        for (Company company : companyPage) {
+            CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
+
+            // 기본값
+            dto.setCompanyParentName("-");
+            dto.setBranchName("-");
+            dto.setFacilityName("-");
+
+            String type = company.getCompanyType();
+
+            if ("center".equals(type)) {
+                // 본사일 경우: 본사명은 자기 이름, 나머지는 "-"
+                dto.setCompanyParentName(company.getCompanyName());
+
+            } else if ("branch".equals(type)) {
+                // 지사일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 지사명
+                dto.setBranchName(company.getCompanyName());
+
+                if (company.getCompanyParent() != null) {
+                    companyRepository.findById(company.getCompanyParent()).ifPresent(parent -> {
+                        dto.setCompanyParentName(parent.getCompanyName());
+                    });
+                }
+
+            } else if ("facility".equals(type)) {
+                // 지점일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 지점명
+                dto.setFacilityName(company.getCompanyName());
+
+                if (company.getCompanyParent() != null) {
+                    companyRepository.findById(company.getCompanyParent()).ifPresent(parent -> {
+                        dto.setCompanyParentName(parent.getCompanyName());
+                    });
+                }
+            }
+
+            companyDTOList.add(dto);
         }
 
         return companyDTOList;
     }
 
 
+
     // 검색용
     @Override
     public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable) {
-        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, pageable);
-        Page<CompanyDTO> companyDTOPage = companyPage.map(company -> modelMapper.map(company, CompanyDTO.class));
-
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return companyRepository.findAll(pageable)
-                    .map(c -> modelMapper.map(c, CompanyDTO.class));
+        // 소속만 선택하고 검색 조건/키워드가 없을 때
+        if ((keyword == null || keyword.trim().isEmpty()) || "전체".equals(select)) {
+            return companyRepository.findByCompanyType(choice, pageable)
+                    .map(this::convertToCompanyDTO);
         }
 
-        return companyDTOPage;
+        // 검색 조건 + 키워드가 있을 때
+        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, pageable);
+        return companyPage.map(this::convertToCompanyDTO);
+    }
+
+    private CompanyDTO convertToCompanyDTO(Company company) {
+        CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
+
+        dto.setCompanyParentName("-");
+        dto.setBranchName("-");
+        dto.setFacilityName("-");
+
+        String type = company.getCompanyType();
+
+        if ("center".equals(type)) {
+            dto.setCompanyParentName(company.getCompanyName());
+        } else if ("branch".equals(type)) {
+            dto.setBranchName(company.getCompanyName());
+            if (company.getCompanyParent() != null) {
+                companyRepository.findById(company.getCompanyParent())
+                        .ifPresent(parent -> dto.setCompanyParentName(parent.getCompanyName()));
+            }
+        } else if ("facility".equals(type)) {
+            dto.setFacilityName(company.getCompanyName());
+            if (company.getCompanyParent() != null) {
+                companyRepository.findById(company.getCompanyParent())
+                        .ifPresent(parent -> dto.setCompanyParentName(parent.getCompanyName()));
+            }
+        }
+
+        return dto;
     }
 
     @Override
