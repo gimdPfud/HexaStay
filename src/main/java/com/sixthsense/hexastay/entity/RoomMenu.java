@@ -60,6 +60,17 @@ public class RoomMenu extends BaseEntity {
     @JoinColumn(name = "room")
     private Room room;   // 룸(방)의 정보 참조
 
+    public void roomMenuOrderStockNumber(Integer stockNumber) {
+        // 수량을 받아 주문이나 주문취소수량을 받아서 재고를 확인 후 재고 수량을 변경
+
+        if (this.roomMenuAmount - stockNumber < 0){
+            throw new IllegalArgumentException("요청 수량이 현재 재고보다 많습니다. (현재수량 : " + this.roomMenuAmount +")");
+        }
+
+        this.roomMenuAmount = this.roomMenuAmount - stockNumber;
+
+    }
+
 
 
 }
