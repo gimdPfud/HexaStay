@@ -4,6 +4,7 @@ import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,5 +25,12 @@ public interface AdminService {
     //가입승인
     void setAdminActive(Long adminNum);
 
+    AdminDTO adminRead(Long adminNum);
+
+    void adminUpdate(AdminDTO adminDTO);
+
+    void adminDelete(Long adminNum);
+
+    AdminDTO adminFindEmail(String adminEmail);
 
 }

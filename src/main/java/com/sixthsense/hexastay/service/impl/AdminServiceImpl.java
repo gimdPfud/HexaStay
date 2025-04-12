@@ -12,11 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +76,7 @@ public class AdminServiceImpl implements AdminService {
     public Page<AdminDTO> searchAdmins(String select, String choice, String keyword, Pageable pageable) {
         Page<Admin> adminList = adminRepository.listAdminSearch(select, choice, keyword, pageable);
         Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
+
         return adminDTOList;
     }
 
@@ -96,5 +99,27 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
+    @Override
+    public AdminDTO adminRead(Long adminNum) {
+        Admin admin = adminRepository.findByAdminNum(adminNum);
+        return modelMapper.map(admin, AdminDTO.class);
+    }
+
+    @Override
+    public void adminUpdate(AdminDTO adminDTO) {
+        adminRepository.save(modelMapper.map(adminDTO, Admin.class));
+    }
+    
+    // 회원 삭제
+    @Override
+    public void adminDelete(Long adminNum){
+        adminRepository.deleteById(adminNum);
+    }
+
+    @Override
+    public AdminDTO adminFindEmail(String adminEmail){
+        Admin admin = adminRepository.findByAdminEmail(adminEmail);
+        return modelMapper.map(admin, AdminDTO.class);
+    }
 
 }
