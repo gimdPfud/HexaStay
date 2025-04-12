@@ -10,13 +10,22 @@ import java.util.List;
 
 public interface CompanyService {
 
-    //center 등록
+    //조직 등록
     void companyInsert(CompanyDTO companyDTO) throws IOException ;
 
+    //조직 목록
     List<CompanyDTO> companyList ();
     Page<CompanyDTO> companyList (Pageable pageable);
 
+    //조직 검색
     public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable);
+
+    //조직 상세보기
+    public CompanyDTO companyRead(Long companyNum);
+
+    //조직 수정
+
+    //조직 삭제
 
 
 }
