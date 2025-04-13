@@ -36,6 +36,12 @@ public class StoreDTO {
 
     //외부 업체주소
     private String storeAddress;
+    //  경도 x
+    private Double storeLongitude;
+    //  위도 y 카카오맵에서는 위도,경도 순으로 받음
+    private Double storeLatitude;
+    private Double storeWtmX;
+    private Double storeWtmY;
 
     //외부 업체 대표자명
     private String storeCeoName;
