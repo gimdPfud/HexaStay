@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현금 결제 완료</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .message {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-top: 40px;
+        }
+
+        .room-number {
+            font-weight: bold;
+            font-size: 20px;
+            color: #4CAF50;
+        }
+
+        .btn {
+            margin-top: 40px;
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #43a047;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">결제 완료</div>
+
+    <!-- 방 번호는 서버에서 동적으로 주입 가능 (예: Thymeleaf 사용 시) -->
+    <div class="message">
+        <span class="room-number" th:text="${roomName}">XXX</span> 방<br>
+        현금결제 주문이 완료되었습니다.<br>
+        직원에게 <strong>현금</strong>을 건네주세요!
+    </div>
+
+    <button class="btn" onclick="goBack()">돌아가기</button>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '/roommenu/orderpage'; // 목록 또는 메인 주문 페이지
+    }
+</script>
+</body>
+</html>

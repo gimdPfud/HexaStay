@@ -113,4 +113,11 @@ public class RoomMenuOrderController {
         return new ResponseEntity<Long>(roomMenuOrderNum, HttpStatus.OK);
     }
 
-}
+        @GetMapping("/roommenu/cashOrder")
+        public String CashOrderPageGet() {
+//            // 룸방번호
+//            model.addAttribute("roomName", roomName);
+            return "roommenu/cashOrder";  // templates/cashOrder.html로 연결
+        }
+
+    }

@@ -20,7 +20,7 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         background-color: #f8f9fa;
-        max-width: 800px;
+        max-width: 1000px;
         margin: 20px auto;
     }
 
@@ -76,7 +76,8 @@
 
 [[${list}]]
 <div class="container mt-4">
-    <h1>룸서비스 메뉴 목록</h1>
+    <h1 style="text-align: center;">룸서비스 메뉴 목록</h1>
+    <p style="text-align: center;">* 카테고리로 검색하려면 카테고리 선택 옆의 이름.. 부분을 클릭해서 카테고리를 선택하세요</p>
 
     <!-- 검색창 -->
 
@@ -118,14 +119,18 @@
                             메뉴등록
                         </a>
                         <!-- 메뉴등록 버튼 끝 -->
-
+                        <div>
+                            <a href="/roommenu/orderpage" class="btn btn-primary" style="width: 160px; height: 40px; padding: 0; font-size: 16px; display: inline-block; text-align: center; line-height: 40px;">
+                                손님용 오더페이지로
+                            </a>
+                        </div>
                     </div>
                 </form> <!-- 검색창 끝 -->
             </div>
     </div>
 
     <!-- 메뉴 목록 테이블 -->
-    <table class="table table-bordered mt-4">
+    <table class="table table-bordered mt-5">
         <thead>
         <tr>
             <th scope="col">#</th>
