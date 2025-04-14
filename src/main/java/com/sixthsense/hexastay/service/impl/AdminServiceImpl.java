@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @RequiredArgsConstructor
@@ -112,9 +113,20 @@ public class AdminServiceImpl implements AdminService {
     
     // 회원 삭제
     @Override
-    public void adminDelete(Long adminNum){
+    public void adminDelete(Long adminNum) throws IOException{
+
+        Admin admin = adminRepository.findById(adminNum).orElseThrow();
+
+        if (!admin.getAdminProfileMeta().isEmpty()) {
+
+            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta());
+            Files.deleteIfExists(filePath);
+
+        }
+
         adminRepository.deleteById(adminNum);
     }
+
 
     @Override
     public AdminDTO adminFindEmail(String adminEmail){

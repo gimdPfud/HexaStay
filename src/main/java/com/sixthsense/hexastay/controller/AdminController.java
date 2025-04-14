@@ -146,7 +146,7 @@ public class AdminController {
     //회원 삭제
 
     @DeleteMapping("/delete")
-    public String adminDelete(@RequestParam Long adminNum) {
+    public String adminDelete(@RequestParam Long adminNum) throws IOException {
         adminService.adminDelete(adminNum);
         return "redirect:/admin/list";
     }

@@ -29,7 +29,7 @@ public interface AdminService {
 
     void adminUpdate(AdminDTO adminDTO);
 
-    void adminDelete(Long adminNum);
+    void adminDelete(Long adminNum) throws IOException;
 
     AdminDTO adminFindEmail(String adminEmail);
 
