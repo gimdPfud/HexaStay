@@ -55,7 +55,6 @@ public class CompanyController {
     public String listPost (@RequestParam("select") String select, @RequestParam("choice") String choice, @RequestParam ("keyword") String keyword) {
 
 
-
         return null;
     }
 
@@ -89,5 +88,12 @@ public class CompanyController {
         return "company/read";
     }
 
+    @GetMapping("/del/{companyNum}")
+    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) {
+
+        companyService.companyDelete(companyNum);
+
+        return "redirect:/company/list";
+    }
 
 }

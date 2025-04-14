@@ -146,6 +146,13 @@ public class CompanyServiceImpl implements CompanyService {
         return companyDTO;
     }
 
+    @Override
+    public void companyDelete(Long companyNum) {
+
+        companyRepository.deleteById(companyNum);
+
+    }
+
     private CompanyDTO convertToCompanyDTO(Company company) {
         CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
 
