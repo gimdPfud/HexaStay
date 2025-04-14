@@ -39,9 +39,14 @@ public class StoreController {
      * 리턴 값 :
      * 기  능 :
      * */
-    @GetMapping("/insert") //todo superAdmin만 접근 가능한 페이지
-    public String insert(Principal principal){
+    @GetMapping("/insert") //todo hotel sv 접근 가능한 페이지
+    public String insert(Principal principal, Model model){
 //        log.info("등록");
+        if(principal==null){
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        model.addAttribute("companyNum",adminDTO.getCompanyNum());
         return "store/insert";
     }
     @PostMapping("/insert")
