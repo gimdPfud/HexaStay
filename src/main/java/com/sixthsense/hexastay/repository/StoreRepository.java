@@ -25,7 +25,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query("select s from Store s where s.storeStatus = 'alive'")
     public List<Store> findAll();
 
-    List<Store> findByCompany_CompanyNum(Long companyNum);
+    @Query("select a from Store a where a.storeStatus='alive' and a.company.companyNum=:companyNum")
+    List<Store> findByCompanyNum(Long companyNum);
 
     public Page<Store> findByStoreStatus(String status, Pageable pageable);
 

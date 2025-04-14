@@ -135,6 +135,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public List<StoreDTO> getAllList() {
         List<Store> storeList = storeRepository.findAll("alive");
+        storeList.forEach(this::checkAndUpdateOrphanStatus);
+        storeList = storeRepository.findAll("alive");
         List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data, StoreDTO.class)).toList();
         return list;
     }
@@ -152,6 +154,11 @@ public class StoreServiceImpl implements StoreService {
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
     }
+    public List<StoreDTO> list(Long companyNum) {
+        List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
+        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data,StoreDTO.class)).toList();
+        return list;
+    }
 
 
     /*
@@ -163,6 +170,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreDTO> list(Pageable pageable) {
         Page<Store> storePage = storeRepository.findAll(pageable);
+        storePage.forEach(this::checkAndUpdateOrphanStatus);
+        storePage = storeRepository.findAll(pageable);
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
     }
@@ -214,5 +223,12 @@ public class StoreServiceImpl implements StoreService {
         } else if (adminDTO.getStoreNum().equals(storeDTO.getStoreNum())) {
             return true;
         }else {return false;}
+    }
+
+    public void checkAndUpdateOrphanStatus(Store store) {
+        if (store.getCompany() == null && !"deleted".equals(store.getStoreStatus())) {
+            store.setStoreStatus("deleted");
+            storeRepository.save(store);
+        }
     }
 }

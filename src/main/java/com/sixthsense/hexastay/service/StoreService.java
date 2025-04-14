@@ -32,6 +32,7 @@ public interface StoreService {
     * 모든 외부 업체 목록 보여주기*/
     public Page<StoreDTO> list(String status, Pageable pageable);
     public Page<StoreDTO> list(Pageable pageable);
+    public List<StoreDTO> list(Long companyNum);
 
     /*todo 목록인데 리뷰가 있는 목록. 근데 리뷰별점을 넣을지말지 고민중...*/
     public Page<StoreDTO> clientlist(Pageable pageable);
