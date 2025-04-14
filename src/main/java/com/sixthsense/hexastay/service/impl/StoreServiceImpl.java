@@ -11,7 +11,6 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
-import com.sixthsense.hexastay.repository.ReviewRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
-    private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -107,6 +105,10 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreStatus(storeDTO.getStoreStatus());
         store.setStoreCeoName(storeDTO.getStoreCeoName());
         store.setStoreAddress(storeDTO.getStoreAddress());
+        store.setStoreLatitude(storeDTO.getStoreLatitude());
+        store.setStoreLongitude(storeDTO.getStoreLongitude());
+        store.setStoreWtmX(storeDTO.getStoreWtmX());
+        store.setStoreWtmY(storeDTO.getStoreWtmY());
         store.setStoreCategory(storeDTO.getStoreCategory());
         store.setStorePassword(storeDTO.getStorePassword());
         return store.getStoreNum();
@@ -152,7 +154,6 @@ public class StoreServiceImpl implements StoreService {
         Page<Store> storePage = storeRepository.findByStoreStatus("alive", pageable);
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data, StoreDTO.class));
         storeDTOPage.map(data -> {
-            /* todo 리뷰를 넣어 말어? 말어?*/
             return data;
         });
         return storeDTOPage;

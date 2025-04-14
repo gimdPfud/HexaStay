@@ -75,6 +75,14 @@ public class CompanyController {
         return "redirect:/company/list";
     }
 
+    @GetMapping("/read/{companyNum}")
+    public String readCompany(Model model, @PathVariable(name = "companyNum") Long companyNum) {
+
+        CompanyDTO companyDTO = companyService.companyRead(companyNum);
+        model.addAttribute("companyDTO", companyDTO);
+
+        return "/company/read";
+    }
 
     @GetMapping("/{type}/modify/{id}")
     public String modifyOrg(@PathVariable("type") String type,

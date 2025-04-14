@@ -4,11 +4,17 @@ import lombok.Getter;
 
 @Getter
 public enum AdminRole {
+    //본사
     EXEC("임원진"),
-    HEAD("관리직"),
+    HEAD("매니저"),
     CREW("사원"),
-    SV("지사관리직"),
-    PARTNER("협력업체"),
+
+    //지사, 지점
+    GM("총괄"),
+    SV("관리자"),
+    AGENT("직원"),
+
+
     MGR("운영총괄"),
     SUBMGR("부매니저"),
     STAFF("매장직원");

@@ -25,6 +25,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long>, AdminReposi
     public List<Admin> findByAdminActive(Boolean active);
 
 
+
     // 시큐리티용
     Admin findByAdminEmail(String adminEmail);
 
