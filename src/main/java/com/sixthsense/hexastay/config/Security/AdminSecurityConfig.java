@@ -37,16 +37,16 @@ import org.springframework.security.web.SecurityFilterChain;
             AuthenticationManager authManager = new ProviderManager(provider);
 
             http
-                    .securityMatcher("/admin/**", "/branch/**", "/center/",
+                    .securityMatcher("/admin/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
 
-
-                    // 
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)
                     .authorizeHttpRequests(authz -> authz
+//                            .requestMatchers("/memberList").hasRole("admin")
+//                            .requestMatchers("/**").hasAnyRole("active","admin")
                             .anyRequest().permitAll()
                     )
                     .formLogin(form -> form
@@ -57,7 +57,18 @@ import org.springframework.security.web.SecurityFilterChain;
                             .passwordParameter("adminPassword")
                             .permitAll()
                     )
-
+                    .logout(logout -> logout
+                            .logoutUrl("/admin/logout")
+                            .logoutSuccessUrl("/admin/login")
+                            .invalidateHttpSession(true)
+                            .deleteCookies("JSESSIONID")
+                            .permitAll()
+                    )
+                    .exceptionHandling(exception -> exception
+                            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                response.sendRedirect("/admin/main");
+                            })
+                    )
                       .csrf().disable();
 
             return http.build();
