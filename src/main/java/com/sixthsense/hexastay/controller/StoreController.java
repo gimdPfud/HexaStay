@@ -40,7 +40,7 @@ public class StoreController {
      * 기  능 :
      * */
     @GetMapping("/insert") //todo superAdmin만 접근 가능한 페이지
-    public String insert(){
+    public String insert(Principal principal){
 //        log.info("등록");
         return "store/insert";
     }

@@ -40,7 +40,15 @@
 <div layout:fragment="contentorder">
     <div class="list-group">
         <a th:each="data:${list}" th:href="@{'/member/store/read/'+${data.storeNum}}" class="list-group-item list-group-item-action d-flex align-items-center">
-            <img src="https://via.placeholder.com/60" class="me-3">
+            <span>
+                <img th:if="${data.storeProfileMeta != null}"
+                     th:src="@{${data.storeProfileMeta}}"
+                     style="width: 80px; height: 80px;">
+
+                <img th:unless="${data.storeProfileMeta != null}"
+                     th:src="@{/store/default.png}"
+                     style="width: 80px; height: 80px;">
+            </span>
             <div>
                 <strong th:text="${data.storeName}"></strong><br>
                 <small>일단 : [[${data.storeAddress}]]</small><!--
