@@ -53,6 +53,12 @@ public class HotelRoom extends BaseEntity{
     @Column(name = "hotelRoomPrice")
     private Integer hotelRoomPrice;              //호텔방 가격
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "companyNum")
+    private Company company;             //호텔룸 소속 커럶 추가 : 0414
+
+
+
     private String hotelRoomProfileMeta;      //이미지 경로 저장용 컬럼
 
 

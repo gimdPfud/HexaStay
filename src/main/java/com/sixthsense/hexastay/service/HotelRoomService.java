@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public interface HotelRoomService {
 
     //***************단일 호텔룸 CRRUD **************//
     //호텔룸만 등록
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException;
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO, Principal principal) throws IOException;
 
     //2-2.리스트(pageable) todo: member의 참조 값을 가지고 있는 메서드
     public Page<HotelRoomDTO> hotelroomList(Pageable page);

@@ -1,7 +1,12 @@
 package com.sixthsense.hexastay.controller;
 
 
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
+import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.service.AdminService;
+import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Controller
 @Log4j2
@@ -26,6 +32,8 @@ public class HotelRoomController {
 
     //member 서비스 가져오기
     private final MemberService memberService;
+    private final AdminService adminService;
+    private final CompanyService companyService;
 
     //호텔 룸 서비스 가져오기
     private final HotelRoomService hotelRoomService;
@@ -47,10 +55,14 @@ public class HotelRoomController {
 
     //todo:http://localhost:8090/admin/hotelroom/input
     @GetMapping("/input")
-    public String inputHotelRoomGet(Model model
+    public String inputHotelRoomGet(Model model, Principal principal) {
+        String loginEmail = principal.getName();
+        AdminDTO adminDTO = adminService.adminFindEmail(loginEmail);
+        Long companyNum =  adminDTO.getAdminComapnyNum();
+        CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
-    )
-    {
+        model.addAttribute("comapny", companyDTO);
+
         log.info("Get 등록 페이지 진입");
 
         return "hotelroom/inputhotelroom";
@@ -59,15 +71,19 @@ public class HotelRoomController {
     //todo:http://localhost:8090/admin/hotelroom/input
     @PostMapping("/input")
     public String inputHotelRoomPost( HotelRoomDTO hotelRoomDTO,
-                                     RedirectAttributes redirectAttributes) throws IOException
+                                     RedirectAttributes redirectAttributes
+                                      ) throws IOException
     {
+
+
+
         if (hotelRoomDTO == null) {
             redirectAttributes.addFlashAttribute("error", "잘못된 요청입니다.");
             return "redirect:/admin/hotelroom/input";
         }
 
         log.info("호텔룸 등록 요청: {}", hotelRoomDTO);
-        hotelRoomService.hotelroomInsert(hotelRoomDTO);
+//        hotelRoomService.hotelroomInsert(hotelRoomDTO);
 
         redirectAttributes.addFlashAttribute("message", "호텔룸이 성공적으로 등록되었습니다.");
         return "redirect:/admin/hotelroom/input"; // 등록 후 목록으로 이동

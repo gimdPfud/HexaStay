@@ -39,13 +39,19 @@ public class HotelRoomDTO {
 
     private Integer hotelRoomPrice;              //호텔 방 가격
 
-    private MultipartFile hotelRoomProfile;      //이미지 경로 저장용 컬럼
+    //Company = 전체 브랜드 소속 확인용 컬럼
+    private String companyName;                     //호텔룸 소속 커럶 추가 : 0414
 
-    private String hotelRoomProfileMeta; //가게 사진정보
+    private Long companyNum;
 
-    //브랜드 BRAND 등록 예정 키워드
+    private Long adminNum;
 
-    //Branch 및 퍼실리티 등록 예정
+
+    private MultipartFile hotelRoomProfile;      //todo:파일 서비스를 이용하기 위한 MultipartFile
+
+    private String hotelRoomProfileMeta; //이미지 경로 저장용 컬럼
+
+
 
 
 
