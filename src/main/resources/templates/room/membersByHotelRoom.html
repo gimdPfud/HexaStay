@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
->
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <!--부트 스트랩-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--부트 스트랩 스타일시트(HTML 속성)-->
+    <title>호텔룸 배정 회원 목록</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!--부트스트랩에 효과(자바스크립트)-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!--부트스트랩 아이콘-->
+
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <title>Title</title>
+    <!-- Custom Style -->
+    <style>
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination .page-link {
+            cursor: pointer;
+        }
+    </style>
 </head>
-<div class="container mt-4">
-    <h2>호텔룸에 배정된 회원 목록</h2>
-    <table class="table table-bordered">
-        <thead>
+<body>
+
+<div class="container mt-5">
+    <h3 class="mb-4">🏨 호텔룸에 배정된 회원 목록</h3>
+
+    <table class="table table-hover table-bordered text-center align-middle">
+        <thead class="table-light">
         <tr>
             <th>회원 번호</th>
             <th>이름</th>
             <th>전화번호</th>
             <th>이메일</th>
+            <th>관리</th>
         </tr>
         </thead>
         <tbody>
@@ -33,18 +52,38 @@
             <td th:text="${member.memberName}"></td>
             <td th:text="${member.memberPhone}"></td>
             <td th:text="${member.memberEmail}"></td>
+            <td>
+                <!-- 수정 버튼: data- 속성으로 정보 전달 -->
+                <button class="btn btn-outline-primary btn-sm btn-icon"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editMemberModal"
+                        th:attr="data-member-num=${member.memberNum},
+                         data-member-name=${member.memberName},
+                         data-member-phone=${member.memberPhone},
+                         data-member-email=${member.memberEmail}">
+                    <i class="bi bi-pencil"></i> 수정
+                </button>
+
+                <!-- 삭제는 그대로 유지 -->
+                <a th:href="@{/member/delete/{memberNum}(memberNum=${member.memberNum})}"
+                   class="btn btn-outline-danger btn-sm btn-icon"
+                   onclick="return confirm('정말 삭제하시겠습니까?');">
+                    <i class="bi bi-trash"></i> 삭제
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>
-    <div>
-        <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">호텔룸 목록</a>
+
+    <div class="my-3">
+        <a th:href="@{/roomlist}" class="btn btn-dark">
+            <i class="bi bi-arrow-left"></i> 호텔룸 목록
+        </a>
     </div>
 
-
     <!-- 페이지네이션 -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <!-- 이전 버튼 -->
+    <nav aria-label="회원 페이지네이션">
+        <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${members.first} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{/membersByHotelRoom/{hotelRoomNum}(hotelRoomNum=${hotelRoomNum}, page=${currentPage - 1})}"
@@ -52,7 +91,6 @@
                 <span class="page-link" th:if="${members.first}">이전</span>
             </li>
 
-            <!-- 페이지 번호 -->
             <li th:each="i : ${#numbers.sequence(0, members.totalPages - 1)}"
                 class="page-item" th:classappend="${currentPage == i} ? 'active'">
                 <a class="page-link"
@@ -60,7 +98,6 @@
                    th:text="${i + 1}"></a>
             </li>
 
-            <!-- 다음 버튼 -->
             <li class="page-item" th:classappend="${members.last} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{/membersByHotelRoom/{hotelRoomNum}(hotelRoomNum=${hotelRoomNum}, page=${currentPage + 1})}"
@@ -70,5 +107,65 @@
         </ul>
     </nav>
 </div>
+
+
+<!-- 회원 수정 모달 -->
+<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" th:action="@{/member/update}" id="editMemberForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMemberModalLabel">회원 정보 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="memberNum" id="modalMemberNum">
+
+                    <div class="mb-3">
+                        <label for="modalMemberName" class="form-label">이름</label>
+                        <input type="text" class="form-control" id="modalMemberName" name="memberName" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalMemberPhone" class="form-label">전화번호</label>
+                        <input type="text" class="form-control" id="modalMemberPhone" name="memberPhone" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalMemberEmail" class="form-label">이메일</label>
+                        <input type="email" class="form-control" id="modalMemberEmail" name="memberEmail" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const editMemberModal = document.getElementById('editMemberModal');
+    editMemberModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        // data-* 속성으로부터 값 가져오기
+        const memberNum = button.getAttribute('data-member-num');
+        const memberName = button.getAttribute('data-member-name');
+        const memberPhone = button.getAttribute('data-member-phone');
+        const memberEmail = button.getAttribute('data-member-email');
+
+        // 모달 폼 요소에 값 설정
+        document.getElementById('modalMemberNum').value = memberNum;
+        document.getElementById('modalMemberName').value = memberName;
+        document.getElementById('modalMemberPhone').value = memberPhone;
+        document.getElementById('modalMemberEmail').value = memberEmail;
+    });
+</script>
+
+
+
+
 </body>
 </html>

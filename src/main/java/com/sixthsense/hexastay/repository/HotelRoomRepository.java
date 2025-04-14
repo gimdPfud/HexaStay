@@ -29,6 +29,10 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     Optional<HotelRoom> findLatestRoomByType(@Param("roomType") String roomType);
 
 
+    //호텔룸에 참조되어 있는 ComplnyNum 정보를 리스트로 가져오기
+    List<HotelRoom> findByCompany_CompanyNum(Long companyNum);
+
+
 
 
 
