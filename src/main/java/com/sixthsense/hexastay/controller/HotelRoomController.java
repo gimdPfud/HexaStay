@@ -58,7 +58,7 @@ public class HotelRoomController {
     public String inputHotelRoomGet(Model model, Principal principal) {
         String loginEmail = principal.getName();
         AdminDTO adminDTO = adminService.adminFindEmail(loginEmail);
-        Long companyNum =  adminDTO.getAdminComapnyNum();
+        Long companyNum =  adminDTO.getCompanyNum();
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
         model.addAttribute("comapny", companyDTO);
