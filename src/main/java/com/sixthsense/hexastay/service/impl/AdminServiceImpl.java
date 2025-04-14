@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Builder
@@ -102,7 +103,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public AdminDTO adminRead(Long adminNum) {
-        Admin admin = adminRepository.findByAdminNum(adminNum);
+        Admin admin = adminRepository.findById(adminNum).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
         return modelMapper.map(admin, AdminDTO.class);
     }
 
@@ -114,19 +115,14 @@ public class AdminServiceImpl implements AdminService {
     // 회원 삭제
     @Override
     public void adminDelete(Long adminNum) throws IOException{
-
-        Admin admin = adminRepository.findById(adminNum).orElseThrow();
+        Admin admin = adminRepository.findById(adminNum).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
         if (!admin.getAdminProfileMeta().isEmpty()) {
-
-            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta());
+            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
             Files.deleteIfExists(filePath);
-
         }
-
         adminRepository.deleteById(adminNum);
     }
-
 
     @Override
     public AdminDTO adminFindEmail(String adminEmail){
