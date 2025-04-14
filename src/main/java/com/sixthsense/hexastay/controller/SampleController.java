@@ -31,4 +31,11 @@ public class SampleController {
         model.addAttribute("list",list);
         return "sample/list";
     }
+    @GetMapping("/password")
+    public String password(@PageableDefault(page = 1)Pageable pageable, Model model) {
+        log.info("샘플페이지 진입 : "+pageable);
+        Page<SampleDTO> password = sampleService.sampleMethod(pageable);
+        model.addAttribute("password",password);
+        return "sample/password";
+    }
 }

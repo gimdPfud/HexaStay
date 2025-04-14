@@ -30,6 +30,7 @@ public class Admin extends BaseEntity {
     private Long adminNum;
 
     //어드민 사번
+    @Column(unique = true, nullable = false)
     private String adminEmployeeNum;
 
     //어드민 패스워드
@@ -39,12 +40,14 @@ public class Admin extends BaseEntity {
     private String adminName;
 
     //어드민 이메일
+    @Column(unique = true, nullable = false)
     private String adminEmail;
 
     //어드민 주소
     private String adminAddress;
 
     //어드민 주민번호
+    @Column(unique = true, nullable = false)
     private String adminResidentNum;
 
     //어드민 전화번호
