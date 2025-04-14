@@ -29,7 +29,7 @@ public class RoomMenuLikeController {
                                                     @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         log.info("룸메뉴 좋아요 컨트롤러 진입");
         log.info("로그인한 사용자" + customMemberDetails.getMember().getMemberEmail());
-        String email = customMemberDetails.getMember().getMemberEmail();
+        String email = customMemberDetails.getName();
         int likes = roomMenuLikeService.roomMenuLike(roomMenuNum, email);
         return ResponseEntity.ok(likes);
     }

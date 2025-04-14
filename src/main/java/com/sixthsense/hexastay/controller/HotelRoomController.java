@@ -61,6 +61,7 @@ public class HotelRoomController {
         String loginEmail = principal.getName();
         AdminDTO adminDTO = adminService.adminFindEmail(loginEmail);
 
+
         //여기에 소속되어 있는 보든 리스트 정보 가져 오기
         Long companyNum =  adminDTO.getCompanyNum();
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
