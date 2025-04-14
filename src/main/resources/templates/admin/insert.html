@@ -134,7 +134,7 @@
                 <input type="date" name="adminJoinDate" class="form-control">
             </div>
             <div class="d-flex justify-content-center gap-3">
-                <button type="submit" onclick="submitForm()" class="btn btn-success">등록</button>
+                <button type="submit" onclick="submitForm(event)" class="btn btn-success">등록</button>
                 <button class="btn btn-danger">취소</button>
             </div>
         </div>
@@ -196,20 +196,20 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = false;
 
-                    fetch(`/admin/searchstore`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("왜안됨?")
-                            adminStore.innerHTML = "<option value=''></option>";
+                fetch(`/admin/searchstore`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("왜안됨?")
+                        adminStore.innerHTML = "<option value=''></option>";
 
-                            data.forEach(item => {
-                                let storeOption = document.createElement("option");
-                                storeOption.value = item.storeNum;
-                                storeOption.textContent = item.storeName;
-                                adminStore.appendChild(storeOption);
-                            });
-                        })
-                }
+                        data.forEach(item => {
+                            let storeOption = document.createElement("option");
+                            storeOption.value = item.storeNum;
+                            storeOption.textContent = item.storeName;
+                            adminStore.appendChild(storeOption);
+                        });
+                    })
+            }
 
 
             adminCenter.addEventListener("change", function () {
@@ -252,10 +252,10 @@
                         })
                         .catch(error => console.error("지점 데이터 불러오기 실패:", error));
                 }
-                    });
+            });
         });
 
-        function submitForm() {
+        function submitForm(event) {
             if (adminChoice.value === "본사") {
                 document.getElementById("centerNum").value = adminCenter.value;
                 document.getElementById("branchNum").value = "";
@@ -290,7 +290,76 @@
                 document.getElementById('adminPhonePartOne').value + "-" +
                 document.getElementById('adminPhonePartTwo').value + "-" +
                 document.getElementById('adminPhonePartThree').value
+
+
+            const password = document.getElementById("adminPassword").value;
+            const passwordConfirm = document.getElementById("adminPasswordTwo").value;
+
+            if (password !== passwordConfirm) {
+                event.preventDefault();
+                alert("패스워드가 일치하지 않습니다.");
+            }
+
+            if (signupActive === false) {
+                event.preventDefault();
+                alert("ID를 확인 해 주십시요!")
+            }
         }
+
+
+        document.getElementById('registerSubmitDummy').addEventListener('click', function () {
+            if (signupActive === false) {
+                alert("ID를 확인 해 주십시요!")
+            } else {
+                document.getElementById('registerSubmitBtn').click();
+            }
+        });
+
+
+        document.getElementById('memberId').addEventListener('keyup', function () {
+            var id = document.getElementById('memberId').value;
+            fetch(`/idcheck/`+(id), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.text())
+                .then(result => {
+                    const idCheck = document.getElementById('idCheck');
+                    if (result.trim() === "1") {
+                        idCheck.textContent = "사용 가능한 ID";
+                        idCheck.style.color = "green";
+                        signupActive = true;
+                    } else {
+                        idCheck.textContent = "이미 사용중인 ID";
+                        idCheck.style.color = "#b10000";
+                        signupActive = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("ID 체크 중 오류 발생:", error);
+                    document.getElementById('idCheck').textContent = "ID 확인 실패.";
+                    signupActive = false;
+                });
+        });
+
+
+        document.getElementById('passwordConfirm').addEventListener('keyup', function () {
+            var password = document.getElementById('memberPassword').value;
+            var passwordTwo = document.getElementById('passwordConfirm').value;
+
+            if (password === passwordTwo) {
+                passwordCheck.textContent = "";
+                passwordCheck.style.display = "none";
+            } else {
+                passwordCheck.textContent = "패스워드 불일치";
+                passwordCheck.style.display = "inline";
+            }
+
+        });
+
+
 
 
         // 프로필 사진
@@ -330,6 +399,9 @@
             let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
             document.querySelector('.file-name').textContent = fileName;
         });
+
+
+
 
 
 

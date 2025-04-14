@@ -39,7 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
             http
                     .securityMatcher("/admin/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
-                            "/notice/**", "/review/**", "/room/**", "/roommenu/**",
+                            "/notice/**", "/review/**", "/room/**",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
 
                     .authenticationManager(authManager)
