@@ -106,6 +106,22 @@ public class HotelRoomController {
         return "hotelroom/list";
     }
 
+    //todo:/hotelRoomsByMember/{memberNum}
+    //모달 페이지 수정 하기
+    @PostMapping("update")
+    public String hotelRoomUpdatePost(HotelRoomDTO hotelRoomDTO) {
+        log.info("hotelRoomUpdate Post 페이지에 들어 오기는 했지 ");
+
+        hotelRoomService.hotelroomrModify(hotelRoomDTO);
+
+        Long memberNum = hotelRoomDTO.getMemberNum(); // DTO에서 추출
+
+        return "redirect:/hotelRoomsByMember/" + memberNum;
+    }
+
+
+
+
 
 
 

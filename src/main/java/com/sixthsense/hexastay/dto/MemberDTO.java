@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.dto;
 
 
+import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
 
 
@@ -53,6 +54,16 @@ public class MemberDTO {
 
     //*******************//
     private HotelRoomDTO hotelRoomDTO;
+
+    public MemberDTO(Member member) {
+        this.memberNum = member.getMemberNum();
+        this.memberName = member.getMemberName();
+        this.memberPhone = member.getMemberPhone();
+        this.memberEmail = member.getMemberEmail();
+
+
+
+    }
 
     public MemberDTO setHotelRoomDTO(HotelRoomDTO hotelRoomDTO) {
 
