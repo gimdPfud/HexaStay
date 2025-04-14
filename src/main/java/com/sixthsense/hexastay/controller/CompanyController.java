@@ -55,7 +55,6 @@ public class CompanyController {
     public String listPost (@RequestParam("select") String select, @RequestParam("choice") String choice, @RequestParam ("keyword") String keyword) {
 
 
-
         return null;
     }
 
@@ -76,21 +75,25 @@ public class CompanyController {
     }
 
     @GetMapping("/read/{companyNum}")
-    public String readCompany(Model model, @PathVariable(name = "companyNum") Long companyNum) {
+    public String readCompany(@PathVariable(name = "companyNum") Long companyNum, Model model) {
+
 
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
         model.addAttribute("companyDTO", companyDTO);
 
-        return "/company/read";
+        if (companyDTO == null) {
+            throw new IllegalArgumentException("해당 회사 정보가 없습니다: " + companyNum);
+        }
+
+        return "company/read";
     }
 
-    @GetMapping("/{type}/modify/{id}")
-    public String modifyOrg(@PathVariable("type") String type,
-                            @PathVariable("id") Long id,
-                            Model model) {
+    @GetMapping("/del/{companyNum}")
+    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) {
 
-        return "company/modify";
+        companyService.companyDelete(companyNum);
+
+        return "redirect:/company/list";
     }
-
 
 }
