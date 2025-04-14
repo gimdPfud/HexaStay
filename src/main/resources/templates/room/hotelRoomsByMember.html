@@ -18,7 +18,6 @@
             <th>방 가격</th>
             <th>수정</th>
             <th>삭제</th>
-
         </tr>
         </thead>
         <tbody>
@@ -40,8 +39,9 @@
                 </button>
             </td>
             <td>
-                <form th:action="@{/hotelRoom/delete/{roomNum}(roomNum=${hotelRoom.hotelRoomNum})}" method="post"
+                <form th:action="@{/admin/hotelroom/delete}" method="post"
                       onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <input type="hidden" name="hotelRoomNum" th:value="${hotelRoom.hotelRoomNum}">
                     <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                 </form>
             </td>
@@ -70,11 +70,10 @@
 </div>
 
 <!-- 수정 모달 -->
-<!-- 모달 창 -->
 <div class="modal fade" id="editHotelRoomModal" tabindex="-1" aria-labelledby="editHotelRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form th:action="@{/hotelRoom/update}" method="post">
+            <form th:action="@{/admin/hotelroom/update}" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editHotelRoomModalLabel">호텔룸 정보 수정</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -82,6 +81,9 @@
                 <div class="modal-body row g-3">
                     <!-- 숨겨진 hotel_room_num -->
                     <input type="hidden" id="editHotelRoomNum" name="hotelRoomNum">
+
+                    <!-- 숨겨진 memberNum 전달 -->
+                    <input type="hidden" id="editMemberNum" name="memberNum" th:value="${memberNum}">
 
                     <div class="col-md-6">
                         <label for="editHotelRoomName" class="form-label">방 이름</label>
@@ -107,7 +109,6 @@
                         <label for="editHotelRoomContent" class="form-label">방 설명</label>
                         <textarea class="form-control" id="editHotelRoomContent" name="hotelRoomContent" rows="3"></textarea>
                     </div>
-                    <!-- 필요시 다른 필드도 추가 가능 -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
@@ -117,7 +118,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- 모달에 데이터 자동 채우기 -->
 <script>

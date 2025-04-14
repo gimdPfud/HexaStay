@@ -94,14 +94,20 @@ public class MemberServiceImpl implements MemberService {
 
     //수정
     @Override
-    public void memberModify(MemberDTO memberDTO) {
+    public MemberDTO memberModify(MemberDTO memberDTO) {
+        // memberDTO -> Member 엔티티로 변환
+        Member member = memberRepository.findById(memberDTO.getMemberNum())
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-        //변환 - Memem만 DTO 타입으로 변환
-        Member member = modelMapper.map(memberDTO, Member.class);
+        member.setMemberName(memberDTO.getMemberName());
+        member.setMemberPhone(memberDTO.getMemberPhone());
+        member.setMemberEmail(memberDTO.getMemberEmail());
 
-        //처리
+        // 수정된 회원 엔티티를 다시 저장
         memberRepository.save(member);
 
+        // 수정된 회원 정보를 DTO로 변환하여 반환
+        return new MemberDTO(member);
     }
 
     //삭제

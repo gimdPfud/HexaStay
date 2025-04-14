@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -114,6 +115,16 @@ public class MemberController {
         model.addAttribute("hotelRoomDTO", new HotelRoomDTO());
 
         return "member/insert";
+    }
+
+    //todo:http://localhost:8090/membersByHotelRoom/{hotelRoomNum}
+    //todo:roomlist
+    @PostMapping("/update/ajax")
+    @ResponseBody
+    public ResponseEntity<MemberDTO> updateMemberAjax(@RequestBody MemberDTO memberDTO) {
+        // 수정된 회원 데이터를 반환
+        MemberDTO updatedMember = memberService.memberModify(memberDTO);
+        return ResponseEntity.ok(updatedMember);
     }
 
 
