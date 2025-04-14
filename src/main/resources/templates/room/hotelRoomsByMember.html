@@ -1,20 +1,24 @@
-<!-- hotelRoomsByMember.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>호텔룸 리스트</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <div class="container mt-4">
-    <h2>호텔룸 리스트</h2>
-    <table class="table table-bordered">
-        <thead>
+    <h2 class="mb-4">호텔룸 리스트</h2>
+
+    <table class="table table-hover align-middle text-center">
+        <thead class="table-dark">
         <tr>
             <th>호텔룸 번호</th>
             <th>방 이름</th>
             <th>방 종류</th>
             <th>방 가격</th>
+            <th>수정</th>
+            <th>삭제</th>
+
         </tr>
         </thead>
         <tbody>
@@ -23,27 +27,119 @@
             <td th:text="${hotelRoom.hotelRoomName}"></td>
             <td th:text="${hotelRoom.hotelRoomType}"></td>
             <td th:text="${hotelRoom.hotelRoomPrice}"></td>
+            <td>
+                <button type="button" class="btn btn-sm btn-warning"
+                        th:attr="data-roomNum=${hotelRoom.hotelRoomNum},
+                     data-roomName=${hotelRoom.hotelRoomName},
+                     data-roomType=${hotelRoom.hotelRoomType},
+                     data-roomPrice=${hotelRoom.hotelRoomPrice},
+                     data-roomPhone=${hotelRoom.hotelRoomPhone},
+                     data-roomContent=${hotelRoom.hotelRoomContent}"
+                        onclick="openEditModal(this)">
+                    수정
+                </button>
+            </td>
+            <td>
+                <form th:action="@{/hotelRoom/delete/{roomNum}(roomNum=${hotelRoom.hotelRoomNum})}" method="post"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                </form>
+            </td>
         </tr>
         </tbody>
     </table>
+
     <div>
         <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">호텔룸 목록</a>
     </div>
 
     <!-- 페이지네이션 -->
     <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li th:classappend="${currentPage == 0} ? 'disabled'">
+        <ul class="pagination mt-3">
+            <li th:classappend="${currentPage == 0} ? 'disabled'" class="page-item">
                 <a class="page-link" th:href="@{/hotelRoomsByMember/{memberNum}(memberNum=${memberNum}, page=${currentPage - 1})}">이전</a>
             </li>
             <li class="page-item">
                 <span class="page-link" th:text="${currentPage + 1}"></span>
             </li>
-            <li th:classappend="${hotelRooms.totalPages - 1 == currentPage} ? 'disabled'">
+            <li th:classappend="${hotelRooms.totalPages - 1 == currentPage} ? 'disabled'" class="page-item">
                 <a class="page-link" th:href="@{/hotelRoomsByMember/{memberNum}(memberNum=${memberNum}, page=${currentPage + 1})}">다음</a>
             </li>
         </ul>
     </nav>
 </div>
+
+<!-- 수정 모달 -->
+<!-- 모달 창 -->
+<div class="modal fade" id="editHotelRoomModal" tabindex="-1" aria-labelledby="editHotelRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form th:action="@{/hotelRoom/update}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHotelRoomModalLabel">호텔룸 정보 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <!-- 숨겨진 hotel_room_num -->
+                    <input type="hidden" id="editHotelRoomNum" name="hotelRoomNum">
+
+                    <div class="col-md-6">
+                        <label for="editHotelRoomName" class="form-label">방 이름</label>
+                        <input type="text" class="form-control" id="editHotelRoomName" name="hotelRoomName">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editHotelRoomType" class="form-label">방 종류</label>
+                        <input type="text" class="form-control" id="editHotelRoomType" name="hotelRoomType">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editHotelRoomPrice" class="form-label">가격</label>
+                        <input type="number" class="form-control" id="editHotelRoomPrice" name="hotelRoomPrice">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="editHotelRoomPhone" class="form-label">전화번호</label>
+                        <input type="text" class="form-control" id="editHotelRoomPhone" name="hotelRoomPhone">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="editHotelRoomContent" class="form-label">방 설명</label>
+                        <textarea class="form-control" id="editHotelRoomContent" name="hotelRoomContent" rows="3"></textarea>
+                    </div>
+                    <!-- 필요시 다른 필드도 추가 가능 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- 모달에 데이터 자동 채우기 -->
+<script>
+    function openEditModal(button) {
+        const roomNum = button.getAttribute('data-roomNum');
+        const roomName = button.getAttribute('data-roomName');
+        const roomType = button.getAttribute('data-roomType');
+        const roomPrice = button.getAttribute('data-roomPrice');
+        const roomPhone = button.getAttribute('data-roomPhone');
+        const roomContent = button.getAttribute('data-roomContent');
+
+        document.getElementById('editHotelRoomNum').value = roomNum;
+        document.getElementById('editHotelRoomName').value = roomName;
+        document.getElementById('editHotelRoomType').value = roomType;
+        document.getElementById('editHotelRoomPrice').value = roomPrice;
+        document.getElementById('editHotelRoomPhone').value = roomPhone;
+        document.getElementById('editHotelRoomContent').value = roomContent;
+
+        const editModal = new bootstrap.Modal(document.getElementById('editHotelRoomModal'));
+        editModal.show();
+    }
+</script>
+
 </body>
 </html>

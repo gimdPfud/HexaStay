@@ -1,127 +1,153 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <!--부트 스트랩-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--부트 스트랩 스타일시트(HTML 속성)-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!--부트스트랩에 효과(자바스크립트)-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!--부트스트랩 아이콘-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Room 배정 목록</title>
 
-    <title>Title</title>
+    <!-- 부트스트랩 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 부트스트랩 아이콘 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* 호텔룸 이름 호버 시 색상 변경 */
+        .hover-link-primary {
+            color: #0d6efd; /* 기본 blue */
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .hover-link-primary:hover {
+            color: #0a58ca; /* 더 진한 blue */
+            text-decoration: underline;
+        }
+
+        /* 회원 이름 호버 시 색상 변경 */
+        .hover-link-dark {
+            color: #212529; /* 기본 dark */
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .hover-link-dark:hover {
+            color: #495057; /* 연한 gray-dark */
+            text-decoration: underline;
+        }
+    </style>
+
+
 </head>
 <body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Room 배정 목록</h2>
 
-<div class="container mt-4">
-    <h2>Room 배정 목록</h2>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>번호</th>
-            <th>호텔룸 이름</th>
-            <th>룸 전화번호</th>
-            <th>회원 이름</th>
-            <th>회원 이메일</th>
-            <th>멤버 룸배정일자</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="room : ${rooms.content}">  <!-- 🔥 rooms.content로 리스트 가져오기 -->
-            <td th:text="${room.roomNum}"></td>
-            <td><!--팝업 창으로도 변경 가믄-->
-                <a href="javascript:void(0);"
-                   onclick="openMemberPopup(this)"
-                   target="_blank"
-                   th:text="${room.hotelRoomName}" class="text-decoration-none"
-                   th:attr="data-hotelRoomNum=${room.hotelRoomNum}">
-                </a>
-            </td>
-            <td th:text="${room.hotelRoomPhone}"></td>
-            <td>
-                <a href="javascript:void(0);"
-                   onclick="openMemberPopupByMember(this)"
-                   th:text="${room.memberName}" class="text-decoration-none"
-                   th:attr="data-memberNum=${room.memberNum}">
-                </a>
-            </td>
-            <td th:text="${room.memberEmail}"></td>
-            <td th:text="${#temporals.format(room.membereDate, 'yy/MM/dd')}"></td>
-            <input hidden th:value="${room.hotelRoomNum}"></input>
-        </tr>
-        </tbody>
-    </table>
-    <div>
-        <a th:href="@{/register-hotelroom}" class="btn btn-dark btn-lg">HotelRommPk_룸배정</a>
-        <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">memberPk_룸배정</a>
+    <!-- 검색 폼 -->
+    <form class="row mb-4" th:action="@{/roomlist}" method="get">
+        <div class="col-md-4">
+            <input type="text" name="keyword" class="form-control" placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> 검색
+            </button>
+        </div>
+        <div class="col-md-2">
+            <a th:href="@{/roomlist}" class="btn btn-secondary w-100">
+                <i class="bi bi-x-circle"></i> 초기화
+            </a>
+        </div>
+    </form>
+
+    <!-- 테이블 -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>번호</th>
+                <th>호텔룸_이름</th>
+                <th>회원_이름</th>
+                <th>회원 이메일</th>
+                <th>호텔룸TEL</th>
+                <th>룸배정일자</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="room : ${rooms.content}">
+                <td th:text="${room.roomNum}"></td>
+                <!-- 호텔룸 이름 -->
+                <td>
+                    <a href="javascript:void(0);"
+                       onclick="openMemberPopup(this)"
+                       class="hover-link-primary fw-semibold"
+                       th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
+                       th:text="${room.hotelRoomName}"></a>
+                </td>
+
+                <!-- 회원 이름 -->
+                <td>
+                    <a href="javascript:void(0);"
+                       onclick="openMemberPopupByMember(this)"
+                       class="hover-link-dark fw-semibold"
+                       th:attr="data-memberNum=${room.memberNum}"
+                       th:text="${room.memberName}"></a>
+                </td>
+                <td th:text="${room.memberEmail}"></td>
+                <td th:text="${room.hotelRoomPhone}"></td>
+                <td th:text="${#temporals.format(room.membereDate, 'yy/MM/dd')}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rooms.content)}">
+                <td colspan="6" class="text-center text-muted">검색 결과가 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- 페이지네이션 -->
-    <div>
-        <span th:text="'현재 페이지: ' + (${rooms.number + 1}) + ' / ' + (${rooms.totalPages})"></span>
-
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <span th:text="'현재 페이지: ' + (${rooms.number + 1}) + ' / ' + (${rooms.totalPages})"></span>
+        </div>
         <nav>
-            <ul class="pagination">
-                <!-- 이전 버튼 -->
+            <ul class="pagination mb-0">
                 <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
-                    <a class="page-link" th:if="${!rooms.first}" th:href="@{/roomlist(page=${rooms.number - 1})}">이전</a>
-                    <span class="page-link" th:if="${rooms.first}">이전</span>
+                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number - 1}, keyword=${keyword})}">이전</a>
                 </li>
-
-                <!-- 페이지 번호 -->
                 <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
                     class="page-item" th:classappend="${rooms.number == i} ? 'active'">
-                    <a class="page-link" th:href="@{/roomlist(page=${i})}" th:text="${i + 1}"></a>
+                    <a class="page-link" th:href="@{/roomlist(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
                 </li>
-
-                <!-- 다음 버튼 -->
                 <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
-                    <a class="page-link" th:if="${!rooms.last}" th:href="@{/roomlist(page=${rooms.number + 1})}">다음</a>
-                    <span class="page-link" th:if="${rooms.last}">다음</span>
+                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number + 1}, keyword=${keyword})}">다음</a>
                 </li>
             </ul>
         </nav>
     </div>
 
+    <!-- 하단 버튼 -->
+    <div class="d-flex justify-content-center mt-4 gap-3">
+        <a th:href="@{/register-hotelroom}" class="btn btn-dark btn-lg">HotelRoomPk_룸배정</a>
+        <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">MemberPk_룸배정</a>
+    </div>
+
+    <!-- 팝업 스크립트 -->
     <script th:inline="javascript">
-
-        /*호텔룸 클릭 했을때 hotelRoomNum 기준*/
         function openMemberPopup(element) {
-            var hotelRoomNum = element.getAttribute("data-hotelRoomNum");
-            console.log("호텔룸 번호:", hotelRoomNum);
-
-            if (!hotelRoomNum) {
-                alert("호텔룸 번호를 가져올 수 없습니다!");
-                return;
-            }
-
-            var popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
-            var popupOption = "width=600,height=500,scrollbars=yes,resizable=yes";
-            window.open(popupUrl, "room/membersByHotelRoom", popupOption);
+            const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+            if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
+            const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
+            window.open(popupUrl, "room/membersByHotelRoom", "width=600,height=500,scrollbars=yes,resizable=yes");
         }
 
-        /*멤버  클릭 했을때 memberNum 기준*/
         function openMemberPopupByMember(element) {
-            var memberNum = element.getAttribute("data-memberNum");  // 🔥 `data-memberNum` 값 가져오기
-            console.log("회원 번호:", memberNum);
-
-            if (!memberNum) {
-                alert("회원 번호를 가져올 수 없습니다!");
-                return;
-            }
-
-            var popupUrl = "/hotelRoomsByMember/" + memberNum;
-            var popupOption = "width=600,height=500,scrollbars=yes,resizable=yes";
-            window.open(popupUrl, "room/hotelRoomsByMembe", popupOption);
+            const memberNum = element.getAttribute("data-memberNum");
+            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+            const popupUrl = "/hotelRoomsByMember/" + memberNum;
+            window.open(popupUrl, "room/hotelRoomsByMember", "width=600,height=500,scrollbars=yes,resizable=yes");
         }
-
     </script>
-
 </div>
 </body>
 </html>
