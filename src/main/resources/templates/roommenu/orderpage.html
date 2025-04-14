@@ -168,6 +168,18 @@
         .food-info {
             flex-grow: 1;
         }
+
+        /*좋아요*/
+        .like-section {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+        }
+
+        #likeIcon:hover {
+            transform: scale(1.2);
+            transition: transform 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -214,7 +226,6 @@
     <ul class="food-list">
         <li th:each="roomMenuDTO : ${list}" class="food-item">
             <!-- 메뉴 이미지 -->
-            <td style="text-align: center;">
                 <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                      th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
                      style="width: 135px; height: 125px;">
@@ -222,64 +233,148 @@
                 <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                      th:src="@{/profile/default.png}"
                      style="width: 60px; height: 80px;">
-            </td>
-            <div class="food-info">
-                <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p> <!-- 카테고리 -->
-                <p>
-                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                       th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
-                    </a>
-                </p>
-                <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
-                <p class="rating">
-                    <!-- 더미 평점 -->
-                    <span class="stars">
-                    &#9733;&#9733;&#9733;&#9733;&#9734; <!-- 4개 채워진 별, 1개 빈 별 -->
-                </span>
-                    <span class="rating-text">4.0</span> <!-- 평점 텍스트 -->
-                </p>
+            <!-- 메뉴 이미지 끝 -->
+            <div class="food-info row">
+                <div class="col-8">
+                    <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p> <!-- 카테고리 -->
+                    <p>
+                        <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                           th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
+                        </a>
+                    </p>
+                    <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
+                </div>
             </div>
+
+            <!-- 좋아요, 싫어요 영역 -->
+            <div class="like-section">
+                <!-- 좋아요 아이콘 -->
+                <span id="likeIcon-1" onclick="toggleLike(1)" style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
+                <!-- 좋아요 수 -->
+                <span id="likeCount-1">0</span>
+
+                <!-- 싫어요 아이콘 -->
+                <span id="dislikeIcon-1" onclick="toggleDislike(1)" style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>
+                <!-- 싫어요 수 -->
+                <span id="dislikeCount-1">0</span>
+            </div>
+
         </li>
     </ul>
 </div>
 
 
+<!-- 스크립트 시작 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-
-    /* 검색창 토글 */
     function toggleSearch() {
         const searchContainer = document.getElementById('search-container');
         searchContainer.style.display = searchContainer.style.display === 'none' || searchContainer.style.display === '' ? 'block' : 'none';
     }
 
-
-    /* 장바구니 아이콘 누르면 읽기 페이지로 이동 */
-
     function submitPostRequest() {
-        // POST 요청을 보내기 위한 데이터
         const data = {
-            key: 'value'  // 예시로 보내고 싶은 데이터
+            key: 'value'
         };
 
-        // fetch로 POST 요청 보내기
         fetch('http://localhost:8090/roommenu/cartlist', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'  // JSON 형식으로 보내기
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)  // 데이터를 JSON 형식으로 변환하여 보냄
+            body: JSON.stringify(data)
         })
-            .then(response => response.json())  // 서버의 응답을 처리
+            .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                // 성공 후 사용자에게 처리 결과를 알려줄 수 있음
-                window.location.href = 'http://localhost:8090/roommenu/cartlist'; // 응답을 받은 후 페이지 이동
+                window.location.href = 'http://localhost:8090/roommenu/cartlist';
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     }
+
+    // 상태 저장
+    const likedStates = {};
+    const dislikedStates = {};
+
+    function toggleLike(menuId) {
+        const liked = likedStates[menuId] || false;
+        const url = liked
+            ? `/roomMenu/orderpage/cancellike/${menuId}`
+            : `/roomMenu/orderpage/like/${menuId}`;
+
+        fetch(url, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('서버 오류');
+                return res.json(); // 서버에서 Integer 대신 { "count": number } 로 응답한다고 가정
+            })
+            .then(data => {
+                const likeIcon = document.getElementById(`likeIcon-${menuId}`);
+                const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
+                const likeCount = document.getElementById(`likeCount-${menuId}`);
+
+                likeIcon.textContent = liked ? '🤍' : '❤️';
+                likeIcon.style.color = liked ? 'gray' : 'red';
+                likeCount.textContent = data;
+
+                if (!liked) {
+                    // 좋아요 누르면 싫어요 초기화
+                    const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
+                    dislikeIcon.textContent = '👎';
+                    dislikeIcon.style.color = 'gray';
+                    dislikedStates[menuId] = false;
+                }
+
+                likedStates[menuId] = !liked;
+            })
+            .catch(err => {
+                console.error('좋아요 실패:', err);
+                alert('좋아요 처리 중 문제가 발생했습니다.');
+            });
+    }
+
+    function toggleDislike(menuId) {
+        const disliked = dislikedStates[menuId] || false;
+        const url = disliked
+            ? `/roomMenu/orderpage/undislike/${menuId}`
+            : `/roomMenu/orderpage/dislike/${menuId}`;
+
+        fetch(url, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('서버 오류');
+                return res.json(); // 서버에서 Integer 대신 { "count": number } 로 응답한다고 가정
+            })
+            .then(data => {
+                const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
+                const likeIcon = document.getElementById(`likeIcon-${menuId}`);
+                const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
+
+                dislikeIcon.textContent = disliked ? '👎' : '💔';
+                dislikeIcon.style.color = disliked ? 'gray' : 'blue';
+                dislikeCount.textContent = data;
+
+                if (!disliked) {
+                    likeIcon.textContent = '🤍';
+                    likeIcon.style.color = 'gray';
+                    likedStates[menuId] = false;
+                }
+
+                dislikedStates[menuId] = !disliked;
+            })
+            .catch(err => {
+                console.error('싫어요 실패:', err);
+                alert('싫어요 처리 중 문제가 발생했습니다.');
+            });
+    }
 </script>
 
+<!-- 스크립트 끝 -->
 </body>
 </html>
+
+

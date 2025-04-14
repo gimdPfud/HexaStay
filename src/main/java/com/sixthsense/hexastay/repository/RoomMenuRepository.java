@@ -10,17 +10,18 @@ package com.sixthsense.hexastay.repository;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuLike;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
-//    @Query("select a from RoomMenu a")
-//    public Page<RoomMenu> findby(Pageable pageable);
-
-    // 사용자를 찾기
-
 
     /* 카테고리 별로 검색 */
     Page<RoomMenu> findByRoomMenuCategory(String category, Pageable pageable);
@@ -42,13 +43,23 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     /*이름 + 이름이나 가격으로 검색*/
     Page<RoomMenu> findByRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(String keyword, Integer price, Pageable pageable);
 
-
-    /*아무거나 검색*/
-    Page<RoomMenu> findByRoomMenuNameLikeOrRoomMenuPriceGreaterThanOrRoomMenuCategoryLikeOrRoomMenuAmountGreaterThanOrRoomMenuStatusLike(String roomMenuName, Integer roomMenuPrice, String roomMenuCategory, Integer roomMenuAmount, String roomMenuStatus, Pageable pageable);
-
-
     // 호텔 룸 멤버의 이메일 참조
     RoomMenu findByRoom_Member_MemberEmail(String memberEmail);
+
+    // 좋아요
+    @Modifying
+    @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes + 1 WHERE rm.roomMenuNum = :menuNum")
+    void roomMenuIncrementLikes(@Param("menuNum") Long menuNum);
+
+    // 싫어요
+    @Modifying
+    @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes - 1 WHERE rm.roomMenuNum = :menuNum")
+    void roomMenuDecrementDisLikes(@Param("menuNum") Long menuNum);
+
+    Optional<RoomMenu> findByMember_MemberEmailAndRoomMenuNum(String memberEmail, Long roomMenuNum);
+
+
+
 
 
 }
