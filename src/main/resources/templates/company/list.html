@@ -83,7 +83,7 @@
             <td th:text="${item.branchName}">지사명</td>
             <td th:text="${item.facilityName}">지점명</td>
             <td th:text="${item.companyPhone}"></td>
-            <td><a th:href="@{/templates/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a></td>
+            <td><a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a></td>
           </tr>
           </tbody>
 
