@@ -46,6 +46,8 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     // 호텔 룸 멤버의 이메일 참조
     RoomMenu findByRoom_Member_MemberEmail(String memberEmail);
 
+
+
     // 좋아요
     @Modifying
     @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes + 1 WHERE rm.roomMenuNum = :menuNum")
@@ -55,11 +57,6 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     @Modifying
     @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes - 1 WHERE rm.roomMenuNum = :menuNum")
     void roomMenuDecrementDisLikes(@Param("menuNum") Long menuNum);
-
-    Optional<RoomMenu> findByMember_MemberEmailAndRoomMenuNum(String memberEmail, Long roomMenuNum);
-
-
-
 
 
 }

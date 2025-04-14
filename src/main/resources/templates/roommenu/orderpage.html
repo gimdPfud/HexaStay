@@ -249,14 +249,18 @@
             <!-- 좋아요, 싫어요 영역 -->
             <div class="like-section">
                 <!-- 좋아요 아이콘 -->
-                <span id="likeIcon-1" onclick="toggleLike(1)" style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
+                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                      th:onclick="'toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                      style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
                 <!-- 좋아요 수 -->
-                <span id="likeCount-1">0</span>
+                <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
 
                 <!-- 싫어요 아이콘 -->
-                <span id="dislikeIcon-1" onclick="toggleDislike(1)" style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>
+                <span th:id="'dislikeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                      th:onclick="'toggleDislike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                      style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>
                 <!-- 싫어요 수 -->
-                <span id="dislikeCount-1">0</span>
+                <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
             </div>
 
         </li>
@@ -309,19 +313,20 @@
         })
             .then(res => {
                 if (!res.ok) throw new Error('서버 오류');
-                return res.json(); // 서버에서 Integer 대신 { "count": number } 로 응답한다고 가정
+                return res.json(); // 서버에서 숫자(int) 응답
             })
             .then(data => {
                 const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                 const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                 const likeCount = document.getElementById(`likeCount-${menuId}`);
 
+                // UI 업데이트
                 likeIcon.textContent = liked ? '🤍' : '❤️';
                 likeIcon.style.color = liked ? 'gray' : 'red';
                 likeCount.textContent = data;
 
+                // 좋아요 누르면 싫어요 초기화
                 if (!liked) {
-                    // 좋아요 누르면 싫어요 초기화
                     const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
                     dislikeIcon.textContent = '👎';
                     dislikeIcon.style.color = 'gray';
@@ -339,7 +344,7 @@
     function toggleDislike(menuId) {
         const disliked = dislikedStates[menuId] || false;
         const url = disliked
-            ? `/roomMenu/orderpage/undislike/${menuId}`
+            ? `/roomMenu/orderpage/cancledislike/${menuId}`  // ✅ 여기가 fix point
             : `/roomMenu/orderpage/dislike/${menuId}`;
 
         fetch(url, {
@@ -347,17 +352,19 @@
         })
             .then(res => {
                 if (!res.ok) throw new Error('서버 오류');
-                return res.json(); // 서버에서 Integer 대신 { "count": number } 로 응답한다고 가정
+                return res.json(); // 서버에서 숫자(int) 응답
             })
             .then(data => {
                 const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                 const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                 const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
 
+                // UI 업데이트
                 dislikeIcon.textContent = disliked ? '👎' : '💔';
                 dislikeIcon.style.color = disliked ? 'gray' : 'blue';
                 dislikeCount.textContent = data;
 
+                // 싫어요 누르면 좋아요 초기화
                 if (!disliked) {
                     likeIcon.textContent = '🤍';
                     likeIcon.style.color = 'gray';
