@@ -66,4 +66,6 @@ public class StoreDTO {
 
     private String storeProfileMeta; //가게 사진정보
 
+    private Long companyNum; //어디다 제공할 지 호텔(company) pk 따옴.
+
 }

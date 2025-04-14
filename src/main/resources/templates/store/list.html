@@ -62,7 +62,7 @@
                 <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center; vertical-align: middle;">
-                    <a th:href="@{/admin/store/read/{id}(id=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
+                    <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
                     <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger">삭제</a>
                 </td>
             </tr>

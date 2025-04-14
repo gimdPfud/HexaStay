@@ -26,7 +26,11 @@
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
                 <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
             </div>
-
+            <div class="mb-3">
+                <label class="form-label">제공할 호텔</label>
+                <input type="hidden" class="form-control" name="companyNum" th:value="${data.companyNum}" required>
+                <input type="text" class="form-control" th:value="${data.companyName}" readonly disabled>
+            </div>
             <div class="mb-3">
                 <label class="form-label">외부 업체 이름</label>
                 <input type="text" class="form-control" name="storeName" required>

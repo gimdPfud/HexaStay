@@ -28,6 +28,7 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
     Page<Orderstore> findByRoom_Member_MemberEmail (String email, Pageable pageable);
     /*리스트로 가져오기. 근데 주문내역이면........... 계속 나오지않나*/
     List<Orderstore> findByRoom_Member_MemberEmail (String email);
+    List<Orderstore> findByRoom_HotelRoom_HotelRoomNum (Long hotelRoomNum);
 
     /*스토어넘버로 가져오기*/
     /*fixme 친구가 만들어준거*/
@@ -43,6 +44,4 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
             "JOIN sm.store s " +
             "WHERE s.storeNum = :storeNum AND o.orderstoreStatus='alive'")
     List<Orderstore> selectAliveOrder(Long storeNum);
-
-
 }

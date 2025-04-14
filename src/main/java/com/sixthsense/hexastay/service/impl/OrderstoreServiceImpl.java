@@ -74,6 +74,37 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         orderstoreRepository.save(order);
         return 1;
     }
+    /*이거 사용함
+    * hotelRoomNum*/
+    @Override
+    public int insert(List<Long> itemIdList, Long hotelRoomNum) {
+        //추가 : room레포지토리에서 방번호로 가장 최근의 room(예약정보)을 찾아 setRoom() 때린다.
+        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelRoomNum, pageable)
+                .stream().findFirst().orElse(null);
+        if(room==null){return 2;}
+        Orderstore order = new Orderstore();
+        order.setRoom(room);
+        order.setOrderstoreStatus("alive");
+
+        List<Orderstoreitem> itemlist = new ArrayList<>();
+        for (Long itemid : itemIdList){
+            Storecartitem cartItem = storecartitemRepository.findById(itemid).orElse(null);
+            if(cartItem==null){return 3;}
+            Storemenu menu = cartItem.getStoremenu();
+            Orderstoreitem orderItem = new Orderstoreitem();
+            orderItem.setOrderstore(order);
+            orderItem.setStoremenu(menu);
+            orderItem.setOrderstoreitemAmount(cartItem.getStorecartitemCount());
+            orderItem.setOrderstoreitemPrice(cartItem.getStoremenu().getStoremenuPrice());
+            orderItem.setOrderstoreitemTotalPrice(cartItem.getStorecartitemCount()*cartItem.getStoremenu().getStoremenuPrice());
+            storecartitemRepository.delete(cartItem);
+            itemlist.add(orderItem);
+        }
+        order.setOrderstoreitemList(itemlist);
+        orderstoreRepository.save(order);
+        return 1;
+    }
 
     @Override
     public void cancel(Long orderId) {
@@ -90,8 +121,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
 
     /* 고객한테 보여줄때는 페이지로 보여주면 되지~~롱*/
     @Override
-    public Page<OrderstoreViewDTO> getOrderList(String email, Pageable pageable) {
-        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_Member_MemberEmail(email,pageable);
+    public List<OrderstoreViewDTO> getOrderList(String email) {
+        List<Orderstore> orderlist = orderstoreRepository.findByRoom_Member_MemberEmail(email);
         List<OrderstoreViewDTO> viewOrderList = new ArrayList<>();
         for (Orderstore orderstore : orderlist){
             OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
@@ -102,9 +133,26 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             });
             viewOrderList.add(orderstoreViewDTO);
         }
-        return new PageImpl<>(viewOrderList, pageable, orderlist.getTotalElements());
+        return viewOrderList;
     }
 
+    @Override
+    public List<OrderstoreViewDTO> getOrderList(Long hotelRoomNum) {
+        List<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum);
+        List<OrderstoreViewDTO> viewOrderList = new ArrayList<>();
+        for (Orderstore orderstore : orderlist){
+            OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
+            List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
+            itemlist.forEach(data->{
+                OrderstoreitemDTO dto = modelMapper.map(data,OrderstoreitemDTO.class);
+                orderstoreViewDTO.addOrderstoreitemDTOList(dto);
+            });
+            viewOrderList.add(orderstoreViewDTO);
+        }
+        return viewOrderList;
+    }
+
+    //완료된 주문들만 가져오기
     @Override
     public List<OrderstoreDTO> getAllList() {
         List<Orderstore> orderstoreList = orderstoreRepository.findAll();
@@ -118,6 +166,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         return list;
     }
 
+    //가게에서 확인하는 들어온 주문 리스트 확인
     @Override
     public List<OrderstoreDTO> getOrderedList(Long storeNum) {
         List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
