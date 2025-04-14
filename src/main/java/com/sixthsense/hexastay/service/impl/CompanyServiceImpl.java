@@ -124,8 +124,6 @@ public class CompanyServiceImpl implements CompanyService {
         return companyDTOList;
     }
 
-
-
     // 검색용
     @Override
     public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable) {
@@ -138,6 +136,14 @@ public class CompanyServiceImpl implements CompanyService {
         // 검색 조건 + 키워드가 있을 때
         Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, pageable);
         return companyPage.map(this::convertToCompanyDTO);
+    }
+
+    @Override
+    public CompanyDTO companyRead(Long companyNum) {
+        Company company = companyRepository.findById(companyNum).orElseThrow();
+        CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
+
+        return companyDTO;
     }
 
     private CompanyDTO convertToCompanyDTO(Company company) {

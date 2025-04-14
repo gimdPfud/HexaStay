@@ -75,13 +75,18 @@ public class CompanyController {
         return "redirect:/company/list";
     }
 
+    @GetMapping("/read/{companyNum}")
+    public String readCompany(@PathVariable(name = "companyNum") Long companyNum, Model model) {
 
-    @GetMapping("/{type}/modify/{id}")
-    public String modifyOrg(@PathVariable("type") String type,
-                            @PathVariable("id") Long id,
-                            Model model) {
 
-        return "company/modify";
+        CompanyDTO companyDTO = companyService.companyRead(companyNum);
+        model.addAttribute("companyDTO", companyDTO);
+
+        if (companyDTO == null) {
+            throw new IllegalArgumentException("해당 회사 정보가 없습니다: " + companyNum);
+        }
+
+        return "company/read";
     }
 
 

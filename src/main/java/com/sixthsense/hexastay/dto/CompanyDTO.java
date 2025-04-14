@@ -7,6 +7,8 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.enums.AdminRole;
+import com.sixthsense.hexastay.enums.CompanyType;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,4 +52,8 @@ public class CompanyDTO {
     private String companyParentName;         // 본사명
     private String branchName;                // 지사명
     private String facilityName;              // 지점명
+
+    public String getCompanyTypeKorean() {
+        return CompanyType.displayNameFromCode(companyType);
+    }
 }

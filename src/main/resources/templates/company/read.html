@@ -16,9 +16,7 @@
 
     <div class="d-flex justify-content-center">
       <h2 class="text-center mb-4">
-        <span th:if="${centerDTO != null}">본사 상세보기</span>
-        <span th:if="${branchDTO != null}">지사 상세보기</span>
-        <span th:if="${facilityDTO != null}">지점 상세보기</span>
+        <span>조직 상세보기</span>
       </h2>
     </div>
 
@@ -26,65 +24,24 @@
       <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
     </div>
 
-    <!-- 본사 상세 -->
-    <div th:if="${centerDTO != null}">
-      <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${centerDTO.centerBrand}"></p></div>
-      <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${centerDTO.centerName}"></p></div>
-      <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${centerDTO.centerBusinessNum}"></p></div>
-      <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${centerDTO.centerCeoName}"></p></div>
-      <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${centerDTO.centerPhone}"></p></div>
-      <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${centerDTO.centerEmail}"></p></div>
-      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${centerDTO.centerAddress}"></p></div>
+    <!-- 상세 -->
+    <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${companyDTO.companyBrand}"></p></div>
+    <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${companyDTO.companyName}"></p></div>
+    <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${companyDTO.companyBusinessNum}"></p></div>
+    <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${companyDTO.companyCeoName}"></p></div>
+    <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${companyDTO.companyPhone}"></p></div>
+    <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${companyDTO.companyEmail}"></p></div>
+    <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${companyDTO.companyAddress}"></p></div>
 
-      <div class="d-flex justify-content-center gap-3">
-        <a th:href="@{/templates/company/list}" class="btn btn-secondary">목록</a>
-        <a th:href="@{/templates/company/{type}/modify/{num}(type='center', num=${centerDTO.centerNum})}" class="btn btn-success">수정</a>
-        <form th:action="@{/templates/company/{type}/delete/{num}(type='center', num=${centerDTO.centerNum})}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit" class="btn btn-danger">삭제</button>
-        </form>
-      </div>
+    <div class="d-flex justify-content-center gap-3">
+      <a th:href="@{/company/list}" class="btn btn-secondary">목록</a>
+      <a th:href="@{/company/modify/{num}(num=${companyDTO.companyNum})}" class="btn btn-success">수정</a>
+      <form th:action="@{/company/delete/{num}(num=${companyDTO.companyNum})}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="btn btn-danger">삭제</button>
+      </form>
     </div>
 
-    <!-- 지사 상세 -->
-    <div th:if="${branchDTO != null}">
-      <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${branchDTO.centerBrand}"></p></div>
-      <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${branchDTO.branchName}"></p></div>
-      <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${branchDTO.branchBusinessNum}"></p></div>
-      <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${branchDTO.branchCeoName}"></p></div>
-      <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${branchDTO.branchPhone}"></p></div>
-      <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${branchDTO.branchEmail}"></p></div>
-      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${branchDTO.branchAddress}"></p></div>
-
-      <div class="d-flex justify-content-center gap-3">
-        <a th:href="@{/templates/company/list}" class="btn btn-secondary">목록</a>
-        <a th:href="@{/templates/company/{type}/modify/{num}(type='branch', num=${branchDTO.branchNum})}" class="btn btn-success">수정</a>
-        <form th:action="@{/templates/company/{type}/delete/{num}(type='branch', num=${branchDTO.branchNum})}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit" class="btn btn-danger">삭제</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- 지점 상세 -->
-    <div th:if="${facilityDTO != null}">
-      <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${facilityDTO.centerBrand}"></p></div>
-      <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${facilityDTO.facilityName}"></p></div>
-      <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${facilityDTO.facilityBusinessNum}"></p></div>
-      <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${facilityDTO.facilityCeoName}"></p></div>
-      <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${facilityDTO.facilityPhone}"></p></div>
-      <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${facilityDTO.facilityEmail}"></p></div>
-      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${facilityDTO.facilityAddress}"></p></div>
-
-      <div class="d-flex justify-content-center gap-3">
-        <a th:href="@{/templates/company/list}" class="btn btn-secondary">목록</a>
-        <a th:href="@{/templates/company/{type}/modify/{num}(type='facility', num=${facilityDTO.facilityNum})}" class="btn btn-success">수정</a>
-        <form th:action="@{/templates/company/{type}/delete/{num}(type='facility', num=${facilityDTO.facilityNum})}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit" class="btn btn-danger">삭제</button>
-        </form>
-      </div>
-    </div>
 
   </div>
 </div>
