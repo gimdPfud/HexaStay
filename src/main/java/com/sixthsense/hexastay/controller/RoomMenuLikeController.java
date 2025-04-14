@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.config.Security.CustomMemberDetails;
 import com.sixthsense.hexastay.service.RoomMenuLikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,10 +25,11 @@ public class RoomMenuLikeController {
     // 좋아요
     @PostMapping("/roomMenu/orderpage/like/{roomMenuNum}")
     @ResponseBody
-    public ResponseEntity<Integer> RoomMenuLikePost(@PathVariable Long roomMenuNum, Principal principal) {
+    public ResponseEntity<Integer> RoomMenuLikePost(@PathVariable Long roomMenuNum,
+                                                    @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         log.info("룸메뉴 좋아요 컨트롤러 진입");
-        log.info("로그인한 사용자" + principal.getName());
-        String email = principal.getName();
+        log.info("로그인한 사용자" + customMemberDetails.getMember().getMemberEmail());
+        String email = customMemberDetails.getMember().getMemberEmail();
         int likes = roomMenuLikeService.roomMenuLike(roomMenuNum, email);
         return ResponseEntity.ok(likes);
     }
