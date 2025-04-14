@@ -2,8 +2,10 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +44,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     //변환 처리를 위한 ModelMapper
     private final ModelMapper modelMapper = new ModelMapper();
+
+    // 어드민 조회용
+    private final AdminRepository adminRepository;
 
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
 
@@ -110,11 +116,15 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //************단일 호텔룸 CRRUD 메소드*************//
     //1.등록 - 이미지 까지 같이 등록 되는 메서드
     @Override
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException {
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO, Principal principal) throws IOException {
         log.info("HotelRoom Service 진입 했습니다. ");
+        Admin admin = adminRepository.findByAdminEmail(principal.getName());
 
-        //변환 - Memem만 DTO 타입으로 변환
+
+        //변환 - HotelRoom entity DTO로 변환
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
+
+
 
         //처리
         hotelRoomRepository.save(hotelRoom);

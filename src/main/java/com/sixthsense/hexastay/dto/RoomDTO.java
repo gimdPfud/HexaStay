@@ -21,6 +21,12 @@ public class RoomDTO {
         //2.HotelRoom
         private Long hotelRoomNum;
 
+
+        //3.Room DB 생성 일자
+        private LocalDateTime createDate;
+
+
+
         // 새로운 필드 추가 (호텔 룸 정보)
         private String hotelRoomName;
         private String hotelRoomPhone;
@@ -28,7 +34,8 @@ public class RoomDTO {
         // 새로운 필드 추가 (멤버 정보)
         private String memberName;
         private String memberEmail;
-        private LocalDateTime membereDate;
+
+        private LocalDateTime membereDate;      //Member 방배정 등록 기준 날짜
 
 
         private MemberDTO memberDTO;
