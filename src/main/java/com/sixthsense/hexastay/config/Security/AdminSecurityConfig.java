@@ -41,6 +41,9 @@ import org.springframework.security.web.SecurityFilterChain;
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
+
+
+                    // 
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)
                     .authorizeHttpRequests(authz -> authz

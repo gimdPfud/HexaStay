@@ -6,38 +6,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>직원 정보 변경</title>
+    <title>직원 정보 입력</title>
 </head>
 <body class="w-100 vh-100 bg-light">
 <div layout:fragment="content">
 
-    <form method="post" action="/insert" enctype="multipart/form-data">
+    <form method="post" action="/admin/insert" enctype="multipart/form-data">
         <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
 
-            <div class="d-flex w-100" style="justify-content: center;">
-                <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
-            </div>
-            <div class="d-flex w-100 ms-5 mt-3" style="justify-content: center;">
-                <input type="file" name="file" id="file">
+            <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                </div>
+                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
+                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
             </div>
 
             <div class="mb-2">
                 <label class="form-label">사번</label>
-                <input type="text" name="adminEmployeeNum" th:value="${adminDTO.adminEmployeeNum}" class="form-control">
+                <input type="text" name="adminEmployeeNum" class="form-control">
             </div>
             <div class="mb-2">
                 <label class="form-label">이메일 (ID)</label>
-                <input type="text" name="adminEmail" class="form-control" th:value="${adminDTO.adminEmail}" readonly>
+                <input type="email" name="adminEmail" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호</label>
+                <input type="text" name="adminPassword" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="text" id="adminPasswordTwo" class="form-control">
             </div>
             <div class="mb-2">
                 <label class="form-label">이름</label>
-                <input type="text" name="adminName" class="form-control" th:value="${adminDTO.adminName}" readonly>
+                <input type="text" name="adminName" class="form-control">
             </div>
-            <input hidden name="adminResidentNum" id="adminResidentNum" th:value="${adminDTO.adminResidentNum}">
+            <div class="mb-2">
+                <label class="form-label">주민등록번호</label>
+                <div class="row">
+                    <input type="number" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
+                    <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
+                </div>
+            </div>
+            <input hidden name="adminResidentNum" id="adminResidentNum" value="">
 
             <div class="mb-2">
                 <label class="form-label">주소</label>
-                <input type="text" name="adminAddress" class="form-control">
+                <input th:velue type="text" name="adminAddress" class="form-control">
             </div>
             <div class="mb-2 row">
                 <label class="form-label">연락처</label>
@@ -46,10 +65,10 @@
                     <option>011</option>
                     <option>017</option>
                 </select> -
-                <input type="text" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
-                <input type="text" id="adminPhonePartThree" class="form-control" style="width:30%">
+                <input type="number" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
+                <input type="number" id="adminPhonePartThree" class="form-control" style="width:30%">
 
-                <input hidden th:value="${adminDTO.adminPhoneNum}" name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
+                <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             </div>
 
             <div class="mb-2">
@@ -65,7 +84,7 @@
                     </div>
                     <div class="col-3">
                         <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
+                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:value="${centerList.centerNum}"></option>
                         </select>
                     </div>
                     <div class="col-3">
@@ -83,31 +102,30 @@
             <div class="mb-3">
                 <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
                 <select class="form-select" id="adminCenterRank">
-                    <option>임원진</option>
-                    <option>관리직</option>
-                    <option>사원</option>
+                    <option value="exec">임원진</option>
+                    <option value="head">관리직</option>
+                    <option value="crew">사원</option>
                 </select>
                 <select class="form-select" id="adminBranchFacilityRank" hidden>
-                    <option>운영 총괄</option>
-                    <option>관리직</option>
-                    <option>사원</option>
-                    <option>협력 업체</option>
+                    <option value="gm">총괄 책임자</option>
+                    <option value="sv">관리직</option>
+                    <option value="crew">사원</option>
+                    <option value="partner">협력 업체</option>
                 </select>
                 <select class="form-select" id="adminStoreRank" hidden>
-                    <option>운영총괄</option>
-                    <option>부매니저</option>
-                    <option>매장 직원</option>
+                    <option value="mgr">매니저</option>
+                    <option value="submgr">부매니저</option>
+                    <option value="staff">매장 직원</option>
                 </select>
 
-                <input hidden name="adminRank" id="adminRank">
+                <input hidden name="adminRole" id="adminRole">
 
             </div>
 
 
-
             <div class="mb-3">
                 <label class="form-label">직책</label>
-                <input type="text"  name="adminPosition" class="form-control">
+                <input type="text" name="adminPosition" class="form-control">
             </div>
 
 
@@ -120,6 +138,11 @@
                 <button class="btn btn-danger">취소</button>
             </div>
         </div>
+
+        <input hidden name="centerNum" id="centerNum">
+        <input hidden name="branchNum" id="branchNum">
+        <input hidden name="facilityNum" id="facilityNum">
+        <input hidden name="facilityNum" id="storeNum">
 
     </form>
 
@@ -173,20 +196,20 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = false;
 
-                    fetch(`/admin/searchstore`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("왜안됨?")
-                            adminStore.innerHTML = "<option value=''></option>";
+                fetch(`/admin/searchstore`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("왜안됨?")
+                        adminStore.innerHTML = "<option value=''></option>";
 
-                            data.forEach(item => {
-                                let storeOption = document.createElement("option");
-                                storeOption.value = item.storeNum;
-                                storeOption.textContent = item.storeName;
-                                adminStore.appendChild(storeOption);
-                            });
-                        })
-                }
+                        data.forEach(item => {
+                            let storeOption = document.createElement("option");
+                            storeOption.value = item.storeNum;
+                            storeOption.textContent = item.storeName;
+                            adminStore.appendChild(storeOption);
+                        });
+                    })
+            }
 
 
             adminCenter.addEventListener("change", function () {
@@ -196,7 +219,7 @@
                 let choiceValue = adminChoice.value;
 
                 if (choiceValue === "지사") {
-                    fetch(`/admin/searchbranch?centerName=${adminCenterValue}`)
+                    fetch(`/admin/searchbranch?centerNum=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
@@ -213,7 +236,7 @@
                         .catch(error => console.error("지사 데이터 불러오기 실패:", error));
 
                 } else if (choiceValue === "지점") {
-                    fetch(`/admin/searchfacility?centerName=${adminCenterValue}`)
+                    fetch(`/admin/searchfacility?centerNum=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
@@ -229,19 +252,35 @@
                         })
                         .catch(error => console.error("지점 데이터 불러오기 실패:", error));
                 }
-                    });
+            });
         });
 
         function submitForm() {
             if (adminChoice.value === "본사") {
-                document.getElementById("adminBrand").value = adminCenter.value;
-                document.getElementById("adminRank").value = adminCenterRank.value;
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                document.getElementById("adminBrand").value = adminBranchFacility.value;
-                document.getElementById("adminRank").value = adminBranchFacilityRank.value;
-            } else if (adminChoice.value === "스토어") {
-                document.getElementById("adminBrand").value = adminStore.value;
-                document.getElementById("adminRank").value = adminStoreRank.value;
+                document.getElementById("centerNum").value = adminCenter.value;
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = "";
+                document.getElementById("storeNum").value = "";
+                document.getElementById("adminRole").value = adminCenterRank.value;
+            } else if (adminChoice.value === "지사") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = adminBranchFacility.value;
+                document.getElementById("facilityNum").value = ""
+                document.getElementById("storeNum").value = "";
+                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
+            } else if (adminChoice.value === "지점") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = adminBranchFacility.value;
+                document.getElementById("storeNum").value = "";
+                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
+            }
+            else if (adminChoice.value === "스토어") {
+                document.getElementById("centerNum").value = "";
+                document.getElementById("branchNum").value = "";
+                document.getElementById("facilityNum").value = "";
+                document.getElementById("storeNum").value = adminStore.value;
+                document.getElementById("adminRole").value = adminStoreRank.value;
             }
 
             document.getElementById('adminResidentNum').value =
@@ -251,12 +290,46 @@
                 document.getElementById('adminPhonePartOne').value + "-" +
                 document.getElementById('adminPhonePartTwo').value + "-" +
                 document.getElementById('adminPhonePartThree').value
-
-
-
         }
 
 
+        // 프로필 사진
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('adminProfile').click();
+        });
+
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
 
 
     </script>

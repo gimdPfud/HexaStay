@@ -123,11 +123,37 @@ public class AdminController {
 
     //마이페이지
     @GetMapping("/mypage")
-    public String mypage(Model model) {
-        List<CompanyDTO> centerDTOList = companyService.companyList();
-        model.addAttribute("centerDTOList", centerDTOList);
+    public String mypage(Model model,Principal principal) {
+        model.addAttribute("centerDTOList", adminService.adminFindEmail(principal.getName()));
         return "admin/mypage";
     }
+
+    @GetMapping("/read/{adminNum}")
+    public String adminRead(@PathVariable Long adminNum, Model model) {
+        AdminDTO adminDTO = adminService.adminRead(adminNum);
+        model.addAttribute("adminDTO", adminDTO);
+        return "admin/read";
+
+    }
+
+    // 회원 수정
+    @GetMapping ("/update")
+    public String adminUpdate (AdminDTO adminDTO) throws IOException {
+        adminService.insertAdmin(adminDTO);
+        return "admin/update";
+    }
+
+    //회원 삭제
+
+    @DeleteMapping("/delete")
+    public String adminDelete(@RequestParam Long adminNum) throws IOException {
+        adminService.adminDelete(adminNum);
+        return "redirect:/admin/list";
+    }
+
+
+
+
 
 
 }
