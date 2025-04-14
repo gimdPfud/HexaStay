@@ -20,7 +20,7 @@ public interface OrderstoreService {
     public boolean validOrder(Long orderId, String email);
 
     /*2. 주문하기 */
-    public void insert(List<Long> itemIdList, String email);
+    public int insert(List<Long> itemIdList, String email);
 
     /*3. 주문취소*/
     public void cancel(Long orderId);
