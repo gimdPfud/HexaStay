@@ -7,17 +7,55 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.service.OrderstoreService;
+import com.sixthsense.hexastay.service.StorecartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.Principal;
+import java.util.List;
 
 @Log4j2
 @RequiredArgsConstructor
 @Controller
 public class StoreOrderController {
+    private final OrderstoreService orderstoreService;
+    private final StorecartService storecartService;
     /* 6. 결제하기
         get? post? */
     /*1. 주문하기 (등록)*/
+    @PostMapping("/member/store/order/insert")
+    public void orderInsert(List<Long> cartitemidList, Principal principal){
+        if(principal==null){
+            return;
+        }
+        if(cartitemidList==null||cartitemidList.isEmpty()){
+            return;
+        }
+        for (Long itemid : cartitemidList) {
+            if(!storecartService.validCartItemOwner(itemid,principal.getName())){
+                return;
+            }
+        }
+        int result = orderstoreService.insert(cartitemidList, principal.getName());
+        if(result==1){
+            log.info("정상주문되었습니다.");
+            return;
+        } else if (result ==2) {
+            log.info("숙박 정보를 찾을 수 없습니다.");
+            return;
+        } else if (result==3) {
+            log.info("장바구니 아이템을 찾을 수 없습니다.");
+            return;
+        }
+    }
     /*2. 내역보기 (목록)
      *   todo 스토어관리자용 목록도 만들기. => 보고 만들기/취소 토글도 해야함. */
+//    @GetMapping("/member/store/order/list") 근데주문내역은 일회용이잔아
+//    @GetMapping("/admin/store/order/list")
+//    @GetMapping("/admin/store/order/modify")
 }

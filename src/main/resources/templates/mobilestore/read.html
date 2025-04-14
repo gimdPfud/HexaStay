@@ -16,118 +16,156 @@
 </head>
 <body>
 <div layout:fragment="contentorder">
-<!-- 매장 정보 -->
-<div class="store-header text-center">
-    <h5 class="mb-2" th:text="${data.storeName}"></h5>
-    <small>리뷰넣어말어!!!</small><br>
-    <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
-    <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
-    <small class="text-muted"><i class="bi bi-geo-alt"></i> [[${data.storeAddress}]]</small>
 
+    <!-- 매장 정보 -->
+    <div class="store-header text-center">
+        <h5 class="mb-2" th:text="${data.storeName}"></h5>
+        <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
+        <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
+        <small class="text-muted"><i class="bi bi-geo-alt"></i>
+            <a class="text-muted"
+               th:href="@{'/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
+        </small>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                data-bs-toggle="modal" data-bs-target="#mapmodal"
+                onclick="showMapBox()">지도보기</button>
+    </div>
+    <input type="hidden" id="storeLatitude"  name="storeLatitude" th:value="${data.storeLatitude}" readonly>
+    <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
 
-    <!-- 지도 영역: 지도 API가 여기에 들어갈 예정 -->
-    <div id="map" style="background-color: #ced4da">지도</div>
-</div>
+    <!-- 카테고리 -->
+    <!-- Bootstrap nav-tabs 스타일 적용 -->
+    <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#section-메인" onclick="setActiveTab(this)">메인</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#section-사이드" onclick="setActiveTab(this)">사이드</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#section-음료" onclick="setActiveTab(this)">음료</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#section-추가" onclick="setActiveTab(this)">추가</a>
+        </li>
+    </ul>
 
-<!-- 카테고리 -->
-<!-- Bootstrap nav-tabs 스타일 적용 -->
-<ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
-    <li class="nav-item">
-        <a class="nav-link active" href="#section-메인" onclick="setActiveTab(this)">메인</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#section-사이드" onclick="setActiveTab(this)">사이드</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#section-음료" onclick="setActiveTab(this)">음료</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#section-추가" onclick="setActiveTab(this)">추가</a>
-    </li>
-</ul>
+    <!-- 메뉴 리스트 -->
+    <div class="container mt-3">
+        <div class="list-group storemenulist"></div>
+    </div>
 
-<!-- 메뉴 리스트 -->
-<div class="container mt-3">
-    <div class="list-group storemenulist"></div>
-</div>
-
-<script th:inline="javascript">
-    let storemenulist = document.querySelector(".storemenulist");
-    let storenum = [[${data.storeNum}]]
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log("페이지 로드 됨")
-
-        fetch(`/member/store/menu/list/${storenum}`)
-            .then(response => {
-                if(!response.ok){
-                    if(response.status===404){
-                        return response.text()
-                            .then(errmsg=> {
-                                let error = new Error(errmsg)
-                                error.status = 404;
-                                throw error;
-                            })
-                    }
-                }
-                return response.json();
-            })
-            .then(data => {
-                showstoremenu(data)
-            })
-            .catch(error => {
-                if(error.status===404) {
-                    showemptymenu(error.message);
-                } else {
-                    console.log(error)
-                }
-            });
-    })
-
-
-
-    /*
-             * 메소드명 : showstoremenu
-             * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
-             * 리턴 값 :
-             * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
-             * */
-    function showstoremenu(list) {
-        let tagscontent = "";
-        let imageTag = "";
-        for (let i=0; i<list.length;i++){
-            if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
-                imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 80px; height: 80px;">`;
-            } else {
-                imageTag = `<img src="/store/menu/default.png" style="width: 80px; height: 80px;">`;
-            }
-            tagscontent += `<a href="/member/store/menu/read/${list[i].storemenuNum}" class="text-decoration-none">
-<div class="list-group-item d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <img src="" class="me-3">
-                <div>
-                    <strong>${list[i].storemenuName}</strong><br>
-                    <small>${list[i].storemenuPrice} 원</small>
+    <!--지도 모달-->
+    <div class="modal" id="mapmodal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">지도 보기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="map" style="width: 100%; height: 300px;"></div>
                 </div>
             </div>
-        </div></a>`
-        }
-        storemenulist.innerHTML=tagscontent;
-    }
-    /*
-             * 메소드명 : showemptymenu
-             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
-             * 리턴 값 :
-             * 기  능 : 선언될 때 메시지를 로그로 출력함
-             * */
-    function showemptymenu(msg) {
-        console.log(msg)
-    }
+        </div>
+    </div>
 
-    function setActiveTab(tab) {
-        document.querySelectorAll(".nav-link").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-    }
-</script>
+
+
+
+    <!--지도 javascript api app key-->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        let storemenulist = document.querySelector(".storemenulist");
+        let storenum = [[${data.storeNum}]]
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("페이지 로드 됨")
+
+            fetch(`/member/store/menu/list/${storenum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showstoremenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404) {
+                        showemptymenu(error.message);
+                    } else {
+                        console.log(error)
+                    }
+                });
+        })
+
+        function showMapBox() {
+            let yy = document.getElementById("storeLatitude").value
+            let xx = document.getElementById("storeLongitude").value
+            var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(yy, xx),
+                level: 2
+            };
+            var map = new kakao.maps.Map(container, options);
+            var marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(yy, xx)
+            });
+            marker.setMap(map);
+        }
+
+        /*
+                 * 메소드명 : showstoremenu
+                 * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
+                 * 리턴 값 :
+                 * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
+                 * */
+        function showstoremenu(list) {
+            let tagscontent = "";
+            let imageTag = "";
+            for (let i=0; i<list.length;i++){
+                if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                    imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 80px; height: 80px;">`;
+                } else {
+                    imageTag = `<img src="/store/menu/default.png" style="width: 80px; height: 80px;">`;
+                }
+                tagscontent += `<a href="/member/store/menu/read/${list[i].storemenuNum}" class="text-decoration-none">
+    <div class="list-group-item d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    ${imageTag}
+                    <div>
+                        <strong>${list[i].storemenuName}</strong><br>
+                        <small>${list[i].storemenuPrice} 원</small>
+                    </div>
+                </div>
+            </div></a>`
+            }
+            storemenulist.innerHTML=tagscontent;
+        }
+        /*
+                 * 메소드명 : showemptymenu
+                 * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+                 * 리턴 값 :
+                 * 기  능 : 선언될 때 메시지를 로그로 출력함
+                 * */
+        function showemptymenu(msg) {
+            console.log(msg)
+        }
+
+        function setActiveTab(tab) {
+            document.querySelectorAll(".nav-link").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+        }
+    </script>
 </div>
 </body>
 </html>

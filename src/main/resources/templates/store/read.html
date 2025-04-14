@@ -40,7 +40,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">사업장 주소</label>
-                    <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
+                    <div class="input-group">
+                        <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-bs-toggle="modal" data-bs-target="#mapmodal"
+                                onclick="showMapBox()">지도 보기</button>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">등록일자</label>
@@ -53,6 +58,8 @@
                 <div class="text-end">
                     <a th:href="@{'/admin/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
                 </div>
+                <input type="hidden" id="storeLatitude"  name="storeLatitude" th:value="${data.storeLatitude}" readonly>
+                <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
             </div><!--외부업체 정보-->
 
             <!--외부업체가 제공하는 서비스 목록들-->
@@ -78,8 +85,24 @@
 
             </div><!--리스트가 비어있지 않다면 끝-->
 
+            <!--모달창-->
+            <div class="modal" id="mapmodal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">지도 보기</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="map" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
         <script th:inline="javascript">
             let storemenulist = document.querySelector(".storemenulist");
             let deletedmenulist = document.querySelector(".deletedmenulist");
@@ -139,6 +162,20 @@
 
 
 
+            function showMapBox() {
+                let yy = document.getElementById("storeLatitude").value
+                let xx = document.getElementById("storeLongitude").value
+                var container = document.getElementById('map');
+                var options = {
+                    center: new kakao.maps.LatLng(yy, xx),
+                    level: 2
+                };
+                var map = new kakao.maps.Map(container, options);
+                var marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(yy, xx)
+                });
+                marker.setMap(map);
+            }
 
             /*
              * 메소드명 : showstoremenu

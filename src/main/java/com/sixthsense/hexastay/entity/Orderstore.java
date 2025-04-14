@@ -29,12 +29,17 @@ public class Orderstore extends BaseEntity {
     //외부업체 결재 (이체/카드/현금 사용여부)
     private String orderstorePay;
 
-    private String orderstoreStatus; // 주문 상태. alive, cancel ?
+    private String orderstoreStatus; // 주문 상태. alive, cancel, end ?
 
-    //외부업체 상품 서비스를 참조
+//    //외부업체 상품 서비스를 참조
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member_num")
+//    private Member member;
+
+    //멤버 참조 대신 room 참조. (room : 호텔방과 사람을 연결하는 중간테이블)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_num")
-    private Member member;
+    @JoinColumn(name = "room_num")
+    private Room room;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "orderstore", cascade = CascadeType.ALL)
