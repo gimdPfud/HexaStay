@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -314,11 +315,11 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         roomMenuCartItemRepository.delete(roomMenuCartItem);
         log.info("아이템 삭제 완료: {}", roomMenuCartItemNum);
 
-        // 삭제 후 해당 아이템이 존재하는지 확인 (아이템이 존재하면 예외가 발생)
-        roomMenuCartItemRepository.findById(roomMenuCartItemNum).orElseThrow(() -> {
-            log.info("삭제된 아이템은 더 이상 존재하지 않습니다: {}", roomMenuCartItemNum);
-            return new EntityNotFoundException("아이템이 삭제되었습니다.");
-        });
+//        // 삭제 후 해당 아이템이 존재하는지 확인 (아이템이 존재하면 예외가 발생)
+//        roomMenuCartItemRepository.findById(roomMenuCartItemNum).orElseThrow(() -> {
+//            log.info("삭제된 아이템은 더 이상 존재하지 않습니다: {}", roomMenuCartItemNum);
+//            return new EntityNotFoundException("아이템이 삭제되었습니다.");
+//        }); // todo(7) 코드를 제거했음 오류 생길수도 있음
     }
 
     // 상세보기
