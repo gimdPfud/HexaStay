@@ -11,7 +11,6 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
-import com.sixthsense.hexastay.repository.ReviewRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
-    private final ReviewRepository reviewRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*

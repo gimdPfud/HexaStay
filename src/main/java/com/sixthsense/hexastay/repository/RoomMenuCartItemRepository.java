@@ -2,7 +2,7 @@ package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
-import com.sixthsense.hexastay.entity.Review;
+
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
