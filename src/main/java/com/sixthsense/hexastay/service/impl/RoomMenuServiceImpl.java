@@ -278,5 +278,75 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         log.info("삭제완료 db를 확인하세요.");
 
     }
-
 }
+
+
+
+//    /**************************************************
+//     * 좋아요 서비스 등록
+//     * 기능 : 룸서비스 메뉴를 등록하는 서비스
+//     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하여 DB에 저장하고,
+//     *        다시 DTO로 변환하여 클라이언트에게 반환
+//     **************************************************/
+//
+//    // 좋아요
+//    @Override
+//    public Integer roomMenuLike(Long roomMenuNum) {
+//        log.info("좋아요 서비스 진입 : " + roomMenuNum);
+//        roomMenuRepository.incrementLikes(roomMenuNum);
+//        return roomMenuRepository.findById(roomMenuNum)
+//                .map(RoomMenu::getRoomMenuLikes)
+//                .orElse(0);
+//    }
+//
+//    // 싫어요
+//    @Override
+//    public Integer roomMenuDisLike(Long roomMenuNum) {
+//        RoomMenu roomMenu = roomMenuRepository.findById(roomMenuNum)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 메뉴가 없습니다."));
+//
+//        int currentDislikes = Optional.ofNullable(roomMenu.getRoomMenuDislikes()).orElse(0);
+//        roomMenu.setRoomMenuDislikes(currentDislikes + 1);
+//        roomMenuRepository.save(roomMenu);
+//
+//        return roomMenu.getRoomMenuDislikes();
+//    }
+//
+//    // 싫어요 취소
+//    @Override
+//    public Integer roomMenuDisLikeCancel(Long roomMenuNum) {
+//        log.info("싫어요 취소 서비스 진입 : " + roomMenuNum);
+//        RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
+//        menu.setRoomMenuDislikes(Math.max(menu.getRoomMenuDislikes() - 1, 0)); // 최소 0
+//        roomMenuRepository.save(menu);
+//        return menu.getRoomMenuDislikes();
+//    }
+//
+//    // 좋아요 취소
+//    @Override
+//    public Integer roomMenuLikeCancel(Long roomMenuNum) {
+//    log.info("좋아요 취소 서비스 진입 : " + roomMenuNum);
+//
+//        roomMenuRepository.decrementLikes(roomMenuNum);
+//        return roomMenuRepository.findById(roomMenuNum)
+//                .map(RoomMenu::getRoomMenuLikes)
+//                .orElse(0);
+//    }
+//
+//    // 좋아요수
+//    @Override
+//    public int getLikeCount(Long roomMenuNum) {
+//        return roomMenuRepository.findById(roomMenuNum)
+//                .map(RoomMenu::getRoomMenuLikes)
+//                .orElse(0);
+//    }
+//
+//    // 싫어요 수
+//    @Override
+//    public int getDislikeCount(Long roomMenuNum) {
+//        return roomMenuRepository.findById(roomMenuNum)
+//                .map(RoomMenu::getRoomMenuDislikes)
+//                .orElse(0);
+//    }
+
+

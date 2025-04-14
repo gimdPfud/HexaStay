@@ -140,11 +140,17 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDTO companyRead(Long companyNum) {
-
         Company company = companyRepository.findById(companyNum).orElseThrow();
         CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
 
         return companyDTO;
+    }
+
+    @Override
+    public void companyDelete(Long companyNum) {
+
+        companyRepository.deleteById(companyNum);
+
     }
 
     private CompanyDTO convertToCompanyDTO(Company company) {
@@ -183,7 +189,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         return companyDTOS;
     }
-
 
 
 }

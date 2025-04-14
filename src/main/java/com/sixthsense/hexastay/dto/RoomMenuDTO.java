@@ -39,6 +39,10 @@ public class RoomMenuDTO {
 
     private String roomMenuStatus;              //품절여부
 
+    private Integer roomMenuLikes = 0; // 좋아요
+
+    private Integer roomMenuDisLikes = 0; // 싫어요
+
     private MultipartFile roomMenuImage; // 룸 메뉴 이미지
 
     private String roomMenuImageMeta; //룸 메뉴 사진 정보

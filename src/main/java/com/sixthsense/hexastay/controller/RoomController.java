@@ -134,4 +134,5 @@ public class RoomController {
         model.addAttribute("currentPage", page);
         return "room/hotelRoomsByMember";  // 🔹 Thymeleaf 파일 존재 여부 확인!
     }
+
 }

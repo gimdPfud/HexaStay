@@ -44,6 +44,11 @@ public class RoomMenu extends BaseEntity {
     @Column(name = "roomMenuStatus")
     private String roomMenuStatus;              //품절여부
 
+    @Column(name = "roomMenuLikes")
+    private Integer roomMenuLikes = 0; // 좋아요
+
+    @Column(name = "roomMenuDisLikes")
+    private Integer roomMenuDisLikes = 0; // 싫어요
 
     @Column(name = "roomMenuImageMeta")
     private String roomMenuImageMeta; //룸 메뉴 대표 이미지

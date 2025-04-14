@@ -17,11 +17,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -356,6 +355,44 @@ public class RoomMenuController {
         return "/roommenu/orderpage";  // orderpage를 반환하여 뷰를 렌더링
     }
 
-
-
 }
+
+///**************************************************
+// * 주문 페이지 조회 및 필터링
+// * 기능: 사용자로부터 전달받은 검색 조건(type, keyword, category)을 기준으로
+// *       룸서비스 메뉴 목록을 조회하고, 페이지네이션을 적용하여 화면에 표시
+// *       등록일 : 2025-04-07
+// *       수정일 : 2025-04-07
+// **************************************************/
+//
+//// 좋아요 요청
+//@PostMapping("/roomMenu/orderpage/like/{roomMenuNum}")
+//@ResponseBody
+//public ResponseEntity<Integer> RoomMenuLikeService(@PathVariable("roomMenuNum") Long roomMenuNum) {
+//    int likes = roomMenuService.roomMenuLike(roomMenuNum);
+//    return ResponseEntity.ok(likes);
+//}
+//
+//// 좋아요 취소
+//@PostMapping("/roomMenu/orderpage/unlike/{roomMenuNum}")
+//@ResponseBody
+//public ResponseEntity<Integer> RoomMenuUnLikeService(@PathVariable("roomMenuNum") Long roomMenuNum) {
+//    int likes = roomMenuService.roomMenuLikeCancel(roomMenuNum);
+//    return ResponseEntity.ok(likes);
+//}
+//
+//// 싫어요 요청
+//@PostMapping("/roomMenu/orderpage/dislike/{roomMenuNum}")
+//@ResponseBody
+//public ResponseEntity<Integer> RoomMenuDisLikeService(@PathVariable("roomMenuNum") Long roomMenuNum) {
+//    int dislikes = roomMenuService.roomMenuDisLike(roomMenuNum);
+//    return ResponseEntity.ok(dislikes);
+//}
+//
+//// 싫어요 취소
+//@PostMapping("/roomMenu/orderpage/undislike/{roomMenuNum}")
+//@ResponseBody
+//public ResponseEntity<Integer> RoomMenuUnDisLikeService(@PathVariable("roomMenuNum") Long roomMenuNum) {
+//    int dislikes = roomMenuService.roomMenuDisLikeCancel(roomMenuNum);
+//    return ResponseEntity.ok(dislikes);
+//}
