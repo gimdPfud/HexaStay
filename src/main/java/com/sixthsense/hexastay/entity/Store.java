@@ -53,4 +53,8 @@ public class Store extends BaseEntity {
     private String storeCategory;
 
     private String storeProfileMeta; //가게 대표 사진
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_num")
+    private Company company;
 }

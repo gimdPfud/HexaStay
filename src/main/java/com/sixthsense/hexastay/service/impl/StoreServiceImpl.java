@@ -9,7 +9,6 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
@@ -41,7 +40,7 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : Store 등록 후 등록한 객체의 pk 반환
      * */
     @Override
-    public void insert(StoreDTO storeDTO) throws IOException {
+    public Long insert(StoreDTO storeDTO) throws IOException {
         //들어온 DTO -> Entity 변환
         Store store = modelMapper.map(storeDTO, Store.class);
         //일단 저장 해서 pk 생성. (저장 안하면 pk 없으니까)
@@ -73,7 +72,8 @@ public class StoreServiceImpl implements StoreService {
         //파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
         store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         //다시 저장 (이때, 이미 pk를 가지고 있으므로 update쿼리가 나간다.)
-        storeRepository.save(store);
+        store = storeRepository.save(store);
+        return store.getStoreNum();
     }
 
 
@@ -98,8 +98,26 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : storeDTO를 받아서 수정 한 후 수정한 객체의 pk값을 반환한다.
      * */
     @Override
-    public Long modify(StoreDTO storeDTO) {
+    public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
+        if (!store.getStoreProfileMeta().equals(storeDTO.getStoreProfileMeta())) {
+            Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta());
+            Files.deleteIfExists(filePath);
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+            String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storeDTO.setStoreProfileMeta("/store/menu/"+fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+        }
+        store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         store.setStoreName(storeDTO.getStoreName());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
@@ -181,5 +199,20 @@ public class StoreServiceImpl implements StoreService {
     public void restore(Long pk) {
         Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         store.setStoreStatus("alive");
+    }
+
+    /*
+     * 메소드명 : validStoreAdmin
+     * 인수 값 : AdminDTO adminDTO, StoreDTO storeDTO
+     * 리턴 값 : boolean
+     * 기  능 : StoreDTO의 storeNum과 adminDTO의 storeNum을 비교해 같으면 true 다르면 false 반환.
+     * */
+    @Override
+    public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
+        if(adminDTO.getAdminRole().equals("sv")){
+            return true; //superAdmin은 무조건 true;
+        } else if (adminDTO.getStoreNum().equals(storeDTO.getStoreNum())) {
+            return true;
+        }else {return false;}
     }
 }

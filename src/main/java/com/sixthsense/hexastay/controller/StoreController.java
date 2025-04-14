@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.StoreService;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Arrays;
 
 @Controller
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class StoreController {
      * 리턴 값 :
      * 기  능 :
      * */
-    @GetMapping("/insert")
+    @GetMapping("/insert") //todo superAdmin만 접근 가능한 페이지
     public String insert(){
 //        log.info("등록");
         return "store/insert";
@@ -52,7 +52,7 @@ public class StoreController {
     }
 
 
-    @GetMapping("/list")
+    @GetMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
     public String list(Pageable pageable, Model model){
         Page<StoreDTO> storeDTOPage = storeService.list("alive", pageable);
 //        storeDTOPage.forEach(log::info);
@@ -61,24 +61,24 @@ public class StoreController {
     }
 
 
-    @GetMapping("/read/{id}")/*todo 접근권한 설정 가능한가??*/
-    public String read(@PathVariable Long id, Model model){
-        StoreDTO data = storeService.read(id);
-        model.addAttribute("data",data);
-        return "store/read";
-    }
-
     @GetMapping("/read")
-    public String readA(Principal principal, Model model){
-        /*todo principal로 admin 찾아서
-           그 어드민이 갖고있는 store fk로
-           스토어서비스.read(fk) 해줄거임 */
-
-//todo        Admin admin = adminService.findByEmail(principal.getName());
-//todo        Long id = admin.getStoreNum();
-//todo        StoreDTO data = storeService.read(id);
-//todo        model.addAttribute("data",data);
-        return "store/read";
+    public String read(Long idid, Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        AdminDTO admin = adminService.adminFindEmail(principal.getName());
+        if (idid == null) {
+            idid = admin.getStoreNum();
+        }
+        StoreDTO data = storeService.read(idid);
+        boolean result = storeService.validStoreAdmin(admin, data);
+        if (result) {
+            model.addAttribute("data", data);
+            return "store/read";
+        } else {
+            log.info("다른 가게의 상세정보를 보려고 함.");
+            return "redirect:/admin/logout";
+        }
     }
 
 
@@ -89,9 +89,9 @@ public class StoreController {
         return "store/modify";
     }
     @PostMapping("/modify")
-    public String modify(StoreDTO storeDTO){
+    public String modify(StoreDTO storeDTO) throws IOException {
         Long storeNum = storeService.modify(storeDTO);
-        return "redirect:/admin/store/read/"+storeNum;
+        return "redirect:/admin/store/read?idid="+storeNum;
     }
 
 
