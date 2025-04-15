@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import com.sixthsense.hexastay.service.RoomMenuService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -111,6 +112,45 @@ public class RoomMenuOrderController {
 
         // 주문 생성 성공 시, 주문 번호 반환 (HTTP 200 OK)
         return new ResponseEntity<Long>(roomMenuOrderNum, HttpStatus.OK);
+    }
+
+    @PostMapping("/roommenu/cart")
+    public ResponseEntity<?> createOrderFromCart(Principal principal, HttpServletRequest request) {
+        log.info("POST /order/cart 컨트롤러 진입");
+        log.info("로그인한 사용자 : " + principal.getName());
+
+        if (principal == null) {
+            log.info("로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        String email = principal.getName();
+
+        try {
+            Long orderNum = roomMenuOrderService.roomMenuOrderInsertFromCart(email);
+            log.info("주문 생성 완료 - 주문번호: {}", orderNum);
+            return ResponseEntity.ok(orderNum);
+        } catch (IllegalStateException | EntityNotFoundException e) {
+            log.error("주문 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("서버 에러: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 처리 중 오류 발생");
+        }
+    }
+
+    @GetMapping("/roommenu/orderList")
+    public String getOrderList(Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/member/login"; // 로그인 안됐으면 로그인 페이지로
+        }
+
+        String email = principal.getName();
+
+        List<RoomMenuOrderDTO> orderList = roomMenuOrderService.getOrderListByEmail(email);
+        model.addAttribute("orderList", orderList);
+
+        return "roommenu/orderList"; // templates/roommenu/orderList.html
     }
 
         @GetMapping("/roommenu/cashOrder")

@@ -1,10 +1,18 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.RoomMenuOrderItem;
+import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,8 +22,14 @@ public class RoomMenuOrderDTO {
 
     private  Long roomMenuOrderNum; // pk
 
-    @NotNull(message = "수량은 필수 입력값입니다.")
-    @Positive(message = "1개 이상 주문해야합니다.")
     private  int roomMenuOrderAmount; // 주문의 수량
+
+    private Member member;
+
+    private RoomMenuOrderStatus roomMenuOrderStatus;
+
+    private LocalDateTime regDate;
+
+    private List<RoomMenuOrderItemDTO> orderItemList = new ArrayList<>();
 
 }

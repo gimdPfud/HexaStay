@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutmobile}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +48,7 @@
         .search-container {
             display: none;
             padding: 10px;
-            justify-content: center;
+            justify-content: space-between;
             background: #f1f1f1;
             border-bottom: 2px solid #ddd;
         }
@@ -189,7 +192,7 @@
             padding: 5px 10px; /* 여백 */
             border-radius: 12px; /* 둥근 모서리 */
             border: 1px solid #ddd; /* 테두리 */
-            font-size: 16px; /* 텍스트 크기 */
+            font-size: clamp(12px, 1.2vw, 18px);
             margin: 10px ; /* 위 아래 여백 */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
             transition: background-color 0.3s ease; /* 호버 시 색상 변경 효과 */
@@ -235,8 +238,6 @@
             background-color: #fdd835;
         }
 
-
-
         .cart-count {
             background-color: #ff5c5c;
             color: white;
@@ -247,53 +248,51 @@
             font-size: 1.2em; /* 숫자 크게 */
         }
 
-
         .back-icon{
             justify-content: start;
         }
-
-
-
     </style>
 </head>
-<body data-logged-in="${session.user != null}"> <!-- todo(7) : 로그인 해결 해야함 -->
-<div class="container">
+<body>
+<div layout:fragment="contentorder">
+
     <div class="container">
-        <!-- 헤더: 메뉴와 장바구니 아이콘 -->
-        <div class="header">
-            <div class="back-icon" onclick="window.location.href='http://localhost:8090/main'">←</div>
-            <div class="page-title">목록페이지</div>
+<!--        <div class="container">-->
+<!--            &lt;!&ndash; 헤더: 메뉴와 장바구니 아이콘 &ndash;&gt;-->
+<!--            <div class="header">-->
+<!--                <div class="back-icon" onclick="window.location.href='http://localhost:8090/main'">←</div>-->
+<!--                <div class="page-title">목록페이지</div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!-- 검색창 (항상 표시되도록 설정) -->
+        <div id="search-container" class="search-container">
+            <form th:action="@{/roommenu/orderpage}" method="get">
+                <div class="search-box">
+                    <select id="search-option" name="type" class="form-select">
+                        <option value="S" th:selected="${type == 'S'}">이름</option>
+                        <option value="P" th:selected="${type == 'P'}">가격</option>
+                        <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                    </select>
+                    <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 160px; height: 30px;">
+                    <button type="submit" style="height: 26.36px">검색</button>
+                </div>
+            </form> <!-- 검색창 끝 -->
         </div>
-    </div>
 
-    <!-- 검색창 (항상 표시되도록 설정) -->
-    <div id="search-container" class="search-container">
-        <form th:action="@{/roommenu/orderpage}" method="get">
-            <div class="search-box">
-                <select id="search-option" name="type" class="form-select">
-                    <option value="S" th:selected="${type == 'S'}">이름</option>
-                    <option value="P" th:selected="${type == 'P'}">가격</option>
-                    <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
-                </select>
-                <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 160px; height: 30px;">
-                <button type="submit" style="height: 26.36px">검색</button>
-            </div>
-        </form> <!-- 검색창 끝 -->
-    </div>
+        <!-- 카테고리 탭 -->
+        <div class="tabs">
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
+            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
+        </div>
 
-    <!-- 카테고리 탭 -->
-    <div class="tabs">
-        <div class="tab" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
-        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
-        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
-        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
-        <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
-    </div>
-
-    <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
-    <ul class="food-list">
-        <li th:each="roomMenuDTO : ${list}" class="food-item">
-            <!-- 메뉴 이미지 -->
+        <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
+        <ul class="food-list">
+            <li th:each="roomMenuDTO : ${list}" class="food-item">
+                <!-- 메뉴 이미지 -->
                 <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                      th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
                      style="width: 135px; height: 125px;">
@@ -301,136 +300,131 @@
                 <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                      th:src="@{/profile/default.png}"
                      style="width: 60px; height: 80px;">
-            <!-- 메뉴 이미지 끝 -->
-            <div class="food-info row">
-                <div class="col-8">
-                    <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p> <!-- 카테고리 -->
-                    <p>
-                        <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                           th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
-                        </a>
-                    </p>
-                    <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 -->
+                <!-- 메뉴 이미지 끝 -->
+                <div class="food-info row">
+                    <div class="col-8">
+                        <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p><br> <!-- 카테고리 -->
+                        <p>
+                            <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                               th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
+                            </a><br>
+                        </p>
+                        <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 --><br>
+                    </div>
                 </div>
-            </div>
 
-            <!-- 좋아요, 싫어요 영역 -->
-            <div class="like-section">
-                <!-- 좋아요 아이콘 -->
-                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                      th:onclick="'toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                      style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
-                <!-- 좋아요 수 -->
-                <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
+                <!-- 좋아요, 싫어요 영역 -->
+                <div class="like-section">
+                    <!-- 좋아요 아이콘 -->
+                    <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                          th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                          style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
+                    <!-- 좋아요 수 -->
+                    <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
 
-<!--                &lt;!&ndash; 싫어요 아이콘 &ndash;&gt;-->
-<!--                <span th:id="'dislikeIcon-' + ${roomMenuDTO.roomMenuNum}"-->
-<!--                      th:onclick="'toggleDislike(' + ${roomMenuDTO.roomMenuNum} + ')'"-->
-<!--                      style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>-->
-<!--                &lt;!&ndash; 싫어요 수 &ndash;&gt;-->
-<!--                <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>-->
-            </div>
-        </li>
-    </ul>
+                    <!--                &lt;!&ndash; 싫어요 아이콘 &ndash;&gt;-->
+                    <!--                <span th:id="'dislikeIcon-' + ${roomMenuDTO.roomMenuNum}"-->
+                    <!--                      th:onclick="'toggleDislike(' + ${roomMenuDTO.roomMenuNum} + ')'"-->
+                    <!--                      style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>-->
+                    <!--                &lt;!&ndash; 싫어요 수 &ndash;&gt;-->
+                    <!--                <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>-->
+                </div>
+            </li>
+        </ul>
 
-    <button class="add-to-cart-btn"
-            onclick="submitPostRequest('/roommenu/cartlist')">
-        🛒 내 카트 리스트로
-        <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
-    </button>
+        <button class="add-to-cart-btn"
+                onclick="submitPostRequest('/roommenu/cartlist')">
+            🛒 내 카트 리스트로
+            <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
+        </button>
+    </div>
 
-</div>
-
-
-<!-- 스크립트 시작 -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+    <!-- 스크립트 시작 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
 
 
-    function submitPostRequest() {
-        const data = {
-            key: 'value'
-        };
+        function submitPostRequest() {
+            const data = {
+                key: 'value'
+            };
 
-        fetch('http://localhost:8090/roommenu/cartlist', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                window.location.href = 'http://localhost:8090/roommenu/cartlist';
+            fetch('http://localhost:8090/roommenu/cartlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
-    // 상태 저장
-    const likedStates = {};
-
-    function toggleLike(menuId) {
-
-        const liked = likedStates[menuId] || false;
-        const url = liked
-            ? `/roommenu/orderpage/cancellike/${menuId}`
-            : `/roommenu/orderpage/like/${menuId}`;
-
-        fetch(url, {
-            method: 'POST'
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('서버 오류');
-                return res.json();
-            })
-            .then(data => {
-                const likeIcon = document.getElementById(`likeIcon-${menuId}`);
-                const likeCount = document.getElementById(`likeCount-${menuId}`);
-
-                // UI 업데이트
-                likeIcon.textContent = liked ? '🤍' : '❤️';
-                likeIcon.style.color = liked ? 'gray' : 'red';
-                likeCount.textContent = data;
-
-                likedStates[menuId] = !liked;
-            })
-            .catch(err => {
-                console.error('좋아요 실패:', err);
-                alert('좋아요 처리 중 문제가 발생했습니다.');
-            });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.like-section').forEach(section => {
-            const menuId = section.querySelector('[id^=likeIcon-]').id.split('-')[1];
-
-            fetch(`/roommenu/orderpage/status/${menuId}`)
-                .then(res => res.json())
+                .then(response => response.json())
                 .then(data => {
-                    const liked = data.liked;
+                    console.log('Success:', data);
+                    window.location.href = 'http://localhost:8090/roommenu/cartlist';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // 상태 저장
+        const likedStates = {};
+
+        function toggleLike(menuId) {
+            const liked = likedStates[menuId] || false;
+            const url = liked
+                ? `/roommenu/orderpage/cancellike/${menuId}`
+                : `/roommenu/orderpage/like/${menuId}`;
+
+            fetch(url, {
+                method: 'POST'
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('서버 오류');
+                    return res.json();
+                })
+                .then(data => {
                     const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                     const likeCount = document.getElementById(`likeCount-${menuId}`);
 
-                    likedStates[menuId] = liked;
+                    // UI 업데이트
+                    likeIcon.textContent = liked ? '🤍' : '❤️';
+                    likeIcon.style.color = liked ? 'gray' : 'red';
+                    likeCount.textContent = data;
 
-                    likeIcon.textContent = liked ? '❤️' : '🤍';
-                    likeIcon.style.color = liked ? 'red' : 'gray';
-                    likeCount.textContent = data.likeCount;
+                    likedStates[menuId] = !liked;
                 })
                 .catch(err => {
-                    console.error('좋아요 상태 불러오기 실패:', err);
+                    console.error('좋아요 실패:', err);
+                    alert('좋아요 처리 중 문제가 발생했습니다.');
                 });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.like-section').forEach(section => {
+                const menuId = section.querySelector('[id^=likeIcon-]').id.split('-')[1];
+
+                fetch(`/roommenu/orderpage/status/${menuId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const liked = data.liked;
+                        const likeIcon = document.getElementById(`likeIcon-${menuId}`);
+                        const likeCount = document.getElementById(`likeCount-${menuId}`);
+
+                        likedStates[menuId] = liked;
+
+                        likeIcon.textContent = liked ? '❤️' : '🤍';
+                        likeIcon.style.color = liked ? 'red' : 'gray';
+                        likeCount.textContent = data.likeCount;
+                    })
+                    .catch(err => {
+                        console.error('좋아요 상태 불러오기 실패:', err);
+                    });
+            });
         });
-    });
+    </script>
+    <!-- 스크립트 끝 -->
 
-
-
-</script>
-
-<!-- 스크립트 끝 -->
+</div>
 </body>
 </html>
 

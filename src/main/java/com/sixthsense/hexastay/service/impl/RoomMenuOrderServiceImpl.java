@@ -1,15 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
-import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuOrder;
-import com.sixthsense.hexastay.entity.RoomMenuOrderItem;
+import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
+import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
-import com.sixthsense.hexastay.repository.MemberRepository;
-import com.sixthsense.hexastay.repository.RoomMenuCartItemRepository;
-import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
-import com.sixthsense.hexastay.repository.RoomMenuRepository;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -19,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,6 +28,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final MemberRepository memberRepository;
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
+    private final RoomMenuCartRepository roomMenuCartRepository;
 
     /***************************************************
      *
@@ -80,7 +77,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         roomMenuOrderItemList.add(roomMenuOrderItem);
 
         // 현재 재고보다 주문 수량이 많으면 예외 발생
-        if(roomMenu.getRoomMenuAmount() - roomMenuOrderDTO.getRoomMenuOrderAmount() < 0) {
+        if (roomMenu.getRoomMenuAmount() - roomMenuOrderDTO.getRoomMenuOrderAmount() < 0) {
             throw new IllegalArgumentException("요청 수량이 현재 재고보다 많습니다. (현재수량 : " + roomMenu.getRoomMenuAmount() + ")");
         }
 
@@ -94,6 +91,88 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         RoomMenuOrder roomMenuOrderA = roomMenuOrderRepository.save(roomMenuOrder);
 
         // 저장된 주문의 주문 번호 반환
-        return roomMenuOrderA.getRoomMenuOrder();
+        return roomMenuOrderA.getRoomMenuOrderNum();
+    }
+
+    @Override
+    public Long roomMenuOrderInsertFromCart(String email) {
+        log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
+
+        // 1. 로그인한 회원 조회
+        Member member = memberRepository.findByMemberEmail(email);
+        if (member == null) throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
+
+        // 2. 해당 회원의 장바구니 가져오기
+        RoomMenuCart cart = roomMenuCartRepository.findByMember(member)
+                .orElseThrow(() -> new EntityNotFoundException("장바구니가 존재하지 않습니다."));
+
+        // 3. 장바구니 아이템들 가져오기
+        List<RoomMenuCartItem> cartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
+        if (cartItems.isEmpty()) throw new IllegalStateException("장바구니가 비어 있습니다.");
+
+        // 4. 주문 객체 생성
+        RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
+        roomMenuOrder.setMember(member);
+        roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
+
+        List<RoomMenuOrderItem> orderItems = new ArrayList<>();
+
+        // 5. 장바구니 아이템 → 주문 아이템으로 변환
+        for (RoomMenuCartItem cartItem : cartItems) {
+            RoomMenu roomMenu = cartItem.getRoomMenu();
+
+            // 재고 확인
+            if (roomMenu.getRoomMenuAmount() < cartItem.getRoomMenuCartItemAmount()) {
+                throw new IllegalStateException("재고가 부족한 메뉴가 존재합니다: " + roomMenu.getRoomMenuName());
+            }
+
+            // 주문 아이템 생성
+            RoomMenuOrderItem orderItem = new RoomMenuOrderItem();
+            orderItem.setRoomMenu(roomMenu);
+            orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());
+            orderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());
+            orderItem.setRoomMenuOrder(roomMenuOrder);
+
+            // 재고 차감
+            roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());
+
+            orderItems.add(orderItem);
+        }
+
+        // 6. 주문과 아이템 연결
+        roomMenuOrder.setOrderItems(orderItems);
+
+        // 7. 주문 저장
+        RoomMenuOrder savedOrder = roomMenuOrderRepository.save(roomMenuOrder);
+
+        // 8. 장바구니 비우기
+        roomMenuCartItemRepository.deleteAll(cartItems);
+
+        return savedOrder.getRoomMenuOrderNum();
+    }
+
+    @Override
+    public List<RoomMenuOrderDTO> getOrderListByEmail(String email) {
+        Member member = memberRepository.findByMemberEmail(email);
+        List<RoomMenuOrder> orders = roomMenuOrderRepository.findByMemberOrderByRegDateDesc(member);
+
+        return orders.stream().map(order -> {
+            RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
+            dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
+            dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
+            dto.setRegDate(order.getRegDate());
+
+            List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
+                RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
+                itemDTO.setRoomMenuOrderItemNum(item.getRoomMenuOrderItemNum().toString());
+                itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
+                itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
+                itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
+                return itemDTO;
+            }).collect(Collectors.toList());
+
+            dto.setOrderItemList(itemDTOList);
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

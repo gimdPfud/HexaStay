@@ -20,7 +20,7 @@ public class CartController {
         System.out.println("이전 페이지: " + referer);
         if (referer != null) {
             if (referer.contains("/roommenu")) {
-                return "redirect:/";//todo 윤겸님 장바구니 경로로 설정해주세요!
+                return "redirect:/roommenu/cartlist";//todo 윤겸님 장바구니 경로로 설정해주세요!
             } else if (referer.contains("/member/store")) {
                 return "redirect:/member/store/cart/list";
             }

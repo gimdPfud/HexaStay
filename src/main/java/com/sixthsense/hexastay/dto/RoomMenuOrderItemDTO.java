@@ -20,12 +20,6 @@ public class RoomMenuOrderItemDTO {
 
     private Integer roomMenuOrderItemPrice; //주문금액
 
-
-
-    public RoomMenuOrderItemDTO(RoomMenuOrderItem orderItem) {
-        this.roomMenuOrderItemNum = orderItem.getRoomMenu().getRoomMenuName();
-        this.roomMenuOrderItemAmount = orderItem.getRoomMenuOrderAmount();
-        this.roomMenuOrderItemPrice = orderItem.getRoomMenuOrderPrice();
-    }
+    private String roomMenuOrderItemName; // 아이템 이름
 
 }
