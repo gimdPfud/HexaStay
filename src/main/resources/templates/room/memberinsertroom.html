@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>호텔룸 회원 등록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script> <!-- 테마 선택 가능 -->
 
     <style>
         body {
@@ -66,17 +69,18 @@
 
             <!-- 방 종류 -->
             <div class="col-md-6">
-                <label for="hotelRoomType" class="form-label fw-bold">🛏️ 방 종류</label>
-                <select class="form-select" id="hotelRoomType" name="hotelRoomType" onchange="updateHotelRoomPk()" required>
-                    <option value="">방 종류 선택</option>
-                    <option value="SINGLE">싱글101호</option>
-                    <option value="DOUBLE">더블3002호</option>
-                    <option value="SUITE">스위트1004호</option>
+                <label for="hotelRoomName" class="form-label fw-bold">🏦️ 방 이름</label>
+                <select class="form-select" id="hotelRoomName" name="hotelRoomName" onchange="updateHotelRoomPk()" required>
+                    <option value="">방 이름 선택</option>
+                    <option th:each="room : ${hotelRoomList}"
+                            th:value="${room.hotelRoomName}"
+                            th:text="${room.hotelRoomName}">
+                    </option>
                 </select>
             </div>
 
-            <!-- Hidden PK -->
-            <input type="hidden" id="hotelRoomNum" th:field="*{hotelRoomNum}" />
+            <!-- 숨겨진 호텔룸 PK 값 전송용 -->
+            <input type="hidden" id="hotelRoomNum" name="hotelRoomNum" th:field="*{hotelRoomNum}">
 
             <!-- 회원 정보 -->
             <div class="col-md-6">
@@ -91,7 +95,18 @@
 
             <div class="col-md-6">
                 <label class="form-label fw-bold">📱 전화번호</label>
-                <input type="text" class="form-control" th:field="*{memberPhone}" placeholder="전화번호 입력" required>
+                <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
+            </div>
+            <!-- 체크인 -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">📅 체크인 날짜</label>
+                <input type="date" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
+            </div>
+
+            <!-- 체크아웃 -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">🏁 체크아웃 날짜</label>
+                <input type="date" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
             </div>
 
             <!-- 버튼 그룹 -->
@@ -107,16 +122,16 @@
 <!-- 호텔룸 자동 선택 JS -->
 <script>
     function updateHotelRoomPk() {
-        let selectedType = document.getElementById("hotelRoomType").value;
+        let selectedName = document.getElementById("hotelRoomName").value;
 
-        if (!selectedType) {
+        if (!selectedName) {
             document.getElementById("hotelRoomNum").value = "";
             return;
         }
 
-        fetch(`/admin/hotelroom/latest?roomType=` + selectedType)
+        fetch(`/admin/hotelroom/latest?hotelRoomName=` + encodeURIComponent(selectedName))
             .then(response => {
-                if (!response.ok) throw new Error("해당 방 타입의 호텔룸이 존재하지 않습니다.");
+                if (!response.ok) throw new Error("해당 이름의 호텔룸이 존재하지 않습니다.");
                 return response.json();
             })
             .then(data => {
@@ -131,7 +146,11 @@
                 alert(error.message);
             });
     }
+
+
+
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

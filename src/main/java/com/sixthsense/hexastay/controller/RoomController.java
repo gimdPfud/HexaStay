@@ -4,6 +4,7 @@ import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
+import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -11,10 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class RoomController {
 
     private final RoomServiceImpl roomServiceimpl;
+
+    private final HotelRoomService hotelRoomService;
 
 
     // 회원을 기준으로 호텔룸 등록 페이지
@@ -53,7 +59,9 @@ public class RoomController {
      * 회원이 특정 호텔룸에 배정되는 등록 페이지 이동
      */
     @GetMapping("/member-insertroom")
-    public String insertMemberGet(Model model) {
+    public String insertMemberGet(Model model,@PageableDefault(page=1)Pageable pageable) {
+        Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList(pageable); // 호텔룸 목록 조회
+        model.addAttribute("hotelRoomList", hotelRoomList); // hotelRoomList를 모델에 추가
         model.addAttribute("memberDTO", new MemberDTO());
         return "room/memberinsertroom";
     }
@@ -61,6 +69,7 @@ public class RoomController {
     /**
      * 회원을 특정 호텔룸에 배정하고 Room 테이블에도 저장
      */
+    //todo:/member-insertroom
     @PostMapping("/member-insertroom")
     public String registerMember(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
         try {
@@ -74,7 +83,7 @@ public class RoomController {
             roomServiceimpl.registerMemberForHotelRoom(hotelRoomDTO, memberDTO);
 
             redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 호텔룸에 배정되었습니다.");
-            return "redirect:/roomlist"; // 성공 시 다시 등록 페이지로 이동
+            return "redirect:/member-insertroom"; // 성공 시 다시 등록 페이지로 이동
         } catch (Exception e) {
             log.error("회원 등록 실패: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "회원 등록 실패");

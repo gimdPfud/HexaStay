@@ -18,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +59,8 @@ public class RoomServiceImpl {
     }
 
 
-    //todo: [[HotelRoom_PK]] 기준으로 member FK 를 등록 하는 메서드
+    //todo: [[HotelRoom_PK]] 기준으로 member FK 를 등록 하는 메서드v
+    //todo: localhost:8090/member-insertroom
     //RoomController
     public void registerMemberForHotelRoom(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
         // 1️⃣ 호텔룸 정보 조회
@@ -74,14 +77,21 @@ public class RoomServiceImpl {
         hotelRoom = hotelRoomRepository.save(hotelRoom);
         log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
-        // 4️⃣ Room 엔티티 저장 (HotelRoom과 Member 관계 저장)
+        // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
+        LocalDate checkInDate = LocalDate.from(memberDTO.getCheckInDate().atStartOfDay());
+        LocalDate checkOutDate = LocalDate.from(memberDTO.getCheckOutDate().atStartOfDay());
+
+        // 5️⃣ Room 엔티티 저장
         Room room = Room.builder()
                 .hotelRoom(hotelRoom)
                 .member(member)
-
+                .checkInDate(checkInDate)
+                .checkOutDate(checkOutDate)
                 .build();
+        log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);
         roomRepository.save(room);
-        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}, 체크인: {}, 체크아웃: {}",
+                hotelRoom.getHotelRoomNum(), member.getMemberNum(), checkInDate, checkOutDate);
     }
 
 
@@ -94,6 +104,7 @@ public class RoomServiceImpl {
             // Null 체크 후 변환
             RoomDTO roomDTO = modelMapper.map(room, RoomDTO.class);
 
+
             if (room.getHotelRoom() != null) {
                 roomDTO.setHotelRoomName(room.getHotelRoom().getHotelRoomName());
                 roomDTO.setHotelRoomPhone(room.getHotelRoom().getHotelRoomPhone());
@@ -102,8 +113,12 @@ public class RoomServiceImpl {
             if (room.getMember() != null) {
                 roomDTO.setMemberName(room.getMember().getMemberName());
                 roomDTO.setMemberEmail(room.getMember().getMemberEmail());
-                roomDTO.setMembereDate(room.getMember().getCreateDate());
+
             }
+            // ✅ 수동 매핑 (중요!)
+            roomDTO.setCheckInDate(room.getCheckInDate());
+            roomDTO.setCheckOutDate(room.getCheckOutDate());
+
 
             return roomDTO;
         });

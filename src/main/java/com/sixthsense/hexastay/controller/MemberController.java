@@ -122,9 +122,8 @@ public class MemberController {
     @PostMapping("/update/ajax")
     @ResponseBody
     public ResponseEntity<MemberDTO> updateMemberAjax(@RequestBody MemberDTO memberDTO) {
-        // 수정된 회원 데이터를 반환
         MemberDTO updatedMember = memberService.memberModify(memberDTO);
-        return ResponseEntity.ok(updatedMember);
+        return ResponseEntity.ok(updatedMember); // 수정된 회원 정보를 반환
     }
 
 

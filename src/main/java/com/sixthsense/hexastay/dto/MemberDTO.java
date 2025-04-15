@@ -10,9 +10,10 @@ package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -36,6 +37,14 @@ public class MemberDTO {
 
 
     private LocalDateTime createDate;       //가입 일자
+
+    //체크인 - 체크아웃 데이터 가져 오기
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate checkInDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate checkOutDate;
+
 
     private String memberRole;
 

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -105,7 +103,6 @@
     </nav>
 </div>
 
-
 <!-- 회원 수정 모달 -->
 <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -180,7 +177,7 @@
         };
 
         // AJAX 요청
-        fetch('/update/ajax', {
+        fetch('/member/update/ajax', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -7,6 +7,10 @@
 </head>
 <body>
 <div class="container mt-4">
+    <!-- 메시지 출력 -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
     <h2 class="mb-4">호텔룸 리스트</h2>
 
     <table class="table table-hover align-middle text-center">
@@ -29,13 +33,14 @@
             <td>
                 <button type="button" class="btn btn-sm btn-warning"
                         th:attr="data-roomNum=${hotelRoom.hotelRoomNum},
-                     data-roomName=${hotelRoom.hotelRoomName},
-                     data-roomType=${hotelRoom.hotelRoomType},
-                     data-roomPrice=${hotelRoom.hotelRoomPrice},
-                     data-roomPhone=${hotelRoom.hotelRoomPhone},
-                     data-roomContent=${hotelRoom.hotelRoomContent}"
-                        onclick="openEditModal(this)">
-                    수정
+                 data-roomName=${hotelRoom.hotelRoomName},
+                 data-roomType=${hotelRoom.hotelRoomType},
+                 data-roomPrice=${hotelRoom.hotelRoomPrice},
+                 data-roomPhone=${hotelRoom.hotelRoomPhone},
+                 data-roomContent=${hotelRoom.hotelRoomContent},
+                 data-memberNum=${memberNum}"
+                onclick="openEditModal(this)">
+                수정
                 </button>
             </td>
             <td>
@@ -129,12 +134,13 @@
         const roomPhone = button.getAttribute('data-roomPhone');
         const roomContent = button.getAttribute('data-roomContent');
 
-        document.getElementById('editHotelRoomNum').value = roomNum;
-        document.getElementById('editHotelRoomName').value = roomName;
-        document.getElementById('editHotelRoomType').value = roomType;
-        document.getElementById('editHotelRoomPrice').value = roomPrice;
-        document.getElementById('editHotelRoomPhone').value = roomPhone;
-        document.getElementById('editHotelRoomContent').value = roomContent;
+        document.getElementById('editHotelRoomNum').value = button.getAttribute('data-roomNum');
+        document.getElementById('editHotelRoomName').value = button.getAttribute('data-roomName');
+        document.getElementById('editHotelRoomType').value = button.getAttribute('data-roomType');
+        document.getElementById('editHotelRoomPrice').value = button.getAttribute('data-roomPrice');
+        document.getElementById('editHotelRoomPhone').value = button.getAttribute('data-roomPhone');
+        document.getElementById('editHotelRoomContent').value = button.getAttribute('data-roomContent');
+        document.getElementById('editMemberNum').value = button.getAttribute('data-memberNum'); // ✅ 추가
 
         const editModal = new bootstrap.Modal(document.getElementById('editHotelRoomModal'));
         editModal.show();

@@ -39,6 +39,15 @@ public class HotelRoomDTO {
 
     private Integer hotelRoomPrice;              //호텔 방 가격
 
+
+    //****룸의 비밀번호 설정 컬럼모음**********//
+    private String hotelRoomQr;                 //Qr명
+
+    private String hotelRoomPassword;           //비밀번호
+    //****룸의 권한 설정 컬럼모음**********//
+
+
+
     //Company = 전체 브랜드 소속 확인용 컬럼
     private String companyName;                     //호텔룸 소속 커럶 추가 : 0414
 
@@ -53,11 +62,6 @@ public class HotelRoomDTO {
 
 
 
-
-
-
-
-
     //*********숙박 일정 필드명********//
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate checkInDate; //체크인
@@ -68,11 +72,7 @@ public class HotelRoomDTO {
 
 
 
-    //****룸의 비밀번호 설정 컬럼모음**********//
-    private String hotelRoomQr;                 //Qr명
 
-    private String hotelRoomPassword;           //비밀번호
-    //****룸의 권한 설정 컬럼모음**********//
 
 
     //todo:참조 참조 구분 하기 편하게

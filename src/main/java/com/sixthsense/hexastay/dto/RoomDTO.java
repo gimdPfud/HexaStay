@@ -2,7 +2,9 @@ package com.sixthsense.hexastay.dto;
 
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter@Setter@ToString
@@ -12,6 +14,15 @@ import java.time.LocalDateTime;
 public class RoomDTO {
 
         private Long roomNum;
+
+
+        /**Room 테이블에 체크인 - 체크아웃 데이터 추가**/
+
+        private LocalDate checkInDate;
+
+
+        private LocalDate checkOutDate;
+
 
 
         //*****참조 PK 테이블****//
