@@ -28,5 +28,4 @@ public interface CompanyService {
     //company 삭제
     void companyDelete(Long companyNum);
 
-
 }

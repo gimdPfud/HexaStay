@@ -195,6 +195,8 @@
 
             window.addEventListener('DOMContentLoaded', function () {
                 const businessNum = document.getElementById('companyBusinessNum').value;
+                console.log('페이지 로드 완료!');
+                console.log('사업자등록번호:', document.getElementById('companyBusinessNum'));
                 if (businessNum) {
                     const [part1, part2, part3] = businessNum.split("-");
                     document.getElementById('companyBusinessNumOne').value = part1 || '';
@@ -209,7 +211,7 @@
                     document.getElementById('companyPhonetwo').value = p2 || '';
                     document.getElementById('companyPhonethree').value = p3 || '';
                 }
-
+            })
 
 
             // 이미지가 있을 경우 보여주기
