@@ -6,30 +6,32 @@
 <head>
     <meta charset="UTF-8">
     <title>매니지먼트 시스템</title>
+    <style>
+        body {
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
 
 <div layout:fragment="content" class="container mt-4">
+    <div class="card shadow p-4 ">
+        <p th:text="${#authentication.principal.admin.adminName}">이름</p>
+        <p th:text="${#authentication.principal.admin.adminPosition}">직책</p>
+        <p th:text="${#authentication.principal.admin.adminEmail}">이메일</p>
+        <p th:text="${#authentication.principal.admin.adminRole}">직급</p>
 
-    <p th:text="${#authentication.principal.admin.adminName}">이름</p>
-    <p th:text="${#authentication.principal.admin.adminPosition}">직책</p>
-    <p th:text="${#authentication.principal.admin.adminEmail}">이메일</p>
-    <p th:text="${#authentication.principal.admin.adminRole}">직급</p>
+        <div class="mt-3">
+            <img th:if="${#authentication.principal.adminProfileMeta != null}"
+                 th:src="@{${#authentication.principal.adminProfileMeta}}"
+                 style="width: 60px; height: 80px;" alt="관리자 프로필 이미지">
 
-
-    사진
-    <td style="text-align: center;">
-        <img th:if="${#authentication.principal.adminProfileMeta != null}"
-             th:src="@{${#authentication.principal.adminProfileMeta}}"
-             style="width: 60px; height: 80px;">
-
-        <img th:unless="${#authentication.principal.adminProfileMeta != null}"
-             th:src="@{/profile/default.png}"
-             style="width: 60px; height: 80px;">
-    </td>
-
-
-
+            <img th:unless="${#authentication.principal.adminProfileMeta != null}"
+                 th:src="@{/profile/default.png}"
+                 style="width: 60px; height: 80px;" alt="기본 프로필 이미지">
+        </div>
+    </div>
 </div>
 
 </body>
