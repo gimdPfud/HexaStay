@@ -33,14 +33,9 @@
                 <label class="form-label">이메일 (ID)</label>
                 <input type="email" name="adminEmail" class="form-control">
             </div>
-            <div class="mb-2">
-                <label class="form-label">비밀번호</label>
-                <input type="text" name="adminPassword" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">비밀번호 확인</label>
-                <input type="text" id="adminPasswordTwo" class="form-control">
-            </div>
+
+             <input hidden type="text" name="adminPassword" class="form-control">
+
             <div class="mb-2">
                 <label class="form-label">이름</label>
                 <input type="text" name="adminName" class="form-control">
@@ -52,7 +47,8 @@
                     <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
                 </div>
             </div>
-            <input hidden name="adminResidentNum" id="adminResidentNum" value="">
+
+            <input hidden name="adminPassword" id="adminPassword" value="">
 
             <div class="mb-2">
                 <label class="form-label">주소</label>
@@ -139,10 +135,10 @@
             </div>
         </div>
 
-        <input hidden name="centerNum" id="centerNum">
-        <input hidden name="branchNum" id="branchNum">
-        <input hidden name="facilityNum" id="facilityNum">
-        <input hidden name="facilityNum" id="storeNum">
+        <input hidden name="companyNum" id="centerNum">
+        <input hidden name="companyNum" id="branchNum">
+        <input hidden name="companyNum" id="facilityNum">
+        <input hidden name="storeNum" id="storeNum">
 
     </form>
 
@@ -256,6 +252,9 @@
         });
 
         function submitForm(event) {
+
+            document.getElementById("adminPassword").value = document.getElementById("adminResidentNumPartOne").value;
+
             if (adminChoice.value === "본사") {
                 document.getElementById("centerNum").value = adminCenter.value;
                 document.getElementById("branchNum").value = "";
@@ -282,6 +281,8 @@
                 document.getElementById("storeNum").value = adminStore.value;
                 document.getElementById("adminRole").value = adminStoreRank.value;
             }
+
+
 
             document.getElementById('adminResidentNum').value =
                 document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
@@ -346,8 +347,8 @@
 
 
         document.getElementById('passwordConfirm').addEventListener('keyup', function () {
-            var password = document.getElementById('memberPassword').value;
-            var passwordTwo = document.getElementById('passwordConfirm').value;
+            var password = document.getElementById('adminPassword').value;
+            var passwordTwo = document.getElementById('adminPassword').value;
 
             if (password === passwordTwo) {
                 passwordCheck.textContent = "";

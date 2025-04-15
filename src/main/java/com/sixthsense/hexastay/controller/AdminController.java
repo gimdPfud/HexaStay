@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +74,12 @@ public class AdminController {
     public String adminInsert (Model model) {
 
         return "/admin/insert";
+    }
+
+    @GetMapping("/insertcenter")
+    public String adminInsertSearch (Model model,
+                                     @RequestParam("center") String center) {
+        return "/admin/insertsearch";
     }
 
     @PostMapping("/insert")
