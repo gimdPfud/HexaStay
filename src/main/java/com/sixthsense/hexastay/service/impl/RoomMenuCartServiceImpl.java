@@ -153,6 +153,8 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         RoomMenuCart roomMenuCart =
                 roomMenuCartRepository.findByMember_MemberEmail(email);
 
+
+
         if (roomMenuCart == null) {
             log.info("회원의 장바구니가 존재하지 않습니다.");
             RoomMenuCart insertCart = new RoomMenuCart();
@@ -177,6 +179,9 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             log.info(" 아이템메뉴 설정됨 - pk : roommenunum: {}, roommenu: {}", roomMenu.getRoomMenuNum(), roomMenu.getRoomMenuName());
             insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); // 수량
             log.info(" 수량 설정됨 - amount: {}", roomMenuCartItemDTO.getRoomMenuCartItemAmount());
+            insertCartItem.setRoomMenuCartItemCount(roomMenuCartItemDTO.getRoomMenuCartItemAmount());
+            log.info("총 수량 설정됨 - Count {}", roomMenuCartItemDTO.getRoomMenuCartItemCount());
+
             // 아이템을 저장하자.
             roomMenuCartItem =
                     roomMenuCartItemRepository.save(insertCartItem);
@@ -186,13 +191,19 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
             // 리턴값 반환
             return roomMenuCartItem.getRoomMenuCartItemNum();
+
         } else {
             log.info("이미 장바구니에 동일한 아이템이 있습니다.");
-            //장바구니에 동일한 아이템이 있다면
-            //장바구니아이템의 수량을 기존수량 + 입력받은 수량 으로 수정해준다.
-            roomMenuCartItem.setRoomMenuCartItemAmount(
-                    roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount()
-            );
+
+            // 기존 수량 + 추가 수량 계산
+            int newAmount = roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount();
+            roomMenuCartItem.setRoomMenuCartItemAmount(newAmount);
+
+            // 기존 카운트 + 추가 수량 계산 (null 체크 포함)
+            int newCount = (roomMenuCartItem.getRoomMenuCartItemCount() != null ? roomMenuCartItem.getRoomMenuCartItemCount() : 0)
+                    + roomMenuCartItemDTO.getRoomMenuCartItemAmount();
+            roomMenuCartItem.setRoomMenuCartItemCount(newCount);
+
             return roomMenuCartItem.getRoomMenuCartItemNum();
         }
     }
@@ -335,6 +346,12 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         return menuDTO;
 
+    }
+
+    @Override
+    public Integer getTotalCartItemCount(String memberEmail) {
+        Integer count = roomMenuCartItemRepository.getTotalItemCountByMemberEmail(memberEmail);
+        return count != null ? count : 0;
     }
 
 }

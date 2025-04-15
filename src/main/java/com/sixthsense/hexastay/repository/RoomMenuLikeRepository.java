@@ -14,4 +14,6 @@ public interface RoomMenuLikeRepository extends JpaRepository<RoomMenuLike, Long
     Long countByRoomMenuAndRoomMenuLikedCheck(RoomMenu roomMenu, Boolean likedCheck);
 
 
+
+
 }

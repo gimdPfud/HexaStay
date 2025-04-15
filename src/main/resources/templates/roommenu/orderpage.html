@@ -180,15 +180,42 @@
             transform: scale(1.2);
             transition: transform 0.2s;
         }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
+
+        .cart-count {
+            background-color: #ff5c5c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px; /* 더 네모나게 */
+            margin-left: 8px;
+            font-weight: bold;
+            font-size: 1.2em; /* 숫자 크게 */
+        }
+
     </style>
 </head>
-<body>
+<body data-logged-in="${session.user != null}">
 <div class="container">
     <!-- 헤더: 메뉴와 장바구니 아이콘 -->
     <div class="header">
-        <div class="menu-icon" onclick="toggleSearch()">☰</div>
+        <div class="back-icon" onclick="window.location.href='http://localhost:8090/main'">←</div>
         <div>목록페이지</div>
-        <div class="cart-icon" onclick="submitPostRequest()">🛒</div>
+        <div class="menu-icon" onclick="toggleSearch()">☰</div>
     </div>
 
     <!-- 검색창 -->
@@ -262,9 +289,15 @@
                 <!-- 싫어요 수 -->
                 <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
             </div>
-
         </li>
     </ul>
+
+    <button class="add-to-cart-btn"
+            onclick="submitPostRequest('/roommenu/cartlist')">
+        🛒 내 카트 리스트로
+        <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
+    </button>
+
 </div>
 
 
@@ -303,10 +336,11 @@
     const dislikedStates = {};
 
     function toggleLike(menuId) {
+
         const liked = likedStates[menuId] || false;
         const url = liked
-            ? `/roomMenu/orderpage/cancellike/${menuId}`
-            : `/roomMenu/orderpage/like/${menuId}`;
+            ? `/roommenu/orderpage/cancellike/${menuId}`
+            : `/roommenu/orderpage/like/${menuId}`;
 
         fetch(url, {
             method: 'POST'
@@ -317,7 +351,6 @@
             })
             .then(data => {
                 const likeIcon = document.getElementById(`likeIcon-${menuId}`);
-                const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                 const likeCount = document.getElementById(`likeCount-${menuId}`);
 
                 // UI 업데이트
@@ -327,7 +360,7 @@
 
                 // 좋아요 누르면 싫어요 초기화
                 if (!liked) {
-                    const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
+                    const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                     dislikeIcon.textContent = '👎';
                     dislikeIcon.style.color = 'gray';
                     dislikedStates[menuId] = false;
@@ -344,8 +377,8 @@
     function toggleDislike(menuId) {
         const disliked = dislikedStates[menuId] || false;
         const url = disliked
-            ? `/roomMenu/orderpage/cancledislike/${menuId}`  // ✅ 여기가 fix point
-            : `/roomMenu/orderpage/dislike/${menuId}`;
+            ? `/roommenu/orderpage/cancledislike/${menuId}`  // ✅ 여기가 fix point
+            : `/roommenu/orderpage/dislike/${menuId}`;
 
         fetch(url, {
             method: 'POST'
@@ -378,6 +411,32 @@
                 alert('싫어요 처리 중 문제가 발생했습니다.');
             });
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.like-section').forEach(section => {
+            const menuId = section.querySelector('[id^=likeIcon-]').id.split('-')[1];
+            fetch(`/roommenu/orderpage/status/${menuId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const liked = data.liked;
+                    const likeIcon = document.getElementById(`likeIcon-${menuId}`);
+                    const likeCount = document.getElementById(`likeCount-${menuId}`);
+
+                    likedStates[menuId] = liked;
+
+                    // UI 업데이트
+                    likeIcon.textContent = liked ? '❤️' : '🤍';
+                    likeIcon.style.color = liked ? 'red' : 'gray';
+                    likeCount.textContent = data.likeCount;
+                })
+                .catch(err => {
+                    console.error('좋아요 상태 불러오기 실패:', err);
+                });
+        });
+    });
+
+
+
 </script>
 
 <!-- 스크립트 끝 -->
