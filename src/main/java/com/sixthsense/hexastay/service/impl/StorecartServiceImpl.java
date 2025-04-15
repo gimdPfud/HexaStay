@@ -9,18 +9,15 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.StorecartitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
-import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.entity.Storecart;
-import com.sixthsense.hexastay.entity.Storecartitem;
-import com.sixthsense.hexastay.entity.Storemenu;
-import com.sixthsense.hexastay.repository.MemberRepository;
-import com.sixthsense.hexastay.repository.StorecartRepository;
-import com.sixthsense.hexastay.repository.StorecartitemRepository;
-import com.sixthsense.hexastay.repository.StoremenuRepository;
+import com.sixthsense.hexastay.entity.*;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.StorecartService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,29 +30,32 @@ import java.util.List;
 @Transactional
 public class StorecartServiceImpl implements StorecartService {
     private final StoremenuRepository storemenuRepository;
-    private final MemberRepository memberRepository;
     private final StorecartRepository storecartRepository;
     private final StorecartitemRepository storecartitemRepository;
+    private final RoomRepository roomRepository;
 
-    @Override
-    public Long addCart(StorecartitemDTO dto, String email) {
+        @Override
+    public Long addCart(StorecartitemDTO dto, Long hotelroomNum) {
         log.info(dto);
         log.info(dto.getStorecartitemCount());
 
         //1. 메뉴 조회
         Storemenu storemenu = storemenuRepository.findById(dto.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
-        //2. 멤버 조회
-        Member member = memberRepository.findByMemberEmail(email);
+        //2. room 조회. (왜냐면?? room과 일대일 관계를 맺도록 바꿈. > room은 1번의 숙박/고객/예약 이니까...)
+        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
+        if(room==null){return null;}//room 못찾으면 1 반환
+
         //3. 장바구니 조회
-        Storecart storecart = storecartRepository.findByMember_MemberEmail(email);
-        log.info("메뉴, 멤버, 카트 찾음.");
+        Storecart storecart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
+        log.info("메뉴, 룸(중간), 카트 찾음.");
         log.info(storemenu);
-        log.info(member);
+        log.info(room);
         log.info(storecart);
         //4. 장바구니가 없으면 하나 만들기.
         if(storecart==null){
             Storecart newcart = new Storecart();
-            newcart.setMember(member);
+            newcart.setRoom(room);
             storecart = storecartRepository.save(newcart);
             log.info("카트 없어서 새로 만들기");
             log.info(storecart);
@@ -101,35 +101,36 @@ public class StorecartServiceImpl implements StorecartService {
         return storecartitem.getStorecartitemNum();
     }
 
-    @Override
-    public List<StorecartitemViewDTO> getCartList(String email) {
-        List<StorecartitemViewDTO> list = storecartitemRepository.storeCartViewList(email);
+        @Override
+    public List<StorecartitemViewDTO> getCartList(Long hotelRoomNum) {
+        List<StorecartitemViewDTO> list = storecartitemRepository.storeCartViewList(hotelRoomNum);
         return list;
     }
 
-    @Override
-    public boolean validCartItemOwner(Long storeCartItemId, String email) {
-        Member inputMember = memberRepository.findByMemberEmail(email);
+        @Override
+    public boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum) {
+        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+        Room inputRoom = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
         Storecartitem itemEntity = storecartitemRepository.findById(storeCartItemId).orElseThrow(EntityNotFoundException::new);
-        Member cartMember = itemEntity.getStorecart().getMember();
-        return inputMember == cartMember;
+        Room cartRoom = itemEntity.getStorecart().getRoom();
+        return inputRoom == cartRoom;
     }
 
-    @Override
+        @Override
     public Integer updateCount(Long storeCartItemId, Integer count) {
         Storecartitem itemEntity = storecartitemRepository.findById(storeCartItemId).orElseThrow(EntityNotFoundException::new);
         itemEntity.setStorecartitemCount(count);
         return itemEntity.getStorecartitemCount();
     }
 
-    @Override
+        @Override
     public void deleteCartItem(Long storeCartItemId) {
         storecartitemRepository.deleteById(storeCartItemId);
     }
 
-    @Override
-    public void clearCartItems(String email) {
-        Storecart cart = storecartRepository.findByMember_MemberEmail(email);
+        @Override
+    public void clearCartItems(Long hotelroomNum) {
+        Storecart cart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
         List<Storecartitem> list = storecartitemRepository.findByStorecart_StorecartNum(cart.getStorecartNum());
         storecartitemRepository.deleteAll(list);
     }

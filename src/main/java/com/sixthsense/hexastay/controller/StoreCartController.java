@@ -36,20 +36,17 @@ public class StoreCartController {
            ??......get?*/
     /*1. 장바구니에 담기 (등록)*/
     @PostMapping("/insert")
-    public ResponseEntity cartInsert(StorecartitemDTO dto, Principal principal){
+    public ResponseEntity cartInsert(StorecartitemDTO dto){
         /*todo DTO 유효성 확인*/
-        if(principal==null){
-            log.info("로그인안됨");
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        String email = principal.getName();
+        Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
         try {
-            Long result = storecartService.addCart(dto, email);
+            Long result = storecartService.addCart(dto, hotelroomNum);
             if(result!=null){
                 log.info("카트 담김");
                 return new ResponseEntity<>(HttpStatus.OK);
             }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//다른가게의 메뉴 담으려고 했음
+            log.info("다른가게의 메뉴 담기 또는 Room 없음");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//
         } catch (Exception e) {
             log.info("알수없는오류");
             throw new RuntimeException(e);
@@ -57,26 +54,20 @@ public class StoreCartController {
     }
     /*2. 장바구니 보기 (목록)*/
     @GetMapping("/list")
-    public String cartList(Principal principal, Model model){
-        if(principal==null){
-            return "redirect:/member/login";
-            /*로그인안되면.........*/
-//            return null;
-        }
-        List<StorecartitemViewDTO> list = storecartService.getCartList(principal.getName());
+    public String cartList(Model model){
+        Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
+        List<StorecartitemViewDTO> list = storecartService.getCartList(hotelroomNum);
         model.addAttribute("list",list);
         return "mobilestore/cart/list";
     }
     /*3. 장바구니 수정 (수정)*/
     @GetMapping("/modify/{cartItemId}/{count}")
-    public ResponseEntity cartModify(@PathVariable("count") int count, Principal principal, @PathVariable("cartItemId") Long cartItemId){
+    public ResponseEntity cartModify(@PathVariable("count") int count, @PathVariable("cartItemId") Long cartItemId){
         if(count<=0){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(principal==null){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        if(!storecartService.validCartItemOwner(cartItemId,principal.getName())){
+        Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
+        if(!storecartService.validCartItemOwner(cartItemId,hotelroomNum)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         count = storecartService.updateCount(cartItemId,count);
@@ -84,11 +75,9 @@ public class StoreCartController {
     }
     /*4. 장바구니 삭제 (진짜삭제)*/
     @GetMapping("/delete/{cartItemId}")
-    public ResponseEntity cartDelete(@PathVariable("cartItemId") Long cartItemId, Principal principal){
-        if(principal==null){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        if(!storecartService.validCartItemOwner(cartItemId,principal.getName())){
+    public ResponseEntity cartDelete(@PathVariable("cartItemId") Long cartItemId){
+        Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
+        if(!storecartService.validCartItemOwner(cartItemId,hotelroomNum)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         storecartService.deleteCartItem(cartItemId);
@@ -96,13 +85,11 @@ public class StoreCartController {
     }
     /*5. 장바구니 비우기*/
     @PostMapping("/clear")
-    public ResponseEntity cartClear(StorecartitemDTO dto, Principal principal){
-        if(principal==null){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity cartClear(StorecartitemDTO dto){
+        Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
         try {
-            storecartService.clearCartItems(principal.getName());
-            cartInsert(dto,principal);
+            storecartService.clearCartItems(hotelroomNum);
+            cartInsert(dto);//저 위에 있는 등록 맞음 ^_^ ;;
             return new ResponseEntity<>(HttpStatus.OK);
         }catch (Exception e){
             log.info("장바구니를 비울 수 없습니다.");

@@ -19,5 +19,5 @@ import lombok.*;
 @AllArgsConstructor
 public class StorecartDTO {
     private Long storecartNum;
-    private Long memberNum;
+    private Long roomNum;
 }

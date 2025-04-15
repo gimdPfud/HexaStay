@@ -27,6 +27,8 @@ public interface OrderstoreService {
     public void cancel(Long orderId);
     /*3-1. 주문완료*/
     public void end(Long orderId);
+    /*3-2. 결제완료*/
+    public void paid(Long orderId);
 
     /*4. 고객용 주문내역 목록*/
     List<OrderstoreViewDTO> getOrderList(String email);
