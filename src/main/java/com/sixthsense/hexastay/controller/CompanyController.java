@@ -99,8 +99,12 @@ public class CompanyController {
     }
 
     @PostMapping("/modify")
-    public String modifyCompanyPost(CompanyDTO companyDTO) {
+    public String modifyCompanyPost(CompanyDTO companyDTO) throws IOException {
 
+        if (companyDTO.getCompanyPicture().isEmpty()) {
+            if (!companyService.companyRead(companyDTO.getCompanyNum()).getCompanyPictureMeta().isEmpty())
+            companyDTO.setCompanyPictureMeta(companyService.companyRead(companyDTO.getCompanyNum()).getCompanyPictureMeta());
+    }
         companyService.companyModify(companyDTO);
 
         return "redirect:/company/list";
