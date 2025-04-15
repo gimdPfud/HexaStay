@@ -127,35 +127,34 @@ public class RoomMenuCartController {
         log.info("장바구니 리스트 컨트롤러 진입");
         log.info("로그인한 사용자" + principal.getName());
 
-        // 로그인 여부 확인
+        // 로그인 체크
         if (principal == null) {
             log.info("로그인되지 않은 사용자의 장바구니 접근 시도");
-            return "redirect:/member/login"; // 또는 로그인 페이지 경로로 리턴
+            return "redirect:/member/login";
         }
 
-        String email = ""; // todo(6) 오류생길수도 있으니 관심
+        String email = principal.getName();
+        Page<RoomMenuCartDetailDTO> cartDetailDTOList = roomMenuCartService.RoomMenuCartItemList(email, pageable);
 
-        Page<RoomMenuCartDetailDTO> cartDetailDTOList
-                = roomMenuCartService.RoomMenuCartItemList(email, pageable);
+        // 장바구니 비어있는지 여부 체크
+        boolean isCartEmpty = cartDetailDTOList == null || cartDetailDTOList.isEmpty();
 
+        // 뷰에 데이터 전달
+        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
+        model.addAttribute("isCartEmpty", isCartEmpty); //
+        model.addAttribute("roomMenuDTO", roomMenuDTO);
 
-        log.info(cartDetailDTOList.getContent());
-
-        // 로그인된 사용자의 이메일로 장바구니 아이템 조회
-        model.addAttribute("cartDetailDTOList", roomMenuCartService.RoomMenuCartItemList(principal.getName(), pageable));
-        model.addAttribute("roomMenuDTO", roomMenuDTO); // todo(5) : 로직 넣어줘야함
-        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
+        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
-
 
         for (RoomMenuCartDetailDTO dto : cartDetailDTOList.getContent()) {
             log.info("메뉴 이름: {}, 가격: {}", dto.getRoomMenuCartDetailMenuItemName(), dto.getRoomMenuCartDetailMenuItemPrice());
         }
 
         return "roommenu/cartlist";
-
     }
+
 
     /***************************************************
      *

@@ -51,7 +51,7 @@ public class StoreController {
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
         if (adminDTO == null) {
-            return "redirect:/admin/login";
+            return "redirect:/admin/logout";
         }
         log.info(adminDTO);
 
@@ -85,10 +85,9 @@ public class StoreController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
         if (adminDTO == null) {
-            return "redirect:/admin/login";
+            return "redirect:/admin/logout";
         }
         log.info(adminDTO);
 
@@ -115,7 +114,12 @@ public class StoreController {
         }
         AdminDTO admin = adminService.adminFindEmail(principal.getName());
         if (idid == null) {
-            idid = admin.getStoreNum();
+            if(admin.getStoreNum()==null){
+                log.info("스토어소속이 아닌데 /admin/store/read로 접근. /list로 반환한다.");
+                return "redirect:/admin/store/list";
+            }else{
+                idid = admin.getStoreNum();
+            }
         }
         StoreDTO data = storeService.read(idid);
         boolean result = storeService.validStoreAdmin(admin, data);
@@ -130,8 +134,16 @@ public class StoreController {
 
 
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, Model model){
+    public String modify(@PathVariable Long id,Principal principal, Model model){
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        if (adminDTO == null) {
+            return "redirect:/admin/logout";
+        }
         StoreDTO data = storeService.read(id);
+        storeService.validStoreAdmin(adminDTO,data);
         model.addAttribute("data",data);
         return "store/modify";
     }

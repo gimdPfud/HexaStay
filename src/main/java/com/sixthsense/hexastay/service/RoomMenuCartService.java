@@ -44,4 +44,7 @@ public interface RoomMenuCartService {
 
     public RoomMenuDTO read(Long num);
 
+    // 장바구니의 아이템 수를 보여주는 서비스
+    public Integer getTotalCartItemCount(String memberEmail);
+
 }

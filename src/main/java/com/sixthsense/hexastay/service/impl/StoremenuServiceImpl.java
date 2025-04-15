@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -55,7 +56,7 @@ public class StoremenuServiceImpl implements StoremenuService {
                                 optionEntity.setStoremenu(finalStoremenu);
                                 return optionEntity;
                             })
-                            .toList()
+                            .collect(Collectors.toList())
             );
         }
         storemenu = storemenuRepository.save(storemenu);

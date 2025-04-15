@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 
@@ -177,17 +178,20 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void companyDelete(Long companyNum) throws IOException {
+    public void deactivateCompany(Long companyNum) {
+        Company company = companyRepository.findById(companyNum)
+                .orElseThrow(() -> new RuntimeException("해당 지사를 찾을 수 없습니다."));
 
-        Company company = companyRepository.findById(companyNum).orElseThrow();
+        // 지사 상태 비활성화
+        company.setCompanyStatus("INACTIVE");
+        companyRepository.save(company);
 
-        if (!company.getCompanyPictureMeta().isEmpty()) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), company.getCompanyPictureMeta().substring(1));
-            Files.deleteIfExists(filePath);
+        // 관련 관리자도 비활성화
+        List<Admin> admins = adminRepository.findByCompany_CompanyNum(companyNum);
+        for (Admin admin : admins) {
+            admin.setAdminActive("INACTIVE");
         }
-
-        companyRepository.deleteById(companyNum);
-
+        adminRepository.saveAll(admins);
     }
 
     private CompanyDTO convertToCompanyDTO(Company company) {

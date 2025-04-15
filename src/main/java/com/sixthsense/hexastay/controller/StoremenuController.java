@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -34,30 +35,29 @@ public class StoremenuController {
     private final StoreService storeService;
 
     /*storeNum없이 바로 메뉴 등록하려고 할 때
-    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지
-    * todo (일단 새 페이지로... 나중에 모달로 바꾸든지 말든지)*/
+    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
     @GetMapping("/insert")
-    public String insertPrevGet(HttpSession session, Model model){
+    public String insertPrevGet(HttpSession session,Principal principal, Model model){
         session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
         List<StoreDTO> list = storeService.getAllList();
         model.addAttribute("list",list);
         return "storemenu/selectstorenum";
     }
     @GetMapping("/list")
-    public String listPrevGet(HttpSession session, Model model){
+    public String listPrevGet(HttpSession session, Principal principal, Model model){
         session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
         List<StoreDTO> list = storeService.getAllList();
         model.addAttribute("list",list);
         return "storemenu/selectstorenum";
     }
     @GetMapping("/selected")
-    public String insertPrevSelected(HttpSession session, Long storeNum, RedirectAttributes model){
+    public String insertPrevSelected(HttpSession session, Principal principal, Long storeNum, RedirectAttributes model){
         log.info(storeNum);
         int prevpage = (int) session.getAttribute("prevpage");
         if(prevpage==1){
             return "redirect:/admin/store/menu/insert/"+storeNum;
         } else if(prevpage==2){
-            return "redirect:/admin/store/read/"+storeNum;
+            return "redirect:/admin/store/read?idid="+storeNum;
         }
         else {
             log.info("뭔진모르겟는데 오류");

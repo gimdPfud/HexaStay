@@ -1,20 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}"
+>
 <head>
     <meta charset="UTF-8">
     <title>외부업체 서비스 등록</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-<div class="container">
-    <div class="row mt-3">
-        <div class="col-2"></div><!-- 오른쪽 여백 -->
-        <div class="col-8">
-
-
+<div layout:fragment="content">
             <h1 class="text-center mb-4">상점을 선택해주세요</h1>
             <form action="/admin/store/menu/selected" method="get">
                 <div class="input-group mb-3">
@@ -30,7 +24,6 @@
                     </button>
                 </div>
             </form>
-
             <script>
                 function toggleButton() {
                     const selectBox = document.getElementById("storeSelect");
@@ -38,11 +31,6 @@
                     submitButton.disabled = !selectBox.value; // 값이 없으면 비활성화, 있으면 활성화
                 }
             </script>
-
-
-        </div><!-- 작업 영역 -->
-        <div class="col-2"></div><!-- 왼쪽 여백 -->
-    </div><!-- row 끝 -->
-</div><!-- container 끝 -->
+</div>
 </body>
 </html>

@@ -33,6 +33,8 @@ public class RoomMenuCartItem {
 
     private Integer roomMenuCartItemAmount;
 
+    private Integer roomMenuCartItemCount; // 카트에 담긴 메뉴 아이템의 갯수
+
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
     @JoinColumn(name = "cart_id")
     private RoomMenuCart roomMenuCart; // 카트참조
