@@ -111,7 +111,7 @@ public class CompanyController {
     }
 
     @PostMapping("/delete/{companyNum}")
-    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) {
+    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) throws IOException {
 
         companyService.companyDelete(companyNum);
 
