@@ -189,7 +189,7 @@ public class CompanyServiceImpl implements CompanyService {
         // 관련 관리자도 비활성화
         List<Admin> admins = adminRepository.findByCompany_CompanyNum(companyNum);
         for (Admin admin : admins) {
-            admin.setAdminStatus("INACTIVE");
+            admin.setAdminActive("INACTIVE");
         }
         adminRepository.saveAll(admins);
     }
