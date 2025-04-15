@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StoremenuOptionService;
 import com.sixthsense.hexastay.service.StoremenuService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,7 +51,7 @@ public class StoremenuOptionController {
     @PostMapping("/insert")
     public String insertPost(StoremenuOptionDTO storemenuOptionDTO) throws IOException {
         storemenuOptionService.insert(storemenuOptionDTO);
-        return "redirect:/admin/store/menu/read"+storemenuOptionDTO.getStoremenuNum();
+        return "redirect:/admin/store/menu/read/"+storemenuOptionDTO.getStoremenuNum();
     }
 
 
@@ -77,12 +78,27 @@ public class StoremenuOptionController {
             return new ResponseEntity<>(menulist, HttpStatus.OK);
         }
     }
+    @ResponseBody
+    @GetMapping("/list/soldout/{id}")
+    public ResponseEntity soldoutlistGet(@PathVariable Long id){
+        /*storeNum으로 Menu 가져오기...*/
+        List<StoremenuOptionDTO> menulist = storemenuOptionService.list(id,"soldout");
+        if(menulist.isEmpty()){
+            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(menulist, HttpStatus.OK);
+        }
+    }
 
+    @ResponseBody
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, Model model){
+    public ResponseEntity modify(@PathVariable Long id){
         StoremenuOptionDTO data = storemenuOptionService.read(id);
-        model.addAttribute("data",data);
-        return "storemenu/modify";
+        if(data==null){
+            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(data, HttpStatus.OK);
+        }
     }
     @PostMapping("/modify")
     public String modify(StoremenuOptionDTO storemenuOptionDTO) throws IOException {
@@ -94,11 +110,11 @@ public class StoremenuOptionController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         Long storemenuNum = storemenuOptionService.delete(id);
-        return "redirect:/admin/store/read?idid="+storemenuNum;
+        return "redirect:/admin/store/menu/read/"+storemenuNum;
     }
     @GetMapping("/restore/{id}")
     public String restore(@PathVariable Long id){
         Long storemenuNum = storemenuOptionService.restore(id);
-        return "redirect:/admin/store/read?idid="+storemenuNum;
+        return "redirect:/admin/store/menu/read/"+storemenuNum;
     }
 }

@@ -9,50 +9,301 @@
 </head>
 <body>
 <div layout:fragment="content">
-            <div class="text-center mb-3">
-                <div class="d-flex w-100" style="justify-content: center;">
-                    <img th:if="${data.storemenuImgMeta != null}"
-                         th:src="@{${data.storemenuImgMeta}}"
-                         class="rounded" style="width: 133px; height: 133px;">
 
-                    <img th:unless="${data.storemenuImgMeta != null}"
-                         th:src="@{/store/menu/default.png}"
-                         class="rounded" style="width: 133px; height: 133px;">
-                </div>
+    <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 400px;">
+        <div class="text-center mb-3">
+            <div class="d-flex w-100" style="justify-content: center;">
+                <img th:if="${data.storemenuImgMeta != null}"
+                     th:src="@{${data.storemenuImgMeta}}"
+                     class="rounded" style="width: 133px; height: 133px;">
+
+                <img th:unless="${data.storemenuImgMeta != null}"
+                     th:src="@{/store/menu/default.png}"
+                     class="rounded" style="width: 133px; height: 133px;">
             </div>
-            <div class="mb-3">
-                <label class="form-label">상품명</label>
-                <input type="text" class="form-control" th:value="${data.storemenuName}" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">상품명</label>
+            <input type="text" class="form-control" th:value="${data.storemenuName}" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">가격</label>
+            <input type="text" class="form-control" th:value="${data.storemenuPrice}" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">설명</label>
+            <textarea class="form-control" rows="3" th:text="${data.storemenuContent}" readonly></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">카테고리</label>
+            <select class="form-select" disabled>
+                <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
+                <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
+                <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
+                <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">등록일자</label>
+            <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">수정일자</label>
+            <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+        </div>
+        <div class="text-center mt-4">
+            <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-dark">목록</a>
+            <a th:href="@{'/admin/store/menu/modify/'+${data.storemenuNum}}" class="btn btn-success">수정</a>
+        </div>
+    </div>
+
+    <!--외부업체가 제공하는 서비스 목록들-->
+    <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 800px;">
+        <div class="mb-3">
+            <h1 class="text-center">제공 서비스 목록
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#insertModal">추가하기</button>
+            </h1>
+        </div><!--제목끝-->
+        <div class="optionlist mt-5"></div>
+        <div class="mt-4 d-grid">
+            <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
+                삭제된 항목
+            </button>
+        </div>
+        <div class="collapse mt-3" id="deletedlist">
+            <div class="card card-body">
+                <h4 class="text-center text-secondary">삭제된 항목 목록</h4>
+                <div class="deletedoptionlist"></div> <!-- 삭제된 목록을 여기에 표시 -->
             </div>
-            <div class="mb-3">
-                <label class="form-label">가격</label>
-                <input type="text" class="form-control" th:value="${data.storemenuPrice}" readonly>
+        </div>
+    </div><!--리스트가 비어있지 않다면 끝-->
+
+
+    <!--등록모달-->
+    <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/admin/store/menu/option/insert" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="insertModalLabel">옵션 등록</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col">
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text">옵션 이름</span>
+                                <input type="text" class="form-control" name="storemenuOptionName">
+                            </div>
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text">옵션 가격</span>
+                                <input type="number" class="form-control" name="storemenuOptionPrice">
+                            </div>
+                            <input hidden type="hidden" class="form-control" name="storemenuOptionStatus" value="alive" readonly>
+                            <input hidden type="hidden" class="form-control" name="storemenuNum" th:value="${data.storemenuNum}" readonly>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" class="btn btn-success">등록</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <label class="form-label">설명</label>
-                <textarea class="form-control" rows="3" th:text="${data.storemenuContent}" readonly></textarea>
+        </div>
+    </div>
+
+    <!--수정모달-->
+    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="modifyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/admin/store/menu/option/modify" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modifyModalLabel">옵션 등록</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col">
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text">옵션 이름</span>
+                                <input type="text" class="form-control" name="storemenuOptionName">
+                            </div>
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text">옵션 가격</span>
+                                <input type="number" class="form-control" name="storemenuOptionPrice">
+                            </div>
+                            <input hidden type="hidden" class="form-control" name="storemenuOptionStatus" value="alive" readonly>
+                            <input hidden type="hidden" class="form-control" name="storemenuNum" th:value="${data.storemenuNum}" readonly>
+                            <input hidden type="hidden" class="form-control" name="storemenuOptionNum" readonly>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" class="btn btn-success">등록</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <label class="form-label">카테고리</label>
-                <select class="form-select" disabled>
-                    <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
-                    <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
-                    <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
-                    <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">등록일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">수정일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="text-center mt-4">
-                <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-dark">목록</a>
-                <a th:href="@{'/admin/store/menu/modify/'+${data.storemenuNum}}" class="btn btn-success">수정</a>
-            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        let optionlist = document.querySelector(".optionlist");
+        let deletedoptionlist = document.querySelector(".deletedoptionlist");
+        let menuNum = [[${data.storemenuNum}]]
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("페이지 로드 됨")
+
+            fetch(`/admin/store/menu/option/list/${menuNum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showstoremenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404){
+                        showemptymenu(error.message);
+                    }
+                    console.log(error)
+                });
+
+            fetch(`/admin/store/menu/option/list/deleted/${menuNum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showdeletedmenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404){
+                        showemptydeletedmenu(error.message);
+                    }
+                    console.log(error)
+                });
+
+        })
+
+        /*
+         * 메소드명 : showstoremenu
+         * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
+         * */
+        function showstoremenu(list) {
+            let tagsstart = `<table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>버튼</th>
+                </tr>
+                </thead>
+                <tbody>`;
+            let tagscontent = "";
+            let tagsend = `</tbody>
+            </table>`;
+            for (let i=0; i<list.length;i++){
+                tagscontent += `<tr>
+                    <td>${list[i].storemenuOptionName}</td>
+                    <td>${list[i].storemenuOptionPrice}</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modifyModal" data-option-num="${list[i].storemenuOptionNum}">수정</button>
+                        <a href="/admin/store/menu/option/delete/${list[i].storemenuOptionNum}" class="btn btn-danger btn-sm">삭제</a>
+                    </td>
+                </tr>`
+            }
+            let totaltags = tagsstart + tagscontent + tagsend;
+
+            optionlist.innerHTML=totaltags;
+
+        }
+
+        const modifyModal = document.getElementById('modifyModal');
+        modifyModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const optionNum = button.getAttribute('data-option-num');
+
+            fetch(`/admin/store/menu/option/modify/${optionNum}`)
+                .then(response => response.json())
+                .then(option => {
+                    const modal = modifyModal;
+                    modal.querySelector('input[name="storemenuOptionName"]').value = option.storemenuOptionName;
+                    modal.querySelector('input[name="storemenuOptionPrice"]').value = option.storemenuOptionPrice;
+                    modal.querySelector('input[name="storemenuOptionNum"]').value = option.storemenuOptionNum;
+                }).catch(error => console.log(error));
+        });
+
+
+
+
+        function showdeletedmenu(list) {
+            let tagsstart = `<table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>버튼</th>
+                </tr>
+                </thead>
+                <tbody>`;
+            let tagscontent = "";
+            let tagsend = `</tbody>
+            </table>`;
+            for (let i=0; i<list.length;i++){
+                tagscontent += `<tr>
+                    <td>${list[i].storemenuOptionName}</td>
+                    <td>${list[i].storemenuOptionPrice}</td>
+                    <td>
+                        <a href="/admin/store/menu/option/restore/${list[i].storemenuOptionNum}" class="btn btn-success btn-sm">복원</a>
+                    </td>
+                </tr>`
+            }
+            let totaltags = tagsstart + tagscontent + tagsend;
+
+            deletedoptionlist.innerHTML=totaltags;
+
+        }
+        /*
+         * 메소드명 : showemptymenu
+         * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
+         * */
+        function showemptymenu(msg) {
+            let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+            optionlist.innerHTML=tagscontent;
+        }
+        /*
+         * 메소드명 : showemptydeletedmenu
+         * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 storemenulist에 메시지를 h1태그로 추가함.
+         * */
+        function showemptydeletedmenu(msg) {
+            let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+            deletedoptionlist.innerHTML=tagscontent;
+        }
+    </script>
+
 </div>
 </body>
 </html>

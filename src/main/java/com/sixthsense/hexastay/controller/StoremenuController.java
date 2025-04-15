@@ -7,8 +7,10 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.dto.StoremenuDTO;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import jakarta.servlet.http.HttpSession;
@@ -33,11 +35,22 @@ import java.util.List;
 public class StoremenuController {
     private final StoremenuService storemenuService;
     private final StoreService storeService;
+    private final AdminService adminService;
 
     /*storeNum없이 바로 메뉴 등록하려고 할 때
     *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
     @GetMapping("/insert")
     public String insertPrevGet(HttpSession session,Principal principal, Model model){
+        if(principal==null){
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        if(adminDTO==null){
+            return "redirect:/admin/logout";
+        }
+        if(adminDTO.getStoreNum()!=null){
+            return "redirect:/admin/store/menu/insert/"+adminDTO.getStoreNum();
+        }
         session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
         List<StoreDTO> list = storeService.getAllList();
         model.addAttribute("list",list);
@@ -45,6 +58,16 @@ public class StoremenuController {
     }
     @GetMapping("/list")
     public String listPrevGet(HttpSession session, Principal principal, Model model){
+        if(principal==null){
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        if(adminDTO==null){
+            return "redirect:/admin/logout";
+        }
+        if(adminDTO.getStoreNum()!=null){
+            return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
+        }
         session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
         List<StoreDTO> list = storeService.getAllList();
         model.addAttribute("list",list);
@@ -144,6 +167,11 @@ public class StoremenuController {
     @GetMapping("/restore/{id}")
     public String restore(@PathVariable Long id){
         Long storeNum = storemenuService.restore(id);
+        return "redirect:/admin/store/read?idid="+storeNum;
+    }
+    @GetMapping("/soldout/{id}")
+    public String soldout(@PathVariable Long id){
+        Long storeNum = storemenuService.soldout(id);
         return "redirect:/admin/store/read?idid="+storeNum;
     }
 }
