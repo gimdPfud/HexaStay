@@ -25,6 +25,9 @@ public interface AdminRepository extends JpaRepository<Admin, Long>, AdminReposi
     public List<Admin> findByAdminActive(String active);
 
 
+    // 컴퍼니 삭제용
+    List<Admin> findByCompany_CompanyNum(Long companyNum);
+
 
     // 시큐리티용
     Admin findByAdminEmail(String adminEmail);
