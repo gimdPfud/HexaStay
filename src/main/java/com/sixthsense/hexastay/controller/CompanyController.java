@@ -99,19 +99,15 @@ public class CompanyController {
     }
 
     @PostMapping("/modify")
-    public String modifyCompanyPost(CompanyDTO companyDTO) throws IOException {
+    public String modifyCompanyPost(CompanyDTO companyDTO) {
 
-        if (companyDTO.getCompanyPicture().isEmpty()) {
-            if (!companyService.companyRead(companyDTO.getCompanyNum()).getCompanyPictureMeta().isEmpty())
-            companyDTO.setCompanyPictureMeta(companyService.companyRead(companyDTO.getCompanyNum()).getCompanyPictureMeta());
-    }
         companyService.companyModify(companyDTO);
 
         return "redirect:/company/list";
     }
 
     @PostMapping("/delete/{companyNum}")
-    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) throws IOException {
+    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) {
 
         companyService.companyDelete(companyNum);
 

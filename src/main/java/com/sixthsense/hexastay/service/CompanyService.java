@@ -23,9 +23,9 @@ public interface CompanyService {
     CompanyDTO companyRead(Long companyNum);
 
     //company 수정
-    void companyModify(CompanyDTO companyDTO) throws IOException;
+    void companyModify(CompanyDTO companyDTO);
 
     //company 삭제
-    void companyDelete(Long companyNum) throws IOException;
+    void companyDelete(Long companyNum);
 
 }
