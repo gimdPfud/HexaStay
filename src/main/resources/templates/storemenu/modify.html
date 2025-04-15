@@ -18,7 +18,7 @@
                 </div>
                 <p class="file-name">변경할 이미지를 선택하세요.</p>
                 <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storemenuImg" class="form-control" accept=".webp, .png, .jpeg, .jpg, .gif">
+                <input hidden type="file" id="adminProfile" name="storemenuImg" class="form-control" accept=".webp, .png, .jpeg, .jpg, .gif" th:value="${data.storemenuImg}">
                 <small id="fileError" class="text-danger d-none">올바른 파일이 선택되지 않았습니다.</small>
             </div>
 
@@ -50,7 +50,17 @@
             <div class="mb-3">
                 <label class="form-label">메뉴 옵션 리스트</label>
                 <div th:each="option:${data.storemenuOptionDTOList}">
-
+                    <div class="mb-3">
+                        <label class="form-label">옵션 이름</label>
+                        <input type="text" class="form-control" th:value="${option.storemenuOptionName}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">옵션 가격</label>
+                        <input type="text" class="form-control" th:value="${option.storemenuOptionPrice}">
+                    </div>
+                    <div class="mb-3">
+                        <button>삭제</button>
+                    </div>
                 </div>
             </div>
 

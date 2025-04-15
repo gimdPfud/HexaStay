@@ -101,22 +101,24 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
-        if (!store.getStoreProfileMeta().equals(storeDTO.getStoreProfileMeta())) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta());
-            Files.deleteIfExists(filePath);
-            /*이미지 등록 절차...*/
-            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
-            String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
+        if(store.getStoreProfileMeta()!=null&&storeDTO.getStoreProfileMeta()!=null) {
+            if (!store.getStoreProfileMeta().equals(storeDTO.getStoreProfileMeta())) {
+                Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta());
+                Files.deleteIfExists(filePath);
+                /*이미지 등록 절차...*/
+                String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+                String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
+                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+                String fileName = fileFirstName + fileSubName;
 
-            storeDTO.setStoreProfileMeta("/store/menu/"+fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
-            if(!Files.exists(createPath)){
-                Files.createDirectory(createPath);
+                storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
+                Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
+                Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+                if (!Files.exists(createPath)) {
+                    Files.createDirectory(createPath);
+                }
+                storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
             }
-            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
         }
         store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         store.setStoreName(storeDTO.getStoreName());

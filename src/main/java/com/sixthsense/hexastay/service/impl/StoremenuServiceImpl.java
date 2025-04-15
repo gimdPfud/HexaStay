@@ -102,24 +102,26 @@ public class StoremenuServiceImpl implements StoremenuService {
     @Override
     public Long modify(StoremenuDTO storemenuDTO) throws IOException {
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
-        if (!entity.getStoremenuImgMeta().equals(storemenuDTO.getStoremenuImgMeta())) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
-            Files.deleteIfExists(filePath);
-            /*이미지 등록 절차...*/
-            String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
-            String fileFirstName = entity.getStoremenuNum() + "_" + storemenuDTO.getStoreNum() + "_" + storemenuDTO.getStoremenuName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
+        if(entity.getStoremenuImgMeta()!=null&&storemenuDTO.getStoremenuImgMeta()!=null) {
+            if (!entity.getStoremenuImgMeta().equals(storemenuDTO.getStoremenuImgMeta())) {
+                Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
+                Files.deleteIfExists(filePath);
+                /*이미지 등록 절차...*/
+                String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
+                String fileFirstName = entity.getStoremenuNum() + "_" + storemenuDTO.getStoreNum() + "_" + storemenuDTO.getStoremenuName();
+                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+                String fileName = fileFirstName + fileSubName;
 
-            storemenuDTO.setStoremenuImgMeta("/store/menu/"+fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
-            if(!Files.exists(createPath)){
-                Files.createDirectory(createPath);
+                storemenuDTO.setStoremenuImgMeta("/store/menu/" + fileName);
+                Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
+                Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+                if (!Files.exists(createPath)) {
+                    Files.createDirectory(createPath);
+                }
+                storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
             }
-            storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
+            entity.setStoremenuImgMeta(storemenuDTO.getStoremenuImgMeta());
         }
-        entity.setStoremenuImgMeta(storemenuDTO.getStoremenuImgMeta());
         entity.setStoremenuContent(storemenuDTO.getStoremenuContent());
         entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
         entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
@@ -167,6 +169,19 @@ public class StoremenuServiceImpl implements StoremenuService {
     public Long delete(Long pk) {
         Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         storemenu.setStoremenuStatus("deleted");
+        return storemenu.getStore().getStoreNum();
+    }
+
+    /*
+     * 메소드명 : delete
+     * 인수 값 : Long
+     * 리턴 값 : void
+     * 기  능 : pk를 받아 해당하는 Storemenu 객체의 활성화 컬럼 데이터를 deleted로 바꾼다.
+     * */
+    @Override
+    public Long soldout(Long pk) {
+        Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+        storemenu.setStoremenuStatus("soldout");
         return storemenu.getStore().getStoreNum();
     }
 

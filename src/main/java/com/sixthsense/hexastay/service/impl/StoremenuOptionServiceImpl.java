@@ -45,9 +45,9 @@ public class StoremenuOptionServiceImpl implements StoremenuOptionService {
      * 기  능 : DTO를 받아 데이터베이스에 추가하고, 등록한 객체의 pk를 반환함.
      * */
     @Override
-    public Long insert(StoremenuOptionDTO StoremenuOptionDTO) throws IOException {
-        StoremenuOptionDTO.setStoremenuOptionStatus("alive");
-        StoremenuOption storemenuOption = modelMapper.map(StoremenuOptionDTO, StoremenuOption.class);
+    public Long insert(StoremenuOptionDTO storemenuOptionDTO) throws IOException {
+        storemenuOptionDTO.setStoremenuOptionStatus("alive");
+        StoremenuOption storemenuOption = modelMapper.map(storemenuOptionDTO, StoremenuOption.class);
         storemenuOption = storemenuOptionRepository.save(storemenuOption);
         return storemenuOption.getStoremenuOptionNum();
     }
@@ -61,7 +61,7 @@ public class StoremenuOptionServiceImpl implements StoremenuOptionService {
     @Override
     public StoremenuOptionDTO read(Long pk) {
         StoremenuOption storemenuOption = storemenuOptionRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
-        StoremenuOptionDTO data = modelMapper.map(storemenuOption, StoremenuOptionDTO.class);
+        StoremenuOptionDTO data = new StoremenuOptionDTO(storemenuOption);
         return data;
     }
 
@@ -90,14 +90,14 @@ public class StoremenuOptionServiceImpl implements StoremenuOptionService {
     @Override
     public List<StoremenuOptionDTO> list(Long storemenuNum, String status) {
         List<StoremenuOption> storemenuList= storemenuOptionRepository.findByStatusAndMenuNum(status,storemenuNum);
-        List<StoremenuOptionDTO> list = storemenuList.stream().map(data -> modelMapper.map(data, StoremenuOptionDTO.class)).toList();
+        List<StoremenuOptionDTO> list = storemenuList.stream().map(StoremenuOptionDTO::new).toList();
         return list;
     }
 
     @Override
     public List<StoremenuOptionDTO> list(Long storemenuNum) {
         List<StoremenuOption> storemenuList = storemenuOptionRepository.findAll(storemenuNum);
-        List<StoremenuOptionDTO> list = storemenuList.stream().map(data->modelMapper.map(data,StoremenuOptionDTO.class)).toList();
+        List<StoremenuOptionDTO> list = storemenuList.stream().map(StoremenuOptionDTO::new).toList();
         return list;
     }
 
