@@ -46,7 +46,7 @@ public class StoreOrderController {
 //        }
 //        int result = orderstoreService.insert(cartitemidList, principal.getName());
         /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        Long hotelroomNum = 9L;
+        Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함.
         int result = orderstoreService.insert(cartitemidList, hotelroomNum);
         if(result==1){
             log.info("정상주문되었습니다.");
