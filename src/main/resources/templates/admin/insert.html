@@ -181,8 +181,8 @@
                 adminCenter.value = "";
                 adminBranchFacility.value = "";
                 adminStore.value = "";
-                adminCenter.disabled = true;
-                adminBranchFacility.disabled = true;
+                adminCenter.disabled = false;
+                adminBranchFacility.disabled = false;
                 adminStore.disabled = false;
 
                 adminCenterRank.hidden = true;
@@ -194,31 +194,71 @@
 
 
 
-        document.getElementById('adminCenter').addEventListener('change', function () {
+        document.getElementById("adminCenter").addEventListener("change", function () {
             const centerCompanyNum = this.value;
-            const companyParent = document.getElementById("adminCenter").value;
-            const adminChoiceValue = adminChoice.value;
+            const adminChoice = document.getElementById("adminChoice").value;
 
-            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&adminChoice=${adminChoiceValue}&companyParent=${companyParent}`)
+
+            let mappedChoice;
+            switch (adminChoice) {
+                case "지사": mappedChoice = "branch"; break;
+                case "지점": mappedChoice = "facility"; break;
+                case "스토어": mappedChoice = "store"; break;
+                default: mappedChoice = ""; break;
+            }
+
+            if (!mappedChoice) return;
+
+            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&adminChoice=${mappedChoice}`)
                 .then(response => response.json())
                 .then(data => {
-                    const childSelect = document.getElementById('childSelect');
-                    childSelect.innerHTML = '<option value="">하위 조직 선택</option>';
-                    data.forEach(child => {
-                        const option = document.createElement('option');
-                        option.value = child.companyNum;
-                        option.textContent = `${child.companyType} - ${child.companyName}`;
-                        childSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('하위 조직 로딩 실패:', error);
+                    const subSelect = document.getElementById("adminBranchFacility");
+                    subSelect.innerHTML = "";
+
+                        // 기본 선택 옵션 추가
+                        const defaultOption = document.createElement("option");
+                        defaultOption.textContent = "";
+                        defaultOption.value = "";
+                        subSelect.appendChild(defaultOption);
+
+                        // 받아온 조직 리스트 추가
+                        data.forEach(company => {
+                            const option = document.createElement("option");
+                            option.value = company.companyNum;
+                            option.textContent = company.companyName;
+                            subSelect.appendChild(option);
+                        });
                 });
         });
 
+        // 브랜치/퍼실리티 선택 시 스토어 목록 가져오기
+        document.getElementById("adminBranchFacility").addEventListener("change", function () {
+            const companyNum = this.value;
+            
+            // 스토어 선택 시에만 실행
+            if (adminChoice !== "스토어" || !companyNum) return;
 
+            fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const storeSelect = document.getElementById("adminStore");
+                    storeSelect.innerHTML = "";
 
+                    // 기본 선택 옵션 추가
+                    const defaultOption = document.createElement("option");
+                    defaultOption.textContent = "";
+                    defaultOption.value = "";
+                    storeSelect.appendChild(defaultOption);
 
+                    // 받아온 스토어 리스트 추가
+                    data.forEach(store => {
+                        const option = document.createElement("option");
+                        option.value = store.storeNum;
+                        option.textContent = store.storeName;
+                        storeSelect.appendChild(option);
+                    });
+                });
+        });
 
         function submitForm(event) {
                 // 주민번호 앞자리를 패스워드로 사용

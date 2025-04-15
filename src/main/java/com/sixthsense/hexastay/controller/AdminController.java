@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
@@ -77,21 +78,19 @@ public class AdminController {
         return "/admin/insert";
     }
 
+    @ResponseBody
     @GetMapping("/insertselect")
-    public String adminInsertSearch (Model model,
-                                     @RequestParam("centerNum") Long centerNum,
-                                     @RequestParam("adminChoice") String adminChoice) {
+    public List<CompanyDTO> adminInsertSearch (Model model,
+                                            @RequestParam("centerNum") Long centerNum,
+                                            @RequestParam("adminChoice") String adminChoice) {
+        return adminService.insertSelectList(centerNum, adminChoice);
+    }
 
-        switch (adminChoice) {
-            case "센터" -> {
-
-            }
-            case "지사" -> {}
-            case "지점" -> {}
-            case "스토어" -> {}
-        }
-
-        return "/admin/insert";
+    @ResponseBody
+    @GetMapping("/insertstore")
+    public List<StoreDTO> adminInsertStore (Model model,
+                                               @RequestParam("companyNum") Long companyNum) {
+        return adminService.insertStoreList(companyNum);
     }
 
     @PostMapping("/insert")

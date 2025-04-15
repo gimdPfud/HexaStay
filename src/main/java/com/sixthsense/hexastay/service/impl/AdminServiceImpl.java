@@ -132,14 +132,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminDTO> insertSelectList (Long centerNum, String adminChoice) {
+    public List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice) {
+        List<Company> companyList =
         switch (adminChoice) {
-            case "센터" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "center");
-            case "지사" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "branch");
-            case "지점" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "facility");
-            case "스토어" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "store");
-        }
-
+            case "branch" ->  companyRepository.findByCompanyTypeAndCompanyParent( "branch", centerNum);
+            case "facility" ->  companyRepository.findByCompanyTypeAndCompanyParent("facility", centerNum);
+            case "store" -> companyRepository.findByCompanyParent(centerNum);
+            default -> new ArrayList<>();
+        };
+        return companyList.stream().map(company -> modelMapper.map(company, CompanyDTO.class)).collect(Collectors.toList());
     }
 
+    @Override
+    public List<StoreDTO> insertStoreList (Long companyNum) {
+        List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
+        return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
+    }
 }
