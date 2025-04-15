@@ -48,7 +48,11 @@
 
             <label class="form-label" for="companyParent" id="companyParentLabel" hidden>소속 본사 선택</label>
             <select type="text" id="companyParent" class="form-control" name="companyParent" hidden>
-                <option th:each="companyDTO : ${company}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
+                <option th:each="companyDTO : ${company}"
+                        th:if="${companyDTO.companyType == 'center'}"
+                        th:text="${companyDTO.companyName}"
+                        th:value="${companyDTO.companyNum}">
+                </option>
             </select>
 
             <div class="mb-2">
