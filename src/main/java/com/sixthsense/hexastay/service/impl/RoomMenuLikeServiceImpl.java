@@ -78,36 +78,46 @@ public class RoomMenuLikeServiceImpl implements RoomMenuLikeService {
 
     @Override
     public Integer roomMenuDisLike(Long roomMenuNum, String memberEmail) {
-        log.info("싫어요 서비스 진입" + roomMenuNum);
-        log.info("싫어요 서비스 진입" + memberEmail);
+        log.info("싫어요 서비스 진입 " + memberEmail);
+        log.info("싫어요 서비스 진입 " + roomMenuNum);
+
         Member member = memberRepository.findByMemberEmail(memberEmail);
         RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
 
-        Optional<RoomMenuLike> optional = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
-        if (optional.isPresent()) {
-            RoomMenuLike like = optional.get();
-            like.setRoomMenuLikedCheck(false); // 싫어요로 전환
-            roomMenuLikeRepository.save(like);
+        Optional<RoomMenuLike> optionalLike = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
+
+        if (optionalLike.isPresent()) {
+            RoomMenuLike like = optionalLike.get();
+            if (Boolean.FALSE.equals(like.getRoomMenuLikedCheck())) {
+                // 이미 싫어요 상태면 → 취소
+                roomMenuLikeRepository.delete(like);
+            } else {
+                // 좋아요였으면 → 싫어요로 전환
+                like.setRoomMenuLikedCheck(false);
+                roomMenuLikeRepository.save(like);
+            }
         } else {
-            RoomMenuLike newLike = new RoomMenuLike();
-            newLike.setRoomMenu(menu);
-            newLike.setMember(member);
-            newLike.setRoomMenuLikedCheck(false); // 싫어요 등록
-            roomMenuLikeRepository.save(newLike);
+            // 처음 누르는 거면 → 새로 생성
+            RoomMenuLike newDislike = new RoomMenuLike();
+            newDislike.setMember(member);
+            newDislike.setRoomMenu(menu);
+            newDislike.setRoomMenuLikedCheck(false);
+            roomMenuLikeRepository.save(newDislike);
         }
 
+        // 싫어요 수 리턴
         return roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, false).intValue();
     }
 
     @Override
     public Integer roomMenuDisLikeCancel(Long roomMenuNum, String memberEmail) {
-        log.info("싫어요 캔슬 서비스 진입" + roomMenuNum);
-        log.info("싫어요 캔슬 서비스 진입" + memberEmail);
+        log.info("싫어요 캔슬 서비스 진입 " + roomMenuNum);
+        log.info("싫어요 캔슬 서비스 진입 " + memberEmail);
+
         Member member = memberRepository.findByMemberEmail(memberEmail);
         RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
 
-        Optional<RoomMenuLike> optional =
-                roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
+        Optional<RoomMenuLike> optional = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
         if (optional.isPresent() && Boolean.FALSE.equals(optional.get().getRoomMenuLikedCheck())) {
             roomMenuLikeRepository.delete(optional.get()); // 싫어요 → 삭제
         }
