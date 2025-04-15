@@ -85,7 +85,7 @@ public class StoremenuController {
     @PostMapping("/insert")
     public String insertPost(StoremenuDTO storemenuDTO) throws IOException {
         storemenuService.insert(storemenuDTO);
-        return "redirect:/admin/store/read/"+storemenuDTO.getStoreNum();
+        return "redirect:/admin/store/read?idid="+storemenuDTO.getStoreNum();
     }
 
 
@@ -130,7 +130,7 @@ public class StoremenuController {
         return "storemenu/modify";
     }
     @PostMapping("/modify")
-    public String modify(StoremenuDTO storemenuDTO){
+    public String modify(StoremenuDTO storemenuDTO) throws IOException {
         Long storemenuNum = storemenuService.modify(storemenuDTO);
         log.info(storemenuNum);
         return "redirect:/admin/store/menu/read/"+storemenuNum;
@@ -139,11 +139,11 @@ public class StoremenuController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         Long storeNum = storemenuService.delete(id);
-        return "redirect:/admin/store/read/"+storeNum;
+        return "redirect:/admin/store/read?idid="+storeNum;
     }
     @GetMapping("/restore/{id}")
     public String restore(@PathVariable Long id){
         Long storeNum = storemenuService.restore(id);
-        return "redirect:/admin/store/read/"+storeNum;
+        return "redirect:/admin/store/read?idid="+storeNum;
     }
 }

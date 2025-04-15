@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.HotelRoomService;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @Log4j2
@@ -58,6 +60,9 @@ public class HotelRoomController {
     public String inputHotelRoomGet(Model model, Principal principal) {
         String loginEmail = principal.getName();
         AdminDTO adminDTO = adminService.adminFindEmail(loginEmail);
+
+
+        //여기에 소속되어 있는 보든 리스트 정보 가져 오기
         Long companyNum =  adminDTO.getCompanyNum();
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
@@ -72,8 +77,8 @@ public class HotelRoomController {
     @PostMapping("/input")
     public String inputHotelRoomPost( HotelRoomDTO hotelRoomDTO,
                                      RedirectAttributes redirectAttributes
-                                      ) throws IOException
-    {
+                                      ) throws IOException {
+        log.info("컴퍼니넘컴퍼니넘컴퍼니넘" + hotelRoomDTO.getCompanyNum());
 
 
 
@@ -83,11 +88,39 @@ public class HotelRoomController {
         }
 
         log.info("호텔룸 등록 요청: {}", hotelRoomDTO);
-//        hotelRoomService.hotelroomInsert(hotelRoomDTO);
+        hotelRoomService.hotelroomInsert(hotelRoomDTO);
 
         redirectAttributes.addFlashAttribute("message", "호텔룸이 성공적으로 등록되었습니다.");
         return "redirect:/admin/hotelroom/input"; // 등록 후 목록으로 이동
     }
+
+    @GetMapping("list")
+    public String hotelRoomList(Model model,Principal principal,
+                                HotelRoomDTO hotelRoomDTO) {
+
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+
+        model.addAttribute("companylist", hotelRoomService.listCompany(adminDTO.getCompanyNum()));
+
+
+        return "hotelroom/list";
+    }
+
+    //todo:/hotelRoomsByMember/{memberNum}
+    //모달 페이지 수정 하기
+    @PostMapping("update")
+    public String hotelRoomUpdatePost(HotelRoomDTO hotelRoomDTO) {
+        log.info("hotelRoomUpdate Post 페이지에 들어 오기는 했지 ");
+
+        hotelRoomService.hotelroomrModify(hotelRoomDTO);
+
+        Long memberNum = hotelRoomDTO.getMemberNum(); // DTO에서 추출
+
+        return "redirect:/hotelRoomsByMember/" + memberNum;
+    }
+
+
+
 
 
 

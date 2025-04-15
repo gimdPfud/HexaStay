@@ -19,7 +19,7 @@ public interface MemberService {
 
 
     //수정
-    public void memberModify(MemberDTO memberDTO);
+    public MemberDTO memberModify(MemberDTO memberDTO);
 
     //삭제
     public void memberDelet(Long memberNum);

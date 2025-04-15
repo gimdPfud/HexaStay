@@ -22,8 +22,10 @@ public interface CompanyService {
     //company 상세보기
     CompanyDTO companyRead(Long companyNum);
 
+    //company 수정
+    void companyModify(CompanyDTO companyDTO);
+
     //company 삭제
     void companyDelete(Long companyNum);
-
 
 }

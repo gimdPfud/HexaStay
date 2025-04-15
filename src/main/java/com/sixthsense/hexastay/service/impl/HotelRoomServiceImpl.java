@@ -3,9 +3,11 @@ package com.sixthsense.hexastay.service.impl;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
@@ -47,6 +49,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     // 어드민 조회용
     private final AdminRepository adminRepository;
+    private final CompanyRepository companyRepository;
 
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
 
@@ -116,13 +119,15 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //************단일 호텔룸 CRRUD 메소드*************//
     //1.등록 - 이미지 까지 같이 등록 되는 메서드
     @Override
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO, Principal principal) throws IOException {
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException {
         log.info("HotelRoom Service 진입 했습니다. ");
-        Admin admin = adminRepository.findByAdminEmail(principal.getName());
-
 
         //변환 - HotelRoom entity DTO로 변환
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
+
+        Long companyNum = hotelRoom.getCompany().getCompanyNum();
+        Company company = companyRepository.findById(companyNum).orElseThrow(()->new EntityNotFoundException("없음"));
+        hotelRoom.setCompany(company);
 
 
 
@@ -231,6 +236,17 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         //삭제처리 - HotelRoom 있는 pk를 가져와서 행 삭제 처리
         hotelRoomRepository.deleteById(hotelRoomNum);
 
+    }
+
+    //6.호텔룸 조회
+    @Override
+    public List<HotelRoom> listCompany(Long companyNUm) {
+        log.info(companyNUm.toString() + "company  num 을 가지고 왔지 ");
+
+        List<HotelRoom> hotelRoomList =
+        hotelRoomRepository.findByCompany_CompanyNum(companyNUm);
+
+        return hotelRoomList;
     }
 
 

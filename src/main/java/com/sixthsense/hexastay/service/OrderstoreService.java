@@ -21,6 +21,7 @@ public interface OrderstoreService {
 
     /*2. 주문하기 */
     public int insert(List<Long> itemIdList, String email);
+    public int insert(List<Long> itemIdList, Long hotelRoomNum);
 
     /*3. 주문취소*/
     public void cancel(Long orderId);
@@ -28,7 +29,8 @@ public interface OrderstoreService {
     public void end(Long orderId);
 
     /*4. 고객용 주문내역 목록*/
-    Page<OrderstoreViewDTO> getOrderList(String email, Pageable pageable);
+    List<OrderstoreViewDTO> getOrderList(String email);
+    List<OrderstoreViewDTO> getOrderList(Long hotelRoomNum);
 
     /*5. 매출용 주문 목록? : 완료된 주문들만 전부 DTO리스트로 내보내는 메소드*/
     List<OrderstoreDTO> getAllList();

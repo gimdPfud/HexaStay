@@ -147,6 +147,14 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public void companyModify(CompanyDTO companyDTO) {
+
+        Company company = modelMapper.map(companyDTO, Company.class);
+        companyRepository.save(company);
+
+    }
+
+    @Override
     public void companyDelete(Long companyNum) {
 
         companyRepository.deleteById(companyNum);

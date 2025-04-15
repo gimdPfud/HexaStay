@@ -20,7 +20,7 @@ public interface StoremenuService {
     public StoremenuDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoremenuDTO storemenuDTO);
+    public Long modify(StoremenuDTO storemenuDTO) throws IOException;
 
     /*목록*/
     public List<StoremenuDTO> list(Long storeNum, String status);

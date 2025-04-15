@@ -12,109 +12,221 @@
 <body>
 
 <div layout:fragment="content" class="w-100 vh-100 bg-light">
+
     <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
         <div class="d-flex justify-content-center">
-            <h2 class="text-center mb-4">
-                <span th:if="${centerDTO != null}">본사 수정</span>
-                <span th:if="${branchDTO != null}">지사 수정</span>
-                <span th:if="${facilityDTO != null}">지점 수정</span>
-            </h2>
+            <h2 class="text-center mb-4">조직 수정</h2>
         </div>
 
-        <div class="d-flex w-100 justify-content-center">
-            <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
-        </div>
+        <form id="modifyForm" action="/company/modify" method="post" enctype="multipart/form-data">
 
-        <form th:action="@{'/center/modify/' + ${type} + '/' + ${id}}" method="post">
+            <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp"
+                         th:src="${companyDTO.companyPictureMeta != null} ? @{${companyDTO.companyPictureMeta}} : ''"
+                         style="width: 100%; height: 100%; object-fit: contain;"
+                         th:classappend="${companyDTO.companyPicture == null} ? ' d-none' : ''">
+                </div>
+                <p class="file-name">수정할 프로필 사진을 선택해 주세요.</p>
+                <button id="pictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                <input hidden type="file" id="adminProfile" name="companyPicture" class="btn btn-light form-control rounded-pill"
+                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+            </div>
 
-        <input type="hidden" name="centerNum" th:if="${centerDTO != null}" th:value="${centerDTO.centerNum}">
-            <input hidden name="branchCenterNum" th:if="${branchDTO != null}" th:value="${branchDTO.centerNum}"></input>
-            <input type="hidden" name="branchNum" th:if="${branchDTO != null}" th:value="${branchDTO.branchNum}">
-            <input hidden name="facilityCenterNum" th:if="${facilityDTO != null}" th:value="${facilityDTO.centerNum}"></input>
-            <input type="hidden" name="facilityNum" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityNum}">
-
-            <div class="mb-2" th:if="${branchDTO != null or facilityDTO != null}">
-                <label class="form-label">브랜드명</label>
-                <select class="form-control" name="centerNumBrand">
-                    <option th:each="centerDTOBrand : ${centerDTOList}"
-                            th:value="${centerDTOBrand.centerNum}"
-                            th:text="${centerDTOBrand.centerBrand}"
-                            th:selected="${(branchDTO != null and centerDTOBrand.centerNum == branchDTO.centerNum)
-                     or (facilityDTO != null and centerDTOBrand.centerNum == facilityDTO.centerNum)}">
-                    </option>
+            <!--브랜드-->
+            <div class="mb-2">
+                <label class="form-label">소속</label>
+                <select id="companySelectedBrand" class="form-control" name="companyType">
+                    <option value="center" th:selected="${companyDTO.companyType == 'center'}">본사</option>
+                    <option value="branch" th:selected="${companyDTO.companyType == 'branch'}">지사</option>
+                    <option value="facility" th:selected="${companyDTO.companyType == 'facility'}">지점</option>
                 </select>
             </div>
 
             <div class="mb-2">
-                <label class="form-label">상호명</label>
-                <input type="text" class="form-control" name="centerName" th:if="${centerDTO != null}" th:value="${centerDTO.centerName}">
-                <input type="text" class="form-control" name="branchName" th:if="${branchDTO != null}" th:value="${branchDTO.branchName}">
-                <input type="text" class="form-control" name="facilityName" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityName}">
+                <label class="form-label" id="brandLabel">브랜드명</label>
+                <input type="text" name="companyBrand" id="inputBrand" class="form-control" th:value="${companyDTO.companyBrand}">
             </div>
 
+
+            <label class="form-label" for="companyParent" id="companyParentLabel" hidden>소속 본사 선택</label>
+            <select type="text" id="companyParent" class="form-control" name="companyParent" hidden >
+                <option th:each="companyDTO : ${company}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}" th:selected="${company.companyNum == companyDTO.companyParent}"></option>
+            </select>
+
+            <div class="mb-2">
+                <label class="form-label">상호명</label>
+                <input type="text" name="companyName" id="companyName" class="form-control" th:value="${companyDTO.companyName}">
+            </div>
             <div class="mb-2">
                 <label class="form-label">사업자등록번호</label>
-                <input type="text" class="form-control" name="centerBusinessNum" th:if="${centerDTO != null}" th:value="${centerDTO.centerBusinessNum}">
-                <input type="text" class="form-control" name="branchBusinessNum" th:if="${branchDTO != null}" th:value="${branchDTO.branchBusinessNum}">
-                <input type="text" class="form-control" name="facilityBusinessNum" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityBusinessNum}">
+                <div class="row g-2">
+                    <div class="col">
+                        <input type="number" id="companyBusinessNumOne" class="form-control">
+                    </div>
+                    <div class="col-auto">-</div>
+                    <div class="col">
+                        <input type="number" id="companyBusinessNumTwo" class="form-control">
+                    </div>
+                    <div class="col-auto">-</div>
+                    <div class="col">
+                        <input type="number" id="companyBusinessNumThree" class="form-control">
+                    </div>
+                    <input hidden name="companyBusinessNum" id="companyBusinessNum" th:value="${companyDTO.companyBusinessNum}">
+                </div>
             </div>
-
             <div class="mb-2">
                 <label class="form-label">대표자명</label>
-                <input type="text" class="form-control" name="centerCeoName" th:if="${centerDTO != null}" th:value="${centerDTO.centerCeoName}">
-                <input type="text" class="form-control" name="branchCeoName" th:if="${branchDTO != null}" th:value="${branchDTO.branchCeoName}">
-                <input type="text" class="form-control" name="facilityCeoName" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityCeoName}">
+                <input type="text" name="companyCeoName" id="companyCeoName" class="form-control" th:value="${companyDTO.companyCeoName}">
             </div>
-
             <div class="mb-2">
                 <label class="form-label">전화번호</label>
-                <input type="text" class="form-control" name="centerPhone" th:if="${centerDTO != null}" th:value="${centerDTO.centerPhone}">
-                <input type="text" class="form-control" name="branchPhone" th:if="${branchDTO != null}" th:value="${branchDTO.branchPhone}">
-                <input type="text" class="form-control" name="facilityPhone" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityPhone}">
+                <div class="row g-2">
+                    <div class="col">
+                        <select id="companyPhoneone" class="form-select">
+                            <option>02</option>
+                            <option>031</option>
+                            <option>032</option>
+                            <option>041</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">-</div>
+                    <div class="col">
+                        <input type="number" id="companyPhonetwo" class="form-control">
+                    </div>
+                    <div class="col-auto">-</div>
+                    <div class="col">
+                        <input type="number" id="companyPhonethree" class="form-control">
+                    </div>
+                    <input hidden name="companyPhone" id="companyPhone" th:value="${companyDTO.companyPhone}">
+                </div>
             </div>
-
             <div class="mb-2">
                 <label class="form-label">이메일</label>
-                <input type="email" class="form-control" name="centerEmail" th:if="${centerDTO != null}" th:value="${centerDTO.centerEmail}">
-                <input type="email" class="form-control" name="branchEmail" th:if="${branchDTO != null}" th:value="${branchDTO.branchEmail}">
-                <input type="email" class="form-control" name="facilityEmail" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityEmail}">
+                <input type="email" name="companyEmail" id="companyEmail" class="form-control" th:value="${companyDTO.companyEmail}">
             </div>
-
             <div class="mb-4">
                 <label class="form-label">주소</label>
-                <input type="text" class="form-control" name="centerAddress" th:if="${centerDTO != null}" th:value="${centerDTO.centerAddress}">
-                <input type="text" class="form-control" name="branchAddress" th:if="${branchDTO != null}" th:value="${branchDTO.branchAddress}">
-                <input type="text" class="form-control" name="facilityAddress" th:if="${facilityDTO != null}" th:value="${facilityDTO.facilityAddress}">
+                <input name="companyAddress" type="text" id="companyAddress" class="form-control" th:value="${companyDTO.companyAddress}">
             </div>
-
             <div class="d-flex justify-content-center gap-3">
-                <button type="submit" class="btn btn-success">수정</button>
-                <a th:href="@{/templates/company/list}" class="btn btn-danger">취소</a>
+                <button type="submit" class="btn btn-success" onclick="submitForm()">등록</button>
+                <a th:href="@{/company/list}" class="btn btn-danger">취소</a>
             </div>
-                </form>
+        </form>
+
+        <form>
+            <button hidden id="companyPictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+            <input hidden type="file" id="companyPictureTemp" name="companyPicture" class="btn btn-light form-control rounded-pill">
+        </form>
+
+        <script>
+            // 가입양식 관련
+            function submitForm() {
+                // 주민번호 합체
+                document.getElementById('companyBusinessNum').value = document.getElementById('companyBusinessNumOne').value + "-" + document.getElementById('companyBusinessNumTwo').value + "-" + document.getElementById('companyBusinessNumThree').value;
+                // 폰번호 합체
+                document.getElementById('companyPhone').value = document.getElementById('companyPhoneone').value + "-" + document.getElementById('companyPhonetwo').value + "-" + document.getElementById('companyPhonethree').value;
+                console.log(document.getElementById('companyPhone').value);
+            }
+
+            // 소속용
+            companySelectedBrand = document.getElementById("companySelectedBrand")
+            companyParent = document.getElementById("companyParent")
+            companyParentLabel = document.getElementById("companyParentLabel")
+            brandLabel = document.getElementById("brandLabel")
+            inputBrand = document.getElementById("inputBrand")
+
+            companySelectedBrand.addEventListener('change', function () {
+                if (companySelectedBrand.value === "center") {
+                    companyParent.hidden = true;
+                    companyParentLabel.hidden = true;
+                    brandLabel.hidden = false;
+                    inputBrand.hidden = false;
+
+                } else if (companySelectedBrand.value === "branch" || companySelectedBrand.value === "facility") {
+                    companyParent.hidden = false;
+                    companyParentLabel.hidden = false;
+                    brandLabel.hidden = true;
+                    inputBrand.hidden = true;
+                    inputBrand.value = "";
+                }
+            });
+
+
+            // 프로필 사진
+
+            document.getElementById('adminProfile').addEventListener('change', function () {
+                const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+                const filePath = this.value;
+                const errorMessage = document.getElementById('fileError');
+                const previewImage = document.getElementById('pictureTemp');
+                const file = this.files[0];
+
+                if (!allowedExtensions.exec(filePath)) {
+                    this.value = '';
+                    errorMessage.classList.remove('d-none');
+                    previewImage.classList.add('d-none');
+                } else {
+                    errorMessage.classList.add('d-none');
+
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewImage.src = e.target.result;
+                            previewImage.classList.remove('d-none');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+
+
+            document.getElementById('pictureBtn').addEventListener('click', function () {
+                document.getElementById('adminProfile').click();
+            });
+
+
+            document.getElementById('adminProfile').addEventListener('change', function () {
+                let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+                document.querySelector('.file-name').textContent = fileName;
+            });
+
+            window.addEventListener('DOMContentLoaded', function () {
+                const businessNum = document.getElementById('companyBusinessNum').value;
+                console.log('페이지 로드 완료!');
+                console.log('사업자등록번호:', document.getElementById('companyBusinessNum'));
+                if (businessNum) {
+                    const [part1, part2, part3] = businessNum.split("-");
+                    document.getElementById('companyBusinessNumOne').value = part1 || '';
+                    document.getElementById('companyBusinessNumTwo').value = part2 || '';
+                    document.getElementById('companyBusinessNumThree').value = part3 || '';
+                }
+
+                const phone = document.getElementById('companyPhone').value;
+                if (phone) {
+                    const [p1, p2, p3] = phone.split("-");
+                    document.getElementById('companyPhoneone').value = p1 || '';
+                    document.getElementById('companyPhonetwo').value = p2 || '';
+                    document.getElementById('companyPhonethree').value = p3 || '';
+                }
+            })
+
+
+            // 이미지가 있을 경우 보여주기
+            const pictureTemp = document.getElementById('pictureTemp');
+            if (pictureTemp.src && !pictureTemp.src.includes('data:') && !pictureTemp.src.includes('#')) {
+                pictureTemp.classList.remove('d-none');
+            }
+
+
+
+
+        </script>
+
     </div>
 
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        let type = /*[[${centerDTO} != null ? 'center' : (${branchDTO} != null ? 'branch' : 'facility')]]*/ 'unknown';
-
-        let id = '';
-        if (type === 'center') {
-            id = /*[[${centerDTO.centerNum}]]*/ 0;
-        } else if (type === 'branch') {
-            id = /*[[${branchDTO.branchNum}]]*/ 0;
-        } else if (type === 'facility') {
-            id = /*[[${facilityDTO.facilityNum}]]*/ 0;
-        }
-
-
-        /*]]>*/
-    </script>
-
-
-
 </div>
-
 </body>
 </html>

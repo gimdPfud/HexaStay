@@ -5,72 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>호텔룸 회원 등록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 850px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        h2 {
+            font-weight: 600;
+            color: #343a40;
+        }
+        .form-label {
+            color: #495057;
+        }
+        .btn-lg {
+            padding: 0.6rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 2rem;
+        }
+        .btn-primary {
+            background-color: #4b4f58;
+            border-color: #4b4f58;
+        }
+        .btn-primary:hover {
+            background-color: #34373d;
+            border-color: #34373d;
+        }
+        .btn-warning {
+            background-color: #e2a940;
+            border-color: #e2a940;
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #c38f2e;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">호텔룸 회원 등록</h2>
 
-    <!-- 성공/실패 메시지 출력 -->
-    <div th:if="${message}" class="alert alert-success" role="alert">
-        <span th:text="${message}"></span>
+<div class="container mt-5">
+    <div class="form-container">
+        <h2 class="mb-4 text-center">🛎️ 호텔룸 회원 등록</h2>
+
+        <!-- 메시지 출력 -->
+        <div th:if="${message}" class="alert alert-success text-center" role="alert">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/member-insertroom}" th:object="${memberDTO}" method="post" class="row g-4">
+
+            <!-- 방 종류 -->
+            <div class="col-md-6">
+                <label for="hotelRoomType" class="form-label fw-bold">🛏️ 방 종류</label>
+                <select class="form-select" id="hotelRoomType" name="hotelRoomType" onchange="updateHotelRoomPk()" required>
+                    <option value="">방 종류 선택</option>
+                    <option value="SINGLE">싱글101호</option>
+                    <option value="DOUBLE">더블3002호</option>
+                    <option value="SUITE">스위트1004호</option>
+                </select>
+            </div>
+
+            <!-- Hidden PK -->
+            <input type="hidden" id="hotelRoomNum" th:field="*{hotelRoomNum}" />
+
+            <!-- 회원 정보 -->
+            <div class="col-md-6">
+                <label class="form-label fw-bold">👤 회원 이름</label>
+                <input type="text" class="form-control" th:field="*{memberName}" placeholder="회원 이름 입력" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">📧 이메일</label>
+                <input type="email" class="form-control" th:field="*{memberEmail}" placeholder="이메일 입력" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">📱 전화번호</label>
+                <input type="text" class="form-control" th:field="*{memberPhone}" placeholder="전화번호 입력" required>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div class="col-12 text-center mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
+                <button type="submit" class="btn btn-primary btn-lg">HotelRoomPk 등록</button>
+                <a th:href="@{/register-hotelroom}" class="btn btn-warning btn-lg">MemberPk 룸배정</a>
+                <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">룸배정 목록</a>
+            </div>
+        </form>
     </div>
-    <div th:if="${error}" class="alert alert-danger" role="alert">
-        <span th:text="${error}"></span>
-    </div>
-
-
-    <form th:action="@{/member-insertroom}" th:object="${memberDTO}" method="post" class="row g-3">
-
-        <!-- 호텔룸 종류 선택 -->
-        <div class="col-md-6">
-            <label class="form-label fw-bold">방 종류:</label>
-            <select class="form-select" id="hotelRoomType" name="hotelRoomType" onchange="updateHotelRoomPk()">
-                <option value="">방 종류 선택</option>
-                <option value="SINGLE">싱글</option>
-                <option value="DOUBLE">더블</option>
-                <option value="SUITE">스위트</option>
-
-            </select>
-
-        </div>
-        <div>
-            <input type="hidden" id="hotelRoomNum" th:field="*{hotelRoomNum}"/>
-        </div>
-
-        <!-- 호텔룸 번호 (자동 입력) -->
-
-
-        <!-- 회원 정보 -->
-        <div class="col-md-6">
-            <label class="form-label fw-bold">회원 이름:</label>
-            <input type="text" class="form-control" th:field="*{memberName}" placeholder="회원 이름 입력" required/>
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label fw-bold">회원 이메일:</label>
-            <input type="email" class="form-control" th:field="*{memberEmail}" placeholder="이메일 입력" required/>
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label fw-bold">회원 전화번호:</label>
-            <input type="text" class="form-control" th:field="*{memberPhone}" placeholder="전화번호 입력" required/>
-        </div>
-
-        <!-- 등록 버튼 -->
-        <div class="col-12 text-center mt-3">
-            <button type="submit" class="btn btn-primary btn-lg">HotelRoomPk_등록</button>
-            <a th:href="@{/register-hotelroom}" class="btn btn-warning btn-lg">MemberPk_룸배정</a>
-            <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">룸배정목록</a>
-        </div>
-    </form>
 </div>
 
-<!--호텔룸 pk 자동으로 가져 오기 -->
+<!-- 호텔룸 자동 선택 JS -->
 <script>
     function updateHotelRoomPk() {
         let selectedType = document.getElementById("hotelRoomType").value;
 
-        console.log(selectedType + "값이 들어 오기는 하니하냐고")
         if (!selectedType) {
             document.getElementById("hotelRoomNum").value = "";
             return;

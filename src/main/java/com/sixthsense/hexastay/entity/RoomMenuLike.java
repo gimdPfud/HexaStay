@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -15,14 +17,14 @@ import lombok.ToString;
 public class RoomMenuLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roomMenuLikeNum;
+    private Long roomMenuLikeNum; // 좋아요의 pk
+
+    private Boolean roomMenuLikedCheck; // true = 좋아요, false = 싫어요
 
     @ManyToOne
     private Member member;
 
     @ManyToOne
     private RoomMenu roomMenu;
-
-    private Boolean roomMenuLikedCheck; // true = 좋아요, false = 싫어요
 
 }
