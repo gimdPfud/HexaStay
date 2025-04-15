@@ -38,9 +38,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                    @Param("keyword") String keyword,
                                    Pageable pageable);
 
+    List<Company> findByCompanyType(String companyType);
 
-
-
+    List<Company> findByCompanyTypeAndCompanyParent(String companyType, Long companyParent);
 
 
 

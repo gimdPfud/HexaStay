@@ -147,7 +147,29 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void companyModify(CompanyDTO companyDTO) {
+    public void companyModify(CompanyDTO companyDTO) throws IOException {
+
+        //프로필 이미지 처리
+        if (companyDTO.getCompanyPicture() != null && !companyDTO.getCompanyPicture().isEmpty()) {
+
+            Company companyOri = companyRepository.findById(companyDTO.getCompanyNum()).orElseThrow();
+            Path filePath = Paths.get(System.getProperty("user.dir"), companyOri.getCompanyPictureMeta().substring(1));
+            Files.deleteIfExists(filePath);
+
+
+            String fileOriginalName = companyDTO.getCompanyPicture().getOriginalFilename();
+            String fileFirstName = companyDTO.getCompanyNum() + "_" + companyDTO.getCompanyName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            companyDTO.setCompanyPictureMeta("/company/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "company/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            companyDTO.getCompanyPicture().transferTo(uploadPath.toFile());
+        }
 
         Company company = modelMapper.map(companyDTO, Company.class);
         companyRepository.save(company);
@@ -155,7 +177,14 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void companyDelete(Long companyNum) {
+    public void companyDelete(Long companyNum) throws IOException {
+
+        Company company = companyRepository.findById(companyNum).orElseThrow();
+
+        if (!company.getCompanyPictureMeta().isEmpty()) {
+            Path filePath = Paths.get(System.getProperty("user.dir"), company.getCompanyPictureMeta().substring(1));
+            Files.deleteIfExists(filePath);
+        }
 
         companyRepository.deleteById(companyNum);
 

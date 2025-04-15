@@ -65,7 +65,7 @@ public class AdminDTO {
     private LocalDateTime modifyDate;
 
     //어드민 승인처리
-    private Boolean adminActive;
+    private String adminActive;
 
     //어드민 직급
     private String adminPosition;
