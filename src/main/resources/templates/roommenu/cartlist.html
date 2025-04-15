@@ -470,13 +470,20 @@
         const isCash = document.getElementById('cashPaymentCheckbox').checked;
 
         if (isCash) {
-            // 현금 결제
-            window.location.href = '/roommenu/cashOrder';
+            $.post('/roommenu/cart')
+                .done(function(orderNum) {
+                    console.log("주문 완료, 주문번호:", orderNum);
+                    window.location.href = '/roommenu/cashOrder';
+                })
+                .fail(function(xhr) {
+                    alert("주문 실패: " + xhr.responseText);
+                });
         } else {
             // 카드 결제
             window.location.href = '/roommenu/cardOrder';
         }
     }
+
 
 </script>
 

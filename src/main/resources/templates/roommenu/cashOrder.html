@@ -65,11 +65,16 @@
     </div>
 
     <button class="btn" onclick="goBack()">돌아가기</button>
+    <button class="btn" onclick="goToOrderPage()">내 주문목록으로</button>
 </div>
 
 <script>
     function goBack() {
         window.location.href = '/roommenu/orderpage'; // 목록 또는 메인 주문 페이지
+    }
+
+    function goToOrderPage() {
+        window.location.href = '/roommenu/orderList'; // 목록 또는 메인 주문 페이지
     }
 </script>
 </body>

@@ -36,6 +36,9 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     @Query("SELECT SUM(i.roomMenuCartItemAmount) FROM RoomMenuCartItem i WHERE i.roomMenuCart.member.memberEmail = :memberEmail")
     Integer getTotalItemCountByMemberEmail(@Param("memberEmail") String memberEmail);
 
+    // RoomMenuCartItemRepository
+    List<RoomMenuCartItem> findByRoomMenuCart(RoomMenuCart cart);
+
 
 }
 
