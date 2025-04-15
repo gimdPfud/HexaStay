@@ -106,7 +106,7 @@ public class CompanyController {
         return "redirect:/company/list";
     }
 
-    @GetMapping("/delete/{companyNum}")
+    @PostMapping("/delete/{companyNum}")
     public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) {
 
         companyService.companyDelete(companyNum);
