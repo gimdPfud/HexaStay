@@ -23,7 +23,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Page<Company> findByCompanyType(String companyType, Pageable pageable);
 
-
     @Query("SELECT c FROM Company c " +
             "WHERE (:choice IS NULL OR c.companyType = :choice) " +
             "AND (" +
@@ -42,6 +41,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     List<Company> findByCompanyTypeAndCompanyParent(String companyType, Long companyParent);
 
+    //활성화 비활성화 상태 조회
+    List<Company> findByCompanyStatus(String companyStatus);
 
+    List<Company> findByCompanyNumAndCompanyType(Long companyNum, String companyType);
 
 }

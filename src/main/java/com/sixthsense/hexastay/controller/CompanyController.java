@@ -113,7 +113,7 @@ public class CompanyController {
     @PostMapping("/delete/{companyNum}")
     public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) throws IOException {
 
-        companyService.companyDelete(companyNum);
+        companyService.deactivateCompany(companyNum);
 
         return "redirect:/company/list";
     }
