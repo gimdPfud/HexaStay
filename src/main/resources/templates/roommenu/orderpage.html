@@ -305,8 +305,8 @@
     function toggleLike(menuId) {
         const liked = likedStates[menuId] || false;
         const url = liked
-            ? `/roomMenu/orderpage/cancellike/${menuId}`
-            : `/roomMenu/orderpage/like/${menuId}`;
+            ? `/roommenu/orderpage/cancellike/${menuId}`
+            : `/roommenu/orderpage/like/${menuId}`;
 
         fetch(url, {
             method: 'POST'
@@ -344,8 +344,8 @@
     function toggleDislike(menuId) {
         const disliked = dislikedStates[menuId] || false;
         const url = disliked
-            ? `/roomMenu/orderpage/cancledislike/${menuId}`  // ✅ 여기가 fix point
-            : `/roomMenu/orderpage/dislike/${menuId}`;
+            ? `/roommenu/orderpage/cancledislike/${menuId}`  // ✅ 여기가 fix point
+            : `/roommenu/orderpage/dislike/${menuId}`;
 
         fetch(url, {
             method: 'POST'
@@ -378,6 +378,42 @@
                 alert('싫어요 처리 중 문제가 발생했습니다.');
             });
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.like-section').forEach(section => {
+            const menuId = section.querySelector('[id^=likeIcon-]').id.split('-')[1];
+            fetch(`/roommenu/orderpage/status/${menuId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const liked = data.liked;
+                    const disliked = data.disliked;
+                    const likeCountValue = data.likeCount;
+                    const dislikeCountValue = data.dislikeCount;
+
+                    const likeIcon = document.getElementById(`likeIcon-${menuId}`);
+                    const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
+                    const likeCount = document.getElementById(`likeCount-${menuId}`);
+                    const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
+
+                    likedStates[menuId] = liked;
+                    dislikedStates[menuId] = disliked;
+
+                    likeCount.textContent = likeCountValue;
+                    dislikeCount.textContent = dislikeCountValue;
+
+                    if (liked) {
+                        likeIcon.textContent = '❤️';
+                        likeIcon.style.color = 'red';
+                    }
+
+                    if (disliked) {
+                        dislikeIcon.textContent = '💔';
+                        dislikeIcon.style.color = 'blue';
+                    }
+                });
+        });
+    });
+
 </script>
 
 <!-- 스크립트 끝 -->
