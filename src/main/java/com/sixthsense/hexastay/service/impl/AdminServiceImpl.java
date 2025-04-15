@@ -60,6 +60,16 @@ public class AdminServiceImpl implements AdminService {
         }
 
         Admin admin = modelMapper.map(adminDTO, Admin.class);
+
+
+        if (adminDTO.getCompanyNum().describeConstable().isPresent()) {
+            Company company = companyRepository.findById(adminDTO.getCompanyNum()).orElseThrow(NoSuchElementException::new);
+            admin.setCompany(company);
+        } else if (adminDTO.getStoreNum().describeConstable().isPresent()){
+            Store store = storeRepository.findById(adminDTO.getStoreNum()).orElseThrow(NoSuchElementException::new);
+            admin.setStore(store);
+        }
+
         adminRepository.save(admin);
     }
 
