@@ -69,7 +69,7 @@
           <tbody>
           <tr th:each="item : ${companyDTOS}" class="text-center">
 
-            <td>
+          <td>
               <img th:if="${item.companyPictureMeta != null}"
                    th:src="@{${item.companyPictureMeta}}"
                    style="width: 60px; height: 80px;">
@@ -83,8 +83,13 @@
             <td th:text="${item.branchName}">지사명</td>
             <td th:text="${item.facilityName}">지점명</td>
             <td th:text="${item.companyPhone}"></td>
-            <td><a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a></td>
+            <td>
+              <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a>
+              <!-- 비활성화 상태 배지 -->
+              <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}" class="badge bg-danger">비활성화 상태</span>
+            </td>
           </tr>
+
           </tbody>
 
         </table>

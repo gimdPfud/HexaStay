@@ -35,13 +35,21 @@
     <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${companyDTO.companyAddress}"></p></div>
 
     <div class="d-flex justify-content-center gap-3">
-      <a th:href="@{/company/list}" class="btn btn-secondary">목록</a>
+      <a th:href="@{/company/list}" class="btn btn-light">목록</a>
       <a th:href="@{/company/modify/{num}(num=${companyDTO.companyNum})}" class="btn btn-success">수정</a>
-      <form th:action="@{/company/delete/{num}(num=${companyDTO.companyNum})}" method="post">
-        <button type="submit" class="btn btn-danger">삭제</button>
+
+      <!-- 비활성화 상태일 경우 '활성화하기' 버튼 표시 -->
+      <form th:if="${companyDTO.companyStatus != null and companyDTO.companyStatus.toUpperCase() == 'INACTIVE'}"
+            th:action="@{/company/activate/{num}(num=${companyDTO.companyNum})}" method="post">
+        <button type="submit" class="btn btn-danger w-auto">활성화하기</button>
+      </form>
+
+      <!-- 비활성화 버튼 (companyStatus가 null이거나 INACTIVE가 아닐 때만 표시) -->
+      <form th:if="${companyDTO.companyStatus == null or companyDTO.companyStatus.toUpperCase() != 'INACTIVE'}"
+            th:action="@{/company/delete/{num}(num=${companyDTO.companyNum})}" method="post">
+        <button type="submit" class="btn btn-danger w-auto">비활성화</button>
       </form>
     </div>
-
 
   </div>
 </div>
