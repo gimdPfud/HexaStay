@@ -54,8 +54,6 @@
                     location.href="/member/login";
                 } else if (response.status === 400) {
                     if(confirm("한 번에 하나의 가게에서만 주문할 수 있습니다. 장바구니를 비우고 담으시겠습니까?")){
-                        // location.href="/member/store/cart/clear";
-                        //여기서 한번 더 fetch 해도 되나요?
                         fetch("/member/store/cart/clear",{
                             method:"POST",
                             body:data

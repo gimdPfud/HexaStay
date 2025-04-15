@@ -12,13 +12,16 @@
     <div class="card p-4">
         <form action="/admin/store/menu/modify" method="post" enctype="multipart/form-data">
             <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                </div>
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
                     <img th:if="${data.storemenuImgMeta != null}" th:src="@{${data.storemenuImgMeta}}" style="width: 100%; height: 100%; object-fit: contain;">
                     <img th:unless="${data.storemenuImgMeta != null}" th:src="@{/store/menu/default.png}" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
                 <p class="file-name">변경할 이미지를 선택하세요.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storemenuImg" class="form-control" accept=".webp, .png, .jpeg, .jpg, .gif" th:value="${data.storemenuImg}">
+                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                <input hidden type="file" id="adminProfile" name="storemenuImg" class="btn btn-light form-control rounded-pill" accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;" th:value="${data.storemenuImg}">
                 <small id="fileError" class="text-danger d-none">올바른 파일이 선택되지 않았습니다.</small>
             </div>
 
