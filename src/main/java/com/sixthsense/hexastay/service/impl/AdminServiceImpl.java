@@ -132,6 +132,17 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public List<CompanyDTO> insertSelectCompany (String companyType) {
+        List<Company> companyList = companyRepository.findByCompanyType(companyType);
+        List<CompanyDTO> companyDTOList = new ArrayList<>();
+        for (Company company : companyList) {
+            CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
+            companyDTOList.add(companyDTO);
+        }
+        return companyDTOList;
+    }
+
+    @Override
     public List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice) {
         List<Company> companyList =
         switch (adminChoice) {
@@ -144,8 +155,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<StoreDTO> insertStoreList (Long companyNum) {
-        List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
+    public List<StoreDTO> insertStoreList (Long branchFacilityNum) {
+        List<Store> storeList = storeRepository.findByCompanyNum(branchFacilityNum);
+        log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
     }
 }

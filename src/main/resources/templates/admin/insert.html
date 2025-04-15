@@ -234,30 +234,43 @@
         // 브랜치/퍼실리티 선택 시 스토어 목록 가져오기
         document.getElementById("adminBranchFacility").addEventListener("change", function () {
             const companyNum = this.value;
+            const adminChoice = document.getElementById("adminChoice");
+            
+            console.log("Branch/Facility changed:", { companyNum, adminChoice: adminChoice.value });
             
             // 스토어 선택 시에만 실행
-            if (adminChoice !== "스토어" || !companyNum) return;
+            if (adminChoice.value === "스토어" && companyNum) {
+                console.log("Fetching store list for:", companyNum);
+                
+                fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Received store data:", data);
+                        const storeSelect = document.getElementById("adminStore");
+                        storeSelect.innerHTML = "";
 
-            fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)
-                .then(response => response.json())
-                .then(data => {
-                    const storeSelect = document.getElementById("adminStore");
-                    storeSelect.innerHTML = "";
+                        // 기본 선택 옵션 추가
+                        const defaultOption = document.createElement("option");
+                        defaultOption.textContent = "";
+                        defaultOption.value = "";
+                        storeSelect.appendChild(defaultOption);
 
-                    // 기본 선택 옵션 추가
-                    const defaultOption = document.createElement("option");
-                    defaultOption.textContent = "";
-                    defaultOption.value = "";
-                    storeSelect.appendChild(defaultOption);
+                        // 받아온 스토어 리스트 추가
 
-                    // 받아온 스토어 리스트 추가
-                    data.forEach(store => {
-                        const option = document.createElement("option");
-                        option.value = store.storeNum;
-                        option.textContent = store.storeName;
-                        storeSelect.appendChild(option);
-                    });
-                });
+                            data.forEach(store => {
+                                const option = document.createElement("option");
+                                option.value = store.storeNum;
+                                option.textContent = store.storeName;
+                                storeSelect.appendChild(option);
+                            });
+                    })
+            }
         });
 
         function submitForm(event) {

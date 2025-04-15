@@ -73,8 +73,8 @@ public class AdminController {
 
     @GetMapping("/insert")
     public String adminInsert (Model model) {
-        model.addAttribute("companyList", companyService.companyList());
-
+        String companyType = "center";
+        model.addAttribute("companyList", adminService.insertSelectCompany(companyType));
         return "/admin/insert";
     }
 
@@ -89,8 +89,8 @@ public class AdminController {
     @ResponseBody
     @GetMapping("/insertstore")
     public List<StoreDTO> adminInsertStore (Model model,
-                                               @RequestParam("companyNum") Long companyNum) {
-        return adminService.insertStoreList(companyNum);
+                                           @RequestParam("branchFacilityNum") Long branchFacilityNum) {
+        return adminService.insertStoreList(branchFacilityNum);
     }
 
     @PostMapping("/insert")
