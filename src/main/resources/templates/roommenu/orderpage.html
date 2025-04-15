@@ -180,13 +180,40 @@
             transform: scale(1.2);
             transition: transform 0.2s;
         }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
+
+        .cart-count {
+            background-color: #ff5c5c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px; /* 더 네모나게 */
+            margin-left: 8px;
+            font-weight: bold;
+            font-size: 1.2em; /* 숫자 크게 */
+        }
+
     </style>
 </head>
-<body>
+<body data-logged-in="${session.user != null}">
 <div class="container">
     <!-- 헤더: 메뉴와 장바구니 아이콘 -->
     <div class="header">
-        <div class="back-icon" onclick="goBack()">←</div>
+        <div class="back-icon" onclick="window.location.href='http://localhost:8090/main'">←</div>
         <div>목록페이지</div>
         <div class="menu-icon" onclick="toggleSearch()">☰</div>
     </div>
@@ -264,6 +291,13 @@
             </div>
         </li>
     </ul>
+
+    <button class="add-to-cart-btn"
+            onclick="submitPostRequest('/roommenu/cartlist')">
+        🛒 내 카트 리스트로
+        <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
+    </button>
+
 </div>
 
 
@@ -302,6 +336,7 @@
     const dislikedStates = {};
 
     function toggleLike(menuId) {
+
         const liked = likedStates[menuId] || false;
         const url = liked
             ? `/roommenu/orderpage/cancellike/${menuId}`
@@ -316,7 +351,6 @@
             })
             .then(data => {
                 const likeIcon = document.getElementById(`likeIcon-${menuId}`);
-                const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                 const likeCount = document.getElementById(`likeCount-${menuId}`);
 
                 // UI 업데이트
@@ -326,7 +360,7 @@
 
                 // 좋아요 누르면 싫어요 초기화
                 if (!liked) {
-                    const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
+                    const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
                     dislikeIcon.textContent = '👎';
                     dislikeIcon.style.color = 'gray';
                     dislikedStates[menuId] = false;
@@ -385,26 +419,23 @@
                 .then(res => res.json())
                 .then(data => {
                     const liked = data.liked;
-                    const disliked = data.disliked;
-
                     const likeIcon = document.getElementById(`likeIcon-${menuId}`);
-                    const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
+                    const likeCount = document.getElementById(`likeCount-${menuId}`);
 
                     likedStates[menuId] = liked;
-                    dislikedStates[menuId] = disliked;
 
-                    if (liked) {
-                        likeIcon.textContent = '❤️';
-                        likeIcon.style.color = 'red';
-                    }
-
-                    if (disliked) {
-                        dislikeIcon.textContent = '💔';
-                        dislikeIcon.style.color = 'blue';
-                    }
+                    // UI 업데이트
+                    likeIcon.textContent = liked ? '❤️' : '🤍';
+                    likeIcon.style.color = liked ? 'red' : 'gray';
+                    likeCount.textContent = data.likeCount;
+                })
+                .catch(err => {
+                    console.error('좋아요 상태 불러오기 실패:', err);
                 });
         });
     });
+
+
 
 </script>
 

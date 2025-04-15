@@ -29,5 +29,7 @@ public class RoomMenuCartItemDTO {
 
     private Integer roomMenuCartItemAmount;
 
+    private Integer roomMenuCartItemCount; // 카트에 담긴 메뉴 아이템의 갯수
+
 
 }

@@ -32,6 +32,10 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
             "ORDER BY rmci.roomMenuCartItemNum DESC")
     public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
 
+    // 장바구니 안의 총 수량 반환 (member 기준)
+    @Query("SELECT SUM(i.roomMenuCartItemAmount) FROM RoomMenuCartItem i WHERE i.roomMenuCart.member.memberEmail = :memberEmail")
+    Integer getTotalItemCountByMemberEmail(@Param("memberEmail") String memberEmail);
+
 
 }
 

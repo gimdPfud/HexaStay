@@ -8,6 +8,7 @@ package com.sixthsense.hexastay.controller;
  * 작성일 : 2025-04-01
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
+import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
@@ -333,11 +334,14 @@ public class RoomMenuController {
                             @RequestParam(value = "type", defaultValue = "") String type,
                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
                             @RequestParam(value = "category", defaultValue = "") String category,
+                            Principal principal, // 👈 추가
                             Model model) {
         log.info("주문페이지 컨트롤러 리스트 진입");
-        log.info("type: {}", type);
-        log.info("keyword: {}", keyword);
-        log.info("category: {}", category);
+        log.info("로그인한 사용자" + principal.getName());
+
+        String email = principal.getName(); // 로그인한 사용자의 이메일
+
+        Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
 
         // 서비스 연동: 전달된 파라미터로 메뉴 리스트 필터링
         Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category);
@@ -350,7 +354,9 @@ public class RoomMenuController {
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
         model.addAttribute("category", category);  // 카테고리 필터링 값 전달
+        model.addAttribute("totalCartItemCount", totalCartItemCount);
         model.addAllAttributes(pageInfo);
+
 
         return "/roommenu/orderpage";  // orderpage를 반환하여 뷰를 렌더링
     }
