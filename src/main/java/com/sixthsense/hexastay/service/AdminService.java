@@ -33,4 +33,9 @@ public interface AdminService {
 
     AdminDTO adminFindEmail(String adminEmail);
 
+    List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice);
+
+    List<StoreDTO> insertStoreList (Long companyNum);
+
+    List<CompanyDTO> insertSelectCompany (String companyType);
 }

@@ -46,4 +46,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     List<Company> findByCompanyNumAndCompanyType(Long companyNum, String companyType);
 
+    List<Company> findByCompanyParent(Long companyNum);
+
 }
