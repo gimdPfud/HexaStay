@@ -52,4 +52,6 @@ public class Company extends BaseEntity {
 
     private Long companyParent;
 
+    private String companyStatus = "ACTIVE";
+
 }
