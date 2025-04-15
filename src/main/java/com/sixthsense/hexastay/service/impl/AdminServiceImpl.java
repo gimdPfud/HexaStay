@@ -85,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
 
     //가입대기 리스트
     public List<AdminDTO> getWaitAdminList() {
-        List<Admin> adminList = adminRepository.findByAdminActive(false);
+        List<Admin> adminList = adminRepository.findByAdminActive("ACTIVE");
         List<AdminDTO> adminDTOList = new ArrayList<>();
         for (Admin admin : adminList) {
             adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
@@ -97,7 +97,7 @@ public class AdminServiceImpl implements AdminService {
     //가입 승인
     public void setAdminActive(Long adminNum) {
         Admin admin = adminRepository.findByAdminNum(adminNum);
-        admin.setAdminActive(true);
+        admin.setAdminActive("ACTIVE");
         adminRepository.save(admin);
     }
 

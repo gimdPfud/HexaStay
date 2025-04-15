@@ -57,7 +57,7 @@ public class Admin extends BaseEntity {
     private String adminRole;
 
     //어드민 승인여부
-    private Boolean adminActive;
+    private String adminActive;
 
     //어드민 직책
     private String adminPosition;

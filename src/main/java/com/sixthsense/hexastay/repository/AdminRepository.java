@@ -22,7 +22,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long>, AdminReposi
     public Page<Admin> findAll(Pageable pageable);
 
     public Admin findByAdminNum(Long adminNum);
-    public List<Admin> findByAdminActive(Boolean active);
+    public List<Admin> findByAdminActive(String active);
 
 
 
