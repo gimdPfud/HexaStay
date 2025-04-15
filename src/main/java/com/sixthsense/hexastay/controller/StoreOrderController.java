@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -32,24 +33,21 @@ public class StoreOrderController {
     /*1. 주문하기 (등록)*/
     //장바구니에서 주문 버튼을 누르면 주문확인창(결제창)으로 이동
     @PostMapping("/member/store/order/insert")
-    public String orderInsert(List<Long> cartitemidList, Model model){
-//        if(principal==null){
-//            return "redirect:/member/login";
-//        }
+    public String orderInsert(@RequestParam("items") List<Long> cartitemidList, Model model){
+        Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return "redirect:/member/store/cart";
         }
-//        for (Long itemid : cartitemidList) {
-//            if(!storecartService.validCartItemOwner(itemid,principal.getName())){
-//                return "redirect:/member/logout";
-//            }
-//        }
-//        int result = orderstoreService.insert(cartitemidList, principal.getName());
+        for (Long itemid : cartitemidList) {
+            if(!storecartService.validCartItemOwner(itemid,hotelroomNum)){
+                return "redirect:/member/logout";
+            }
+        }
         /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함.
         int result = orderstoreService.insert(cartitemidList, hotelroomNum);
         if(result==1){
             log.info("정상주문되었습니다.");
+            storecartService.clearCartItems(hotelroomNum);
             List<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum);
             model.addAttribute("list",list);
             return "mobilestore/order/list";

@@ -85,7 +85,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         if(room==null){return 2;}
         Orderstore order = new Orderstore();
         order.setRoom(room);
-        order.setOrderstoreStatus("alive");
+        order.setOrderstoreStatus("unpaid");
 
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
@@ -104,6 +104,12 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         order.setOrderstoreitemList(itemlist);
         orderstoreRepository.save(order);
         return 1;
+    }
+
+    @Override
+    public void paid(Long orderId) {
+        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        orderstore.setOrderstoreStatus("paid");
     }
 
     @Override

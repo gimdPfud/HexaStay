@@ -30,6 +30,6 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
             "sci.storemenu.storemenuPrice, " +
             "sci.storecartitemCount, " +
             "sci.storemenu.storemenuImgMeta" +
-            ") from Storecartitem sci where sci.storecart.member.memberEmail=:email")
-    List<StorecartitemViewDTO> storeCartViewList(String email);
+            ") from Storecartitem sci where sci.storecart.room.hotelRoom.hotelRoomNum=:hotelRoomNum")
+    List<StorecartitemViewDTO> storeCartViewList(Long hotelRoomNum);
 }

@@ -16,49 +16,18 @@
         <div class="list-group">
             <div th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <img th:if="${item.imgName != null}"
-                         th:src="@{${item.imgName}}" alt="menu image" class="me-3">
-                    <img th:if="${item.imgName == null}"
-                         th:src="@{/store/menu/default.png}" alt="menu image" class="me-3">
-                    <div>
-                        <div th:text="${item.storemenuName}" class="fw-bold"></div>
-                        <div th:text="${#numbers.formatInteger(item.storemenuPrice, 0)} + '원'" class="text-muted small"></div>
-                    </div>
-                </div>
-                <div>
-                    <button th:disabled="${item.storemenuCount<=1}" type="button" onclick="minusCount(this)"
-                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
-                    <span th:text="${item.storemenuCount} + '개'" class="text-end"></span>
-                    <button type="button" onclick="plusCount(this)"
-                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
-                </div>
-                <div>
-                    <button>item 삭제버튼</button>
+                    <!--날짜 | 주문된 날짜. 이거... 연도가 바뀔때 연도까지 보여주고 머 그런 기능도?? #temporal 어쩌고로-->
+                    <!--상태 | [접수됨] [취소됨] [완료됨]-->
+                    <!--스토어이름 | store 이름. 역전우동 부천역곡점. a태그로 해당 스토어로 바로가기해도 좋을듯?-->
+                    <!--첫번째 아이템이름 | storemenu 이름. 일반 우동-->
+                    <!--아이템개수-1 | storemenu가 2개 이상이라면? "외 orderstoreitemList.size()-1 개" -->
+                    <!--주문전체금액 | order money... 원-->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 총 가격 및 주문 버튼 -->
-    <div th:if="${list != null}" class="cart-bottom-bar" th:text="주문"></div>
-
     <script>
-        function minusCount(button) {
-            const cartItemId = button.dataset.cartitemid;
-            let count = parseInt(button.dataset.count);
-            if (count <= 1) return;
-            count--;
-            console.log(cartItemId);
-            fetch("/member/store/cart/modify/"+cartItemId+"/"+count)
-                .then(()=>location.reload())
-        }
-        function plusCount(button) {
-            const cartItemId = button.dataset.cartitemid;
-            let count = parseInt(button.dataset.count);
-            count++;
-            fetch("/member/store/cart/modify/"+cartItemId+"/"+count)
-                .then(()=>location.reload())
-        }
     </script>
 </div>
 </body>

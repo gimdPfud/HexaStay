@@ -21,6 +21,6 @@ public class Storecart {
     private Long storecartNum;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_num")
-    private Member member;
+    @JoinColumn(name = "room_num")
+    private Room room;
 }

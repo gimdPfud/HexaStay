@@ -11,5 +11,5 @@ import com.sixthsense.hexastay.entity.Storecart;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StorecartRepository extends JpaRepository<Storecart, Long> {
-    Storecart findByMember_MemberEmail(String email);
+    Storecart findByRoom_HotelRoom_HotelRoomNum(Long hotelroomNum);
 }
