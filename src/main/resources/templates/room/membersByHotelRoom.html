@@ -47,13 +47,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="member : ${members}">
-            <td th:text="${member.memberNum}"></td>
-            <td th:text="${member.memberName}"></td>
-            <td th:text="${member.memberPhone}"></td>
-            <td th:text="${member.memberEmail}"></td>
+        <tr th:each="member : ${members}" th:data-member-num="${member.memberNum}">
+            <td class="member-num" th:text="${member.memberNum}"></td>
+            <td class="member-name" th:text="${member.memberName}"></td>
+            <td class="member-phone" th:text="${member.memberPhone}"></td>
+            <td class="member-email" th:text="${member.memberEmail}"></td>
             <td>
-                <!-- 수정 버튼: data- 속성으로 정보 전달 -->
                 <button class="btn btn-outline-primary btn-sm btn-icon"
                         data-bs-toggle="modal"
                         data-bs-target="#editMemberModal"
@@ -63,8 +62,6 @@
                          data-member-email=${member.memberEmail}">
                     <i class="bi bi-pencil"></i> 수정
                 </button>
-
-                <!-- 삭제는 그대로 유지 -->
                 <a th:href="@{/member/delete/{memberNum}(memberNum=${member.memberNum})}"
                    class="btn btn-outline-danger btn-sm btn-icon"
                    onclick="return confirm('정말 삭제하시겠습니까?');">
@@ -112,7 +109,7 @@
 <!-- 회원 수정 모달 -->
 <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="post" th:action="@{/member/update}" id="editMemberForm">
+        <form method="post" id="editMemberForm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editMemberModalLabel">회원 정보 수정</h5>
@@ -145,6 +142,7 @@
         </form>
     </div>
 </div>
+
 <script>
     const editMemberModal = document.getElementById('editMemberModal');
     editMemberModal.addEventListener('show.bs.modal', function (event) {
@@ -162,10 +160,52 @@
         document.getElementById('modalMemberPhone').value = memberPhone;
         document.getElementById('modalMemberEmail').value = memberEmail;
     });
+
+    // 회원 정보 수정 후 AJAX로 변경 사항 서버에 전송
+    const editMemberForm = document.getElementById('editMemberForm');
+    editMemberForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // 수정된 데이터 가져오기
+        const memberNum = document.getElementById('modalMemberNum').value;
+        const memberName = document.getElementById('modalMemberName').value;
+        const memberPhone = document.getElementById('modalMemberPhone').value;
+        const memberEmail = document.getElementById('modalMemberEmail').value;
+
+        const updatedMember = {
+            memberNum: memberNum,
+            memberName: memberName,
+            memberPhone: memberPhone,
+            memberEmail: memberEmail
+        };
+
+        // AJAX 요청
+        fetch('/update/ajax', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedMember),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 서버로부터 받은 수정된 데이터로 테이블 업데이트
+                const row = document.querySelector(`tr[data-member-num='${data.memberNum}']`);
+                if (row) {
+                    row.querySelector('.member-name').textContent = data.memberName;
+                    row.querySelector('.member-phone').textContent = data.memberPhone;
+                    row.querySelector('.member-email').textContent = data.memberEmail;
+                }
+
+                // 모달 닫기
+                const modal = bootstrap.Modal.getInstance(editMemberModal);
+                modal.hide();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
 </script>
-
-
-
 
 </body>
 </html>

@@ -9,7 +9,6 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
@@ -25,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -41,7 +41,7 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : Store 등록 후 등록한 객체의 pk 반환
      * */
     @Override
-    public void insert(StoreDTO storeDTO) throws IOException {
+    public Long insert(StoreDTO storeDTO) throws IOException {
         //들어온 DTO -> Entity 변환
         Store store = modelMapper.map(storeDTO, Store.class);
         //일단 저장 해서 pk 생성. (저장 안하면 pk 없으니까)
@@ -73,7 +73,8 @@ public class StoreServiceImpl implements StoreService {
         //파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
         store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         //다시 저장 (이때, 이미 pk를 가지고 있으므로 update쿼리가 나간다.)
-        storeRepository.save(store);
+        store = storeRepository.save(store);
+        return store.getStoreNum();
     }
 
 
@@ -98,8 +99,26 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : storeDTO를 받아서 수정 한 후 수정한 객체의 pk값을 반환한다.
      * */
     @Override
-    public Long modify(StoreDTO storeDTO) {
+    public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
+        if (!store.getStoreProfileMeta().equals(storeDTO.getStoreProfileMeta())) {
+            Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta());
+            Files.deleteIfExists(filePath);
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+            String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storeDTO.setStoreProfileMeta("/store/menu/"+fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+        }
+        store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         store.setStoreName(storeDTO.getStoreName());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
@@ -117,6 +136,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public List<StoreDTO> getAllList() {
         List<Store> storeList = storeRepository.findAll("alive");
+        storeList.forEach(this::checkAndUpdateOrphanStatus);
+        storeList = storeRepository.findAll("alive");
         List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data, StoreDTO.class)).toList();
         return list;
     }
@@ -134,6 +155,11 @@ public class StoreServiceImpl implements StoreService {
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
     }
+    public List<StoreDTO> list(Long companyNum) {
+        List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
+        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data,StoreDTO.class)).toList();
+        return list;
+    }
 
 
     /*
@@ -145,6 +171,8 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreDTO> list(Pageable pageable) {
         Page<Store> storePage = storeRepository.findAll(pageable);
+        storePage.forEach(this::checkAndUpdateOrphanStatus);
+        storePage = storeRepository.findAll(pageable);
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
     }
@@ -181,5 +209,34 @@ public class StoreServiceImpl implements StoreService {
     public void restore(Long pk) {
         Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         store.setStoreStatus("alive");
+    }
+
+    /*
+     * 메소드명 : validStoreAdmin
+     * 인수 값 : AdminDTO adminDTO, StoreDTO storeDTO
+     * 리턴 값 : boolean
+     * 기  능 : StoreDTO의 storeNum과 adminDTO의 storeNum을 비교해 같으면 true 다르면 false 반환.
+     * */
+    @Override
+    public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
+        List<String> possibleRoles = Arrays.asList("gm","exec","head","crew");
+        //상위 관리자라면 무조건 참.
+        if(possibleRoles.contains(adminDTO.getAdminRole())){
+            return true;
+        }
+        //스토어소속 직원이라면 현재 스토어가 자기 스토어인지 확인함
+        else if (adminDTO.getStoreNum()!=null) {
+            return adminDTO.getStoreNum().equals(storeDTO.getStoreNum());
+        }
+        //상위관리자도 아니고 스토어소속도 아니면 무조건 거짓.
+        else {return false;}
+    }
+
+    //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.
+    public void checkAndUpdateOrphanStatus(Store store) {
+        if (store.getCompany() == null && !"deleted".equals(store.getStoreStatus())) {
+            store.setStoreStatus("deleted");
+            storeRepository.save(store);
+        }
     }
 }

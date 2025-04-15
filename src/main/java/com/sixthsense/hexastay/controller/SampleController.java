@@ -38,4 +38,12 @@ public class SampleController {
         model.addAttribute("password",password);
         return "sample/password";
     }
+    @GetMapping("/main")
+    public String mian(@PageableDefault(page = 1)Pageable pageable, Model model) {
+        log.info("main 진입 : "+pageable);
+        Page<SampleDTO> main = sampleService.sampleMethod(pageable);
+        model.addAttribute("main",main);
+        return "sample/main";
+    }
+
 }

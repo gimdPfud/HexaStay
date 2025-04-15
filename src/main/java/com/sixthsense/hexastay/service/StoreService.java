@@ -7,6 +7,7 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +17,13 @@ import java.util.List;
 
 public interface StoreService {
     /*등록*/
-    public void insert(StoreDTO storeDTO) throws IOException;
+    public Long insert(StoreDTO storeDTO) throws IOException;
 
     /*읽기*/
     public StoreDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoreDTO storeDTO);
+    public Long modify(StoreDTO storeDTO) throws IOException;
 
     /*추가목록 : 전부 가져오기*/
     public List<StoreDTO> getAllList();
@@ -31,6 +32,7 @@ public interface StoreService {
     * 모든 외부 업체 목록 보여주기*/
     public Page<StoreDTO> list(String status, Pageable pageable);
     public Page<StoreDTO> list(Pageable pageable);
+    public List<StoreDTO> list(Long companyNum);
 
     /*todo 목록인데 리뷰가 있는 목록. 근데 리뷰별점을 넣을지말지 고민중...*/
     public Page<StoreDTO> clientlist(Pageable pageable);
@@ -39,4 +41,6 @@ public interface StoreService {
     public void delete(Long pk);
     public void restore(Long pk);
 
+    //검증하기 admin과 store의 주인!!...
+    public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO);
 }

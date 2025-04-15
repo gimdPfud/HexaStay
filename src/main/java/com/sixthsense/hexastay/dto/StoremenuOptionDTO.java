@@ -22,5 +22,5 @@ public class StoremenuOptionDTO {
     private String storemenuOptionName;     //옵션 이름
     private Integer storemenuOptionPrice;   //옵션 가격
     private String storemenuOptionStatus;   //활성화비활성화
-    private Storemenu storemenu;            //어느 메뉴의 옵션인지?? 연결
+    private Long storemenuNum;            //어느 메뉴의 옵션인지?? 연결
 }

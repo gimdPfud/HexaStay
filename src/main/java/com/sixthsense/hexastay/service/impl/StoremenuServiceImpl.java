@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -55,7 +56,7 @@ public class StoremenuServiceImpl implements StoremenuService {
                                 optionEntity.setStoremenu(finalStoremenu);
                                 return optionEntity;
                             })
-                            .toList()
+                            .collect(Collectors.toList())
             );
         }
         storemenu = storemenuRepository.save(storemenu);
@@ -99,8 +100,26 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 기  능 : DTO를 받아 수정한 후, 수정한 객체의 pk를 반환한다.
      * */
     @Override
-    public Long modify(StoremenuDTO storemenuDTO) {
+    public Long modify(StoremenuDTO storemenuDTO) throws IOException {
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
+        if (!entity.getStoremenuImgMeta().equals(storemenuDTO.getStoremenuImgMeta())) {
+            Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
+            Files.deleteIfExists(filePath);
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
+            String fileFirstName = entity.getStoremenuNum() + "_" + storemenuDTO.getStoreNum() + "_" + storemenuDTO.getStoremenuName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storemenuDTO.setStoremenuImgMeta("/store/menu/"+fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
+            if(!Files.exists(createPath)){
+                Files.createDirectory(createPath);
+            }
+            storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
+        }
+        entity.setStoremenuImgMeta(storemenuDTO.getStoremenuImgMeta());
         entity.setStoremenuContent(storemenuDTO.getStoremenuContent());
         entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
         entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
