@@ -186,9 +186,9 @@
 <div class="container">
     <!-- 헤더: 메뉴와 장바구니 아이콘 -->
     <div class="header">
-        <div class="menu-icon" onclick="toggleSearch()">☰</div>
+        <div class="back-icon" onclick="goBack()">←</div>
         <div>목록페이지</div>
-        <div class="cart-icon" onclick="submitPostRequest()">🛒</div>
+        <div class="menu-icon" onclick="toggleSearch()">☰</div>
     </div>
 
     <!-- 검색창 -->
@@ -262,7 +262,6 @@
                 <!-- 싫어요 수 -->
                 <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
             </div>
-
         </li>
     </ul>
 </div>
@@ -387,19 +386,12 @@
                 .then(data => {
                     const liked = data.liked;
                     const disliked = data.disliked;
-                    const likeCountValue = data.likeCount;
-                    const dislikeCountValue = data.dislikeCount;
 
                     const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                     const dislikeIcon = document.getElementById(`dislikeIcon-${menuId}`);
-                    const likeCount = document.getElementById(`likeCount-${menuId}`);
-                    const dislikeCount = document.getElementById(`dislikeCount-${menuId}`);
 
                     likedStates[menuId] = liked;
                     dislikedStates[menuId] = disliked;
-
-                    likeCount.textContent = likeCountValue;
-                    dislikeCount.textContent = dislikeCountValue;
 
                     if (liked) {
                         likeIcon.textContent = '❤️';

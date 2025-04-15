@@ -209,11 +209,19 @@
 * 수정일    : 2025-04-13
 *
 -------------------------------------------------------------->
-<div class="container">
-    <!-- 헤더: 메뉴 제목 -->
+<!-- 장바구니가 비어있는 경우 -->
+<div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
+    <p>웹에서 주문</p>
+    🛒 장바구니의<br> 아이템이 존재하지 않습니다
+</div>
+
+<!-- 장바구니에 아이템이 있는 경우만 아래 내용 출력 -->
+<div th:unless="${isCartEmpty}" class="container">
+    <!-- 헤더 -->
     <div class="header">
         <div>주문</div>
     </div>
+
 
     <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
     <ul class="food-list">
@@ -406,6 +414,26 @@
                         alert("아이템이 삭제되었습니다.");
                         item.remove();
                         updateFinalTotal();
+                        // ⭐ 삭제 후 남은 아이템이 없으면 메시지 보여주기
+                        // 삭제?
+                        const remainingItems = document.querySelectorAll('.food-item');
+                        if (remainingItems.length === 0) {
+                            const emptyMsg = document.createElement('div');
+                            emptyMsg.textContent = '🛒 장바구니의 아이템이 존재하지 않습니다.';
+                            emptyMsg.style.textAlign = 'center';
+                            emptyMsg.style.padding = '50px';
+                            emptyMsg.style.color = '#888';
+                            emptyMsg.setAttribute('id', 'emptyCartMsg');
+
+                            document.querySelector('.container').appendChild(emptyMsg);
+
+                            // 결제 버튼 등 숨기기
+                            document.querySelector('.add-to-cart-btn').style.display = 'none';
+                            document.querySelector('.back-btn').style.display = 'none';
+                            document.querySelector('.pricing-section').style.display = 'none';
+                            document.querySelector('.request-section').style.display = 'none';
+                            document.querySelector('.payment-option').style.display = 'none';
+                        }
                     },
                     error: function (jqXHR) {
                         if (jqXHR.status === 401) {
