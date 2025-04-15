@@ -26,6 +26,9 @@ public interface CompanyService {
     void companyModify(CompanyDTO companyDTO) throws IOException;
 
     //company 삭제
-    public void deactivateCompany(Long companyNum);
+    void deactivateCompany(Long companyNum);
+
+    //companyStatus 비활성화를 활성화하기 (activateCompany)
+    void activateCompany(Long companyNum);
 
 }

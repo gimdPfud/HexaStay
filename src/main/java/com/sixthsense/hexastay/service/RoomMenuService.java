@@ -27,24 +27,5 @@ public interface RoomMenuService {
 }
 
 
-//    // 좋아요
-//    public Integer roomMenuLike(Long roomMenuNum);
-//
-//    // 싫어요
-//    public Integer roomMenuDisLike(Long roomMenuNum);
-//
-//    // 좋아요 취소
-//    public Integer roomMenuLikeCancel(Long roomMenuNum);
-//
-//    // 싫어요 취소
-//    public Integer roomMenuDisLikeCancel(Long roomMenuNum);
-//
-//    // 좋아요 수
-//    public int getLikeCount (Long roomMenuNum);
-//
-//    // 싫어요 수
-//    public int getDislikeCount(Long roomMenuNum);
-
-
 
 

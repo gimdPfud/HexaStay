@@ -53,6 +53,8 @@ public class CompanyDTO {
     private String branchName;                // 지사명
     private String facilityName;              // 지점명
 
+    private String companyStatus;             //활성화 비활성화 상태
+
     public String getCompanyTypeKorean() {
         return CompanyType.displayNameFromCode(companyType);
     }

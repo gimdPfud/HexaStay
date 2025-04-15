@@ -194,6 +194,15 @@ public class CompanyServiceImpl implements CompanyService {
         adminRepository.saveAll(admins);
     }
 
+    @Override
+    public void activateCompany(Long companyNum) {
+        Company company = companyRepository.findById(companyNum)
+                .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
+        company.setCompanyStatus("ACTIVE");
+        companyRepository.save(company);
+
+    }
+
     private CompanyDTO convertToCompanyDTO(Company company) {
         CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
 

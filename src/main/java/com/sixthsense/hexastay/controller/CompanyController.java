@@ -118,4 +118,10 @@ public class CompanyController {
         return "redirect:/company/list";
     }
 
+    @PostMapping("/activate/{companyNum}")
+    public String activateCompany(@PathVariable(name = "companyNum") Long companyNum) {
+        companyService.activateCompany(companyNum); // 내부에서 status를 ACTIVE로 변경
+        return "redirect:/company/read/" + companyNum;
+    }
+
 }
