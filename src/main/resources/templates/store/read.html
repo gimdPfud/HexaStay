@@ -72,6 +72,18 @@
                 <div class="storemenulist mt-5"></div>
 
                 <div class="mt-4 d-grid">
+                    <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#soldoutmenulist" aria-expanded="false" aria-controls="soldoutlist">
+                        품절된 항목
+                    </button>
+                </div>
+                <div class="collapse mt-3" id="soldoutlist">
+                    <div class="card card-body">
+                        <h4 class="text-center text-secondary">품절된 항목 목록</h4>
+                        <div class="soldoutmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                    </div>
+                </div>
+
+                <div class="mt-4 d-grid">
                     <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
                         삭제된 항목
                     </button>
@@ -106,6 +118,7 @@
         <script th:inline="javascript">
             let storemenulist = document.querySelector(".storemenulist");
             let deletedmenulist = document.querySelector(".deletedmenulist");
+            let soldoutmenulist = document.querySelector(".soldoutmenulist");
             let storenum = [[${data.storeNum}]]
             document.addEventListener("DOMContentLoaded", function () {
                 console.log("페이지 로드 됨")
@@ -193,6 +206,7 @@
                     <th>설명</th>
                     <th>분류</th>
                     <th>버튼</th>
+                    <th>옵션 수</th>
                 </tr>
                 </thead>
                 <tbody>`;
@@ -215,8 +229,10 @@
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>
                         <a href="/admin/store/menu/read/${list[i].storemenuNum}" class="btn btn-success btn-sm">상세</a>
+                        <a href="/admin/store/menu/soldout/${list[i].storemenuNum}" class="btn btn-secondary btn-sm">품절</a>
                         <a href="/admin/store/menu/delete/${list[i].storemenuNum}" class="btn btn-danger btn-sm">삭제</a>
                     </td>
+                    <td>${list[i].storemenuOptionList ? list[i].storemenuOptionList.length : 0}</td>
                 </tr>`
                 }
                 let totaltags = tagsstart + tagscontent + tagsend;
@@ -238,6 +254,7 @@
                     <th>설명</th>
                     <th>카테고리</th>
                     <th>버튼</th>
+                    <th>옵션수</th>
                 </tr>
                 </thead>
                 <tbody>`;
@@ -261,11 +278,55 @@
                     <td>
                         <a href="/admin/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
                     </td>
+                    <td>${list[i].storemenuOptionList ? list[i].storemenuOptionList.length : 0}</td>
                 </tr>`
                 }
                 let totaltags = tagsstart + tagscontent + tagsend;
 
                 deletedmenulist.innerHTML=totaltags;
+
+            }
+
+            function showsoldoutmenu(list) {
+                let tagsstart = `<table class="table table-bordered text-center align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>이미지</th>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>설명</th>
+                    <th>카테고리</th>
+                    <th>버튼</th>
+                    <th>옵션수</th>
+                </tr>
+                </thead>
+                <tbody>`;
+                let tagscontent = "";
+                let tagsend = `</tbody>
+            </table>`;
+                let imageTag = "";
+                for (let i=0; i<list.length;i++){
+                    if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                        imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 80px; height: 80px;">`;
+                    } else {
+                        imageTag = `<img src="/store/menu/default.png" style="width: 80px; height: 80px;">`;
+                    }
+                    let categ = list[i].storemenuCategory;
+                    tagscontent += `<tr>
+                    <td style="text-align: center;">${imageTag}</td>
+                    <td>${list[i].storemenuName}</td>
+                    <td>${list[i].storemenuPrice}</td>
+                    <td>${list[i].storemenuContent}</td>
+                    <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
+                    <td>
+                        <a href="/admin/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
+                    </td>
+                    <td>${list[i].storemenuOptionList ? list[i].storemenuOptionList.length : 0}</td>
+                </tr>`
+                }
+                let totaltags = tagsstart + tagscontent + tagsend;
+
+                soldoutmenulist.innerHTML=totaltags;
 
             }
 

@@ -32,6 +32,8 @@ public interface StoremenuService {
 
     /*삭제인척 하는 활성화->비활성화*/
     public Long delete(Long pk);
+
+    public Long soldout(Long pk);
     /*비활성화->활성화*/
     public Long restore(Long pk);
 }
