@@ -209,13 +209,14 @@
 
 
             adminCenter.addEventListener("change", function () {
+
                 adminBranchFacility.innerHTML = "<option value=''></option>";
                 adminStore.innerHTML = "<option value=''></option>";
+
                 let adminCenterValue = adminCenter.value;
                 let choiceValue = adminChoice.value;
-
                 if (choiceValue === "지사") {
-                    fetch(`/admin/searchbranch?centerNum=${adminCenterValue}`)
+                    fetch(`/admin/insertsearch?type=branch&parent=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
@@ -232,7 +233,7 @@
                         .catch(error => console.error("지사 데이터 불러오기 실패:", error));
 
                 } else if (choiceValue === "지점") {
-                    fetch(`/admin/searchfacility?centerNum=${adminCenterValue}`)
+                    fetch(`/admin/insertsearch?type=facility&parent=${adminCenterValue}`)
                         .then(response => response.json())
                         .then(data => {
                             adminBranchFacility.innerHTML = "<option value=''></option>";
