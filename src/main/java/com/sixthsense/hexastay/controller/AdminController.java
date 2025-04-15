@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
@@ -71,13 +72,20 @@ public class AdminController {
 
     @GetMapping("/insert")
     public String adminInsert (Model model) {
+        model.addAttribute("companyList", companyService.companyList());
 
+        return "/admin/insert";
+    }
+
+    @GetMapping("/insertselect")
+    public String adminInsertSearch (Model model,
+                                     @RequestParam("center") String center, @RequestParam("parent") String parent) {
         return "/admin/insert";
     }
 
     @PostMapping("/insert")
     public String insert(AdminDTO adminDTO) throws IOException {
-        adminDTO.setAdminActive(false);
+        adminDTO.setAdminActive("PENDING");
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
     }

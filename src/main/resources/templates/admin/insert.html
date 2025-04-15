@@ -33,14 +33,9 @@
                 <label class="form-label">이메일 (ID)</label>
                 <input type="email" name="adminEmail" class="form-control">
             </div>
-            <div class="mb-2">
-                <label class="form-label">비밀번호</label>
-                <input type="text" name="adminPassword" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">비밀번호 확인</label>
-                <input type="text" id="adminPasswordTwo" class="form-control">
-            </div>
+
+             <input hidden type="text" name="adminPassword" class="form-control">
+
             <div class="mb-2">
                 <label class="form-label">이름</label>
                 <input type="text" name="adminName" class="form-control">
@@ -52,7 +47,8 @@
                     <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
                 </div>
             </div>
-            <input hidden name="adminResidentNum" id="adminResidentNum" value="">
+
+            <input hidden name="adminPassword" id="adminPassword" value="">
 
             <div class="mb-2">
                 <label class="form-label">주소</label>
@@ -84,7 +80,7 @@
                     </div>
                     <div class="col-3">
                         <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:value="${centerList.centerNum}"></option>
+                            <option th:each="companyDTO : ${companyList}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
                         </select>
                     </div>
                     <div class="col-3">
@@ -139,10 +135,7 @@
             </div>
         </div>
 
-        <input hidden name="centerNum" id="centerNum">
-        <input hidden name="branchNum" id="branchNum">
-        <input hidden name="facilityNum" id="facilityNum">
-        <input hidden name="facilityNum" id="storeNum">
+        <input hidden name="storeNum" id="storeNum">
 
     </form>
 
@@ -161,9 +154,9 @@
             adminBranchFacility.innerHTML = "<option value=''></option>";
 
             if (adminChoice.value === "본사") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
+                adminCenter.value = "";
+                adminBranchFacility.value = "";
+                adminStore.value = "";
                 adminCenter.disabled = false;
                 adminBranchFacility.disabled = true;
                 adminStore.disabled = true;
@@ -173,9 +166,9 @@
                 adminStoreRank.hidden = true;
 
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
+                adminCenter.value = "";
+                adminBranchFacility.value = "";
+                adminStore.value = "";
                 adminCenter.disabled = false;
                 adminBranchFacility.disabled = false;
                 adminStore.disabled = true;
@@ -185,9 +178,9 @@
                 adminStoreRank.hidden = true;
 
             } else if (adminChoice.value === "스토어") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
+                adminCenter.value = "";
+                adminBranchFacility.value = "";
+                adminStore.value = "";
                 adminCenter.disabled = true;
                 adminBranchFacility.disabled = true;
                 adminStore.disabled = false;
@@ -196,211 +189,88 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = false;
 
-                fetch(`/admin/searchstore`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("왜안됨?")
-                        adminStore.innerHTML = "<option value=''></option>";
-
-                        data.forEach(item => {
-                            let storeOption = document.createElement("option");
-                            storeOption.value = item.storeNum;
-                            storeOption.textContent = item.storeName;
-                            adminStore.appendChild(storeOption);
-                        });
-                    })
             }
+        })
 
 
-            adminCenter.addEventListener("change", function () {
-                adminBranchFacility.innerHTML = "<option value=''></option>";
-                adminStore.innerHTML = "<option value=''></option>";
-                let adminCenterValue = adminCenter.value;
-                let choiceValue = adminChoice.value;
 
-                if (choiceValue === "지사") {
-                    fetch(`/admin/searchbranch?centerNum=${adminCenterValue}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            adminBranchFacility.innerHTML = "<option value=''></option>";
+        document.getElementById('adminCenter').addEventListener('change', function () {
+            const centerCompanyNum = this.value;
+            const companyParent = document.getElementById("adminCenter");
 
-                            data.forEach(item => {
-                                let option = document.createElement("option");
-                                option.value = item.branchNum;
-                                option.textContent = item.branchName;
-                                adminBranchFacility.appendChild(option);
-                            });
-
-                            adminBranchFacility.disabled = false;
-                        })
-                        .catch(error => console.error("지사 데이터 불러오기 실패:", error));
-
-                } else if (choiceValue === "지점") {
-                    fetch(`/admin/searchfacility?centerNum=${adminCenterValue}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            adminBranchFacility.innerHTML = "<option value=''></option>";
-
-                            data.forEach(item => {
-                                let option = document.createElement("option");
-                                option.value = item.facilityNum;
-                                option.textContent = item.facilityName;
-                                adminBranchFacility.appendChild(option);
-                            });
-
-                            adminBranchFacility.disabled = false;
-                        })
-                        .catch(error => console.error("지점 데이터 불러오기 실패:", error));
-                }
-            });
-        });
-
-        function submitForm(event) {
-            if (adminChoice.value === "본사") {
-                document.getElementById("centerNum").value = adminCenter.value;
-                document.getElementById("branchNum").value = "";
-                document.getElementById("facilityNum").value = "";
-                document.getElementById("storeNum").value = "";
-                document.getElementById("adminRole").value = adminCenterRank.value;
-            } else if (adminChoice.value === "지사") {
-                document.getElementById("centerNum").value = "";
-                document.getElementById("branchNum").value = adminBranchFacility.value;
-                document.getElementById("facilityNum").value = ""
-                document.getElementById("storeNum").value = "";
-                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-            } else if (adminChoice.value === "지점") {
-                document.getElementById("centerNum").value = "";
-                document.getElementById("branchNum").value = "";
-                document.getElementById("facilityNum").value = adminBranchFacility.value;
-                document.getElementById("storeNum").value = "";
-                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-            }
-            else if (adminChoice.value === "스토어") {
-                document.getElementById("centerNum").value = "";
-                document.getElementById("branchNum").value = "";
-                document.getElementById("facilityNum").value = "";
-                document.getElementById("storeNum").value = adminStore.value;
-                document.getElementById("adminRole").value = adminStoreRank.value;
-            }
-
-            document.getElementById('adminResidentNum').value =
-                document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
-
-            document.getElementById('adminPhone').value =
-                document.getElementById('adminPhonePartOne').value + "-" +
-                document.getElementById('adminPhonePartTwo').value + "-" +
-                document.getElementById('adminPhonePartThree').value
-
-
-            const password = document.getElementById("adminPassword").value;
-            const passwordConfirm = document.getElementById("adminPasswordTwo").value;
-
-            if (password !== passwordConfirm) {
-                event.preventDefault();
-                alert("패스워드가 일치하지 않습니다.");
-            }
-
-            if (signupActive === false) {
-                event.preventDefault();
-                alert("ID를 확인 해 주십시요!")
-            }
-        }
-
-
-        document.getElementById('registerSubmitDummy').addEventListener('click', function () {
-            if (signupActive === false) {
-                alert("ID를 확인 해 주십시요!")
-            } else {
-                document.getElementById('registerSubmitBtn').click();
-            }
-        });
-
-
-        document.getElementById('memberId').addEventListener('keyup', function () {
-            var id = document.getElementById('memberId').value;
-            fetch(`/idcheck/`+(id), {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.text())
-                .then(result => {
-                    const idCheck = document.getElementById('idCheck');
-                    if (result.trim() === "1") {
-                        idCheck.textContent = "사용 가능한 ID";
-                        idCheck.style.color = "green";
-                        signupActive = true;
-                    } else {
-                        idCheck.textContent = "이미 사용중인 ID";
-                        idCheck.style.color = "#b10000";
-                        signupActive = false;
-                    }
+            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&companyParent=${companyParent}`)
+                .then(response => response.json())
+                .then(data => {
+                    const childSelect = document.getElementById('childSelect');
+                    childSelect.innerHTML = '<option value="">하위 조직 선택</option>';
+                    data.forEach(child => {
+                        const option = document.createElement('option');
+                        option.value = child.companyNum;
+                        option.textContent = `${child.companyType} - ${child.companyName}`;
+                        childSelect.appendChild(option);
+                    });
                 })
                 .catch(error => {
-                    console.error("ID 체크 중 오류 발생:", error);
-                    document.getElementById('idCheck').textContent = "ID 확인 실패.";
-                    signupActive = false;
+                    console.error('하위 조직 로딩 실패:', error);
                 });
         });
 
 
-        document.getElementById('passwordConfirm').addEventListener('keyup', function () {
-            var password = document.getElementById('memberPassword').value;
-            var passwordTwo = document.getElementById('passwordConfirm').value;
 
-            if (password === passwordTwo) {
-                passwordCheck.textContent = "";
-                passwordCheck.style.display = "none";
-            } else {
-                passwordCheck.textContent = "패스워드 불일치";
-                passwordCheck.style.display = "inline";
+
+
+        function submitForm(event) {
+                // 주민번호 앞자리를 패스워드로 사용
+                document.getElementById("adminPassword").value = document.getElementById("adminResidentNumPartOne").value;
+
+                // 연락처 결합
+                document.getElementById('adminPhone').value =
+                    document.getElementById('adminPhonePartOne').value + "-" +
+                    document.getElementById('adminPhonePartTwo').value + "-" +
+                    document.getElementById('adminPhonePartThree').value
+
+                // 주민번호 결합
+                document.getElementById('adminResidentNum').value =
+                    document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
             }
 
-        });
+                // 프로필 사진
+
+                document.getElementById('adminProfile').addEventListener('change', function () {
+                    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+                    const filePath = this.value;
+                    const errorMessage = document.getElementById('fileError');
+                    const previewImage = document.getElementById('pictureTemp');
+                    const file = this.files[0];
+
+                    if (!allowedExtensions.exec(filePath)) {
+                        this.value = '';
+                        errorMessage.classList.remove('d-none');
+                        previewImage.classList.add('d-none');
+                    } else {
+                        errorMessage.classList.add('d-none');
+
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                previewImage.src = e.target.result;
+                                previewImage.classList.remove('d-none');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                });
 
 
+                document.getElementById('PictureBtn').addEventListener('click', function () {
+                    document.getElementById('adminProfile').click();
+                });
 
 
-        // 프로필 사진
-
-        document.getElementById('adminProfile').addEventListener('change', function () {
-            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-            const filePath = this.value;
-            const errorMessage = document.getElementById('fileError');
-            const previewImage = document.getElementById('pictureTemp');
-            const file = this.files[0];
-
-            if (!allowedExtensions.exec(filePath)) {
-                this.value = '';
-                errorMessage.classList.remove('d-none');
-                previewImage.classList.add('d-none');
-            } else {
-                errorMessage.classList.add('d-none');
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.remove('d-none');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        });
-
-
-        document.getElementById('PictureBtn').addEventListener('click', function () {
-            document.getElementById('adminProfile').click();
-        });
-
-
-        document.getElementById('adminProfile').addEventListener('change', function () {
-            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-            document.querySelector('.file-name').textContent = fileName;
-        });
-
-
+                document.getElementById('adminProfile').addEventListener('change', function () {
+                    let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+                    document.querySelector('.file-name').textContent = fileName;
+                });
 
 
 
