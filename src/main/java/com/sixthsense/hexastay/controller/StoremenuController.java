@@ -135,6 +135,17 @@ public class StoremenuController {
             return new ResponseEntity<>(menulist, HttpStatus.OK);
         }
     }
+    @ResponseBody
+    @GetMapping("/list/soldout/{id}")
+    public ResponseEntity soldoutlistGet(@PathVariable Long id){
+        /*storeNum으로 Menu 가져오기...*/
+        List<StoremenuDTO> menulist = storemenuService.list(id,"soldout");
+        if(menulist.isEmpty()){
+            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(menulist, HttpStatus.OK);
+        }
+    }
 
 
     @GetMapping("/read/{id}")

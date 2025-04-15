@@ -101,25 +101,26 @@ public class StoremenuServiceImpl implements StoremenuService {
      * */
     @Override
     public Long modify(StoremenuDTO storemenuDTO) throws IOException {
+        log.info("수정 서비스 진입 : "+storemenuDTO);
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
-        if(entity.getStoremenuImgMeta()!=null&&storemenuDTO.getStoremenuImgMeta()!=null) {
-            if (!entity.getStoremenuImgMeta().equals(storemenuDTO.getStoremenuImgMeta())) {
+        if(storemenuDTO.getStoremenuImg()!=null) {
+            if (entity.getStoremenuImgMeta()!=null) {
                 Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
                 Files.deleteIfExists(filePath);
-                /*이미지 등록 절차...*/
-                String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
-                String fileFirstName = entity.getStoremenuNum() + "_" + storemenuDTO.getStoreNum() + "_" + storemenuDTO.getStoremenuName();
-                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-                String fileName = fileFirstName + fileSubName;
-
-                storemenuDTO.setStoremenuImgMeta("/store/menu/" + fileName);
-                Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-                Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
-                if (!Files.exists(createPath)) {
-                    Files.createDirectory(createPath);
-                }
-                storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
             }
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storemenuDTO.getStoremenuImg().getOriginalFilename();
+            String fileFirstName = entity.getStoremenuNum() + "_" + storemenuDTO.getStoreNum() + "_" + storemenuDTO.getStoremenuName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            storemenuDTO.setStoremenuImgMeta("/store/menu/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            storemenuDTO.getStoremenuImg().transferTo(uploadPath.toFile());
             entity.setStoremenuImgMeta(storemenuDTO.getStoremenuImgMeta());
         }
         entity.setStoremenuContent(storemenuDTO.getStoremenuContent());

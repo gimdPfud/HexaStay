@@ -81,7 +81,7 @@ public class StoreController {
 
 
     @GetMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
-    public String list(Model model, Principal principal){
+    public String list(Model model, Principal principal, Pageable pageable){
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -101,7 +101,7 @@ public class StoreController {
                 return "redirect:/admin/logout";
             }
         }
-        List<StoreDTO> list = storeService.list(adminDTO.getCompanyNum());
+        Page<StoreDTO> list = storeService.list(adminDTO.getCompanyNum(), pageable);
         model.addAttribute("list",list);
         return "store/list";
     }

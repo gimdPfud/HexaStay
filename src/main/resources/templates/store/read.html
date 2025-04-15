@@ -72,7 +72,7 @@
                 <div class="storemenulist mt-5"></div>
 
                 <div class="mt-4 d-grid">
-                    <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#soldoutmenulist" aria-expanded="false" aria-controls="soldoutlist">
+                    <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#soldoutlist" aria-expanded="false" aria-controls="soldoutlist">
                         품절된 항목
                     </button>
                 </div>
@@ -167,6 +167,30 @@
                     .catch(error => {
                         if(error.status===404){
                             showemptydeletedmenu(error.message);
+                        }
+                        console.log(error)
+                    });
+
+                fetch(`/admin/store/menu/list/soldout/${storenum}`)
+                    .then(response => {
+                        if(!response.ok){
+                            if(response.status===404){
+                                return response.text()
+                                    .then(errmsg=> {
+                                        let error = new Error(errmsg)
+                                        error.status = 404;
+                                        throw error;
+                                    })
+                            }
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showsoldoutmenu(data)
+                    })
+                    .catch(error => {
+                        if(error.status===404){
+                            showemptysoldoutmenu(error.message);
                         }
                         console.log(error)
                     });
@@ -352,6 +376,11 @@
             function showemptydeletedmenu(msg) {
                 let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
                 deletedmenulist.innerHTML=tagscontent;
+            }
+
+            function showemptysoldoutmenu(msg) {
+                let tagscontent = `<h2 class="text-center text-secondary">${msg}</h2>`;
+                soldoutmenulist.innerHTML=tagscontent;
             }
         </script>
 

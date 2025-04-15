@@ -101,10 +101,11 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
-        if(store.getStoreProfileMeta()!=null&&storeDTO.getStoreProfileMeta()!=null) {
-            if (!store.getStoreProfileMeta().equals(storeDTO.getStoreProfileMeta())) {
-                Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta());
-                Files.deleteIfExists(filePath);
+        if(storeDTO.getStoreProfile()!=null) {//이미지 새로 넣었고
+            if (store.getStoreProfileMeta()!=null) {//기존 이미지가 있다면
+                Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta().substring(1));
+                Files.deleteIfExists(filePath);//삭제
+            }
                 /*이미지 등록 절차...*/
                 String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
                 String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
@@ -116,7 +117,6 @@ public class StoreServiceImpl implements StoreService {
                 Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
                 if (!Files.exists(createPath)) {
                     Files.createDirectory(createPath);
-                }
                 storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
             }
         }
@@ -157,9 +157,16 @@ public class StoreServiceImpl implements StoreService {
         Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
         return storeDTOPage;
     }
+    @Override
     public List<StoreDTO> list(Long companyNum) {
         List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
         List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data,StoreDTO.class)).toList();
+        return list;
+    }
+    @Override
+    public Page<StoreDTO> list(Long companyNum, Pageable pageable) {
+        Page<Store> storeList = storeRepository.findByCompanyNum(companyNum, pageable);
+        Page<StoreDTO> list = storeList.map(data -> modelMapper.map(data,StoreDTO.class));
         return list;
     }
 

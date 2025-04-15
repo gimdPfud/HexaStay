@@ -17,9 +17,9 @@
             <div th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <img th:if="${item.imgName != null}"
-                         th:src="@{${item.imgName}}" alt="menu image" class="me-3">
+                         th:src="@{${item.imgName}}" alt="menu image" class="me-3" width="100px" height="100px">
                     <img th:if="${item.imgName == null}"
-                         th:src="@{/store/menu/default.png}" alt="menu image" class="me-3">
+                         th:src="@{/store/menu/default.png}" alt="menu image" class="me-3" width="100px" height="100px">
                     <div>
                         <div th:text="${item.storemenuName}" class="fw-bold"></div>
                         <div th:text="${#numbers.formatInteger(item.storemenuPrice, 0)} + '원'" class="text-muted small"></div>
@@ -61,5 +61,6 @@
         }
     </script>
 </div>
+
 </body>
 </html>
