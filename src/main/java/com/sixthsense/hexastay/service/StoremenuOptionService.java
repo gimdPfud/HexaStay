@@ -13,22 +13,19 @@ import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 import java.io.IOException;
 import java.util.List;
 
-public interface StoremenuService {
+public interface StoremenuOptionService {
     /*등록*/
-    public Long insert(StoremenuDTO storemenuDTO) throws IOException;
+    public Long insert(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
 
     /*상세보기*/
-    public StoremenuDTO read(Long pk);
+    public StoremenuOptionDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoremenuDTO storemenuDTO) throws IOException;
+    public Long modify(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
 
-    /*목록*/
-    public List<StoremenuDTO> list(Long storeNum, String status);
-    /*목록2 페이징없는 모든 목록*/
-    public List<StoremenuDTO> list(Long storeNum);
-    /*목록3 카테고리별 목록*/
-    public List<StoremenuDTO> list(Long storeNum, String category, String status);
+    /*메뉴옵션 목록*/
+    public List<StoremenuOptionDTO> list(Long storemenuNum, String status);
+    public List<StoremenuOptionDTO> list(Long storemenuNum);
 
     /*삭제인척 하는 활성화->비활성화*/
     public Long delete(Long pk);

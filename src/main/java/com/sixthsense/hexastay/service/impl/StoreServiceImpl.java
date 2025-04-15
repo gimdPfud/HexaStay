@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -218,13 +219,20 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
-        if(adminDTO.getAdminRole().equals("sv")){
-            return true; //superAdmin은 무조건 true;
-        } else if (adminDTO.getStoreNum().equals(storeDTO.getStoreNum())) {
+        List<String> possibleRoles = Arrays.asList("gm","exec","head","crew");
+        //상위 관리자라면 무조건 참.
+        if(possibleRoles.contains(adminDTO.getAdminRole())){
             return true;
-        }else {return false;}
+        }
+        //스토어소속 직원이라면 현재 스토어가 자기 스토어인지 확인함
+        else if (adminDTO.getStoreNum()!=null) {
+            return adminDTO.getStoreNum().equals(storeDTO.getStoreNum());
+        }
+        //상위관리자도 아니고 스토어소속도 아니면 무조건 거짓.
+        else {return false;}
     }
 
+    //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.
     public void checkAndUpdateOrphanStatus(Store store) {
         if (store.getCompany() == null && !"deleted".equals(store.getStoreStatus())) {
             store.setStoreStatus("deleted");
