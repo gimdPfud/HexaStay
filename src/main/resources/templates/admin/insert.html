@@ -252,40 +252,49 @@
             });
         });
 
-        function submitForm(event) {
 
+
+        function submitForm(event) {
+            // 주민번호 앞자리를 패스워드로 사용
             document.getElementById("adminPassword").value = document.getElementById("adminResidentNumPartOne").value;
 
-            if (adminChoice.value === "본사") {
+            // 연락처 결합
+            const phone = `${document.getElementById("adminPhonePartOne").value}-${document.getElementById("adminPhonePartTwo").value}-${document.getElementById("adminPhonePartThree").value}`;
+            document.getElementById("adminPhone").value = phone;
+
+            // 소속 선택에 따라 companyNum 값 설정
+            const choice = adminChoice.value;
+            if (choice === "본사") {
                 document.getElementById("centerNum").value = adminCenter.value;
                 document.getElementById("branchNum").value = "";
                 document.getElementById("facilityNum").value = "";
                 document.getElementById("storeNum").value = "";
                 document.getElementById("adminRole").value = adminCenterRank.value;
-            } else if (adminChoice.value === "지사") {
-                document.getElementById("centerNum").value = "";
+            } else if (choice === "지사") {
+                document.getElementById("centerNum").value = adminCenter.value;
                 document.getElementById("branchNum").value = adminBranchFacility.value;
-                document.getElementById("facilityNum").value = ""
+                document.getElementById("facilityNum").value = "";
                 document.getElementById("storeNum").value = "";
                 document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-            } else if (adminChoice.value === "지점") {
-                document.getElementById("centerNum").value = "";
+            } else if (choice === "지점") {
+                document.getElementById("centerNum").value = adminCenter.value;
                 document.getElementById("branchNum").value = "";
                 document.getElementById("facilityNum").value = adminBranchFacility.value;
                 document.getElementById("storeNum").value = "";
                 document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-            }
-            else if (adminChoice.value === "스토어") {
+            } else if (choice === "스토어") {
                 document.getElementById("centerNum").value = "";
                 document.getElementById("branchNum").value = "";
                 document.getElementById("facilityNum").value = "";
                 document.getElementById("storeNum").value = adminStore.value;
                 document.getElementById("adminRole").value = adminStoreRank.value;
             }
+        }
 
 
 
-            document.getElementById('adminResidentNum').value =
+
+        document.getElementById('adminResidentNum').value =
                 document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
 
             document.getElementById('adminPhone').value =
