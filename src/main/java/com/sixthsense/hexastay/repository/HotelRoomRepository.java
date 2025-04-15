@@ -28,6 +28,10 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotelRoomType = :roomType ORDER BY hr.hotelRoomNum DESC LIMIT 1")
     Optional<HotelRoom> findLatestRoomByType(@Param("roomType") String roomType);
 
+    //호텔 방이름을 기준으로 하는 검색 조건
+    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotelRoomName = :hotelRoomName ORDER BY hr.hotelRoomNum DESC")
+    Optional<HotelRoom> findByHotelRoomName(@Param("hotelRoomName") String hotelRoomName);
+
 
     //호텔룸에 참조되어 있는 ComplnyNum 정보를 리스트로 가져오기
     List<HotelRoom> findByCompany_CompanyNum(Long companyNum);

@@ -53,29 +53,25 @@ public class HotelRoom extends BaseEntity{
     @Column(name = "hotelRoomPrice")
     private Integer hotelRoomPrice;              //호텔방 가격
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "companyNum")
-    private Company company;             //호텔룸 소속 커럶 추가 : 0414
-
-
-
-    private String hotelRoomProfileMeta;      //이미지 경로 저장용 컬럼
-
-
-
-               //체크인    - BaseEntity 로 대체
-             //체크아웃 -BaseEntity로 대체
-
-
 
     //****룸의 비밀번호 설정 컬럼모음**********//
     @Column(name = "hotelRoomQr")
     private String hotelRoomQr;                 //Qr명
 
+
+
     @Column(name = "hotelRoomPassword")
     private String hotelRoomPassword;           //비밀번호
     //****룸의 권한 설정 컬럼모음**********//
 
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "companyNum")
+    private Company company;             //호텔룸 소속 커럶 추가 : 0414
+
+
+    private String hotelRoomProfileMeta;      //이미지 경로 저장용 컬럼
 
     //*********참조 테이블 모음*********//
 

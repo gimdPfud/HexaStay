@@ -24,7 +24,9 @@ public interface HotelRoomService {
 
 
     //0411
-    public HotelRoomDTO getLatestHotelRoomByType(String roomType);
+    public HotelRoomDTO HotelRoomByName(String hotelRoomName);
+
+
 
 
 

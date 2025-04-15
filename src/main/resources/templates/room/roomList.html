@@ -71,7 +71,8 @@
                 <th>회원_이름</th>
                 <th>회원 이메일</th>
                 <th>호텔룸TEL</th>
-                <th>룸배정일자</th>
+                <th>체크인</th>
+                <th>체크아웃</th>
             </tr>
             </thead>
             <tbody>
@@ -96,7 +97,9 @@
                 </td>
                 <td th:text="${room.memberEmail}"></td>
                 <td th:text="${room.hotelRoomPhone}"></td>
-                <td th:text="${#temporals.format(room.membereDate, 'yy/MM/dd')}"></td>
+                <td th:text="${room.checkInDate}"></td>   <!-- ✅ 여기 추가 -->
+                <td th:text="${room.checkOutDate}"></td>
+
             </tr>
             <tr th:if="${#lists.isEmpty(rooms.content)}">
                 <td colspan="6" class="text-center text-muted">검색 결과가 없습니다.</td>
