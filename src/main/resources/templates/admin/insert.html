@@ -196,9 +196,10 @@
 
         document.getElementById('adminCenter').addEventListener('change', function () {
             const centerCompanyNum = this.value;
-            const companyParent = document.getElementById("adminCenter");
+            const companyParent = document.getElementById("adminCenter").value;
+            const adminChoiceValue = adminChoice.value;
 
-            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&companyParent=${companyParent}`)
+            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&adminChoice=${adminChoiceValue}&companyParent=${companyParent}`)
                 .then(response => response.json())
                 .then(data => {
                     const childSelect = document.getElementById('childSelect');

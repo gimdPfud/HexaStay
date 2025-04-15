@@ -79,7 +79,18 @@ public class AdminController {
 
     @GetMapping("/insertselect")
     public String adminInsertSearch (Model model,
-                                     @RequestParam("center") String center, @RequestParam("parent") String parent) {
+                                     @RequestParam("centerNum") Long centerNum,
+                                     @RequestParam("adminChoice") String adminChoice) {
+
+        switch (adminChoice) {
+            case "센터" -> {
+
+            }
+            case "지사" -> {}
+            case "지점" -> {}
+            case "스토어" -> {}
+        }
+
         return "/admin/insert";
     }
 

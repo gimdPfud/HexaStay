@@ -34,6 +34,7 @@ public class AdminServiceImpl implements AdminService {
     private final StoreRepository storeRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final PasswordEncoder passwordEncoder;
+    private final CompanyRepository companyRepository;
 
 
     // 가입
@@ -128,6 +129,17 @@ public class AdminServiceImpl implements AdminService {
     public AdminDTO adminFindEmail(String adminEmail){
         Admin admin = adminRepository.findByAdminEmail(adminEmail);
         return modelMapper.map(admin, AdminDTO.class);
+    }
+
+    @Override
+    public List<AdminDTO> insertSelectList (Long centerNum, String adminChoice) {
+        switch (adminChoice) {
+            case "센터" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "center");
+            case "지사" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "branch");
+            case "지점" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "facility");
+            case "스토어" -> companyRepository.findByCompanyNumAndCompanyType(centerNum, "store");
+        }
+
     }
 
 }

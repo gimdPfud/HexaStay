@@ -33,4 +33,5 @@ public interface AdminService {
 
     AdminDTO adminFindEmail(String adminEmail);
 
+    public List<AdminDTO> insertSelectList (Long centerNum, String adminChoice);
 }
