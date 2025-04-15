@@ -67,6 +67,9 @@
                 <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             </div>
 
+            <input hidden name="companyNum" id="companyNum">
+            <input hidden name="storeNum" id="storeNum">
+
             <div class="mb-2">
                 <label class="form-label">소속</label>
                 <div class="row g-2">
@@ -135,7 +138,7 @@
             </div>
         </div>
 
-        <input hidden name="storeNum" id="storeNum">
+
 
     </form>
 
@@ -164,6 +167,8 @@
                 adminCenterRank.hidden = false;
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = true;
+                document.getElementById("companyNum").value = adminCenter.value;
+                document.getElementById("adminRole").value = adminCenterRank.value;
 
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
                 adminCenter.value = "";
@@ -176,6 +181,8 @@
                 adminCenterRank.hidden = true;
                 adminBranchFacilityRank.hidden = false;
                 adminStoreRank.hidden = true;
+                document.getElementById("adminRole").value = adminBranchFacilityRank.value;
+                document.getElementById("companyNum").value = adminBranchFacility.value;
 
             } else if (adminChoice.value === "스토어") {
                 adminCenter.value = "";
@@ -188,7 +195,8 @@
                 adminCenterRank.hidden = true;
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = false;
-
+                document.getElementById("adminRole").value = adminStoreRank.value;
+                document.getElementById("storeNum").value = adminStore.value;
             }
         })
 

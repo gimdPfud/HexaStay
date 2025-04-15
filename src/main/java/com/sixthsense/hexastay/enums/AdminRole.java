@@ -13,6 +13,7 @@ public enum AdminRole {
     GM("총괄"),
     SV("관리자"),
     AGENT("직원"),
+    PARTNER("협력업체"),
 
 
     MGR("운영총괄"),
