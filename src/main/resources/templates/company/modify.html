@@ -37,11 +37,13 @@
             <!--브랜드-->
             <div class="mb-2">
                 <label class="form-label">소속</label>
-                <select id="companySelectedBrand" class="form-control" name="companyType">
+                <select id="companySelectedBrand" class="form-control" name="companyType" disabled>
                     <option value="center" th:selected="${companyDTO.companyType == 'center'}">본사</option>
                     <option value="branch" th:selected="${companyDTO.companyType == 'branch'}">지사</option>
                     <option value="facility" th:selected="${companyDTO.companyType == 'facility'}">지점</option>
                 </select>
+                <input type="hidden" name="companyType" th:value="${companyDTO.companyType}">
+                <input type="hidden" name="companyNum" th:value="${companyDTO.companyNum}">
             </div>
 
             <div class="mb-2">
@@ -195,8 +197,7 @@
 
             window.addEventListener('DOMContentLoaded', function () {
                 const businessNum = document.getElementById('companyBusinessNum').value;
-                console.log('페이지 로드 완료!');
-                console.log('사업자등록번호:', document.getElementById('companyBusinessNum'));
+
                 if (businessNum) {
                     const [part1, part2, part3] = businessNum.split("-");
                     document.getElementById('companyBusinessNumOne').value = part1 || '';
@@ -219,8 +220,6 @@
             if (pictureTemp.src && !pictureTemp.src.includes('data:') && !pictureTemp.src.includes('#')) {
                 pictureTemp.classList.remove('d-none');
             }
-
-
 
 
         </script>
