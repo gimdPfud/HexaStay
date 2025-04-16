@@ -110,12 +110,12 @@ public class CompanyController {
         return "redirect:/company/list";
     }
 
-    @PostMapping("/delete/{companyNum}")
-    public String deleteCompany(@PathVariable(name = "companyNum") Long companyNum) throws IOException {
+    @PostMapping("/deactivate/{companyNum}")
+    public String deactivateCompany(@PathVariable(name = "companyNum") Long companyNum) throws IOException {
 
         companyService.deactivateCompany(companyNum);
 
-        return "redirect:/company/list";
+        return "redirect:/company/read/" + companyNum;
     }
 
     @PostMapping("/activate/{companyNum}")
@@ -123,5 +123,6 @@ public class CompanyController {
         companyService.activateCompany(companyNum); // 내부에서 status를 ACTIVE로 변경
         return "redirect:/company/read/" + companyNum;
     }
+
 
 }
