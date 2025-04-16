@@ -103,7 +103,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      * 기능 : 룸서비스 메뉴의 목록을 페이지네이션 처리하여 반환
      * 설명 : Pageable을 사용하여 페이지 단위로 메뉴 리스트를 조회하고,
      *        해당 리스트를 DTO로 변환하여 반환
-     *        수정일자 : 2025-04-07
+     *        수정일자 : 2025-04-07, 2025-04-16 - 재고량 추가
      **************************************************/
 
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
@@ -153,8 +153,19 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             roomMenuPage = roomMenuRepository.findAll(pageable);
         }
 
-        // DTO로 변환
-        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> {
+            RoomMenuDTO dto = modelMapper.map(roomMenu, RoomMenuDTO.class);
+
+            // 🔽 재고량에 따라 상태 설정
+            if (roomMenu.getRoomMenuAmount() <= 0) {
+                dto.setRoomMenuStatus("품절");
+            } else {
+                dto.setRoomMenuStatus("판매중");
+            }
+
+            return dto;
+        });
+
         return roomMenuDTOList;
     }
 

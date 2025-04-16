@@ -1,3 +1,4 @@
+<!-- templates/roommenu/orderList.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -14,24 +15,15 @@
         <div class="alert alert-info text-center">주문 내역이 없습니다.</div>
     </div>
 
-    <!-- 주문 카드 루프 -->
     <div th:each="order : ${orderList}" class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <div><strong>주문번호:</strong> <span th:text="${order.roomMenuOrderNum}"></span></div>
             <div>
                 <span class="badge bg-primary" th:text="${order.roomMenuOrderStatus}"></span>
             </div>
-
-            <!-- 휴지통 버튼: 전체 주문 삭제 -->
-            <div>
-                <button type="button" class="btn btn-danger btn-sm" onclick="deleteOrderTable(this)">
-                    <i class="fas fa-trash-alt"></i> 전체 주문 삭제
-                </button>
-            </div>
         </div>
 
         <ul class="list-group list-group-flush">
-            <!-- 주문 항목 루프 -->
             <li th:each="item : ${order.orderItemList}" class="list-group-item">
                 <div class="row text-center text-md-start">
                     <div class="col-12 col-md-6 mb-2">
@@ -59,66 +51,33 @@
     </div>
 
     <div class="text-center">
-        <a href="/roommenu/list" class="btn btn-secondary mt-3">돌아가기</a>
+        <a href="/roommenu/orderpage" class="btn btn-secondary mt-3">돌아가기</a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
-    // 주문 취소 기능
-    function cancelOrder(button) {
+        function cancelOrder(button) {
         if (!confirm("정말 주문을 취소하시겠습니까?")) return;
 
         const orderNum = button.getAttribute("data-order-id");
 
         fetch('/roommenu/deleteOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ orderNum })
-        })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-
-                // 주문 카드 삭제
-                const card = button.closest('.card');
-                if (card) card.remove();
-
-                // 리스트가 비었으면 메시지 표시
-                if (document.querySelectorAll('.card').length === 0) {
-                    const container = document.querySelector('.container');
-                    const emptyAlert = document.createElement('div');
-                    emptyAlert.className = 'alert alert-info mt-4';
-                    emptyAlert.textContent = '주문 내역이 없습니다.';
-                    container.appendChild(emptyAlert);
-                }
-            })
-            .catch(error => {
-                alert("오류 발생: " + error);
-            });
-    }
-
-    // 주문 테이블 전체 삭제
-    function deleteOrderTable(button) {
-        if (!confirm("정말 이 주문을 삭제하시겠습니까?")) return;
-
-        // 해당 주문 카드 삭제
-        const card = button.closest('.card');
-        if (card) {
-            card.remove();
-        }
-
-        // 리스트가 비었으면 메시지 표시
-        if (document.querySelectorAll('.card').length === 0) {
-            const container = document.querySelector('.container');
-            const emptyAlert = document.createElement('div');
-            emptyAlert.className = 'alert alert-info mt-4';
-            emptyAlert.textContent = '주문 내역이 없습니다.';
-            container.appendChild(emptyAlert);
-        }
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+        body: new URLSearchParams({orderNum})
+    })
+        .then(response => response.text())
+        .then(data => {
+        alert(data); // 성공 메시지
+        window.location.reload(); // 새로고침으로 반영
+    })
+        .catch(error => {
+        alert("오류 발생: " + error);
+    });
     }
 
 </script>
