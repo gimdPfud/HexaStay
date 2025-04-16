@@ -254,7 +254,6 @@ public class RoomMenuController {
             roomMenuService.modify(roomMenuDTO); // 서비스 호출
             redirectAttributes.addFlashAttribute("msg", "수정 완료");
 
-            roomMenuService.modify(roomMenuDTO);
 
         } catch (Exception e) {
 

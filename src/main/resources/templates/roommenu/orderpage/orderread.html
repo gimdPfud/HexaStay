@@ -242,6 +242,7 @@
     let price = [[${roomMenuDTO.roomMenuPrice}]];
     let count = [[${roomMenuDTO.roomMenuAmount}]];
     let cartAdd = $(".add-to-cart-btn")//장바구니 담기 버튼
+    let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
 
     $(document).ready(function () {
         $("#count").on("change", function () {
@@ -327,6 +328,23 @@
     function goBack() {
         window.history.back();
     }
+
+    // 수량체크?
+
+    // 수량 input 변경 시, 실시간으로 체크
+    $("#count").on("change", function () {
+        let count = parseInt($(this).val(), 10);
+
+        if (count > maxCount) {
+            alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
+            $(this).val(maxCount);  // 자동으로 최대 수량으로 조정
+            count = maxCount;
+        }
+
+        let total = count * price;
+        $("#totalPrice").text(total + '원');
+    });
+
 
 
 

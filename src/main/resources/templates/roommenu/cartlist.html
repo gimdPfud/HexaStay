@@ -227,7 +227,8 @@
     <ul class="food-list">
         <li th:each="roomMenuCartDTO : ${cartDetailDTOList}"
             class="food-item"
-            th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
+            th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum},
+             data-stock=${roomMenuDTO.roomMenuAmount}">
 
             <div class="food-info col-6">
                 <p>가격: <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>원</p>
@@ -290,6 +291,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
+
     // ----- 총 결제 금액을 계산해주는 스크립트 시작 ----
     document.addEventListener('DOMContentLoaded', function () {
         const totalSpans = document.querySelectorAll('.item-total');
@@ -310,6 +312,7 @@
     });
     // ----- 총 결제 금액을 계산해주는 스크립트 끝 ----
 
+
     // ----- 목록으로 이동시키기 시작 ----
 
         function goToOrderPage() {
@@ -328,6 +331,11 @@
         const confirmBtn = document.getElementById('modalConfirmBtn');
         const cancelBtn = document.getElementById('modalCancelBtn');
 
+        // ✅ 취소 버튼 클릭 시 모달 닫기
+        cancelBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+        });
+
         let currentItem = null;
 
         document.querySelectorAll('.update-btn').forEach(button => {
@@ -344,9 +352,23 @@
                 const modal = document.getElementById('quantityModal');
                 modal.style.display = 'flex';
 
+
                 // 확인 버튼 클릭 시 AJAX로 서버에 PUT 요청 보내기
                 document.getElementById('modalConfirmBtn').addEventListener('click', function () {
                     const updatedQty = parseInt(input.value);
+
+                    if (!updatedQty || updatedQty < 1) {
+                        alert("수량은 1 이상이어야 합니다.");
+                        return;
+                    }
+
+                    const availableStock = parseInt(currentItem.dataset.stock);
+
+                    if (updatedQty > availableStock) {
+                        alert("수량이 부족합니다. 현재 재고는 " + availableStock + "개 입니다.");
+                        return;
+                    }
+
                     if (updatedQty && updatedQty > 0) {
                         // PUT 요청 보내기
                         $.ajax({
