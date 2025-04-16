@@ -63,9 +63,6 @@ public class AdminServiceImpl implements AdminService {
 
         Admin admin = modelMapper.map(adminDTO, Admin.class);
 
-
-        log.info("컴퍼니넘 : " + adminDTO.getCompanyNum());
-        log.info("스토어넘 : " + adminDTO.getStoreNum());
         if (adminDTO.getCompanyNum() != null) {
             admin.getCompany().setCompanyNum(adminDTO.getCompanyNum());
         } else if (adminDTO.getStoreNum() != null) {
@@ -121,10 +118,38 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void adminUpdate(AdminDTO adminDTO) {
+    public void adminUpdate(AdminDTO adminDTO) throws IOException {
+
+        Admin admin = adminRepository.findById(adminDTO.getAdminNum()).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
+
+        if (!adminDTO.getAdminProfileMeta().isEmpty()) {
+            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
+            Files.deleteIfExists(filePath);
+
+            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            adminDTO.setAdminProfileMeta("/profile/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
+
+        } else if (adminDTO.getAdminProfileMeta().isEmpty() && !admin.getAdminProfileMeta().isEmpty())
+        {adminDTO.setAdminProfileMeta(admin.getAdminProfileMeta());}
+
+
         adminRepository.save(modelMapper.map(adminDTO, Admin.class));
     }
-    
+
+
+
+
+
     // 회원 삭제
     @Override
     public void adminDelete(Long adminNum) throws IOException{
@@ -157,12 +182,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice) {
         List<Company> companyList =
-        switch (adminChoice) {
-            case "branch" ->  companyRepository.findByCompanyTypeAndCompanyParent( "branch", centerNum);
-            case "facility" ->  companyRepository.findByCompanyTypeAndCompanyParent("facility", centerNum);
-            case "store" -> companyRepository.findByCompanyParent(centerNum);
-            default -> new ArrayList<>();
-        };
+                switch (adminChoice) {
+                    case "branch" ->  companyRepository.findByCompanyTypeAndCompanyParent( "branch", centerNum);
+                    case "facility" ->  companyRepository.findByCompanyTypeAndCompanyParent("facility", centerNum);
+                    case "store" -> companyRepository.findByCompanyParent(centerNum);
+                    default -> new ArrayList<>();
+                };
         return companyList.stream().map(company -> modelMapper.map(company, CompanyDTO.class)).collect(Collectors.toList());
     }
 

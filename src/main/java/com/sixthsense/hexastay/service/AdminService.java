@@ -27,7 +27,7 @@ public interface AdminService {
 
     AdminDTO adminRead(Long adminNum);
 
-    void adminUpdate(AdminDTO adminDTO);
+    void adminUpdate(AdminDTO adminDTO) throws IOException;
 
     void adminDelete(Long adminNum) throws IOException;
 
