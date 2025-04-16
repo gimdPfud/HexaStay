@@ -2,6 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}"
 >
 <head>
     <meta charset="UTF-8">
@@ -17,68 +18,73 @@
     <title>Compnay list</title>
 </head>
 <body>
-<h1>호텔룸 리스트 정보 페이지 </h1>
+<div layout:fragment="content" class="container mt-4">
+    <h1>호텔룸 리스트 정보 페이지 </h1>
 
-<div class="container my-5 px-3 px-md-5">
-    <div class="row gy-4 gx-3" th:each="hotelList : ${companylist}">
-        <div class="col-12">
-            <div class="card flex-row shadow-sm rounded-4 overflow-hidden border-0 bg-white" style="min-height: 200px;">
+    <div class="container my-5 px-3 px-md-5" >
+        <div class="row gy-4 gx-3" th:each="hotelList : ${companylist}">
+            <div class="col-12">
+                <div class="card flex-row shadow-sm rounded-4 overflow-hidden border-0 bg-white" style="min-height: 200px;">
 
-                <!-- 호텔 이미지 영역 -->
-                <div class="col-md-4 p-0">
-                    <div class="h-100 w-100">
-                        <img th:src="@{${hotelList.hotelRoomProfileMeta}}"
-                             class="img-fluid w-100 h-100 object-fit-cover"
-                             alt="호텔 이미지"
-                             style="border-top-left-radius: 1rem; border-bottom-left-radius: 1rem;">
+                    <!-- 호텔 이미지 영역 -->
+                    <div class="col-md-4 p-0">
+                        <div class="h-100 w-100">
+                            <img th:src="@{${hotelList.hotelRoomProfileMeta}}"
+                                 class="img-fluid w-100 h-100 object-fit-cover"
+                                 alt="호텔 이미지"
+                                 style="border-top-left-radius: 1rem; border-bottom-left-radius: 1rem;">
+                        </div>
                     </div>
-                </div>
 
-                <!-- 호텔 정보 영역 -->
-                <div class="col-md-8 p-4 d-flex flex-column justify-content-between bg-light">
-                    <div>
-                        <h4 class="mb-3 text-dark fw-semibold" th:text="${hotelList.hotelRoomName}">호텔룸 이름</h4>
+                    <!-- 호텔 정보 영역 -->
+                    <div class="col-md-8 p-4 d-flex flex-column justify-content-between bg-light">
+                        <div>
+                            <h4 class="mb-3 text-dark fw-semibold" th:text="${hotelList.hotelRoomName}">호텔룸 이름</h4>
 
 
-                        <p class="text-muted mb-2">
+                            <p class="text-muted mb-2">
                             <h3><strong>Company:</strong></h3>
                             <h4><span th:text="${hotelList.getCompany().getCompanyName()}"></span></h4>
-                        </p>
-                        <p class="text-muted mb-2">
-                            <strong>Room Type:</strong>
-                            <span th:text="${hotelList.hotelRoomType}">스위트</span>
-                        </p>
-                        <p class="text-muted mb-2">
-                            <strong>Price:</strong>
-                            <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'">200,000 원</span>
-                        </p>
-                        <p class="text-muted mb-2">
-                            <strong>Phone:</strong>
-                            <span th:text="${hotelList.hotelRoomPhone}">010-1234-5678</span>
-                        </p>
-                        <p class="text-muted mb-2">
-                            <strong>Status:</strong>
-                            <span th:text="${hotelList.hotelRoomStatus}">숙박가능</span>
-                        </p>
-                        <!-- QR 코드 추가 및 링크로 이동 -->
-                        <p class="text-muted mb-2">
-                            <strong>QR 코드:</strong><br>
-                            <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
-                                <img th:src="@{${hotelRoom.hotelRoomQr}}" alt="QR 코드" class="img-thumbnail" style="width: 150px; height: 150px;">
-                            </a>
-                        </p>
+                            </p>
+                            <p class="text-muted mb-2">
+                                <strong>Room Type:</strong>
+                                <span th:text="${hotelList.hotelRoomType}">스위트</span>
+                            </p>
+                            <p class="text-muted mb-2">
+                                <strong>Price:</strong>
+                                <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'">200,000 원</span>
+                            </p>
+                            <p class="text-muted mb-2">
+                                <strong>Phone:</strong>
+                                <span th:text="${hotelList.hotelRoomPhone}">010-1234-5678</span>
+                            </p>
+                            <p class="text-muted mb-2">
+                                <strong>Status:</strong>
+                                <span th:text="${hotelList.hotelRoomStatus}">숙박가능</span>
+                            </p>
+                            <!-- QR 코드 추가 및 링크로 이동 -->
+                            <p class="text-muted mb-2">
+                                <strong>QR 코드:</strong><br>
+                                <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
+                                    <img th:if="${hotelList.hotelRoomQr}" th:src="@{${hotelList.hotelRoomQr}}" alt="QR 코드" class="img-thumbnail" style="width: 150px; height: 150px;">
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="mt-3 d-flex gap-2">
+                            <button class="btn btn-outline-dark px-4 py-2 rounded-pill">자세히 보기</button>
+                            <button class="btn btn-dark px-4 py-2 rounded-pill">예약하기</button>
+                        </div>
                     </div>
 
-                    <div class="mt-3 d-flex gap-2">
-                        <button class="btn btn-outline-dark px-4 py-2 rounded-pill">자세히 보기</button>
-                        <button class="btn btn-dark px-4 py-2 rounded-pill">예약하기</button>
-                    </div>
                 </div>
-
             </div>
         </div>
     </div>
+
 </div>
+
+
 
 
 
