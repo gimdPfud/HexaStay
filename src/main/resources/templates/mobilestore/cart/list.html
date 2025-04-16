@@ -46,7 +46,7 @@
         </div>
 
         <!-- 총 가격 및 주문 버튼 -->
-        <div th:if="${list != null}"  class="position-fixed d-grid bottom-0 start-0 w-100 bg-white p-3 shadow" style="z-index: 10;">
+        <div th:if="${list != null}" class="position-fixed d-grid bottom-0 start-0 w-100 bg-white p-3 shadow" style="z-index: 10;">
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal"
                     th:text="'주문 ('+(${list.size()})+')'" th:disabled="${list==null || list.isEmpty()}"></button>
         </div>
@@ -55,7 +55,7 @@
         <!--todo 주문정보 입력하는 모달창-->
         <!--todo form태그로 넘길때... 결제api 한번 거쳐야하는데??-->
         <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-fullscreen">
                 <div class="modal-content">
                     <div class="modal-header">
                         <!--전체화면이 되면 이 부분이 마치 네비게이션바처럼 보일거니까.. 동일하게 꾸며주면 이쁠듯-->
