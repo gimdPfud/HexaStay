@@ -467,22 +467,27 @@
 
     // 결제여부에 따라서 이동되는 페이지
     function processPayment() {
-        const isCash = document.getElementById('cashPaymentCheckbox').checked;
+        const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
 
-        if (isCash) {
-            $.post('/roommenu/cart')
-                .done(function(orderNum) {
-                    console.log("주문 완료, 주문번호:", orderNum);
-                    window.location.href = '/roommenu/cashOrder';
-                })
-                .fail(function(xhr) {
-                    alert("주문 실패: " + xhr.responseText);
-                });
-        } else {
-            // 카드 결제
-            window.location.href = '/roommenu/cardOrder';
-        }
+        fetch('/roommenu/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                requestMessage: roomMenuOrderRequestMessage
+            })
+        })
+            .then(res => res.text())
+            .then(result => {
+                alert("결제가 완료되었습니다.");
+                window.location.href = '/roommenu/orderList';
+            })
+            .catch(error => {
+                alert("결제 중 오류 발생: " + error);
+            });
     }
+
 
 
 </script>

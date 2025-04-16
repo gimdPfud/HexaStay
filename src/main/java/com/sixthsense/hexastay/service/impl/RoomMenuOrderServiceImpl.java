@@ -95,7 +95,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     }
 
     @Override
-    public Long roomMenuOrderInsertFromCart(String email) {
+    public Long roomMenuOrderInsertFromCart(String email, String requestMessage) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
@@ -132,6 +132,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());
             orderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());
             orderItem.setRoomMenuOrder(roomMenuOrder);
+            orderItem.setRoomMenuOrderRequestMessage(requestMessage);
 
             // 재고 차감
             roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());
@@ -169,6 +170,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
+                itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
                 return itemDTO;
             }).collect(Collectors.toList());
 
@@ -210,5 +212,34 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
 //         // 취소된 주문 삭제 (필요한 경우)
 //         roomMenuOrderRepository.delete(order);  // 필요 시 전체 삭제
+    }
+
+
+
+    // 주문어드민
+    @Override
+    public List<RoomMenuOrderDTO> getAllOrdersForAdmin() {
+        List<RoomMenuOrder> orders = roomMenuOrderRepository
+                .findAllByRoomMenuOrderStatusOrderByRegDateDesc(RoomMenuOrderStatus.ORDER);
+
+        return orders.stream().map(order -> {
+            RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
+            dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
+            dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
+            dto.setRegDate(order.getRegDate());
+            dto.setMember(order.getMember());
+
+            List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
+                RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
+                itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
+                itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
+                itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
+                itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
+                return itemDTO;
+            }).collect(Collectors.toList());
+
+            dto.setOrderItemList(itemDTOList);
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

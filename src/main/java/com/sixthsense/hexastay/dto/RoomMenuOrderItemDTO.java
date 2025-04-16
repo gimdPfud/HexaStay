@@ -20,6 +20,9 @@ public class RoomMenuOrderItemDTO {
 
     private Integer roomMenuOrderItemPrice; //주문금액
 
+    private String roomMenuOrderRequestMessage; // 요청사항
+
+
     private String roomMenuOrderItemName; // 아이템 이름
 
 }

@@ -30,5 +30,8 @@ public class RoomMenuOrderItem extends BaseEntity {
 
     private Integer roomMenuOrderPrice;  //주문가격
 
+    @Column(length = 1000)
+    private String roomMenuOrderRequestMessage; // 주문요청사항
+
     private int roomMenuOrderAmount; //주문수량
 }

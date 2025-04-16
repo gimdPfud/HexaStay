@@ -56,7 +56,7 @@ public class RoomMenuOrderController {
 
     @PostMapping("/order")
     public ResponseEntity roomMenuOrderPost(@RequestBody @Valid RoomMenuOrderDTO roomMenuOrderDTO,
-                                BindingResult bindingResult , Principal principal, HttpServletRequest request){
+                                            BindingResult bindingResult, Principal principal, HttpServletRequest request) {
         log.info("주문하기 Post 컨트롤러 진입" + roomMenuOrderDTO);
 
         // DTO 유효성 검사 결과에 에러가 존재할 경우
@@ -111,7 +111,7 @@ public class RoomMenuOrderController {
     }
 
     @PostMapping("/roommenu/cart")
-    public ResponseEntity<?> createOrderFromCart(Principal principal, HttpServletRequest request) {
+    public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -123,7 +123,7 @@ public class RoomMenuOrderController {
         String email = principal.getName();
 
         try {
-            Long orderNum = roomMenuOrderService.roomMenuOrderInsertFromCart(email);
+            Long orderNum = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage);
             log.info("주문 생성 완료 - 주문번호: {}", orderNum);
             return ResponseEntity.ok(orderNum);
         } catch (IllegalStateException | EntityNotFoundException e) {
@@ -169,12 +169,19 @@ public class RoomMenuOrderController {
         }
     }
 
-        @GetMapping("/roommenu/cashOrder")
-        public String CashOrderPageGet() {
+    @GetMapping("/roommenu/cashOrder")
+    public String CashOrderPageGet() {
         log.info("현금 결제 컨트롤러 진입");
 //            // 룸방번호
 //            model.addAttribute("roomName", roomName);
-            return "roommenu/cashOrder";  // templates/cashOrder.html로 연결
-        }
+        return "roommenu/cashOrder";  // templates/cashOrder.html로 연결
+    }
+
+    @GetMapping("/roommenu/adminOrderList")
+    public String viewAllOrders(Model model) {
+        List<RoomMenuOrderDTO> orders = roomMenuOrderService.getAllOrdersForAdmin();
+        model.addAttribute("orders", orders);
+        return "roommenu/adminOrderList"; //
 
     }
+}
