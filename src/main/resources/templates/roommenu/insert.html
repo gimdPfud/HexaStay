@@ -71,47 +71,48 @@
 
     </form>
 </div>
-</div>
-</body>
-<script>
-    // 프로필 사진
+    <script>
+        // 프로필 사진
 
-    document.getElementById('menuImage').addEventListener('change', function () {
-        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-        const filePath = this.value;
-        const errorMessage = document.getElementById('fileError');
-        const previewImage = document.getElementById('pictureTemp');
-        const file = this.files[0];
+        document.getElementById('menuImage').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
 
-        if (!allowedExtensions.exec(filePath)) {
-            this.value = '';
-            errorMessage.classList.remove('d-none');
-            previewImage.classList.add('d-none');
-        } else {
-            errorMessage.classList.add('d-none');
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImage.src = e.target.result;
-                    previewImage.classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
-        }
-    });
+        });
 
 
-    document.getElementById('PictureBtn').addEventListener('click', function () {
-        document.getElementById('menuImage').click();
-    });
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('menuImage').click();
+        });
 
 
-    document.getElementById('menuImage').addEventListener('change', function () {
-        let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-        document.querySelector('.file-name').textContent = fileName;
-    });
+        document.getElementById('menuImage').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
 
-</script>
+    </script>
+</div>
 
+
+</body>
 </html>
