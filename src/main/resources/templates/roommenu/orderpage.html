@@ -162,6 +162,18 @@
             margin-top: 20px;
         }
 
+        .order-list-btn {
+            background-color: #FAE100;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
         /* 공통 스타일 */
         .card-list {
             list-style: none;
@@ -388,6 +400,10 @@
             🛒 내 카트 리스트로
             <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
         </button>
+        <button class="order-list-btn"
+                onclick="window.location.href='/roommenu/orderList'">
+            🛒 내 주문 리스트로
+        </button>
     </div>
 
     <!-- 스크립트 시작 -->
@@ -416,6 +432,7 @@
                     console.error('Error:', error);
                 });
         }
+
 
         // 상태 저장
         const likedStates = {};
