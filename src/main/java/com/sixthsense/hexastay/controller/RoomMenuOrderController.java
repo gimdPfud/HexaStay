@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
+import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,6 +40,7 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuOrderController {
 
     private final RoomMenuOrderService roomMenuOrderService;
+    private final RoomMenuOrderRepository roomMenuOrderRepository;
 
     /***************************************************
      *
@@ -183,5 +185,18 @@ public class RoomMenuOrderController {
         model.addAttribute("orders", orders);
         return "roommenu/adminOrderList"; //
 
+    }
+
+    // 임시임.. 체크여부에 따라서 삭제 기능
+    @PostMapping("/roommenu/complete-orders")
+    public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
+        try {
+            for (Long orderId : orderIds) {
+                roomMenuOrderRepository.deleteById(orderId);  // 삭제 or 상태변경 로직
+            }
+            return ResponseEntity.ok("처리 완료");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러: " + e.getMessage());
+        }
     }
 }

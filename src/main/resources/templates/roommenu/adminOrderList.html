@@ -23,7 +23,7 @@
             <th>주문번호</th>
             <th>주문자</th>
             <th>상태</th>
-            <th>주문완료여부</th> <!-- 변경된 부분 -->
+            <th>주문완료여부</th>
             <th>주문내용</th>
         </tr>
         </thead>
@@ -32,7 +32,6 @@
             <td th:text="${order.roomMenuOrderNum}">1001</td>
             <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}">홍길동</td>
             <td th:text="${order.roomMenuOrderStatus}">ORDER</td>
-            <!-- 체크박스 추가 -->
             <td>
                 <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
             </td>
@@ -49,6 +48,54 @@
         </tr>
         </tbody>
     </table>
+
+    <!-- 버튼 추가 영역 -->
+    <div class="button-wrapper">
+        <button type="button" onclick="location.href='/admin/home'">관리자 목록 페이지로</button>
+        <button type="button" onclick="handleConfirm()">확인</button>
+    </div>
 </form>
+
+<script>
+
+    function handleConfirm() {
+        const checkedOrders = [];
+
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.checked) {
+                const row = checkbox.closest('tr');
+                const orderId = row.querySelector('td').textContent.trim();
+                checkedOrders.push(orderId);
+
+                // 프론트에서 행 제거
+                row.remove();
+            }
+        });
+
+        if (checkedOrders.length === 0) {
+            alert("선택된 주문이 없습니다.");
+            return;
+        }
+
+        // 백엔드에 삭제 요청 보내기
+        fetch('/roommenu/complete-orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(checkedOrders)
+        }).then(res => {
+            if (res.ok) {
+                alert("주문이 완료 처리되었습니다.");
+            } else {
+                alert("처리 중 오류 발생");
+            }
+        }).catch(error => {
+            console.error(error);
+            alert("요청 실패: " + error);
+        });
+    }
+
+</script>
 </body>
 </html>
