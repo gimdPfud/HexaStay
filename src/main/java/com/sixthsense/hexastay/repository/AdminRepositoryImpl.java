@@ -26,6 +26,8 @@ public class AdminRepositoryImpl implements AdminRepositoryCustom {
 
         List<Admin> content = queryFactory
                 .selectFrom(admin)
+                .leftJoin(admin.company).fetchJoin()
+                .leftJoin(admin.store).fetchJoin()
                 .where(whereCondition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

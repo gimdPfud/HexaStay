@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<Admin, Long>, AdminRepositoryCustom {
-    @Query("select a from Admin a")
+    @Query("select distinct a from Admin a left join fetch a.company left join fetch a.store")
     public Page<Admin> findAll(Pageable pageable);
 
     public Admin findByAdminNum(Long adminNum);
