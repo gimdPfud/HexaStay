@@ -224,13 +224,11 @@
                     const subSelect = document.getElementById("adminBranchFacility");
                     subSelect.innerHTML = "";
 
-                        // 기본 선택 옵션 추가
                         const defaultOption = document.createElement("option");
                         defaultOption.textContent = "";
                         defaultOption.value = "";
                         subSelect.appendChild(defaultOption);
 
-                        // 받아온 조직 리스트 추가
                         data.forEach(company => {
                             const option = document.createElement("option");
                             option.value = company.companyNum;
