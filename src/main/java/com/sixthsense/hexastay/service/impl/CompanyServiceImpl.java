@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service.impl;
 
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 
 import com.sixthsense.hexastay.entity.Admin;
@@ -202,6 +203,19 @@ public class CompanyServiceImpl implements CompanyService {
         company.setCompanyStatus("ACTIVE");
         companyRepository.save(company);
 
+    }
+
+    @Override
+    public List<AdminDTO> getCompanyAdmins(Long companyNum) {
+
+        List<Admin> adminList = adminRepository.findByCompany_CompanyNum(companyNum);
+        List<AdminDTO> adminDTOList = new ArrayList<>();
+        for (Admin admin : adminList) {
+            AdminDTO adminDTO = modelMapper.map(admin, AdminDTO.class);
+            adminDTOList.add(adminDTO);
+        }
+
+       return adminDTOList;
     }
 
     private CompanyDTO convertToCompanyDTO(Company company) {

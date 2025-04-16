@@ -1,9 +1,11 @@
 package com.sixthsense.hexastay.controller;
 
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -27,7 +29,7 @@ import java.util.List;
 public class CompanyController {
 
     private final CompanyService companyService;
-    private final AdminRepository adminRepository;
+    private final AdminService adminService;
 
     @GetMapping("/list")
     public String listCompany(@RequestParam(required = false) String choice,
@@ -130,9 +132,9 @@ public class CompanyController {
 
     @GetMapping("/{companyNum}/admins")
     @ResponseBody
-    public ResponseEntity<List<Admin>> getAdminsByCompany(@PathVariable Long companyNum) {
+    public ResponseEntity<List<AdminDTO>> getAdminsByCompany(@PathVariable Long companyNum) {
         log.info("직원 조회 요청 : " + companyNum);
-        List<Admin> admins = adminRepository.findByCompany_CompanyNum(companyNum);
+        List<AdminDTO> admins = companyService.getCompanyAdmins(companyNum);
         return ResponseEntity.ok(admins);
     }
 
