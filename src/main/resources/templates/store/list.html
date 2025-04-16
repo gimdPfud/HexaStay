@@ -37,6 +37,7 @@
         <table class="table table-bordered table-sm align-middle" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
             <thead style="background-color: #f1f1f1;">
             <tr>
+                <th style="text-align: center; vertical-align: middle;">제공호텔</th>
                 <th style="text-align: center; vertical-align: middle;">이미지</th>
                 <th style="text-align: center; vertical-align: middle;">업체명</th>
                 <th style="text-align: center; vertical-align: middle;">전화번호</th>
@@ -47,6 +48,7 @@
             </thead>
             <tbody>
             <tr th:each="data : ${list}">
+                <td th:text="${data.companyName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center;">
                     <img th:if="${data.storeProfileMeta != null}"
                          th:src="@{${data.storeProfileMeta}}"

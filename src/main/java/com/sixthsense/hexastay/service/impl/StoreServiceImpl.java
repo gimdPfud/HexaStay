@@ -154,19 +154,33 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreDTO> list(String status, Pageable pageable) {
         Page<Store> storePage = storeRepository.findByStoreStatus(status, pageable);
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return storeDTOPage;
     }
     @Override
     public List<StoreDTO> list(Long companyNum) {
         List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
-        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data,StoreDTO.class)).toList();
+        List<StoreDTO> list = storeList.stream().map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        }).toList();
         return list;
     }
     @Override
     public Page<StoreDTO> list(Long companyNum, Pageable pageable) {
         Page<Store> storeList = storeRepository.findByCompanyNum(companyNum, pageable);
-        Page<StoreDTO> list = storeList.map(data -> modelMapper.map(data,StoreDTO.class));
+        storeList.forEach(this::checkAndUpdateOrphanStatus);
+        storeList = storeRepository.findByCompanyNum(companyNum, pageable);
+        Page<StoreDTO> list = storeList.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return list;
     }
 
@@ -182,7 +196,11 @@ public class StoreServiceImpl implements StoreService {
         Page<Store> storePage = storeRepository.findAll(pageable);
         storePage.forEach(this::checkAndUpdateOrphanStatus);
         storePage = storeRepository.findAll(pageable);
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return storeDTOPage;
     }
 
