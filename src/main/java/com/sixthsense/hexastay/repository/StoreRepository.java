@@ -15,8 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface StoreRepository extends JpaRepository<Store, Long> {
-    @Query("select a from Store a")
+public interface StoreRepository extends JpaRepository<Store, Long>, StoreRepositoryCustom{
+    @Query("select a from Store a where a.storeStatus = 'alive'")
     public Page<Store> findAll(Pageable pageable);
 
     @Query("select s from Store s where s.storeStatus = :status")
