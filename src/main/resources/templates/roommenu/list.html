@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -6,191 +7,193 @@
     <meta charset="UTF-8">
     <title>룸서비스 메뉴 목록</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 스타일시트 -->
+    <style>
+        body{
+            font: 600 16px/18px 'Open Sans', sans-serif;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            max-width: 1200px;
+        }
+
+        .search-box select,
+        .search-box input,
+        .search-box button,
+        .search-box option {
+            border-radius: 5px;
+            height: 40px;
+        }
+        .search-box select {
+            width: 150px;
+
+        }
+        .search-box input {
+            width: 520px;
+        }
+        .search-box button {
+            background-color: #45a049;
+            color: white;
+            border: none;
+            cursor: pointer;
+
+        }
+
+        .search-box button:hover {
+            background-color: #4CAF50;
+        }
+
+        #category-option {
+            display: none;
+        }
+
+        /* ✅ 테이블 모든 셀 가운데 정렬 */
+        table th,
+        table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* ✅ 이미지 가운데 정렬 */
+        table img {
+            display: block;
+            margin: 0 auto;
+        }
+        .page-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .btn-custom {
+            width: 80px;
+            height: 40px;
+            padding: 0;
+            font-size: 18px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            text-align: center;
+            margin: 3px;
+        }
+
+
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            .btn-custom {
+                width: 100%;
+            }
+        }
+        a{
+            text-decoration-line: none;
+        }
+    </style>
 </head>
-
-<!-- 스타일시트 -->
-
-<style>
-    .search-box {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #f8f9fa;
-        max-width: 1000px;
-        margin: 20px auto;
-    }
-
-    .search-box select,
-    .search-box input,
-    .search-box button {
-        border-radius: 5px;
-        padding: 5px 10px;
-    }
-
-    .search-box select {
-        width: 220px;
-    }
-
-    .search-box input {
-        width: 220px;
-    }
-
-    .search-box button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .search-box button:hover {
-        background-color: #0056b3;
-    }
-
-    #category-option {
-        display: none;
-    }
-
-    /* ✅ 테이블 모든 셀 가운데 정렬 */
-    table th,
-    table td {
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    /* ✅ 이미지 가운데 정렬 */
-    table img {
-        display: block;
-        margin: 0 auto;
-    }
-
-</style>
-
-<!-- 스타일시트 끝 -->
-
-<body>
-<div layout:fragment="content">
-[[${list}]]
-<div class="container mt-4">
-    <h1 style="text-align: center;">룸서비스 메뉴 목록</h1>
-    <p style="text-align: center;">* 카테고리로 검색하려면 카테고리 선택 옆의 이름.. 부분을 클릭해서 카테고리를 선택하세요</p>
-
-    <!-- 검색창 -->
-
-    <div class="container">
-            <!-- 검색창 시작 -->
-            <div class="container">
-                <form th:action="@{/roommenu/list}" method="get">
+<body class="w-100 vh-100 bg-light">
+    <div layout:fragment="content">
+        <div class="container p-4 rounded w-100 h-100" >
+            <h1 class="page-title">룸서비스 메뉴 목록</h1>
                     <!-- 검색창 시작 -->
-                    <div class="search-box">
-                        <select id="search-option" name="type" class="form-select">
-                            <option value="S" th:selected="${type == 'S'}">이름</option>
-                            <option value="P" th:selected="${type == 'P'}">가격</option>
-                            <option value="A" th:selected="${type == 'A'}">재고량</option>
-                            <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
-                            <option value="C" th:selected="${type == 'C'}">카테고리 선택</option> <!-- 카테고리 선택 -->
-                        </select>
+            <form th:action="@{/roommenu/list}" class="row g-2 mb-4 justify-content-center" method="get">
+                <!-- 검색창 시작 -->
+                <div class="search-box">
+                    <select id="search-option" name="type" class="form-select">
+                        <option value="S" th:selected="${type == 'S'}">이름</option>
+                        <option value="P" th:selected="${type == 'P'}">가격</option>
+                        <option value="A" th:selected="${type == 'A'}">재고량</option>
+                        <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                        <option value="C" th:selected="${type == 'C'}">카테고리 선택</option> <!-- 카테고리 선택 -->
+                    </select>
+                                <!-- 카테고리 선택 -->
+                    <select id="category-select" name="category" class="form-select" disabled>
+                        <option value="">카테고리 선택</option>
+                        <option value="한식" th:selected="${category == '한식'}">한식</option>
+                        <option value="양식" th:selected="${category == '양식'}">양식</option>
+                        <option value="중식" th:selected="${category == '중식'}">중식</option>
+                        <option value="에피타이저" th:selected="${category == '에피타이저'}">에피타이저</option>
+                    </select>
+
+                    <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword">
 
 
-                        <!-- 카테고리 선택 -->
-                        <select id="category-select" name="category" class="form-select" disabled>
-                            <option value="">카테고리 선택</option>
-                            <option value="한식" th:selected="${category == '한식'}">한식</option>
-                            <option value="양식" th:selected="${category == '양식'}">양식</option>
-                            <option value="중식" th:selected="${category == '중식'}">중식</option>
-                            <option value="에피타이저" th:selected="${category == '에피타이저'}">에피타이저</option>
-                            <!-- 추가적인 카테고리도 여기에 추가 -->
-                        </select>
-
-                        <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 250px">
-
-                        <!-- 검색버튼 -->
-                        <button type="submit" style="width: 95px; height: 40px; padding: 0; font-size: 16px; text-align: center; line-height: 40px; margin-right: 10px;">
-                            검색
-                        </button>
-                        <!-- 검색버튼 끝 -->
-
-                        <!-- 메뉴등록 버튼 시작 -->
-                        <a href="/roommenu/insert" class="btn btn-warning" style="width: 95px; height: 40px; padding: 0; font-size: 16px; display: inline-block; text-align: center; line-height: 40px;">
-                            메뉴등록
-                        </a>
-                        <!-- 메뉴등록 버튼 끝 -->
-                        <div>
-                            <a href="/roommenu/orderpage" class="btn btn-primary" style="width: 160px; height: 40px; padding: 0; font-size: 16px; display: inline-block; text-align: center; line-height: 40px;">
-                                손님용 오더페이지로
-                            </a>
-                        </div>
+                                <!-- 검색버튼 -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-custom"> 검색 </button>
+                        <a href="/roommenu/insert" class="btn btn-warning btn-custom"> 메뉴등록</a>
+                        <a href="/roommenu/orderpage" class="btn btn-primary btn-custom" >고객용 </a>
                     </div>
-                </form> <!-- 검색창 끝 -->
+                </div>
+            </form> <!-- 검색창 끝 -->
+            <!-- 메뉴 목록 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-bordered ">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">이미지</th>
+                        <th scope="col">메뉴이름</th>
+                        <th scope="col">상품가격</th>
+                        <th scope="col">재고량</th>
+                        <th scope="col">카테고리</th>
+                        <th scope="col">품절여부</th>
+                        <th scope="col">기능</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="roomMenuDTO : ${list}">
+                        <th scope="row" th:text="${roomMenuDTO.roomMenuNum}"></th>
+
+                        <td>
+                            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                 style="width: 60px; height: 80px;">
+
+                            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                                 th:src="@{/profile/default.png}"
+                                 style="width: 60px; height: 80px;">
+                        </td>
+
+                        <td>
+                            <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTO.roomMenuNum}}"
+                               th:text="${roomMenuDTO.roomMenuName}">
+                            </a>
+                        </td>
+                        <td th:text="${roomMenuDTO.roomMenuPrice}"></td>
+                        <td th:text="${roomMenuDTO.roomMenuAmount}"></td>
+                        <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
+                        <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
+                        <td>
+                            <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary btn-sm">수정</a>
+                            <form action="/roommenu/delete" method="post" style="display:inline;">
+                                <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
+                                <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
+            <!-- 페이지 네비게이션 -->
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item"><a class="page-link" href="#">이전</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                </ul>
+            </nav>
+        </div>
     </div>
-
-    <!-- 메뉴 목록 테이블 -->
-    <table class="table table-bordered mt-5">
-        <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">이미지</th>
-            <th scope="col">메뉴이름</th>
-            <th scope="col">상품가격</th>
-            <th scope="col">재고량</th>
-            <th scope="col">카테고리</th>
-            <th scope="col">품절여부</th>
-            <th scope="col">기능</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="roomMenuDTO : ${list}">
-            <th scope="row" th:text="${roomMenuDTO.roomMenuNum}"></th>
-
-            <td>
-                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                     style="width: 60px; height: 80px;">
-
-                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     style="width: 60px; height: 80px;">
-            </td>
-
-            <td>
-                <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTO.roomMenuNum}}"
-                   th:text="${roomMenuDTO.roomMenuName}">
-                </a>
-            </td>
-            <td th:text="${roomMenuDTO.roomMenuPrice}"></td>
-            <td th:text="${roomMenuDTO.roomMenuAmount}"></td>
-            <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
-            <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
-            <td>
-                <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary btn-sm">수정</a>
-                <form action="/roommenu/delete" method="post" style="display:inline;">
-                    <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
-                    <button type="submit" class="btn btn-danger btn-sm">삭제</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- 페이지 네비게이션 -->
-    <nav>
-        <ul class="pagination justify-content-center">
-            <li class="page-item"><a class="page-link" href="#">이전</a></li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">다음</a></li>
-        </ul>
-    </nav>
-</div>
-</div>
 </body>
 
     <script>

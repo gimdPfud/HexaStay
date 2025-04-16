@@ -10,138 +10,135 @@
 </head>
 <body class="w-100 vh-100 bg-light">
 <div layout:fragment="content">
+    <div class="container p-4 rounded shadow-sm w-100 h-100" >
+        <form method="post" action="/admin/insert" enctype="multipart/form-data">
+            <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
 
-    <form method="post" action="/admin/insert" enctype="multipart/form-data">
-        <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
-
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                    </div>
+                    <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
-                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
-                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-            </div>
 
-            <div class="mb-2">
-                <label class="form-label">사번</label>
-                <input type="text" name="adminEmployeeNum" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">이메일 (ID)</label>
-                <input type="email" name="adminEmail" class="form-control">
-            </div>
+                <div class="mb-2">
+                    <label class="form-label">사번</label>
+                    <input type="text" name="adminEmployeeNum" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">이메일 (ID)</label>
+                    <input type="email" name="adminEmail" class="form-control">
+                </div>
 
-             <input hidden type="text" name="adminPassword" class="form-control">
+                 <input hidden type="text" name="adminPassword" class="form-control">
 
-            <div class="mb-2">
-                <label class="form-label">이름</label>
-                <input type="text" name="adminName" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">주민등록번호</label>
-                <div class="row">
-                    <input type="number" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
-                    <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
+                <div class="mb-2">
+                    <label class="form-label">이름</label>
+                    <input type="text" name="adminName" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">주민등록번호</label>
+                    <div class="row">
+                        <input type="number" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
+                        <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
+                    </div>
+                </div>
+
+                <input hidden name="adminPassword" id="adminPassword" value="">
+
+                <div class="mb-2">
+                    <label class="form-label">주소</label>
+                    <input type="text" name="adminAddress" class="form-control">
+                </div>
+                <div class="mb-2 row">
+                    <label class="form-label">연락처</label>
+                    <select class="form-select" id="adminPhonePartOne" style="margin-left : 3.5%; width:30%">
+                        <option>010</option>
+                        <option>011</option>
+                        <option>017</option>
+                    </select> -
+                    <input type="number" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
+                    <input type="number" id="adminPhonePartThree" class="form-control" style="width:30%">
+
+                    <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
+                </div>
+
+                <input hidden name="companyNum" id="companyNum">
+                <input hidden name="storeNum" id="storeNum">
+
+                <div class="mb-2">
+                    <label class="form-label">소속</label>
+                    <div class="row g-2">
+                        <div class="col-3">
+                            <select id="adminChoice" class="form-select">
+                                <option>본사</option>
+                                <option>지사</option>
+                                <option>지점</option>
+                                <option>스토어</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select name="adminCenter" id="adminCenter" class="form-select">
+                                <option th:each="companyDTO : ${companyList}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <select name="adminStore" id="adminStore" class="form-select" disabled>
+                            </select>
+                        </div>
+                        <input hidden name="adminBrand" id="adminBrand" value="">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
+                    <select class="form-select" id="adminCenterRank">
+                        <option value="exec">임원진</option>
+                        <option value="head">팀장</option>
+                        <option value="crew">사원</option>
+                    </select>
+                    <select class="form-select" id="adminBranchFacilityRank" hidden>
+                        <option value="gm">총괄 책임자</option>
+                        <option value="sv">관리자</option>
+                        <option value="agent">사원</option>
+                        <option value="partner">협력 업체</option>
+                    </select>
+                    <select class="form-select" id="adminStoreRank" hidden>
+                        <option value="mgr">매니저</option>
+                        <option value="submgr">부매니저</option>
+                        <option value="staff">매장 직원</option>
+                    </select>
+
+                    <input hidden name="adminRole" id="adminRole">
+
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">직책</label>
+                    <input type="text" name="adminPosition" class="form-control">
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">입사일</label>
+                    <input type="date" name="adminJoinDate" class="form-control">
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" onclick="submitForm(event)" class="btn btn-success">등록</button>
+                    <button class="btn btn-danger">취소</button>
                 </div>
             </div>
-
-            <input hidden name="adminPassword" id="adminPassword" value="">
-
-            <div class="mb-2">
-                <label class="form-label">주소</label>
-                <input type="text" name="adminAddress" class="form-control">
-            </div>
-            <div class="mb-2 row">
-                <label class="form-label">연락처</label>
-                <select class="form-select" id="adminPhonePartOne" style="margin-left : 3.5%; width:30%">
-                    <option>010</option>
-                    <option>011</option>
-                    <option>017</option>
-                </select> -
-                <input type="number" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
-                <input type="number" id="adminPhonePartThree" class="form-control" style="width:30%">
-
-                <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
-            </div>
-
-            <input hidden name="companyNum" id="companyNum">
-            <input hidden name="storeNum" id="storeNum">
-
-            <div class="mb-2">
-                <label class="form-label">소속</label>
-                <div class="row g-2">
-                    <div class="col-3">
-                        <select id="adminChoice" class="form-select">
-                            <option>본사</option>
-                            <option>지사</option>
-                            <option>지점</option>
-                            <option>스토어</option>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="companyDTO : ${companyList}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminStore" id="adminStore" class="form-select" disabled>
-                        </select>
-                    </div>
-                    <input hidden name="adminBrand" id="adminBrand" value="">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
-                <select class="form-select" id="adminCenterRank">
-                    <option value="exec">임원진</option>
-                    <option value="head">팀장</option>
-                    <option value="crew">사원</option>
-                </select>
-                <select class="form-select" id="adminBranchFacilityRank" hidden>
-                    <option value="gm">총괄 책임자</option>
-                    <option value="sv">관리자</option>
-                    <option value="agent">사원</option>
-                    <option value="partner">협력 업체</option>
-                </select>
-                <select class="form-select" id="adminStoreRank" hidden>
-                    <option value="mgr">매니저</option>
-                    <option value="submgr">부매니저</option>
-                    <option value="staff">매장 직원</option>
-                </select>
-
-                <input hidden name="adminRole" id="adminRole">
-
-            </div>
-
-
-            <div class="mb-3">
-                <label class="form-label">직책</label>
-                <input type="text" name="adminPosition" class="form-control">
-            </div>
-
-
-            <div class="mb-3">
-                <label class="form-label">입사일</label>
-                <input type="date" name="adminJoinDate" class="form-control">
-            </div>
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" onclick="submitForm(event)" class="btn btn-success">등록</button>
-                <button class="btn btn-danger">취소</button>
-            </div>
-        </div>
-
-
-
-    </form>
-
+        </form>
+    </div>
     <script>
         const adminChoice = document.getElementById("adminChoice");
         const adminCenter = document.getElementById("adminCenter");
