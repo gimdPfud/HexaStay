@@ -8,19 +8,14 @@ package com.sixthsense.hexastay.controller;
  * 작성일 : 2025-04-09
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
-import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
-import com.sixthsense.hexastay.service.RoomMenuCartService;
+import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
-import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -141,6 +137,7 @@ public class RoomMenuOrderController {
 
     @GetMapping("/roommenu/orderList")
     public String getOrderList(Principal principal, Model model) {
+        log.info("주문 리스트 페이지 컨트롤러 진입");
         if (principal == null) {
             return "redirect:/member/login"; // 로그인 안됐으면 로그인 페이지로
         }
@@ -153,8 +150,32 @@ public class RoomMenuOrderController {
         return "roommenu/orderList"; // templates/roommenu/orderList.html
     }
 
+    // 주문 취소
+    @PostMapping("/roommenu/deleteOrder")
+    public ResponseEntity<?> cancelOrder(@RequestParam Long orderNum, Principal principal) {
+        log.info("주문 취소 컨트롤러 post 진입");
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            String email = principal.getName();
+            roomMenuOrderService.cancelRoomMenuOrder(orderNum, email);
+
+            // 주문 취소 후 최신 주문 목록 반환
+            List<RoomMenuOrderDTO> updatedOrderList = roomMenuOrderService.getOrderListByEmail(email);
+
+            return ResponseEntity.ok(updatedOrderList);
+        } catch (IllegalStateException | EntityNotFoundException | AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 취소 중 오류 발생");
+        }
+    }
+
         @GetMapping("/roommenu/cashOrder")
         public String CashOrderPageGet() {
+        log.info("현금 결제 컨트롤러 진입");
 //            // 룸방번호
 //            model.addAttribute("roomName", roomName);
             return "roommenu/cashOrder";  // templates/cashOrder.html로 연결

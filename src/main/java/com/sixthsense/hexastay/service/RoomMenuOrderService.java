@@ -14,4 +14,8 @@ public interface RoomMenuOrderService {
 
     // 리스트
     public List<RoomMenuOrderDTO> getOrderListByEmail(String email);
+
+    // 주문취소
+    public void cancelRoomMenuOrder(Long orderNum, String email);
+
 }

@@ -78,6 +78,11 @@ public class RoomMenu extends BaseEntity {
 
     }
 
+    // 주문한 상태의 주문취소요청이 들어왔을 경우 수량을 차감하는 매소드
+    public void restoreRoomMenuStockNumber(Integer stockNumber) {
+        this.roomMenuAmount += stockNumber;
+    }
+
 
 
 }

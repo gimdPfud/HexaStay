@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
     <meta charset="UTF-8">
     <title>룸서비스 메뉴 수정</title>
@@ -23,6 +25,7 @@
     </style>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="container mt-4">
     <h1 class="mb-4">룸서비스 메뉴 수정</h1>
 
@@ -115,7 +118,9 @@
         </div>
     </div>
 </div>
+</div>
 </body>
+
 
 <script>
 
