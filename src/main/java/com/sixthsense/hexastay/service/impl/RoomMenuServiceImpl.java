@@ -210,6 +210,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
         try {
 
+            roomMenu.setRoomMenuName(roomMenuDTO.getRoomMenuName());
+            roomMenu.setRoomMenuPrice(roomMenuDTO.getRoomMenuPrice());
+            roomMenu.setRoomMenuAmount(roomMenuDTO.getRoomMenuAmount());
+            roomMenu.setRoomMenuCategory(roomMenuDTO.getRoomMenuCategory());
+            roomMenu.setRoomMenuStatus(roomMenuDTO.getRoomMenuStatus());
+            roomMenu.setRoomMenuContent(roomMenuDTO.getRoomMenuContent());
+
         MultipartFile newImageFile = roomMenuDTO.getRoomMenuImage();
         if (newImageFile != null && !newImageFile.isEmpty()) {
 
