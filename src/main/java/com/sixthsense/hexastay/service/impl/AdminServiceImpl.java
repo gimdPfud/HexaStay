@@ -4,10 +4,12 @@ import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.AdminService;
+import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+
 @Builder
 @RequiredArgsConstructor
 @Service
@@ -35,7 +38,6 @@ public class AdminServiceImpl implements AdminService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final PasswordEncoder passwordEncoder;
     private final CompanyRepository companyRepository;
-
 
     // 가입
     @Override
@@ -62,12 +64,12 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = modelMapper.map(adminDTO, Admin.class);
 
 
-        if (adminDTO.getCompanyNum().describeConstable().isPresent()) {
-            Company company = companyRepository.findById(adminDTO.getCompanyNum()).orElseThrow(NoSuchElementException::new);
-            admin.setCompany(company);
-        } else if (adminDTO.getStoreNum().describeConstable().isPresent()){
-            Store store = storeRepository.findById(adminDTO.getStoreNum()).orElseThrow(NoSuchElementException::new);
-            admin.setStore(store);
+        log.info("컴퍼니넘 : " + adminDTO.getCompanyNum());
+        log.info("스토어넘 : " + adminDTO.getStoreNum());
+        if (adminDTO.getCompanyNum() != null) {
+            admin.getCompany().setCompanyNum(adminDTO.getCompanyNum());
+        } else if (adminDTO.getStoreNum() != null) {
+            admin.getStore().setStoreNum(adminDTO.getStoreNum());
         }
 
         adminRepository.save(admin);
