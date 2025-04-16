@@ -20,30 +20,6 @@
             padding: 10px; /* 내부 여백 설정 */
         }
 
-        /* Header: 상단 메뉴 */
-        .header {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 50px;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 10px;
-        }
-
-        .back-icon {
-            position: absolute;
-            left: 10px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .page-title {
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
-
         /* 검색창 */
         .search-container {
             display: none;
@@ -87,36 +63,6 @@
             font-size: 14px;
             border-radius: 5px;
         }
-        .tab:hover {
-            background-color: #007bff; /* 호버시 배경색 변경 */
-            color: white;
-        }
-        .tab.active {
-            font-weight: bold;
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* 음식 목록 */
-        .food-list { list-style: none; padding: 10px; }
-        .food-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            position: relative; /* 상대 위치로 "추가" 버튼 배치 */
-        }
-        .food-item img {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            margin-right: 10px; /* 이미지와 텍스트 사이에 간격 추가 */
-        }
-        .food-info {
-            flex-grow: 1; /* 남는 공간을 채우도록 설정 */
-        }
-        .food-info p { margin: 2px 0; }
-        .price { font-weight: bold; } /* 가격 강조 */
 
         /* 검색 박스 스타일 */
         .search-box {
@@ -144,7 +90,6 @@
             box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* 포커스시 그림자 */
         }
 
-        /* 옵션들 스타일링 */
         .form-select option {
             padding: 10px;
             font-size: 16px;
@@ -204,23 +149,6 @@
             border-color: #fdd835; /* 호버 시 테두리 색상 */
         }
 
-        .food-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-
-        .food-info {
-            flex-grow: 1;
-        }
-
-        /*좋아요*/
-        .like-section {
-            display: flex;
-            align-items: center;
-            justify-content: start;
-        }
 
         .add-to-cart-btn {
             background-color: #ffeb3b;
@@ -234,6 +162,134 @@
             margin-top: 20px;
         }
 
+        /* 공통 스타일 */
+        .card-list {
+            list-style: none;
+            padding: 0;
+            display: grid; /* 그리드 레이아웃 사용 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
+            gap: 20px; /* 카드 사이 간격 */
+        }
+
+        .div-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* 카드 높이 유동적으로 */
+        }
+
+        .food-item {
+            padding: 0; /* food-item의 기본 패딩 제거 */
+            border-bottom: none; /* food-item의 하단 테두리 제거 */
+            margin-bottom: 0; /* food-item의 하단 마진 제거 */
+        }
+
+        .category-wrapper {
+            padding: 15px;
+            text-align: left;
+        }
+
+        /* 카테고리 텍스트 스타일 (기존 스타일 유지) */
+        .category-label {
+            display: inline-block;
+            background-color: #f1fdf1;
+            color: #333;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: clamp(12px, 1.2vw, 18px);
+            margin: 0; /* category-wrapper에 의해 여백 처리 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .category-label:hover {
+            background-color: #ffeb3b;
+            color: #000;
+            border-color: #fdd835;
+        }
+
+        .inner-wrapper {
+            padding: 15px;
+        }
+
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .text-info {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-right: 10px;
+        }
+
+        .text-info .menu-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: black;
+        }
+
+        .menu-content {
+            color: black;
+        }
+
+        .price-box{
+            color: black;
+        }
+
+        .image-like-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .menu-image {
+            width: 150px; /* 가로 크기 변경 */
+            height: 150px; /* 세로 크기 변경 */
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .like-section {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            padding: 0 15px 15px 15px; /* 하단 좋아요 섹션 패딩 */
+        }
+
+        .like-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            color: gray;
+        }
+
+        .like-count {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px; /* 버튼 상단 마진 조정 */
+        }
+
         .add-to-cart-btn:hover {
             background-color: #fdd835;
         }
@@ -242,28 +298,26 @@
             background-color: #ff5c5c;
             color: white;
             padding: 4px 10px;
-            border-radius: 4px; /* 더 네모나게 */
+            border-radius: 4px;
             margin-left: 8px;
             font-weight: bold;
-            font-size: 1.2em; /* 숫자 크게 */
+            font-size: 1.2em;
         }
 
-        .back-icon{
-            justify-content: start;
+        a {
+            color: #333; /* 진회색 - 검정에 가까움 */
+            text-decoration: none; /* 밑줄 제거 */
         }
+
+
+
+
     </style>
 </head>
 <body>
 <div layout:fragment="contentorder">
 
     <div class="container">
-<!--        <div class="container">-->
-<!--            &lt;!&ndash; 헤더: 메뉴와 장바구니 아이콘 &ndash;&gt;-->
-<!--            <div class="header">-->
-<!--                <div class="back-icon" onclick="window.location.href='http://localhost:8090/main'">←</div>-->
-<!--                <div class="page-title">목록페이지</div>-->
-<!--            </div>-->
-<!--        </div>-->
 
         <!-- 검색창 (항상 표시되도록 설정) -->
         <div id="search-container" class="search-container">
@@ -289,45 +343,42 @@
             <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
         </div>
 
+
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
-        <ul class="food-list">
+        <ul class="food-list card-list">
             <li th:each="roomMenuDTO : ${list}" class="food-item">
-                <!-- 메뉴 이미지 -->
-                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                     style="width: 135px; height: 125px;">
-
-                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     style="width: 60px; height: 80px;">
-                <!-- 메뉴 이미지 끝 -->
-                <div class="food-info row">
-                    <div class="col-8">
-                        <p th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></p><br> <!-- 카테고리 -->
-                        <p>
-                            <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                               th:text="${roomMenuDTO.roomMenuName}"> <!-- 메뉴 이름 -->
-                            </a><br>
-                        </p>
-                        <p class="price" th:text="${roomMenuDTO.roomMenuPrice + '원'}"></p> <!-- 가격 --><br>
+                <div class="div-card">
+                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                       style="text-decoration: none; color: inherit; display: block; width: 100%;">
+                        <div class="inner-wrapper">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="text-info">
+                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                    <div class="price-box">
+                                        <span th:text="${roomMenuDTO.roomMenuPrice + '원'}" class="price-text"></span>
+                                    </div>
+                                </div>
+                                <div class="image-like-container">
+                                    <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                                         th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                         class="menu-image">
+                                    <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                                         th:src="@{/profile/default.png}"
+                                         class="menu-image">
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="like-section">
+                        <div class="category-wrapper">
+                            <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
+                        </div>
+                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                      th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                      class="like-icon">🤍</span>
+                        <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                     </div>
-                </div>
-
-                <!-- 좋아요, 싫어요 영역 -->
-                <div class="like-section">
-                    <!-- 좋아요 아이콘 -->
-                    <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                          th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                          style="font-size: 2rem; cursor: pointer; color: gray;">🤍</span>
-                    <!-- 좋아요 수 -->
-                    <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>
-
-                    <!--                &lt;!&ndash; 싫어요 아이콘 &ndash;&gt;-->
-                    <!--                <span th:id="'dislikeIcon-' + ${roomMenuDTO.roomMenuNum}"-->
-                    <!--                      th:onclick="'toggleDislike(' + ${roomMenuDTO.roomMenuNum} + ')'"-->
-                    <!--                      style="font-size: 2rem; cursor: pointer; color: gray;">👎</span>-->
-                    <!--                &lt;!&ndash; 싫어요 수 &ndash;&gt;-->
-                    <!--                <span th:id="'dislikeCount-' + ${roomMenuDTO.roomMenuNum}">0</span>-->
                 </div>
             </li>
         </ul>

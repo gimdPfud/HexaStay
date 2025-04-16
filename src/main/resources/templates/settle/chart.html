@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>재무 정산 차트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .form-select {
+            max-width: 200px;
+            margin-right: 15px;
+        }
+
+        .download-btn {
+            float: right;
+        }
+
+        table {
+            font-size: 0.9rem;
+        }
+
+        canvas {
+            background-color: #fff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container mt-5">
+
+    <h2 class="mb-4 fw-bold text-primary">재무 정산 차트</h2>
+
+    <!-- 🔽 선택 필터 -->
+    <div class="d-flex flex-wrap align-items-center mb-4">
+        <select class="form-select" id="hqSelect">
+            <option selected>본사 선택</option>
+            <option>서울본사</option>
+            <option>부산본사</option>
+        </select>
+        <select class="form-select" id="branchSelect">
+            <option selected>지사 선택</option>
+            <option>중부지사</option>
+            <option>남부지사</option>
+        </select>
+        <select class="form-select" id="officeSelect">
+            <option selected>지점 선택</option>
+            <option>강남지점</option>
+            <option>대구지점</option>
+        </select>
+        <select class="form-select" id="storeSelect">
+            <option selected>스토어 선택</option>
+            <option>스토어 A</option>
+            <option>스토어 B</option>
+        </select>
+        <button class="btn btn-success download-btn">엑셀로 다운로드</button>
+    </div>
+
+    <!-- 📊 테이블 & 차트 -->
+    <div class="chart-section">
+
+        <!-- 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="table-primary">
+                <tr>
+                    <th>날짜</th>
+                    <th>매출 금액</th>
+                    <th>수수료율</th>
+                    <th>수수료</th>
+                    <th>공제 금액</th>
+                    <th>최종 정산 금액</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>2025-04-01</td>
+                    <td>₩1,200,000</td>
+                    <td>5%</td>
+                    <td>₩60,000</td>
+                    <td>₩10,000</td>
+                    <td>₩1,130,000</td>
+                </tr>
+                <tr>
+                    <td>2025-04-02</td>
+                    <td>₩950,000</td>
+                    <td>5%</td>
+                    <td>₩47,500</td>
+                    <td>₩10,000</td>
+                    <td>₩892,500</td>
+                </tr>
+                <tr>
+                    <td>2025-04-03</td>
+                    <td>₩800,000</td>
+                    <td>5%</td>
+                    <td>₩40,000</td>
+                    <td>₩10,000</td>
+                    <td>₩750,000</td>
+                </tr>
+                <tr>
+                    <td>2025-04-04</td>
+                    <td>₩1,500,000</td>
+                    <td>5%</td>
+                    <td>₩75,000</td>
+                    <td>₩10,000</td>
+                    <td>₩1,415,000</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 📊 차트들 -->
+        <div class="row mt-5">
+            <div class="col-lg-8 mb-4">
+                <h5 class="mb-3">매출 & 정산 추이</h5>
+                <canvas id="mixedChart" height="260"></canvas>
+            </div>
+            <div class="col-lg-4">
+                <h5 class="mb-3">정산 비율 분석</h5>
+                <canvas id="donutChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js 스크립트 -->
+<script>
+    // 혼합형 차트 (매출 + 정산액)
+    const mixedCtx = document.getElementById('mixedChart').getContext('2d');
+    new Chart(mixedCtx, {
+        type: 'bar',
+        data: {
+            labels: ['4/1', '4/2', '4/3', '4/4'],
+            datasets: [
+                {
+                    type: 'bar',
+                    label: '매출 금액',
+                    data: [1200000, 950000, 800000, 1500000],
+                    backgroundColor: '#0d6efd'
+                },
+                {
+                    type: 'line',
+                    label: '최종 정산 금액',
+                    data: [1130000, 892500, 750000, 1415000],
+                    borderColor: '#198754',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointBackgroundColor: '#198754'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ₩${context.raw.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: val => '₩' + val.toLocaleString()
+                    }
+                }
+            }
+        }
+    });
+
+    // 도넛 차트 (정산 비율 분석)
+    const donutCtx = document.getElementById('donutChart').getContext('2d');
+    new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['수수료 합계', '공제 금액 합계', '정산액 합계'],
+            datasets: [{
+                data: [222500, 40000, 4197500],
+                backgroundColor: ['#ffc107', '#dc3545', '#198754']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ₩${context.raw.toLocaleString()}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

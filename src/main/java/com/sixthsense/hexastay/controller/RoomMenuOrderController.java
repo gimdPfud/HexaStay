@@ -152,7 +152,7 @@ public class RoomMenuOrderController {
 
     // 주문 취소
     @PostMapping("/roommenu/deleteOrder")
-    public ResponseEntity<?> cancelOrder(@RequestParam Long orderNum, Principal principal) {
+    public ResponseEntity<String> cancelOrder(@RequestParam Long orderNum, Principal principal) {
         log.info("주문 취소 컨트롤러 post 진입");
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -161,11 +161,7 @@ public class RoomMenuOrderController {
         try {
             String email = principal.getName();
             roomMenuOrderService.cancelRoomMenuOrder(orderNum, email);
-
-            // 주문 취소 후 최신 주문 목록 반환
-            List<RoomMenuOrderDTO> updatedOrderList = roomMenuOrderService.getOrderListByEmail(email);
-
-            return ResponseEntity.ok(updatedOrderList);
+            return ResponseEntity.ok("주문이 성공적으로 취소되었습니다.");
         } catch (IllegalStateException | EntityNotFoundException | AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

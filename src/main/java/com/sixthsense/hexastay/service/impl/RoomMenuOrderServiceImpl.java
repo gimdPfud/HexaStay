@@ -206,8 +206,9 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
 
         roomMenuOrderRepository.save(order);
+        log.info("주문취소 :: 삭제완료");
 
-         // 취소된 주문 삭제 (필요한 경우)
-         roomMenuOrderRepository.delete(order);  // 필요 시 전체 삭제
+//         // 취소된 주문 삭제 (필요한 경우)
+//         roomMenuOrderRepository.delete(order);  // 필요 시 전체 삭제
     }
 }

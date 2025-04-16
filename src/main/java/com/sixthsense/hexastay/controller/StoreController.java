@@ -19,14 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,27 +47,26 @@ public class StoreController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        log.info(adminDTO);
+//        log.info(adminDTO);
 
-        // 소속된 회사 없음
-        if (adminDTO.getCompanyNum() == null) {
-            if (adminDTO.getStoreNum() != null) {
-                log.info("어드민이지만 회사 소속 아님. 대신 스토어 소속: {}", adminDTO.getStoreNum());
-                return "redirect:/admin/store/read?idid=" + adminDTO.getStoreNum();
-            } else {
-                log.warn("회사도 스토어도 소속 안 된 어드민 접근: {}", adminDTO.getAdminEmail());
-                return "redirect:/admin/logout";
-            }
-        }
+//        // 소속된 회사 없음
+//        if (adminDTO.getCompanyNum() == null) {
+//            if (adminDTO.getStoreNum() != null) {
+//                log.info("어드민이지만 회사 소속 아님. 대신 스토어 소속: {}", adminDTO.getStoreNum());
+//                return "redirect:/admin/store/read?idid=" + adminDTO.getStoreNum();
+//            } else {
+//                log.warn("회사도 스토어도 소속 안 된 어드민 접근: {}", adminDTO.getAdminEmail());
+//                return "redirect:/admin/logout";
+//            }
+//        }
 
-        // 정상적인 호텔 소속 어드민
-        CompanyDTO companyDTO = companyService.companyRead(adminDTO.getCompanyNum());
-        model.addAttribute("data", companyDTO);
+//         정상적인 호텔 소속 어드민
+//        CompanyDTO companyDTO = companyService.companyRead(adminDTO.getCompanyNum());
+//        model.addAttribute("data", companyDTO);
         return "store/insert";
     }
 
@@ -80,8 +78,37 @@ public class StoreController {
     }
 
 
-    @GetMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
-    public String list(Model model, Principal principal, Pageable pageable){
+    @GetMapping("/list")
+    public String list(Pageable pageable, Model model,
+                       @RequestParam(required = false) String searchType,
+                       @RequestParam(required = false) String chosenCompany,
+                       @RequestParam(required = false) String keyword){
+        Page<StoreDTO> list = storeService.list(pageable);
+        model.addAttribute("list",list);
+        /*친구찬스*/
+        Map<Long, String> uniqueCompanies = list.stream()
+                .collect(Collectors.toMap(
+                        StoreDTO::getCompanyNum,
+                        StoreDTO::getCompanyName,
+                        (existing, replacement) -> existing, // 중복 키 무시
+                        LinkedHashMap::new
+                ));
+        model.addAttribute("companyMap", uniqueCompanies);
+        /*친구찬스끝*/
+        model.addAttribute("searchType",searchType);
+        model.addAttribute("chosenCompany",chosenCompany);
+        model.addAttribute("keyword",keyword);
+        return "store/list";
+    }
+    @PostMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
+    public String list(Model model, Principal principal, Pageable pageable,
+                       @RequestParam(required = false) String searchType,
+                       @RequestParam(required = false) String chosenCompany,
+                       @RequestParam(required = false) String keyword){
+//        log.info("searchType : " + searchType);
+//        log.info("chosenCompany : " + chosenCompany);
+//        log.info("keyword : " + keyword);
+//        log.info("pageable : " + pageable.toString());
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -89,20 +116,37 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        log.info(adminDTO);
-
         // 소속된 회사 없음
-        if (adminDTO.getCompanyNum() == null) {
-            if (adminDTO.getStoreNum() != null) {
-                log.info("어드민이지만 회사 소속 아님. 대신 스토어 소속: {}", adminDTO.getStoreNum());
-                return "redirect:/admin/store/read?idid=" + adminDTO.getStoreNum();
-            } else {
-                log.warn("회사도 스토어도 소속 안 된 어드민 접근: {}", adminDTO.getAdminEmail());
-                return "redirect:/admin/logout";
-            }
+//        if (adminDTO.getCompanyNum() == null) {
+//            if (adminDTO.getStoreNum() != null) {
+//                log.info("어드민이지만 회사 소속 아님. 대신 스토어 소속: {}", adminDTO.getStoreNum());
+//                return "redirect:/admin/store/read?idid=" + adminDTO.getStoreNum();
+//            } else {
+//                log.warn("회사도 스토어도 소속 안 된 어드민 접근: {}", adminDTO.getAdminEmail());
+//                return "redirect:/admin/logout";
+//            }
+//        }
+        Long companyNum = 0L;
+        if(chosenCompany!=null && !chosenCompany.trim().isEmpty() && !chosenCompany.equals("호텔목록")){
+            companyNum = Long.valueOf(chosenCompany);
         }
-        Page<StoreDTO> list = storeService.list(adminDTO.getCompanyNum(), pageable);
+//        log.info(companyNum);
+        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
+//        list.forEach(log::info);
         model.addAttribute("list",list);
+        model.addAttribute("chosenCompany",companyNum);
+        /*친구찬스*/
+        Map<Long, String> uniqueCompanies = list.stream()
+                .collect(Collectors.toMap(
+                        StoreDTO::getCompanyNum,
+                        StoreDTO::getCompanyName,
+                        (existing, replacement) -> existing, // 중복 키 무시
+                        LinkedHashMap::new
+                ));
+        model.addAttribute("companyMap", uniqueCompanies);
+        /*친구찬스끝*/
+        model.addAttribute("searchType",searchType);
+        model.addAttribute("keyword",keyword);
         return "store/list";
     }
 

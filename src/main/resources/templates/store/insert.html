@@ -28,8 +28,10 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">제공할 호텔</label>
-                <input type="hidden" class="form-control" name="companyNum" th:value="${data.companyNum}" required>
-                <input type="text" class="form-control" th:value="${data.companyName}" readonly disabled>
+                <select class="form-select" name="companyNum">
+                    <option>호텔목록</option>
+                    <option th:each="data:${companyMap}" th:unless="${companyMap == null or #maps.isEmpty(companyMap)}" th:selected="${chosenCompany == data.key}" th:value="${data.key}" th:text="${data.value}"></option>
+                </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">외부 업체 이름</label>

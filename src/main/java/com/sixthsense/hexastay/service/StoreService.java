@@ -34,6 +34,7 @@ public interface StoreService {
     public Page<StoreDTO> list(Pageable pageable);
     public List<StoreDTO> list(Long companyNum);
     public Page<StoreDTO> list(Long companyNum, Pageable pageable);
+    public Page<StoreDTO> searchlist(Long companyNum, String searchType ,String keyword, Pageable pageable);
 
     /*todo 목록인데 리뷰가 있는 목록. 근데 리뷰별점을 넣을지말지 고민중...*/
     public Page<StoreDTO> clientlist(Pageable pageable);

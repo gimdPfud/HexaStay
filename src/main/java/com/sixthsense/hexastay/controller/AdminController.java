@@ -95,6 +95,8 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(AdminDTO adminDTO) throws IOException {
+        log.info("컨트 컴퍼니넘" + adminDTO.getCompanyNum());
+        log.info("컨트 스토어넘" + adminDTO.getStoreNum());
         adminDTO.setAdminActive("PENDING");
         adminService.insertAdmin(adminDTO);
         return "redirect:/admin/list";
