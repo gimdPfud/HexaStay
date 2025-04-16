@@ -14,20 +14,16 @@
             align-items: center;
             justify-content: center;
         }
-        h4 {
-            margin: 10px 0;
-        }
 
         h5 {
             color: #1f1a35;
             text-transform: uppercase;
-            margin: 10px 0;
+            font-size: 18px;
         }
 
         p {
             font-size: 14px;
             color: #1f1a35;
-            line-height: 20px;
         }
         .container {
             width: 350px;
@@ -45,6 +41,13 @@
             border-radius: 50%;
             border: 1px solid #000;
         }
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; /* 요소 간 간격 */
+        }
+
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -54,16 +57,16 @@
         <div class="mt-3">
             <img th:if="${#authentication.principal.adminProfileMeta != null}"
                  th:src="@{${#authentication.principal.adminProfileMeta}}"
-                 style="width: 60px; height: 80px;" alt="관리자 프로필 이미지">
+                 style="width: 140px; height: 140px;" alt="관리자 프로필 이미지">
 
             <img th:unless="${#authentication.principal.adminProfileMeta != null}"
                  th:src="@{/profile/default.png}"
-                 style="width: 60px; height: 80px;" alt="기본 프로필 이미지">
+                 style="width: 180px; height: auto;" alt="기본 프로필 이미지">
         </div>
-        <h5><p th:text="${#authentication.principal.admin.adminName}">이름</p></h5>
-        <h4><p th:text="${#authentication.principal.admin.adminPosition}">직책</p></h4>
+        <h5 th:text="${#authentication.principal.admin.adminName}">이름</h5>
+        <h6 th:text="${#authentication.principal.admin.adminPosition}">직책</h6>
         <p th:text="${#authentication.principal.admin.adminRole}">직급</p>
-        <p th:text="${#authentication.principal.admin.adminEmail}">이메일</p>
+        <p style="display: inline">E: <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span></p>
     </div>
 </div>
 
