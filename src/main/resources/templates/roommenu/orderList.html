@@ -33,7 +33,8 @@
                         <strong>수량:</strong> <span th:text="${item.roomMenuOrderItemAmount}"></span>
                     </div>
                     <div class="col-6 col-md-3 mb-2">
-                        <strong>가격:</strong> ₩<span th:text="${item.roomMenuOrderItemPrice}"></span>
+                        <strong>총 가격:</strong>
+                        ₩<span th:text="${item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount}"></span>
                     </div>
                 </div>
             </li>

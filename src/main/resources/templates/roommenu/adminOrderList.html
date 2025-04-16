@@ -40,7 +40,8 @@
                     <li th:each="item : ${order.orderItemList}">
                         <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
                         <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
-                        <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원
+                        <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
+                        <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원 (합계)
                         <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
                     </li>
                 </ul>
@@ -57,7 +58,6 @@
 </form>
 
 <script>
-
     function handleConfirm() {
         const checkedOrders = [];
 
@@ -95,7 +95,6 @@
             alert("요청 실패: " + error);
         });
     }
-
 </script>
 </body>
 </html>
