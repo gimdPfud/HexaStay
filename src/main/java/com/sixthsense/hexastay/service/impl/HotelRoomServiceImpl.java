@@ -173,15 +173,41 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
         hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
 
-        // QR 코드 경로 생성
-        String qrCodePath = "/qr/" + hotelRoomDTO.getHotelRoomNum() + ".png";  // 예: /qr/14.png
+        try {
 
-        // QR 코드 생성 및 저장
-        String qrContent = "/hotel/room/details/" + hotelRoomDTO.getHotelRoomNum();  // QR 코드에 포함할 URL
-        qrCodeServiceimpl.generateQrCodeToFile(qrContent, qrCodePath);  // QR 코드 파일 생성
+            // QR 코드 생성용 URL 또는 고유 문자열
+            String qrText = "HotelRoom:" + hotelRoom.getHotelRoomName(); // 또는 고유 ID 등
 
-        // QR 코드 경로를 호텔룸 DTO에 설정
-        hotelRoomDTO.setHotelRoomQr(qrCodePath);
+            // QR 코드 이미지 생성
+            String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qr/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");// 절대 경로
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+
+            log.info(fileName + " 파일 네임 경로 까지는 들어 와 지니 ??????");
+
+
+            // QR 코드 생성
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 200, 200);
+            Path path = uploadPath;
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+
+            log.info(path + "파일 생성은 되고 있는 거냐 있냐고 ~~~~~~~");
+
+
+
+            // DB에 저장할 상대 경로
+            hotelRoom.setHotelRoomQr(fileName);
+
+            // 저장
+            hotelRoomRepository.save(hotelRoom);
+
+        } catch (Exception e) {
+            throw new RuntimeException("호텔 룸 등록 중 오류 발생: " + e.getMessage());
+        }
 
 
 

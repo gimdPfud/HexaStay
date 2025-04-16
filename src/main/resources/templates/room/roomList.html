@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}"
+>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,116 +43,122 @@
 
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Room 배정 목록</h2>
+<div layout:fragment="content" class="container mt-4"><!--레이아웃 fragment 시작점-->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Room 배정 목록</h2>
 
-    <!-- 검색 폼 -->
-    <form class="row mb-4" th:action="@{/roomlist}" method="get">
-        <div class="col-md-4">
-            <input type="text" name="keyword" class="form-control" placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+        <!-- 검색 폼 -->
+        <form class="row mb-4" th:action="@{/roomlist}" method="get">
+            <div class="col-md-4">
+                <input type="text" name="keyword" class="form-control" placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a th:href="@{/roomlist}" class="btn btn-secondary w-100">
+                    <i class="bi bi-x-circle"></i> 초기화
+                </a>
+            </div>
+        </form>
+
+        <!-- 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center">
+                <thead class="table-dark">
+                <tr>
+                    <th>번호</th>
+                    <th>호텔룸_이름</th>
+                    <th>회원_이름</th>
+                    <th>회원 이메일</th>
+                    <th>호텔룸TEL</th>
+                    <th>체크인</th>
+                    <th>체크아웃</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="room : ${rooms.content}">
+                    <td th:text="${room.roomNum}"></td>
+                    <!-- 호텔룸 이름 -->
+                    <td>
+                        <a href="javascript:void(0);"
+                           onclick="openMemberPopup(this)"
+                           class="hover-link-primary fw-semibold"
+                           th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
+                           th:text="${room.hotelRoomName}"></a>
+                    </td>
+
+                    <!-- 회원 이름 -->
+                    <td>
+                        <a href="javascript:void(0);"
+                           onclick="openMemberPopupByMember(this)"
+                           class="hover-link-dark fw-semibold"
+                           th:attr="data-memberNum=${room.memberNum}"
+                           th:text="${room.memberName}"></a>
+                    </td>
+                    <td th:text="${room.memberEmail}"></td>
+                    <td th:text="${room.hotelRoomPhone}"></td>
+                    <td th:text="${room.checkInDate}"></td>   <!-- ✅ 여기 추가 -->
+                    <td th:text="${room.checkOutDate}"></td>
+
+                </tr>
+                <tr th:if="${#lists.isEmpty(rooms.content)}">
+                    <td colspan="6" class="text-center text-muted">검색 결과가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="bi bi-search"></i> 검색
-            </button>
+
+        <!-- 페이지네이션 -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <span th:text="'현재 페이지: ' + (${rooms.number + 1}) + ' / ' + (${rooms.totalPages})"></span>
+            </div>
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roomlist(page=${rooms.number - 1}, keyword=${keyword})}">이전</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
+                        class="page-item" th:classappend="${rooms.number == i} ? 'active'">
+                        <a class="page-link" th:href="@{/roomlist(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roomlist(page=${rooms.number + 1}, keyword=${keyword})}">다음</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <div class="col-md-2">
-            <a th:href="@{/roomlist}" class="btn btn-secondary w-100">
-                <i class="bi bi-x-circle"></i> 초기화
-            </a>
+
+        <!-- 하단 버튼 -->
+        <div class="d-flex justify-content-center mt-4 gap-3">
+            <a th:href="@{/register-hotelroom}" class="btn btn-dark btn-lg">HotelRoomPk_룸배정</a>
+            <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">MemberPk_룸배정</a>
         </div>
-    </form>
 
-    <!-- 테이블 -->
-    <div class="table-responsive">
-        <table class="table table-hover align-middle text-center">
-            <thead class="table-dark">
-            <tr>
-                <th>번호</th>
-                <th>호텔룸_이름</th>
-                <th>회원_이름</th>
-                <th>회원 이메일</th>
-                <th>호텔룸TEL</th>
-                <th>체크인</th>
-                <th>체크아웃</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="room : ${rooms.content}">
-                <td th:text="${room.roomNum}"></td>
-                <!-- 호텔룸 이름 -->
-                <td>
-                    <a href="javascript:void(0);"
-                       onclick="openMemberPopup(this)"
-                       class="hover-link-primary fw-semibold"
-                       th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
-                       th:text="${room.hotelRoomName}"></a>
-                </td>
+        <!-- 팝업 스크립트 -->
+        <script th:inline="javascript">
+            function openMemberPopup(element) {
+                const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+                if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
+                const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
+                window.open(popupUrl, "room/membersByHotelRoom", "width=600,height=500,scrollbars=yes,resizable=yes");
+            }
 
-                <!-- 회원 이름 -->
-                <td>
-                    <a href="javascript:void(0);"
-                       onclick="openMemberPopupByMember(this)"
-                       class="hover-link-dark fw-semibold"
-                       th:attr="data-memberNum=${room.memberNum}"
-                       th:text="${room.memberName}"></a>
-                </td>
-                <td th:text="${room.memberEmail}"></td>
-                <td th:text="${room.hotelRoomPhone}"></td>
-                <td th:text="${room.checkInDate}"></td>   <!-- ✅ 여기 추가 -->
-                <td th:text="${room.checkOutDate}"></td>
-
-            </tr>
-            <tr th:if="${#lists.isEmpty(rooms.content)}">
-                <td colspan="6" class="text-center text-muted">검색 결과가 없습니다.</td>
-            </tr>
-            </tbody>
-        </table>
+            function openMemberPopupByMember(element) {
+                const memberNum = element.getAttribute("data-memberNum");
+                if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+                const popupUrl = "/hotelRoomsByMember/" + memberNum;
+                window.open(popupUrl, "room/hotelRoomsByMember", "width=600,height=500,scrollbars=yes,resizable=yes");
+            }
+        </script>
     </div>
 
-    <!-- 페이지네이션 -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <div>
-            <span th:text="'현재 페이지: ' + (${rooms.number + 1}) + ' / ' + (${rooms.totalPages})"></span>
-        </div>
-        <nav>
-            <ul class="pagination mb-0">
-                <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number - 1}, keyword=${keyword})}">이전</a>
-                </li>
-                <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
-                    class="page-item" th:classappend="${rooms.number == i} ? 'active'">
-                    <a class="page-link" th:href="@{/roomlist(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
-                </li>
-                <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number + 1}, keyword=${keyword})}">다음</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+</div><!--레이아웃 fragment 끝점 -->
 
-    <!-- 하단 버튼 -->
-    <div class="d-flex justify-content-center mt-4 gap-3">
-        <a th:href="@{/register-hotelroom}" class="btn btn-dark btn-lg">HotelRoomPk_룸배정</a>
-        <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">MemberPk_룸배정</a>
-    </div>
 
-    <!-- 팝업 스크립트 -->
-    <script th:inline="javascript">
-        function openMemberPopup(element) {
-            const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
-            if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
-            const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
-            window.open(popupUrl, "room/membersByHotelRoom", "width=600,height=500,scrollbars=yes,resizable=yes");
-        }
 
-        function openMemberPopupByMember(element) {
-            const memberNum = element.getAttribute("data-memberNum");
-            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
-            const popupUrl = "/hotelRoomsByMember/" + memberNum;
-            window.open(popupUrl, "room/hotelRoomsByMember", "width=600,height=500,scrollbars=yes,resizable=yes");
-        }
-    </script>
-</div>
 </body>
 </html>

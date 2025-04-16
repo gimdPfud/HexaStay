@@ -17,6 +17,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -113,11 +118,23 @@ public class HotelRoomController {
 
     @GetMapping("list")
     public String hotelRoomList(Model model,Principal principal,
-                                HotelRoomDTO hotelRoomDTO) {
+                                HotelRoomDTO hotelRoomDTO,
+          @PageableDefault(page = 1, size = 10, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
+
+    )
+    {
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
 
+        Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList( pageable);
+
         model.addAttribute("companylist", hotelRoomService.listCompany(adminDTO.getCompanyNum()));
+        model.addAttribute("hotelRoomList", hotelRoomList);
+
+
+        // 혹시 페이징 처리된 호텔 룸 리스트도 넘기고 싶다면 아래처럼:
+        // Page<HotelRoomDTO> hotelRoomList = hotelRoomService.getHotelRooms(adminDTO.getCompanyNum(), pageable);
+        // model.addAttribute("hotelRoomList", hotelRoomList);
 
 
         return "hotelroom/list";
