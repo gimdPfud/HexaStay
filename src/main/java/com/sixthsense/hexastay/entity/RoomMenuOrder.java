@@ -24,6 +24,7 @@ public class RoomMenuOrder extends BaseEntity {
     @Column(name = "roomMenuOrderNum")
     private Long roomMenuOrderNum;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member")  // 외래키 컬럼도 명확하게
     private Member member;

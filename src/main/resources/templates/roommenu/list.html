@@ -102,6 +102,7 @@
     <div layout:fragment="content">
         <div class="container p-4 rounded w-100 h-100" >
             <h1 class="page-title">룸서비스 메뉴 목록</h1>
+            <a href="/roommenu/adminOrderList" class="btn btn-primary btn-custom" >관리자 알람 페이지로 </a>
                     <!-- 검색창 시작 -->
             <form th:action="@{/roommenu/list}" class="row g-2 mb-4 justify-content-center" method="get">
                 <!-- 검색창 시작 -->
@@ -114,7 +115,7 @@
                         <option value="C" th:selected="${type == 'C'}">카테고리 선택</option> <!-- 카테고리 선택 -->
                     </select>
                                 <!-- 카테고리 선택 -->
-                    <select id="category-select" name="category" class="form-select" disabled>
+                    <select id="category-select" name="category" class="form-select">
                         <option value="">카테고리 선택</option>
                         <option value="한식" th:selected="${category == '한식'}">한식</option>
                         <option value="양식" th:selected="${category == '양식'}">양식</option>
@@ -132,10 +133,11 @@
                         <a href="/roommenu/orderpage" class="btn btn-primary btn-custom" >고객용 </a>
                     </div>
                 </div>
+                <p> * 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
             </form> <!-- 검색창 끝 -->
             <!-- 메뉴 목록 테이블 -->
             <div class="table-responsive">
-                <table class="table table-bordered ">
+                <table class="table table-bordered">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -194,31 +196,31 @@
             </nav>
         </div>
     </div>
-</body>
-
     <script>
-    /*카테고리 드롭다운 활성화*/
+        /*카테고리 드롭다운 활성화*/
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchOptionSelect = document.getElementById("search-option");
-        const categorySelect = document.getElementById("category-select");
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchOptionSelect = document.getElementById("search-option");
+            const categorySelect = document.getElementById("category-select");
 
-        // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
-        searchOptionSelect.addEventListener("change", function() {
+            // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
+            searchOptionSelect.addEventListener("change", function() {
+                if (searchOptionSelect.value === "C") {
+                    categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
+                } else {
+                    categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
+                    categorySelect.value = "";  // 카테고리 선택 초기화
+                }
+            });
+
+            // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
             if (searchOptionSelect.value === "C") {
-                categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
-            } else {
-                categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
-                categorySelect.value = "";  // 카테고리 선택 초기화
+                categorySelect.disabled = false;
             }
         });
+    </script>
+</body>
 
-        // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
-        if (searchOptionSelect.value === "C") {
-            categorySelect.disabled = false;
-        }
-    });
-</script>
 
 
 </html>
