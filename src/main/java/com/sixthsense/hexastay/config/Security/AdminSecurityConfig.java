@@ -40,7 +40,8 @@ import org.springframework.security.web.SecurityFilterChain;
                     .securityMatcher("/admin/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**",
-                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/settle")
+                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/settle",
+                            "/toss/**", "/js/**", "/qr/**")
 
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)
