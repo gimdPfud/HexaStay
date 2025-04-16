@@ -153,6 +153,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     @Override
     public List<RoomMenuOrderDTO> getOrderListByEmail(String email) {
+        log.info("주문 리스트 서비스 진입 : " + email);
         Member member = memberRepository.findByMemberEmail(email);
         List<RoomMenuOrder> orders = roomMenuOrderRepository.findByMemberOrderByRegDateDesc(member);
 
@@ -174,5 +175,39 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setOrderItemList(itemDTOList);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    // 주문 취소
+    @Override
+    public void cancelRoomMenuOrder(Long orderNum, String email) {
+        log.info("주문 취소 서비스 진입 : " + email);
+        RoomMenuOrder order = roomMenuOrderRepository.findById(orderNum)
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+
+        if (!order.getMember().getMemberEmail().equals(email)) {
+            throw new IllegalStateException("본인의 주문만 취소할 수 있습니다.");
+        }
+
+        if (order.getRoomMenuOrderStatus() == RoomMenuOrderStatus.CANCEL) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+
+        if (order.getRoomMenuOrderStatus() != RoomMenuOrderStatus.ORDER) {
+            throw new IllegalStateException("해당 주문은 취소할 수 없습니다.");
+        }
+
+        // 재고 복구
+        for (RoomMenuOrderItem item : order.getOrderItems()) {
+            RoomMenu menu = item.getRoomMenu();
+            menu.restoreRoomMenuStockNumber(item.getRoomMenuOrderAmount());
+        }
+
+        // 상태 변경
+        order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
+
+        roomMenuOrderRepository.save(order);
+
+         // 취소된 주문 삭제 (필요한 경우)
+         roomMenuOrderRepository.delete(order);  // 필요 시 전체 삭제
     }
 }
