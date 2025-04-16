@@ -35,7 +35,7 @@
                                 th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
                     </div>
                     <div>
-                        <button>item 삭제버튼</button>
+                        <button type="button" th:onclick="|deleteCart(${item.storecartitemNum})|">item 삭제버튼</button>
                     </div>
                     <input type="hidden" name="items" th:value="${item.storecartitemNum}">
                 </div>
@@ -46,9 +46,33 @@
         </div>
 
         <!-- 총 가격 및 주문 버튼 -->
-        <div th:if="${list != null}" class="cart-bottom-bar d-grid">
-            <button type="submit" class="btn btn-success" th:text="'주문 ('+(${list.size()})+')'" th:disabled="${list==null || list.isEmpty()}"></button>
+        <div th:if="${list != null}"  class="position-fixed d-grid bottom-0 start-0 w-100 bg-white p-3 shadow" style="z-index: 10;">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal"
+                    th:text="'주문 ('+(${list.size()})+')'" th:disabled="${list==null || list.isEmpty()}"></button>
         </div>
+
+
+        <!--todo 주문정보 입력하는 모달창-->
+        <!--todo form태그로 넘길때... 결제api 한번 거쳐야하는데??-->
+        <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!--전체화면이 되면 이 부분이 마치 네비게이션바처럼 보일거니까.. 동일하게 꾸며주면 이쁠듯-->
+                        <button type="button" class="btn-close" id="modalCloseBtn" aria-label="Close"></button>
+                        <h1 class="modal-title fs-5" id="orderLabel">주문하기</h1>
+                    </div>
+                    <div class="modal-body">
+                        어쩌고저쩌고... 주문방법은 어떻게... 요청사항?....
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">결제하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </form>
 
 
@@ -68,6 +92,10 @@
             let count = parseInt(button.dataset.count);
             count++;
             fetch("/member/store/cart/modify/"+cartItemId+"/"+count)
+                .then(()=>location.reload())
+        }
+        function deleteCart(itemId) {
+            fetch(`/member/store/cart/delete/${itemId}`)
                 .then(()=>location.reload())
         }
     </script>

@@ -13,16 +13,23 @@
 <div layout:fragment="content">
 
     <!-- 검색 조건 및 등록 버튼 -->
-    <form class="row g-3 mb-4">
+    <form class="row g-3 mb-4" action="/admin/store/list" method="post">
         <div class="col-md-2">
-            <select class="form-select">
-                <option selected>검색 조건</option>
-                <option value="업체명">업체명</option>
-                <option value="이름">이름</option>
+            <select class="form-select" name="chosenCompany">
+                <option>호텔목록</option>
+                <option th:each="data:${companyMap}" th:unless="${companyMap == null or #maps.isEmpty(companyMap)}" th:selected="${chosenCompany == data.key}" th:value="${data.key}" th:text="${data.value}"></option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" name="searchType">
+                <option>검색타입</option>
+                <option th:selected="${searchType}=='storeName'" value="storeName">상호명</option>
+                <option th:selected="${searchType}=='storeAddress'" value="storeAddress">가게주소</option>
+                <option th:selected="${searchType}=='storeCeoName'" value="storeCeoName">대표자명</option>
             </select>
         </div>
         <div class="col-md-6">
-            <input type="text" class="form-control" placeholder="검색어 입력">
+            <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
         </div>
         <div class="d-flex gap-3 col-md-4">
             <button type="submit" class="btn btn-success w-50">조회(기능X)</button>
@@ -37,6 +44,7 @@
         <table class="table table-bordered table-sm align-middle" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
             <thead style="background-color: #f1f1f1;">
             <tr>
+                <th style="text-align: center; vertical-align: middle;">제공호텔</th>
                 <th style="text-align: center; vertical-align: middle;">이미지</th>
                 <th style="text-align: center; vertical-align: middle;">업체명</th>
                 <th style="text-align: center; vertical-align: middle;">전화번호</th>
@@ -47,6 +55,7 @@
             </thead>
             <tbody>
             <tr th:each="data : ${list}">
+                <td th:text="${data.companyName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center;">
                     <img th:if="${data.storeProfileMeta != null}"
                          th:src="@{${data.storeProfileMeta}}"

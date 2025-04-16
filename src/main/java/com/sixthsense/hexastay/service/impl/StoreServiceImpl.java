@@ -14,6 +14,7 @@ import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log4j2
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final ModelMapper modelMapper = new ModelMapper();
@@ -154,20 +156,52 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreDTO> list(String status, Pageable pageable) {
         Page<Store> storePage = storeRepository.findByStoreStatus(status, pageable);
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return storeDTOPage;
     }
     @Override
     public List<StoreDTO> list(Long companyNum) {
         List<Store> storeList = storeRepository.findByCompanyNum(companyNum);
-        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data,StoreDTO.class)).toList();
+        List<StoreDTO> list = storeList.stream().map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        }).toList();
         return list;
     }
     @Override
     public Page<StoreDTO> list(Long companyNum, Pageable pageable) {
         Page<Store> storeList = storeRepository.findByCompanyNum(companyNum, pageable);
-        Page<StoreDTO> list = storeList.map(data -> modelMapper.map(data,StoreDTO.class));
+        storeList.forEach(this::checkAndUpdateOrphanStatus);
+        storeList = storeRepository.findByCompanyNum(companyNum, pageable);
+        Page<StoreDTO> list = storeList.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return list;
+    }
+    @Override
+    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable) {
+//        log.info("서비스 들어옴 : ");
+//        log.info(companyNum);
+//        log.info(searchType);
+//        log.info(keyword);
+        Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable);
+//        log.info(storeList.getSize());
+//        storeList.forEach(log::info);
+        Page<StoreDTO> list = storeList.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
+//        list.forEach(log::info);
+        return list;
+//        return null;
     }
 
 
@@ -182,7 +216,11 @@ public class StoreServiceImpl implements StoreService {
         Page<Store> storePage = storeRepository.findAll(pageable);
         storePage.forEach(this::checkAndUpdateOrphanStatus);
         storePage = storeRepository.findAll(pageable);
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data,StoreDTO.class));
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
         return storeDTOPage;
     }
 
