@@ -132,89 +132,88 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
     //************단일 호텔룸 CRRUD 메소드*************//
-    //1.등록 - 이미지 까지 같이 등록 되는 메서드
+    // 1. 호텔방 등록 (이미지 + QR 코드까지 함께 등록하는 메서드)
     @Override
     public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException {
-        log.info("HotelRoom Service 진입 했습니다. ");
+        log.info("HotelRoom Service 진입 했습니다."); // 이 메서드가 실행되었다는 로그 출력
 
-        // 변환 - HotelRoom entity DTO로 변환
+        // DTO → Entity로 바꿔주는 코드 (HotelRoomDTO → HotelRoom)
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
 
+        // DTO에 있는 회사 번호(companyNum)를 꺼내서, DB에서 실제 회사 정보를 찾아오기
         Long companyNum = hotelRoom.getCompany().getCompanyNum();
         Company company = companyRepository.findById(companyNum)
-                .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다."));
-        hotelRoom.setCompany(company);
+                .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다.")); // 회사 없으면 오류
+        hotelRoom.setCompany(company); // 찾은 회사 정보를 호텔방에 다시 넣어줌
 
-        // 처리
+        // 일단 호텔방 정보를 DB에 저장 (PK 값 생김)
         hotelRoomRepository.save(hotelRoom);
         log.info("호텔룸 정보 저장 완료: {}", hotelRoomDTO.getHotelRoomProfile());
 
-        // 들어온 DTO에 사진에 대한 정보가 있다면
+        // 만약 이미지 파일이 있다면, 저장 처리를 시작함
         if (hotelRoomDTO.getHotelRoomProfile() != null && !hotelRoomDTO.getHotelRoomProfile().isEmpty()) {
             log.info("이미지 파일 처리 시작: {}", hotelRoomDTO.getHotelRoomProfile());
 
-            // 저장할 때 필요한 데이터들을 설정한다.
+            // 이미지 파일 이름 설정 (ex. 방이름_번호.png)
             String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
             String fileFirstName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoom.getHotelRoomNum();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
+            // 나중에 이미지 보여줄 때 쓸 경로 저장
             hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/" + fileName);
 
-            // 파일을 저장할 경로 설정
+            // 이미지 파일을 저장할 경로 지정
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "hotelroom/" + fileName);
             Path createPath = Paths.get(System.getProperty("user.dir"), "hotelroom/");
             if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
+                Files.createDirectory(createPath); // 폴더 없으면 새로 만들기
             }
+
+            // 이미지 파일을 컴퓨터에 저장
             hotelRoomDTO.getHotelRoomProfile().transferTo(uploadPath.toFile());
         }
 
-        // 파일의 데이터(/store/상호명_저장된pk.확장자)를 저장한다.
+        // 이미지 경로를 실제 Entity에도 넣어주기
         hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
 
         try {
+            // ✅ QR 코드 만들기 시작!
+            // QR 코드에 넣을 URL 주소 (핸드폰으로 찍으면 이 주소로 이동함)
+            String qrText = "https://naver.com"; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
 
-            // QR 코드 생성용 URL 또는 고유 문자열
-            String qrText = "HotelRoom:" + hotelRoom.getHotelRoomName(); // 또는 고유 ID 등
-
-            // QR 코드 이미지 생성
+            // QR 코드 이미지 파일 이름 만들기 (ex. 방이름_qr.png)
             String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "qr/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");// 절대 경로
+            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");
             if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
+                Files.createDirectory(createPath); // 폴더 없으면 만들기
             }
 
             log.info(fileName + " 파일 네임 경로 까지는 들어 와 지니 ??????");
 
-
-            // QR 코드 생성
+            // QR 코드 만들기 도구로 이미지 생성
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 200, 200);
+            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300); // QR 크기 300x300
             Path path = uploadPath;
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path); // QR 코드를 파일로 저장
 
             log.info(path + "파일 생성은 되고 있는 거냐 있냐고 ~~~~~~~");
 
-
-
-            // DB에 저장할 상대 경로
+            // QR 이미지 파일 경로를 DB에 저장할 수 있게 세팅
             hotelRoom.setHotelRoomQr(fileName);
 
-            // 저장
+            // QR 이미지까지 포함된 호텔방 정보 다시 저장
             hotelRoomRepository.save(hotelRoom);
 
         } catch (Exception e) {
+            // QR 코드 만들다가 에러나면 알려주기
             throw new RuntimeException("호텔 룸 등록 중 오류 발생: " + e.getMessage());
         }
 
-
-
-        // 호텔룸을 저장 (이때, 이미 pk를 가지고 있으므로 update 쿼리가 나간다.)
+        // 다시 한번 전체 정보 저장 (이미 PK가 있어서 update처럼 동작함)
         hotelRoomRepository.save(hotelRoom);
     }
-
 
 
     //2.리스트
