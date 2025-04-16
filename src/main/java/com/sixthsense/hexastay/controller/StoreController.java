@@ -10,11 +10,14 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -23,7 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,6 +39,8 @@ import java.util.stream.Collectors;
 public class StoreController {
     private final StoreService storeService;
     private final CompanyService companyService;
+    private final ModelMapper modelMapper = new ModelMapper();//todo 임시조치 끝나면 지우기
+    private final CompanyRepository companyRepository;
     private final AdminService adminService; //adminRepository에는 email로 찾아오는게 있는데.. 여긴 없음.
 
     /*
@@ -63,7 +70,13 @@ public class StoreController {
 //                return "redirect:/admin/logout";
 //            }
 //        }
-
+        //todo 임시조치
+        List<CompanyDTO> list = new ArrayList<>();
+        List<CompanyDTO> fcL = companyRepository.findByCompanyType("facility").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
+        List<CompanyDTO> brL = companyRepository.findByCompanyType("branch").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
+        list.addAll(brL);
+        list.addAll(fcL);
+        model.addAttribute("companyList",list);
 //         정상적인 호텔 소속 어드민
 //        CompanyDTO companyDTO = companyService.companyRead(adminDTO.getCompanyNum());
 //        model.addAttribute("data", companyDTO);

@@ -26,11 +26,15 @@
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
                 <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
             </div>
+            <label class="form-label">제공할 호텔(모달만 있고 현재 기능 X)</label>
+            <div class="mb-3 input-group">
+                <input type="text" class="form-control"  required>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#companySearchModal">검색</button><!--모달버튼? 누르면 검색가능한 창 뜸.-->
+            </div>
             <div class="mb-3">
-                <label class="form-label">제공할 호텔</label>
-                <select class="form-select" name="companyNum">
-                    <option>호텔목록</option>
-                    <option th:each="data:${companyMap}" th:unless="${companyMap == null or #maps.isEmpty(companyMap)}" th:selected="${chosenCompany == data.key}" th:value="${data.key}" th:text="${data.value}"></option>
+                <label class="form-label">임시조치(모달에서 선택 대신 여기서 고르기..)</label>
+                <select name="companyNum">
+                    <option th:each="data:${companyList}" th:value="${data.companyNum}" th:text="${data.companyName}"></option>
                 </select>
             </div>
             <div class="mb-3">
@@ -102,6 +106,95 @@
         </form>
     </div>
 
+
+    <!-- Modal -->
+    <div class="modal fade" id="companySearchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">호텔 검색</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 검색 폼 -->
+                    <form>
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <label class="form-label">소속</label>
+                                <select name="choice" id="choice" class="form-select" onchange="this.form.submit()">
+                                    <option value="center" th:selected="${choice} == 'center'">본사</option>
+                                    <option value="branch" th:selected="${choice} == 'branch'">지사</option>
+                                    <option value="facility" th:selected="${choice} == 'facility'">지점</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">검색 조건</label>
+                                <select name="select" class="form-select">
+                                    <option value="전체" th:selected="${select == '전체'}">전체</option>
+                                    <option value="company" th:selected="${select == 'company'}">조직명</option>
+                                    <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
+                                    <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">검색어</label>
+                                <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" th:value="${keyword}">
+                            </div>
+
+                            <div class="col-md-2 d-flex gap-2">
+                                <button type="button" onclick="companysearch(this)" id="searchBtn" class="btn btn-success w-50">조회</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <!-- 결과 테이블 -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <table class="table table-bordered text-company mb-0">
+                                <thead class="table-light text-center">
+                                <tr>
+                                    <th style="width: 11%">프로필 사진</th>
+                                    <th style="width: 14%;">브랜드명</th>
+                                    <th style="width: 14%;">본사명</th>
+                                    <th style="width: 14%;">지사명</th>
+                                    <th style="width: 14%;">지점명</th>
+                                    <th style="width: 14%;">전화번호</th>
+                                    <th style="width: 12%;">버튼</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr class="text-center">
+                                    <td>
+                                        <img
+                                             th:src="@{/profile/default.png}"
+                                             style="width: 60px; height: 80px;">
+                                    </td>
+                                    <td>브랜드명</td>
+                                    <td>본사명</td>
+                                    <td>지사명</td>
+                                    <td>지점명</td>
+                                    <td>번호...</td>
+                                    <td>
+                                        <a href="#" class="btn btn-success">선택</a>
+                                        <!-- 비활성화 상태 배지 -->
+                                        <span class="badge bg-danger">비활성화 상태</span>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
