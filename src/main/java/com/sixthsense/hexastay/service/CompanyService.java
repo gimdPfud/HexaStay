@@ -28,8 +28,8 @@ public interface CompanyService {
     //company 비활성화
     void deactivateCompany(Long companyNum);
 
-
     //companyStatus 비활성화를 활성화하기 (activateCompany)
     void activateCompany(Long companyNum);
+
 
 }
