@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.entity.Company;
 import org.springframework.data.domain.Page;
@@ -31,5 +32,7 @@ public interface CompanyService {
     //companyStatus 비활성화를 활성화하기 (activateCompany)
     void activateCompany(Long companyNum);
 
+    //company 소속 직원 조회
+    List<AdminDTO> getCompanyAdmins (Long companyNum);
 
 }

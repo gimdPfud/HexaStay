@@ -9,12 +9,23 @@
     .table td {
       vertical-align: middle;
     }
+
+   .badge-outline-danger {
+     color: #dc3545;
+     background-color: #fff;
+     border: 1px solid #dc3545;
+     padding: 0.35em 0.6em;
+     font-size: 0.75rem;
+     border-radius: 0.25rem;
+   }
+
   </style>
 </head>
 <body>
 <div layout:fragment="content">
 
   <div class="container mt-4">
+    <h3 class="fw-bold mb-4 text-center">조직 조회</h3>
     <!-- 검색 폼 -->
     <form method="get" action="/company/list" class="row g-3 align-items-end">
 
@@ -98,7 +109,8 @@
               </button>
 
               <!-- 비활성화 상태 배지 -->
-              <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}" class="badge bg-danger">비활성화중</span>
+              <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}"
+                    class="badge badge-outline-danger">비활성화중</span>
             </td>
           </tr>
 
@@ -197,15 +209,16 @@
         </div>
 
         <div class="modal-body">
-          <table class="table table-bordered text-center align-middle">
-            <thead>
+          <h5 class="text-center mb-3 fw-bold">직원 조회</h5>
+          <table class="table table-bordered text-center align-middle text-company">
+            <thead class="table-light">
             <tr>
-              <th>번호</th>
-              <th>사번</th>
-              <th>직급</th>
-              <th>이름</th>
-              <th>이메일(ID)</th>
-              <th>연락처</th>
+              <th style="width: 8%;">번호</th>
+              <th style="width: 13%;">사번</th>
+              <th style="width: 13%;">직급</th>
+              <th style="width: 13%;">이름</th>
+              <th style="width: 30%;">이메일(ID)</th>
+              <th style="width: 23%;">연락처</th>
             </tr>
             </thead>
             <tbody id="adminTableBody">
@@ -214,9 +227,14 @@
           </table>
         </div>
 
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">닫기</button>
+        </div>
+
       </div>
     </div>
   </div>
+
 
 
 </div>
