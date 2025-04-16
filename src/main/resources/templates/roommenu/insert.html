@@ -10,10 +10,10 @@
 </head>
 <body class="w-100 vh-100 bg-light">
 <div layout:fragment="content">
-<div class="container p-4 rounded shadow-sm w-100 h-100" >
+<div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
     <!-- 메뉴 등록/수정 폼 -->
-    <form action="/roommenu/insert" method="post" enctype="multipart/form-data">
-        <h1 style="text-align: center;">룸서비스 메뉴 등록</h1>
+    <form action="/roommenu/insert" method="post" enctype="multipart/form-data" >
+        <h1 style="text-align: center; margin-bottom: 30px; ">룸서비스 메뉴 등록</h1>
         <!-- 이미지 파일 -->
         <div class="mb-3 user-box text-center">
             <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -47,7 +47,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="roomMenuCategory" class="form-label">메뉴 카테고리</label>
+            <label for="roomMenuCategory" class="form-label">카테고리</label>
             <select class="form-select" id="roomMenuCategory" name="roomMenuCategory">
                 <option value="" disabled selected>카테고리 선택</option> <!-- 기본값을 빈 값으로 설정 -->
                 <option value="한식">한식</option>
@@ -58,14 +58,17 @@
         </div>
 
         <div class="mb-3">
-            <label for="roomMenuStatus" class="form-label">메뉴 판매 상태</label>
+            <label for="roomMenuStatus" class="form-label">메뉴 상태</label>
             <select class="form-select" id="roomMenuStatus" name="roomMenuStatus">
                 <option value="판매중">판매중</option>
                 <option value="품절">품절</option>
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">등록</button>
+        <div style="display: flex; justify-content: center;">
+            <button type="submit" class="btn btn-primary">등록</button>
+        </div>
+
     </form>
 </div>
 </div>
