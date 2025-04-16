@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토스 결제</title>
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .payment-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .payment-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        #payment-method {
+            margin-bottom: 1rem;
+        }
+        #agreement {
+            margin-bottom: 1rem;
+        }
+        #payment-request-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        #payment-request-button:hover {
+            background-color: #0052cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h1 class="payment-title">결제하기</h1>
+        <div id="payment-method"></div>
+        <div id="agreement"></div>
+        <button id="payment-request-button">결제하기</button>
+    </div>
+    <script src="/js/payment.js"></script>
+</body>
+</html>

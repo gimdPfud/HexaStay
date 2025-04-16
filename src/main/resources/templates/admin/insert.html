@@ -27,14 +27,14 @@
 
             <div class="mb-2">
                 <label class="form-label">사번</label>
-                <input type="text" inputmode="numeric" name="adminEmployeeNum" class="form-control numberOnly" maxlength="8">
+                <input type="text" name="adminEmployeeNum" class="form-control">
             </div>
             <div class="mb-2">
                 <label class="form-label">이메일 (ID)</label>
                 <input type="email" name="adminEmail" class="form-control">
             </div>
 
-
+             <input hidden type="text" name="adminPassword" class="form-control">
 
             <div class="mb-2">
                 <label class="form-label">이름</label>
@@ -43,12 +43,12 @@
             <div class="mb-2">
                 <label class="form-label">주민등록번호</label>
                 <div class="row">
-                    <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly" style="margin-left: 3.5%; width:46%" maxlength="8"> -
-                    <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly" style="width:46%" maxlength="7">
+                    <input type="number" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
+                    <input type="number" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
                 </div>
             </div>
 
-
+            <input hidden name="adminPassword" id="adminPassword" value="">
 
             <div class="mb-2">
                 <label class="form-label">주소</label>
@@ -61,10 +61,10 @@
                     <option>011</option>
                     <option>017</option>
                 </select> -
-                <input type="text" id="adminPhonePartTwo" class="form-control numberOnly" style="width:30%" maxlength="4"> -
-                <input type="text" id="adminPhonePartThree" class="form-control numberOnly" style="width:30%" maxlength="4">
+                <input type="number" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
+                <input type="number" id="adminPhonePartThree" class="form-control" style="width:30%">
 
-
+                <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             </div>
 
             <div class="mb-2">
@@ -79,7 +79,7 @@
                         </select>
                     </div>
                     <div class="col-3">
-                        <select name="adminCenter" id="adminCenter" class="form-select">
+                        <select name="companyNum" id="adminCenter" class="form-select">
                             <option th:each="companyDTO : ${companyList}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
                         </select>
                     </div>
@@ -88,9 +88,10 @@
                         </select>
                     </div>
                     <div class="col-3">
-                        <select name="adminStore" id="adminStore" class="form-select" disabled>
+                        <select name="storeNum" id="adminStore" class="form-select" disabled>
                         </select>
                     </div>
+                    <input hidden name="adminBrand" id="adminBrand" value="">
                 </div>
             </div>
 
@@ -113,7 +114,7 @@
                     <option value="staff">매장 직원</option>
                 </select>
 
-
+                <input hidden name="adminRole" id="adminRole">
 
             </div>
 
@@ -134,13 +135,7 @@
             </div>
         </div>
 
-        <input hidden type="text" name="adminPassword" class="form-control">
-        <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
-        <input hidden name="companyNum" id="companyNum">
         <input hidden name="storeNum" id="storeNum">
-        <input hidden name="adminPassword" id="adminPassword" value="">
-        <input hidden name="adminResidentNum" id="adminResidentNum">
-        <input hidden name="adminRole" id="adminRole">
 
     </form>
 
@@ -152,8 +147,6 @@
         const adminCenterRank = document.getElementById("adminCenterRank");
         const adminBranchFacilityRank = document.getElementById("adminBranchFacilityRank");
         const adminStoreRank = document.getElementById("adminStoreRank");
-        const companyNum = document.getElementById("companyNum");
-        const storeNum = document.getElementById("storeNum");
 
 
         // 소속 선택 시 다른 선택 박스 활성화/비활성화
@@ -172,7 +165,6 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = true;
 
-
             } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
                 adminCenter.value = "";
                 adminBranchFacility.value = "";
@@ -184,7 +176,6 @@
                 adminCenterRank.hidden = true;
                 adminBranchFacilityRank.hidden = false;
                 adminStoreRank.hidden = true;
-
 
             } else if (adminChoice.value === "스토어") {
                 adminCenter.value = "";
@@ -224,11 +215,13 @@
                     const subSelect = document.getElementById("adminBranchFacility");
                     subSelect.innerHTML = "";
 
+                        // 기본 선택 옵션 추가
                         const defaultOption = document.createElement("option");
                         defaultOption.textContent = "";
                         defaultOption.value = "";
                         subSelect.appendChild(defaultOption);
 
+                        // 받아온 조직 리스트 추가
                         data.forEach(company => {
                             const option = document.createElement("option");
                             option.value = company.companyNum;
@@ -243,17 +236,12 @@
             const companyNum = this.value;
             const adminChoice = document.getElementById("adminChoice");
             
-            console.log("Branch/Facility changed:", { companyNum, adminChoice: adminChoice.value });
-            
             // 스토어 선택 시에만 실행
             if (adminChoice.value === "스토어" && companyNum) {
-                console.log("Fetching store list for:", companyNum);
-                
                 fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)
                     .then(response => {
-                        console.log("Response status:", response.status);
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            throw new Error('Network response was not ok');
                         }
                         return response.json();
                     })
@@ -274,39 +262,13 @@
                                 const option = document.createElement("option");
                                 option.value = store.storeNum;
                                 option.textContent = store.storeName;
-                                console.log(store.storeNum)
                                 storeSelect.appendChild(option);
                             });
-                    });
+                    })
             }
         });
 
         function submitForm(event) {
-
-            switch (adminChoice.value) {
-                case "센터":
-                    document.getElementById("adminRole").value = adminCenterRank.value;
-                    companyNum.value = adminCenter.value;
-                    storeNum.value = "";
-                    break;
-                case "지사":
-                    document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
-                    storeNum.value = "";
-                    break;
-                case "지점":
-                    document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
-                storeNum.value = "";
-                break;
-                case "스토어":
-                    document.getElementById("adminRole").value = adminStoreRank.value;
-                    companyNum.value = "";
-                    storeNum.value = adminStore.value;
-
-                    break;
-            }
-
                 // 주민번호 앞자리를 패스워드로 사용
                 document.getElementById("adminPassword").value = document.getElementById("adminResidentNumPartOne").value;
 
@@ -361,8 +323,8 @@
 
 
 
-        // 입력 제한
-        document.querySelectorAll('.numberOnly').forEach(input => input.addEventListener('input', () => input.value = input.value.replace(/[^0-9]/g, '')));
+
+
 
 
 
