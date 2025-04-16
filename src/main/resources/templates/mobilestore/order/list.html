@@ -17,18 +17,22 @@
             <div th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <!--날짜 | 주문된 날짜. 이거... 연도가 바뀔때 연도까지 보여주고 머 그런 기능도?? #temporal 어쩌고로-->
+                    <p th:text="${item.formatDate}"></p>
                     <!--상태 | [접수됨] [취소됨] [완료됨]-->
+                    <p th:text="${item.orderstoreStatus}"></p><br>
                     <!--스토어이름 | store 이름. 역전우동 부천역곡점. a태그로 해당 스토어로 바로가기해도 좋을듯?-->
+                    <p th:text="${item.orderstoreStoreName}"></p>
                     <!--첫번째 아이템이름 | storemenu 이름. 일반 우동-->
+                    <p th:text="${item.orderstoreFirstItemName}"></p>
                     <!--아이템개수-1 | storemenu가 2개 이상이라면? "외 orderstoreitemList.size()-1 개" -->
+                    <p th:if="${item.orderstoreitemDTOList.size()>1}" th:text="' 외 '+${item.orderstoreitemDTOList.size()-1}+' 개'"></p>
                     <!--주문전체금액 | order money... 원-->
+                    <br><p th:text="${item.orderstoreFinalPrice}+'원'"></p>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-    </script>
 </div>
+
 </body>
 </html>

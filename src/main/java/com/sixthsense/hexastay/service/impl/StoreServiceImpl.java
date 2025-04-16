@@ -142,7 +142,11 @@ public class StoreServiceImpl implements StoreService {
         List<Store> storeList = storeRepository.findAll("alive");
         storeList.forEach(this::checkAndUpdateOrphanStatus);
         storeList = storeRepository.findAll("alive");
-        List<StoreDTO> list = storeList.stream().map(data -> modelMapper.map(data, StoreDTO.class)).toList();
+        List<StoreDTO> list = storeList.stream().map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        }).toList();
         return list;
     }
 

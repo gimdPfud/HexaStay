@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +26,32 @@ import java.util.Objects;
 @AllArgsConstructor
 public class OrderstoreViewDTO {
     private Long orderstoreNum;
-    private String orderstoreDate; //modifyDate
+    private LocalDateTime orderstoreDate; //modifyDate
+    private String formatDate; //modifyDate
     private String orderstoreStatus;
     private int orderstoreFinalPrice;
+    private String orderstoreStoreName;
+    private String orderstoreFirstItemName;
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 
     public OrderstoreViewDTO(Orderstore orders) {
+        LocalDateTime now = LocalDateTime.now();
+
+        this.orderstoreDate = orders.getModifyDate();
+
+        if(this.orderstoreDate.getYear() == now.getYear()){
+            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("MM-dd"));
+        } else {
+            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
+
         this.orderstoreNum = orders.getOrderstoreNum();
-        this.orderstoreDate = orders.getModifyDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         this.orderstoreFinalPrice = orders.getOrderstoreitemList().stream().filter(Objects::nonNull)
                 .mapToInt(Orderstoreitem::getOrderstoreitemTotalPrice)
                 .sum();
         this.orderstoreStatus = orders.getOrderstoreStatus();
+        this.orderstoreStoreName = orders.getOrderstoreitemList().getFirst().getStoremenu().getStore().getStoreName();
+        this.orderstoreFirstItemName = orders.getOrderstoreitemList().getFirst().getStoremenu().getStoremenuName();
     }
     public void addOrderstoreitemDTOList(OrderstoreitemDTO orderstoreitemDTO){
         orderstoreitemDTOList.add(orderstoreitemDTO);

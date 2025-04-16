@@ -59,14 +59,20 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <!--전체화면이 되면 이 부분이 마치 네비게이션바처럼 보일거니까.. 동일하게 꾸며주면 이쁠듯-->
-                        <button type="button" class="btn-close" id="modalCloseBtn" aria-label="Close"></button>
                         <h1 class="modal-title fs-5" id="orderLabel">주문하기</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         어쩌고저쩌고... 주문방법은 어떻게... 요청사항?....
+                        토스api가 여기 들어가면 되나???
+                        <select name="orderstorePay">
+                            <option value="cash">현금</option>
+                            <option value="credit">신용카드</option>
+                            <option value="somethingPay">어쩌고페이</option>
+                        </select>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">결제하기</button>
+                    <div class="modal-footer text-center">
+                        <button type="submit" class="btn btn-primary">결제하기(submit버튼)</button>
                     </div>
                 </div>
             </div>

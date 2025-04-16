@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>가게 목록</title>
+</head>
+<body style="background-color: #f8f9fa;">
+
+<div layout:fragment="content">
+
+    <!-- 테이블 -->
+    <div class="container cart-container mt-3">
+        <div class="list-group">
+            <form action="/admin/store/order/list" method="post">
+                <div class="list-group-item cart-item d-flex justify-content-between align-items-center">
+                    임시조치?
+                    <select class="form-select" name="storeNum" onchange="this.form.submit()">
+                        <option selected disabled>가게를 선택하세요</option>
+                        <option th:each="store:${storeList}" th:selected="${storeNum==store.storeNum}"
+                                th:value="${store.storeNum}" th:text="${store.storeName}"></option>
+                    </select>
+                </div>
+            </form>
+
+            <div th:unless="${list == null or list.empty}"
+                    th:each="orderDTO : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <!--날짜 | 주문된 날짜. 이거... 연도가 바뀔때 연도까지 보여주고 머 그런 기능도?? #temporal 어쩌고로-->
+                    <p th:text="${orderDTO}"></p>
+                    <button type="button" th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}" th:onclick="|ordercancel(${orderDTO.orderstoreNum})|">주문취소</button>
+                    <button type="button" th:disabled="${orderDTO.orderstoreStatus.equals('end')}" th:onclick="|orderEnd(${orderDTO.orderstoreNum})|">주문완료</button>
+                </div>
+            </div>
+            <div th:if="${list == null or list.empty}"
+                 class="list-group-item cart-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <p>EMPTY</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        function ordercancel(orderNum) {
+            fetch(`/admin/store/order/cancel/${orderNum}`)
+                .then(res => {
+                    if (!res.ok) alert("취소 실패");
+                    else location.reload();
+                });
+        }
+        function orderEnd(orderNum) {
+            fetch(`/admin/store/order/end/${orderNum}`)
+                .then(res => {
+                    if (!res.ok) alert("end 실패");
+                    else location.reload();
+                });
+        }
+    </script>
+
+</div>
+</body>
+</html>
