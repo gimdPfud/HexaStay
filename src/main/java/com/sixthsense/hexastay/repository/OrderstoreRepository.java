@@ -38,10 +38,11 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
             "JOIN sm.store s " +
             "WHERE s.storeNum = :storeNum")
     List<Orderstore> findByStoreNum(Long storeNum);
+
     @Query("SELECT DISTINCT o FROM Orderstore o " +
-            "JOIN o.orderstoreitemList oi " +
+            "JOIN fetch o.orderstoreitemList oi " +
             "JOIN oi.storemenu sm " +
             "JOIN sm.store s " +
-            "WHERE s.storeNum = :storeNum AND o.orderstoreStatus='alive'")
-    List<Orderstore> selectAliveOrder(Long storeNum);
+            "WHERE s.storeNum = :storeNum AND o.orderstoreStatus='paid'")
+    List<Orderstore> selectPaidOrder(Long storeNum);
 }

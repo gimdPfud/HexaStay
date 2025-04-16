@@ -19,6 +19,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         if(room==null){return 2;}
         Orderstore order = new Orderstore();
         order.setRoom(room);
-        order.setOrderstoreStatus("unpaid");
+        order.setOrderstoreStatus("paid");
 
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
@@ -176,8 +177,10 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     @Override
     public List<OrderstoreDTO> getOrderedList(Long storeNum) {
         List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
-        list.forEach(log::info);
+        list.forEach(log::info);//됨
         List<OrderstoreDTO> result = list.stream().map(data->modelMapper.map(data, OrderstoreDTO.class)).toList();
+        log.info("서비스에서 찾음? "+result.size());
+        result.forEach(log::info);
         return result;
     }
 }
