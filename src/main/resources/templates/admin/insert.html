@@ -10,20 +10,21 @@
 </head>
 <body class="w-100 vh-100 bg-light">
 <div layout:fragment="content">
+    <div class="container p-4 rounded shadow-sm w-100 h-100" >
+        <form method="post" action="/admin/insert" enctype="multipart/form-data">
+            <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
 
-    <form method="post" action="/admin/insert" enctype="multipart/form-data">
-        <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
-
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                    </div>
+                    <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
-                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
-                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                <small id="fileError" class="text-danger d-none"><br>옳바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-            </div>
+
 
             <div class="mb-2">
                 <label class="form-label">사번</label>
@@ -46,7 +47,6 @@
                     <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly" style="margin-left: 3.5%; width:46%" maxlength="8"> -
                     <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly" style="width:46%" maxlength="7">
                 </div>
-            </div>
 
 
 
@@ -92,7 +92,6 @@
                         </select>
                     </div>
                 </div>
-            </div>
 
             <div class="mb-3">
                 <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
@@ -115,22 +114,23 @@
 
 
 
-            </div>
+                </div>
 
 
-            <div class="mb-3">
-                <label class="form-label">직책</label>
-                <input type="text" name="adminPosition" class="form-control">
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">직책</label>
+                    <input type="text" name="adminPosition" class="form-control">
+                </div>
 
 
-            <div class="mb-3">
-                <label class="form-label">입사일</label>
-                <input type="date" name="adminJoinDate" class="form-control">
-            </div>
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" onclick="submitForm(event)" class="btn btn-success">등록</button>
-                <button class="btn btn-danger">취소</button>
+                <div class="mb-3">
+                    <label class="form-label">입사일</label>
+                    <input type="date" name="adminJoinDate" class="form-control">
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" onclick="submitForm(event)" class="btn btn-success">등록</button>
+                    <button class="btn btn-danger">취소</button>
+                </div>
             </div>
         </div>
 
