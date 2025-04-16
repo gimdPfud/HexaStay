@@ -2,12 +2,15 @@ package com.sixthsense.hexastay.controller;
 
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
+import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import java.util.List;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final AdminRepository adminRepository;
 
     @GetMapping("/list")
     public String listCompany(@RequestParam(required = false) String choice,
@@ -122,6 +126,14 @@ public class CompanyController {
     public String activateCompany(@PathVariable(name = "companyNum") Long companyNum) {
         companyService.activateCompany(companyNum); // 내부에서 status를 ACTIVE로 변경
         return "redirect:/company/read/" + companyNum;
+    }
+
+    @GetMapping("/{companyNum}/admins")
+    @ResponseBody
+    public ResponseEntity<List<Admin>> getAdminsByCompany(@PathVariable Long companyNum) {
+        log.info("직원 조회 요청 : " + companyNum);
+        List<Admin> admins = adminRepository.findByCompany_CompanyNum(companyNum);
+        return ResponseEntity.ok(admins);
     }
 
 

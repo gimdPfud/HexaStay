@@ -82,11 +82,27 @@
             <td th:text="${item.facilityName}">지점명</td>
             <td th:text="${item.companyPhone}"></td>
             <td>
-              <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}" class="btn btn-success">상세보기</a>
+              <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}"
+                 class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
+                상세보기
+              </a>
+
+              <button type="button"
+                      class="btn btn-outline-success px-2 py-1"
+                      style="font-size: 0.8rem; line-height: 1;"
+                      th:attr="data-companynum=${item.companyNum}"
+                      data-bs-toggle="modal"
+                      data-bs-target="#adminModal"
+                      onclick="loadAdmins(this)">
+                직원 조회
+              </button>
+
               <!-- 비활성화 상태 배지 -->
-              <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}" class="badge bg-danger">비활성화 상태</span>
+              <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}" class="badge bg-danger">비활성화중</span>
             </td>
           </tr>
+
+
 
           </tbody>
 
@@ -133,8 +149,74 @@
 
 
   <script>
-    
+
+    function loadAdmins(button) {
+      const companyNum = button.getAttribute('data-companynum');
+
+      fetch(`/company/${companyNum}/admins`)
+              .then(response => response.json())
+              .then(data => {
+                const adminTableBody = document.getElementById('adminTableBody');
+                adminTableBody.innerHTML = ''; // 초기화
+
+                if (data.length === 0) {
+                  adminTableBody.innerHTML = '<tr><td colspan="6">직원이 없습니다.</td></tr>';
+                } else {
+                  data.forEach((admin, index) => {
+                    const row = `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${admin.adminEmployeeNum || '-'}</td>
+              <td>${admin.adminPosition || '-'}</td>
+              <td>${admin.adminName || '-'}</td>
+              <td>${admin.adminEmail || '-'}</td>
+              <td>${admin.adminPhone || '-'}</td>
+            </tr>
+          `;
+                    adminTableBody.innerHTML += row;
+                  });
+                }
+              })
+              .catch(error => {
+                console.error('직원 조회 실패:', error);
+              });
+    }
+
+
+
   </script>
+
+  <!-- 직원 목록 모달 -->
+  <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="adminModalLabel">직원 조회</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+
+        <div class="modal-body">
+          <table class="table table-bordered text-center align-middle">
+            <thead>
+            <tr>
+              <th>번호</th>
+              <th>사번</th>
+              <th>직급</th>
+              <th>이름</th>
+              <th>이메일(ID)</th>
+              <th>연락처</th>
+            </tr>
+            </thead>
+            <tbody id="adminTableBody">
+            <!-- JS로 채울 부분 -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
 
 </div>
