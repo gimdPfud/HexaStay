@@ -28,48 +28,55 @@
     <div class="container my-5 px-3 px-md-5">
         <div class="row gy-4 gx-3">
             <div class="col-12 col-md-4" th:each="hotelList : ${companylist}">
-                <div class="card h-100 shadow-sm rounded-4 overflow-hidden border-0 d-flex flex-row">
+                <div class="card h-100 shadow-sm rounded-4 overflow-hidden border-0 d-flex flex-column">
 
-                <!-- 왼쪽: 호텔 이미지 -->
-                    <div class="w-50" style="padding: 16px;">
+                    <!-- 상단: 호텔 이미지 -->
+                    <div class="w-100" style="height: 200px; overflow: hidden;">
                         <img th:src="@{${hotelList.hotelRoomProfileMeta}}"
-                             class="img-fluid h-100 object-fit-cover"
+                             class="img-fluid w-100 h-100 object-fit-cover"
                              alt="호텔 이미지"
                              style="object-fit: cover;">
                     </div>
 
-                    <!-- 오른쪽: 호텔 정보 -->
-                    <div class="w-50 d-flex flex-column justify-content-between" style="padding: 16px 16px 16px 12px;">
-                    <div>
-                            <h6 class="fw-bold mb-1" th:text="${hotelList.hotelRoomName}">호텔룸 이름</h6>
-                            <p class="mb-1"><strong>회사:</strong> <span th:text="${hotelList.getCompany().getCompanyName()}"></span></p>
-                            <p class="mb-1"><strong>유형:</strong> <span th:text="${hotelList.hotelRoomType}"></span></p>
-                            <p class="mb-1"><strong>가격:</strong> <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'"></span></p>
-                            <p class="mb-1"><strong>전화:</strong> <span th:text="${hotelList.hotelRoomPhone}"></span></p>
-                            <p class="mb-1"><strong>상태:</strong> <span th:text="${hotelList.hotelRoomStatus}"></span></p>
+                    <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
+
+                        <!-- 호텔 정보와 QR 코드, 버튼을 같은 줄에 나란히 배치 -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+
+                            <!-- 왼쪽: 호텔 정보 -->
+                            <div class="text-start">
+                                <h6 class="fw-bold mb-1" th:text="${hotelList.hotelRoomName}">호텔룸 이름</h6>
+                                <p class="mb-1"><strong>회사:</strong> <span th:text="${hotelList.getCompany().getCompanyName()}"></span></p>
+                                <p class="mb-1"><strong>유형:</strong> <span th:text="${hotelList.hotelRoomType}"></span></p>
+                                <p class="mb-1"><strong>가격:</strong> <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'"></span></p>
+                                <p class="mb-1"><strong>전화:</strong> <span th:text="${hotelList.hotelRoomPhone}"></span></p>
+                                <p class="mb-1"><strong>상태:</strong> <span th:text="${hotelList.hotelRoomStatus}"></span></p>
+                            </div>
+
+                            <!-- 오른쪽: QR 코드 (중앙 정렬) -->
+                            <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
+                                <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}" class="d-flex align-items-center" style="margin-right: 10px;">
+                                    <img th:src="@{'/qr/' + ${hotelList.hotelRoomQr}}"
+                                         alt="QR 코드"
+                                         class="zoom-image img-thumbnail"
+                                         style="width: 80px; height: 80px;">
+                                </a>
+                            </div>
+
                         </div>
 
-                        <!-- QR 코드 영역 -->
-                        <div class="mb-2 ms-1"> <!-- 마진 유지 -->
-                            <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
-                                <img th:src="@{'/qr/' + ${hotelList.hotelRoomQr}}"
-                                     alt="QR 코드"
-                                     class="zoom-image img-thumbnail"
-                                     style="width: 80px; height: 80px;">
-                            </a>
-                        </div>
-
-                        <!-- 버튼 영역 -->
-                        <div class="d-flex ms-1"> <!-- QR코드와 같은 왼쪽 정렬을 위해 ms-1 추가 -->
-                            <button class="btn btn-outline-dark btn-sm me-2">자세히</button> <!-- 오른쪽 마진 -->
+                        <!-- 버튼 영역 (왼쪽 정렬) -->
+                        <div class="d-flex justify-content-start align-items-center">
+                            <button class="btn btn-outline-dark btn-sm me-2">자세히</button>
                             <a href="/member-insertroom" class="btn btn-dark btn-sm">예약</a>
                         </div>
 
-
                     </div>
                 </div>
+
             </div>
         </div>
+    </div>
     </div>
 
 
