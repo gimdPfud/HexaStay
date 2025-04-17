@@ -48,6 +48,8 @@ public class WebConfig implements WebMvcConfigurer {
         return interceptor; // 설정한 interceptor 객체 반환
     }
 
+
+
     // 인터셉터를 등록하고, 특정 URL 패턴에 대해 적용될지 설정
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

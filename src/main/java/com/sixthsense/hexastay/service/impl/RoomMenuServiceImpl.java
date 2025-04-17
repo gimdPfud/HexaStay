@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -111,7 +112,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      *        수정일자 : 2025-04-07, 2025-04-16 - 재고량 추가
      **************************************************/
 
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale) {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
         Page<RoomMenu> roomMenuPage;
@@ -318,9 +319,9 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                     dto.setRoomMenuCategory(menu.getRoomMenuCategory());
 
                     // 로케일별로 덮어쓰기
-                    roomMenuTranslationRepository.findByRoomMenu_RoomMenuNumAndLocale(menu.getRoomMenuNum(), locale)
+                    roomMenuTranslationRepository.findByRoomMenu_RoomMenuNumAndLocale(menu.getRoomMenuNum(),locale)
                             .ifPresent(translation -> {
-                                dto.setRoomMenuName(translation.getRoomMenuTransLationName());
+                                dto.setRoomMenuName(translation.getRoomMenuTransLationName()); // ← 영어가 여기로 들어옴!
                                 dto.setRoomMenuContent(translation.getRoomMenuTransLationContent());
                                 dto.setRoomMenuCategory(translation.getRoomMenuTransLationCategory());
                             });
