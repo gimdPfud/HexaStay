@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -94,9 +95,9 @@ public class StoreController {
     @GetMapping("/list")
     public String list(Pageable pageable, Model model,
                        @RequestParam(required = false) String searchType,
-                       @RequestParam(required = false) String chosenCompany,
+                       @RequestParam(required = false) Long companyNum,
                        @RequestParam(required = false) String keyword){
-        Page<StoreDTO> list = storeService.list(pageable);
+        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
         /*친구찬스*/
         Map<Long, String> uniqueCompanies = list.stream()
@@ -109,12 +110,12 @@ public class StoreController {
         model.addAttribute("companyMap", uniqueCompanies);
         /*친구찬스끝*/
         model.addAttribute("searchType",searchType);
-        model.addAttribute("chosenCompany",chosenCompany);
+        model.addAttribute("chosenCompany",companyNum);
         model.addAttribute("keyword",keyword);
         return "store/list";
     }
     @PostMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
-    public String list(Model model, Principal principal, Pageable pageable,
+    public String list(RedirectAttributes model, Principal principal, Pageable pageable,
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) String chosenCompany,
                        @RequestParam(required = false) String keyword){
@@ -144,23 +145,22 @@ public class StoreController {
             companyNum = Long.valueOf(chosenCompany);
         }
 //        log.info(companyNum);
-        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
+//        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
-        model.addAttribute("list",list);
-        model.addAttribute("chosenCompany",companyNum);
-        /*친구찬스*/
-        Map<Long, String> uniqueCompanies = list.stream()
-                .collect(Collectors.toMap(
-                        StoreDTO::getCompanyNum,
-                        StoreDTO::getCompanyName,
-                        (existing, replacement) -> existing, // 중복 키 무시
-                        LinkedHashMap::new
-                ));
-        model.addAttribute("companyMap", uniqueCompanies);
-        /*친구찬스끝*/
+        model.addAttribute("companyNum",companyNum);
+//        /*친구찬스*/
+//        Map<Long, String> uniqueCompanies = list.stream()
+//                .collect(Collectors.toMap(
+//                        StoreDTO::getCompanyNum,
+//                        StoreDTO::getCompanyName,
+//                        (existing, replacement) -> existing, // 중복 키 무시
+//                        LinkedHashMap::new
+//                ));
+//        model.addAttribute("companyMap", uniqueCompanies);
+//        /*친구찬스끝*/
         model.addAttribute("searchType",searchType);
         model.addAttribute("keyword",keyword);
-        return "store/list";
+        return "redirect:/admin/store/list";
     }
 
 

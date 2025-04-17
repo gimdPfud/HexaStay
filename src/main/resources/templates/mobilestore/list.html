@@ -1,9 +1,3 @@
-<!--일단 모양만 만듬-->
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -17,64 +11,362 @@
 <body>
 <!-- 매장 리스트 -->
 <div layout:fragment="contentorder">
-    <div class="list-group">
-        <a th:each="data:${list}" th:href="@{'/member/store/read/'+${data.storeNum}}" class="list-group-item list-group-item-action d-flex align-items-center">
-            <div>
-                <strong th:text="${data.storeName}"></strong><br>
-                <small>주소 [[${data.storeAddress}]]</small>
-                <small>주소 대신 거리? 00m</small><!--
-                todo
-                    현재좌표(company의 좌표?) 필요함.
-                    해당 가게의 좌표는 있음.
 
-                -->
-            </div>
-            <span>
-                <img th:if="${data.storeProfileMeta != null}"
-                     th:src="@{${data.storeProfileMeta}}"
-                     style="width: 80px; height: 80px;">
+    <style>
+        /* 기본 스타일: 모든 요소에 기본 마진, 패딩 제거 및 박스 크기 설정 */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; } /* 배경 색상 설정 */
 
-                <img th:unless="${data.storeProfileMeta != null}"
-                     th:src="@{/store/default.png}"
-                     style="width: 80px; height: 80px;">
-            </span>
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto; /* 화면 중앙 정렬 */
+            background: white;
+            padding: 10px; /* 내부 여백 설정 */
+        }
 
-            <ul class="store-list card-list">
-                <li th:each="store : ${list}">
-                    <div class="div-card">
-                        <a style="text-decoration: none; color: inherit; display: block; width: 100%;"
-                           th:href="@{'/member/store/read/'+${store.storeNum}}">
-                            <div class="inner-wrapper">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="text-info">
-                                        <p th:text="${store.storeName}"></p>
-                                        <p th:text="${store.storeAddress}"></p>
-                                    </div>
-                                    <div class="image-like-container">
-                                        <img th:if="${store.storeProfileMeta != null}"
-                                             th:src="@{${store.storeProfileMeta}}"
-                                             class="store-image">
-                                        <img th:unless="${store.storeProfileMeta != null}"
-                                             th:src="@{/store/default.png}"
-                                             class="store-image">
-                                    </div>
-                                </div>
+        /* 검색창 */
+        .search-container {
+            display: none;
+            padding: 10px;
+            justify-content: space-between;
+            background: #f1f1f1;
+            border-bottom: 2px solid #ddd;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-box input {
+            width: 200px;
+            padding: 5px;
+            border: 2px solid #ddd;
+            border-radius: 5px; /* 입력 필드 둥근 모서리 */
+        }
+        .search-box button {
+            background-color: #4CAF50; /* 버튼 배경색 */
+            color: white;
+            border: none;
+            border-radius: 5px; /* 버튼 둥근 모서리 */
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+
+        /* 탭 메뉴 스타일 */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #f8f8f8;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        /* 검색 박스 스타일 */
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px; /* 여백 조정 */
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: #4CAF50; /* 초록색 테두리 */
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* 포커스시 그림자 */
+        }
+
+        .form-select option {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        /* 선택한 항목 hover시 변화 */
+        .form-select:hover {
+            border-color: #66bb6a;
+        }
+
+        /* select 요소 화살표 커스터마이징 */
+        .form-select::-ms-expand {
+            display: none; /* Internet Explorer에서 기본 화살표 숨기기 */
+        }
+
+        .form-select {
+            width: 115px; /* ✅ 가로 너비 조정 */
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"%3E%3Cpolygon points="0,0 5,5 10,0" fill="%23666"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+        }
+
+        #search-container {
+            display: block; /* 항상 보이게 설정 */
+        }
+
+        /* 카테고리 텍스트를 꾸미는 스타일 */
+        .category-label {
+            display: inline-block;
+            background-color: #f1fdf1; /* 배경 색상 */
+            color: #333; /* 텍스트 색상 */
+            font-weight: bold; /* 텍스트 굵게 */
+            padding: 5px 10px; /* 여백 */
+            border-radius: 12px; /* 둥근 모서리 */
+            border: 1px solid #ddd; /* 테두리 */
+            font-size: clamp(12px, 1.2vw, 18px);
+            margin: 10px ; /* 위 아래 여백 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            transition: background-color 0.3s ease; /* 호버 시 색상 변경 효과 */
+        }
+
+        .category-label:hover {
+            background-color: #ffeb3b; /* 호버 시 배경 색상 */
+            color: #000; /* 호버 시 텍스트 색상 */
+            border-color: #fdd835; /* 호버 시 테두리 색상 */
+        }
+
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .order-list-btn {
+            background-color: #FAE100;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* 공통 스타일 */
+        .card-list {
+            list-style: none;
+            padding: 0;
+            display: grid; /* 그리드 레이아웃 사용 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
+            gap: 20px; /* 카드 사이 간격 */
+        }
+
+        .div-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* 카드 높이 유동적으로 */
+        }
+
+        .food-item {
+            padding: 0; /* food-item의 기본 패딩 제거 */
+            border-bottom: none; /* food-item의 하단 테두리 제거 */
+            margin-bottom: 0; /* food-item의 하단 마진 제거 */
+        }
+
+        .category-wrapper {
+            padding: 15px;
+            text-align: left;
+        }
+
+        /* 카테고리 텍스트 스타일 (기존 스타일 유지) */
+        .category-label {
+            display: inline-block;
+            background-color: #f1fdf1;
+            color: #333;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: clamp(12px, 1.2vw, 18px);
+            margin: 0; /* category-wrapper에 의해 여백 처리 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .category-label:hover {
+            background-color: #ffeb3b;
+            color: #000;
+            border-color: #fdd835;
+        }
+
+        .inner-wrapper {
+            padding: 15px;
+        }
+
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .text-info {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-right: 10px;
+        }
+
+        .text-info .menu-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: black;
+        }
+
+        .menu-content {
+            color: black;
+        }
+
+        .price-box{
+            color: black;
+        }
+
+        .image-like-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .menu-image {
+            width: 150px; /* 가로 크기 변경 */
+            height: 150px; /* 세로 크기 변경 */
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .like-section {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            padding: 0 15px 15px 15px; /* 하단 좋아요 섹션 패딩 */
+        }
+
+        .like-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            color: gray;
+        }
+
+        .like-count {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .add-to-cart-btn {
+            background-color: #ffeb3b;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px; /* 버튼 상단 마진 조정 */
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #fdd835;
+        }
+
+        .cart-count {
+            background-color: #ff5c5c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+
+
+    </style>
+
+
+    <ul class="store-list card-list">
+        <li th:each="store : ${list}">
+            <div class="div-card">
+                <a style="text-decoration: none; display: block; width: 100%;"
+                   th:href="@{'/member/store/read/'+${store.storeNum}}">
+                    <div class="inner-wrapper">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="text-info">
+                                <p th:text="${store.storeName}"></p>
+                                <p th:text="${store.storeAddress}"></p>
                             </div>
-                        </a>
-                        <div class="like-section">
-                            <div class="category-wrapper">
-                                <span th:text="${store.storeCategory}" class="category-label"></span>
+                            <div class="image-like-container">
+                                <img th:if="${store.storeProfileMeta != null}"
+                                     th:src="@{${store.storeProfileMeta}}"
+                                     class="store-image">
+                                <img th:unless="${store.storeProfileMeta != null}"
+                                     th:src="@{/store/default.png}"
+                                     class="store-image">
                             </div>
-<!--                            <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"-->
-<!--                                  th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"-->
-<!--                                  class="like-icon">🤍</span>-->
-<!--                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>-->
                         </div>
                     </div>
-                </li>
-            </ul>
-        </a>
-    </div>
+                </a>
+                <div class="like-section">
+                    <div class="category-wrapper">
+                        <span th:text="${store.storeCategory}" class="category-label"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+
+    <a th:href="@{/member/store/cart/list}" class="add-to-cart-btn">
+        🛒 내 카트 리스트로
+        <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
+    </a>
+    <button class="order-list-btn"
+            onclick="window.location.href='/roommenu/orderList'">
+        🛒 내 주문 리스트로
+    </button>
+
 </div>
 
 </body>

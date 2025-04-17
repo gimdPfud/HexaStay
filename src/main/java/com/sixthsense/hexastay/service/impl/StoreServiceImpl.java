@@ -231,10 +231,13 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreDTO> clientlist(Pageable pageable) {
         Page<Store> storePage = storeRepository.findByStoreStatus("alive", pageable);
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> modelMapper.map(data, StoreDTO.class));
-        storeDTOPage.map(data -> {
-            return data;
+        log.info("스토어 목록 찾았니? : "+storePage.getSize());
+        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
         });
+        log.info("스토어 목록 반환했니? : "+storeDTOPage.getSize());
         return storeDTOPage;
     }
 
