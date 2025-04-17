@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
-    Optional<Room> findByHotelRoom_HotelRoomNum(Long hotelRoomNum);
+    //roomPassword 만 찾아오는 커리 메소드
+    Optional<Room> findRoomByRoomPassword(String roomPassword);
 
     Page<Room> findByHotelRoom_HotelRoomNum(Long hotelRoomNum, Pageable pageable);
 

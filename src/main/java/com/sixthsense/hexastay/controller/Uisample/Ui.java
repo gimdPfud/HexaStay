@@ -25,5 +25,11 @@ public class Ui {
         return "ui/passwordb";
     }
 
+    @GetMapping("/uipassword-c")
+    public String uipasswordc() {
+
+        return "ui/passwordc";
+    }
+
 
 }
