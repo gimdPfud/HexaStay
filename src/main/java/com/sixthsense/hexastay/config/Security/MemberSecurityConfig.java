@@ -38,7 +38,7 @@ import org.springframework.security.web.SecurityFilterChain;
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                             "/roomMenu/**",
-                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**")
+                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**")
                     .authenticationManager(authManager)
                     .userDetailsService(memberDetailsService)
                     .authorizeHttpRequests(authz -> authz

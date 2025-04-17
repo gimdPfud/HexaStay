@@ -52,9 +52,8 @@
         <h1 class="success-title">결제가 완료되었습니다!</h1>
 
                 <div class="payment-info">
-                    <p>주문번호: <span th:text="123321">주문번호</span></p>
-                    <p>결제금액: <span th:text="37000d">결제금액</span>원</p>
-                    <p>결제일시: <span>11/22/33</span></p>
+                    <p>결제금액: <span th:text="${tossprice}">결제금액</span>원</p>
+                    <p>결제일시: <div>히히 아직 안넣었다</div></p>
                 </div>
 
 
@@ -63,7 +62,26 @@
 <!--            <p>결제금액: <span th:text="${#numbers.formatInteger(payment.amount, 0, 'COMMA')}">결제금액</span>원</p>-->
 <!--            <p>결제일시: <span th:text="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm:ss')}">결제일시</span></p>-->
 <!--        </div>-->
-        <a href="/" class="home-button">홈으로 가기</a>
+        <a href="#" class="home-button" onclick="goHome()">결제창 닫기</a>
     </div>
 </body>
+
+
+
+<script>
+    function goHome() {
+        // 부모 창 이동
+        if (window.opener) {
+            window.opener.location.href = "/roommenu/orderList";
+        }
+        // 팝업창 닫기
+        window.close();
+    }
+    window.onbeforeunload = function() {
+        if (window.opener) {
+            window.opener.location.href = "/roommenu/orderList";
+        }
+    }
+</script>
+
 </html> 
