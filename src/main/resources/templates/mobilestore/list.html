@@ -198,7 +198,7 @@
             height: 100%; /* 카드 높이 유동적으로 */
         }
 
-        .food-item {
+        .store-item {
             padding: 0; /* food-item의 기본 패딩 제거 */
             border-bottom: none; /* food-item의 하단 테두리 제거 */
             margin-bottom: 0; /* food-item의 하단 마진 제거 */
@@ -248,14 +248,14 @@
             padding-right: 10px;
         }
 
-        .text-info .menu-name {
+        .text-info .store-name {
             font-size: 1.2rem;
             font-weight: bold;
             margin: 5px 0;
             color: black;
         }
 
-        .menu-content {
+        .store-content {
             color: black;
         }
 
@@ -269,7 +269,7 @@
             align-items: flex-end;
         }
 
-        .menu-image {
+        img {
             width: 150px; /* 가로 크기 변경 */
             height: 150px; /* 세로 크기 변경 */
             object-fit: cover;
@@ -326,46 +326,51 @@
     </style>
 
 
-    <ul class="store-list card-list">
-        <li th:each="store : ${list}">
-            <div class="div-card">
-                <a style="text-decoration: none; display: block; width: 100%;"
-                   th:href="@{'/member/store/read/'+${store.storeNum}}">
-                    <div class="inner-wrapper">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="text-info">
-                                <p th:text="${store.storeName}"></p>
-                                <p th:text="${store.storeAddress}"></p>
-                            </div>
-                            <div class="image-like-container">
-                                <img th:if="${store.storeProfileMeta != null}"
-                                     th:src="@{${store.storeProfileMeta}}"
-                                     class="store-image">
-                                <img th:unless="${store.storeProfileMeta != null}"
-                                     th:src="@{/store/default.png}"
-                                     class="store-image">
+    <div class="container">
+        <ul class="store-list card-list">
+            <li th:each="store : ${list}" class="store-item">
+                <div class="div-card">
+                    <a style="text-decoration: none; color: inherit; display: block; width: 100%;"
+                       th:href="@{'/member/store/read/'+${store.storeNum}}">
+                        <div class="inner-wrapper">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="text-info">
+                                    <p class="store-name" th:text="${store.storeName}"></p>
+                                    <p class="store-content" th:text="${store.storeAddress}"></p>
+                                    <div class="price-box"><span class="price-text"> </span></div>
+                                </div>
+                                <div class="image-like-container">
+                                    <img style="height: 150px; width: 150px;" th:if="${store.storeProfileMeta != null}"
+                                         th:src="@{${store.storeProfileMeta}}"
+                                         class="store-image">
+                                    <img style="height: 150px; width: 150px;" th:unless="${store.storeProfileMeta != null} "
+                                         th:src="@{/store/default.png}"
+                                         class="store-image">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-                <div class="like-section">
-                    <div class="category-wrapper">
-                        <span th:text="${store.storeCategory}" class="category-label"></span>
+                    </a>
+                    <div class="like-section">
+                        <div class="category-wrapper">
+                            <span th:text="${store.storeCategory}" class="category-label"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </li>
-    </ul>
+            </li>
+        </ul>
 
 
-    <a th:href="@{/member/store/cart/list}" class="add-to-cart-btn">
-        🛒 내 카트 리스트로
-        <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
-    </a>
-    <button class="order-list-btn"
-            onclick="window.location.href='/roommenu/orderList'">
-        🛒 내 주문 리스트로
-    </button>
+        <button class="add-to-cart-btn"
+           onclick="window.location.href='/member/store/cart/list'">
+            🛒 내 카트 리스트로
+            <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
+        </button>
+        <button class="order-list-btn"
+                onclick="window.location.href='/member/store/order/list'">
+            🛒 내 주문 리스트로
+        </button>
+
+    </div>
 
 </div>
 

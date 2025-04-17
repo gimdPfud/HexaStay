@@ -11,6 +11,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.dto.StoremenuDTO;
 import com.sixthsense.hexastay.service.StoreService;
+import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -35,6 +36,9 @@ import java.util.List;
 public class StoreClientController {
     private final StoreService storeService;
     private final StoremenuService storemenuService;
+    private final StorecartService storecartService;
+    Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
+
 
 /* 1. 스토어 목록 보기
         get. */
@@ -42,6 +46,7 @@ public class StoreClientController {
     public String list(Model model, Pageable pageable){
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
         log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
+        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
         model.addAttribute("list",storeDTOPage);
         return "mobilestore/list";
     }
