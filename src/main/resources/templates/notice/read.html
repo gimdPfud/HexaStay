@@ -35,12 +35,12 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-secondary">
+                            <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-outline-secondary px-2 py-1">
                                 <i class="bi-caret-left"></i>
                             </button>
                             <div>
-                                <a th:href="@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-success">수정</a>
-                                <a th:href="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-danger">삭제</a>
+                                <a th:href="@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-outline-success px-2 py-1">수정</a>
+                                <a th:href="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-outline-danger px-2 py-1">삭제</a>
                             </div>
                         </div>
                     </div>
