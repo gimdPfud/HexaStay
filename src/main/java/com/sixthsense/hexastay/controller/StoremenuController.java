@@ -53,6 +53,7 @@ public class StoremenuController {
         }
         session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
         List<StoreDTO> list = storeService.getAllList();
+        model.addAttribute("valid","서비스 등록");
         model.addAttribute("list",list);
         return "storemenu/selectstorenum";
     }
@@ -70,11 +71,12 @@ public class StoremenuController {
         }
         session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
         List<StoreDTO> list = storeService.getAllList();
+        model.addAttribute("valid","서비스 목록");
         model.addAttribute("list",list);
         return "storemenu/selectstorenum";
     }
     @GetMapping("/selected")
-    public String insertPrevSelected(HttpSession session, Principal principal, Long storeNum, RedirectAttributes model){
+    public String insertPrevSelected(HttpSession session, Principal principal, Long storeNum, Model model){
         log.info(storeNum);
         int prevpage = (int) session.getAttribute("prevpage");
         if(prevpage==1){
