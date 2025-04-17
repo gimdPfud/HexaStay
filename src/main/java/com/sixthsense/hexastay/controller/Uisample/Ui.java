@@ -13,4 +13,17 @@ public class Ui {
         return "uisample/uisample";
     }
 
+    @GetMapping("/uipassword-a")
+    public String uipassworda() {
+
+        return "ui/passworda";
+    }
+
+    @GetMapping("/uipassword-b")
+    public String uipasswordb() {
+
+        return "ui/passwordb";
+    }
+
+
 }
