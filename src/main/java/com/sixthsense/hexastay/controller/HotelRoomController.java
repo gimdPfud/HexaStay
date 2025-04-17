@@ -116,7 +116,7 @@ public class HotelRoomController {
         }
     }
 
-    @GetMapping("list")
+    @GetMapping("/list")
     public String hotelRoomList(Model model,Principal principal,
                                 HotelRoomDTO hotelRoomDTO,
           @PageableDefault(page = 1, size = 10, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
@@ -142,7 +142,13 @@ public class HotelRoomController {
 
     //todo:/hotelRoomsByMember/{memberNum}
     //모달 페이지 수정 하기
-    @PostMapping("update")
+    @GetMapping("/modify")
+    public String hotelRoomModify() {
+
+        return "hotelroom/modifyhotelroom";
+    }
+
+    @PostMapping("/modify")
     public String hotelRoomUpdatePost(@ModelAttribute HotelRoomDTO hotelRoomDTO,
         RedirectAttributes redirectAttributes                              ) {
 
@@ -157,7 +163,7 @@ public class HotelRoomController {
             redirectAttributes.addFlashAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다.");
         }
 
-        return "redirect:/hotelRoomsByMember/" + hotelRoomDTO.getMemberNum();
+        return "redirect:/admin/hotelroom/modify";
     }
 
     // 호텔룸 상세 페이지로 이동
