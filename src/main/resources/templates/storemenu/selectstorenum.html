@@ -9,7 +9,7 @@
 </head>
 <body>
 <div layout:fragment="content">
-            <h1 class="text-center mb-4">상점을 선택해주세요</h1>
+            <h1 class="text-center mb-4" th:text="${valid}"></h1>
                 <!-- 검색 조건 및 등록 버튼 -->
                 <form class="row g-3 mb-4">
                     <div class="col-md-2">
