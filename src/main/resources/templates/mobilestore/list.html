@@ -19,6 +19,16 @@
 <div layout:fragment="contentorder">
     <div class="list-group">
         <a th:each="data:${list}" th:href="@{'/member/store/read/'+${data.storeNum}}" class="list-group-item list-group-item-action d-flex align-items-center">
+            <div>
+                <strong th:text="${data.storeName}"></strong><br>
+                <small>주소 [[${data.storeAddress}]]</small>
+                <small>주소 대신 거리? 00m</small><!--
+                todo
+                    현재좌표(company의 좌표?) 필요함.
+                    해당 가게의 좌표는 있음.
+
+                -->
+            </div>
             <span>
                 <img th:if="${data.storeProfileMeta != null}"
                      th:src="@{${data.storeProfileMeta}}"
@@ -28,15 +38,44 @@
                      th:src="@{/store/default.png}"
                      style="width: 80px; height: 80px;">
             </span>
-            <div>
-                <strong th:text="${data.storeName}"></strong><br>
-                <small>일단 : [[${data.storeAddress}]]</small><!--
-                todo
-                    현재좌표(company의 좌표?) 필요함.
-                    해당 가게의 좌표는 있음.
 
-                -->
-            </div>
+            <ul class="store-list card-list">
+                <li th:each="store : ${list}">
+                    <div class="div-card">
+                        <a style="text-decoration: none; color: inherit; display: block; width: 100%;"
+                           th:href="@{'/member/store/read/'+${store.storeNum}}">
+                            <div class="inner-wrapper">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="text-info">
+                                        <p th:text="${store.storeName}"></p>
+                                        <p th:text="${store.storeAddress}"></p>
+                                        <div class="price-box">
+                                            <span th:text="${store. + '원'}" class="price-text"></span>
+                                        </div>
+                                    </div>
+                                    <div class="image-like-container">
+                                        <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                                             th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                             class="menu-image">
+                                        <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                                             th:src="@{/profile/default.png}"
+                                             class="menu-image">
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="like-section">
+                            <div class="category-wrapper">
+                                <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
+                            </div>
+                            <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                  th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                  class="like-icon">🤍</span>
+                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </a>
     </div>
 </div>
