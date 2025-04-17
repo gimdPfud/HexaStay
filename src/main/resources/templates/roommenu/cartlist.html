@@ -211,15 +211,14 @@
 -------------------------------------------------------------->
 <!-- 장바구니가 비어있는 경우 -->
 <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
-    <p>웹에서 주문</p>
-    🛒 장바구니의<br> 아이템이 존재하지 않습니다
+    <p th:text="#{cart.emptyTitle}">웹에서 주문</p>
+    <span th:text="#{cart.emptyMessage}">🛒 장바구니의<br> 아이템이 존재하지 않습니다</span>
 </div>
 
-<!-- 장바구니에 아이템이 있는 경우만 아래 내용 출력 -->
+<!-- 장바구니에 아이템이 있는 경우 -->
 <div th:unless="${isCartEmpty}" class="container">
-    <!-- 헤더 -->
     <div class="header">
-        <div>주문</div>
+        <div th:text="#{cart.orderTitle}">주문</div>
     </div>
 
 
@@ -231,11 +230,15 @@
 
 
             <div class="food-info col-6">
-                <p>가격: <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>원</p>
-                <p>수량: <span class="item-quantity" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}"></span></p>
+                <span th:text="#{cart.price}">가격</span>:
+                <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>원
+                <p>
+                    <span th:text="#{cart.quantity}">수량</span>:
+                    <span class="item-quantity" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}"></span>
+                </p>
                 <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
                     <p>
-                        총 금액:
+                        <span th:text="#{cart.total}">총 금액</span>:
                         <span class="item-total"
                               th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}"></span>원
                     </p>
@@ -254,8 +257,8 @@
 
             <!-- 수량변경, 장바구니 삭제 시작 -->
             <div class="col-2 button-container">
-                <button class="mini-btn delete-btn">삭제</button>
-                <button class="mini-btn update-btn">수량 변경</button>
+                <button class="mini-btn delete-btn" th:text="#{cart.delete}">삭제</button>
+                <button class="mini-btn update-btn" th:text="#{cart.update}">수량 변경</button>
             </div>
             <!-- 수량변경, 장바구니 삭제 끝 -->
         </li>
@@ -271,21 +274,25 @@
 <!--    &lt;!&ndash; 현금으로 결제하기 체크박스 끝 &ndash;&gt;-->
 
 
-    <!-- 요청사항 입력 섹션 -->
     <div class="request-section">
-        <label for="request-input">요청사항</label>
-        <textarea id="request-input" placeholder="요청사항을 입력하세요..."></textarea>
+        <label for="request-input" th:text="#{cart.request}">요청사항</label>
+        <textarea id="request-input" th:placeholder="#{cart.request.placeholder}">요청사항을 입력하세요...</textarea>
     </div>
 
     <!-- 할인금액과 최종결제금액 표시 -->
+    <!-- 결제금액 -->
     <div class="pricing-section">
-        <div class="discount">할인금액: 0원</div>
-        <div class="final-total">최종결제금액: 0원</div>
+        <div class="discount">
+            <span th:text="#{cart.discount}">할인금액</span>: 0원
+        </div>
+        <div class="final-total">
+            <span th:text="#{cart.finalTotal}">최종결제금액</span>: 0원
+        </div>
     </div>
 
     <!-- 결제하기 및 목록으로 버튼 -->
-    <button class="btn add-to-cart-btn" onclick="processPayment()">결제하기</button>
-    <button class="btn back-btn" onclick="goToOrderPage()">목록으로</button>
+    <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
+    <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}">목록으로</button>
 
 
     <!-- 모달 -->

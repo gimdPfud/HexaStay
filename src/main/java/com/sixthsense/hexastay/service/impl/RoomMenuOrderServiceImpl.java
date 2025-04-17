@@ -124,7 +124,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // 3. 장바구니 아이템들 가져오기
         List<RoomMenuCartItem> cartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
-        if (cartItems.isEmpty()) throw new IllegalStateException("장바구니가 비어 있습니다.");
+        if (cartItems.isEmpty()) throw new IllegalStateException("구입해주셔서 감사합니다.");
 
         // 4. 주문 객체 생성
         RoomMenuOrder roomMenuOrder = new RoomMenuOrder();

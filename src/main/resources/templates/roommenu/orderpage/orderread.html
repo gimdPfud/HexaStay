@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>아이템 상세보기</title>
+    <title th:text="#{page.title}">아이템 상세보기</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
@@ -184,9 +184,8 @@
 <div class="container">
     <!-- 헤더: 제목과 뒤로가기 버튼 -->
     <div class="header">
-        <div onclick="goBack()">🔙 뒤로가기</div>
-        <div>아이템 상세보기</div>
-        <div></div>
+        <div onclick="goBack()" th:text="#{back}">🔙 뒤로가기</div>
+        <div th:text="#{page.title}">아이템 상세보기</div>
     </div>
 
     <!-- 아이템 상세 정보 -->
@@ -203,9 +202,12 @@
         </td>
     </div>
 
-    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품 이름</h2>
-    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품 설명</p>
-    <p class="col-sm-9">가격 : <span th:text="${roomMenuDTO.roomMenuPrice}"></span></p>
+    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">#{item.name}</h2>
+    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">#{item.description}</p>
+    <p class="col-sm-9">
+        <span th:text="#{item.price}">가격</span> : <span th:text="${roomMenuDTO.roomMenuPrice}"></span>원
+    </p>
+
 
 
 
@@ -213,7 +215,7 @@
     <div class="container mt-4">
         <div class="row justify-content-center mb-3">
             <!-- 주문수량 라벨 -->
-            <label for="count" class="col-sm-3 col-form-label text-end fw-bold">주문수량</label>
+            <label for="count" class="col-sm-3 col-form-label text-end fw-bold" th:text="#{item.quantity}">주문수량</label>
             <div class="col-sm-6">
                 <div class="input-group">
                     <!-- 수량 입력창 -->
@@ -224,15 +226,13 @@
     </div>
 
         <!-- 가격 변동을 표시할 부분 -->
-        <p>총 가격 : <span id="totalPrice">가격</span> 원</p>
+        <span th:text="#{item.totalPrice}">총 가격</span> : <span id="totalPrice">가격</span> 원
 
 
-        <!-- 장바구니 담기 -->
-        <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}">장바구니 담기</button>
-        <!-- 목록으로 돌아가기 버튼 추가 -->
-        <button class="back-to-list-btn" onclick="window.location.href='http://localhost:8090/roommenu/orderpage'">목록으로 돌아가기</button>
-        <!-- 바로 주문하기 -->
-        <button class="order-cart-btn" th:value="${roomMenuDTO.roomMenuNum}">바로 주문하기</button>
+    <!-- 버튼들 -->
+    <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.addToCart}">장바구니 담기</button>
+    <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
+    <button class="order-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.orderNow}">바로 주문하기</button>
 </div>
 </div>
 
