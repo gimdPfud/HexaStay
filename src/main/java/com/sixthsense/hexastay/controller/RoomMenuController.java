@@ -144,7 +144,7 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/list")
-    public String RoomMenuList(Pageable pageable,
+    public String RoomMenuList(@PageableDefault(size = 8) Pageable pageable,
                                @RequestParam(value="type", required = false, defaultValue = "") String type,
                                @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                                @RequestParam(value = "category", required = false) String category, // @RequestParam 추가
