@@ -87,7 +87,7 @@ public class RoomServiceImpl {
                 .member(member)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkOutDate)
-                .roomPassword(hotelRoomDTO.getHotelRoomPassword()) // ✅ 추가된 부분
+                .roomPassword(memberDTO.getRoomPassword()) // ✅ 추가된 부분
                 .build();
         log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);
         roomRepository.save(room);
@@ -154,6 +154,11 @@ public class RoomServiceImpl {
                     .hotelRoomPrice(hotelRoom.getHotelRoomPrice())
                     .build();
         });
+    }
+
+    //roompassword 을 찾아와서 패스워드를 인증 하는 메소드
+    public boolean RoomPassword(String roomPassword) {
+        return roomRepository.findRoomByRoomPassword(roomPassword).isPresent();
     }
 
 

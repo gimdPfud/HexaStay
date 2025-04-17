@@ -144,4 +144,25 @@ public class RoomController {
         return "room/hotelRoomsByMember";  // 🔹 Thymeleaf 파일 존재 여부 확인!
     }
 
+    //Room 인즈키 (RoomPassword 확인용)
+    @GetMapping("/roomlist/roompassword")
+    public String showPasswordPage() {
+
+        return "room/password"; // 비밀번호 입력 페이지
+    }
+
+    @PostMapping("/roomlist/roompassword")
+    public String checkPassword(@RequestParam("roomPassword") String roomPassword,
+                                RedirectAttributes redirectAttributes) {
+
+        if (roomServiceimpl.RoomPassword(roomPassword)) {
+            return "redirect:/main"; // 메인 페이지로 이동
+        } else {
+            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/roomlist/roompassword";
+        }
+    }
+
+
+
 }

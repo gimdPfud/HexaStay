@@ -38,6 +38,18 @@
             color: #495057; /* 연한 gray-dark */
             text-decoration: underline;
         }
+        .hover-grow-text {
+            display: inline-block;
+            font-size: 1rem; /* 기본 크기 */
+            transition: transform 0.25s ease-in-out, color 0.25s;
+            cursor: pointer;
+        }
+
+        .hover-grow-text:hover {
+            transform: scale(1.3); /* 확대 비율 */
+            color: #0d6efd; /* 부트스트랩 블루톤 */
+        }
+
     </style>
 
 
@@ -76,6 +88,7 @@
                     <th>호텔룸TEL</th>
                     <th>체크인</th>
                     <th>체크아웃</th>
+                    <th>Room_password</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -85,7 +98,7 @@
                     <td>
                         <a href="javascript:void(0);"
                            onclick="openMemberPopup(this)"
-                           class="hover-link-primary fw-semibold"
+                           class="hover-grow-text fw-semibold"
                            th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
                            th:text="${room.hotelRoomName}"></a>
                     </td>
@@ -94,7 +107,7 @@
                     <td>
                         <a href="javascript:void(0);"
                            onclick="openMemberPopupByMember(this)"
-                           class="hover-link-dark fw-semibold"
+                           class="hover-grow-text fw-semibold"
                            th:attr="data-memberNum=${room.memberNum}"
                            th:text="${room.memberName}"></a>
                     </td>
@@ -102,6 +115,7 @@
                     <td th:text="${room.hotelRoomPhone}"></td>
                     <td th:text="${room.checkInDate}"></td>   <!-- ✅ 여기 추가 -->
                     <td th:text="${room.checkOutDate}"></td>
+                    <td class="text-danger fw-bold" th:text="${room.roomPassword}"></td>
 
                 </tr>
                 <tr th:if="${#lists.isEmpty(rooms.content)}">
