@@ -396,7 +396,7 @@
         </ul>
 
         <button class="add-to-cart-btn"
-                onclick="submitPostRequest('/roommenu/cartlist')">
+                onclick="goToCartList('/roommenu/cartlist')">
             🛒 내 카트 리스트로
             <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
         </button>
@@ -411,26 +411,8 @@
     <script>
 
 
-        function submitPostRequest() {
-            const data = {
-                key: 'value'
-            };
-
-            fetch('http://localhost:8090/roommenu/cartlist', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    window.location.href = 'http://localhost:8090/roommenu/cartlist';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+        function goToCartList() {
+            window.location.href = '/roommenu/cartlist';
         }
 
 
