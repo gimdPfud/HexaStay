@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -57,7 +58,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      * ***********************************************/
 
     @Override
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale) {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
         Page<RoomMenu> roomMenuPage;
