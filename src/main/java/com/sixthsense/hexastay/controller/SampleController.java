@@ -39,11 +39,15 @@ public class SampleController {
         return "sample/password";
     }
     @GetMapping("/main")
-    public String mian(@PageableDefault(page = 1)Pageable pageable, Model model) {
-        log.info("main 진입 : "+pageable);
+    public String main(@PageableDefault(page = 0) Pageable pageable, Model model) {
+        log.info("main 진입 : " + pageable);
+
         Page<SampleDTO> main = sampleService.sampleMethod(pageable);
-        model.addAttribute("main",main);
+        log.info("main 1 : " + pageable);
+        model.addAttribute("main", main);
+        log.info("main 2 : " + pageable);
         return "sample/main";
     }
+
 
 }

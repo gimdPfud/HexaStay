@@ -65,10 +65,11 @@
         }
 
         .flex-half {
-            flex: 20px;
-            overflow: hidden;
+            flex: 1;
+            min-width: 0;
             white-space: nowrap;
             text-overflow: ellipsis;
+            padding-right: 10px;
         }
 
         .sidebar {
@@ -124,7 +125,11 @@
             max-width: 100%;
             width: 100%;
         }
-
+        .dropdown > .btn {
+            padding: 0;
+            border: none;
+            background: none;
+        }
         .dropdown-toggle img {
             cursor: pointer;
         }
@@ -142,9 +147,8 @@
             padding: 10px 10px; /* 상하 여백 */
             position: absolute;
             top: 20px; /* 버튼 바로 아래 */
-            center: 0;  /* 오른쪽 정렬 */
+            right: 0;
             min-width: 0;
-            display: none;
             z-index: 100;
         }
 
@@ -182,7 +186,6 @@
             #content {
                 margin-left: 0;
             }
-
             .sidebar.show {
                 left: 0;
             }
@@ -203,39 +206,45 @@
     <!-- 사용자 고정 정보 + 토글 프로필 -->
     <div class="d-flex align-items-center gap-3">
         <!-- 프로필 이미지 드롭다운 -->
-<!--        <div class="dropdown">-->
-<!--            <button class="btn " type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--                <img class="profile-img" style="pointer-events: none;"-->
-<!--                     th:if="${#authentication.principal.adminProfileMeta != null}"-->
-<!--                     th:src="@{${#authentication.principal.adminProfileMeta}}" />-->
-<!--                <img class="profile-img" style="pointer-events: none;"-->
-<!--                     th:unless="${#authentication.principal.adminProfileMeta != null}"-->
-<!--                     th:src="@{/profile/default.png}" />-->
-<!--            </button>-->
-<!--            <ul class="dropdown-menu" aria-labelledby="profileDropdown">-->
-<!--                <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>-->
-<!--                <li><a class="dropdown-item" href="/logout">로그아웃</a></li>-->
-<!--            </ul>-->
-<!--        </div>-->
-        <!-- 사용자 정보 (고정 표시) -->
-<!--        <div class="text-white small text">-->
-<!--            <div class="d-flex mb-1">-->
-<!--                <div class="flex-half">-->
-<!--                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>-->
-<!--                </div>-->
-<!--                <div class="flex-half ">-->
-<!--                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="d-flex">-->
-<!--                <div class="flex-half">-->
-<!--                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>-->
-<!--                </div>-->
-<!--                <div class="flex-half">-->
-<!--                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <!-- 프로필 드롭다운 + 관리자 정보 블록 -->
+        <div class="dropdown">
+            <button class="btn" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <img class="profile-img"
+                     style="pointer-events: none;"
+                     th:if="${#authentication.principal.adminProfileMeta != null}"
+                     th:src="${#authentication.principal.adminProfileMeta}" />
+
+                <img class="profile-img"
+                     style="pointer-events: none;"
+                     th:unless="${#authentication.principal.adminProfileMeta != null}"
+                     th:src="@{/profile/default.png}" />
+
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>
+                <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
+            </ul>
+        </div>
+
+        <!-- 관리자 정보 텍스트 박스 -->
+        <div class="text-white small text">
+            <div class="d-flex mb-1">
+                <div class="flex-half">
+                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>
+                </div>
+                <div class="flex-half">
+                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="flex-half">
+                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>
+                </div>
+                <div class="flex-half">
+                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -314,5 +323,8 @@
     });
 
 </script>
+<!-- Bootstrap JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
