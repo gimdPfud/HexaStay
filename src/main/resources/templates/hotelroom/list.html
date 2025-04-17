@@ -71,8 +71,8 @@
                                 </a>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <button class="btn btn-outline-dark btn-sm">자세히</button>
-                                <a href="/member-insertroom" class="btn btn-dark btn-sm">예약</a>
+                                <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}"><button class="btn btn-outline-dark btn-sm">자세히</button></a>
+                                <a href="/member-insertroom" class="btn btn-dark btn-sm ms-1">예약</a>
                             </div>
                         </div>
 

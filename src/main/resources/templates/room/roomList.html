@@ -97,7 +97,7 @@
                     <!-- 호텔룸 이름 -->
                     <td>
                         <a href="javascript:void(0);"
-                           onclick="openMemberPopup(this)"
+                           onclick="openHotelRoomPopup(this)"
                            class="hover-grow-text fw-semibold"
                            th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
                            th:text="${room.hotelRoomName}"></a>
@@ -106,7 +106,7 @@
                     <!-- 회원 이름 -->
                     <td>
                         <a href="javascript:void(0);"
-                           onclick="openMemberPopupByMember(this)"
+                           onclick="openMemberPopup(this)"
                            class="hover-grow-text fw-semibold"
                            th:attr="data-memberNum=${room.memberNum}"
                            th:text="${room.memberName}"></a>
@@ -152,20 +152,74 @@
             <a th:href="@{/member-insertroom}" class="btn btn-danger btn-lg">MemberPk_룸배정</a>
         </div>
 
-        <!-- 팝업 스크립트 -->
+        <!--Room 정보 클릭시 팝업 스크립트 -->
+
         <script th:inline="javascript">
-            function openMemberPopup(element) {
+            function openHotelRoomPopup(element) {
                 const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
                 if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
+
                 const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
-                window.open(popupUrl, "room/membersByHotelRoom", "width=600,height=500,scrollbars=yes,resizable=yes");
+
+                // 팝업 기본 사이즈
+                const popupWidth = 1200;
+                const popupHeight = 700;
+
+                // 화면 가운데 정렬 좌표 계산
+                const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+                const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+                const width = window.innerWidth || document.documentElement.clientWidth || screen.width;
+                const height = window.innerHeight || document.documentElement.clientHeight || screen.height;
+
+                const left = screenLeft + (width - popupWidth) / 2;
+                const top = screenTop + (height - popupHeight) / 2;
+
+                // 팝업 열기
+                const newWindow = window.open(
+                    popupUrl,
+                    "room/membersByHotelRoom",
+                    `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                );
+
+                // 팝업 창에 포커스
+                if (window.focus && newWindow) {
+                    newWindow.focus();
+                }
             }
 
-            function openMemberPopupByMember(element) {
+            <!--member 정보 클릭시 팝업 스크립트 -->
+            function openMemberPopup(element) {
                 const memberNum = element.getAttribute("data-memberNum");
                 if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+
                 const popupUrl = "/hotelRoomsByMember/" + memberNum;
-                window.open(popupUrl, "room/hotelRoomsByMember", "width=600,height=500,scrollbars=yes,resizable=yes");
+
+                // 팝업 기본 사이즈
+                const popupWidth = 1200;
+                const popupHeight = 600;
+
+                // 화면 가운데 위치 계산
+                const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+                const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+                const width = window.innerWidth || document.documentElement.clientWidth || screen.width;
+                const height = window.innerHeight || document.documentElement.clientHeight || screen.height;
+
+                const left = screenLeft + (width - popupWidth) / 2;
+                const top = screenTop + (height - popupHeight) / 2;
+
+                // 팝업 열기
+                const newWindow = window.open(
+                    popupUrl,
+                    "room/hotelRoomsByMember",
+                    `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                );
+
+                // 팝업 포커스
+                if (window.focus && newWindow) {
+                    newWindow.focus();
+                }
             }
         </script>
     </div>

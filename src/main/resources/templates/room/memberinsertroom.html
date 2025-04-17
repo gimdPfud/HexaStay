@@ -111,7 +111,8 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                         <input type="text" class="form-control" id="roomPassword" name="roomPassword"
-                               th:field="*{roomPassword}" placeholder="비밀번호 입력" required>
+                               th:field="*{roomPassword}" placeholder="숫자 4자리 입력"
+                               maxlength="4" pattern="\d{4}" inputmode="numeric" required>
                     </div>
                 </div>
 
@@ -121,6 +122,7 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
                         <input type="text" class="form-control" id="confirmPassword"
+                               maxlength="4" pattern="\d{4}"
                                placeholder="비밀번호 다시 입력" required>
                     </div>
                     <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
@@ -181,16 +183,29 @@
             });
     }
 
-    /*비밀번호 유효성 검사 추가*/
+    /*비밀번호 유효성 검사 추가 4 자리로 제안 스크립트*/
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector("form");
-        const passwordInput = document.getElementById("hotelRoomPassword");
+        const passwordInput = document.getElementById("roomPassword");
         const confirmInput = document.getElementById("confirmPassword");
         const mismatchText = document.getElementById("passwordMismatch");
 
         form.addEventListener("submit", function (e) {
-            if (passwordInput.value !== confirmInput.value) {
-                e.preventDefault(); // 제출 막기
+            const passwordValue = passwordInput.value.trim();
+
+            // 비밀번호 4자리 숫자 확인
+            if (!/^\d{4}$/.test(passwordValue)) {
+                e.preventDefault();
+                alert("비밀번호는 숫자 4자리여야 합니다.");
+                passwordInput.classList.add("is-invalid");
+                return;
+            } else {
+                passwordInput.classList.remove("is-invalid");
+            }
+
+            // 비밀번호 일치 확인
+            if (passwordValue !== confirmInput.value.trim()) {
+                e.preventDefault();
                 mismatchText.style.display = "block";
                 confirmInput.classList.add("is-invalid");
             } else {

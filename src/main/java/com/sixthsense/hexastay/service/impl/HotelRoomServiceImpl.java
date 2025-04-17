@@ -180,7 +180,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         try {
             // ✅ QR 코드 만들기 시작!
             // QR 코드에 넣을 URL 주소 (핸드폰으로 찍으면 이 주소로 이동함)
-            String qrText = "https://naver.com"; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
+            String qrText = "http://localhost:8090/main"; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
 
             // QR 코드 이미지 파일 이름 만들기 (ex. 방이름_qr.png)
             String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
