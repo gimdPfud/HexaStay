@@ -2,7 +2,9 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuTranslation;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
+import com.sixthsense.hexastay.repository.RoomMenuTranslationRepository;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,8 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,6 +35,7 @@ import java.util.UUID;
 public class RoomMenuServiceImpl implements RoomMenuService {
 
     private final RoomMenuRepository roomMenuRepository;
+    private final RoomMenuTranslationRepository roomMenuTranslationRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
 
@@ -295,6 +300,36 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
         log.info("삭제완료 db를 확인하세요.");
 
+    }
+
+    // 번역
+    @Override
+    public List<RoomMenuDTO> getMenusWithLocale(String locale) {
+        List<RoomMenu> menus = roomMenuRepository.findAll();
+
+        return menus.stream()
+                .map(menu -> {
+                    RoomMenuDTO dto = new RoomMenuDTO();
+                    dto.setRoomMenuNum(menu.getRoomMenuNum());
+
+                    // 기본값 (예: 한국어)
+                    dto.setRoomMenuName(menu.getRoomMenuName());
+                    dto.setRoomMenuContent(menu.getRoomMenuContent());
+                    dto.setRoomMenuCategory(menu.getRoomMenuCategory());
+
+                    // 로케일별로 덮어쓰기
+                    roomMenuTranslationRepository.findByRoomMenu_RoomMenuNumAndLocale(menu.getRoomMenuNum(), locale)
+                            .ifPresent(translation -> {
+                                dto.setRoomMenuName(translation.getRoomMenuTransLationName());
+                                dto.setRoomMenuContent(translation.getRoomMenuTransLationContent());
+                                dto.setRoomMenuCategory(translation.getRoomMenuTransLationCategory());
+                            });
+
+                    dto.setRoomMenuPrice(menu.getRoomMenuPrice());
+                    dto.setRoomMenuImageMeta(menu.getRoomMenuImageMeta());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
 

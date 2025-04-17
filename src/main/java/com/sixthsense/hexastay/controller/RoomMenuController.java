@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
@@ -333,31 +334,33 @@ public class RoomMenuController {
                             @RequestParam(value = "type", defaultValue = "") String type,
                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
                             @RequestParam(value = "category", defaultValue = "") String category,
-                            Principal principal, // 👈 추가
+                            Principal principal,
+                            Locale locale, // ✅ 추가
                             Model model) {
+
         log.info("주문페이지 컨트롤러 리스트 진입");
-        log.info("로그인한 사용자" + principal.getName());
+        log.info("로그인한 사용자: " + principal.getName());
 
         String email = principal.getName(); // 로그인한 사용자의 이메일
-
         Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
 
-        // 서비스 연동: 전달된 파라미터로 메뉴 리스트 필터링
-        Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category);
+        // ✅ 로케일 처리
+        String lang = locale.getLanguage(); // ex) "ko", "en"
 
-        // 페이지 정보 가공
+        // ✅ 다국어 적용된 서비스 호출
+        Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category, locale);
+
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
 
-        // 값 전달 (Model)
         model.addAttribute("list", roomMenuList);
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("category", category);  // 카테고리 필터링 값 전달
+        model.addAttribute("category", category);
         model.addAttribute("totalCartItemCount", totalCartItemCount);
         model.addAllAttributes(pageInfo);
 
+        return "/roommenu/orderpage";
 
-        return "/roommenu/orderpage";  // orderpage를 반환하여 뷰를 렌더링
     }
 
 

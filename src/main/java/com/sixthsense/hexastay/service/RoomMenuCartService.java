@@ -6,6 +6,8 @@ import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Locale;
+
 
 public interface RoomMenuCartService {
 
@@ -14,7 +16,7 @@ public interface RoomMenuCartService {
 //    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
 
     // 리스트
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
 
     // 장바구니 읽기 (read)
     public RoomMenuDTO RoomMenuCartRead(String email);
