@@ -6,99 +6,94 @@
 <head>
     <meta charset="UTF-8">
     <title>직원 관리</title>
-
 </head>
 <body style="background-color: #f8f9fa;">
 
-<div layout:fragment="content" class="container mt-4">
+<div layout:fragment="content">
 
+    <div  class="container mt-4 w-100 vh-100 bg-light">
+        <!-- 검색 폼 -->
+        <form action="/admin/list" method="post" style="margin-top: 70px;">
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;">
+                        <option value="all"      th:selected="${select} == 'all'">전체</option>
+                        <option value="center"   th:selected="${select} == 'center'">센터</option>
+                        <option value="branch"   th:selected="${select} == 'branch'">지사</option>
+                        <option value="facility" th:selected="${select} == 'facility'">지점</option>
+                        <option value="store"    th:selected="${select} == 'store'">스토어</option>
+                    </select>
+                </div>
 
+                <div class="col-md-2">
+                    <select name="choice" class="form-select" style="height: 35px; font-size: 0.9rem;">
+                        <option selected>검색 조건</option>
+                        <option value="adminEmployeeNum" th:selected="${choice} == 'adminEmployeeNum'">사번</option>
+                        <option value="adminRole"         th:selected="${choice} == 'adminRole'">직급</option>
+                        <option value="adminPosition"     th:selected="${choice} == 'adminPosition'">직책</option>
+                        <option value="adminName"         th:selected="${choice} == 'adminName'">이름</option>
+                    </select>
+                </div>
 
-    <form action="/admin/list" style="margin-top: 70px;" method="post">
-        <!-- 검색 조건 -->
-        <div class="row mb-3">
+                <div class="col-md-2">
+                    <input name="keyword" type="text" class="form-control"
+                           placeholder="검색어 입력"
+                           style="height: 35px; font-size: 0.9rem;"
+                           th:value="${keyword}">
+                </div>
 
-
-            <div class="col-md-2">
-                <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;">
-                    <option value="all"     th:selected="${select} == 'all'">전체</option>
-                    <option value="center"  th:selected="${select} == 'center'">센터</option>
-                    <option value="branch"  th:selected="${select} == 'branch'">지사</option>
-                    <option value="facility" th:selected="${select} == 'facility'">지점</option>
-                    <option value="store"   th:selected="${select} == 'store'">스토어</option>
-                </select>
+                <div class="col-md-2">
+                    <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
+                </div>
             </div>
+        </form>
 
-            <div class="col-md-2">
-                <select name="choice" class="form-select" style="height: 35px; font-size: 0.9rem;" >
-                    <option selected>검색 조건</option>
-                    <option value="adminEmployeeNum" th:selected="${choice} == 'adminEmployeeNum'">사번</option>
-                    <option value="adminRole" th:selected="${choice} == 'adminRole'">직급</option>
-                    <option value="adminPosition" th:selected="${choice} == 'adminPosition'">직책</option>
-                    <option value="adminName" th:selected="${choice} == 'adminName'">이름</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;"
-                       th:value="${keyword}">
-            </div>
-
-
-
-            <div class="col-md-2">
-                <button class="btn btn-success w-100" style="height: 35px; font-size: 0.9rem;">조회</button>
-            </div>
+        <!-- 직원 목록 테이블 -->
+        <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
+            <table class="table table-bordered table-sm mb-0">
+                <thead style="background-color: #f1f1f1;">
+                <tr>
+                    <th style="text-align: center; vertical-align: middle; width: 10%">프로필 사진</th>
+                    <th style="text-align: center; vertical-align: middle; width: 13%">사번</th>
+                    <th style="text-align: center; vertical-align: middle; width: 13%">직급</th>
+                    <th style="text-align: center; vertical-align: middle; width: 13%">직책</th>
+                    <th style="text-align: center; vertical-align: middle; width: 13%">이름</th>
+                    <th style="text-align: center; vertical-align: middle; width: 15%">소속</th>
+                    <th style="text-align: center; vertical-align: middle; width: 10%">입사일</th>
+                    <th style="text-align: center; vertical-align: middle; width: 10%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="adminDTO : ${adminDTOList}">
+                    <td style="text-align: center;">
+                        <img th:if="${adminDTO.adminProfileMeta != null}"
+                             th:src="@{${adminDTO.adminProfileMeta}}"
+                             style="width: 60px; height: 80px;">
+                        <img th:unless="${adminDTO.adminProfileMeta != null}"
+                             th:src="@{/profile/default.png}"
+                             style="width: 60px; height: 80px;">
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminEmployeeNum}">사번</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.getAdminRoleKorean()}">직급</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminPosition}">직책</td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminName}">이름</td>
+                    <td style="text-align: center; vertical-align: middle;"
+                        th:text="${#strings.isEmpty(adminDTO.companyName) ? (!#strings.isEmpty(adminDTO.storeName) ? adminDTO.storeName : '') : adminDTO.companyName}">
+                        소속
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminJoinDate}">입사일</td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <a th:href="@{|/admin/edit/${adminDTO.adminNum}|}"
+                           class="btn btn-success mx-auto p-0"
+                           style="font-size: 0.8rem; white-space: nowrap; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">
+                            수정
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-    </form>
-
-    <!-- 테이블 -->
-    <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
-        <table class="table table-bordered table-sm" style="margin-bottom: 0;">
-            <thead style="background-color: #f1f1f1;">
-            <tr>
-                <th style="text-align: center; vertical-align: middle; width: 10%">프로필 사진</th>
-                <th style="text-align: center; vertical-align: middle; width: 15%">사번</th>
-                <th style="text-align: center; vertical-align: middle; width: 15%">직급</th>
-                <th style="text-align: center; vertical-align: middle; width: 15%">직책</th>
-                <th style="text-align: center; vertical-align: middle; width: 15%">이름</th>
-                <th style="text-align: center; vertical-align: middle; width: 15%">소속</th>
-                <th style="text-align: center; vertical-align: middle; width: 10%">입사일</th>
-                <th style="text-align: center; vertical-align: middle; width: 5%">버튼</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr th:each="adminDTO : ${adminDTOList}">
-                <td style="text-align: center;">
-                    <img th:if="${adminDTO.adminProfileMeta != null}"
-                         th:src="@{${adminDTO.adminProfileMeta}}"
-                         style="width: 60px; height: 80px;">
-
-                    <img th:unless="${adminDTO.adminProfileMeta != null}"
-                         th:src="@{/profile/default.png}"
-                         style="width: 60px; height: 80px;">
-                </td>
-
-                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminEmployeeNum}">사번</td>
-                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.getAdminRoleKorean()}">직책</td>
-                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminPosition}">직책</td>
-                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminName}">이름</td>
-                <td style="text-align: center; vertical-align: middle;"
-                    th:text="${#strings.isEmpty(adminDTO.companyName) ? (!#strings.isEmpty(adminDTO.storeName) ? adminDTO.storeName : '') : adminDTO.companyName}">
-                    소속
-                </td>
-
-                <td style="text-align: center; vertical-align: middle;" th:text="${adminDTO.adminJoinDate}">입사일</td>
-                <td style="text-align: center; vertical-align: middle;"><a th:href="@{|/admin/edit/${adminDTO.adminNum}|}" class="btn btn-success mx-auto p-0" style="font-size: 0.8rem; white-space: nowrap; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">수정</a></td>
-            </tr>
-
-            </tbody>
-        </table>
-
-
     </div>
-
-
 
 </div>
 
