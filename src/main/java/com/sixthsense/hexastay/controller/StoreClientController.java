@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.dto.StoremenuDTO;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@Log4j2
 @RequestMapping("/member/store")/*지금 일단 로그인때문에... 멤버 밑에다 껴둠.*/
 public class StoreClientController {
     private final StoreService storeService;
@@ -39,6 +41,7 @@ public class StoreClientController {
     @GetMapping("/list")
     public String list(Model model, Pageable pageable){
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
+        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
         model.addAttribute("list",storeDTOPage);
         return "mobilestore/list";
     }

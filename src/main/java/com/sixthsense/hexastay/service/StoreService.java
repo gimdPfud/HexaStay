@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface StoreService {
     /*등록*/
@@ -27,6 +28,7 @@ public interface StoreService {
 
     /*추가목록 : 전부 가져오기*/
     public List<StoreDTO> getAllList();
+    Map<Long, String> getCompanyMap();
     /*목록?
     * 활성화된 외부업체만 목록으로 보여주기
     * 모든 외부 업체 목록 보여주기*/
