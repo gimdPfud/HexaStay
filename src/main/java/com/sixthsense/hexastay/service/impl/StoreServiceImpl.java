@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
@@ -26,7 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -148,6 +152,23 @@ public class StoreServiceImpl implements StoreService {
             return storeDTO;
         }).toList();
         return list;
+    }
+
+    @Override
+    public Map<Long, String> getCompanyMap() {
+        List<Store> storeList = storeRepository.findAll("alive");
+        storeList.forEach(this::checkAndUpdateOrphanStatus);
+        storeList = storeRepository.findAll("alive");
+        Map<Long, String> maps = storeList.stream()
+                .map(Store::getCompany)
+                .filter(company -> company != null && company.getCompanyNum() != null && company.getCompanyName() != null)
+                .collect(Collectors.toMap(
+                        Company::getCompanyNum,
+                        Company::getCompanyName,
+                        (existing, replacement) -> existing, // 중복 키 무시
+                        LinkedHashMap::new
+                ));
+        return maps;
     }
 
 

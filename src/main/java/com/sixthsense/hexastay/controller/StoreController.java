@@ -99,23 +99,14 @@ public class StoreController {
                        @RequestParam(required = false) String keyword){
         Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
-        /*친구찬스*/
-        Map<Long, String> uniqueCompanies = list.stream()
-                .collect(Collectors.toMap(
-                        StoreDTO::getCompanyNum,
-                        StoreDTO::getCompanyName,
-                        (existing, replacement) -> existing, // 중복 키 무시
-                        LinkedHashMap::new
-                ));
-        model.addAttribute("companyMap", uniqueCompanies);
-        /*친구찬스끝*/
+        model.addAttribute("companyMap", storeService.getCompanyMap());
         model.addAttribute("searchType",searchType);
         model.addAttribute("chosenCompany",companyNum);
         model.addAttribute("keyword",keyword);
         return "store/list";
     }
     @PostMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
-    public String list(RedirectAttributes model, Principal principal, Pageable pageable,
+    public String list(Model model, Principal principal, Pageable pageable,
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) String chosenCompany,
                        @RequestParam(required = false) String keyword){
@@ -144,23 +135,20 @@ public class StoreController {
         if(chosenCompany!=null && !chosenCompany.trim().isEmpty() && !chosenCompany.equals("호텔목록")){
             companyNum = Long.valueOf(chosenCompany);
         }
+        model.addAttribute("companyNum",companyNum);
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
-        model.addAttribute("companyNum",companyNum);
+        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
+        model.addAttribute("list",list);
+        model.addAttribute("companyMap", storeService.getCompanyMap());
 //        /*친구찬스*/
-//        Map<Long, String> uniqueCompanies = list.stream()
-//                .collect(Collectors.toMap(
-//                        StoreDTO::getCompanyNum,
-//                        StoreDTO::getCompanyName,
-//                        (existing, replacement) -> existing, // 중복 키 무시
-//                        LinkedHashMap::new
-//                ));
-//        model.addAttribute("companyMap", uniqueCompanies);
+//        Map<Long,String>maps= storeService.getCompanyMap();
+//        model.addFlashAttribute("companyMap", maps);
 //        /*친구찬스끝*/
         model.addAttribute("searchType",searchType);
         model.addAttribute("keyword",keyword);
-        return "redirect:/admin/store/list";
+        return "store/list";
     }
 
 

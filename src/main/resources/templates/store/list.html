@@ -16,8 +16,11 @@
     <form class="row g-3 mb-4" action="/admin/store/list" method="post">
         <div class="col-md-2">
             <select class="form-select" name="chosenCompany">
-                <option>호텔목록</option>
-                <option th:each="data:${companyMap}" th:unless="${companyMap == null or #maps.isEmpty(companyMap)}" th:selected="${chosenCompany == data.key}" th:value="${data.key}" th:text="${data.value}"></option>
+                <option value="">호텔목록</option>
+                <option th:each="data : ${companyMap}"
+                        th:value="${data.key}"
+                        th:text="${data.value}"
+                        th:selected="${chosenCompany == data.key}"></option>
             </select>
         </div>
         <div class="col-md-2">
@@ -32,7 +35,7 @@
             <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
         </div>
         <div class="d-flex gap-3 col-md-4">
-            <button type="submit" class="btn btn-success w-50">조회(기능X)</button>
+            <button type="submit" class="btn btn-success w-50">조회</button>
             <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
                 등록(모달)
             </button>
