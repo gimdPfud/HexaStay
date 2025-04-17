@@ -89,7 +89,7 @@ public class StoreOrderController {
         }
         List< StoreDTO> storelist = storeService.getAllList();//됨
         model.addAttribute("storeList",storelist);
-        return "store/orderlist";
+        return "store/orderlistForAdmin";
     }
     @PostMapping("/admin/store/order/list")
     public String adminOrderList(@RequestParam(value = "storeNum") Long storeNum, Principal principal, Model model){
@@ -108,7 +108,7 @@ public class StoreOrderController {
         list.forEach(log::info);
         model.addAttribute("list",list);
         model.addAttribute("storeNum",storeNum);
-        return "store/orderlist";
+        return "store/orderlistForAdmin";
     }
     @GetMapping("/admin/store/order/cancel/{orderNum}")
     public ResponseEntity cancelOrder(@PathVariable(value = "orderNum") Long orderNum){

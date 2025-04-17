@@ -53,7 +53,6 @@
 
 
         <!--todo 주문정보 입력하는 모달창-->
-        <!--todo form태그로 넘길때... 결제api 한번 거쳐야하는데??-->
         <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderLabel" aria-hidden="true">
             <div class="modal-dialog modal-fullscreen">
                 <div class="modal-content">
@@ -64,7 +63,7 @@
                     </div>
                     <div class="modal-body">
                         어쩌고저쩌고... 주문방법은 어떻게... 요청사항?....
-                        토스api가 여기 들어가면 되나???
+                        <textarea class="form-control" maxlength="500" name="orderstoreMessage" placeholder="500자 까지 작성 가능합니다."></textarea>
                         <select name="orderstorePay">
                             <option value="cash">현금</option>
                             <option value="credit">신용카드</option>
