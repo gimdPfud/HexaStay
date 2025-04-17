@@ -321,12 +321,18 @@
             text-decoration: none; /* 밑줄 제거 */
         }
 
+        /* 다국어 */
 
+        .lang-en .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: -0.5px;
+        }
 
 
     </style>
 </head>
-<body>
+<body th:classappend="${#locale.language == 'en'} ? 'lang-en' : ''">
 <div layout:fragment="contentorder">
 
     <div class="container">
@@ -337,7 +343,6 @@
             <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
                 <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
                 <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
             </select>
         </form>
 
@@ -346,12 +351,12 @@
             <form th:action="@{/roommenu/orderpage}" method="get">
                 <div class="search-box">
                     <select id="search-option" name="type" class="form-select">
-                        <option value="S" th:selected="${type == 'S'}">이름</option>
-                        <option value="P" th:selected="${type == 'P'}">가격</option>
-                        <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                        <option value="S" th:selected="${type == 'S'}" th:text="#{search.option.name}"></option>
+                        <option value="P" th:selected="${type == 'P'}" th:text="#{search.option.price}"></option>
+                        <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}"></option>
                     </select>
-                    <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword" style="width: 160px; height: 30px;">
-                    <button type="submit" style="height: 26.36px">검색</button>
+                    <input type="text" th:placeholder="#{search.placeholder}" name="keyword" />
+                    <button type="submit" th:text="#{search.button}"></button>
                 </div>
             </form> <!-- 검색창 끝 -->
         </div>
@@ -406,14 +411,15 @@
             </li>
         </ul>
 
-        <button class="add-to-cart-btn"
-                onclick="goToCartList('/roommenu/cartlist')">
-            🛒 내 카트 리스트로
+        <!-- 카트 버튼 -->
+        <button class="add-to-cart-btn" onclick="goToCartList('/roommenu/cartlist')">
+            <span th:text="#{button.cart}"></span>
             <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
         </button>
-        <button class="order-list-btn"
-                onclick="window.location.href='/roommenu/orderList'">
-            🛒 내 주문 리스트로
+
+        <!-- 주문 리스트 버튼 -->
+        <button class="order-list-btn" onclick="window.location.href='/roommenu/orderList'">
+            <span th:text="#{button.orderlist}"></span>
         </button>
     </div>
 
