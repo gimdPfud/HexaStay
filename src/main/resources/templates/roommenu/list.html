@@ -25,10 +25,9 @@
 
         .search-box select,
         .search-box input,
-        .search-box button,
         .search-box option {
             border-radius: 5px;
-            height: 40px;
+            height: 30px;
         }
         .search-box select {
             width: 150px;
@@ -36,17 +35,6 @@
         }
         .search-box input {
             width: 520px;
-        }
-        .search-box button {
-            background-color: #45a049;
-            color: white;
-            border: none;
-            cursor: pointer;
-
-        }
-
-        .search-box button:hover {
-            background-color: #4CAF50;
         }
 
         #category-option {
@@ -69,19 +57,6 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        .btn-custom {
-            width: 80px;
-            height: 40px;
-            padding: 0;
-            font-size: 18px;
-            display: inline-block;
-            text-align: center;
-            line-height: 40px;
-            text-align: center;
-            margin: 3px;
-        }
-
-
         @media (max-width: 768px) {
             .search-box {
                 flex-direction: column;
@@ -127,9 +102,9 @@
 
                                 <!-- 검색버튼 -->
                     <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary btn-custom"> 검색 </button>
-                        <a href="/roommenu/insert" class="btn btn-warning btn-custom"> 메뉴등록</a>
-                        <a href="/roommenu/orderpage" class="btn btn-primary btn-custom" >고객용 </a>
+                        <button type="submit" class="btn btn-outline-primary px-2 py-1" > 검색 </button>
+                        <a href="/roommenu/insert" class="btn btn-outline-success px-2 py-1"> 메뉴등록</a>
+                        <a href="/roommenu/orderpage" class="btn btn-outline-danger px-2 py-1" >고객용 </a>
                     </div>
                 </div>
                 <p> * 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
