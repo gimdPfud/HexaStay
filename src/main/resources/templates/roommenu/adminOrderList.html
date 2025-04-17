@@ -1,20 +1,28 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
     <meta charset="UTF-8">
     <title>판매자 주문 알람 내역</title>
-    <style>
-        body { font-family: 'Open Sans', sans-serif; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background-color: #f0f0f0; }
-        input[type="checkbox"] {
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-    </style>
+
 </head>
 <body>
+
+<div th:fragment="content">
+
+<style>
+    body { font-family: 'Open Sans', sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #f0f0f0; }
+    input[type="checkbox"] {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+</style>
+
 <h2>사용자가 주문한 주문 목록</h2>
 <form id="orderForm">
     <table>
@@ -96,5 +104,8 @@
         });
     }
 </script>
+
+</div>
+
 </body>
 </html>
