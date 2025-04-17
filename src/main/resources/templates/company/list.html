@@ -22,16 +22,18 @@
   </style>
 </head>
 <body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-  <div class="container mt-4">
+  <div class="container mt-4 w-100 vh-100 bg-light">
     <h3 class="fw-bold mb-4 text-center">조직 조회</h3>
+
     <!-- 검색 폼 -->
-    <form method="get" action="/company/list" class="row g-3 align-items-end">
+    <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3">
         <label class="form-label">소속</label>
-        <select name="choice" id="choice" class="form-select" onchange="this.form.submit()">
+        <select name="choice" id="choice" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
           <option value="center" th:selected="${choice} == 'center'">본사</option>
           <option value="branch" th:selected="${choice} == 'branch'">지사</option>
           <option value="facility" th:selected="${choice} == 'facility'">지점</option>
@@ -40,8 +42,8 @@
 
       <div class="col-md-3">
         <label class="form-label">검색 조건</label>
-        <select name="select" class="form-select">
-          <option value="전체" th:selected="${select == '전체'}">전체</option>
+        <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;">
+          <<option selected>검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
           <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
@@ -50,7 +52,7 @@
 
       <div class="col-md-4">
         <label class="form-label">검색어</label>
-        <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" th:value="${keyword}">
+        <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;" th:value="${keyword}">
       </div>
 
       <div class="col-md-2 d-flex gap-2">
@@ -78,7 +80,7 @@
           <tbody>
           <tr th:each="item : ${companyDTOS}" class="text-center">
 
-          <td>
+            <td>
               <img th:if="${item.companyPictureMeta != null}"
                    th:src="@{${item.companyPictureMeta}}"
                    style="width: 60px; height: 80px;">
