@@ -47,6 +47,7 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuCartController {
 
     private final RoomMenuCartService roomMenuCartService;
+    private final RoomMenuService roomMenuService;
 
     /***************************************************
      *
@@ -135,6 +136,7 @@ public class RoomMenuCartController {
 
         String email = principal.getName();
         Page<RoomMenuCartDetailDTO> cartDetailDTOList = roomMenuCartService.RoomMenuCartItemList(email, pageable);
+
 
         // 장바구니 비어있는지 여부 체크
         boolean isCartEmpty = cartDetailDTOList == null || cartDetailDTOList.isEmpty();

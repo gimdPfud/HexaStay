@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.RoomMenu;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +39,7 @@ public class RoomMenuCartDetailDTO {
 
     private String originalImageMeta; // 기존 이미지의 경로
 
+
     public RoomMenuCartDetailDTO(Long roomMenuCartItemNum, String roomMenuCartDetailMenuItemName,
                                  Integer roomMenuCartDetailMenuItemPrice, Integer roomMenuCartDetailMenuItemAmount,
                                  String roomMenuImageMeta) {
@@ -49,5 +51,6 @@ public class RoomMenuCartDetailDTO {
     }
         // DTO를 참조
         private RoomMenuDTO roomMenuDTO;
+
 
     }
