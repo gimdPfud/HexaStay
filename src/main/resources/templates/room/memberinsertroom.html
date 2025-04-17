@@ -13,46 +13,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script> <!-- 테마 선택 가능 -->
 
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
         .form-container {
             max-width: 850px;
             margin: auto;
-            background-color: #fff;
+            background-color: #ffffff;
             border-radius: 1rem;
-            padding: 3rem;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding: 3rem 2.5rem;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.05);
         }
-        h2 {
-            font-weight: 600;
-            color: #343a40;
-        }
+
         .form-label {
-            color: #495057;
+            font-weight: 600;
+            color: #212529;
         }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            padding: 0.6rem 0.75rem;
+        }
+
+        .input-group-text {
+            background-color: #f1f3f5;
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+
         .btn-lg {
             padding: 0.6rem 2rem;
             font-size: 1.1rem;
             border-radius: 2rem;
         }
-        .btn-primary {
-            background-color: #4b4f58;
-            border-color: #4b4f58;
+
+        .form-text.text-danger {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
         }
-        .btn-primary:hover {
-            background-color: #34373d;
-            border-color: #34373d;
-        }
-        .btn-warning {
-            background-color: #e2a940;
-            border-color: #e2a940;
-            color: white;
-        }
-        .btn-warning:hover {
-            background-color: #c38f2e;
+
+        @media (max-width: 767px) {
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.5rem 1.2rem;
+            }
         }
     </style>
+
 </head>
 <body>
 <div layout:fragment="content" class="container mt-4"><!--레이아웃 fragment 시작점-->
@@ -101,6 +105,28 @@
                     <label class="form-label fw-bold">📱 전화번호</label>
                     <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
                 </div>
+                <!-- 비밀번호 입력 (보이게 수정됨) -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">🔒 호텔룸 이용 비밀번호</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="text" class="form-control" id="roomPassword" name="roomPassword"
+                               th:field="*{roomPassword}" placeholder="비밀번호 입력" required>
+                    </div>
+                </div>
+
+                <!-- 비밀번호 확인 (유효성 검사용 그대로 유지) -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">✅ 비밀번호 확인</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
+                        <input type="password" class="form-control" id="confirmPassword"
+                               placeholder="비밀번호 다시 입력" required>
+                    </div>
+                    <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
+                        ❗비밀번호가 일치하지 않습니다.
+                    </div>
+                </div>
                 <!-- 체크인 -->
                 <div class="col-md-6">
                     <label class="form-label fw-bold">📅 체크인 날짜</label>
@@ -123,11 +149,12 @@
         </div>
     </div><!--등록 페이지 끝 지점-->
 
-</div><!--레이아웃 fragment 끝지점 -->
+
 
 
 <!-- 호텔룸 자동 선택 JS -->
 <script>
+    /*호텔룸 pk 을 자동으로 가져 와서 pk 값이 자동으로 room 테이블에 입력되는 메소드*/
     function updateHotelRoomPk() {
         let selectedName = document.getElementById("hotelRoomName").value;
 
@@ -154,11 +181,31 @@
             });
     }
 
+    /*비밀번호 유효성 검사 추가*/
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const passwordInput = document.getElementById("hotelRoomPassword");
+        const confirmInput = document.getElementById("confirmPassword");
+        const mismatchText = document.getElementById("passwordMismatch");
+
+        form.addEventListener("submit", function (e) {
+            if (passwordInput.value !== confirmInput.value) {
+                e.preventDefault(); // 제출 막기
+                mismatchText.style.display = "block";
+                confirmInput.classList.add("is-invalid");
+            } else {
+                mismatchText.style.display = "none";
+                confirmInput.classList.remove("is-invalid");
+            }
+        });
+    });
+
 
 
 </script>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</div><!--레이아웃 fragment 끝지점 -->
 </body>
 </html>
