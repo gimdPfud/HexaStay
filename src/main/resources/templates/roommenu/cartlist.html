@@ -286,7 +286,21 @@
     <!-- 결제하기 및 목록으로 버튼 -->
     <button class="btn add-to-cart-btn" onclick="processPayment()">결제하기</button>
     <button class="btn back-btn" onclick="goToOrderPage()">목록으로</button>
+
+
+    <!-- 모달 -->
+    <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+        <div style="position:relative; width:90%; max-width:600px; margin:5% auto; background:white; border-radius:10px; padding:20px;">
+            <iframe id="paymentFrame" style="width:100%; height:600px; border:none;"></iframe>
+            <button onclick="closeModal()" style="position:absolute; top:10px; right:10px;">X</button>
+        </div>
+    </div>
+
+
 </div>
+
+
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -305,6 +319,8 @@
         });
 
         // 총 금액을 "최종결제금액" 영역에 표시
+        let tossprice = total;
+
         const finalTotalEl = document.querySelector('.final-total');
         if (finalTotalEl) {
             finalTotalEl.textContent = `최종결제금액: ${total.toLocaleString()}원`;
@@ -470,36 +486,24 @@
             document.querySelectorAll('.item-total').forEach(span => {
                 const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
                 if (!isNaN(value)) total += value;
+                tossprice = total
             });
             document.querySelector('.final-total').textContent = `최종결제금액: ${total.toLocaleString()}원`;
         }
-
         updateFinalTotal();
     });
     // ----- 결제하기 최종 결제 금액을 업데이트 끝 ----
 
     // 결제여부에 따라서 이동되는 페이지
     function processPayment() {
-        const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
-
-        fetch('/roommenu/cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                requestMessage: roomMenuOrderRequestMessage
-            })
-        })
-            .then(res => res.text())
-            .then(result => {
-                alert("결제가 완료되었습니다.");
-                window.location.href = '/roommenu/orderList';
-            })
-            .catch(error => {
-                alert("결제 중 오류 발생: " + error);
-            });
+        const url = "/payment?tossprice=" + tossprice;
+        const popup = window.open(url, "_blank", "width=600,height=800");
+        if (!popup) {
+            alert("팝업 차단 해제해 주세요.");
+        }
+            window.location.href = "/tossloading";
     }
+
 
 
 
@@ -516,7 +520,7 @@
         </div>
     </div>
 </div>
-<!-- 모달창 팝업 끝 -->
+
 
 </body>
 </html>
