@@ -48,6 +48,10 @@ public class SampleController {
         log.info("main 2 : " + pageable);
         return "sample/main";
     }
+    @GetMapping("/admin/store/order/pay")
+    public String storeMaechul(){
+        return "store/mae";
+    }
 
 
 }

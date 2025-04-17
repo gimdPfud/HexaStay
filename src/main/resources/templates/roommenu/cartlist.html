@@ -227,8 +227,8 @@
     <ul class="food-list">
         <li th:each="roomMenuCartDTO : ${cartDetailDTOList}"
             class="food-item"
-            th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum},
-             data-stock=${roomMenuDTO.roomMenuAmount}">
+            th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
+
 
             <div class="food-info col-6">
                 <p>가격: <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>원</p>
@@ -331,84 +331,75 @@
         const confirmBtn = document.getElementById('modalConfirmBtn');
         const cancelBtn = document.getElementById('modalCancelBtn');
 
+        let currentItem = null;
+
         // ✅ 취소 버튼 클릭 시 모달 닫기
         cancelBtn.addEventListener('click', function () {
             modal.style.display = 'none';
         });
 
-        let currentItem = null;
-
+        // ✅ 수량 수정 버튼 클릭 시
         document.querySelectorAll('.update-btn').forEach(button => {
             button.addEventListener('click', function () {
-                // 현재 클릭된 food-item을 찾고 그 안의 item-id 값 가져오기
                 currentItem = button.closest('.food-item');
-                const itemId = currentItem.dataset.itemId; // 데이터에서 itemId 가져오기
                 const qtySpan = currentItem.querySelector('.item-quantity');
-                const newQty = parseInt(qtySpan.textContent) || 1; // 수량 가져오기 (기본값: 1)
+                const newQty = parseInt(qtySpan.textContent) || 1;
 
-                // 모달에 값 설정
-                const input = document.getElementById('modalQuantityInput');
                 input.value = newQty;
-                const modal = document.getElementById('quantityModal');
                 modal.style.display = 'flex';
-
-
-                // 확인 버튼 클릭 시 AJAX로 서버에 PUT 요청 보내기
-                document.getElementById('modalConfirmBtn').addEventListener('click', function () {
-                    const updatedQty = parseInt(input.value);
-
-                    if (!updatedQty || updatedQty < 1) {
-                        alert("수량은 1 이상이어야 합니다.");
-                        return;
-                    }
-
-                    const availableStock = parseInt(currentItem.dataset.stock);
-
-                    if (updatedQty > availableStock) {
-                        alert("수량이 부족합니다. 현재 재고는 " + availableStock + "개 입니다.");
-                        return;
-                    }
-
-                    if (updatedQty && updatedQty > 0) {
-                        // PUT 요청 보내기
-                        $.ajax({
-                            url: `/roommenu/orderpage/read/${itemId}/${updatedQty}`,  // itemId와 newQty를 URL에 포함시킴
-                            type: 'PUT',
-                                success: function () {
-                                    console.log(`수량 ${updatedQty}개로 변경 성공`);
-
-                                    // 수량 갱신
-                                    currentItem.querySelector('.item-quantity').textContent = updatedQty;
-
-                                    // 단가 가져와서 총 금액 계산
-                                    const price = parseInt(currentItem.querySelector('.item-price').textContent.replace(/[^0-9]/g, ''), 10);
-                                    const totalElement = currentItem.querySelector('.item-total');
-                                    const newTotal = updatedQty * price;
-                                    totalElement.textContent = newTotal.toLocaleString(); // 쉼표 포함된 숫자 문자열로 표시
-
-                                    // 최종 결제 금액 재계산
-                                    updateFinalTotal();
-                            },
-                            error: function (jqXHR) {
-                                if (jqXHR.status === 401) {
-                                    alert("로그인이 필요합니다.");
-                                    window.location.href = "/member/login";
-                                } else if (jqXHR.status === 403) {
-                                    alert("해당 항목에 접근 권한이 없습니다.");
-                                } else {
-                                    alert("수량 변경에 실패했습니다.");
-                                    console.error(jqXHR.responseText);
-                                }
-                            }
-                        });
-
-                        modal.style.display = 'none';  // 모달 닫기
-                    } else {
-                        alert("수량은 1 이상이어야 합니다.");
-                    }
-                });
             });
-        }); // ----- 음식 아이템의 수량을 동적으로 업데이트하는 기능을 구현하기 수정 끝 ----
+        });
+
+        // ✅ 확인 버튼은 오직 한 번만 이벤트 리스너 등록
+        confirmBtn.addEventListener('click', function () {
+            if (!currentItem) return;
+
+            const updatedQty = parseInt(input.value);
+
+            if (!updatedQty || updatedQty < 1) {
+                alert("수량은 1 이상이어야 합니다.");
+                return;
+            }
+
+            const availableStock = parseInt(currentItem.dataset.stock);
+            if (updatedQty > availableStock) {
+                alert("수량이 부족합니다. 현재 재고는 " + availableStock + "개 입니다.");
+                return;
+            }
+
+            const itemId = currentItem.dataset.itemId;
+
+            $.ajax({
+                url: `/roommenu/orderpage/read/${itemId}/${updatedQty}`,
+                type: 'PUT',
+                success: function () {
+                    console.log(`수량 ${updatedQty}개로 변경 성공`);
+
+                    currentItem.querySelector('.item-quantity').textContent = updatedQty;
+
+                    const price = parseInt(currentItem.querySelector('.item-price').textContent.replace(/[^0-9]/g, ''), 10);
+                    const totalElement = currentItem.querySelector('.item-total');
+                    const newTotal = updatedQty * price;
+                    totalElement.textContent = newTotal.toLocaleString();
+
+                    updateFinalTotal();
+                },
+                error: function (jqXHR) {
+                    if (jqXHR.status === 401) {
+                        alert("로그인이 필요합니다.");
+                        window.location.href = "/member/login";
+                    } else if (jqXHR.status === 403) {
+                        alert("해당 항목에 접근 권한이 없습니다.");
+                    } else {
+                        alert("수량 변경에 실패했습니다.");
+                        console.error(jqXHR.responseText);
+                    }
+                }
+            });
+
+            modal.style.display = 'none';
+        });
+    // ----- 음식 아이템의 수량을 동적으로 업데이트하는 기능을 구현하기 수정 끝 ----
 
         // ----- 삭제하기 시작 ----
         document.querySelectorAll('.delete-btn').forEach(button => {

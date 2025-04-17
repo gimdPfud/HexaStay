@@ -49,24 +49,21 @@
                                     <div class="text-info">
                                         <p th:text="${store.storeName}"></p>
                                         <p th:text="${store.storeAddress}"></p>
-                                        <div class="price-box">
-                                            <span th:text="${store. + '원'}" class="price-text"></span>
-                                        </div>
                                     </div>
                                     <div class="image-like-container">
-                                        <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                                             th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                                             class="menu-image">
-                                        <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                                             th:src="@{/profile/default.png}"
-                                             class="menu-image">
+                                        <img th:if="${store.storeProfileMeta != null}"
+                                             th:src="@{${store.storeProfileMeta}}"
+                                             class="store-image">
+                                        <img th:unless="${store.storeProfileMeta != null}"
+                                             th:src="@{/store/default.png}"
+                                             class="store-image">
                                     </div>
                                 </div>
                             </div>
                         </a>
                         <div class="like-section">
                             <div class="category-wrapper">
-                                <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
+                                <span th:text="${store.storeCategory}" class="category-label"></span>
                             </div>
                             <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
                                   th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
