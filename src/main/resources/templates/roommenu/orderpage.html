@@ -331,6 +331,16 @@
 
     <div class="container">
 
+        <!-- 다국어 시작 -->
+
+        <form method="get" action="" class="mb-3">
+            <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
+                <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+            </select>
+        </form>
+
         <!-- 검색창 (항상 표시되도록 설정) -->
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
@@ -348,12 +358,13 @@
 
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
+            <div class="tab" th:text="#{tab.all}" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
+            <div class="tab" th:text="#{tab.korean}" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
+            <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
+            <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
+            <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
         </div>
+
 
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
