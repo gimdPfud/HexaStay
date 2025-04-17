@@ -29,6 +29,8 @@ public class MemberDTO {
 
     private String roomPassword;                      //비밀번호
 
+    private String memberPassword;
+
     private String memberPhone;                         //전화번호
 
     private String memberEmail;                         //이메일
