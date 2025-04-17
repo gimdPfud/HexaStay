@@ -41,6 +41,21 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final MemberRepository memberRepository;
 
+    /***********************************************
+     * 메서드명 : RoomMenuList
+     * 기능 : 룸 메뉴 목록을 페이징 처리하여 조회하고, 검색 조건(타입, 키워드, 카테고리)에 따라 필터
+     * - 타입(type)에 따라 카테고리, 이름, 가격, 재고량, 이름+가격으로 검색을 수행
+     * - 유효하지 않은 타입 또는 파싱 오류 발생 시 전체 룸 메뉴 목록을 조회
+     * 매개변수 : Pageable pageable - 페이징 정보
+     * String type - 검색 타입 (C: 카테고리, S: 이름, P: 가격, A: 재고량, N: 이름+가격)
+     * String keyword - 검색 키워드
+     * String category - 카테고리
+     * 반환값 : Page<RoomMenuDTO> - 페이징된 룸 메뉴 DTO 목록
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-08
+     * 수정일 : -
+     * ***********************************************/
+
     @Override
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category) {
         log.info("룸서비스 상품 리스트 서비스 진입");
@@ -333,6 +348,16 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 //        }); // todo(7) 코드를 제거했음 오류 생길수도 있음
     }
 
+    /***********************************************
+     * 메서드명 : read
+     * 기능 : 특정 룸 메뉴 번호를 기반으로 룸 메뉴 상세 정보를 조회
+     * 매개변수 : Long num - 룸 메뉴 번호
+     * 반환값 : RoomMenuDTO - 조회된 룸 메뉴 DTO
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-09
+     * 수정일 : -
+     * ***********************************************/
+
     // 상세보기
     @Override
     public RoomMenuDTO read(Long num) {
@@ -347,6 +372,16 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         return menuDTO;
 
     }
+
+    /***********************************************
+     * 메서드명 : getTotalCartItemCount
+     * 기능 : 특정 회원의 이메일을 기반으로 장바구니에 담긴 총 아이템 수를 조회.
+     * 매개변수 : String memberEmail - 회원 이메일
+     * 반환값 : Integer - 총 장바구니 아이템 수 (null일 경우 0 반환)
+     * 작성자 : 자동 생성
+     * 작성일 : 2025-04-14
+     * 수정일 : -
+     * ***********************************************/
 
     @Override
     public Integer getTotalCartItemCount(String memberEmail) {

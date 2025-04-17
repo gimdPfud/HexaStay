@@ -28,9 +28,15 @@ import java.util.Optional;
 
 public class RoomMenuLikeController {
     private final RoomMenuLikeRepository roomMenuLikeRepository;
-
     private final RoomMenuLikeService roomMenuLikeService;
     private final RoomMenuRepository roomMenuRepository;
+
+    /**************************************************
+     * 룸 메뉴 좋아요 설정/해제
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 좋아요 상태를 설정하거나 해제
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-17
+     **************************************************/
 
     // 좋아요
     @PostMapping("/roommenu/orderpage/like/{roomMenuNum}")
@@ -43,6 +49,13 @@ public class RoomMenuLikeController {
         int likes = roomMenuLikeService.roomMenuLike(roomMenuNum, email);
         return ResponseEntity.ok(likes);
     }
+
+    /**************************************************
+     * 룸 메뉴 좋아요 상태 및 총 개수 조회
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 좋아요/싫어요 상태와 총 좋아요/싫어요 개수를 조회
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-17
+     **************************************************/
 
     @GetMapping("/roommenu/orderpage/status/{roomMenuNum}")
     @ResponseBody
@@ -76,6 +89,13 @@ public class RoomMenuLikeController {
         return ResponseEntity.ok(response);
     }
 
+    /**************************************************
+     * 룸 메뉴 좋아요 취소
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 좋아요 설정을 취소
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-17
+     **************************************************/
+
     // 좋아요 취소
     @PostMapping("/roommenu/orderpage/cancellike/{roomMenuNum}")
     @ResponseBody
@@ -86,6 +106,13 @@ public class RoomMenuLikeController {
         return ResponseEntity.ok(likes);
     }
 
+    /**************************************************
+     * 룸 메뉴 싫어요 설정/해제
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 싫어요 상태를 설정하거나 해제
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-17
+     **************************************************/
+
     // 싫어요
     @PostMapping("/roommenu/orderpage/dislike/{roomMenuNum}")
     @ResponseBody
@@ -95,6 +122,13 @@ public class RoomMenuLikeController {
         int dislikes = roomMenuLikeService.roomMenuDisLike(roomMenuNum, email);
         return ResponseEntity.ok(dislikes);
     }
+
+    /**************************************************
+     * 룸 메뉴 싫어요 상태 및 총 개수 조회
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 싫어요 상태와 총 싫어요 개수를 조회합니다.
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-17
+     **************************************************/
 
     @GetMapping("/roommenu/orderpage/dislike/status/{roomMenuNum}")
     @ResponseBody
@@ -122,6 +156,13 @@ public class RoomMenuLikeController {
 
         return ResponseEntity.ok(response);
     }
+
+    /**************************************************
+     * 룸 메뉴 싫어요 취소
+     * 기능: 특정 룸 메뉴에 대해 현재 로그인한 사용자의 싫어요 설정을 취소합니다.
+     * 등록일 : 2025-04-14
+     * 수정일 : 2025-04-16
+     **************************************************/
 
     // 싫어요 취소
     @PostMapping("/roommenu/orderpage/cancledislike/{roomMenuNum}")

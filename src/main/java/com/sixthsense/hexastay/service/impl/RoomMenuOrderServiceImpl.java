@@ -94,6 +94,22 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         return roomMenuOrderA.getRoomMenuOrderNum();
     }
 
+
+    /***********************************************
+     * 메서드명 : roomMenuOrderInsertFromCart
+     * 기능 : 장바구니에 담긴 상품들을 기반으로 새로운 룸 메뉴 주문을 생성한다.
+     * - 로그인한 회원을 찾고, 해당 회원의 장바구니와 아이템들을 조회한다.
+     * - 장바구니 아이템들을 주문 아이템으로 변환하면서 재고를 확인하고 차감한다.
+     * - 주문 객체를 생성하고, 주문 아이템들과 연결하여 저장한다.
+     * - 주문 완료 후 장바구니를 비운다.
+     * 매개변수 : String email - 주문하는 회원의 이메일
+     * String requestMessage - 주문 시 요청사항
+     * 반환값 : Long - 생성된 주문 번호
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-16
+     * 수정일 : -
+     * ***********************************************/
+
     @Override
     public Long roomMenuOrderInsertFromCart(String email, String requestMessage) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
@@ -152,6 +168,18 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         return savedOrder.getRoomMenuOrderNum();
     }
 
+    /***********************************************
+     * 메서드명 : getOrderListByEmail
+     * 기능 : 특정 이메일을 가진 회원의 주문 목록을 조회하여 DTO 리스트로 반환한다.
+     * - 회원 정보를 조회하고, 해당 회원의 주문 목록을 등록일자 내림차순으로 가져온다.
+     * - 각 주문 정보를 RoomMenuOrderDTO로 변환하고, 주문 아이템 정보도 RoomMenuOrderItemDTO로 변환하여 포함한다.
+     * 매개변수 : String email - 조회할 회원의 이메일
+     * 반환값 : List<RoomMenuOrderDTO> - 주문 정보 DTO 리스트
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-16
+     * 수정일 : -
+     * ***********************************************/
+
     @Override
     public List<RoomMenuOrderDTO> getOrderListByEmail(String email) {
         log.info("주문 리스트 서비스 진입 : " + email);
@@ -178,6 +206,21 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    /***********************************************
+     * 메서드명 : cancelRoomMenuOrder
+     * 기능 : 특정 주문 번호에 해당하는 주문을 취소한다.
+     * - 주문을 조회하고, 주문한 회원의 이메일과 현재 로그인한 회원의 이메일을 비교하여 취소 권한을 확인한다.
+     * - 이미 취소된 주문이거나, 주문 상태가 '주문'이 아닌 경우 예외를 발생시킨다.
+     * - 주문 아이템들의 수량만큼 룸 메뉴의 재고를 복구한다.
+     * - 주문 상태를 '취소'로 변경하고 저장한다.
+     * 매개변수 : Long orderNum - 취소할 주문 번호
+     * String email - 현재 로그인한 회원의 이메일
+     * 반환값 : void
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-16
+     * 수정일 : -
+     * ***********************************************/
 
     // 주문 취소
     @Override
@@ -215,6 +258,18 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     }
 
 
+    /***********************************************
+     * 메서드명 : getAllOrdersForAdmin
+     * 기능 : 관리자 페이지에서 모든 '주문' 상태의 주문 목록을 조회하여 DTO 리스트로 반환한다.
+     * - 주문 상태가 '주문'인 모든 주문을 등록일자 내림차순으로 가져온다.
+     * - 각 주문 정보를 RoomMenuOrderDTO로 변환하고, 주문 아이템 정보도 RoomMenuOrderItemDTO로 변환하여 포함한다.
+     * - 주문한 회원 정보도 DTO에 포함한다.
+     * 매개변수 : 없음
+     * 반환값 : List<RoomMenuOrderDTO> - 주문 정보 DTO 리스트
+     * 작성자 : 김윤겸
+     * 작성일 : 2025-04-16
+     * 수정일 : -
+     * ***********************************************/
 
     // 주문어드민
     @Override

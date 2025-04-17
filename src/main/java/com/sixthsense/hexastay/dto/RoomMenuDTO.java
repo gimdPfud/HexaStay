@@ -1,21 +1,23 @@
 /***********************************************
- * 클래스명 : RoomServiceDTO
- * 기능 : RoomServiceDTO 엔티티
+ * 클래스명 : RoomMenuDTO
+ * 기능 : 룸 메뉴 정보를 담는 DTO 클래스
+ * - 룸 메뉴의 고유 번호, 이름, 가격, 수량, 설명, 카테고리, 판매 상태 등의 정보를 관리
+ * - 좋아요 및 싫어요 수, 이미지 파일 및 관련 메타데이터 포함
+ * - 등록일자와 수정일자 정보 관리
+ * - 호텔 방 번호를 참조하여 룸과의 관계 설정
  * 작성자 : 김예령
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 날짜 필드 이름 수정 : 김예령
+ * 수정 : 2025-03-31 날짜 필드 이름 수정 (createDate, modifyDate), 김예령
+ * 수정 : 2025-04-17 클래스 주석 추가, 자동 생성
  * ***********************************************/
-package com.sixthsense.hexastay.dto;
 
+package com.sixthsense.hexastay.dto;
 import com.sixthsense.hexastay.entity.Room;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
+
+
 
 @Getter
 @Setter

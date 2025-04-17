@@ -3,6 +3,20 @@ package com.sixthsense.hexastay.dto;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/***************************************************
+ *
+ * 클래스명   : RoomMenuCartDetailDTO
+ * 기능      : 룸 메뉴 장바구니 상세 정보를 담는 DTO 클래스
+ * - 장바구니 아이템의 고유 번호, 메뉴 이름, 가격, 수량 등의 정보를 관리
+ * - 룸 메뉴 이미지 파일 및 관련 메타데이터를 포함
+ * - 특정 필드만을 초기화하는 생성자 제공
+ * - RoomMenuDTO 객체를 참조하여 관련된 룸 메뉴 정보에 접근 가능
+ * 작성자    : 김윤겸
+ * 작성일    : 2025-04-05
+ * 수정일    : -
+ *
+ ****************************************************/
+
 @Getter
 @Setter
 @ToString
