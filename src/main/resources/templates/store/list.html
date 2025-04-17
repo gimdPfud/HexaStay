@@ -32,7 +32,7 @@
             <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
         </div>
         <div class="d-flex gap-3 col-md-4">
-            <button type="submit" class="btn btn-success w-50">조회(기능X)</button>
+            <button type="submit" class="btn btn-primary w-50">조회(기능X)</button>
             <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
                 등록(모달)
             </button>
@@ -71,8 +71,8 @@
                 <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                 <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                 <td style="text-align: center; vertical-align: middle;">
-                    <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">상세보기</a>
-                    <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger">삭제</a>
+                    <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">보기</a>
+                    <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger btn-sm">삭제</a>
                 </td>
             </tr>
             </tbody>
