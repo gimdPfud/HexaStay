@@ -9,23 +9,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
+<style>
+    .card-body {
+        font-size: 1.1rem;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+    }
+</style>
 <body>
 <div layout:fragment="content">
-    <style>
-        .card-body {
-            font-size: 1.1rem;
-        }
-        .card-header {
-            background-color: #f8f9fa;
-        }
-        .btn-back {
-            margin-top: 20px;
-        }
-        .card-img-top {
-            max-height: 300px;
-            object-fit: cover;
-        }
-    </style>
 <div class="container mt-4">
     <h1 class="mb-4">룸서비스 메뉴 수정</h1>
 
@@ -104,7 +97,7 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="roomMenuContent" class="form-label">상품 설명</label>
-                                    <textarea id="roomMenuContent" name="roomMenuContent" class="form-control" rows="4" th:text="${roomMenuDTO.roomMenuContent}"></textarea>
+                                    <textarea id="roomMenuContent" name="roomMenuContent" class="form-control" rows="4" th:text="${menuDTO.roomMenuContent}"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -120,50 +113,64 @@
         </div>
     </div>
 </div>
+    <script>
+
+        // 프로필 사진
+
+        document.getElementById('menuImage').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('menuImage').click();
+        });
+
+
+        document.getElementById('menuImage').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+
+        /* --- 재고량이 있으면 품절을 선택할 수 없게 하는 스크립트 ---- */
+        const amountInput = document.getElementById("roomMenuAmount");
+        const statusSelect = document.getElementById("roomMenuStatus");
+
+        statusSelect.addEventListener("change", function () {
+            const selected = this.value;
+            const amount = parseInt(amountInput.value, 10);
+
+            if (selected === "품절" && amount > 0) {
+                alert("재고량이 있으면 품절을 선택할 수 없습니다.");
+                // '판매중'으로 다시 변경
+                this.value = "판매중";
+            }
+        });
+        /* --- 재고량이 있으면 품절을 선택할 수 없게 하는 스크립트  끝---- */
+
+    </script>
 </div>
 </body>
-
-
-<script>
-
-    // 프로필 사진
-
-    document.getElementById('menuImage').addEventListener('change', function () {
-        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-        const filePath = this.value;
-        const errorMessage = document.getElementById('fileError');
-        const previewImage = document.getElementById('pictureTemp');
-        const file = this.files[0];
-
-        if (!allowedExtensions.exec(filePath)) {
-            this.value = '';
-            errorMessage.classList.remove('d-none');
-            previewImage.classList.add('d-none');
-        } else {
-            errorMessage.classList.add('d-none');
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImage.src = e.target.result;
-                    previewImage.classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    });
-
-
-    document.getElementById('PictureBtn').addEventListener('click', function () {
-        document.getElementById('menuImage').click();
-    });
-
-
-    document.getElementById('menuImage').addEventListener('change', function () {
-        let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-        document.querySelector('.file-name').textContent = fileName;
-    });
-
-</script>
 
 </html>
