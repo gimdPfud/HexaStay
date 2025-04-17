@@ -243,11 +243,11 @@
     let cartAdd = $(".add-to-cart-btn");
 
     $(document).ready(function () {
-        // ✅ 1. 초기 총 가격 표시
+        //  1. 초기 총 가격 표시
         let initialCount = parseInt($("#count").val());
         $("#totalPrice").text((initialCount * price) + '원');
 
-        // ✅ 2. 수량 변경 시 총 가격 업데이트 및 재고 체크
+        //  2. 수량 변경 시 총 가격 업데이트 및 재고 체크
         $("#count").on("change", function () {
             let count = parseInt($(this).val());
 
@@ -337,7 +337,6 @@
     }
 </script>
 
-</script>
 
 </body>
 </html>
