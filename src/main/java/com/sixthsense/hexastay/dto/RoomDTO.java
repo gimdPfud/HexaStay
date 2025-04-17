@@ -15,6 +15,8 @@ public class RoomDTO {
 
         private Long roomNum;
 
+        private String roomPassword;    //Room이용 password
+
 
         /**Room 테이블에 체크인 - 체크아웃 데이터 추가**/
 

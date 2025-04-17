@@ -39,9 +39,9 @@ import org.springframework.security.web.SecurityFilterChain;
             http
                     .securityMatcher("/admin/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
-                            "/notice/**", "/review/**", "/room/**",
+                            "/notice/**", "/review/**", "/room/**", "/company/**",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/settle",
-                            "/toss/**", "/js/**", "/qr/**")
+                            "/toss/**", "/js/**", "/qr/**", "/roomelist/**", "/member-insertroom/**")
 
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)

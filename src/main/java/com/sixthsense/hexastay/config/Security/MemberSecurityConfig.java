@@ -34,7 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
             AuthenticationManager authManager = new ProviderManager(provider);
 
             http
-                    .securityMatcher("/member/**", "/branch/**", "/center/",
+                    .securityMatcher("/main/**", "/member/**", "/branch/**", "/center/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                             "/roomMenu/**",
