@@ -32,6 +32,7 @@ public class OrderstoreViewDTO {
     private int orderstoreFinalPrice;
     private String orderstoreStoreName;
     private String orderstoreFirstItemName;
+    private String orderstoreMessage;
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 
     public OrderstoreViewDTO(Orderstore orders) {

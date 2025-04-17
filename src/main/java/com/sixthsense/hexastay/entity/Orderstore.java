@@ -3,7 +3,7 @@
  * 기능 : Orderstore 엔티티
  * 작성자 : 김부환
  * 작성일 : 2025-03-31
- * 수정 : 2025-03-31 BaseEntity 추가, 기존 날짜 필드 삭제 : 김예령
+ * 수정 : 2025-04-17 주문 요청사항 추가
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
@@ -30,6 +30,9 @@ public class Orderstore extends BaseEntity {
     private String orderstorePay;
 
     private String orderstoreStatus; // 주문 상태. alive, cancel, end ?
+
+    @Column(length = 500)
+    private String orderstoreMessage;//주문 요청사항
 
 //    //외부업체 상품 서비스를 참조
 //    @ManyToOne(fetch = FetchType.LAZY)

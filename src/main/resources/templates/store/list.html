@@ -129,6 +129,13 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label">임시조치(일단 여기서 고르기..)</label>
+                                <select name="companyNum">
+                                    <option th:each="data:${companyList}" th:value="${data.companyNum}" th:text="${data.companyName}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">가게 이름</label>
                                 <input type="text" class="form-control" name="storeName" required>
                             </div>
