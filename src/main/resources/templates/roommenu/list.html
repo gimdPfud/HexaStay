@@ -183,16 +183,54 @@
                     </tbody>
                 </table>
             </div>
+
             <!-- 페이지 네비게이션 -->
             <nav>
                 <ul class="pagination justify-content-center">
-                    <li class="page-item"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                    <!-- 첫 페이지로 -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/list(page=0, type=${type}, keyword=${keyword}, category=${category})}">
+                            &laquo; 첫 페이지
+                        </a>
+                    </li>
+
+                    <!-- 이전 -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/list(page=${prevPage - 1}, type=${type}, keyword=${keyword}, category=${category})}">
+                            이전
+                        </a>
+                    </li>
+
+                    <!-- 페이지 숫자 -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/list(page=${i - 1}, type=${type}, keyword=${keyword}, category=${category})}"
+                           th:text="${i}">1</a>
+                    </li>
+
+                    <!-- 다음 -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/list(page=${nextPage - 1}, type=${type}, keyword=${keyword}, category=${category})}">
+                            다음
+                        </a>
+                    </li>
+
+                    <!-- 마지막 페이지로 -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/list(page=${totalPages - 1}, type=${type}, keyword=${keyword}, category=${category})}">
+                            마지막 페이지 &raquo;
+                        </a>
+                    </li>
                 </ul>
             </nav>
+
+
         </div>
     </div>
     <script>
