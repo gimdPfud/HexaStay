@@ -4,53 +4,45 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>상세보기</title>
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
-<div layout:fragment="content" class="w-100 vh-100 bg-light">
-  <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+  <div class="container mt-4 w-100 bg-light">
+    <h3 class="fw-bold mb-4 text-center">조직 상세보기</h3>
+    <div class="container p-4" style="max-width: 700px;">
+      <div class="d-flex w-100 justify-content-center">
+        <img th:src="@{${companyDTO.companyPictureMeta} != null ? ${companyDTO.companyPictureMeta} : 'https://via.placeholder.com/103x133'}"
+             class="rounded" style="width: 103px; height: 133px;">
+      </div>
 
-    <div class="d-flex justify-content-center">
-      <h2 class="text-center mb-4">
-        <span>조직 상세보기</span>
-      </h2>
+      <!-- 상세 -->
+      <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${companyDTO.companyBrand}"></p></div>
+      <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${companyDTO.companyName}"></p></div>
+      <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${companyDTO.companyBusinessNum}"></p></div>
+      <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${companyDTO.companyCeoName}"></p></div>
+      <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${companyDTO.companyPhone}"></p></div>
+      <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${companyDTO.companyEmail}"></p></div>
+      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${companyDTO.companyAddress}"></p></div>
+
+      <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{/company/list}" class="btn btn-outline-success">목록</a>
+        <a th:href="@{/company/modify/{num}(num=${companyDTO.companyNum})}" class="btn btn-success">수정</a>
+
+        <!-- 비활성화 상태일 경우 '활성화하기' 버튼 표시 -->
+        <form th:if="${companyDTO.companyStatus != null and companyDTO.companyStatus.toUpperCase() == 'INACTIVE'}"
+              th:action="@{/company/activate/{num}(num=${companyDTO.companyNum})}" method="post">
+          <button type="submit" class="btn btn-outline-danger w-auto">활성화하기</button>
+        </form>
+
+        <!-- 비활성화 버튼 (companyStatus가 null이거나 INACTIVE가 아닐 때만 표시) -->
+        <form th:if="${companyDTO.companyStatus == null or companyDTO.companyStatus.toUpperCase() != 'INACTIVE'}"
+              th:action="@{/company/deactivate/{num}(num=${companyDTO.companyNum})}" method="post">
+          <button type="submit" class="btn btn-outline-danger w-auto">비활성화</button>
+        </form>
+      </div>
     </div>
-
-    <div class="d-flex w-100 justify-content-center">
-      <img th:src="@{${companyDTO.companyPictureMeta} != null ? ${companyDTO.companyPictureMeta} : 'https://via.placeholder.com/103x133'}"
-           class="rounded" style="width: 103px; height: 133px;">
-    </div>
-
-    <!-- 상세 -->
-    <div class="mb-2"><label class="form-label">브랜드명</label><p class="form-control" th:text="${companyDTO.companyBrand}"></p></div>
-    <div class="mb-2"><label class="form-label">상호명</label><p class="form-control" th:text="${companyDTO.companyName}"></p></div>
-    <div class="mb-2"><label class="form-label">사업자등록번호</label><p class="form-control" th:text="${companyDTO.companyBusinessNum}"></p></div>
-    <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${companyDTO.companyCeoName}"></p></div>
-    <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${companyDTO.companyPhone}"></p></div>
-    <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${companyDTO.companyEmail}"></p></div>
-    <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${companyDTO.companyAddress}"></p></div>
-
-    <div class="d-flex justify-content-center gap-3">
-      <a th:href="@{/company/list}" class="btn btn-outline-success">목록</a>
-      <a th:href="@{/company/modify/{num}(num=${companyDTO.companyNum})}" class="btn btn-success">수정</a>
-
-      <!-- 비활성화 상태일 경우 '활성화하기' 버튼 표시 -->
-      <form th:if="${companyDTO.companyStatus != null and companyDTO.companyStatus.toUpperCase() == 'INACTIVE'}"
-            th:action="@{/company/activate/{num}(num=${companyDTO.companyNum})}" method="post">
-        <button type="submit" class="btn btn-outline-danger w-auto">활성화하기</button>
-      </form>
-
-      <!-- 비활성화 버튼 (companyStatus가 null이거나 INACTIVE가 아닐 때만 표시) -->
-      <form th:if="${companyDTO.companyStatus == null or companyDTO.companyStatus.toUpperCase() != 'INACTIVE'}"
-            th:action="@{/company/deactivate/{num}(num=${companyDTO.companyNum})}" method="post">
-        <button type="submit" class="btn btn-outline-danger w-auto">비활성화</button>
-      </form>
-
-    </div>
-
-
   </div>
 </div>
 
