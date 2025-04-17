@@ -87,6 +87,7 @@ public class RoomServiceImpl {
                 .member(member)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkOutDate)
+                .roomPassword(hotelRoomDTO.getHotelRoomPassword()) // ✅ 추가된 부분
                 .build();
         log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);
         roomRepository.save(room);

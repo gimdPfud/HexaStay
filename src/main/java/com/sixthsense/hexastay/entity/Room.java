@@ -19,6 +19,8 @@ public class Room extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomNum;
 
+    private String roomPassword;    //Room이용 password
+
     //체크인 체크 // 체크 아웃
     private LocalDate checkInDate;
 
