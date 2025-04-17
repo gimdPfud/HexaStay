@@ -1,25 +1,29 @@
 /***********************************************
- * 인터페이스명 : RoomServiceRepository
- * 기능 :
- * 작성자 :
- * 작성일 : 2025-03-31
- * 수정 : 2025-03-31
+ * 인터페이스명 : RoomMenuRepository
+ * 기능 : 룸 메뉴 관련 데이터베이스 접근을 위한 JPA Repository 인터페이스
+ * - RoomMenu 엔티티에 대한 기본적인 CRUD 연산 제공
+ * - 특정 카테고리별 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공
+ * - 특정 카테고리 및 키워드를 포함하는 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공 (정확히 일치)
+ * - 특정 키워드를 포함하는 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공
+ * - 특정 가격 이하의 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공
+ * - 특정 재고량 초과의 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공
+ * - 특정 키워드를 포함하는 이름 또는 특정 가격 이하의 룸 메뉴 목록을 페이징 처리하여 조회하는 기능 제공
+ * - 특정 호텔 룸 멤버의 이메일을 참조하여 룸 메뉴를 조회하는 기능 제공
+ * - 특정 룸 메뉴의 좋아요 수를 증가시키는 기능 제공
+ * - 특정 룸 메뉴의 싫어요 수를 감소시키는 기능 제공
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-03
+ * 수정일 : -
  * ***********************************************/
-package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
-import com.sixthsense.hexastay.entity.HotelRoom;
+package com.sixthsense.hexastay.repository;
 import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuLike;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 

@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.repository;
-
 import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
@@ -10,9 +9,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
+
+/***********************************************
+ * 클래스명 : RoomMenuCartItemRepository
+ * 기능 : 룸 메뉴 장바구니 아이템 관련 데이터베이스 접근을 위한 JPA Repository 인터페이스
+ * - RoomMenuCartItem 엔티티에 대한 기본적인 CRUD 연산 제공
+ * - 페이징 처리된 모든 장바구니 아이템 조회 기능 제공
+ * - 특정 장바구니와 룸 메뉴를 기반으로 장바구니 아이템 조회 기능 제공
+ * - 특정 회원의 장바구니 상세 정보를 DTO 형태로 조회하는 기능 제공 (페이징 적용)
+ * - 특정 회원의 장바구니에 담긴 총 아이템 수량 조회 기능 제공
+ * - 특정 장바구니에 속한 모든 장바구니 아이템 조회 기능 제공
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-08
+ * 수정일 : -
+ * ***********************************************/
 
 @Repository
 public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartItem, Long> {

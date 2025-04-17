@@ -112,6 +112,21 @@ public class RoomMenuOrderController {
         return new ResponseEntity<Long>(roomMenuOrderNum, HttpStatus.OK);
     }
 
+
+    /***************************************************
+     *
+     * 클래스명   : createOrderFromCart
+     * 기능      : 장바구니를 기반으로 룸서비스 메뉴 주문을 처리하는 POST 컨트롤러 메소드
+     * - 로그인한 사용자의 장바구니 정보를 이용하여 주문 생성
+     * - requestMessage 파라미터를 통해 추가적인 요청 사항을 전달받음
+     * - 주문 서비스 호출 후 생성된 주문 번호를 ResponseEntity 형태로 반환
+     * - 주문 실패 시 에러 메시지를 담아 HTTP 상태 코드를 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-15
+     * 수정일    : -
+     *
+     ****************************************************/
+
     @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage) {
         log.info("POST /order/cart 컨트롤러 진입");
@@ -137,6 +152,19 @@ public class RoomMenuOrderController {
         }
     }
 
+    /***************************************************
+     *
+     * 클래스명   : getOrderList
+     * 기능      : 현재 로그인한 사용자의 룸서비스 주문 목록을 조회하여 화면에 표시하는 GET 컨트롤러 메소드
+     * - 로그인 여부 확인 후, 주문 서비스 호출
+     * - 조회된 주문 목록을 Model 객체에 담아 뷰로 전달
+     * - 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-15
+     * 수정일    : -
+     *
+     ****************************************************/
+
     @GetMapping("/roommenu/orderList")
     public String getOrderList(Principal principal, Model model) {
         log.info("주문 리스트 페이지 컨트롤러 진입");
@@ -151,6 +179,19 @@ public class RoomMenuOrderController {
 
         return "roommenu/orderList"; // templates/roommenu/orderList.html
     }
+
+    /***************************************************
+     *
+     * 클래스명   : cancelOrder
+     * 기능      : 특정 주문 번호에 해당하는 룸서비스 주문을 취소하는 POST 컨트롤러 메소드
+     * - 로그인 여부 확인 및 주문 취소 권한 검증
+     * - 주문 서비스의 주문 취소 기능 호출
+     * - 처리 결과를 ResponseEntity 형태로 반환 (성공 시 "주문이 성공적으로 취소되었습니다.", 실패 시 에러 메시지)
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-15
+     * 수정일    : -
+     *
+     ****************************************************/
 
     // 주문 취소
     @PostMapping("/roommenu/deleteOrder")
@@ -171,6 +212,17 @@ public class RoomMenuOrderController {
         }
     }
 
+    /***************************************************
+     *
+     * 클래스명   : CashOrderPageGet
+     * 기능      : 현금 결제 페이지를 보여주는 GET 컨트롤러 메소드
+     * - 별도의 데이터 조회 없이 현금 결제 관련 뷰를 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-15
+     * 수정일    : -
+     *
+     ****************************************************/
+
     @GetMapping("/roommenu/cashOrder")
     public String CashOrderPageGet() {
         log.info("현금 결제 컨트롤러 진입");
@@ -179,6 +231,18 @@ public class RoomMenuOrderController {
         return "roommenu/cashOrder";  // templates/cashOrder.html로 연결
     }
 
+    /***************************************************
+     *
+     * 클래스명   : viewAllOrders
+     * 기능      : 관리자 권한으로 모든 룸서비스 주문 목록을 조회하여 화면에 표시하는 GET 컨트롤러 메소드
+     * - 주문 서비스의 모든 주문 조회 기능 호출
+     * - 조회된 주문 목록을 Model 객체에 담아 관리자 주문 목록 뷰로 전달
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-15
+     * 수정일    : -
+     *
+     ****************************************************/
+
     @GetMapping("/roommenu/adminOrderList")
     public String viewAllOrders(Model model) {
         List<RoomMenuOrderDTO> orders = roomMenuOrderService.getAllOrdersForAdmin();
@@ -186,6 +250,20 @@ public class RoomMenuOrderController {
         return "roommenu/adminOrderList"; //
 
     }
+
+    /***************************************************
+     *
+     * 클래스명   : completeOrders
+     * 기능      : 전달받은 주문 ID 목록을 기준으로 주문 완료 처리 (임시 기능)
+     * - 요청 Body에 JSON 형태로 주문 ID 목록을 받음
+     * - 각 주문 ID에 대해 주문 삭제 (or 상태 변경) 로직 수행
+     * - 처리 완료 메시지를 ResponseEntity 형태로 반환
+     * - 오류 발생 시 HTTP 상태 코드와 에러 메시지 반환
+     * 작성자    : 김윤겸
+     * 작성일    : 2025-04-17
+     * 수정일    : -
+     *
+     ****************************************************/
 
     // 임시임.. 체크여부에 따라서 삭제 기능
     @PostMapping("/roommenu/complete-orders")
