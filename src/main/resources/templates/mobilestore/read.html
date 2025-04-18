@@ -24,7 +24,7 @@
         <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
         <small class="text-muted"><i class="bi bi-geo-alt"></i>
             <a class="text-muted"
-               th:href="@{'/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
+               th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
         </small>
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 data-bs-toggle="modal" data-bs-target="#mapmodal"
