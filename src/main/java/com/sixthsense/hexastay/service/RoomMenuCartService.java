@@ -15,9 +15,6 @@ public interface RoomMenuCartService {
 
 //    public RoomMenuCartDTO insertRoomMenuCart(Long memberNum, Long roomMenuNum, Integer amount);
 
-    // 리스트
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
-
     // 장바구니 읽기 (read)
     public RoomMenuDTO RoomMenuCartRead(String email);
 

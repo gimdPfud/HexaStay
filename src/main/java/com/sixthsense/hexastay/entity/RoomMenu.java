@@ -67,6 +67,12 @@ public class RoomMenu extends BaseEntity {
     @JoinColumn(name = "room")
     private Room room;   // 룸(방)의 정보 참조
 
+    @Column(name = "supportsMultilang")
+    private Boolean supportsMultilang = false;  // 다국어 체크 여부
+
+    @Column(name = "approvedByDev")
+    private Boolean approvedByDev = false; // 개발자 승인 여부
+
     public void roomMenuOrderStockNumber(Integer stockNumber) {
         // 수량을 받아 주문이나 주문취소수량을 받아서 재고를 확인 후 재고 수량을 변경
 

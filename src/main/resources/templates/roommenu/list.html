@@ -75,8 +75,21 @@
 <body class="w-100 vh-100 bg-light">
     <div layout:fragment="content">
         <div class="container p-4 rounded w-100 h-100" >
+            <form langage method="get" th:action="@{/roommenu/list}" class="mb-3" style="float: right;">
+                <input type="hidden" name="type" th:value="${type}" />
+                <input type="hidden" name="keyword" th:value="${keyword}" />
+                <input type="hidden" name="category" th:value="${category}" />
+
+                <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
+                    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                </select>
+            </form>
             <h1 class="page-title">룸서비스 메뉴 목록</h1>
             <a href="/roommenu/adminOrderList" class="btn btn-primary btn-custom" >관리자 알람 페이지로 </a>
+            <a href="/roommenu/dev/translation" class="btn btn-primary btn-custom" >번역 승인 페이지로 </a>
+
                     <!-- 검색창 시작 -->
             <form th:action="@{/roommenu/list}" class="row g-2 mb-4 justify-content-center" method="get">
                 <!-- 검색창 시작 -->
@@ -109,6 +122,7 @@
                 </div>
                 <p> * 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
             </form> <!-- 검색창 끝 -->
+
             <!-- 메뉴 목록 테이블 -->
             <div class="table-responsive">
                 <table class="table table-bordered">
