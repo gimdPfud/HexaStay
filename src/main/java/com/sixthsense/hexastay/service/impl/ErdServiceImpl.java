@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,7 +30,7 @@ public class ErdServiceImpl implements ErdService {
     public void insert(ErdDTO erdDTO) throws IOException {
         if (erdDTO.getErdPicture() != null && !erdDTO.getErdPicture().isEmpty()) {
             String fileOriginalName = erdDTO.getErdPicture().getOriginalFilename();
-            String fileFirstName = erdDTO.getErdSKU() + "_" + erdDTO.getErdName();
+            String fileFirstName = erdDTO.getErdSku() + "_" + erdDTO.getErdName();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
@@ -53,6 +55,11 @@ public class ErdServiceImpl implements ErdService {
         erdRepository.save(erd);
     }
 
+
+    public Page<ErdDTO> list(Pageable pageable) {
+     Page<Erd> erdList = erdRepository.findAll(pageable);
+     return erdList.map(erd -> modelMapper.map(erd, ErdDTO.class));
+    }
 
 
 

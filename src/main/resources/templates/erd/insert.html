@@ -13,7 +13,7 @@
     <h1 class="mb-4">새 품목 추가</h1>
 
 
-    <form th:action="@{/erd/insert}" method="post" enctype="multipart/form-data">
+    <form action="/erd/insert" method="post" enctype="multipart/form-data">
 
         <div class="mb-3 user-box text-center">
             <div class="border mb-2" style="width: 300px; height: 300px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -29,7 +29,6 @@
         <div class="mb-3">
             <label for="erdName" class="form-label">물품명</label>
             <input type="text" class="form-control" id="erdName" name="erdName" required>
-            <div class="invalid-feedback">테이블명을 입력하세요.</div>
         </div>
 
         <div class="mb-3">
@@ -39,7 +38,7 @@
 
         <div class="mb-3">
             <label for="erdsku" class="form-label">분류</label>
-            <select type="text" class="form-control" id="erdType" name="erdsku" required>
+            <select type="text" class="form-control" id="erdType" name="erdType" required>
                 <option>호텔용품</option>
                 <option>설비</option>
                 <option>시설관리자재</option>
@@ -53,12 +52,12 @@
 
         <div class="mb-3">
             <label for="erdsku" class="form-label">수량</label>
-            <input type="text" class="form-control" id="erdUnit" name="erdsku" required>
+            <input type="text" class="form-control" id="erdUnit" name="erdUnit" required>
         </div>
 
         <div class="mb-3">
-            <label for="erdsku" class="form-label">수량</label>
-            <input type="text" class="form-control" name="erdsku" required>
+            <label for="erdNote" class="form-label">비고</label>
+            <input type="text" class="form-control" id="erdNote" name="erdNote" required>
         </div>
 
         <div class="d-flex">

@@ -82,6 +82,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/qr/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qr/");
 
+        registry.addResourceHandler("/erd/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/erd/");
+
         // 다국어 설정
 
 
