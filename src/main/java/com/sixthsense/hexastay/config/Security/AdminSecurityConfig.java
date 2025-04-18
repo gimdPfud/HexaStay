@@ -42,7 +42,8 @@ import org.springframework.security.web.SecurityFilterChain;
                             "/notice/**", "/review/**", "/room/**", "/company/**",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/settle",
                             "/toss/**", "/js/**", "/qr/**", "/roomlist/**", "/member-insertroom/**",
-                            "/success", "/fail", "/payment", "/settle/**")
+                            "/success", "/fail", "/payment", "/settle/**", "/erd/**",
+                            "/register-hotelroom/**")
 
                     .authenticationManager(authManager)
                     .userDetailsService(adminDetailsService)
