@@ -15,7 +15,7 @@ public interface RoomMenuService {
     public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException;
 
     // 목록
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale, boolean forUserView);
 
     // 상세보기
     public RoomMenuDTO read(Long num);
@@ -28,6 +28,8 @@ public interface RoomMenuService {
 
     // 번역
     List<RoomMenuDTO> getMenusWithLocale(String locale);
+
+    public Page<RoomMenuDTO> searchRoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
 
 }
 

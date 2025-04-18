@@ -13,6 +13,7 @@
 
 package com.sixthsense.hexastay.dto;
 import com.sixthsense.hexastay.entity.Room;
+import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
@@ -58,6 +59,10 @@ public class RoomMenuDTO {
     private Long hotelRoomNum;         //방 참조
 
     private Room room; // 룸을 참조
+
+    private Boolean supportsMultilang = false;  // 다국어 체크 여부
+
+    private Boolean approvedByDev = false; // 개발자 승인 여부
 
     public Integer getRoomMenuAmount() {
         if (this.roomMenuAmount == null) {
