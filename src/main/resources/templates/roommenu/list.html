@@ -16,81 +16,67 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <div class="container mt-4 w-100 bg-light">
-      
-      
-          <form langage method="get" th:action="@{/roommenu/list}" class="mb-3" style="float: right;">
-                <input type="hidden" name="type" th:value="${type}" />
-                <input type="hidden" name="keyword" th:value="${keyword}" />
-                <input type="hidden" name="category" th:value="${category}" />
+    <div class="container-fluid mt-4 w-100 bg-light">
+        <h3 class="fw-bold mb-4 text-center">룸 서비스 목록</h3>
 
-                <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
-                    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
-                    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
-                    <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
-                </select>
-            </form>
-            <h1 class="page-title" th:text="#{page.title.roommenu.list}">룸서비스 메뉴 목록</h1>
-            <a href="/roommenu/adminOrderList" class="btn btn-primary btn-custom" th:text="#{menu.adminOrderPage}"></a>
-            <a href="/roommenu/dev/translation" class="btn btn-primary btn-custom" th:text="#{menu.translationPage}"></a>
+        <form method="get" th:action="@{/roommenu/list}" class="mb-3" style="width: 300px; float: right; display: flex; align-items: center; gap: 10px;">
+            <a href="/roommenu/dev/translation" class="btn btn-primary mb-2" th:text="#{menu.translationPage}"></a>
+            <input type="hidden" name="type" th:value="${type}" />
+            <input type="hidden" name="keyword" th:value="${keyword}" />
+            <input type="hidden" name="category" th:value="${category}" />
+            <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
+                <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
+            </select>
+        </form>
 
-        <!-- 검색창 시작 -->
-        <form action="/roommenu/list" class="row g-3 align-items-end mb-4" method="get">
+        <form action="/roommenu/list" class="d-flex flex-wrap align-items-end gap-2 mb-4 w-100" method="get">
 
-          
-          <!-- 검색창 시작 -->
-            <div class="col-md-2">
+            <input type="hidden" name="type" th:value="${type}" />
+            <input type="hidden" name="keyword" th:value="${keyword}" />
+            <input type="hidden" name="category" th:value="${category}" />
+
+            <div class="flex-fill" style="min-width: 150px;">
                 <label class="form-label">검색 조건</label>
                 <select name="choice" id="search-option" class="form-select">
-                        <option value="S" th:selected="${type == 'S'}" th:text="#{search.option.name}">이름</option>
-                        <option value="P" th:selected="${type == 'P'}" th:text="#{search.option.price}">가격</option>
-                        <option value="A" th:selected="${type == 'A'}" th:text="#{search.option.amount}">재고량</option>
-                        <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}">이름 + 가격</option>
-                        <option value="C" th:selected="${type == 'C'}" th:text="#{search.option.category}">카테고리 선택</option>
+                    <option value="S" th:selected="${type == 'S'}">이름</option>
+                    <option value="P" th:selected="${type == 'P'}">가격</option>
+                    <option value="A" th:selected="${type == 'A'}">재고량</option>
+                    <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
+                    <option value="C" th:selected="${type == 'C'}">카테고리 선택</option>
                 </select>
             </div>
 
-            <div class="col-md-2">
+            <div class="flex-fill" style="min-width: 150px;">
                 <label class="form-label">카테고리 선택</label>
                 <select name="select" id="category-select" class="form-select">
-                        <option value="" th:text="#{category.select}">카테고리 선택</option>
-                        <option value="한식" th:selected="${category == '한식'}" th:text="#{category.korean}">한식</option>
-                        <option value="양식" th:selected="${category == '양식'}" th:text="#{category.western}">양식</option>
-                        <option value="중식" th:selected="${category == '중식'}" th:text="#{category.chinese}">중식</option>
-                        <option value="에피타이저" th:selected="${category == '에피타이저'}" th:text="#{category.appetizer}">에피타이저</option>
+                    <option value="">카테고리 선택</option>
+                    <option value="한식" th:selected="${category == '한식'}">한식</option>
+                    <option value="양식" th:selected="${category == '양식'}">양식</option>
+                    <option value="중식" th:selected="${category == '중식'}">중식</option>
+                    <option value="에피타이저" th:selected="${category == '에피타이저'}">에피타이저</option>
                 </select>
             </div>
 
-            <div class="col-md-4">
+            <div class="flex-grow-1">
                 <label class="form-label">검색어</label>
-                <input type="text" id="search-input" name="keyword" th:placeholder="#{search.placeholder}" placeholder="검색어를 입력하세요...">
+                <input type="text" name="keyword" id="search-input" class="form-control" placeholder="">
             </div>
 
-          <!-- 검색버튼 -->
-            <div class="col-md-4 d-flex gap-3">
-                <div>
-                    <label class="form-label invisible">검색</label>
-                    <button type="submit" class="btn btn-outline-primary px-2 py-1" th:text="#{search.button}">검색</button>
-                </div>
-                <div>
-                    <label class="form-label invisible">등록</label>
-                    <a href="/roommenu/insert" class="btn btn-outline-success px-2 py-1" th:text="#{menu.register}">등록</a>
-                </div>
-                <div>
-                    <label class="form-label invisible">고객용</label>
-                    <a href="/roommenu/orderpage" class="btn btn-outline-danger px-2 py-1" th:text="#{menu.customerView}">손님용</a>
-                </div>
-                <div>
-                    <label class="form-label invisible">관리자용</label>
-                    <a href="/roommenu/adminOrderList" class="btn btn-outline-primary w-100">관리자용</a>
+            <div class="d-flex flex-column justify-content-end gap-1">
+                <label class="form-label invisible">작업</label>
+                <div class="d-flex gap-1 flex-wrap">
+                    <button type="submit" class="btn btn-primary">검색</button>
+                    <a href="/roommenu/insert" class="btn btn-success">등록</a>
+                    <a href="/roommenu/orderpage" class="btn btn-outline-danger">고객용</a>
+                    <a href="/roommenu/adminOrderList" class="btn btn-outline-primary">관리자용</a>
                 </div>
             </div>
+        </form>
 
-            <div class="col-12">
-                <p th:text="#{search.category.info}">* 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
-            </div>
-        </form><!-- 검색창 끝 -->
+
 
         <!-- 메뉴 목록 테이블 -->
         <div class="row mt-4">
