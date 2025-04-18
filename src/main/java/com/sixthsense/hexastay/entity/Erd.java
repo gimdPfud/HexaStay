@@ -23,11 +23,11 @@ public class Erd {
 
     private String erdName;
 
-    private String erdSKU;
+    private String erdSku;
 
     private String erdType;
 
-    private String erdUnit;
+    private Integer erdUnit;
 
     private String erdNote;
 
