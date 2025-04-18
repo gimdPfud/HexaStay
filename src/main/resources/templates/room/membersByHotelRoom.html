@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>호텔룸 배정 회원 목록</title>
+    <title>room 배정 회원 목록</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,74 +11,52 @@
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Custom Style -->
-    <style>
-        .table-hover tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .pagination .page-link {
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
 
 <div class="container mt-5">
-    <h3 class="mb-4">🏨 호텔룸에 배정된 회원 목록</h3>
+    <h3 class="fw-bold mb-4 text-center">room 배정 회원 목록</h3>
 
-    <table class="table table-hover table-bordered text-center align-middle">
-        <thead class="table-light">
+    <table class="table table-bordered text-company mb-0">
+        <thead class="table-light text-center">
         <tr>
-            <th>회원 번호</th>
-            <th>이름</th>
-            <th>전화번호</th>
-            <th>이메일</th>
-            <th>관리</th>
+            <th style="width: 20%;">회원 번호</th>
+            <th style="width: 20%;">이름</th>
+            <th style="width: 20%;">전화번호</th>
+            <th style="width: 20%;">이메일</th>
+            <th style="width: 20%;"></th>
         </tr>
         </thead>
+
         <tbody>
-        <tr th:each="member : ${members}" th:data-member-num="${member.memberNum}">
+        <tr th:each="member : ${members}" th:data-member-num="${member.memberNum}" class="text-center">
             <td class="member-num" th:text="${member.memberNum}"></td>
             <td class="member-name" th:text="${member.memberName}"></td>
             <td class="member-phone" th:text="${member.memberPhone}"></td>
             <td class="member-email" th:text="${member.memberEmail}"></td>
             <td>
-                <button class="btn btn-outline-primary btn-sm btn-icon"
+                <button class="btn btn-primary btn-sm btn-icon"
                         data-bs-toggle="modal"
                         data-bs-target="#editMemberModal"
                         th:attr="data-member-num=${member.memberNum},
                          data-member-name=${member.memberName},
                          data-member-phone=${member.memberPhone},
                          data-member-email=${member.memberEmail}">
-                    <i class="bi bi-pencil"></i> 수정
+                    수정
                 </button>
                 <a th:href="@{/member/delete/{memberNum}(memberNum=${member.memberNum})}"
-                   class="btn btn-outline-danger btn-sm btn-icon"
+                   class="btn btn-danger btn-sm btn-icon"
                    onclick="return confirm('정말 삭제하시겠습니까?');">
-                    <i class="bi bi-trash"></i> 삭제
+                    삭제
                 </a>
             </td>
         </tr>
         </tbody>
     </table>
 
-    <div class="my-3">
-        <a th:href="@{/roomlist}" class="btn btn-dark">
-            <i class="bi bi-arrow-left"></i> 호텔룸 목록
-        </a>
-    </div>
-
     <!-- 페이지네이션 -->
     <nav aria-label="회원 페이지네이션">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-center mt-5">
             <li class="page-item" th:classappend="${members.first} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{/membersByHotelRoom/{hotelRoomNum}(hotelRoomNum=${hotelRoomNum}, page=${currentPage - 1})}"
@@ -87,7 +65,7 @@
             </li>
 
             <li th:each="i : ${#numbers.sequence(0, members.totalPages - 1)}"
-                class="page-item" th:classappend="${currentPage == i} ? 'active'">
+                class="page-item active" th:classappend="${currentPage == i} ? 'active'">
                 <a class="page-link"
                    th:href="@{/membersByHotelRoom/{hotelRoomNum}(hotelRoomNum=${hotelRoomNum}, page=${i})}"
                    th:text="${i + 1}"></a>
@@ -131,7 +109,7 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
                 </div>
