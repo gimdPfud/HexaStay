@@ -84,43 +84,43 @@
                     <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
                     <option value="en" th:selected="${#locale.language == 'en'}">English</option>
                     <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                    <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
                 </select>
             </form>
-            <h1 class="page-title">룸서비스 메뉴 목록</h1>
-            <a href="/roommenu/adminOrderList" class="btn btn-primary btn-custom" >관리자 알람 페이지로 </a>
-            <a href="/roommenu/dev/translation" class="btn btn-primary btn-custom" >번역 승인 페이지로 </a>
+            <h1 class="page-title" th:text="#{page.title.roommenu.list}">룸서비스 메뉴 목록</h1>
+            <a href="/roommenu/adminOrderList" class="btn btn-primary btn-custom" th:text="#{menu.adminOrderPage}"></a>
+            <a href="/roommenu/dev/translation" class="btn btn-primary btn-custom" th:text="#{menu.translationPage}"></a>
 
                     <!-- 검색창 시작 -->
             <form th:action="@{/roommenu/list}" class="row g-2 mb-4 justify-content-center" method="get">
                 <!-- 검색창 시작 -->
                 <div class="search-box">
                     <select id="search-option" name="type" class="form-select">
-                        <option value="S" th:selected="${type == 'S'}">이름</option>
-                        <option value="P" th:selected="${type == 'P'}">가격</option>
-                        <option value="A" th:selected="${type == 'A'}">재고량</option>
-                        <option value="N" th:selected="${type == 'N'}">이름 + 가격</option>
-                        <option value="C" th:selected="${type == 'C'}">카테고리 선택</option> <!-- 카테고리 선택 -->
+                        <option value="S" th:selected="${type == 'S'}" th:text="#{search.option.name}">이름</option>
+                        <option value="P" th:selected="${type == 'P'}" th:text="#{search.option.price}">가격</option>
+                        <option value="A" th:selected="${type == 'A'}" th:text="#{search.option.amount}">재고량</option>
+                        <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}">이름 + 가격</option>
+                        <option value="C" th:selected="${type == 'C'}" th:text="#{search.option.category}">카테고리 선택</option>
                     </select>
-                                <!-- 카테고리 선택 -->
+
                     <select id="category-select" name="category" class="form-select">
-                        <option value="">카테고리 선택</option>
-                        <option value="한식" th:selected="${category == '한식'}">한식</option>
-                        <option value="양식" th:selected="${category == '양식'}">양식</option>
-                        <option value="중식" th:selected="${category == '중식'}">중식</option>
-                        <option value="에피타이저" th:selected="${category == '에피타이저'}">에피타이저</option>
+                        <option value="" th:text="#{category.select}">카테고리 선택</option>
+                        <option value="한식" th:selected="${category == '한식'}" th:text="#{category.korean}">한식</option>
+                        <option value="양식" th:selected="${category == '양식'}" th:text="#{category.western}">양식</option>
+                        <option value="중식" th:selected="${category == '중식'}" th:text="#{category.chinese}">중식</option>
+                        <option value="에피타이저" th:selected="${category == '에피타이저'}" th:text="#{category.appetizer}">에피타이저</option>
                     </select>
 
-                    <input type="text" placeholder="검색어를 입력하세요..." id="search-input" name="keyword">
-
+                    <input type="text" id="search-input" name="keyword" th:placeholder="#{search.placeholder}" placeholder="검색어를 입력하세요...">
 
                                 <!-- 검색버튼 -->
                     <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-outline-primary px-2 py-1" > 검색 </button>
-                        <a href="/roommenu/insert" class="btn btn-outline-success px-2 py-1"> 메뉴등록</a>
-                        <a href="/roommenu/orderpage" class="btn btn-outline-danger px-2 py-1" >고객용 </a>
+                        <button type="submit" class="btn btn-outline-primary px-2 py-1" th:text="#{search.button}">검색</button>
+                        <a href="/roommenu/insert" class="btn btn-outline-success px-2 py-1" th:text="#{menu.register}">등록</a>
+                        <a href="/roommenu/orderpage" class="btn btn-outline-danger px-2 py-1" th:text="#{menu.customerView}">손님용</a>
                     </div>
                 </div>
-                <p> * 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
+                <p th:text="#{search.category.info}">* 카테고리 별로 검색하시려면 반드시 카테고리 테이블 옆칸에서 카테고리 선택 버튼을 눌러주십시오.</p>
             </form> <!-- 검색창 끝 -->
 
             <!-- 메뉴 목록 테이블 -->
@@ -128,14 +128,14 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">이미지</th>
-                        <th scope="col">메뉴이름</th>
-                        <th scope="col">상품가격</th>
-                        <th scope="col">재고량</th>
-                        <th scope="col">카테고리</th>
-                        <th scope="col">품절여부</th>
-                        <th scope="col">기능</th>
+                        <th scope="col" th:text="#{table.header.number}">#</th>
+                        <th scope="col" th:text="#{table.header.image}">이미지</th>
+                        <th scope="col" th:text="#{table.header.name}">메뉴이름</th>
+                        <th scope="col" th:text="#{table.header.price}">상품가격</th>
+                        <th scope="col" th:text="#{table.header.amount}">재고량</th>
+                        <th scope="col" th:text="#{table.header.category}">카테고리</th>
+                        <th scope="col" th:text="#{table.header.status}">품절여부</th>
+                        <th scope="col" th:text="#{table.header.action}">기능</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -162,10 +162,10 @@
                         <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
                         <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
                         <td>
-                            <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary btn-sm">수정</a>
+                            <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-primary btn-sm" th:text="#{menu.modify}">수정</a>
                             <form action="/roommenu/delete" method="post" style="display:inline;">
                                 <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
-                                <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                                <button type="submit" class="btn btn-danger btn-sm" th:text="#{menu.delete}">삭제</button>
                             </form>
                         </td>
                     </tr>
