@@ -35,43 +35,42 @@ public class StoreOrderController {
     private final StorecartService storecartService;
     private final AdminService adminService;
     private final StoreService storeService;
+    Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
     /* 6. 결제하기
         get? post? */
     /*1. 주문하기 (등록)*/
     //장바구니에서 주문 버튼을 누르면 주문확인창(결제창)으로 이동
+    @ResponseBody
     @PostMapping("/member/store/order/insert")
-    public String orderInsert(@RequestParam("items") List<Long> cartitemidList, Model model){
-        Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
+    public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList, Model model){
         if(cartitemidList==null||cartitemidList.isEmpty()){
-            return "redirect:/member/store/cart";
+            return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
         for (Long itemid : cartitemidList) {
             if(!storecartService.validCartItemOwner(itemid,hotelroomNum)){
-                return "redirect:/member/logout";
+                return new ResponseEntity<>("잘못된 접근입니다.",HttpStatus.FORBIDDEN);
             }
         }
         /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        int result = orderstoreService.insert(cartitemidList, hotelroomNum);
+        int result = orderstoreService.insert(cartitemidList, hotelroomNum);// todo 반환하는거를 orderid가 되도록?
         if(result==1){
             log.info("정상주문되었습니다.");
             storecartService.clearCartItems(hotelroomNum);
-            List<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum);
-            model.addAttribute("list",list);
-            return "redirect:/member/store/order/list";
+
+            //todo orderid 넘기고넘기고 넘겨서 success에서 /member/store/order/paid/{orderid} 해야 함
+
+            return new ResponseEntity<>(HttpStatus.OK);
         } else if (result ==2) {
-            log.info("숙박 정보를 찾을 수 없습니다.");
-            return null;
+            return ResponseEntity.badRequest().body("숙박 정보를 찾을 수 없습니다.");
         } else if (result==3) {
-            log.info("장바구니 아이템을 찾을 수 없습니다.");
-            return null;
+            return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }else {
-            return null;
+            return new ResponseEntity<>("알 수 없는 오류입니다.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     /*2. 내역보기 (목록)*/
     @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
     public String clientOrderList(Model model){
-        Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
         List<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum);
         model.addAttribute("list",list);
         return "mobilestore/order/list";
@@ -131,5 +130,25 @@ public class StoreOrderController {
             throw new RuntimeException(e);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @GetMapping("/admin/store/order/paid/{orderNum}")
+    public ResponseEntity paidOrder(@PathVariable(value = "orderNum") Long orderNum){
+        try {
+            orderstoreService.paid(orderNum);
+        } catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @ResponseBody
+    @GetMapping("/member/store/order/getlastorder")
+    public ResponseEntity getlastorder(){
+        Long orderid = orderstoreService.getLastOrder(hotelroomNum);
+        if(orderid==null){
+            return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(orderid,HttpStatus.OK);
     }
 }

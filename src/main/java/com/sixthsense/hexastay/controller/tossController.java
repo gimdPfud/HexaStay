@@ -16,23 +16,39 @@ public class tossController {
     public String tossControl (@RequestParam Integer tossprice, Model model) {
         log.info("히히 주문 토스");
         model.addAttribute("tossprice", tossprice);
-        return "/toss/payment";
+        return "toss/payment";
     }
 
     @GetMapping("/success")
     public String successPage(@RequestParam Integer tossprice, Model model) {
         model.addAttribute("tossprice", tossprice);
-        return "/toss/success";
+        return "toss/success";
     }
 
     @GetMapping("/fail")
     public String failPage() {
-        return "/toss/fail";
+        return "toss/fail";
     }
 
     @GetMapping("/tossloading")
     public String tossloadingPage() {
-        return "/toss/tossloading";
+        return "toss/tossloading";
+    }
+
+    @RequestMapping(value = "/storepayment", method = {RequestMethod.GET, RequestMethod.POST})
+    public String storetossControl (@RequestParam Integer tossprice, @RequestParam Long o, Model model) {
+        log.info("히히 주문 토스");
+        model.addAttribute("tossprice", tossprice);
+        model.addAttribute("o", o);
+        return "toss/store/payment";
+    }
+
+    @GetMapping("/storesuccess")
+    public String storesuccessPage(@RequestParam Integer tossprice, @RequestParam Long o, Model model) {
+        log.info("스토어성공?");
+        model.addAttribute("tossprice", tossprice);
+        model.addAttribute("o", o);
+        return "toss/store/success";
     }
 }
 

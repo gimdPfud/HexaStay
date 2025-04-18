@@ -86,7 +86,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         if(room==null){return 2;}
         Orderstore order = new Orderstore();
         order.setRoom(room);
-        order.setOrderstoreStatus("paid");
+        order.setOrderstoreStatus("unpaid");
 
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
@@ -111,6 +111,16 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     public void paid(Long orderId) {
         Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
         orderstore.setOrderstoreStatus("paid");
+    }
+
+    @Override
+    public Long getLastOrder(Long hotelRoom) {
+        List<Orderstore> list = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoom);
+        if(list.isEmpty()){
+            return null;
+        }
+        Long orderId = list.getLast().getOrderstoreNum();
+        return orderId;
     }
 
     @Override
