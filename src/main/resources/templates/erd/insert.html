@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>새 ERD 항목 추가</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="container my-5">
+    <h1 class="mb-4">새 품목 추가</h1>
+
+
+    <form th:action="@{/erd/insert}" method="post" enctype="multipart/form-data">
+
+        <div class="mb-3 user-box text-center">
+            <div class="border mb-2" style="width: 300px; height: 300px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+            </div>
+            <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+            <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+            <input hidden type="file" id="erdPicture" name="erdPicture" class="btn btn-light form-control rounded-pill"
+                   accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+            <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="erdName" class="form-label">물품명</label>
+            <input type="text" class="form-control" id="erdName" name="erdName" required>
+            <div class="invalid-feedback">테이블명을 입력하세요.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="erdsku" class="form-label">sku번호</label>
+            <input type="text" class="form-control" id="erdsku" name="erdsku" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="erdsku" class="form-label">분류</label>
+            <select type="text" class="form-control" id="erdType" name="erdsku" required>
+                <option>호텔용품</option>
+                <option>설비</option>
+                <option>시설관리자재</option>
+                <option>사무/소모품품</option>
+                <option>식음료</option>
+                <option>청소/위생용품</option>
+                <option>유니폼/의류</option>
+                <option>기타</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="erdsku" class="form-label">수량</label>
+            <input type="text" class="form-control" id="erdUnit" name="erdsku" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="erdsku" class="form-label">수량</label>
+            <input type="text" class="form-control" name="erdsku" required>
+        </div>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-success me-2">저장</button>
+            <a th:href="@{/erd/list}" class="btn btn-outline-secondary">취소</a>
+        </div>
+    </form>
+</div>
+
+    <script>
+        // 프로필 사진
+
+        document.getElementById('erdPicture').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('erdPicture').click();
+        });
+
+
+        document.getElementById('erdPicture').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+    </script>
+
+</div>
+</body>
+</html>

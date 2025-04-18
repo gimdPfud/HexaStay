@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>ERD 항목 수정</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select { width: 300px; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input[type="checkbox"] { margin-bottom: 15px; margin-left: 5px; }
+        input[type="hidden"] { display: none; }
+        .form-group { margin-bottom: 15px; }
+        button, a { padding: 10px 15px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px; }
+        button[type="submit"] { background-color: #4CAF50; color: white; }
+        button[type="submit"]:hover { background-color: #45a049; }
+        a { background-color: #f8f8f8; color: #333; border: 1px solid #ccc; }
+        a:hover { background-color: #eee; }
+        .error { color: red; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>ERD 항목 수정</h1>
+    <!-- th:object를 사용하여 DTO와 폼 바인딩 -->
+    <form th:action="@{/erd/update}" th:object="${erdDto}" method="post">
+        <!-- ID는 hidden 필드로 전송 -->
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group">
+            <label for="tableName">테이블명:</label>
+            <input type="text" th:field="*{tableName}" required />
+            <span class="error" th:if="${#fields.hasErrors('tableName')}" th:errors="*{tableName}">Table Name Error</span>
+        </div>
+        <div class="form-group">
+            <label for="columnName">컬럼명:</label>
+            <input type="text" th:field="*{columnName}" required />
+             <span class="error" th:if="${#fields.hasErrors('columnName')}" th:errors="*{columnName}">Column Name Error</span>
+        </div>
+        <div class="form-group">
+            <label for="dataType">데이터 타입:</label>
+            <input type="text" th:field="*{dataType}" placeholder="예: VARCHAR(255), INT, BOOLEAN" required />
+             <span class="error" th:if="${#fields.hasErrors('dataType')}" th:errors="*{dataType}">Data Type Error</span>
+        </div>
+        <div class="form-group">
+            <label for="isNullable">NULL 허용:</label>
+            <input type="checkbox" th:field="*{isNullable}" />
+            <!-- th:field 사용 시 value 불필요, boolean 타입 자동 처리 -->
+        </div>
+        <!-- 필요한 다른 ERD 관련 필드들 추가 -->
+
+        <button type="submit">저장</button>
+        <a th:href="@{/erd/list}">취소</a>
+    </form>
+</body>
+</html> 
