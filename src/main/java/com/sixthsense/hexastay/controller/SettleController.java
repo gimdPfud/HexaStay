@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/settle")
-public class settleController {
+public class SettleController {
 
-    @GetMapping("/main")
-    public String main() {
+    @GetMapping("/chart")
+    public String chart() {
         return "/settle/chart";
     }
 
