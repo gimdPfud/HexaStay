@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>다국어 번역 승인 대기 목록</title>
+    <style>
+        body {
+            font: 600 16px/18px 'Open Sans', sans-serif;
+        }
+
+        .page-title {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table img {
+            display: block;
+            margin: 0 auto;
+            width: 60px;
+            height: 80px;
+        }
+
+        .btn-approve {
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+    </style>
+</head>
+<body class="w-100 vh-100 bg-light">
+<div layout:fragment="content">
+    <div class="container p-4 rounded">
+        <h1 class="page-title">📝 다국어 번역 승인 대기 목록</h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>이미지</th>
+                    <th>메뉴 이름</th>
+                    <th>가격</th>
+                    <th>재고</th>
+                    <th>카테고리</th>
+                    <th>승인</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="menu : ${pendingMenus}">
+                    <td th:text="${menu.roomMenuNum}"></td>
+                    <td>
+                        <img th:if="${menu.roomMenuImageMeta != null}"
+                             th:src="@{${menu.roomMenuImageMeta}}"/>
+                        <img th:unless="${menu.roomMenuImageMeta != null}"
+                             th:src="@{/profile/default.png}"/>
+                    </td>
+                    <td th:text="${menu.roomMenuName}"></td>
+                    <td th:text="${menu.roomMenuPrice} + ' 원'"></td>
+                    <td th:text="${menu.roomMenuAmount}"></td>
+                    <td th:text="${menu.roomMenuCategory}"></td>
+                    <td>
+                        <form th:action="@{'/roommenu/dev/translation/' + ${menu.roomMenuNum}}" method="post">
+                            <button type="submit" class="btn btn-success btn-sm btn-approve">승인</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

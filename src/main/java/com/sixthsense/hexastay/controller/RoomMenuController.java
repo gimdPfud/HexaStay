@@ -10,6 +10,8 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,6 +41,7 @@ public class RoomMenuController {
 
     private final RoomMenuService roomMenuService;
     private final RoomMenuCartService roomMenuCartService;
+    private final RoomMenuRepository roomMenuRepository;
 
     /**************************************************
      * 메인 페이지
@@ -132,6 +135,7 @@ public class RoomMenuController {
             return "redirect:/admin/login";  // 로그인 페이지 URL로 변경
         }
 
+
         // 서비스를 통해 내부처리
         roomMenuService.insert(roomMenuDTO);
 
@@ -150,11 +154,11 @@ public class RoomMenuController {
                                @RequestParam(value="type", required = false, defaultValue = "") String type,
                                @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                                @RequestParam(value = "category", required = false) String category, // @RequestParam 추가
-                               Model model, Locale locale) {
+                               Model model, Locale locale, boolean forUserView) {
         log.info("리스트 컨트롤러 진입");
 
         Page<RoomMenuDTO> roomMenuDTOPage =
-                roomMenuService.RoomMenuList(pageable, type, keyword, category, locale);
+                roomMenuService.RoomMenuList(pageable, type, keyword, category, locale, false);
 
         Map<String, Integer> pageInfo = Pagination(roomMenuDTOPage);
 
@@ -271,6 +275,7 @@ public class RoomMenuController {
     /**************************************************
      * 룸서비스 메뉴 삭제
      * 기능 : 특정 메뉴를 삭제
+     * 작성일 : 2025-04-02
      * 수정일 : 2025-04-08 (프린시퀄 추가)
      **************************************************/
 
@@ -331,13 +336,14 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/orderpage")
-    public String orderList(@PageableDefault(page = 0) Pageable pageable,
+    public String orderList(@PageableDefault(page = 0, size = 100)  Pageable pageable,
                             @RequestParam(value = "type", defaultValue = "") String type,
                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
                             @RequestParam(value = "category", defaultValue = "") String category,
                             Principal principal,
                             Locale locale, // ✅ 추가
-                            Model model) {
+                            Model model) { // 무한스크롤 비슷하게 느낌을 내기 위해서 size를 100으로 조정
+        // size = Integer.MAX_VALUE 으로 다 불러올 수 있지만 데이터 많으면 오류생기니까 그냥 맵두자.
 
         log.info("주문페이지 컨트롤러 리스트 진입");
         log.info("로그인한 사용자: " + principal.getName());
@@ -349,7 +355,9 @@ public class RoomMenuController {
         String lang = locale.getLanguage(); // ex) "ko", "en"
 
         // ✅ 다국어 적용된 서비스 호출
-        Page<RoomMenuDTO> roomMenuList = roomMenuCartService.RoomMenuList(pageable, type, keyword, category, locale);
+        Page<RoomMenuDTO> roomMenuList =
+                roomMenuService.RoomMenuList(pageable, type, keyword, category, locale, true); // <-- 유저용
+
 
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
 
@@ -362,6 +370,30 @@ public class RoomMenuController {
 
         return "/roommenu/orderpage";
 
+    }
+
+    @GetMapping("/roommenu/dev/translation")
+    public String approvalList(Model model, Pageable pageable) {
+        Page<RoomMenu> pendingMenus = roomMenuRepository.findByApprovedByDevFalseAndSupportsMultilangTrue(pageable);
+        model.addAttribute("pendingMenus", pendingMenus);
+        return "roommenu/dev/translation"; // HTML 파일 이름
+    }
+
+    @PostMapping("/roommenu/dev/translation/{roomMenuNum}")
+    public String approveMenu(@PathVariable Long roomMenuNum) {
+        // 메뉴 검색
+        RoomMenu menu = roomMenuRepository.findById(roomMenuNum)
+                .orElseThrow(() -> new RuntimeException("메뉴가 존재하지 않음."));
+
+        // 승인 처리
+        menu.setApprovedByDev(true);
+        roomMenuRepository.save(menu);
+
+        // 필요 시 번역 테이블에 수동으로 insert 처리
+        // translationRepository.save(new Translation(...));
+
+        // 승인 후 다시 승인 대기 목록 페이지로 리다이렉트
+        return "redirect:/roommenu/dev/translation";
     }
 
 
