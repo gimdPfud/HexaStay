@@ -6,105 +6,100 @@
 <head>
     <meta charset="UTF-8">
     <title>판매자 주문 알람 내역</title>
-
+    <style>
+        body { font-family: 'Open Sans', sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background-color: #f0f0f0; }
+        input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+<div layout:fragment="content">
+    <h2>사용자가 주문한 주문 목록</h2>
+    <form id="orderForm">
+        <table>
+            <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>주문자</th>
+                <th>상태</th>
+                <th>주문완료여부</th>
+                <th>주문내용</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.roomMenuOrderNum}">1001</td>
+                <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}">홍길동</td>
+                <td th:text="${order.roomMenuOrderStatus}">ORDER</td>
+                <td>
+                    <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
+                </td>
+                <td>
+                    <ul>
+                        <li th:each="item : ${order.orderItemList}">
+                            <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
+                            <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
+                            <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
+                            <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원 (합계)
+                            <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-<div th:fragment="content">
+        <!-- 버튼 추가 영역 -->
+        <div class="button-wrapper">
+            <button type="button" onclick="location.href='/roommenu/list'">관리자 목록 페이지로</button>
+            <button type="button" onclick="handleConfirm()">확인</button>
+        </div>
+    </form>
+    <script>
+        function handleConfirm() {
+            const checkedOrders = [];
 
-<style>
-    body { font-family: 'Open Sans', sans-serif; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background-color: #f0f0f0; }
-    input[type="checkbox"] {
-        transform: scale(1.2);
-        cursor: pointer;
-    }
-</style>
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    const row = checkbox.closest('tr');
+                    const orderId = row.querySelector('td').textContent.trim();
+                    checkedOrders.push(orderId);
 
-<h2>사용자가 주문한 주문 목록</h2>
-<form id="orderForm">
-    <table>
-        <thead>
-        <tr>
-            <th>주문번호</th>
-            <th>주문자</th>
-            <th>상태</th>
-            <th>주문완료여부</th>
-            <th>주문내용</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="order : ${orders}">
-            <td th:text="${order.roomMenuOrderNum}">1001</td>
-            <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}">홍길동</td>
-            <td th:text="${order.roomMenuOrderStatus}">ORDER</td>
-            <td>
-                <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
-            </td>
-            <td>
-                <ul>
-                    <li th:each="item : ${order.orderItemList}">
-                        <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
-                        <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
-                        <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
-                        <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원 (합계)
-                        <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
-                    </li>
-                </ul>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                    // 프론트에서 행 제거
+                    row.remove();
+                }
+            });
 
-    <!-- 버튼 추가 영역 -->
-    <div class="button-wrapper">
-        <button type="button" onclick="location.href='/roommenu/list'">관리자 목록 페이지로</button>
-        <button type="button" onclick="handleConfirm()">확인</button>
-    </div>
-</form>
-
-<script>
-    function handleConfirm() {
-        const checkedOrders = [];
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox.checked) {
-                const row = checkbox.closest('tr');
-                const orderId = row.querySelector('td').textContent.trim();
-                checkedOrders.push(orderId);
-
-                // 프론트에서 행 제거
-                row.remove();
+            if (checkedOrders.length === 0) {
+                alert("선택된 주문이 없습니다.");
+                return;
             }
-        });
 
-        if (checkedOrders.length === 0) {
-            alert("선택된 주문이 없습니다.");
-            return;
+            // 백엔드에 삭제 요청 보내기
+            fetch('/roommenu/complete-orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(checkedOrders)
+            }).then(res => {
+                if (res.ok) {
+                    alert("주문이 완료 처리되었습니다.");
+                } else {
+                    alert("처리 중 오류 발생");
+                }
+            }).catch(error => {
+                console.error(error);
+                alert("요청 실패: " + error);
+            });
         }
-
-        // 백엔드에 삭제 요청 보내기
-        fetch('/roommenu/complete-orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(checkedOrders)
-        }).then(res => {
-            if (res.ok) {
-                alert("주문이 완료 처리되었습니다.");
-            } else {
-                alert("처리 중 오류 발생");
-            }
-        }).catch(error => {
-            console.error(error);
-            alert("요청 실패: " + error);
-        });
-    }
-</script>
-
+    </script>
+    </div>
 </div>
 
 </body>

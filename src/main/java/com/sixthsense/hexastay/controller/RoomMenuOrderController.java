@@ -9,7 +9,10 @@ package com.sixthsense.hexastay.controller;
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
+import com.sixthsense.hexastay.enums.AdminRole;
+import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +31,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +45,7 @@ public class RoomMenuOrderController {
 
     private final RoomMenuOrderService roomMenuOrderService;
     private final RoomMenuOrderRepository roomMenuOrderRepository;
+    private final MemberRepository memberRepository;
 
     /***************************************************
      *
@@ -244,11 +249,25 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @GetMapping("/roommenu/adminOrderList")
-    public String viewAllOrders(Model model) {
+    public String viewAllOrders(Model model, Principal principal) {
+        log.info("로그인한 사용자 : " + principal.getName());
+
+        Member member = memberRepository.findByMemberEmail(principal.getName());
+
+        // String → AdminRole enum으로 변환
+        boolean isAdminRole = false;
+        try {
+            AdminRole userRole = AdminRole.valueOf(member.getMemberRole().toUpperCase());
+            isAdminRole = Arrays.stream(AdminRole.values())
+                    .anyMatch(role -> role == userRole);
+        } catch (IllegalArgumentException e) {
+            isAdminRole = false; // enum에 없는 문자열일 경우 예외 발생함
+        }
+
         List<RoomMenuOrderDTO> orders = roomMenuOrderService.getAllOrdersForAdmin();
         model.addAttribute("orders", orders);
-        return "roommenu/adminOrderList"; //
 
+        return "roommenu/adminOrderList";
     }
 
     /***************************************************

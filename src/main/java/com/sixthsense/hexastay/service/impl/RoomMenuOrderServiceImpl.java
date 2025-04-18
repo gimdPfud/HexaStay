@@ -290,6 +290,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
+                log.info("불러온 주문 개수: {}", orders.size());
                 return itemDTO;
             }).collect(Collectors.toList());
 
