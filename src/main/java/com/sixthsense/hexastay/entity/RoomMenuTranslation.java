@@ -25,7 +25,7 @@ public class RoomMenuTranslation {
     private String roomMenuTransLationCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roomMenu")
+    @JoinColumn(name = "room_menu_id")  // 이걸로 바꿈
     private RoomMenu roomMenu;
 
 }

@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -149,11 +150,11 @@ public class RoomMenuController {
                                @RequestParam(value="type", required = false, defaultValue = "") String type,
                                @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                                @RequestParam(value = "category", required = false) String category, // @RequestParam 추가
-                               Model model) {
+                               Model model, Locale locale) {
         log.info("리스트 컨트롤러 진입");
 
         Page<RoomMenuDTO> roomMenuDTOPage =
-                roomMenuService.RoomMenuList(pageable, type, keyword, category);
+                roomMenuService.RoomMenuList(pageable, type, keyword, category, locale);
 
         Map<String, Integer> pageInfo = Pagination(roomMenuDTOPage);
 

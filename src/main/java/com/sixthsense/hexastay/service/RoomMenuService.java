@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public interface RoomMenuService {
 
@@ -14,7 +15,7 @@ public interface RoomMenuService {
     public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException;
 
     // 목록
-    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category);
+    public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
 
     // 상세보기
     public RoomMenuDTO read(Long num);

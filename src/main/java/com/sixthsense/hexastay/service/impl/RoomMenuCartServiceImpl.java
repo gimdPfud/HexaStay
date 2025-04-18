@@ -8,10 +8,7 @@ import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
-import com.sixthsense.hexastay.repository.MemberRepository;
-import com.sixthsense.hexastay.repository.RoomMenuCartItemRepository;
-import com.sixthsense.hexastay.repository.RoomMenuCartRepository;
-import com.sixthsense.hexastay.repository.RoomMenuRepository;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -41,6 +38,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final MemberRepository memberRepository;
+    private final RoomMenuTranslationRepository roomMenuTranslationRepository;
 
     /***********************************************
      * 메서드명 : RoomMenuList
@@ -62,6 +60,8 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         log.info("룸서비스 상품 리스트 서비스 진입");
 
         Page<RoomMenu> roomMenuPage;
+        String lang = locale.getLanguage();
+        log.info("현재 언어: " + lang);
 
         // 카테고리 선택 시 검색
         if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
@@ -101,8 +101,25 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             roomMenuPage = roomMenuRepository.findAll(pageable);
         }
 
-        // DTO로 변환
-        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> modelMapper.map(roomMenu, RoomMenuDTO.class));
+        // DTO로 변환 및 다국어 적용
+        Page<RoomMenuDTO> roomMenuDTOList = roomMenuPage.map(roomMenu -> {
+            RoomMenuDTO dto = modelMapper.map(roomMenu, RoomMenuDTO.class);
+
+            // 다국어 번역 적용
+            roomMenuTranslationRepository
+                    .findByRoomMenu_RoomMenuNumAndLocale(roomMenu.getRoomMenuNum(), lang)
+                    .ifPresent(translation -> {
+                        log.info("번역된 이름: {}", dto.getRoomMenuName());
+                        dto.setRoomMenuName(translation.getRoomMenuTransLationName());
+                        dto.setRoomMenuContent(translation.getRoomMenuTransLationContent());
+                        dto.setRoomMenuCategory(translation.getRoomMenuTransLationCategory());
+
+                        log.info("번역 적용됨 - name: {}, locale: {}", translation.getRoomMenuTransLationName(), lang);
+                        log.info("현재 언어: {}", locale.getLanguage());
+                    });
+
+            return dto;
+        });
         return roomMenuDTOList;
     }
 
