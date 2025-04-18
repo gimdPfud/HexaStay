@@ -59,12 +59,14 @@
     </div>
 
     <input hidden id="tossprice" th:value="${tossprice}">
+    <input hidden id="o" th:value="${o}">
 
 
-<script>;
+<script>
 
 // 결제 금액 설정
 const amount = document.getElementById('tossprice').value;
+const o = document.getElementById('o').value;
 
     // 토스 결제 초기화 및 결제 위젯 렌더링
        const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
@@ -78,7 +80,7 @@ const amount = document.getElementById('tossprice').value;
 
     // 결제 수단 선택 후 바로 성공 페이지로 이동
            tossprice = document.getElementById('tossprice').value;
-    window.location.href = window.location.origin + '/success?tossprice=' + tossprice;
+    window.location.href = window.location.origin + '/storesuccess?tossprice=' + tossprice + '&o=' + o;
     });
 
     function generateRandomString() {

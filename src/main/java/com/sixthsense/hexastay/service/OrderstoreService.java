@@ -17,18 +17,19 @@ import java.util.List;
 
 public interface OrderstoreService {
     /*1. 주문 본인확인*/
-    public boolean validOrder(Long orderId, String email);
+    boolean validOrder(Long orderId, String email);
 
     /*2. 주문하기 */
-    public int insert(List<Long> itemIdList, String email);
-    public int insert(List<Long> itemIdList, Long hotelRoomNum);
+    int insert(List<Long> itemIdList, String email);
+    int insert(List<Long> itemIdList, Long hotelRoomNum);
 
     /*3. 주문취소*/
-    public void cancel(Long orderId);
+    void cancel(Long orderId);
     /*3-1. 주문완료*/
-    public void end(Long orderId);
+    void end(Long orderId);
     /*3-2. 결제완료*/
-    public void paid(Long orderId);
+    void paid(Long orderId);
+    Long getLastOrder(Long hotelRoom);
 
     /*4. 고객용 주문내역 목록*/
     List<OrderstoreViewDTO> getOrderList(String email);
