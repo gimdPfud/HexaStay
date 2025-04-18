@@ -1,16 +1,13 @@
 <!-- fragments/sidebar.html -->
 <div id="sidebar" class="sidebar" th:fragment="sidebar">
 
+    <button onclick='location.href="/company/list"'><strong>조직관리</strong></button>
+
     <button onclick="toggleMenu('memberMenu')"><strong>회원관리</strong></button>
     <div id="memberMenu" class="submenu">
         <a href="/admin/list">- 회원 목록</a>
         <a href="/admin/approve">- 회원 승인</a>
         <a href="/admin/insert">- 회원 등록</a>
-    </div>
-
-    <button onclick="toggleMenu('orgMenu')"><strong>조직관리</strong></button>
-    <div id="orgMenu" class="submenu">
-        <a href="/company/list">- 조직 조회</a>
     </div>
 
     <button onclick="toggleMenu('roomList')"><strong>호텔 객실관리</strong></button>
@@ -44,6 +41,18 @@
         <a href="/admin/store/menu/list">- 서비스 목록</a>
         <a href="/admin/store/menu/insert">- 서비스 등록</a>
         <a href="/admin/store/order/list">- 주문내역</a>
+    </div>
+
+    <button onclick="toggleMenu('erd')"><strong>자재관리</strong></button>
+    <div id="erd" class="submenu">
+        <a href="/erd/list">- 자재관리 목록</a>
+        <a href="/erd/insert">- 자재관리 등록</a>
+    </div>
+
+    <button onclick="toggleMenu('settle')"><strong>매출관리</strong></button>
+    <div id="settle" class="submenu">
+        <a href="/settle/chart">- 매출 조회</a>
+        <a href="/settle/salaries">- 급여 조회</a>
     </div>
 
     <button onclick="toggleMenu('notice')"><strong>공지사항</strong></button>
