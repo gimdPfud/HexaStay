@@ -28,7 +28,7 @@
 
         <form>
             <input th:value="${data.storemenuNum}" name="storemenuNum" hidden type="hidden" readonly>
-            <input min="1" th:default="1" name="storecartitemCount" type="number"><!--몇개살건지-->
+            <input min="1" value="1" name="storecartitemCount" type="number"><!--몇개살건지-->
         </form>
         <button type="button" onclick="addcart()" class="btn btn-outline-primary mt-3 w-100">장바구니담기</button>
     </div>
