@@ -11,18 +11,16 @@ import com.sixthsense.hexastay.dto.StorecartitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
 import com.sixthsense.hexastay.service.OrderstoreService;
 import com.sixthsense.hexastay.service.StorecartService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -57,7 +55,13 @@ public class StoreCartController {
     public String cartList(Model model){
         Long hotelroomNum = 9L; //todo 나중에... 암튼 받아옴. 일단 하드코딩
         List<StorecartitemViewDTO> list = storecartService.getCartList(hotelroomNum);
+        AtomicReference<Long> totalpirce = new AtomicReference<>(0L);
+        list.forEach(dto -> {
+            totalpirce.updateAndGet(v -> v + (long) dto.getStoremenuCount() * dto.getStoremenuPrice());
+        });
+        log.info(totalpirce);
         model.addAttribute("list",list);
+        model.addAttribute("totalPrice",totalpirce);
         return "mobilestore/cart/list";
     }
     /*3. 장바구니 수정 (수정)*/
