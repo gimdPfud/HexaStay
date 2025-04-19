@@ -218,6 +218,14 @@ public class CompanyServiceImpl implements CompanyService {
        return adminDTOList;
     }
 
+    @Override
+    public List<Company> getCompanyList(Long companyNum) {
+
+        List<Company> companyList = companyRepository.findByCompanyNum(companyNum);
+
+        return companyList;
+    }
+
     private CompanyDTO convertToCompanyDTO(Company company) {
         CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
 
