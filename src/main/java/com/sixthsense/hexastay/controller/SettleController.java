@@ -33,26 +33,6 @@ public class SettleController {
     public String chart(Principal principal, Model model)
     {
 
-        Long companyNum = adminService.adminFindEmail(principal.getName()).getCompanyNum();
-        Long storeNum = adminService.adminFindEmail(principal.getName()).getStoreNum();
-
-        String role = adminService.adminFindEmail(principal.getName()).getAdminRole();
-        if (role.equals("admin")) {
-            List<CompanyDTO> companyList = settleService.getCompanyParent(companyNum);
-            model.addAttribute("companyList", companyList);
-            List<StoreDTO> storeList = storeService.list(companyNum);
-            model.addAttribute("storeList", storeList);
-        }
-
-        else if (companyNum != null) {
-            List<CompanyDTO> companyList = adminService.getCompanyParent(companyNum);
-            model.addAttribute("companyList", companyList);
-        } else {
-            List<StoreDTO> storeList = storeService.list(companyNum);
-            model.addAttribute("storeList", storeList);
-        }
-
-
         return "/settle/chart";
     }
 
