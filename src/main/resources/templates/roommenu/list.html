@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>룸 서비스 목록</title>
+    <title>룸 서비스 메뉴 목록</title>
     <style>
         .table td,
         .table th {
@@ -15,6 +15,22 @@
         .text-center {
             text-align: center;
         }
+
+        .nav-pills .nav-link {
+            color: #4a5568 !important;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: transparent !important;
+            color: black !important;
+            font-weight: bold;
+            text-decoration: underline;
+            border: none;
+        }
+        .table {
+            width: 100%;
+            table-layout: fixed; /* 고정된 테이블 너비 설정 */
+        }
     </style>
 </head>
 <!-- fixme : value 값과, name명 수정하지 마세요!! 오류생깁니다. 그리고 th:text 지워버리면 번역 실행 안됩니다.. 예) th:text="#{menu.translationPage}" -->
@@ -22,23 +38,38 @@
 <div layout:fragment="content">
 
     <div class="container-fluid mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center" th:text="#{roomServiceListTitle}">룸 서비스 목록</h3>
+        <h3 class="fw-bold mb-4 text-center" th:text="#{roomServiceListTitle}">룸 서비스 메뉴 목록</h3>
 
 
-        <form method="get" th:action="@{/roommenu/list}" class="mb-3" style="width: 300px; float: right; display: flex; align-items: center; gap: 10px;">
-            <a href="/roommenu/dev/translation" class="btn btn-primary mb-2" th:text="#{menu.translationPage}"></a>
-            <!-- 숨김처리 -->
-            <input type="hidden" name="type" th:value="${type}" />
-            <input type="hidden" name="keyword" th:value="${keyword}" />
-            <input type="hidden" name="category" th:value="${category}" />
-            <!-- 숨김처리 끝 -->
-            <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
-                <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
-                <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
-                <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
-            </select>
-        </form>
+        <!-- 언어선택 및 번역페이지 버튼을 오른쪽 정렬 -->
+        <div class="d-flex justify-content-end mb-3">
+            <form method="get"
+                  th:action="@{/roommenu/list}"
+                  class="d-flex align-items-center gap-2"
+                  style="width: auto;">
+
+                <a href="/roommenu/dev/translation"
+                   class="btn btn-outline-secondary btn-sm"
+                   style="padding: 0.3rem 0.6rem; font-size: 0.85rem; width: 120px;"
+                   th:text="#{menu.translationPage}"></a>
+
+                <!-- 숨김처리 -->
+                <input type="hidden" name="type" th:value="${type}" />
+                <input type="hidden" name="keyword" th:value="${keyword}" />
+                <input type="hidden" name="category" th:value="${category}" />
+                <!-- 숨김처리 끝 -->
+
+                <select name="lang"
+                        onchange="this.form.submit()"
+                        class="form-select form-select-sm"
+                        style="width: 150px; padding: 0.3rem 0.6rem; font-size: 0.85rem;">
+                    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                    <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
+                </select>
+            </form>
+        </div>
 
         <form action="/roommenu/list" class="d-flex flex-wrap align-items-end gap-2 mb-4 w-100" method="get">
 
@@ -81,27 +112,27 @@
         </form>
 
         <!-- 특정 카테고리만 검색 시작 -->
-        <div class="text-center mb-3" role="group" aria-label="카테고리 선택">
-            <a href="/roommenu/list?type=C&category=한식"
-               class="btn btn-outline-primary [[${category} == '한식' ? 'active' : '']]"
-               th:text="#{category.hansik}">한식</a>
-
-            <a href="/roommenu/list?type=C&category=중식"
-               class="btn btn-outline-primary [[${category} == '중식' ? 'active' : '']]"
-               th:text="#{category.jungshik}">중식</a>
-
-            <a href="/roommenu/list?type=C&category=양식"
-               class="btn btn-outline-primary [[${category} == '양식' ? 'active' : '']]"
-               th:text="#{category.yangsik}">양식</a>
-
-            <a href="/roommenu/list?type=C&category=에피타이저"
-               class="btn btn-outline-primary [[${category} == '에피타이저' ? 'active' : '']]"
-               th:text="#{category.appetizer}">에피타이저</a>
-
-            <a href="/roommenu/list?type=S&category=&keyword="
-               class="btn btn-outline-primary [[${category} == '전체보기' ? 'active' : '']]"
-               th:text="#{category.all}">전체보기</a>
-        </div>
+        <ul class="nav nav-pills justify-content-center mb-3" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '' ? 'active' : '']]" href="/roommenu/list?type=S&category=&keyword=" th:text="#{category.all}">전체보기</a>
+            </li>
+            <li class="px-2 align-self-center">|</li>
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '한식' ? 'active' : '']]" href="/roommenu/list?type=C&category=한식" th:text="#{category.hansik}">한식</a>
+            </li>
+            <li class="px-2 align-self-center">|</li>
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '중식' ? 'active' : '']]" href="/roommenu/list?type=C&category=중식" th:text="#{category.jungsik}">중식</a>
+            </li>
+            <li class="px-2 align-self-center">|</li>
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '양식' ? 'active' : '']]" href="/roommenu/list?type=C&category=양식" th:text="#{category.yangsik}">양식</a>
+            </li>
+            <li class="px-2 align-self-center">|</li>
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '에피타이저' ? 'active' : '']]" href="/roommenu/list?type=C&category=에피타이저" th:text="#{category.appetizer}">에피타이저</a>
+            </li>
+        </ul>
         <!-- 특정 카테고리 검색 끝 -->
 
         <!-- 메뉴 목록 테이블 -->
@@ -110,14 +141,14 @@
                 <table class="table table-bordered text-company mb-0">
                     <thead class="table-light text-center">
                     <tr>
-                        <th scope="col" th:text="#{table.header.number}">#</th>
-                        <th scope="col" th:text="#{table.header.image}">이미지</th>
-                        <th scope="col" th:text="#{table.header.name}">메뉴이름</th>
-                        <th scope="col" th:text="#{table.header.price}">상품가격</th>
-                        <th scope="col" th:text="#{table.header.amount}">재고량</th>
-                        <th scope="col" th:text="#{table.header.category}">카테고리</th>
-                        <th scope="col" th:text="#{table.header.status}">품절여부</th>
-                        <th scope="col" th:text="#{table.header.action}">기능</th>
+                        <th scope="col" th:text="#{table.header.number}" style="width: 5%;">#</th>
+                        <th scope="col" th:text="#{table.header.image}" style="width: 15%;">이미지</th>
+                        <th scope="col" th:text="#{table.header.category}" style="width: 10%;">카테고리</th>
+                        <th scope="col" th:text="#{table.header.name}" style="width: 15%;">메뉴이름</th>
+                        <th scope="col" th:text="#{table.header.price}" style="width: 10%;">상품가격</th>
+                        <th scope="col" th:text="#{table.header.amount}" style="width: 10%;">재고량</th>
+                        <th scope="col" th:text="#{table.header.status}" style="width: 10%;">판매여부</th>
+                        <th scope="col" th:text="#{table.header.action}" style="width: 20%;">기능</th>
                     </tr>
                     </thead>
 
@@ -132,13 +163,13 @@
                                  th:src="@{/profile/default.png}"
                                  style="width: 60px; height: 80px;">
                         </td>
+                        <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
                         <td>
                             <a th:href="@{'/roommenu/read?num=' + ${roomMenuDTO.roomMenuNum}}"
                                th:text="${roomMenuDTO.roomMenuName}">
                             </a>
                         </td>
                         <td th:text="${roomMenuDTO.roomMenuPrice}"></td>
-                        <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
                         <td th:text="${roomMenuDTO.roomMenuAmount}"></td>
                         <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
                         <td>

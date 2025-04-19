@@ -1,80 +1,71 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>다국어 번역 승인 대기 목록</title>
     <style>
-        body {
-            font: 600 16px/18px 'Open Sans', sans-serif;
-        }
-
-        .page-title {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        table th, table td {
-            text-align: center;
+        .table td {
             vertical-align: middle;
         }
-
-        table img {
-            display: block;
-            margin: 0 auto;
-            width: 60px;
-            height: 80px;
-        }
-
-        .btn-approve {
-            font-size: 14px;
-            padding: 6px 12px;
+        .table {
+            width: 100%;
+            table-layout: fixed; /* 고정된 테이블 너비 설정 */
         }
     </style>
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <div class="container p-4 rounded">
-        <h1 class="page-title">📝 다국어 번역 승인 대기 목록</h1>
 
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>이미지</th>
-                    <th>메뉴 이름</th>
-                    <th>가격</th>
-                    <th>재고</th>
-                    <th>카테고리</th>
-                    <th>승인</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="menu : ${pendingMenus}">
-                    <td th:text="${menu.roomMenuNum}"></td>
-                    <td>
-                        <img th:if="${menu.roomMenuImageMeta != null}"
-                             th:src="@{${menu.roomMenuImageMeta}}"/>
-                        <img th:unless="${menu.roomMenuImageMeta != null}"
-                             th:src="@{/profile/default.png}"/>
-                    </td>
-                    <td th:text="${menu.roomMenuName}"></td>
-                    <td th:text="${menu.roomMenuPrice} + ' 원'"></td>
-                    <td th:text="${menu.roomMenuAmount}"></td>
-                    <td th:text="${menu.roomMenuCategory}"></td>
-                    <td>
-                        <form th:action="@{'/roommenu/dev/translation/' + ${menu.roomMenuNum}}" method="post">
-                            <button type="submit" class="btn btn-success btn-sm btn-approve">승인</button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <div class="container mt-4 w-100 bg-light">
+        <h3 class="fw-bold mb-4 text-center">다국어 번역 승인 대기 목록</h3>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered text-company mb-0">
+                    <thead class="table-light text-center">
+                    <tr>
+                        <th style="width: 5%;"></th>
+                        <th style="width: 10%;">이미지</th>
+                        <th style="width: 10%;">카테고리</th>
+                        <th style="width: 15%;">메뉴 이름</th>
+                        <th style="width: 10%;">가격</th>
+                        <th style="width: 10%;">재고</th>
+                        <th style="width: 15%;">승인</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="menu : ${pendingMenus}" class="text-center">
+                        <td th:text="${menu.roomMenuNum}"></td>
+                        <td>
+                            <img th:if="${menu.roomMenuImageMeta != null}"
+                                 th:src="@{${menu.roomMenuImageMeta}}"
+                                 style="width: 80px; height: auto; object-fit: cover;" />
+                            <img th:unless="${menu.roomMenuImageMeta != null}"
+                                 th:src="@{/profile/default.png}"
+                                 style="width: 80px; height: auto; object-fit: cover;" />
+                        </td>
+                        <td th:text="${menu.roomMenuCategory}"></td>
+                        <td th:text="${menu.roomMenuName}"></td>
+                        <td th:text="${menu.roomMenuPrice} + ' 원'"></td>
+                        <td th:text="${menu.roomMenuAmount}"></td>
+                        <td>
+                            <form th:action="@{'/roommenu/dev/translation/' + ${menu.roomMenuNum}}" method="post">
+                                <button type="submit" class="btn btn-success btn-sm btn-approve">승인</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-center mt-4 gap-3">
+                    <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
+                </div>
         </div>
     </div>
+</div>
 </div>
 </body>
 </html>

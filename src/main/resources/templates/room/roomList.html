@@ -9,6 +9,11 @@
         .table td {
             vertical-align: middle;
         }
+
+        .table {
+            width: 100%;
+            table-layout: fixed; /* 고정된 테이블 너비 설정 */
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -36,14 +41,14 @@
                 <table class="table table-bordered text-company mb-0">
                     <thead class="table-light text-center">
                     <tr>
-                        <th>번호</th>
-                        <th>room명</th>
-                        <th>회원 이름</th>
-                        <th>회원 이메일</th>
-                        <th>room연락처</th>
-                        <th>체크인</th>
-                        <th>체크아웃</th>
-                        <th>room비밀번호</th>
+                        <th style="width: 5%;">번호</th>
+                        <th style="width: 17%;">room명</th>
+                        <th style="width: 10%;">회원 이름</th>
+                        <th style="width: 18%;">회원 이메일</th>
+                        <th style="width: 10%;">room연락처</th>
+                        <th style="width: 10%;">체크인</th>
+                        <th style="width: 10%;">체크아웃</th>
+                        <th style="width: 10%;">room비밀번호</th>
                     </tr>
                     </thead>
 

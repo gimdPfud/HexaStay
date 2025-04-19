@@ -1,122 +1,92 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>룸서비스 메뉴 수정</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
 </head>
-<style>
-    .card-body {
-        font-size: 1.1rem;
-    }
-    .card-header {
-        background-color: #f8f9fa;
-    }
-</style>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-<div class="container mt-4">
-    <h1 class="mb-4">룸서비스 메뉴 수정</h1>
 
-    <input type="hidden" name="roomMenuImageMeta" th:value="${menuDTO.roomMenuImageMeta}">
+    <div class="container mt-4 w-100 bg-light">
+        <h3 class="fw-bold mb-4 text-center">룸서비스 메뉴 수정</h3>
 
-    <!-- 수정 폼 카드 -->
-    <div class="card">
-        <div class="card-header">
-            <h4 th:text="${roomMenuDTO.roomMenuName}">메뉴 이름</h4>
-        </div>
-        <div class="card-body">
-            <form th:action="@{/roommenu/modify}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/roommenu/modify}" method="post" enctype="multipart/form-data">
+            <div class="container p-4" style="max-width: 700px;">
+                <input type="hidden" name="originalImageMeta" th:value="${menuDTO.roomMenuImageMeta}">
+                <input type="hidden" name="roomMenuNum" th:value="${menuDTO.roomMenuNum}">
 
-
-                <div class="row">
-                    <div class="col-4">
-                        <div class="mb-3">
-                            <label for="roomMenuNum" class="form-label">상품 번호</label>
-                            <input type="text" id="roomMenuNum" name="roomMenuNum" class="form-control" th:value="${menuDTO.roomMenuNum}" readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="roomMenuName" class="form-label">상품 이름</label>
-                            <input type="text" id="roomMenuName" name="roomMenuName" class="form-control" th:value="${menuDTO.roomMenuName}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="roomMenuPrice" class="form-label">상품 가격</label>
-                            <input type="number" id="roomMenuPrice" name="roomMenuPrice" class="form-control" th:value="${menuDTO.roomMenuPrice}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="roomMenuAmount" class="form-label">상품 수량</label>
-                            <input type="number" id="roomMenuAmount" name="roomMenuAmount" class="form-control" th:value="${menuDTO.roomMenuAmount}">
-                        </div>
+                <!-- 이미지 파일 -->
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;"
+                             th:if="${menuDTO.roomMenuImageMeta != null}" th:src="@{${menuDTO.roomMenuImageMeta}}">
                     </div>
-                    <div class="col-4">
-                        <div class="mb-3">
-                            <label for="roomMenuCategory" class="form-label">카테고리</label>
-                            <select id="roomMenuCategory" name="roomMenuCategory" class="form-control">
-                                <option th:value="한식" th:text="한식" th:selected="${menuDTO.roomMenuCategory == '한식'}">한식</option>
-                                <option th:value="양식" th:text="양식" th:selected="${menuDTO.roomMenuCategory == '양식'}">양식</option>
-                                <option th:value="중식" th:text="중식" th:selected="${menuDTO.roomMenuCategory == '중식'}">중식</option>
-                                <option th:value="에피타이저" th:text="에피타이저" th:selected="${menuDTO.roomMenuCategory == '에피타이저'}">에피타이저</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="roomMenuStatus" class="form-label">상태</label>
-                            <select id="roomMenuStatus" name="roomMenuStatus" class="form-control">
-                                <option th:value="판매중" th:text="판매중" th:selected="${menuDTO.roomMenuStatus == '판매중'}">판매중</option>
-                                <option th:value="품절" th:text="품절" th:selected="${menuDTO.roomMenuStatus == '품절'}">품절</option>
-                            </select>
-                        </div>
-
-                    </div>
-                    <div class="col-4">
-                        <!-- 이미지 파일 -->
-                        <div class="card" style="width: 25rem; border: 2px solid #ccc;">
-                            <div class="mb-3 user-box text-center mt-5">
-                                <!-- 기존 이미지 경로 유지용 -->
-                                <input type="hidden" name="originalImageMeta" th:value="${menuDTO.roomMenuImageMeta}">
-                                <!-- 기존 이미지 경로 유지 끝 -->
-                                <!-- 기존 이미지가 있는 경우 표시 -->
-                                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
-                                    <img th:if="${menuDTO.roomMenuImageMeta != null}" th:src="@{${menuDTO.roomMenuImageMeta}}" id="pictureTemp"
-                                         style="width: 100%; height: 100%; object-fit: contain;">
-                                </div>
-                                <!-- 기존 이미지 끝 -->
-                                <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
-                                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                                <input hidden type="file" id="menuImage" name="roomMenuImage" class="btn btn-light form-control rounded-pill"
-                                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-                            </div> <!-- 이미지 파일 끝 -->
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="roomMenuContent" class="form-label">상품 설명</label>
-                                    <textarea id="roomMenuContent" name="roomMenuContent" class="form-control" rows="4" th:text="${menuDTO.roomMenuContent}"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="menuImage" name="roomMenuImage" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
 
-                <!-- 수정 및 취소 버튼 -->
-                <div class="card-footer mt-3 d-flex justify-content-between">
+                <div class="mb-3">
+                    <label for="roomMenuName" class="form-label">메뉴명</label>
+                    <input type="text" class="form-control" id="roomMenuName" name="roomMenuName"
+                           th:value="${menuDTO.roomMenuName}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roomMenuPrice" class="form-label">가격</label>
+                    <input type="number" class="form-control" id="roomMenuPrice" name="roomMenuPrice"
+                           th:value="${menuDTO.roomMenuPrice}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roomMenuAmount" class="form-label">수량</label>
+                    <input type="number" class="form-control" id="roomMenuAmount" name="roomMenuAmount"
+                           th:value="${menuDTO.roomMenuAmount}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roomMenuContent" class="form-label">설명</label>
+                    <textarea class="form-control" id="roomMenuContent" name="roomMenuContent" rows="3" required
+                              th:text="${menuDTO.roomMenuContent}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roomMenuCategory" class="form-label">카테고리</label>
+                    <select class="form-select" id="roomMenuCategory" name="roomMenuCategory">
+                        <option th:value="한식" th:selected="${menuDTO.roomMenuCategory == '한식'}">한식</option>
+                        <option th:value="양식" th:selected="${menuDTO.roomMenuCategory == '양식'}">양식</option>
+                        <option th:value="중식" th:selected="${menuDTO.roomMenuCategory == '중식'}">중식</option>
+                        <option th:value="에피타이저" th:selected="${menuDTO.roomMenuCategory == '에피타이저'}">에피타이저</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roomMenuStatus" class="form-label">판매여부</label>
+                    <select class="form-select" id="roomMenuStatus" name="roomMenuStatus">
+                        <option th:value="판매중" th:selected="${menuDTO.roomMenuStatus == '판매중'}">판매중</option>
+                        <option th:value="품절" th:selected="${menuDTO.roomMenuStatus == '품절'}">품절</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="supportsMultilang" name="supportsMultilang"
+                           value="true" th:checked="${menuDTO.supportsMultilang}">
+                    <label class="form-check-label" for="supportsMultilang">이 메뉴는 다국어를 지원해야 합니다.</label>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
                     <button type="submit" class="btn btn-primary">수정 완료</button>
-                    <a href="/roommenu/list" class="btn btn-secondary">취소</a>
+                    <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
-</div>
+
     <script>
-
-        // 프로필 사진
-
         document.getElementById('menuImage').addEventListener('change', function () {
             const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
             const filePath = this.value;
@@ -130,7 +100,6 @@
                 previewImage.classList.add('d-none');
             } else {
                 errorMessage.classList.add('d-none');
-
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function (e) {
@@ -142,35 +111,27 @@
             }
         });
 
-
         document.getElementById('PictureBtn').addEventListener('click', function () {
             document.getElementById('menuImage').click();
         });
-
 
         document.getElementById('menuImage').addEventListener('change', function () {
             let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
             document.querySelector('.file-name').textContent = fileName;
         });
 
-        /* --- 재고량이 있으면 품절을 선택할 수 없게 하는 스크립트 ---- */
         const amountInput = document.getElementById("roomMenuAmount");
         const statusSelect = document.getElementById("roomMenuStatus");
 
         statusSelect.addEventListener("change", function () {
             const selected = this.value;
             const amount = parseInt(amountInput.value, 10);
-
             if (selected === "품절" && amount > 0) {
                 alert("재고량이 있으면 품절을 선택할 수 없습니다.");
-                // '판매중'으로 다시 변경
                 this.value = "판매중";
             }
         });
-        /* --- 재고량이 있으면 품절을 선택할 수 없게 하는 스크립트  끝---- */
-
     </script>
 </div>
 </body>
-
 </html>

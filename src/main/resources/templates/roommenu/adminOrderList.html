@@ -1,65 +1,75 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>판매자 주문 알람 내역</title>
+    <title>관리자 전용 주문 내역 목록</title>
     <style>
-        body { font-family: 'Open Sans', sans-serif; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background-color: #f0f0f0; }
-        input[type="checkbox"] {
-            transform: scale(1.2);
-            cursor: pointer;
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table {
+            width: 100%;
+            table-layout: fixed; /* 고정된 테이블 너비 설정 */
         }
     </style>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <h2>사용자가 주문한 주문 목록</h2>
+
+
+    <div class="container mt-4 w-100 bg-light">
+        <h3 class="fw-bold mb-4 text-center">관리자 전용 주문 내역 목록</h3>
+
     <form id="orderForm">
-        <table>
-            <thead>
-            <tr>
-                <th>주문번호</th>
-                <th>주문자</th>
-                <th>상태</th>
-                <th>주문완료여부</th>
-                <th>주문내용</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="order : ${orders}">
-                <td th:text="${order.roomMenuOrderNum}">1001</td>
-                <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}">홍길동</td>
-                <td th:text="${order.roomMenuOrderStatus}">ORDER</td>
-                <td>
-                    <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
-                </td>
-                <td>
-                    <ul>
-                        <li th:each="item : ${order.orderItemList}">
-                            <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
-                            <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
-                            <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
-                            <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원 (합계)
-                            <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered text-company mb-0">
+                    <thead class="table-light text-center">
+                    <tr>
+                        <th style="width: 10%;">주문번호</th>
+                        <th style="width: 20%;">주문자</th>
+                        <th style="width: 10%;">상태</th>
+                        <th style="width: 10%;">주문완료여부</th>
+                        <th style="width: 50%;">주문내용</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
+                        <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
+                        <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
+                        <td class="text-center">
+                            <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;">
+                            <ul>
+                                <li th:each="item : ${order.orderItemList}">
+                                    <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
+                                    <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
+                                    <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
+                                    (합계) <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원
+                                    <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
             </tbody>
         </table>
 
         <!-- 버튼 추가 영역 -->
-        <div class="button-wrapper">
-            <button type="button" onclick="location.href='/roommenu/list'">관리자 목록 페이지로</button>
-            <button type="button" onclick="handleConfirm()">확인</button>
+        <div class="d-flex justify-content-center mt-4 gap-3">
+            <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
+            <button type="button" onclick="handleConfirm()" class="btn btn-success px-4">확인</button>
+        </div>
+            </div>
         </div>
     </form>
+    </div>
+
     <script>
         function handleConfirm() {
             const checkedOrders = [];
@@ -99,7 +109,6 @@
             });
         }
     </script>
-    </div>
 </div>
 
 </body>
