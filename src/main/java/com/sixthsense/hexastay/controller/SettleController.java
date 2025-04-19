@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,10 +29,9 @@ public class SettleController {
 
         Long companyNum = adminService.adminFindEmail(principal.getName()).getCompanyNum();
         if (companyNum != null) {
-            Page<Company> companyList = companyService.com(companyNum, pageable);
+            List<Company> companyList = companyService.getCompanyList(companyNum);
         } else {
-            companyService.
-            Long storeNum = adminService.adminFindEmail(principal.getName()).getStoreNum();
+
         }
 
         return "/settle/chart";

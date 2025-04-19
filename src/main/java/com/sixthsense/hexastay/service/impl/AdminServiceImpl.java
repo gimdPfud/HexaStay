@@ -199,7 +199,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<CompanyDTO> getCompanyList(Pageable pageable) {
+    public List<CompanyDTO> getCompanyList(Long companyNum) {
+
         return null;
     }
 }

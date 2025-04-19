@@ -39,5 +39,5 @@ public interface AdminService {
 
     List<CompanyDTO> insertSelectCompany (String companyType);
 
-    Page<CompanyDTO> getCompanyList(Pageable pageable);
+    List<CompanyDTO> getCompanyList(Long companyNum);
 }
