@@ -231,7 +231,7 @@
 
             <div class="food-info col-6">
                 <span th:text="#{cart.price}">가격</span>:
-                <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>원
+                <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>
                 <p>
                     <span th:text="#{cart.quantity}">수량</span>:
                     <span class="item-quantity" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}"></span>
@@ -240,7 +240,7 @@
                     <p>
                         <span th:text="#{cart.total}">총 금액</span>:
                         <span class="item-total"
-                              th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}"></span>원
+                              th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}"></span>
                     </p>
                 </th:block>
             </div>
@@ -275,18 +275,18 @@
 
 
     <div class="request-section">
-        <label for="request-input" th:text="#{cart.request}">요청사항</label>
-        <textarea id="request-input" th:placeholder="#{cart.request.placeholder}">요청사항을 입력하세요...</textarea>
+        <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
+        <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
     </div>
 
     <!-- 할인금액과 최종결제금액 표시 -->
     <!-- 결제금액 -->
     <div class="pricing-section">
         <div class="discount">
-            <span th:text="#{cart.discount}">할인금액</span>: 0원
+            <span th:text="#{cart.discount}">할인금액</span>:
         </div>
         <div class="final-total">
-            <span th:text="#{cart.finalTotal}">최종결제금액</span>: 0원
+            <span th:text="#{cart.finalTotal.full(${finalTotal})}">최종결제금액:</span>
         </div>
     </div>
 

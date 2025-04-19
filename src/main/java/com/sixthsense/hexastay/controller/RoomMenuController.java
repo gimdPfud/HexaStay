@@ -93,8 +93,8 @@ public class RoomMenuController {
 
     // 오더페이지 상세페이지
     @GetMapping("/roomMenu/read")
-    public String roomMenuReadA(Long num, Model model) {
-        log.info("상세보기 컨트롤러 진입" + num);
+    public String roomMenuReadA(Long num, Model model, Locale locale) {
+        log.info("상세보기 Roommenu 컨트롤러 진입" + num);
 
         RoomMenuDTO roomMenuDTO = roomMenuService.read(num);
 
@@ -189,10 +189,10 @@ public class RoomMenuController {
      ****************************************************/
 
     @GetMapping("/roommenu/orderpage/orderread")
-    public String roomMenuOrderRead(@RequestParam Long num, Model model) {
-        log.info("상세보기 컨트롤러 진입: " + num);
+    public String roomMenuOrderRead(@RequestParam Long num, Model model, Locale locale) {
+        log.info("상세보기 orderpage 컨트롤러 진입: " + num);
 
-        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num);
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale);
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         log.info("모델로 받은 dto: " + roomMenuDTO);
 
@@ -201,9 +201,10 @@ public class RoomMenuController {
 
 
     @GetMapping("/roommenu/read")
-    public String roomMenuRead(Long num, Model model) {
+    public String roomMenuRead(Long num, Model model, Locale locale) {
+        log.info("roommenu/read get 컨트롤러 진입");
 
-        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num);
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale);
 
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         log.info("모델로 받은 dto" + roomMenuDTO);

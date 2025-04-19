@@ -29,11 +29,15 @@ import java.util.List;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 
+
+
+    // 이름으로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)
     @Query("SELECT r FROM RoomMenu r " +
             "WHERE r.roomMenuName LIKE %:name% " +
             "AND (r.supportsMultilang = false OR r.approvedByDev = true)")
     Page<RoomMenu> searchByNameForUser(@Param("name") String name, Pageable pageable);
 
+    // 카테고리 & 이름으로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)
     @Query("SELECT r FROM RoomMenu r " +
             "WHERE r.roomMenuCategory = :category " +
             "AND r.roomMenuName LIKE %:name% " +
@@ -42,10 +46,20 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
                                                   @Param("name") String name,
                                                   Pageable pageable);
 
+    // 카테고리로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)
     @Query("SELECT r FROM RoomMenu r " +
             "WHERE r.roomMenuCategory = :category " +
             "AND (r.supportsMultilang = false OR r.approvedByDev = true)")
     Page<RoomMenu> searchByCategoryForUser(@Param("category") String category, Pageable pageable);
+
+    // 특정 카테고리 & 특정 가격 이하 룸 메뉴 페이징 조회
+    Page<RoomMenu> findByRoomMenuCategoryAndRoomMenuPriceLessThanEqual(String category, int price, Pageable pageable);
+
+    // 특정 카테고리 & 특정 수량 초과 룸 메뉴 페이징 조회
+    Page<RoomMenu> findByRoomMenuCategoryAndRoomMenuAmountGreaterThan(String category, int amount, Pageable pageable);
+
+    // 특정 카테고리 & 특정 이름 포함 OR 특정 가격 이하 룸 메뉴 페이징 조회
+    Page<RoomMenu> findByRoomMenuCategoryAndRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(String category, String name, int price, Pageable pageable);
 
     /* 카테고리 별로 검색 */
     Page<RoomMenu> findByRoomMenuCategory(String category, Pageable pageable);
@@ -89,11 +103,7 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     // 다국어 승인을 필터를 위해 추가한 레포지토리
     Page<RoomMenu> findBySupportsMultilangFalseOrApprovedByDevTrue(Pageable pageable);
 
-    Page<RoomMenu> findByRoomMenuNameContainingAndSupportsMultilangFalseOrApprovedByDevTrue(String keyword, Pageable pageable);
-
-    Page<RoomMenu> findByRoomMenuCategoryAndSupportsMultilangFalseOrApprovedByDevTrue(String category, Pageable pageable);
-
-    Page<RoomMenu> findByRoomMenuCategoryAndRoomMenuNameContainingAndSupportsMultilangFalseOrApprovedByDevTrue(String category, String keyword, Pageable pageable);
-
+    // read 룸 메뉴 가져오기
+    RoomMenu findByRoomMenuNum(Long roomMenuNum);
 
 }
