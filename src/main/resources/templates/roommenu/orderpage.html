@@ -34,7 +34,7 @@
             justify-content: space-between;
         }
         .search-box input {
-            width: 200px;
+            width: 150px;
             padding: 5px;
             border: 2px solid #ddd;
             border-radius: 5px; /* 입력 필드 둥근 모서리 */
@@ -362,7 +362,7 @@
                         <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}"></option>
                     </select>
                     <input type="text" th:placeholder="#{search.placeholder}" name="keyword" />
-                    <button type="submit" th:text="#{search.button}"></button>
+                    <button type="submit" th:text="#{search.button}">검색</button>
                 </div>
             </form> <!-- 검색창 끝 -->
         </div>
@@ -390,7 +390,9 @@
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
                                     <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
                                     <div class="price-box">
-                                        <span th:text="${roomMenuDTO.roomMenuPrice + '원'}" class="price-text"></span>
+                                        <!-- 메뉴가격 -->
+                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="#{item.currency}">원</span>
                                     </div>
                                 </div>
                                 <div class="image-like-container">
