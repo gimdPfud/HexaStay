@@ -75,49 +75,44 @@
                 <thead class="table-primary">
                 <tr>
                     <th>날짜</th>
+                    <th>예약자</th>
+                    <th>객실</th>
+                    <th>체크인</th>
+                    <th>체크아웃</th>
                     <th>매출 금액</th>
-                    <th>수수료율</th>
                     <th>수수료</th>
                     <th>공제 금액</th>
                     <th>최종 정산 금액</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>2025-04-01</td>
-                    <td>₩1,200,000</td>
-                    <td>5%</td>
-                    <td>₩60,000</td>
-                    <td>₩10,000</td>
-                    <td>₩1,130,000</td>
+                <tr th:each="roomList, stat : ${roomDTOList.content}">
+                    <td><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yyyy-MM-dd HH:mm')}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
+
+                    <!-- 날짜 데이터용 input -->
+                    <td><input type="text" class="form-control checkin" th:value="${roomList.checkInDate}" readonly></td>
+                    <td><input type="text" class="form-control checkout" th:value="${roomList.checkOutDate}" readonly></td>
+                    
+                    <!-- 가격 데이터 -->
+                    <td>
+                        <input hidden type="text" class="checkDays">
+                        <input hidden type="text" class="price" th:value="${roomList.hotelRoomDTO.hotelRoomPrice}" readonly>
+                        <input type="text" class="form-control priceResult" readonly>
+                    </td>
+
+                    <!-- 계산 결과용 input -->
+                    <td><input type="text" class="form-control commission" readonly></td>
+                    <td><input type="text" class="form-control deduct" readonly></td>
+                    <td><input type="text" class="form-control final" readonly></td>
                 </tr>
-                <tr>
-                    <td>2025-04-02</td>
-                    <td>₩950,000</td>
-                    <td>5%</td>
-                    <td>₩47,500</td>
-                    <td>₩10,000</td>
-                    <td>₩892,500</td>
-                </tr>
-                <tr>
-                    <td>2025-04-03</td>
-                    <td>₩800,000</td>
-                    <td>5%</td>
-                    <td>₩40,000</td>
-                    <td>₩10,000</td>
-                    <td>₩750,000</td>
-                </tr>
-                <tr>
-                    <td>2025-04-04</td>
-                    <td>₩1,500,000</td>
-                    <td>5%</td>
-                    <td>₩75,000</td>
-                    <td>₩10,000</td>
-                    <td>₩1,415,000</td>
-                </tr>
+
                 </tbody>
             </table>
         </div>
+
+
 
         <!-- 📊 차트들 -->
         <div class="row mt-5">
@@ -130,90 +125,222 @@
                 <canvas id="donutChart" height="260"></canvas>
             </div>
         </div>
+
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('tbody tr').forEach(row => {
+                // 가격 가져오기
+                const priceInput = row.querySelector('.price');
+                if (!priceInput) {
+                    console.error('가격 입력란을 찾을 수 없습니다.');
+                    return;
+                }
+                const price = parseFloat(priceInput.value);
+
+                // 날짜 가져오기
+                const checkIn = new Date(row.querySelector('.checkin').value);
+                const checkOut = new Date(row.querySelector('.checkout').value);
+
+                // 숙박 일수 계산 - 수정된 부분
+                // 체크인과 체크아웃이 같은 날짜여도 1일로 계산
+                // 체크인과 체크아웃이 다르면 차이 + 1일로 계산
+                let days;
+
+                if (checkIn.toDateString() === checkOut.toDateString()) {
+                    // 같은 날이면 1일 숙박
+                    days = 1;
+                } else {
+                    // 다른 날이면 차이 계산해서 +1
+                    const diffTime = Math.abs(checkOut - checkIn);
+                    days = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                }
+
+
+                // 체크인~체크아웃 일수를 checkDays에 저장 (class로 변경됨)
+                const checkDaysInput = row.querySelector('.checkDays');
+                if (checkDaysInput) {
+                    checkDaysInput.value = days;
+                }
+
+                // 매출 금액 계산 (price x 일수)
+                const sales = price * days;
+
+                // 매출 금액 표시
+                const priceResultInput = row.querySelector('.priceResult');
+                if (priceResultInput) {
+                    priceResultInput.value = Math.round(sales).toLocaleString() + '원';
+                }
+
+                // 수수료 (5%)
+                const fee = sales * 0.05;
+                const commissionInput = row.querySelector('.commission');
+                if (commissionInput) {
+                    commissionInput.value = Math.round(fee).toLocaleString() + '원';
+                }
+
+                // 공제 금액 (5%)
+                const deduction = sales * 0.05;
+                const deductInput = row.querySelector('.deduct');
+                if (deductInput) {
+                    deductInput.value = Math.round(deduction).toLocaleString() + '원';
+                }
+
+                // 최종 정산 금액 (매출 - 수수료 - 공제)
+                const final = sales - fee - deduction;
+                const finalInput = row.querySelector('.final');
+                if (finalInput) {
+                    finalInput.value = Math.round(final).toLocaleString() + '원';
+                }
+            });
+        });
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('tbody tr');
+
+            // 데이터 배열 초기화
+            const labels = []; // 날짜
+            const salesList = []; // 매출
+            const finalList = []; // 최종 정산
+            let totalSales = 0;
+            let totalCommission = 0;
+            let totalDeduct = 0;
+            let totalFinal = 0;
+
+            rows.forEach(row => {
+                const date = row.querySelector('td input')?.value || ''; // 첫 번째 td의 input
+                const priceText = row.querySelector('.priceResult')?.value.replace(/[^\d]/g, '') || '0';
+                const commissionText = row.querySelector('.commission')?.value.replace(/[^\d]/g, '') || '0';
+                const deductText = row.querySelector('.deduct')?.value.replace(/[^\d]/g, '') || '0';
+                const finalText = row.querySelector('.final')?.value.replace(/[^\d]/g, '') || '0';
+
+                const price = parseInt(priceText);
+                const commission = parseInt(commissionText);
+                const deduct = parseInt(deductText);
+                const final = parseInt(finalText);
+
+                // 날짜와 금액 저장
+                labels.push(date.split(' ')[0]); // 날짜만 추출
+                salesList.push(price);
+                finalList.push(final);
+
+                totalSales += price;
+                totalCommission += commission;
+                totalDeduct += deduct;
+                totalFinal += final;
+            });
+
+            // ✅ 혼합형 차트 (매출 & 정산)
+            const mixedCtx = document.getElementById('mixedChart').getContext('2d');
+            new Chart(mixedCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '매출 금액',
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            data: salesList,
+                            borderRadius: 5
+                        },
+                        {
+                            type: 'line',
+                            label: '최종 정산 금액',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            data: finalList
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => value.toLocaleString() + '원'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#333',
+                            formatter: value => value.toLocaleString() + '원',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+
+                }
+            });
+
+// ✅ 도넛 차트 (전체 비율)
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['정산금액', '수수료', '공제금액'],
+                    datasets: [{
+                        data: [totalFinal, totalCommission, totalDeduct],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 205, 86, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            formatter: (value, context) => {
+                                const sum = totalFinal + totalCommission + totalDeduct;
+                                const percentage = ((value / sum) * 100).toFixed(1);
+                                return `${percentage}%`;
+                            },
+                            color: '#fff',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+        });
+    </script>
+
+
 </div>
-
-<!-- Chart.js 스크립트 -->
-<script>
-    // 혼합형 차트 (매출 + 정산액)
-    const mixedCtx = document.getElementById('mixedChart').getContext('2d');
-    new Chart(mixedCtx, {
-        type: 'bar',
-        data: {
-            labels: ['4/1', '4/2', '4/3', '4/4'],
-            datasets: [
-                {
-                    type: 'bar',
-                    label: '매출 금액',
-                    data: [1200000, 950000, 800000, 1500000],
-                    backgroundColor: '#0d6efd'
-                },
-                {
-                    type: 'line',
-                    label: '최종 정산 금액',
-                    data: [1130000, 892500, 750000, 1415000],
-                    borderColor: '#198754',
-                    borderWidth: 3,
-                    fill: false,
-                    tension: 0.4,
-                    pointBackgroundColor: '#198754'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            interaction: {
-                mode: 'index',
-                intersect: false
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.dataset.label}: ₩${context.raw.toLocaleString()}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    ticks: {
-                        callback: val => '₩' + val.toLocaleString()
-                    }
-                }
-            }
-        }
-    });
-
-    // 도넛 차트 (정산 비율 분석)
-    const donutCtx = document.getElementById('donutChart').getContext('2d');
-    new Chart(donutCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['수수료 합계', '공제 금액 합계', '정산액 합계'],
-            datasets: [{
-                data: [222500, 40000, 4197500],
-                backgroundColor: ['#ffc107', '#dc3545', '#198754']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ₩${context.raw.toLocaleString()}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-</script>
-
 </body>
 </html>

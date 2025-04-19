@@ -52,4 +52,8 @@ public interface HotelRoomService {
     //******************단일 호텔룸 CRRUD *************//
 
 
+    // 정산전용
+    List<HotelRoomDTO> getSettleList(Long companyNum);
+    Page<HotelRoomDTO> getSettleList(Long companyNum, Pageable pageable);
+
 }
