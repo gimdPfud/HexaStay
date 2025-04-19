@@ -124,7 +124,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // 3. 장바구니 아이템들 가져오기
         List<RoomMenuCartItem> cartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
-        if (cartItems.isEmpty()) throw new IllegalStateException("구입해주셔서 감사합니다.");
+        if (cartItems.isEmpty()) throw new IllegalStateException("장바구니에 아이템이 존재하지 않습니다..");
 
         // 4. 주문 객체 생성
         RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
@@ -149,6 +149,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             orderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());
             orderItem.setRoomMenuOrder(roomMenuOrder);
             orderItem.setRoomMenuOrderRequestMessage(requestMessage);
+            log.info("요청사항: {}", requestMessage);
 
             // 재고 차감
             roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());

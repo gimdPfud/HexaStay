@@ -113,7 +113,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      * 기능 : 룸서비스 메뉴의 목록을 페이지네이션 처리하여 반환
      * 설명 : Pageable을 사용하여 페이지 단위로 메뉴 리스트를 조회하고,
      *        해당 리스트를 DTO로 변환하여 반환
-     *        수정일자 : 2025-04-07, 2025-04-16 - 재고량 추가
+     *        수정일자 : 2025-04-07, 2025-04-16 - 재고량 추가 2025-04-19 : 통합매소드 합치기
      **************************************************/
 
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword,
@@ -126,6 +126,10 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         log.info("검색 키워드(keyword): {}", keyword);
         log.info("카테고리(category): {}", category);
         log.info("forUserView: {}", forUserView);
+
+        // 카테고리가 존재한다면 ?
+        boolean hasCategory = category != null && !category.trim().isEmpty();
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
 
         // === 검색 조건 처리 === //
         if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
@@ -142,26 +146,34 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             roomMenuPage = forUserView
                     ? roomMenuRepository.searchByNameForUser(keyword, pageable)
                     : roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
-        } else if (!forUserView && "P".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+        } else if (!forUserView && "P".equals(type) && hasKeyword) {
             try {
                 int price = Integer.parseInt(keyword);
-                roomMenuPage = roomMenuRepository.findByRoomMenuPriceLessThanEqual(price, pageable);
+                roomMenuPage = hasCategory
+                        ? roomMenuRepository.findByRoomMenuCategoryAndRoomMenuPriceLessThanEqual(category, price, pageable)
+                        : roomMenuRepository.findByRoomMenuPriceLessThanEqual(price, pageable);
             } catch (NumberFormatException e) {
                 roomMenuPage = roomMenuRepository.findAll(pageable);
             }
-        } else if (!forUserView && "A".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+        } else if (!forUserView && "A".equals(type) && hasKeyword) {
             try {
                 int amount = Integer.parseInt(keyword);
-                roomMenuPage = roomMenuRepository.findByRoomMenuAmountGreaterThan(amount, pageable);
+                roomMenuPage = hasCategory
+                        ? roomMenuRepository.findByRoomMenuCategoryAndRoomMenuAmountGreaterThan(category, amount, pageable)
+                        : roomMenuRepository.findByRoomMenuAmountGreaterThan(amount, pageable);
             } catch (NumberFormatException e) {
                 roomMenuPage = roomMenuRepository.findAll(pageable);
             }
-        } else if (!forUserView && "N".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
+        } else if (!forUserView && "N".equals(type) && hasKeyword) {
             try {
                 int price = Integer.parseInt(keyword);
-                roomMenuPage = roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(keyword, price, pageable);
+                roomMenuPage = hasCategory
+                        ? roomMenuRepository.findByRoomMenuCategoryAndRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(category, keyword, price, pageable)
+                        : roomMenuRepository.findByRoomMenuNameContainingOrRoomMenuPriceLessThanEqual(keyword, price, pageable);
             } catch (NumberFormatException e) {
-                roomMenuPage = roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
+                roomMenuPage = hasCategory
+                        ? roomMenuRepository.findByRoomMenuCategoryAndRoomMenuNameContaining(category, keyword, pageable)
+                        : roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
             }
         } else {
             roomMenuPage = forUserView

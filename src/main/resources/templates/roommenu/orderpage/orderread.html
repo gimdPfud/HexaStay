@@ -202,10 +202,12 @@
         </td>
     </div>
 
-    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">#{item.name}</h2>
-    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">#{item.description}</p>
-    <p class="col-sm-9">
-        <span th:text="#{item.price}">가격</span> : <span th:text="${roomMenuDTO.roomMenuPrice}"></span>원
+    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품이름</h2>
+    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품정보"</p>
+    <p>
+        <span th:text="#{item.price}">가격</span> :
+        <span th:text="${roomMenuDTO.roomMenuPrice}"></span>
+        <span th:text="#{item.currency}">원</span>
     </p>
 
 
@@ -226,7 +228,8 @@
     </div>
 
         <!-- 가격 변동을 표시할 부분 -->
-        <span th:text="#{item.totalPrice}">총 가격</span> : <span id="totalPrice">가격</span> 원
+         <span th:text="#{item.totalPrice}">총 가격</span> : <span id="totalPrice">가격</span>
+         <span th:text="#{item.currency}"></span>
 
 
     <!-- 버튼들 -->

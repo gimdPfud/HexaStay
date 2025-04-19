@@ -4,10 +4,7 @@ import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
-import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuCart;
-import com.sixthsense.hexastay.entity.RoomMenuCartItem;
+import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import jakarta.persistence.EntityNotFoundException;
@@ -311,17 +308,26 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     // 상세보기
     @Override
-    public RoomMenuDTO read(Long num) {
-        log.info("상세보기 페이지 서비스 진입" + num);
+    public RoomMenuDTO read(Long num, Locale locale) {
+        log.info("상세보기 Cart 페이지 서비스 진입" + num);
 
-        Optional<RoomMenu> optionalRoomMenu =
-                roomMenuRepository.findById(num);
+        RoomMenu roomMenu = roomMenuRepository.findByRoomMenuNum(num); // DB에서 메뉴 정보를 가져옴
+        RoomMenuDTO roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class); // 원본 정보 매핑
 
-        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
-        log.info("변환된 dto read service의 값" + menuDTO);
+        Optional<RoomMenuTranslation> translation = roomMenuTranslationRepository
+                .findByRoomMenu_RoomMenuNumAndLocale(roomMenu.getRoomMenuNum(), locale.getLanguage());
 
-        return menuDTO;
+        if (translation.isPresent()) {
+            roomMenuDTO.setRoomMenuName(translation.get().getRoomMenuTransLationName());
+            roomMenuDTO.setRoomMenuContent(translation.get().getRoomMenuTransLationContent());
+            // 필요한 다른 번역 필드가 있다면 여기 추가
+        } else {
+            log.warn("번역 정보가 없습니다. 기본 언어로 표시됩니다.");
+        }
 
+        log.info("최종 반환되는 roomMenuDTO: " + roomMenuDTO);
+
+        return roomMenuDTO;  // 이걸 그대로 리턴!
     }
 
     /***********************************************

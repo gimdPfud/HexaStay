@@ -36,7 +36,7 @@ public interface RoomMenuCartService {
     // 장바구니를 삭제하는 매소드
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum);
 
-    public RoomMenuDTO read(Long num);
+    public RoomMenuDTO read(Long num, Locale locale);
 
     // 장바구니의 아이템 수를 보여주는 서비스
     public Integer getTotalCartItemCount(String memberEmail);
