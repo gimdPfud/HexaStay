@@ -23,7 +23,7 @@
 
             <div class="col-md-3">
                 <label class="form-label">소속</label>
-                <select name="choice" id="choice" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
+                <select name="select" id="select" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
                     <option value="all"      th:selected="${select} == 'all'">전체</option>
                     <option value="center"   th:selected="${select} == 'center'">본사</option>
                     <option value="branch"   th:selected="${select} == 'branch'">지사</option>
