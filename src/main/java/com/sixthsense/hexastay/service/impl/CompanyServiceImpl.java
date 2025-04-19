@@ -219,11 +219,16 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<Company> getCompanyList(Long companyNum) {
+    public List<CompanyDTO> getCompanyList(Long companyNum) {
 
         List<Company> companyList = companyRepository.findByCompanyNum(companyNum);
+        List<CompanyDTO> companyDTOList = new ArrayList<>();
+        for (Company company : companyList) {
+            CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
+            companyDTOList.add(companyDTO);
+        }
 
-        return companyList;
+        return companyDTOList;
     }
 
     private CompanyDTO convertToCompanyDTO(Company company) {
