@@ -228,6 +228,7 @@ public class CompanyServiceImpl implements CompanyService {
             companyDTOList.add(companyDTO);
         }
 
+
         return companyDTOList;
     }
 
