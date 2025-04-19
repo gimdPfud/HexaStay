@@ -35,6 +35,6 @@ public interface CompanyService {
     //company 소속 직원 조회
     List<AdminDTO> getCompanyAdmins (Long companyNum);
 
-    List<Company> getCompanyList (Long companyNum);
+    List<CompanyDTO> getCompanyList (Long companyNum);
 
 }
