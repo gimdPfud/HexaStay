@@ -197,4 +197,9 @@ public class AdminServiceImpl implements AdminService {
         log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public Page<CompanyDTO> getCompanyList(Pageable pageable) {
+        return null;
+    }
 }
