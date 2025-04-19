@@ -197,4 +197,10 @@ public class AdminServiceImpl implements AdminService {
         log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public List<CompanyDTO> getCompanyList(Long companyNum) {
+
+        return null;
+    }
 }
