@@ -310,6 +310,27 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
 
+    // 정산전용
+    @Override
+    public List<HotelRoomDTO> getSettleList(Long companyNum) {
+        List<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum);
+        List<HotelRoomDTO> hotelRoomDTOList = new ArrayList<>();
+        for (HotelRoom hotelRoom : hotelRoomList) {
+            HotelRoomDTO hotelRoomDTO = new HotelRoomDTO();
+            hotelRoomDTO.setHotelRoomNum(hotelRoom.getHotelRoomNum());
+            hotelRoomDTO.setHotelRoomName(hotelRoom.getHotelRoomName());
+            hotelRoomDTOList.add(hotelRoomDTO);
+        }
+        return hotelRoomDTOList;
+    }
+
+    @Override
+    public Page<HotelRoomDTO> getSettleList(Long companyNum, Pageable pageable) {
+
+        Page<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum, pageable);
+        Page<HotelRoomDTO> hotelRoomDTOList = hotelRoomList.map(data -> modelMapper.map(data, HotelRoomDTO.class));
+        return hotelRoomDTOList;
+    }
 
 
 }

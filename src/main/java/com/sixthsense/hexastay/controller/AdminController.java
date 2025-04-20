@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -101,7 +103,7 @@ public class AdminController {
     }
 
     @GetMapping("/list")
-    public String adminList (Pageable pageable, Model model) {
+    public String adminList (@PageableDefault(sort = "adminNum", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
         model.addAttribute("adminDTOList", adminService.list(pageable));
         return "/admin/list";
     }
@@ -110,7 +112,7 @@ public class AdminController {
     public String adminListSearch(@RequestParam("select") String select,
                                   @RequestParam("choice") String choice,
                                   @RequestParam("keyword") String keyword,
-                                  Pageable pageable,
+                                  @PageableDefault(sort = "adminNum", direction = Sort.Direction.DESC) Pageable pageable,
                                   Model model) {
 
 
