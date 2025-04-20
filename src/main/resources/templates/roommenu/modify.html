@@ -123,6 +123,7 @@
         const amountInput = document.getElementById("roomMenuAmount");
         const statusSelect = document.getElementById("roomMenuStatus");
 
+        // ----- 품절 여부에 따라서 셀렉트창을 선택할 수 없도록 변경 시작 -----
         statusSelect.addEventListener("change", function () {
             const selected = this.value;
             const amount = parseInt(amountInput.value, 10);
@@ -131,6 +132,18 @@
                 this.value = "판매중";
             }
         });
+
+        statusSelect.addEventListener("change", function () {
+            const selected = this.value;
+            const amount = parseInt(amountInput.value, 10);
+
+            // 판매중인데 재고가 0 이하이면 경고 후 다시 '품절'로 변경
+            if (selected === "판매중" && amount <= 0) {
+                alert("재고량이 0이면 '판매중'으로 변경할 수 없습니다.");
+                this.value = "품절";
+            }
+        });
+        // ----- 품절 여부에 따라서 셀렉트창을 선택할 수 없도록 변경 끝 -----
     </script>
 </div>
 </body>
