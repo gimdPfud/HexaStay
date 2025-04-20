@@ -134,19 +134,13 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         // === 검색 조건 처리 === //
         if ("C".equals(type) && category != null && !category.trim().isEmpty()) {
             if (keyword != null && !keyword.trim().isEmpty()) {
-                roomMenuPage = forUserView
-                        ? roomMenuRepository.searchByCategoryAndNameForUser(category, keyword, pageable)
-                        : roomMenuRepository.findByRoomMenuCategoryAndRoomMenuNameContaining(category, keyword, pageable);
+                roomMenuPage = roomMenuRepository.searchByCategoryAndNameForUser(category, keyword, pageable);
             } else {
-                roomMenuPage = forUserView
-                        ? roomMenuRepository.searchByCategoryForUser(category, pageable)
-                        : roomMenuRepository.findByRoomMenuCategory(category, pageable);
+                roomMenuPage = roomMenuRepository.searchByCategoryForUser(category, pageable);
             }
         } else if ("S".equals(type) && keyword != null && !keyword.trim().isEmpty()) {
-            roomMenuPage = forUserView
-                    ? roomMenuRepository.searchByNameForUser(keyword, pageable)
-                    : roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
-        } else if (!forUserView && "P".equals(type) && hasKeyword) {
+            roomMenuPage = roomMenuRepository.searchByNameForUser(keyword, pageable);
+        } else if ("P".equals(type) && hasKeyword) {
             try {
                 int price = Integer.parseInt(keyword);
                 roomMenuPage = hasCategory
@@ -155,7 +149,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             } catch (NumberFormatException e) {
                 roomMenuPage = roomMenuRepository.findAll(pageable);
             }
-        } else if (!forUserView && "A".equals(type) && hasKeyword) {
+        } else if ("A".equals(type) && hasKeyword) {
             try {
                 int amount = Integer.parseInt(keyword);
                 roomMenuPage = hasCategory
@@ -164,7 +158,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             } catch (NumberFormatException e) {
                 roomMenuPage = roomMenuRepository.findAll(pageable);
             }
-        } else if (!forUserView && "N".equals(type) && hasKeyword) {
+        } else if ("N".equals(type) && hasKeyword) {
             try {
                 int price = Integer.parseInt(keyword);
                 roomMenuPage = hasCategory
@@ -175,10 +169,10 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                         ? roomMenuRepository.findByRoomMenuCategoryAndRoomMenuNameContaining(category, keyword, pageable)
                         : roomMenuRepository.findByRoomMenuNameContaining(keyword, pageable);
             }
+        } else if ("L".equals(type)) {
+            roomMenuPage = roomMenuRepository.findAllOrderByLikeCountDescForUser(pageable);
         } else {
-            roomMenuPage = forUserView
-                    ? roomMenuRepository.findBySupportsMultilangFalseOrApprovedByDevTrue(pageable)
-                    : roomMenuRepository.findAll(pageable);
+            roomMenuPage = roomMenuRepository.findBySupportsMultilangFalseOrApprovedByDevTrue(pageable);
         }
 
         // === DTO 변환 + 다국어 및 상태 처리 === //

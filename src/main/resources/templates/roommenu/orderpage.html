@@ -369,11 +369,14 @@
 
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <div class="tab" th:text="#{tab.all}" onclick="window.location.href='/roommenu/orderpage?category=전체보기'">전체보기</div>
+            <button type="button"
+                    onclick="window.location.href='/roommenu/orderpage?type=L'"
+                    class="btn btn-outline-danger">❤️ 인기순</button>
             <div class="tab" th:text="#{tab.korean}" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
             <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
+
         </div>
 
 

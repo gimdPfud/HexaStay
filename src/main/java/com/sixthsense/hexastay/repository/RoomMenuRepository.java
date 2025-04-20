@@ -46,6 +46,14 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
                                                   @Param("name") String name,
                                                   Pageable pageable);
 
+    // 좋아요 순으로 정렬
+    @Query("SELECT rm FROM RoomMenu rm " +
+            "LEFT JOIN RoomMenuLike rml ON rm = rml.roomMenu " +
+            "WHERE (rm.supportsMultilang = false OR rm.approvedByDev = true) " +
+            "GROUP BY rm " +
+            "ORDER BY COUNT(CASE WHEN rml.roomMenuLikedCheck = true THEN 1 END) DESC")
+    Page<RoomMenu> findAllOrderByLikeCountDescForUser(Pageable pageable);
+
     // 카테고리로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)
     @Query("SELECT r FROM RoomMenu r " +
             "WHERE r.roomMenuCategory = :category " +
