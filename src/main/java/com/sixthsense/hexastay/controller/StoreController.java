@@ -99,6 +99,14 @@ public class StoreController {
                        @RequestParam(required = false) String keyword){
         Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
+
+        List<CompanyDTO> comlist = new ArrayList<>();
+        List<CompanyDTO> fcL = companyRepository.findByCompanyType("facility").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
+        List<CompanyDTO> brL = companyRepository.findByCompanyType("branch").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
+        comlist.addAll(brL);
+        comlist.addAll(fcL);
+        model.addAttribute("companyList",comlist);
+
         model.addAttribute("companyMap", storeService.getCompanyMap());
         model.addAttribute("searchType",searchType);
         model.addAttribute("chosenCompany",companyNum);

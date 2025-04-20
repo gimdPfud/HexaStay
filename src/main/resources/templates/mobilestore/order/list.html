@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}"
->
+      layout:decorate="~{layouts/layoutmobile.html}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,23 +10,33 @@
 <body>
 
 <div layout:fragment="contentorder">
-    <!-- 장바구니 리스트 -->
-    <div class="container cart-container mt-3">
-        <div class="list-group">
-            <div th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <!--날짜 | 주문된 날짜. 이거... 연도가 바뀔때 연도까지 보여주고 머 그런 기능도?? #temporal 어쩌고로-->
-                    <p th:text="${item.formatDate}"></p>
-                    <!--상태 | [접수됨] [취소됨] [완료됨]-->
-                    <p th:text="${item.orderstoreStatus}"></p><br>
-                    <!--스토어이름 | store 이름. 역전우동 부천역곡점. a태그로 해당 스토어로 바로가기해도 좋을듯?-->
-                    <p th:text="${item.orderstoreStoreName}"></p>
-                    <!--첫번째 아이템이름 | storemenu 이름. 일반 우동-->
-                    <p th:text="${item.orderstoreFirstItemName}"></p>
-                    <!--아이템개수-1 | storemenu가 2개 이상이라면? "외 orderstoreitemList.size()-1 개" -->
-                    <p th:if="${item.orderstoreitemDTOList.size()>1}" th:text="' 외 '+${item.orderstoreitemDTOList.size()-1}+' 개'"></p>
-                    <!--주문전체금액 | order money... 원-->
-                    <br><p th:text="${item.orderstoreFinalPrice}+'원'"></p>
+    <div class="container mt-4">
+        <h5 class="mb-3">주문 내역</h5>
+        <div class="row row-cols-1 gy-3">
+            <div class="col" th:each="item : ${list}">
+                <div class="card shadow-sm rounded">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted" th:text="${item.formatDate}">2025.04.20</small>
+                            <span class="badge"
+                                  th:classappend="${item.orderstoreStatus == 'paid' ? 'bg-primary' : (item.orderstoreStatus == 'end' ? 'bg-success' : 'bg-secondary')}"
+                                  th:text="${item.orderstoreStatus}">상태</span>
+                        </div>
+
+                        <h6 class="mt-2 mb-1">
+                            <a href="#"
+                               class="text-decoration-none text-dark fw-bold"
+                               th:text="${item.orderstoreStoreName}">스토어 이름</a>
+                        </h6>
+
+                        <p class="mb-1">
+                            <span th:text="${item.orderstoreFirstItemName}">일반 우동</span>
+                            <span th:if="${item.orderstoreitemDTOList.size()>1}"
+                                  th:text="' 외 ' + ${item.orderstoreitemDTOList.size() - 1} + ' 개'"></span>
+                        </p>
+
+                        <p class="fw-bold text-end mb-0" th:text="${item.orderstoreFinalPrice} + '원'">총 금액</p>
+                    </div>
                 </div>
             </div>
         </div>
