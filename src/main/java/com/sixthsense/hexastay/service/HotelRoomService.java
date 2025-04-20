@@ -41,7 +41,7 @@ public interface HotelRoomService {
     public HotelRoomDTO hotelroomrRead(Long hotelRoomNum);
 
     //수정
-    public void hotelroomrModify(HotelRoomDTO hotelRoomDTO);
+    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException;
 
     //삭제
     public void hotelroomDelet(Long hotelRoomNum);
