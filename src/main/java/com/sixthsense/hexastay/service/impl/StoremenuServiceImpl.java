@@ -103,8 +103,8 @@ public class StoremenuServiceImpl implements StoremenuService {
     public Long modify(StoremenuDTO storemenuDTO) throws IOException {
         log.info("수정 서비스 진입 : "+storemenuDTO);
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
-        if(storemenuDTO.getStoremenuImg()!=null) {
-            if (entity.getStoremenuImgMeta()!=null) {
+        if(storemenuDTO.getStoremenuImg()!=null&&!storemenuDTO.getStoremenuImg().isEmpty()) {
+            if (entity.getStoremenuImgMeta()!=null&&!entity.getStoremenuImgMeta().isEmpty()) {
                 Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
                 Files.deleteIfExists(filePath);
             }
