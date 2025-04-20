@@ -503,13 +503,45 @@
 
     // 결제여부에 따라서 이동되는 페이지
     function processPayment() {
-        const url = "/payment?tossprice=" + tossprice;
-        const popup = window.open(url, "_blank", "width=600,height=800");
-        if (!popup) {
-            alert("팝업 차단 해제해 주세요.");
-        }
-            window.location.href = "/tossloading";
+        const requestMessage = document.getElementById('request-input').value;
+
+        fetch("/roommenu/cart", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ requestMessage: requestMessage })
+        })
+            .then(res => res.text())
+            .then(data => {
+                alert("결제 페이지로 이동합니다!");
+
+                // 주문 완료 후 toss 결제 페이지로 이동 (옵션)
+                const url = "/payment?tossprice=" + tossprice;
+                const popup = window.open(url, "_blank", "width=600,height=800");
+                if (!popup) {
+                    alert("팝업 차단 해제해 주세요.");
+                }
+
+                // 로딩 페이지로도 이동 (필요 시)
+                window.location.href = "/tossloading";
+            })
+            .catch(err => {
+                alert("에러 발생: " + err.message);
+            });
     }
+
+    // fetch("/roommenu/cart", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    //     body: new URLSearchParams({ requestMessage: "기타 요청 사항" })
+    // })
+    //     .then(res => res.json()) // 또는 res.text() depending on response
+    //     .then(data => {
+    //         alert("주문이 완료되었습니다!");
+    //         window.location.href = "/roommenu/orderList"; // ✅ 주문 내역으로 이동
+    //     })
+    //     .catch(err => {
+    //         alert("에러 발생: " + err.message);
+    //     });
 
 
 

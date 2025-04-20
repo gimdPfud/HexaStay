@@ -84,20 +84,6 @@
     }
     /*------ 주문을 취소하는 스크립트 끝 ------*/
 
-    fetch("/roommenu/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ requestMessage: "기타 요청 사항" })
-    })
-        .then(res => res.json()) // 또는 res.text() depending on response
-        .then(data => {
-            alert("주문이 완료되었습니다!");
-            window.location.href = "/roommenu/orderList"; // ✅ 주문 내역으로 이동
-        })
-        .catch(err => {
-            alert("에러 발생: " + err.message);
-        });
-
 </script>
 
 </body>
