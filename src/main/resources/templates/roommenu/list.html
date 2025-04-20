@@ -132,6 +132,10 @@
             <li class="nav-item">
                 <a class="nav-link [[${category} == '에피타이저' ? 'active' : '']]" href="/roommenu/list?type=C&category=에피타이저" th:text="#{category.appetizer}">에피타이저</a>
             </li>
+            <li class="px-2 align-self-center">|</li>
+            <li class="nav-item">
+                <a class="nav-link [[${category} == '인기순' ? 'active' : '']]" href="http://localhost:8090/roommenu/list?type=L">인기순</a>
+            </li>
         </ul>
         <!-- 특정 카테고리 검색 끝 -->
 
