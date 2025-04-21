@@ -45,8 +45,8 @@ public class SettleController {
     {
 
         Long storeNum = adminRepository.findByAdminEmail(principal.getName()).getStore().getStoreNum();
-//        Page<OrderstoreDTO> orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
-//        model.addAttribute("storeDTOList", orderstoreDTOList);
+        Page<OrderstoreDTO> orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
+        model.addAttribute("storeDTOList", orderstoreDTOList);
         return "/settle/chartstore";
     }
 
