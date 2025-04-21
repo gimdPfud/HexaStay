@@ -21,4 +21,8 @@ public interface RoomMenuOrderService {
     // 판매자가 주문 정보를 확인
     public List<RoomMenuOrderDTO> getAllOrdersForAdmin();
 
+    // 관리자에게 알람을 띄우기
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto);
+
+
 }

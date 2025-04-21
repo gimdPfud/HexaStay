@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /***************************************************
      *
@@ -298,5 +300,12 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setOrderItemList(itemDTOList);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto) {
+
+        messagingTemplate.convertAndSend("/topic/new-order", orderDto);
+
     }
 }

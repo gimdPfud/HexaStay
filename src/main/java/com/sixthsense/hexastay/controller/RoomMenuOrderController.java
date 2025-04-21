@@ -104,6 +104,11 @@ public class RoomMenuOrderController {
         try {
             // 주문 서비스 호출 → 주문 생성 및 저장
             roomMenuOrderNum = roomMenuOrderService.roomMenuOrderInsert(roomMenuOrderDTO, email);
+
+            // 관리자의 알람을 위해서
+
+            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO);
+
             log.info(String.format("주문이 완료됨 - DTO: %s, Email: %s", roomMenuOrderDTO, email));
 
 
