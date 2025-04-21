@@ -138,8 +138,9 @@
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
-                <a class="nav-link [[${category} == '인기순' ? 'active' : '']]" href="http://localhost:8090/roommenu/list?type=L">
-                    ❤️ 인기순
+                <a class="nav-link [[${category} == '인기순' ? 'active' : '']]"
+                   href="http://localhost:8090/roommenu/list?type=L">
+                    ❤️ <span th:text="#{category.popular}">인기순</span>
                 </a>
             </li>
         </ul>
