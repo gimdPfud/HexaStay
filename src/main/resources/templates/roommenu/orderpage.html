@@ -329,6 +329,29 @@
             letter-spacing: -0.5px;
         }
 
+        /* 영어 */
+        .lang-en .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: -0.5px;
+        }
+
+        /* 일본어 */
+        .lang-ja .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: 0px; /* 일본어는 자간을 좁히지 않는 게 가독성에 좋음 */
+            font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
+        }
+
+        /* 중국어 */
+        .lang-cn .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: 0px; /* 중국어도 자간 유지 */
+            font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        }
+
 
     </style>
 </head>
@@ -371,7 +394,7 @@
         <div class="tabs">
             <button type="button"
                     onclick="window.location.href='/roommenu/orderpage?type=L'"
-                    class="btn btn-outline-danger">❤️ 인기순</button>
+                    th:text="#{category.popular}" class="btn btn-outline-danger">❤️ 인기순</button>
             <div class="tab" th:text="#{tab.korean}" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
