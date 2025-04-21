@@ -148,22 +148,25 @@ public class HotelRoomController {
         return "hotelroom/modifyhotelroom";
     }
 
-    @PostMapping("/modify")
-    public String hotelRoomUpdatePost(@ModelAttribute HotelRoomDTO hotelRoomDTO,
+    @PostMapping("/update")
+    public String hotelRoomUpdatePost(@RequestParam Long hotelRoomNum,
+                                      HotelRoomDTO hotelRoomDTO,
         RedirectAttributes redirectAttributes                              ) {
 
         log.info("hotelRoomUpdate Post 페이지에 들어 오기는 했지 ");
 
         try {
-            hotelRoomService.hotelroomrModify(hotelRoomDTO);
+            hotelRoomService.hotelroomUpdate(hotelRoomNum,hotelRoomDTO);
             redirectAttributes.addFlashAttribute("successMessage", "호텔룸 정보가 성공적으로 수정되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        return "redirect:/admin/hotelroom/modify";
+        return "redirect:/roomlist";
     }
 
     // 호텔룸 상세 페이지로 이동

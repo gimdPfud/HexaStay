@@ -266,25 +266,69 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     //4.수정
     @Override
-    public void hotelroomrModify(HotelRoomDTO hotelRoomDTO) {
-        try {
-            // 존재하는 호텔룸인지 확인 (예외 메시지를 사용자에게 전달할 수 있도록 처리)
-            HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 호텔룸이 존재하지 않습니다."));
+    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException {
+        log.info("HotelRoom 수정 Service 진입");
 
-            // DTO → Entity로 덮어쓰기 (기존 엔티티를 기준으로 덮어쓰기)
-            modelMapper.map(hotelRoomDTO, hotelRoom);
+        // 기존 호텔룸 정보 가져오기
+        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 호텔룸이 존재하지 않습니다."));
 
-            // 저장
-            hotelRoomRepository.save(hotelRoom);
+        // DTO → Entity (기존 엔티티에 덮어쓰기 형태로 수정)
+        modelMapper.map(hotelRoomDTO, hotelRoom);
 
-        } catch (IllegalArgumentException e) {
-            // 사용자에게 친절한 메시지 전달을 위한 예외 전파
-            throw new IllegalArgumentException(e.getMessage());
-        } catch (Exception e) {
-            // 시스템 예외 처리
-            throw new RuntimeException("호텔룸 정보 수정 중 오류가 발생했습니다.");
+        // 회사 정보 매핑
+        Long companyNum = hotelRoom.getCompany().getCompanyNum();
+        Company company = companyRepository.findById(companyNum)
+                .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다."));
+        hotelRoom.setCompany(company);
+
+        // 이미지 수정
+        if (hotelRoomDTO.getHotelRoomProfile() != null && !hotelRoomDTO.getHotelRoomProfile().isEmpty()) {
+            // 새 파일 이름 설정
+            String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
+            String fileFirstName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoomNum;
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            // 새 이미지 경로
+            hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "hotelroom/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "hotelroom/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+
+            // 이미지 저장 (덮어쓰기 가능)
+            hotelRoomDTO.getHotelRoomProfile().transferTo(uploadPath.toFile());
+
+            // 새로운 이미지 경로 저장
+            hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
         }
+
+        try {
+            // ✅ QR 코드 재생성
+            String qrText = "http://localhost:8090/main"; // QR 링크
+
+            String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qr/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300);
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", uploadPath);
+
+            hotelRoom.setHotelRoomQr(fileName);
+
+        } catch (Exception e) {
+            throw new RuntimeException("QR 코드 생성 중 오류 발생: " + e.getMessage());
+        }
+
+        // 수정된 정보 저장
+        hotelRoomRepository.save(hotelRoom);
+        log.info("호텔룸 정보 수정 완료: {}", hotelRoom.getHotelRoomNum());
     }
 
 
