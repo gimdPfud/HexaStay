@@ -188,7 +188,13 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     public List<OrderstoreDTO> getOrderedList(Long storeNum) {
         List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
         list.forEach(log::info);//됨
-        List<OrderstoreDTO> result = list.stream().map(data->modelMapper.map(data, OrderstoreDTO.class)).toList();
+        List<OrderstoreDTO> result = list.stream().map(data -> {
+            OrderstoreDTO dto = modelMapper.map(data, OrderstoreDTO.class);
+            dto.setOrderstoreitemDTOList(
+                    data.getOrderstoreitemList().stream().map(a->modelMapper.map(a,OrderstoreitemDTO.class)).toList()
+            );
+            return dto;
+        }).toList();
         log.info("서비스에서 찾음? "+result.size());
         result.forEach(log::info);
         return result;
