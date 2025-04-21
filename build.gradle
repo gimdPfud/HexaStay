@@ -33,6 +33,10 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
 
+
+    // 웹 소켓을 이용하기 위해서..
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     //QR용 코끼리 추가
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.google.zxing:javase:3.5.2'

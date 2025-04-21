@@ -242,35 +242,70 @@
             </ul>
         </nav>
     </div>
-</div>
+    <!-- WebSocket 관련 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        /*------ 카테고리 드롭다운 활성화 시작 ------*/
+        console.log("JS 로딩됨");
 
-<script>
-    /*------ 카테고리 드롭다운 활성화 시작 ------*/
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchOptionSelect = document.getElementById("search-option");
+            const categorySelect = document.getElementById("category-select");
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchOptionSelect = document.getElementById("search-option");
-        const categorySelect = document.getElementById("category-select");
+            // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
+            searchOptionSelect.addEventListener("change", function() {
+                if (searchOptionSelect.value === "C") {
+                    categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
+                } else {
+                    categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
+                    categorySelect.value = "";  // 카테고리 선택 초기화
+                }
+            });
 
-        // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
-        searchOptionSelect.addEventListener("change", function() {
+            // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
             if (searchOptionSelect.value === "C") {
-                categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
-            } else {
-                categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
-                categorySelect.value = "";  // 카테고리 선택 초기화
+                categorySelect.disabled = false;
             }
         });
 
-        // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
-        if (searchOptionSelect.value === "C") {
-            categorySelect.disabled = false;
-        }
-    });
+        /*------ 카테고리 드롭다운 활성화 끝 ------*/
 
-    /*------ 카테고리 드롭다운 활성화 끝 ------*/
-</script>
 
-    </div>
+        /* ----- 주문페이지 알람 시작 -----*/
+        document.addEventListener("DOMContentLoaded", function () {
+            // [1] SockJS를 이용해 서버에 연결
+            const socket = new SockJS("/ws-order-alert"); // 백엔드에서 설정한 WebSocket 엔드포인트
+            const stompClient = Stomp.over(socket);
+
+            // [2] STOMP 연결
+            stompClient.connect({}, function (frame) {
+                console.log("✅ 웹소켓 연결됨: ", frame);
+
+                // [3] 서버가 전달하는 주문 알림 메시지 구독
+                stompClient.subscribe("/topic/new-order", function (message) {
+                    try {
+                        const orderData = JSON.parse(message.body);
+
+                        // [4] 팝업 알림 표시 (관리자 페이지라면 더 정교하게 커스터마이징 가능)
+                        alert("🔔 새 주문이 들어왔습니다!\n주문자: " + orderData.memberEmail + "\n총 금액: " + orderData.roomMenuPrice + "원");
+
+                        // [5] 필요 시 자동 새로고침 등 추가 동작 가능
+                        // location.reload();
+
+                    } catch (error) {
+                        console.error("❌ 메시지 처리 중 오류 발생", error);
+                    }
+                });
+            }, function (error) {
+                console.error("❌ 웹소켓 연결 실패", error);
+            });
+        });
+        /* ----- 주문페이지 알람 끝 -----*/
+
+    </script>
+</div>
+</div>
 
 </body>
 </html>
