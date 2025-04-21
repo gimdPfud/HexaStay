@@ -2,49 +2,88 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}"
->
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>가게 목록</title>
+    <title>가게 주문 목록</title>
 </head>
 <body style="background-color: #f8f9fa;">
 
 <div layout:fragment="content">
+    <div class="container mt-4">
 
-    <!-- 테이블 -->
-    <div class="container cart-container mt-3">
+        <!-- 가게 선택 -->
+        <form action="/admin/store/order/list" method="post" class="mb-4">
+            <div class="input-group">
+                <label class="input-group-text" for="storeSelect">가게 선택</label>
+                <select class="form-select" id="storeSelect" name="storeNum" onchange="this.form.submit()">
+                    <option selected disabled>가게를 선택하세요</option>
+                    <option th:each="store : ${storeList}"
+                            th:selected="${storeNum == store.storeNum}"
+                            th:value="${store.storeNum}"
+                            th:text="${store.storeName}">
+                    </option>
+                </select>
+            </div>
+        </form>
+
+        <!-- 주문 리스트 -->
         <div class="list-group">
-            <form action="/admin/store/order/list" method="post">
-                <div class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                    임시조치?
-                    <select class="form-select" name="storeNum" onchange="this.form.submit()">
-                        <option selected disabled>가게를 선택하세요</option>
-                        <option th:each="store:${storeList}" th:selected="${storeNum==store.storeNum}"
-                                th:value="${store.storeNum}" th:text="${store.storeName}"></option>
-                    </select>
-                </div>
-            </form>
 
-            <div th:unless="${list == null or list.empty}"
-                    th:each="orderDTO : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <!--날짜 | 주문된 날짜. 이거... 연도가 바뀔때 연도까지 보여주고 머 그런 기능도?? #temporal 어쩌고로-->
-                    <p th:text="${orderDTO}"></p>
-                    <button type="button" th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}" th:onclick="|ordercancel(${orderDTO.orderstoreNum})|">주문취소</button>
-                    <button type="button" th:disabled="${orderDTO.orderstoreStatus.equals('end')}" th:onclick="|orderEnd(${orderDTO.orderstoreNum})|">주문완료</button>
+            <!-- 주문 항목 있음 -->
+            <div th:each="orderDTO : ${list}" th:unless="${list == null or list.empty}"
+                 class="list-group-item mb-3 rounded shadow-sm bg-white">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1" th:text="'주문일: ' + ${orderDTO.createDate}"></h6>
+                        <div class="small text-muted">
+                            상태: <span th:text="${orderDTO.orderstoreStatus}"></span><br>
+                            메시지: <span th:text="${orderDTO.orderstoreMessage}"></span><br>
+                            룸번호: <span th:text="${orderDTO.roomNum}"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger me-2"
+                                th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}"
+                                th:onclick="|ordercancel(${orderDTO.orderstoreNum})|">주문취소</button>
+                        <button type="button" class="btn btn-sm btn-outline-success"
+                                th:disabled="${orderDTO.orderstoreStatus.equals('end')}"
+                                th:onclick="|orderEnd(${orderDTO.orderstoreNum})|">주문완료</button>
+                    </div>
+                </div>
+
+                <!-- 메뉴 항목 테이블 -->
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                        <tr>
+                            <th>메뉴번호</th>
+                            <th>수량</th>
+                            <th>총 금액</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${orderDTO.orderstoreitemDTOList}">
+                            <td width="20%" th:text="${item.storemenuNum}">메뉴번호</td>
+                            <td  width="20%" th:text="${item.orderstoreitemAmount}">수량</td>
+                            <td th:text="${item.orderstoreitemTotalPrice}">금액</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+            <!-- 주문 없음 -->
             <div th:if="${list == null or list.empty}"
-                 class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <p>EMPTY</p>
-                </div>
+                 class="list-group-item text-center py-5 bg-light border text-muted">
+                <p class="mb-0">주문 내역이 없습니다.</p>
             </div>
+
         </div>
     </div>
 
-
+    <!-- JS -->
     <script th:inline="javascript">
         function ordercancel(orderNum) {
             fetch(`/admin/store/order/cancel/${orderNum}`)
@@ -53,15 +92,16 @@
                     else location.reload();
                 });
         }
+
         function orderEnd(orderNum) {
             fetch(`/admin/store/order/end/${orderNum}`)
                 .then(res => {
-                    if (!res.ok) alert("end 실패");
+                    if (!res.ok) alert("완료 실패");
                     else location.reload();
                 });
         }
     </script>
-
 </div>
+
 </body>
 </html>
