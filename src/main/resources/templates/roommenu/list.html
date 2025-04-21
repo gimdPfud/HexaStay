@@ -242,6 +242,27 @@
             </ul>
         </nav>
     </div>
+
+
+    <!-- 모달창 시작 -->
+
+    <!-- 모달창 -->
+    <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="orderAlertModalLabel">🔔 새 주문 알림</h5>
+                </div>
+                <div class="modal-body" id="orderAlertContent">
+                    <!-- 자바스크립트에서 내용이 삽입될 부분 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- WebSocket 관련 라이브러리 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -274,29 +295,33 @@
 
         /* ----- 주문페이지 알람 시작 -----*/
         document.addEventListener("DOMContentLoaded", function () {
-            // [1] SockJS를 이용해 서버에 연결
-            const socket = new SockJS("/ws-order-alert"); // 백엔드에서 설정한 WebSocket 엔드포인트
+            const socket = new SockJS("/ws-order-alert");
             const stompClient = Stomp.over(socket);
 
-            // [2] STOMP 연결
             stompClient.connect({}, function (frame) {
                 console.log("✅ 웹소켓 연결됨: ", frame);
 
-                // [3] 서버가 전달하는 주문 알림 메시지 구독
                 stompClient.subscribe("/topic/new-order", function (message) {
                     try {
                         const orderData = JSON.parse(message.body);
+                        console.log("📦 메시지 수신:", orderData);
 
-                        // [4] 팝업 알림 표시 (관리자 페이지라면 더 정교하게 커스터마이징 가능)
-                        alert("🔔 새 주문이 들어왔습니다!\n주문자: " + orderData.memberEmail + "\n총 금액: " + orderData.roomMenuPrice + "원");
+                        // 모달 내용 채우기
+                        const content = `
+                    주문자: <strong>${orderData.memberEmail}</strong><br>
+                    총 금액: <strong>${orderData.roomMenuPrice}원</strong>
+                `;
+                        document.getElementById("orderAlertContent").innerHTML = content;
 
-                        // [5] 필요 시 자동 새로고침 등 추가 동작 가능
-                        // location.reload();
+                        // 부트스트랩 모달 띄우기
+                        const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
+                        modal.show();
 
                     } catch (error) {
-                        console.error("❌ 메시지 처리 중 오류 발생", error);
+                        console.error("❌ 메시지 처리 오류", error);
                     }
                 });
+
             }, function (error) {
                 console.error("❌ 웹소켓 연결 실패", error);
             });

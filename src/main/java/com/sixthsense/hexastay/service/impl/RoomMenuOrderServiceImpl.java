@@ -304,6 +304,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     @Override
     public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto) {
+        log.info("주문 알람 서비스 진입");
 
         messagingTemplate.convertAndSend("/topic/new-order", orderDto);
 
