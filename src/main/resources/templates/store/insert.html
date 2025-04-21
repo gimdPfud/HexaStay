@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}"
->
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>스토어 등록</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+
     <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
         <h1 class="text-center mb-4">스토어 등록</h1>
         <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
@@ -20,7 +17,7 @@
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
                     <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
                 </div>
-                <p class="file-name">사진이 선택되지 않았습니다.</p>
+                <p class="file-name">이미지가 선택되지 않았습니다.</p>
                 <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
                 <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
@@ -42,7 +39,7 @@
                 <input type="text" class="form-control" name="storeName" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">스토어 폰 번호</label>
+                <label class="form-label">스토어 전화번호</label>
                 <input type="text" class="form-control" name="storePhone" required>
             </div>
             <div class="mb-3">
