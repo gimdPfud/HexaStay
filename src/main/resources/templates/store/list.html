@@ -2,213 +2,225 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}"
->
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>스토어 목록</title>
 </head>
+<style>
+    .table td {
+        vertical-align: middle;
+    }
+</style>
 <body style="background-color: #f8f9fa;">
-
 <div layout:fragment="content">
 
-    <!-- 검색 조건 및 등록 버튼 -->
-    <form class="row g-3 mb-4" action="/admin/store/list" method="post">
-        <div class="col-md-2">
-            <select class="form-select" name="chosenCompany">
-                <option value="">호텔목록</option>
-                <option th:each="data : ${companyMap}"
-                        th:value="${data.key}"
-                        th:text="${data.value}"
-                        th:selected="${chosenCompany == data.key}"></option>
-            </select>
+    <div class="container mt-4 w-100 bg-light">
+        <h3 class="fw-bold mb-4 text-center">스토어 관리</h3>
+
+        <!-- 검색 조건 및 등록 버튼 -->
+        <form class="row g-3 align-items-end" action="/admin/store/list" method="post">
+
+            <div class="col-md-3">
+                <label class="form-label">호텔 선택</label>
+                <select class="form-select" name="chosenCompany" style="height: 35px; font-size: 0.9rem;">
+                    <option th:each="data : ${companyMap}"
+                            th:value="${data.key}"
+                            th:text="${data.value}"
+                            th:selected="${chosenCompany == data.key}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">검색 조건</label>
+                <select class="form-select" name="searchType" style="height: 35px; font-size: 0.9rem;">
+                    <option th:selected="${searchType}=='storeName'" value="storeName">상호명</option>
+                    <option th:selected="${searchType}=='storeAddress'" value="storeAddress">스토어주소</option>
+                    <option th:selected="${searchType}=='storeCeoName'" value="storeCeoName">대표자명</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">검색어</label>
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-50">조회</button>
+                <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
+                    등록
+                </button>
+            </div>
+        </form>
+
+        <!-- 테이블 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered text-company mb-0">
+                    <thead class="table-light text-center">
+                    <tr>
+                        <th style="text-align: center; vertical-align: middle;">제공호텔</th>
+                        <th style="text-align: center; vertical-align: middle;">이미지</th>
+                        <th style="text-align: center; vertical-align: middle;">업체명</th>
+                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
+                        <th style="text-align: center; vertical-align: middle;">주소</th>
+                        <th style="text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="text-align: center; vertical-align: middle;">상세보기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="data : ${list}">
+                        <td th:text="${data.companyName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td style="text-align: center;">
+                            <img th:if="${data.storeProfileMeta != null}"
+                                 th:src="@{${data.storeProfileMeta}}"
+                                 style="width: 80px; height: 80px;">
+
+                            <img th:unless="${data.storeProfileMeta != null}"
+                                 th:src="@{/store/default.png}"
+                                 style="width: 80px; height: 80px;">
+                        </td>
+
+                        <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">보기</a>
+                            <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger btn-sm">삭제</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-5" th:if="${list == null or list.empty}">
+                <h2 class="text-secondary">목록이 없습니다.</h2>
+            </div>
         </div>
-        <div class="col-md-2">
-            <select class="form-select" name="searchType">
-                <option>검색타입</option>
-                <option th:selected="${searchType}=='storeName'" value="storeName">상호명</option>
-                <option th:selected="${searchType}=='storeAddress'" value="storeAddress">스토어주소</option>
-                <option th:selected="${searchType}=='storeCeoName'" value="storeCeoName">대표자명</option>
-            </select>
+
+        <!-- 페이징 -->
+        <div class="row mt-3" th:if="${list != null and !list.empty}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/store/list?page=0}">처음</a>
+                </li>
+                <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
+                </li>
+                <li class="page-item"
+                    th:each="pageNum : ${#numbers.sequence((list.number - 4 > 0 ? list.number - 4 : 0), (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
+                    th:classappend="${pageNum == list.number} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/store/list?page={next}(next=${list.number + 1})}">다음</a>
+                </li>
+                <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
+                </li>
+            </ul>
         </div>
-        <div class="col-md-6">
-            <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
-        </div>
-        <div class="d-flex gap-3 col-md-4">
-            <button type="submit" class="btn btn-primary w-50">조회</button>
-            <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
-                등록(모달)
-            </button>
-        </div>
-    </form>
 
-    <!-- 테이블 -->
-    <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
-        <table class="table table-bordered table-sm align-middle" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
-            <thead style="background-color: #f1f1f1;">
-            <tr>
-                <th style="text-align: center; vertical-align: middle;">제공호텔</th>
-                <th style="text-align: center; vertical-align: middle;">이미지</th>
-                <th style="text-align: center; vertical-align: middle;">업체명</th>
-                <th style="text-align: center; vertical-align: middle;">전화번호</th>
-                <th style="text-align: center; vertical-align: middle;">주소</th>
-                <th style="text-align: center; vertical-align: middle;">대표자</th>
-                <th style="text-align: center; vertical-align: middle;">상세보기</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="data : ${list}">
-                <td th:text="${data.companyName}" style="text-align: center; vertical-align: middle;"></td>
-                <td style="text-align: center;">
-                    <img th:if="${data.storeProfileMeta != null}"
-                         th:src="@{${data.storeProfileMeta}}"
-                         style="width: 80px; height: 80px;">
+        <!-- 등록 모달 -->
+        <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-md modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="insertModalLabel">스토어 등록</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col">
+                                <div class="mb-3 user-box text-center">
+                                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                                    </div>
+                                    <p class="file-name">사진이 선택되지 않았습니다.</p>
+                                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                                    <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
+                                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                                </div>
 
-                    <img th:unless="${data.storeProfileMeta != null}"
-                         th:src="@{/store/default.png}"
-                         style="width: 80px; height: 80px;">
-                </td>
+                                <div class="mb-3">
+                                    <label class="form-label">임시조치(일단 여기서 고르기..)</label>
+                                    <select name="companyNum">
+                                        <option th:each="data:${companyList}" th:value="${data.companyNum}" th:text="${data.companyName}"></option>
+                                    </select>
+                                </div>
 
-                <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
-                <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
-                <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
-                <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
-                <td style="text-align: center; vertical-align: middle;">
-                    <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">보기</a>
-                    <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger btn-sm">삭제</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <div class="text-center mt-5" th:if="${list == null or list.empty}">
-            <h2 class="text-secondary">목록이 없습니다.</h2>
-        </div>
-    </div>
-
-    <!-- 페이징 -->
-    <div class="row mt-3" th:if="${list != null and !list.empty}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/store/list?page=0}">처음</a>
-            </li>
-            <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
-            </li>
-            <li class="page-item"
-                th:each="pageNum : ${#numbers.sequence((list.number - 4 > 0 ? list.number - 4 : 0), (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
-                th:classappend="${pageNum == list.number} ? 'active'">
-                <a class="page-link" th:href="@{/admin/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-            </li>
-            <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/store/list?page={next}(next=${list.number + 1})}">다음</a>
-            </li>
-            <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- 등록 모달 -->
-    <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="insertModalLabel">스토어 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="col">
-                            <div class="mb-3 user-box text-center">
-                                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                                <div class="mb-3">
+                                    <label class="form-label">스토어 이름</label>
+                                    <input type="text" class="form-control" name="storeName" required>
                                 </div>
-                                <p class="file-name">사진이 선택되지 않았습니다.</p>
-                                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                                <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
-                                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">임시조치(일단 여기서 고르기..)</label>
-                                <select name="companyNum">
-                                    <option th:each="data:${companyList}" th:value="${data.companyNum}" th:text="${data.companyName}"></option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">스토어 이름</label>
-                                <input type="text" class="form-control" name="storeName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">스토어 폰 번호</label>
-                                <input type="text" class="form-control" name="storePhone" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="storeAddress">스토어 주소</label>
-                                <div class="input-group">
-                                    <input style="background-color: #ced4da;" readonly
-                                           type="text" id="storeAddress" class="form-control" name="storeAddress" required>
-                                    <button class="btn btn-outline-secondary"
-                                            type="button" onclick="insertAddress()">주소 검색</button>
+                                <div class="mb-3">
+                                    <label class="form-label">스토어 폰 번호</label>
+                                    <input type="text" class="form-control" name="storePhone" required>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">스토어 대표자명</label>
-                                <input type="text" class="form-control" name="storeCeoName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">스토어 패스워드</label>
-                                <input type="password" class="form-control" name="storePassword" required>
-                            </div>
-                            <input type="hidden" name="storeStatus" value="alive" readonly>
-                            <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
-                            <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
-                            <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
-                            <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
-                            <div class="mb-3">
-                                <label class="form-label d-block">카테고리</label>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
-                                    <label class="form-check-label" for="korean">한식</label>
+                                <div class="mb-3">
+                                    <label class="form-label" for="storeAddress">스토어 주소</label>
+                                    <div class="input-group">
+                                        <input style="background-color: #ced4da;" readonly
+                                               type="text" id="storeAddress" class="form-control" name="storeAddress" required>
+                                        <button class="btn btn-outline-secondary"
+                                                type="button" onclick="insertAddress()">주소 검색</button>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
-                                    <label class="form-check-label" for="chinese">중식</label>
+                                <div class="mb-3">
+                                    <label class="form-label">스토어 대표자명</label>
+                                    <input type="text" class="form-control" name="storeCeoName" required>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
-                                    <label class="form-check-label" for="japanese">일식</label>
+                                <div class="mb-3">
+                                    <label class="form-label">스토어 패스워드</label>
+                                    <input type="password" class="form-control" name="storePassword" required>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
-                                    <label class="form-check-label" for="asian">아시안</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
-                                    <label class="form-check-label" for="western">양식</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
-                                    <label class="form-check-label" for="fastfood">패스트푸드</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
-                                    <label class="form-check-label" for="cafe">카페</label>
+                                <input type="hidden" name="storeStatus" value="alive" readonly>
+                                <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
+                                <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
+                                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+                                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
+                                <div class="mb-3">
+                                    <label class="form-label d-block">카테고리</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
+                                        <label class="form-check-label" for="korean">한식</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
+                                        <label class="form-check-label" for="chinese">중식</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
+                                        <label class="form-check-label" for="japanese">일식</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
+                                        <label class="form-check-label" for="asian">아시안</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
+                                        <label class="form-check-label" for="western">양식</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
+                                        <label class="form-check-label" for="fastfood">패스트푸드</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
+                                        <label class="form-check-label" for="cafe">카페</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    </div>
-                </form>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
 
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
