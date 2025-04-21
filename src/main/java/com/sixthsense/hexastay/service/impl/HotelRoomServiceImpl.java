@@ -328,8 +328,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                 log.warn("QR 코드 삭제 실패: {}", e.getMessage());
             }
         }
-
-        String qrText = "https://f66c-116-33-138-85.ngrok-free.app/roomlist/roompassword";
+        //todo 호텔룸 수정 주소 변경한 곳
+        String qrText = " https://cc76-116-33-138-85.ngrok-free.app/roomlist/roompassword";
         String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png";
         Path qrPath = Paths.get(System.getProperty("user.dir"), "qr", qrFileName);
         Files.createDirectories(qrPath.getParent());
