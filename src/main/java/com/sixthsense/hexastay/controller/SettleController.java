@@ -1,9 +1,6 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.CompanyDTO;
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
-import com.sixthsense.hexastay.dto.RoomDTO;
-import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
@@ -38,12 +35,19 @@ public class SettleController {
     {
 
         Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
-        log.info("1차확인" + companyNum);
         Page<RoomDTO> roomDTOList = settleService.getSettleList(companyNum, pageable);
-        log.info("2차확인" + roomDTOList.getTotalElements());
         model.addAttribute("roomDTOList", roomDTOList);
-        log.info("roomDTOList: {}", roomDTOList.getContent().get(0).getHotelRoomDTO());
         return "/settle/chart";
+    }
+
+    @GetMapping("/chartstore")
+    public String chartStore(Principal principal, Model model, Pageable pageable)
+    {
+
+        Long storeNum = adminRepository.findByAdminEmail(principal.getName()).getStore().getStoreNum();
+        Page<OrderstoreDTO> orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
+        model.addAttribute("storeDTOList", orderstoreDTOList);
+        return "/settle/chartstore";
     }
 
     @GetMapping("/salaries")

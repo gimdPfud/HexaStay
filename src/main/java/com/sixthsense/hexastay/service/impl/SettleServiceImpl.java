@@ -1,10 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.CompanyDTO;
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
-import com.sixthsense.hexastay.dto.MemberDTO;
-import com.sixthsense.hexastay.dto.RoomDTO;
-import com.sixthsense.hexastay.dto.SettleDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Room;
@@ -58,6 +54,15 @@ public class SettleServiceImpl implements SettleService {
         });
 
         return roomDTOList;
+    }
+
+
+    // 정산용 (스토어)
+    public Page<StoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
+
+
+
+        return null;
     }
 
 }
