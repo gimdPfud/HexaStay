@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import java.util.Optional;
 
 /***********************************************
  * 클래스명 : RoomMenuOrderRepository
@@ -28,5 +29,6 @@ public interface RoomMenuOrderRepository extends JpaRepository<RoomMenuOrder, Lo
 
     // 오더된 정보만 빼오기.
     List<RoomMenuOrder> findAllByRoomMenuOrderStatusOrderByRegDateDesc(RoomMenuOrderStatus status);
+
 
 }
