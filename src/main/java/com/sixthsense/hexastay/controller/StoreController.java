@@ -97,7 +97,7 @@ public class StoreController {
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) Long companyNum,
                        @RequestParam(required = false) String keyword){
-        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
 
         List<CompanyDTO> comlist = new ArrayList<>();
@@ -147,8 +147,10 @@ public class StoreController {
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
-        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> listA = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
+        model.addAttribute("deletedList",listA);
         model.addAttribute("companyMap", storeService.getCompanyMap());
 //        /*친구찬스*/
 //        Map<Long,String>maps= storeService.getCompanyMap();
