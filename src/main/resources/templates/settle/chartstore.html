@@ -86,19 +86,19 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="roomList, stat : ${roomDTOList.content}">
-                    <td><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yyyy-MM-dd HH:mm')}" readonly></td>
-                    <td><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
-                    <td><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
+                <tr th:each="storeList : ${storeDTOList.content}">
+                    <td><input type="text" class="form-control" th:value="${#temporals.format(storeList.createDate, 'yyyy-MM-dd HH:mm')}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${storeList.orderstoreMessage}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${storeList.orderstoreMessage}" readonly></td>
 
                     <!-- 날짜 데이터용 input -->
-                    <td><input type="text" class="form-control checkin" th:value="${roomList.checkInDate}" readonly></td>
-                    <td><input type="text" class="form-control checkout" th:value="${roomList.checkOutDate}" readonly></td>
+                    <td><input type="text" class="form-control checkin" th:value="${storeList.orderstoreMessage}" readonly></td>
+                    <td><input type="text" class="form-control checkout" th:value="${storeList.orderstoreMessage}" readonly></td>
                     
                     <!-- 가격 데이터 -->
                     <td>
                         <input hidden type="text" class="checkDays">
-                        <input hidden type="text" class="price" th:value="${roomList.hotelRoomDTO.hotelRoomPrice}" readonly>
+                        <input hidden type="text" class="price" th:value="${storeList.orderstoreMessage}" readonly>
                         <input type="text" class="form-control priceResult" readonly>
                     </td>
 
