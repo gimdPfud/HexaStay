@@ -254,6 +254,12 @@
         $("#count").on("change", function () {
             let count = parseInt($(this).val());
 
+            if (isNaN(count) || count < 1) {
+                alert("수량은 1개 이상이어야 합니다.");
+                $(this).val(1);
+                count = 1;
+            }
+
             if (count > maxCount) {
                 alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
                 $(this).val(maxCount);

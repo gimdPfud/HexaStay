@@ -31,6 +31,10 @@
             width: 100%;
             table-layout: fixed; /* 고정된 테이블 너비 설정 */
         }
+
+        option[disabled] {
+            display: none;
+        }
     </style>
 </head>
 <!-- fixme : value 값과, name명 수정하지 마세요!! 오류생깁니다. 그리고 th:text 지워버리면 번역 실행 안됩니다.. 예) th:text="#{menu.translationPage}" -->
@@ -80,7 +84,7 @@
                     <option value="P" th:selected="${type == 'P'}" th:text="#{searchOption.price}">가격</option>
                     <option value="A" th:selected="${type == 'A'}" th:text="#{searchOption.amount}">재고량</option>
                     <option value="N" th:selected="${type == 'N'}" th:text="#{searchOption.nameAndPrice}">이름 + 가격</option>
-                    <option value="C" th:selected="${type == 'C'}" th:text="#{searchOption.category}">카테고리</option> <!-- 지우지 말 것 -->
+                    <option value="C" th:selected="${type == 'C'}" th:text="#{searchOption.category}" disabled>카테고리</option> <!-- 지우지 말 것 -->
                 </select>
             </div>
 
@@ -134,7 +138,9 @@
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
-                <a class="nav-link [[${category} == '인기순' ? 'active' : '']]" href="http://localhost:8090/roommenu/list?type=L" th:text="#{category.popular}">❤️인기순</a>
+                <a class="nav-link [[${category} == '인기순' ? 'active' : '']]" href="http://localhost:8090/roommenu/list?type=L">
+                    ❤️ 인기순
+                </a>
             </li>
         </ul>
         <!-- 특정 카테고리 검색 끝 -->
