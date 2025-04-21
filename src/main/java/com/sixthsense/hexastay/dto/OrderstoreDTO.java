@@ -39,6 +39,7 @@ public class OrderstoreDTO {
     //**********************************
     //멤버 정보를 가져올 PK - room
     private Long roomNum;
+    private Long storeNum;
 
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 }
