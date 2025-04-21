@@ -62,11 +62,10 @@ public class SettleServiceImpl implements SettleService {
 
     // 정산용 (스토어)
     public Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
-//        Page<Orderstore> orderstoreList = orderstoreRepository.findByStoreNum(storeNum, pageable);
-//        Page<OrderstoreDTO> orderstoreDTOList =
-
-
-        return null;
+        Page<Orderstore> orderstoreList = orderstoreRepository.findByOrderstoreStoreNum(storeNum, pageable);
+        Page<OrderstoreDTO> orderstoreDTOList = orderstoreList.map(order -> modelMapper.map(order, OrderstoreDTO.class));
+        return orderstoreDTOList;
     }
+
 
 }

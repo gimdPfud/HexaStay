@@ -43,7 +43,6 @@ public class SettleController {
     @GetMapping("/chartstore")
     public String chartStore(Principal principal, Model model, Pageable pageable)
     {
-
         Long storeNum = adminRepository.findByAdminEmail(principal.getName()).getStore().getStoreNum();
         Page<OrderstoreDTO> orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
         model.addAttribute("storeDTOList", orderstoreDTOList);

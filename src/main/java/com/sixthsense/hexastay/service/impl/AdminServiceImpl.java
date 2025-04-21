@@ -153,9 +153,10 @@ public class AdminServiceImpl implements AdminService {
     // 회원 삭제
     @Override
     public void adminDelete(Long adminNum) throws IOException{
+        log.info("어드민넘 ㅋㅋ" + adminNum);
         Admin admin = adminRepository.findById(adminNum).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
-        if (!admin.getAdminProfileMeta().isEmpty()) {
+        if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
             Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
             Files.deleteIfExists(filePath);
         }
