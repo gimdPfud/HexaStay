@@ -16,5 +16,5 @@ public interface SettleService {
 
 
     // 스토어넘 소속 스토어 찾기
-    Page<StoreDTO> getSettleStoreList(Long storeNum, Pageable pageable);
+    Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable);
 }

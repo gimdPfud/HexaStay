@@ -3,9 +3,11 @@ package com.sixthsense.hexastay.service.impl;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
+import com.sixthsense.hexastay.entity.Orderstore;
 import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
+import com.sixthsense.hexastay.repository.OrderstoreRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.SettleService;
@@ -32,6 +34,7 @@ public class SettleServiceImpl implements SettleService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomRepository roomRepository;
     private final HotelRoomRepository hotelRoomRepository;
+    private final OrderstoreRepository orderstoreRepository;
 
 
     // 정산용
@@ -58,7 +61,7 @@ public class SettleServiceImpl implements SettleService {
 
 
     // 정산용 (스토어)
-    public Page<StoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
+    public Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
 
 
 
