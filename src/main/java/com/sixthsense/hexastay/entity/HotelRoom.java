@@ -45,7 +45,7 @@ public class HotelRoom extends BaseEntity{
     private String hotelRoomContent;            //방 상세설명
 
     @Column(name = "hotelRoomStatus")
-    private boolean hotelRoomStatus;            //활성화 상태
+    private String hotelRoomStatus;            //활성화 상태
 
     @Column(name = "hotelRoomLodgment")
     private Integer hotelRoomLodgment;              //숙박일수

@@ -39,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -266,73 +267,91 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     //4.수정
     @Override
-    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException {
+
+    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO dto) throws IOException {
         log.info("HotelRoom 수정 Service 진입");
 
-        // 기존 호텔룸 정보 가져오기
+        // 1. 기존 HotelRoom 조회
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 호텔룸이 존재하지 않습니다."));
 
-        // DTO → Entity (기존 엔티티에 덮어쓰기 형태로 수정)
-        modelMapper.map(hotelRoomDTO, hotelRoom);
+        // 2. 수동 필드 매핑
+        hotelRoom.setHotelRoomName(dto.getHotelRoomName());
+        hotelRoom.setHotelRoomType(dto.getHotelRoomType());
+        hotelRoom.setHotelRoomContent(dto.getHotelRoomContent());
+        hotelRoom.setHotelRoomPrice(dto.getHotelRoomPrice());
+        hotelRoom.setHotelRoomPhone(dto.getHotelRoomPhone());
+        hotelRoom.setHotelRoomStatus(dto.getHotelRoomStatus());
+        hotelRoom.setHotelRoomLodgment(dto.getHotelRoomLodgment());
+        hotelRoom.setHotelRoomPassword(dto.getHotelRoomPassword());
+        hotelRoom.setModifyDate(LocalDateTime.now());
 
-        // 회사 정보 매핑
-        Long companyNum = hotelRoom.getCompany().getCompanyNum();
-        Company company = companyRepository.findById(companyNum)
+        // 3. Member 연관관계 설정 (nullable)
+        if (dto.getMemberNum() != null) {
+            Member member = memberRepository.findById(dto.getMemberNum())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 존재하지 않습니다."));
+            hotelRoom.setMember(member);
+        } else {
+            hotelRoom.setMember(null); // 제거하고 싶은 경우
+        }
+
+        // 4. Company 연관관계 유지
+        Company company = companyRepository.findById(hotelRoom.getCompany().getCompanyNum())
                 .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다."));
         hotelRoom.setCompany(company);
 
-        // 이미지 수정
-        if (hotelRoomDTO.getHotelRoomProfile() != null && !hotelRoomDTO.getHotelRoomProfile().isEmpty()) {
-            // 새 파일 이름 설정
-            String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
-            String fileFirstName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoomNum;
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            // 새 이미지 경로
-            hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "hotelroom/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "hotelroom/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
+        // 5. 프로필 이미지 수정
+        if (dto.getHotelRoomProfile() != null && !dto.getHotelRoomProfile().isEmpty()) {
+            if (hotelRoom.getHotelRoomProfileMeta() != null) {
+                try {
+                    Files.deleteIfExists(Paths.get(System.getProperty("user.dir"), hotelRoom.getHotelRoomProfileMeta()));
+                } catch (IOException e) {
+                    log.warn("파일 삭제 실패: {}", e.getMessage());
+                }
             }
 
-            // 이미지 저장 (덮어쓰기 가능)
-            hotelRoomDTO.getHotelRoomProfile().transferTo(uploadPath.toFile());
-
-            // 새로운 이미지 경로 저장
-            hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
+            String ext = dto.getHotelRoomProfile().getOriginalFilename()
+                    .substring(dto.getHotelRoomProfile().getOriginalFilename().lastIndexOf("."));
+            String fileName = dto.getHotelRoomName() + "_" + hotelRoomNum + ext;
+            Path savePath = Paths.get(System.getProperty("user.dir"), "hotelroom", fileName);
+            Files.createDirectories(savePath.getParent());
+            dto.getHotelRoomProfile().transferTo(savePath.toFile());
+            hotelRoom.setHotelRoomProfileMeta("/hotelroom/" + fileName);
         }
+
+        // 6. QR코드 삭제 후 재생성
+        if (hotelRoom.getHotelRoomQr() != null) {
+            Path qrPath = Paths.get(System.getProperty("user.dir"), "qr", hotelRoom.getHotelRoomQr());
+            try {
+                Files.deleteIfExists(qrPath);
+            } catch (IOException e) {
+                log.warn("QR 코드 삭제 실패: {}", e.getMessage());
+            }
+        }
+
+        String qrText = "https://f66c-116-33-138-85.ngrok-free.app/roomlist/roompassword";
+        String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png";
+        Path qrPath = Paths.get(System.getProperty("user.dir"), "qr", qrFileName);
+        Files.createDirectories(qrPath.getParent());
 
         try {
-            // ✅ QR 코드 재생성
-            String qrText = "http://localhost:8090/main"; // QR 링크
-
-            String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qr/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300);
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", uploadPath);
-
-            hotelRoom.setHotelRoomQr(fileName);
-
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", qrPath);
+            hotelRoom.setHotelRoomQr(qrFileName);
         } catch (Exception e) {
-            throw new RuntimeException("QR 코드 생성 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage());
         }
 
-        // 수정된 정보 저장
+        // 7. 저장
         hotelRoomRepository.save(hotelRoom);
         log.info("호텔룸 정보 수정 완료: {}", hotelRoom.getHotelRoomNum());
     }
 
 
-        //5.삭제
+
+
+    //5.삭제
     @Override
     public void hotelroomDelet(Long hotelRoomNum) {
 

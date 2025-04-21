@@ -151,9 +151,11 @@ public class HotelRoomController {
     @PostMapping("/update")
     public String hotelRoomUpdatePost(@RequestParam Long hotelRoomNum,
                                       HotelRoomDTO hotelRoomDTO,
-        RedirectAttributes redirectAttributes                              ) {
+        RedirectAttributes redirectAttributes                              )
+    {
 
-        log.info("hotelRoomUpdate Post 페이지에 들어 오기는 했지 ");
+        log.info(hotelRoomNum + "hotelRoomNum Post 페이지에 들어 오기는 했지 ");
+        log.info(hotelRoomNum + "hotelRoomNum 키 값이 들어 오니  ");
 
         try {
             hotelRoomService.hotelroomUpdate(hotelRoomNum,hotelRoomDTO);
