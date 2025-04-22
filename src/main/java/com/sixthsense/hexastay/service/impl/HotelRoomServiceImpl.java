@@ -226,7 +226,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         int firstPage = page.getPageNumber() - 1;
 
         //총 토탈 페이지 설정 - 토탈 페이지는 갯수는 여기서 설정 가능
-        int pageLimites = 15;
+        int pageLimites = 30;
 
         //페이지 재정의후 페이지 조립
         Pageable pageable =
