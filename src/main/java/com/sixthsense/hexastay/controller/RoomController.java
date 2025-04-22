@@ -60,12 +60,12 @@ public class RoomController {
                                              RedirectAttributes redirectAttributes) {
         try {
             roomServiceimpl.memberPkRoominsert(memberDTO, hotelRoomDTO);
-            redirectAttributes.addFlashAttribute("message", "회원 기준 호텔룸이 성공적으로 등록되었습니다.");
+            redirectAttributes.addFlashAttribute("successMessage", "회원 기준 호텔룸이 성공적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("회원 기준 호텔룸 등록 실패: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "회원 기준 호텔룸 등록에 실패했습니다.");
+            redirectAttributes.addFlashAttribute("errorMessage", "회원 기준 호텔룸 등록에 실패했습니다.");
         }
-        return "redirect://register-hotelroom";
+        return "redirect:/register-hotelroom";
     }
 
     /**

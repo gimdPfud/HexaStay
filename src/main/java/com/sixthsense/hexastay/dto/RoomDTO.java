@@ -20,9 +20,10 @@ public class RoomDTO {
 
         /**Room 테이블에 체크인 - 체크아웃 데이터 추가**/
 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         private LocalDateTime checkInDate;
 
-
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         private LocalDateTime checkOutDate;
 
 
