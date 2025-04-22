@@ -34,4 +34,10 @@ public class RoomMenuOrderItem extends BaseEntity {
     private String roomMenuOrderRequestMessage; // 주문요청사항
 
     private int roomMenuOrderAmount; //주문수량
+
+    public int calculateTotalPrice(RoomMenuOrder order) {
+        return order.getOrderItems().stream()
+                .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                .sum();
+    }
 }

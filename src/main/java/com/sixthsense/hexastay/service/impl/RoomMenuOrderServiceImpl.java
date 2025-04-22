@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.RoomMenuOrderAlertDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.*;
@@ -113,7 +114,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * ***********************************************/
 
     @Override
-    public Long roomMenuOrderInsertFromCart(String email, String requestMessage) {
+    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
@@ -168,7 +169,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         // 8. 장바구니 비우기
         roomMenuCartItemRepository.deleteAll(cartItems);
 
-        return savedOrder.getRoomMenuOrderNum();
+        return roomMenuOrder;
     }
 
     /***********************************************
@@ -303,10 +304,23 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     }
 
     @Override
-    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto) {
-        log.info("주문 알람 서비스 진입");
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order) {
+        if (order == null || order.getMember() == null) {
+            log.warn("알람 전송 실패: 주문 또는 회원 정보가 없음");
+            return;
+        }
 
-        messagingTemplate.convertAndSend("/topic/new-order", orderDto);
+        int totalPrice = order.getOrderItems().stream()
+                .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                .sum();
+
+        RoomMenuOrderAlertDTO alertDto = new RoomMenuOrderAlertDTO();
+        alertDto.setMemberEmail(order.getMember().getMemberEmail());
+        alertDto.setTotalPrice(totalPrice);
+
+        log.info("🚀 알람 전송 DTO: {}", alertDto);
+
+        messagingTemplate.convertAndSend("/topic/new-order", alertDto);
 
     }
 }

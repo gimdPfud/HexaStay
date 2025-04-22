@@ -106,9 +106,6 @@ public class RoomMenuOrderController {
             roomMenuOrderNum = roomMenuOrderService.roomMenuOrderInsert(roomMenuOrderDTO, email);
             log.info("2️⃣ 주문 insert 완료 - 주문번호: {}", roomMenuOrderNum);
 
-            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO);
-            log.info("3️⃣ 알람 전송 완료");
-
 
         } catch (IllegalStateException e) {
             // 재고 부족 등의 IllegalStateException 발생 시 BAD_REQUEST로 에러 메시지 반환
@@ -136,7 +133,7 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @PostMapping("/roommenu/cart")
-    public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO) {
+    public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO, RoomMenuOrder roomMenuOrder) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -148,13 +145,13 @@ public class RoomMenuOrderController {
         String email = principal.getName();
 
         try {
-            Long orderNum = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage);
-            log.info("주문 생성 완료 - 주문번호: {}", orderNum);
-            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO);
+            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage);
+            log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
+            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order);
             log.info("3️⃣ 알람 전송 완료");
 
 
-            return ResponseEntity.ok(orderNum);
+            return ResponseEntity.ok(order.getRoomMenuOrderNum());
         } catch (IllegalStateException | EntityNotFoundException e) {
             log.error("주문 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
