@@ -7,13 +7,18 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.entity.RoomService;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,25 +52,28 @@ public class CartController {
     }
 
     @ResponseBody
-    @GetMapping("/getlength")
+    @GetMapping("/member/getlength")
     public ResponseEntity getlength(HttpServletRequest request, Principal principal){ //todo 일단 로그인으로...?
         String referer = request.getHeader("Referer");
         System.out.println("이전 페이지: " + referer);
+        System.out.println("principal: " + principal);
         if(principal==null){
-            return null;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String email = principal.getName();
         Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
-//        roomService.getHotelRoomsByMember(memberNum,)
+        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+        HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
 
         if (referer != null) {
             if (referer.contains("/roommenu")) {
                 Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
                 return new ResponseEntity<>(totalCartItemCount, HttpStatus.OK);
             } else if (referer.contains("/member/store")) {
-//                return new ResponseEntity<>(storecartService.getCartList(hotelroomNum).size());
+                return new ResponseEntity<>(storecartService.getCartList(hotelRoomDTO.getHotelRoomNum()).size(),HttpStatus.OK);
             }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
     }
 }
