@@ -248,16 +248,17 @@
 
     <!-- 모달창 -->
     <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-4 shadow">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title" id="orderAlertModalLabel">🔔 새 주문 알림</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 룸서비스 주문</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <div class="modal-body" id="orderAlertContent">
-                    <!-- 자바스크립트에서 내용이 삽입될 부분 -->
+                <div class="modal-body">
+                    <p id="orderAlertContent" class="mb-0"></p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">닫기</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">확인</button>
                 </div>
             </div>
         </div>
@@ -292,6 +293,44 @@
 
         /*------ 카테고리 드롭다운 활성화 끝 ------*/
 
+        document.addEventListener("DOMContentLoaded", function () {
+            const orderDto = {
+                memberEmail: "test@example.com",  // 예시 회원 이메일
+                orderItemList: [
+                    {
+                        roomMenuOrderItemNum: "ITEM001",
+                        roomMenuOrderItemAmount: 2,
+                        roomMenuOrderItemPrice: 10000,
+                        roomMenuOrderRequestMessage: "덜 맵게 해주세요",
+                        roomMenuOrderItemName: "불고기 피자"
+                    },
+                    {
+                        roomMenuOrderItemNum: "ITEM002",
+                        roomMenuOrderItemAmount: 1,
+                        roomMenuOrderItemPrice: 8000,
+                        roomMenuOrderRequestMessage: "케첩 빼주세요",
+                        roomMenuOrderItemName: "핫도그"
+                    }
+                ]
+            };
+
+            // 서버로 주문 데이터 전송
+            fetch("/api/room-order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderDto)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("주문 생성 성공:", data);
+                })
+                .catch(error => {
+                    console.error("주문 생성 실패:", error);
+                });
+        });
+
 
         /* ----- 주문페이지 알람 시작 -----*/
         document.addEventListener("DOMContentLoaded", function () {
@@ -309,6 +348,8 @@
                         const content = `
                     주문자: <strong>${orderData.memberEmail}</strong><br>
                     총 금액: <strong>${orderData.totalPrice}원</strong>
+                    요구사항: <strong>${orderData.roomMenuOrderRequestMessage || '없음'}</strong><br>
+                    수량: <strong>${orderData.roomMenuOrderAmount}개</strong>
                 `;
                         document.getElementById("orderAlertContent").innerHTML = content;
 

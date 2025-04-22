@@ -14,7 +14,7 @@ public class WebSocketSecurityConfig {
     @Bean
     public SecurityFilterChain webSocketFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/ws-order-alert/**", "/ws-order-alert/**/**") // 경로 포괄
+                .securityMatcher("/ws-order-alert/**", "/ws-order-alert/") // 경로 포괄
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().permitAll()
                 )
