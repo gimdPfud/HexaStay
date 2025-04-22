@@ -22,40 +22,73 @@
 
         /* 검색창 */
         .search-container {
-            display: none;
-            padding: 10px;
-            justify-content: space-between;
-            background: #f1f1f1;
-            border-bottom: 2px solid #ddd;
+            padding: 0.2rem;
+            background-color: white;
+            margin-bottom: 0;
         }
+
         .search-box {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-        .search-box input {
-            width: 150px;
-            padding: 5px;
-            border: 2px solid #ddd;
-            border-radius: 5px; /* 입력 필드 둥근 모서리 */
-        }
-        .search-box button {
-            background-color: #4CAF50; /* 버튼 배경색 */
-            color: white;
-            border: none;
-            border-radius: 5px; /* 버튼 둥근 모서리 */
-            cursor: pointer;
-            padding: 5px 10px;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+            padding: 0.3rem;
+            margin-bottom: 0;
         }
 
+        .search-box select,
+        .search-box input[type="text"],
+        .search-box button {
+            height: 40px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+        }
+
+        .search-box select {
+            width: 120px;
+            padding: 0 0.5rem;
+        }
+
+        .search-box input[type="text"] {
+            width: 120px;
+            flex: 1;
+            padding: 0 0.75rem;
+        }
+
+        .search-box button {
+            padding: 0 1rem;
+            background-color: #d0e8ff;
+            border: 1px solid #90c6f7;
+            color: #0d6efd;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .search-box button:hover {
+            background-color: #b3dcff;
+        }
+
+        /* 버튼, 입력창 외곽선 스타일 변경 */
+        .search-box select:focus,
+        .search-box input[type="text"]:focus,
+        .search-box button:focus {
+            border-color: #80b3ff;
+            outline: none; /* 포커스 시 외곽선 제거 */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* 포커스 시 테두리 그림자 */
+        }
 
         /* 탭 메뉴 스타일 */
         .tabs {
             display: flex;
             justify-content: space-around;
-            padding: 10px;
-            background: #f8f8f8;
-            border-bottom: 4px solid #ddd;
+            padding: 3px;
+            background-color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
         .tab {
             cursor: pointer;
@@ -78,7 +111,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
-            background-color: #f9f9f9;
+            background-color: #ffffff;
             color: #333;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -131,47 +164,15 @@
         /* 카테고리 텍스트를 꾸미는 스타일 */
         .category-label {
             display: inline-block;
-            background-color: #f1fdf1; /* 배경 색상 */
-            color: #333; /* 텍스트 색상 */
-            font-weight: bold; /* 텍스트 굵게 */
-            padding: 5px 10px; /* 여백 */
-            border-radius: 12px; /* 둥근 모서리 */
-            border: 1px solid #ddd; /* 테두리 */
-            font-size: clamp(12px, 1.2vw, 18px);
-            margin: 10px ; /* 위 아래 여백 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-            transition: background-color 0.3s ease; /* 호버 시 색상 변경 효과 */
-        }
-
-        .category-label:hover {
-            background-color: #ffeb3b; /* 호버 시 배경 색상 */
-            color: #000; /* 호버 시 텍스트 색상 */
-            border-color: #fdd835; /* 호버 시 테두리 색상 */
-        }
-
-
-        .add-to-cart-btn {
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
+            background-color: white;
+            color: #333;
             font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .order-list-btn {
-            background-color: #FAE100;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
+            padding: 3px 8px; /* 패딩 줄이기 */
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: clamp(10px, 1.1vw, 16px); /* 글자 크기 줄이기 */
+            margin: 0;
+            transition: background-color 0.3s ease;
         }
 
         /* 공통 스타일 */
@@ -200,29 +201,9 @@
         }
 
         .category-wrapper {
+            background-color: white;
             padding: 15px;
             text-align: left;
-        }
-
-        /* 카테고리 텍스트 스타일 (기존 스타일 유지) */
-        .category-label {
-            display: inline-block;
-            background-color: #f1fdf1;
-            color: #333;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: clamp(12px, 1.2vw, 18px);
-            margin: 0; /* category-wrapper에 의해 여백 처리 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-        }
-
-        .category-label:hover {
-            background-color: #ffeb3b;
-            color: #000;
-            border-color: #fdd835;
         }
 
         .inner-wrapper {
@@ -252,9 +233,13 @@
 
         .menu-content {
             color: black;
+            font-size: 0.8rem;
         }
 
         .price-box{
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
             color: black;
         }
 
@@ -264,9 +249,19 @@
             align-items: flex-end;
         }
 
+        /* 이미지 세로 중앙 배치 */
+        .menu-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
         .menu-image {
-            width: 150px; /* 가로 크기 변경 */
-            height: 150px; /* 세로 크기 변경 */
+            width: 120px;
+            height: 120px;
+            justify-content: center;
+            align-items: center;
             object-fit: cover;
             border-radius: 10px;
         }
@@ -275,12 +270,11 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 5px;
-            padding: 0 15px 15px 15px; /* 하단 좋아요 섹션 패딩 */
+            gap: 5px; /* 카테고리와 하트 아이콘 사이의 간격을 줄여서 가까운 위치로 */
+            padding: 0 15px 15px 15px;
         }
-
         .like-icon {
-            font-size: 2rem;
+            font-size: 1.5rem;
             cursor: pointer;
             color: gray;
         }
@@ -353,27 +347,40 @@
         }
 
         .btn-custom {
-            background-color: #ff6b6b; /* 사랑스러운 빨간색 배경 */
-            color: white; /* 글자 색상 */
-            border: none; /* 테두리 제거 */
+            background-color: transparent; /* 배경색 제거 */
+            color: #ff6b6b; /* 텍스트 색상 */
+            border: 2px solid #ff6b6b; /* 빨간색 테두리 */
             border-radius: 12px; /* 둥근 모서리 */
-            padding: 10px 20px; /* 여백 */
-            font-size: 13px; /* 폰트 크기 */
-            font-weight: bold; /* 폰트 굵기 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 살짝 드롭 섀도우 추가 */
+            padding: 8px 16px; /* 여백을 조금 더 줄임 */
+            font-size: 12px; /* 폰트 크기 약간 증가 */
+            font-weight: normal; /* 폰트 굵기 조정 */
+            box-shadow: none; /* 그림자 제거 */
             cursor: pointer; /* 클릭 가능한 포인터 */
-            transition: transform 0.2s, box-shadow 0.2s; /* 부드러운 애니메이션 */
+            transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
         }
 
-        /* 인기순 스타일리시 */
-        .btn-custom:hover {
-            transform: scale(1.05); /* 살짝 커지는 효과 */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* 호버 시 섀도우 강화 */
+        /* 인기순 버튼의 hover 효과 제거 */
+        .tabs .btn-custom:hover {
+            background-color: transparent; /* 배경색 변경 없이 유지 */
+            border: 2px solid #ff6b6b; /* 테두리 유지 */
+            color: #ff6b6b; /* 텍스트 색상 유지 */
         }
 
-        .btn-custom:active {
-            transform: scale(0.95); /* 클릭 시 살짝 눌리는 효과 */
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15); /* 클릭 시 섀도우 약화 */
+        /* 탭 버튼에 active 클래스 추가 시 글자 굵기 변화 */
+        .tabs .tab.active {
+            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
+        }
+
+        /* 기본 상태에서 탭 글자는 normal */
+        .tabs .tab {
+            font-weight: normal; /* 기본 상태에서는 글자 굵기 normal */
+        }
+
+        /* 탭 버튼에 active 클래스 추가 시 글자 굵기 변화 */
+        .tabs .tab.active {
+            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
+            background-color: #f0f0f0 !important; /* 배경 색상도 강제로 지정 */
+            color: #333 !important; /* 텍스트 색상 강제로 지정 */
         }
 
     </style>
@@ -402,15 +409,11 @@
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
                 <div class="search-box">
-                    <select id="search-option" name="type" class="form-select">
-                        <option value="S" th:selected="${type == 'S'}" th:text="#{search.option.name}"></option>
-                        <option value="P" th:selected="${type == 'P'}" th:text="#{search.option.price}"></option>
-                        <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}"></option>
-                    </select>
+                    <input hidden name="type" th:value="S">
                     <input type="text" th:placeholder="#{search.placeholder}" name="keyword" />
                     <button type="submit" th:text="#{search.button}">검색</button>
                 </div>
-            </form> <!-- 검색창 끝 -->
+            </form>
         </div>
 
         <!-- 카테고리 탭 -->
@@ -424,7 +427,6 @@
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
             <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
-
         </div>
 
 
@@ -436,17 +438,9 @@
                     <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
                        style="text-decoration: none; color: inherit; display: block; width: 100%;">
                         <div class="inner-wrapper">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="text-info">
-                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
-                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
-                                    <div class="price-box">
-                                        <!-- 메뉴가격 -->
-                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
-                                        <span th:text="#{item.currency}">원</span>
-                                    </div>
-                                </div>
-                                <div class="image-like-container">
+                            <div class="d-flex">
+                                <!-- 이미지 왼쪽 배치 -->
+                                <div class="menu-image-container">
                                     <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                                          th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
                                          class="menu-image">
@@ -454,43 +448,43 @@
                                          th:src="@{/profile/default.png}"
                                          class="menu-image">
                                 </div>
+
+                                <!-- 오른쪽 메뉴명, 설명, 가격, 카테고리 뱃지, 하트 아이콘 -->
+                                <div class="text-info">
+                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                    <div class="price-box">
+                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="#{item.currency}">원</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <!-- 카테고리 뱃지 -->
+                                        <div class="category-wrapper">
+                                            <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
+                                        </div>
+                                        <!-- 좋아요 아이콘 -->
+                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                              class="like-icon">🤍</span>
+                                        <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>
-                    <div class="like-section">
-                        <div class="category-wrapper">
-                            <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
-                        </div>
-                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                      th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                      class="like-icon">🤍</span>
-                        <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
-                    </div>
                 </div>
             </li>
         </ul>
 
-        <!-- 카트 버튼 -->
-        <button class="add-to-cart-btn" onclick="goToCartList('/roommenu/cartlist')">
-            <span th:text="#{button.cart}"></span>
-            <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
-        </button>
-
-        <!-- 주문 리스트 버튼 -->
-        <button class="order-list-btn" onclick="window.location.href='/roommenu/orderList'">
-            <span th:text="#{button.orderlist}"></span>
-        </button>
     </div>
 
     <!-- 스크립트 시작 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
-
         function goToCartList() {
             window.location.href = '/roommenu/cartlist';
         }
-
 
         // 상태 저장
         const likedStates = {};
@@ -512,10 +506,9 @@
                     const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                     const likeCount = document.getElementById(`likeCount-${menuId}`);
 
-                    // UI 업데이트
                     likeIcon.textContent = liked ? '🤍' : '❤️';
                     likeIcon.style.color = liked ? 'gray' : 'red';
-                    likeCount.textContent = data;
+                    likeCount.textContent = data.count;  // data.count로 업데이트
 
                     likedStates[menuId] = !liked;
                 })
@@ -547,6 +540,31 @@
                     });
             });
         });
+
+        // 탭 클릭 시 active 클래스 추가
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 모든 탭에서 active 클래스를 제거
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+                // 클릭한 탭에 active 클래스 추가
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 모든 탭에서 active 클래스를 제거
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+                // 클릭한 탭에 active 클래스 추가
+                this.classList.add('active');
+
+                // 스타일 강제 적용을 위해 body에서 active 상태를 처리할 수 있도록 할 수 있음
+                this.style.fontWeight = 'bold'; // 클릭한 탭에 글씨 굵기 적용
+            });
+        });
+
     </script>
     <!-- 스크립트 끝 -->
 

@@ -5,7 +5,7 @@
             <!-- 좌측: 뒤로가기 -->
             <div style="width: 100px;">
                 <button class="btn btn-link p-0" onclick="history.back()">
-                    <i class="bi bi-arrow-left fs-1"></i>
+                    <i class="bi bi-arrow-left fs-1" style="color: #77b1fb;"></i>
                 </button>
             </div>
 
@@ -16,41 +16,54 @@
                 </a>
             </div>
 
-            <!-- 우측: 장바구니 -->
             <div style="width: 100px; text-align: right;">
+                <!-- 주문내역 아이콘 -->
+                <a href="/roommenu/orderList" class="d-inline-block me-2">
+                    <i class="bi bi-receipt-cutoff fs-3"></i>
+                </a>
+
+                <!-- 장바구니 -->
                 <a href="/cart/gocart" class="position-relative d-inline-block">
-                    <i class="bi bi-cart fs-1"></i>
-                    <span id="cartnumber" style="display: none"
-                          class="position-absolute top-0 start-80 translate-middle badge rounded-pill bg-danger">
-                        <span class="visually-hidden">장바구니 아이템 개수</span>
-                    </span>
+                    <i class="bi bi-cart4 fs-3"></i>
+                    <span id="cartnumber"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="display: none;"></span>
                 </a>
             </div>
+
 
         </div>
     </nav>
 
     <script th:inline="javascript">
         let cartnumber = document.getElementById("cartnumber");
-        document.addEventListener("DOMContentLoaded",function () {
-            fetch("/cart/getlength",{
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/cart/getlength", {
                 credentials: 'same-origin'
             })
-                .then(response=>{
-                    if(response.ok){
-                        return response.json();
-                    }
+                .then(response => {
+                    return response.text();  // 서버가 숫자(1,2 등)만 내려주면 text() 써도 OK
                 })
-                .then(data=>{
-                    if(cartnumber){
-                        if(data==0){
-                            cartnumber.style.display="none";
-                        }else{
-                            cartnumber.textContent = data;
+                .then(data => {
+                    console.log("응답 테스트:", data);
+
+                    const cartnumber = document.getElementById("cartnumber");
+
+                    const count = parseInt(data);
+
+                    if (!isNaN(count)) {
+                        if (count > 0) {
+                            cartnumber.textContent = count;
                             cartnumber.style.display = "inline-block";
+                        } else {
+                            cartnumber.style.display = "none";
                         }
+                    } else {
+                        console.warn("숫자로 파싱 안 됨:", data);
                     }
-                })
-        })
+                });
+
+        });
     </script>
+
 </div>
