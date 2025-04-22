@@ -24,12 +24,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 
 @RequiredArgsConstructor
 @Controller
+@RequestMapping("/cart")
 public class CartController {
     private final StorecartService storecartService;
     private final RoomMenuCartService roomMenuCartService;
@@ -52,7 +54,7 @@ public class CartController {
     }
 
     @ResponseBody
-    @GetMapping("/member/getlength")
+    @GetMapping("/getlength")
     public ResponseEntity getlength(HttpServletRequest request, Principal principal){ //todo 일단 로그인으로...?
         String referer = request.getHeader("Referer");
         System.out.println("이전 페이지: " + referer);
