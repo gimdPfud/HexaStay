@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     public Page<Member> findAll(Pageable pageable);
 
     Member findByMemberEmail(String memberEmail);
+
+    //member의 이름과 email을 찾아 오는 검색 커리
+    @Query("SELECT m FROM Member m WHERE m.memberName LIKE %:keyword% OR m.memberEmail LIKE %:keyword%")
+    List<Member> searchByNameOrEmail(@Param("keyword") String keyword);
 
 
 

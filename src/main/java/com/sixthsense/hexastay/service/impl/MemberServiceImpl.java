@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -118,5 +120,14 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.deleteById(memberNum);
 
 
+    }
+
+
+    //todo:http://localhost:8090/register-hotelroom room 배정 member검색 로직
+    public List<MemberDTO> searchByNameOrEmail(String keyword) {
+        List<Member> members = memberRepository.searchByNameOrEmail(keyword);
+        return members.stream()
+                .map(member -> modelMapper.map(member, MemberDTO.class))
+                .collect(Collectors.toList());
     }
 }

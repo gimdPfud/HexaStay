@@ -5,6 +5,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface MemberService {
 
     //등록
@@ -23,6 +25,11 @@ public interface MemberService {
 
     //삭제
     public void memberDelet(Long memberNum);
+
+
+    //todo:http://localhost:8090/register-hotelroom room 배정 member검색 로직
+    public List<MemberDTO> searchByNameOrEmail(String query);
+
 
 
 }
