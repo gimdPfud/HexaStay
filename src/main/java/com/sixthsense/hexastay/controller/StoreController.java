@@ -152,10 +152,6 @@ public class StoreController {
         model.addAttribute("list",list);
         model.addAttribute("deletedList",listA);
         model.addAttribute("companyMap", storeService.getCompanyMap());
-//        /*친구찬스*/
-//        Map<Long,String>maps= storeService.getCompanyMap();
-//        model.addFlashAttribute("companyMap", maps);
-//        /*친구찬스끝*/
         model.addAttribute("searchType",searchType);
         model.addAttribute("keyword",keyword);
         return "store/list";

@@ -10,9 +10,13 @@ package com.sixthsense.hexastay.service;
 import com.sixthsense.hexastay.dto.StorecartitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface StorecartService {
+    /*0. principal로 hotelroomNum 반환*/
+    public Long principalToHotelroomNum(Principal principal);
+
     /*1. 등록*/
     public Long addCart(StorecartitemDTO dto, Long hotelroomNum);
 

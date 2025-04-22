@@ -56,9 +56,6 @@ public class StoreOrderController {
         if(result==1){
             log.info("정상주문되었습니다.");
             storecartService.clearCartItems(hotelroomNum);
-
-            //todo orderid 넘기고넘기고 넘겨서 success에서 /member/store/order/paid/{orderid} 해야 함
-
             return new ResponseEntity<>(HttpStatus.OK);
         } else if (result ==2) {
             return ResponseEntity.badRequest().body("숙박 정보를 찾을 수 없습니다.");
