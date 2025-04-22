@@ -19,6 +19,13 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
+    <div class="d-flex justify-content-center mt-4 gap-3">
+        <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
+        <button type="button" onclick="handleConfirm('ACCEPT')" class="btn btn-warning px-4">주문 접수</button>
+        <button type="button" onclick="handleConfirm('COMPLETE')" class="btn btn-success px-4">주문 완료</button>
+        <button type="button" onclick="handleConfirm('CANCEL')" class="btn btn-danger px-4">주문 취소</button>
+    </div>
+
 
     <div class="container mt-4 w-100 bg-light">
         <h3 class="fw-bold mb-4 text-center">관리자 전용 주문 내역 목록</h3>
@@ -33,6 +40,7 @@
                         <th style="width: 20%;">주문자</th>
                         <th style="width: 10%;">상태</th>
                         <th style="width: 10%;">주문완료여부</th>
+<!--                        <th style="width: 20%;">기능</th>-->
                         <th style="width: 50%;">주문내용</th>
                     </tr>
                     </thead>
@@ -43,7 +51,7 @@
                         <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
                         <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
                         <td class="text-center">
-                            <input type="checkbox" th:name="'complete_' + ${order.roomMenuOrderNum}" />
+                            <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
                         </td>
                         <td class="text-center" style="vertical-align: middle;">
                             <ul>
@@ -71,17 +79,28 @@
     </div>
 
     <script>
-        function handleConfirm() {
+
+        function handleConfirm(actionType) {
             const checkedOrders = [];
 
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 if (checkbox.checked) {
+                    // 체크박스에 data-id 속성을 사용하여 주문번호 추출
                     const row = checkbox.closest('tr');
-                    const orderId = row.querySelector('td').textContent.trim();
-                    checkedOrders.push(orderId);
+                    const orderIdStr = checkbox.dataset.id;
+                    const orderId = parseInt(orderIdStr, 10);
 
-                    // 프론트에서 행 제거
-                    row.remove();
+                    if (isNaN(orderId)) {
+                        console.error("유효하지 않은 주문번호입니다: " + orderIdStr);
+                    } else {
+                        checkedOrders.push(orderId);
+                    }
+
+                    // 주문 접수(ACCEPT)인 경우, 나중에 주문 완료를 위해 목록에 남겨둡니다.
+                    // 다른 상태(COMPLETE, CANCEL)는 UI에서 제거합니다.
+                    if (actionType !== 'ACCEPT') {
+                        row.remove();
+                    }
                 }
             });
 
@@ -90,16 +109,26 @@
                 return;
             }
 
-            // 백엔드에 삭제 요청 보내기
-            fetch('/roommenu/complete-orders', {
+            let url = "";
+            switch (actionType) {
+                case 'COMPLETE':
+                    url = '/roommenu/complete-orders';
+                    break;
+                case 'CANCEL':
+                    url = '/roommenu/cancel-orders';
+                    break;
+                case 'ACCEPT':
+                    url = '/roommenu/accept-orders';
+                    break;
+            }
+
+            fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(checkedOrders)
             }).then(res => {
                 if (res.ok) {
-                    alert("주문이 완료 처리되었습니다.");
+                    alert("처리되었습니다.");
                 } else {
                     alert("처리 중 오류 발생");
                 }
@@ -108,6 +137,8 @@
                 alert("요청 실패: " + error);
             });
         }
+
+
     </script>
 </div>
 

@@ -9,9 +9,11 @@ package com.sixthsense.hexastay.controller;
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.AdminRole;
+import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
@@ -20,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +37,8 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 
@@ -46,6 +51,7 @@ public class RoomMenuOrderController {
     private final RoomMenuOrderService roomMenuOrderService;
     private final RoomMenuOrderRepository roomMenuOrderRepository;
     private final MemberRepository memberRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     /***************************************************
      *
@@ -293,11 +299,73 @@ public class RoomMenuOrderController {
     public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
         try {
             for (Long orderId : orderIds) {
-                roomMenuOrderRepository.deleteById(orderId);  // 삭제 or 상태변경 로직
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.COMPLETE);
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
             }
-            return ResponseEntity.ok("처리 완료");
+
+            return ResponseEntity.ok("주문이 완료 처리되었습니다.");
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("에러: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/roommenu/cancel-orders")
+    public ResponseEntity<?> cancelOrders(@RequestBody List<Long> orderIds) {
+        try {
+            for (Long orderId : orderIds) {
+                // 주문 ID를 이용해 해당 주문을 찾습니다.
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+
+                    // 주문 상태를 CANCEL로 변경
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
+
+                    // 변경된 주문을 저장
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    // 주문이 존재하지 않으면 에러 메시지 반환
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
+            }
+
+            return ResponseEntity.ok("주문이 취소 처리되었습니다.");
+        } catch (Exception e) {
+            // 예외 발생 시 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/roommenu/accept-orders")
+    public ResponseEntity<?> acceptOrders(@RequestBody List<Long> orderIds) {
+        try {
+            for (Long orderId : orderIds) {
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.ACCEPT);
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
+            }
+
+            return ResponseEntity.ok("주문이 접수 처리되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("에러: " + e.getMessage());
         }
     }
 }
