@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.ErdDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Erd;
@@ -46,8 +47,8 @@ public class ErdServiceImpl implements ErdService {
 
         Erd erd = modelMapper.map(erdDTO, Erd.class);
 
-        if (erdDTO.getComapnyNum() != null) {
-            erd.getCompany().setCompanyNum(erdDTO.getComapnyNum());
+        if (erdDTO.getCompanyNum() != null) {
+            erd.getCompany().setCompanyNum(erdDTO.getCompanyNum());
         } else if (erdDTO.getStoreNum() != null) {
             erd.getStore().setStoreNum(erdDTO.getStoreNum());
         }
@@ -55,12 +56,17 @@ public class ErdServiceImpl implements ErdService {
         erdRepository.save(erd);
     }
 
-
-    public Page<ErdDTO> list(Pageable pageable) {
-     Page<Erd> erdList = erdRepository.findAll(pageable);
+    //소속 리스트
+@Override
+    public Page<ErdDTO> getErdList(AdminDTO adminDTO, Pageable pageable) {
+        Page<Erd> erdList = null;
+        if (adminDTO.getCompanyNum() != null) {
+            erdList = erdRepository.findByCompany_CompanyNum(adminDTO.getCompanyNum(), pageable);
+        } else if (adminDTO.getStoreNum() != null) {
+            erdList = erdRepository.findByStore_StoreNum(adminDTO.getStoreNum(), pageable);
+        }
      return erdList.map(erd -> modelMapper.map(erd, ErdDTO.class));
     }
-
 
 
 }

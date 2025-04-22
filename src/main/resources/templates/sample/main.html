@@ -40,6 +40,13 @@
             margin-top: 100px;
             text-align: center;
         }
+        @media (max-width: 768px) {
+            form.lang-selector {
+                width: 80% !important;
+            }
+        }
+    </style>
+
     </style>
 </head>
 
@@ -67,6 +74,18 @@
                     시설 서비스
                 </a>
             </div>
+            <form method="get" th:action="@{/main}" class="mb-3 mx-auto" style="width: 50%; display: flex; justify-content: center; margin-top: 30px;">
+                <input type="hidden" name="type" th:value="${type}" />
+                <input type="hidden" name="keyword" th:value="${keyword}" />
+                <input type="hidden" name="category" th:value="${category}" />
+
+                <select name="lang" onchange="this.form.submit()" class="form-select w-auto">
+                    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                    <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
+                </select>
+            </form>
         </div>
     </div>
 </div>

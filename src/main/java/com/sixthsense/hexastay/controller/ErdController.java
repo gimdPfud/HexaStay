@@ -1,7 +1,9 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.ErdDTO;
 import com.sixthsense.hexastay.repository.ErdRepository;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.ErdService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,10 +29,13 @@ import java.io.IOException;
 public class ErdController {
 
     private final ErdService erdService;
+    private final AdminService adminService;
 
     @GetMapping("/list")
-    public String list(Pageable pageable, Model model) {
-        Page<ErdDTO> erdList = erdService.list(pageable);
+    public String list(Pageable pageable, Model model, Principal principal) {
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+
+        Page<ErdDTO> erdList = erdService.getErdList(adminDTO, pageable);
         model.addAttribute("erd", erdList);
         return "/erd/list";
     }
@@ -40,7 +46,18 @@ public class ErdController {
     }
 
     @PostMapping("/insert")
-    public String insertPost(ErdDTO erdDTO) throws IOException {
+    public String insertPost(ErdDTO erdDTO, Principal principal) throws IOException {
+        String email = principal.getName();
+        AdminDTO adminDTO = adminService.adminFindEmail(email);
+        log.info("로그인 이메일은?"+ adminDTO.getAdminEmail());
+        log.info("로그인 컴퍼니넘은?"+ adminDTO.getCompanyNum());
+
+        if (adminDTO.getCompanyNum() != null) {
+            erdDTO.setCompanyNum(adminDTO.getCompanyNum());
+        } else if (adminDTO.getStoreNum() != null) {
+            erdDTO.setStoreNum(adminDTO.getStoreNum());
+        }
+
         erdService.insert(erdDTO);
         return "redirect:/erd/list";
     }

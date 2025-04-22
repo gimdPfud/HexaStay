@@ -368,6 +368,7 @@
         <button class="order-list-btn"
                 onclick="window.location.href='/member/store/order/list'">
             🛒 내 주문 리스트로
+            <span th:text="'(' + ${totalOrderCount} + ')'" class="cart-count">[0]</span>
         </button>
 
     </div>

@@ -28,8 +28,8 @@ public class ErdDTO {
     private String erdPictureMeta;
 
 
-    private Long comapnyNum;
-    private String comapnyName;
+    private Long companyNum;
+    private String companyName;
 
     private Long storeNum;
     private String storeName;

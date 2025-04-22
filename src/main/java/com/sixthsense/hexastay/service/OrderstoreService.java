@@ -34,6 +34,7 @@ public interface OrderstoreService {
     /*4. 고객용 주문내역 목록*/
     List<OrderstoreViewDTO> getOrderList(String email);
     List<OrderstoreViewDTO> getOrderList(Long hotelRoomNum);
+    Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable);
 
     /*5. 매출용 주문 목록? : 완료된 주문들만 전부 DTO리스트로 내보내는 메소드*/
     List<OrderstoreDTO> getAllList();

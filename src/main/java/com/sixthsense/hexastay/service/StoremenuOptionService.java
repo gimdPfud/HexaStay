@@ -15,20 +15,20 @@ import java.util.List;
 
 public interface StoremenuOptionService {
     /*등록*/
-    public Long insert(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
+    Long insert(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
 
     /*상세보기*/
-    public StoremenuOptionDTO read(Long pk);
+    StoremenuOptionDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
+    Long modify(StoremenuOptionDTO StoremenuOptionDTO) throws IOException;
 
     /*메뉴옵션 목록*/
-    public List<StoremenuOptionDTO> list(Long storemenuNum, String status);
-    public List<StoremenuOptionDTO> list(Long storemenuNum);
+    List<StoremenuOptionDTO> list(Long storemenuNum, String status);
+    List<StoremenuOptionDTO> list(Long storemenuNum);
 
     /*삭제인척 하는 활성화->비활성화*/
-    public Long delete(Long pk);
+    Long delete(Long pk);
     /*비활성화->활성화*/
-    public Long restore(Long pk);
+    Long restore(Long pk);
 }
