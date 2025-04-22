@@ -199,7 +199,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
-            dto.setRegDate(order.getRegDate());
+            dto.setRegDate(order.getRegDate() != null ? order.getRegDate() : order.getCreateDate());
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -212,6 +212,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             }).collect(Collectors.toList());
 
             dto.setOrderItemList(itemDTOList);
+            log.info("주문번호 {} -> regDate: {}", order.getRoomMenuOrderNum(), order.getRegDate());
             return dto;
         });
         return dtoPage;
