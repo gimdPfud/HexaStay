@@ -217,37 +217,23 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     }
 
 
+
+    //todo:http://localhost:8090/register-hotelroom
     //2.리스트
     @Override
     public Page<HotelRoomDTO> hotelroomList(Pageable page) {
+        // 페이지 번호 0 이상 유지
+        int firstPage = Math.max(page.getPageNumber(), 0);
 
-        //********페이지 처리 ************//
-        //시작 페이지 설정
-        int firstPage = page.getPageNumber() - 1;
+        // 페이지 크기 제한 (예: 50개 이상은 제한)
+        int pageSize = (page.getPageSize() > 0 && page.getPageSize() <= 50) ? page.getPageSize() : 30;
 
-        //총 토탈 페이지 설정 - 토탈 페이지는 갯수는 여기서 설정 가능
-        int pageLimites = 30;
+        Pageable pageable = PageRequest.of(firstPage, pageSize, Sort.by(Sort.Direction.DESC, "hotelRoomNum"));
 
-        //페이지 재정의후 페이지 조립
-        Pageable pageable =
-                PageRequest.of(firstPage, pageLimites,
-                        Sort.by(Sort.Direction.DESC,"hotelRoomNum"));
+        Page<HotelRoom> hotelroomEntity = hotelRoomRepository.findAll(pageable);
 
-        //*** 변환 및 처리 작업 **//
-        //엔티티 변수 선언
-        Page<HotelRoom> hotelroomEntity;
-
-        hotelroomEntity =
-                hotelRoomRepository.findAll(pageable);
-
-        //todo : memberRepository에서 검색설정후 검색 메서드 구현 예정
-
-        //변환    - 람다식으로 변환
-        Page<HotelRoomDTO> hotelRoomDTOS =
-                hotelroomEntity.map(data -> modelMapper.map(data, HotelRoomDTO.class));
-
-        //호텔룸 최종 반환 타입
-        return hotelRoomDTOS;
+        // DTO로 변환
+        return hotelroomEntity.map(entity -> modelMapper.map(entity, HotelRoomDTO.class));
     }
 
     //3.읽기

@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -213,25 +214,13 @@ public class HotelRoomController {
         return "redirect:/admin/hotelroom/list"; // 수정 후 목록 페이지로 이동하거나 필요에 맞게 수정
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //todo:http://localhost:8090/register-hotelroom
+    @GetMapping("/listpage")
+    @ResponseBody
+    public ResponseEntity<Page<HotelRoomDTO>> getHotelRoomList(Pageable pageable) {
+        Page<HotelRoomDTO> rooms = hotelRoomService.hotelroomList(pageable); // 이미지 포함한 DTO 반환
+        return ResponseEntity.ok(rooms);
+    }
 
 
 

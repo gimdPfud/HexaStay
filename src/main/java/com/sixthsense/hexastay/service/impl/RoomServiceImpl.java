@@ -36,23 +36,32 @@ public class RoomServiceImpl {
 
 
     //todo: [[Member_PK]] 기준으로 hotelroom FK 를 등록 하는 메서드
+    //todo:http://localhost:8090/register-hotelroom
     //RoomController
     @Transactional
-    public void registerHotelRoomForMember(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) {
+    public void memberPkRoominsert(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) {
         // 1️⃣ 회원 정보 조회
         Member member = memberRepository.findById(memberDTO.getMemberNum())
                 .orElseThrow(() -> new EntityNotFoundException("회원 정보 없음 - 회원 번호: " + memberDTO.getMemberNum()));
 
+        HotelRoom hotelRoom =
+                hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum()).orElseThrow(EntityNotFoundException::new);
         // 2️⃣ 호텔룸 저장 (Member와 연결)
-        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
-        hotelRoom.setMember(member); // 회원과 연결
-        hotelRoom = hotelRoomRepository.save(hotelRoom);
-        log.info("호텔룸 저장 완료 - 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+//        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
+//        hotelRoom.setMember(member); // 회원과 연결
+//        hotelRoom = hotelRoomRepository.save(hotelRoom);
+//        log.info("호텔룸 저장 완료 - 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
+        // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
+        LocalDateTime checkInDate = LocalDateTime.from(hotelRoomDTO.getCheckInDate());
+        LocalDateTime checkOutDate = LocalDateTime.from(hotelRoomDTO.getCheckOutDate());
         // 3️⃣ Room 엔티티 저장 (HotelRoom과 Member 관계 저장)
         Room room = Room.builder()
                 .hotelRoom(hotelRoom)
                 .member(member)
+                .checkInDate(checkInDate)
+                .checkOutDate(checkOutDate)
+                .roomPassword(memberDTO.getRoomPassword())
                 .build();
         roomRepository.save(room);
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
@@ -62,7 +71,7 @@ public class RoomServiceImpl {
     //todo: [[HotelRoom_PK]] 기준으로 member FK 를 등록 하는 메서드v
     //todo: localhost:8090/member-insertroom
     //RoomController
-    public void registerMemberForHotelRoom(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
+    public void hotelRoomPkMemberinsert(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
         // 1️⃣ 호텔룸 정보 조회
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
                 .orElseThrow(() -> new EntityNotFoundException("호텔룸 정보 없음 - 호텔룸 번호: " + hotelRoomDTO.getHotelRoomNum()));
@@ -78,8 +87,8 @@ public class RoomServiceImpl {
         log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
-        LocalDate checkInDate = LocalDate.from(memberDTO.getCheckInDate().atStartOfDay());
-        LocalDate checkOutDate = LocalDate.from(memberDTO.getCheckOutDate().atStartOfDay());
+        LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate().atStartOfDay());
+        LocalDateTime checkOutDate = LocalDateTime.from(memberDTO.getCheckOutDate().atStartOfDay());
 
         // 5️⃣ Room 엔티티 저장
         Room room = Room.builder()

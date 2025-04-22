@@ -20,10 +20,10 @@ public class RoomDTO {
 
         /**Room 테이블에 체크인 - 체크아웃 데이터 추가**/
 
-        private LocalDate checkInDate;
+        private LocalDateTime checkInDate;
 
 
-        private LocalDate checkOutDate;
+        private LocalDateTime checkOutDate;
 
 
 
