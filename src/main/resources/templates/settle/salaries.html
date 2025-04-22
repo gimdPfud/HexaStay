@@ -76,35 +76,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>김철수</td>
-                <td>12345</td>
-                <td>2025-04-01</td>
-                <td>₩3,000,000</td>
-                <td>₩500,000</td>
-                <td>₩300,000</td>
-                <td>₩100,000</td>
-                <td>₩3,100,000</td>
-            </tr>
-            <tr>
-                <td>이영희</td>
-                <td>67890</td>
-                <td>2025-04-02</td>
-                <td>₩2,800,000</td>
-                <td>₩400,000</td>
-                <td>₩250,000</td>
-                <td>₩80,000</td>
-                <td>₩2,870,000</td>
-            </tr>
-            <tr>
-                <td>박상민</td>
-                <td>11223</td>
-                <td>2025-04-03</td>
-                <td>₩2,900,000</td>
-                <td>₩450,000</td>
-                <td>₩280,000</td>
-                <td>₩90,000</td>
-                <td>₩2,980,000</td>
+            <tr th:each="salary : ${salariesList.content}">
+                <td th:text="${salary.salNum}"></td>
             </tr>
             </tbody>
         </table>

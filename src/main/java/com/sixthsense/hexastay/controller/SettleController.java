@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.entity.Salaries;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.service.*;
@@ -50,8 +51,17 @@ public class SettleController {
         return "/settle/chartstore";
     }
 
+
+
+
+
+    //급여용
+
     @GetMapping("/salaries")
-    public String salaries() {
+    public String salaries(Pageable pageable, Principal principal, Model model) {
+        adminRepository.findByAdminEmail(principal.getName());
+        Page<SalariesDTO> salariesList = settleService.getSalariesList(adminService.adminFindEmail(principal.getName()), pageable);
+        model.addAttribute("salariesList", salariesList);
         return "/settle/salaries";
     }
 
@@ -65,14 +75,6 @@ public class SettleController {
     @ResponseBody
     public String salariesList(Principal principal) {
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-
-        if (adminDTO.getCompanyNum() != null) {
-
-
-            adminDTO.getCompanyNum();
-        } else if (adminDTO.getStoreNum() != null) {
-            adminDTO.getStoreNum();
-        }
 
 
 
