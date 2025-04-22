@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -30,13 +31,17 @@ public class CompanyController {
 
     private final CompanyService companyService;
     private final AdminService adminService;
+    private final AdminRepository adminRepository;
 
     @GetMapping("/list")
     public String listCompany(@RequestParam(required = false) String choice,
                               @RequestParam(required = false) String select,
                               @RequestParam(required = false) String keyword,
                               Model model,
-                              Pageable pageable) {
+                              Pageable pageable, Principal principal) {
+
+        String email = principal.getName();
+        Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
         log.info("choice : " + choice);
         log.info("select : " + select);
@@ -47,7 +52,7 @@ public class CompanyController {
             choice = "center";
         }
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, pageable);
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
 
         model.addAttribute("companyDTOS", companyDTOS);
         model.addAttribute("choice", choice);

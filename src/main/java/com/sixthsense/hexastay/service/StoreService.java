@@ -18,33 +18,37 @@ import java.util.Map;
 
 public interface StoreService {
     /*등록*/
-    public Long insert(StoreDTO storeDTO) throws IOException;
+    Long insert(StoreDTO storeDTO) throws IOException;
 
     /*읽기*/
-    public StoreDTO read(Long pk);
+    StoreDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoreDTO storeDTO) throws IOException;
+    Long modify(StoreDTO storeDTO) throws IOException;
 
-    /*추가목록 : 전부 가져오기*/
-    public List<StoreDTO> getAllList();
+    /*목록 : 전부 가져오기*/
+    List<StoreDTO> getAllList();
     Map<Long, String> getCompanyMap();
-    /*목록?
+    /*목록
     * 활성화된 외부업체만 목록으로 보여주기
     * 모든 외부 업체 목록 보여주기*/
-    public Page<StoreDTO> list(String status, Pageable pageable);
-    public Page<StoreDTO> list(Pageable pageable);
-    public List<StoreDTO> list(Long companyNum);
-    public Page<StoreDTO> list(Long companyNum, Pageable pageable);
-    public Page<StoreDTO> searchlist(Long companyNum, String searchType ,String keyword, Pageable pageable);
+    Page<StoreDTO> list(String status, Pageable pageable);
+    Page<StoreDTO> list(Pageable pageable);
+    List<StoreDTO> list(Long companyNum);
+    Page<StoreDTO> list(Long companyNum, Pageable pageable);
+    Page<StoreDTO> searchlist(String status, Long companyNum, String searchType, String keyword, Pageable pageable);
 
-    /*todo 목록인데 리뷰가 있는 목록. 근데 리뷰별점을 넣을지말지 고민중...*/
-    public Page<StoreDTO> clientlist(Pageable pageable);
+    Page<StoreDTO> clientlist(Pageable pageable);
 
     /*삭제: 활성화->비활성화 바꾸기*/
-    public void delete(Long pk);
-    public void restore(Long pk);
+    void delete(Long pk);
+    void restore(Long pk);
 
     //검증하기 admin과 store의 주인!!...
-    public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO);
+    boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO);
+
+    /*좋아요... 좋아요한 스토어의 좋아요 수 리턴*/
+    void storeLiketoggle(Long storeNum, String email);
+    long getStoreLikeCount(Long storeNum);
+    boolean isLiked(Long storeNum, String email);
 }

@@ -80,7 +80,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDTO> companyList() {
+    public List<CompanyDTO> companyList() {     //페이징 없이 상위 10개 회사 조회
         Pageable pageable = PageRequest.of(0, 10); // 페이지 0, size 10으로 고정
         Page<Company> companyPage = companyRepository.findAll(pageable);
 
@@ -129,15 +129,15 @@ public class CompanyServiceImpl implements CompanyService {
 
     // 검색용
     @Override
-    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable) {
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable) {    //검색조건 적용한 회사 목록
         // 소속만 선택하고 검색 조건/키워드가 없을 때
         if ((keyword == null || keyword.trim().isEmpty()) || "전체".equals(select)) {
-            return companyRepository.findByCompanyType(choice, pageable)
+            return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
                     .map(this::convertToCompanyDTO);
         }
 
         // 검색 조건 + 키워드가 있을 때
-        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, pageable);
+        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
         return companyPage.map(this::convertToCompanyDTO);
     }
 
@@ -158,7 +158,6 @@ public class CompanyServiceImpl implements CompanyService {
             Company companyOri = companyRepository.findById(companyDTO.getCompanyNum()).orElseThrow();
             Path filePath = Paths.get(System.getProperty("user.dir"), companyOri.getCompanyPictureMeta().substring(1));
             Files.deleteIfExists(filePath);
-
 
             String fileOriginalName = companyDTO.getCompanyPicture().getOriginalFilename();
             String fileFirstName = companyDTO.getCompanyNum() + "_" + companyDTO.getCompanyName();
@@ -202,7 +201,6 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new RuntimeException("조직을 찾을 수 없습니다."));
         company.setCompanyStatus("ACTIVE");
         companyRepository.save(company);
-
     }
 
     @Override
@@ -219,7 +217,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyDTO> getCompanyList(Long companyNum) {
+    public List<CompanyDTO> getCompanyList(Long companyNum) {   //특정 회사 번호에 해당하는 회사만 리스트 반환
 
         List<Company> companyList = companyRepository.findByCompanyNum(companyNum);
         List<CompanyDTO> companyDTOList = new ArrayList<>();
@@ -227,7 +225,6 @@ public class CompanyServiceImpl implements CompanyService {
             CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
             companyDTOList.add(companyDTO);
         }
-
 
         return companyDTOList;
     }
@@ -261,7 +258,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Page<CompanyDTO> companyList(Pageable pageable) {
+    public Page<CompanyDTO> companyList(Pageable pageable) {    //페이징 적용된 회사 목록
 
         Page<Company> companyList = companyRepository.findAll(pageable);
         Page<CompanyDTO> companyDTOS = companyList.map(company -> modelMapper.map(company, CompanyDTO.class));

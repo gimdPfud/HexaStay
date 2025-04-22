@@ -21,9 +21,9 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Store> listStoreSearch(Long companyNum, String searchType, String keyword, Pageable pageable) {
+    public Page<Store> listStoreSearch(String status, Long companyNum, String searchType, String keyword, Pageable pageable) {
         //조건
-        BooleanExpression whereCondition = buildSearchCondition(companyNum, searchType, keyword);
+        BooleanExpression whereCondition = buildSearchCondition(status, companyNum, searchType, keyword);
         List<Store> content = queryFactory
                 .selectFrom(store)
                 .leftJoin(store.company).fetchJoin()
@@ -40,8 +40,13 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private BooleanExpression buildSearchCondition(Long companyNum, String searchType, String keyword) {
+    private BooleanExpression buildSearchCondition(String status, Long companyNum, String searchType, String keyword) {
         BooleanExpression condition = Expressions.TRUE; // 기본 조건
+
+        //스토어 활성화여부
+        if(status!=null&&!status.isBlank()){
+            condition= condition.and(store.storeStatus.eq(status));
+        }
 
         // 회사 유형
         if (companyNum != null && companyNum!=0L) {

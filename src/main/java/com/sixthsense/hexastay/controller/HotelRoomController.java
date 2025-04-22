@@ -5,20 +5,17 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 
-import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 
 import com.sixthsense.hexastay.service.impl.QrCodeServiceimpl;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,12 +23,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -119,7 +116,7 @@ public class HotelRoomController {
     @GetMapping("/list")
     public String hotelRoomList(Model model,Principal principal,
                                 HotelRoomDTO hotelRoomDTO,
-          @PageableDefault(page = 1, size = 10, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
+          @PageableDefault(page = 1, size = 15, sort = "companyNum", direction = Sort.Direction.ASC) Pageable pageable
 
     )
     {
@@ -142,28 +139,29 @@ public class HotelRoomController {
 
     //todo:/hotelRoomsByMember/{memberNum}
     //모달 페이지 수정 하기
-    @GetMapping("/modify")
-    public String hotelRoomModify() {
 
-        return "hotelroom/modifyhotelroom";
-    }
+    //modal창에서 호텔룸 수정 페이지
+    @PostMapping("/update")
+    public String hotelRoomUpdatePost(@RequestParam Long hotelRoomNum,
+                                      HotelRoomDTO hotelRoomDTO,
+        RedirectAttributes redirectAttributes                              )
+    {
 
-    @PostMapping("/modify")
-    public String hotelRoomUpdatePost(@ModelAttribute HotelRoomDTO hotelRoomDTO,
-        RedirectAttributes redirectAttributes                              ) {
-
-        log.info("hotelRoomUpdate Post 페이지에 들어 오기는 했지 ");
+        log.info(hotelRoomNum + "hotelRoomNum Post 페이지에 들어 오기는 했지 ");
+        log.info(hotelRoomNum + "hotelRoomNum 키 값이 들어 오니  ");
 
         try {
-            hotelRoomService.hotelroomrModify(hotelRoomDTO);
+            hotelRoomService.hotelroomUpdate(hotelRoomNum,hotelRoomDTO);
             redirectAttributes.addFlashAttribute("successMessage", "호텔룸 정보가 성공적으로 수정되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        return "redirect:/admin/hotelroom/modify";
+        return "redirect:/roomlist";
     }
 
     // 호텔룸 상세 페이지로 이동
@@ -182,24 +180,47 @@ public class HotelRoomController {
     }
 
 
+    //호텔룸 수정 페이지
+    @GetMapping("/modify")
+    public String hotelRoomModifyGet(@RequestParam("hotelRoomNum") Long hotelRoomNum, Model model) {
+        HotelRoomDTO hotelRoomDTO = hotelRoomService.hotelroomrRead(hotelRoomNum);
+        model.addAttribute("hotelRoomDTO", hotelRoomDTO);
+        return "hotelroom/modifyhotelroom";
+    }
 
+    @PostMapping("/modify")
+    public String hotelRoomModifyPost(
+            @RequestParam(value = "hotelRoomNum", required = false) Long hotelRoomNum,
+            @ModelAttribute HotelRoomDTO hotelRoomDTO,
+            Model model) throws IOException {
 
+        log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
+        log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
+        log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
 
+        // hotelroomnum 값이 없는 경우 예외 처리
+        if (hotelRoomNum == null) {
+            model.addAttribute("errorMessage", "호텔룸 번호가 전달되지 않았습니다.");
+            return "hotelroom/modifyhotelroom"; // 또는 에러 페이지
+        }
 
+        try {
+            hotelRoomService.hotelroomUpdate(hotelRoomNum, hotelRoomDTO);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다: " + e.getMessage());
+            return "hotelroom/modifyhotelroom";
+        }
 
+        return "redirect:/admin/hotelroom/list"; // 수정 후 목록 페이지로 이동하거나 필요에 맞게 수정
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    //todo:http://localhost:8090/register-hotelroom
+    @GetMapping("/listpage")
+    @ResponseBody
+    public ResponseEntity<Page<HotelRoomDTO>> getHotelRoomList(Pageable pageable) {
+        Page<HotelRoomDTO> rooms = hotelRoomService.hotelroomList(pageable); // 이미지 포함한 DTO 반환
+        return ResponseEntity.ok(rooms);
+    }
 
 
 

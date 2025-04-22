@@ -34,6 +34,9 @@ public class Orderstore extends BaseEntity {
     @Column(length = 500)
     private String orderstoreMessage;//주문 요청사항
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeNum")
+    private Store store;
 //    //외부업체 상품 서비스를 참조
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "member_num")

@@ -354,6 +354,10 @@
                         <div class="category-wrapper">
                             <span th:text="${store.storeCategory}" class="category-label"></span>
                         </div>
+                        <button class="btn heart" type="button" th:onclick="|toggleLike(${store.storeNum})|">
+                            <i class="bi bi-heart"></i>
+                            <span class="likespan" th:id="${store.storeNum}"></span>
+                        </button>
                     </div>
                 </div>
             </li>
@@ -361,17 +365,60 @@
 
 
         <button class="add-to-cart-btn"
-           onclick="window.location.href='/member/store/cart/list'">
+                onclick="window.location.href='/member/store/cart/list'">
             🛒 내 카트 리스트로
             <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
         </button>
         <button class="order-list-btn"
                 onclick="window.location.href='/member/store/order/list'">
             🛒 내 주문 리스트로
+            <span th:text="'(' + ${totalOrderCount} + ')'" class="cart-count">[0]</span>
         </button>
 
     </div>
 
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded",function () {
+            showlikes();
+        });
+
+        function showlikes() {
+            let likespans = document.querySelectorAll(".likespan");
+            likespans.forEach(span=>{
+                updateLikespan(span.id);
+            })
+        }
+
+        function updateLikespan(storeNum) {
+            fetch(`/member/store/like/list/${storeNum}`,{
+                credentials: 'same-origin'
+            })
+                .then(response=>response.json())
+                .then(data=>{
+                    const span = document.getElementById(storeNum);
+                    span.textContent = data.likes;
+                    const heartIcon = span.closest(".heart").querySelector("i");
+                    if (data.check) {
+                        heartIcon.classList.remove("bi-heart");
+                        heartIcon.classList.add("bi-heart-fill");
+                    } else {
+                        heartIcon.classList.remove("bi-heart-fill");
+                        heartIcon.classList.add("bi-heart");
+                    }
+                })
+        }
+
+        function toggleLike(storeNum) {
+            fetch(`/member/store/like/${storeNum}`,{
+                credentials: "same-origin"
+            })
+                .then(response=>{
+                    if(response.ok){
+                        updateLikespan(storeNum);
+                    }
+                })
+        }
+    </script>
 </div>
 
 </body>

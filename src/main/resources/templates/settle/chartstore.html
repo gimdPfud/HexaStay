@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>재무 정산 차트 (업체)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .form-select {
+            max-width: 200px;
+            margin-right: 15px;
+        }
+
+        .download-btn {
+            float: right;
+        }
+
+        table {
+            font-size: 0.9rem;
+        }
+
+        canvas {
+            background-color: #fff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container mt-5">
+
+    <h2 class="mb-4 fw-bold text-primary">재무 정산 차트</h2>
+
+    <!-- 🔽 선택 필터 -->
+    <div class="d-flex flex-wrap align-items-center mb-4">
+        <select class="form-select" id="hqSelect">
+            <option selected>본사 선택</option>
+            <option>서울본사</option>
+            <option>부산본사</option>
+        </select>
+        <select class="form-select" id="branchSelect">
+            <option selected>지사 선택</option>
+            <option>중부지사</option>
+            <option>남부지사</option>
+        </select>
+        <select class="form-select" id="officeSelect">
+            <option selected>지점 선택</option>
+            <option>강남지점</option>
+            <option>대구지점</option>
+        </select>
+        <select class="form-select" id="storeSelect">
+            <option selected>스토어 선택</option>
+            <option>스토어 A</option>
+            <option>스토어 B</option>
+        </select>
+        <button class="btn btn-success download-btn">엑셀로 다운로드</button>
+    </div>
+
+    <!-- 📊 테이블 & 차트 -->
+    <div class="chart-section">
+
+        <!-- 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="table-primary">
+                <tr>
+                    <th>날짜</th>
+                    <th>예약자</th>
+                    <th>객실</th>
+                    <th>체크인</th>
+                    <th>체크아웃</th>
+                    <th>매출 금액</th>
+                    <th>수수료</th>
+                    <th>공제 금액</th>
+                    <th>최종 정산 금액</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="storeList : ${storeDTOList.content}">
+                    <td><input type="text" class="form-control" th:value="${#temporals.format(storeList.createDate, 'yyyy-MM-dd HH:mm')}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${storeList.orderstoreMessage}" readonly></td>
+                    <td><input type="text" class="form-control" th:value="${storeList.orderstoreMessage}" readonly></td>
+
+                    <!-- 날짜 데이터용 input -->
+                    <td><input type="text" class="form-control checkin" th:value="${storeList.orderstoreMessage}" readonly></td>
+                    <td><input type="text" class="form-control checkout" th:value="${storeList.orderstoreMessage}" readonly></td>
+                    
+                    <!-- 가격 데이터 -->
+                    <td>
+                        <input hidden type="text" class="checkDays">
+                        <input hidden type="text" class="price" th:value="${storeList.orderstoreMessage}" readonly>
+                        <input type="text" class="form-control priceResult" readonly>
+                    </td>
+
+                    <!-- 계산 결과용 input -->
+                    <td><input type="text" class="form-control commission" readonly></td>
+                    <td><input type="text" class="form-control deduct" readonly></td>
+                    <td><input type="text" class="form-control final" readonly></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <!-- 📊 차트들 -->
+        <div class="row mt-5">
+            <div class="col-lg-8 mb-4">
+                <h5 class="mb-3">매출 & 정산 추이</h5>
+                <canvas id="mixedChart" height="260"></canvas>
+            </div>
+            <div class="col-lg-4">
+                <h5 class="mb-3">정산 비율 분석</h5>
+                <canvas id="donutChart" height="260"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('tbody tr').forEach(row => {
+                // 가격 가져오기
+                const priceInput = row.querySelector('.price');
+                if (!priceInput) {
+                    console.error('가격 입력란을 찾을 수 없습니다.');
+                    return;
+                }
+                const price = parseFloat(priceInput.value);
+
+                // 날짜 가져오기
+                const checkIn = new Date(row.querySelector('.checkin').value);
+                const checkOut = new Date(row.querySelector('.checkout').value);
+
+                // 숙박 일수 계산 - 수정된 부분
+                // 체크인과 체크아웃이 같은 날짜여도 1일로 계산
+                // 체크인과 체크아웃이 다르면 차이 + 1일로 계산
+                let days;
+
+                if (checkIn.toDateString() === checkOut.toDateString()) {
+                    // 같은 날이면 1일 숙박
+                    days = 1;
+                } else {
+                    // 다른 날이면 차이 계산해서 +1
+                    const diffTime = Math.abs(checkOut - checkIn);
+                    days = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                }
+
+
+                // 체크인~체크아웃 일수를 checkDays에 저장 (class로 변경됨)
+                const checkDaysInput = row.querySelector('.checkDays');
+                if (checkDaysInput) {
+                    checkDaysInput.value = days;
+                }
+
+                // 매출 금액 계산 (price x 일수)
+                const sales = price * days;
+
+                // 매출 금액 표시
+                const priceResultInput = row.querySelector('.priceResult');
+                if (priceResultInput) {
+                    priceResultInput.value = Math.round(sales).toLocaleString() + '원';
+                }
+
+                // 수수료 (5%)
+                const fee = sales * 0.05;
+                const commissionInput = row.querySelector('.commission');
+                if (commissionInput) {
+                    commissionInput.value = Math.round(fee).toLocaleString() + '원';
+                }
+
+                // 공제 금액 (5%)
+                const deduction = sales * 0.05;
+                const deductInput = row.querySelector('.deduct');
+                if (deductInput) {
+                    deductInput.value = Math.round(deduction).toLocaleString() + '원';
+                }
+
+                // 최종 정산 금액 (매출 - 수수료 - 공제)
+                const final = sales - fee - deduction;
+                const finalInput = row.querySelector('.final');
+                if (finalInput) {
+                    finalInput.value = Math.round(final).toLocaleString() + '원';
+                }
+            });
+        });
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('tbody tr');
+
+            // 데이터 배열 초기화
+            const labels = []; // 날짜
+            const salesList = []; // 매출
+            const finalList = []; // 최종 정산
+            let totalSales = 0;
+            let totalCommission = 0;
+            let totalDeduct = 0;
+            let totalFinal = 0;
+
+            rows.forEach(row => {
+                const date = row.querySelector('td input')?.value || ''; // 첫 번째 td의 input
+                const priceText = row.querySelector('.priceResult')?.value.replace(/[^\d]/g, '') || '0';
+                const commissionText = row.querySelector('.commission')?.value.replace(/[^\d]/g, '') || '0';
+                const deductText = row.querySelector('.deduct')?.value.replace(/[^\d]/g, '') || '0';
+                const finalText = row.querySelector('.final')?.value.replace(/[^\d]/g, '') || '0';
+
+                const price = parseInt(priceText);
+                const commission = parseInt(commissionText);
+                const deduct = parseInt(deductText);
+                const final = parseInt(finalText);
+
+                // 날짜와 금액 저장
+                labels.push(date.split(' ')[0]); // 날짜만 추출
+                salesList.push(price);
+                finalList.push(final);
+
+                totalSales += price;
+                totalCommission += commission;
+                totalDeduct += deduct;
+                totalFinal += final;
+            });
+
+            // ✅ 혼합형 차트 (매출 & 정산)
+            const mixedCtx = document.getElementById('mixedChart').getContext('2d');
+            new Chart(mixedCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '매출 금액',
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            data: salesList,
+                            borderRadius: 5
+                        },
+                        {
+                            type: 'line',
+                            label: '최종 정산 금액',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            fill: false,
+                            data: finalList
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => value.toLocaleString() + '원'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#333',
+                            formatter: value => value.toLocaleString() + '원',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+
+                }
+            });
+
+// ✅ 도넛 차트 (전체 비율)
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['정산금액', '수수료', '공제금액'],
+                    datasets: [{
+                        data: [totalFinal, totalCommission, totalDeduct],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 205, 86, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            formatter: (value, context) => {
+                                const sum = totalFinal + totalCommission + totalDeduct;
+                                const percentage = ((value / sum) * 100).toFixed(1);
+                                return `${percentage}%`;
+                            },
+                            color: '#fff',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+        });
+    </script>
+
+
+</div>
+</body>
+</html>

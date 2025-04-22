@@ -22,9 +22,9 @@ public class Room extends BaseEntity {
     private String roomPassword;    //Room이용 password
 
     //체크인 체크 // 체크 아웃
-    private LocalDate checkInDate;
+    private LocalDateTime checkInDate;
 
-    private LocalDate checkOutDate;
+    private LocalDateTime checkOutDate;
 
 
     //*****참조 테이블****//

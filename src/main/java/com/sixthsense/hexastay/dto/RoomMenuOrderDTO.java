@@ -35,6 +35,12 @@ public class RoomMenuOrderDTO {
 
     private LocalDateTime regDate;
 
+    private String roomMenuImageMeta; //룸 메뉴 사진 정보
+
+    private String originalImageMeta; // 기존 이미지의 경로
+
     private List<RoomMenuOrderItemDTO> orderItemList = new ArrayList<>();
+
+
 
 }

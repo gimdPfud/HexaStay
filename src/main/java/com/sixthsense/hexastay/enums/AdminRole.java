@@ -15,7 +15,7 @@ public enum AdminRole {
     AGENT("직원"),
     PARTNER("협력업체"),
 
-
+    //스토어
     MGR("운영총괄"),
     SUBMGR("부매니저"),
     STAFF("매장직원");

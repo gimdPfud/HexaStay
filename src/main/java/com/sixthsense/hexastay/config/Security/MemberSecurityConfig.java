@@ -38,7 +38,8 @@ import org.springframework.security.web.SecurityFilterChain;
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                             "/roomMenu/**",
-                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**")
+                            "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**,",
+                            "/ws-order-alert/**", "/cart/**")
                     .authenticationManager(authManager)
                     .userDetailsService(memberDetailsService)
                     .authorizeHttpRequests(authz -> authz
@@ -46,14 +47,24 @@ import org.springframework.security.web.SecurityFilterChain;
                     )
                     .formLogin(form -> form
                             .loginPage("/member/login")
-                            .defaultSuccessUrl("/member/main")
+                            .defaultSuccessUrl("/roomlist/roompassword")
                             .failureUrl("/member/login?error")
                             .usernameParameter("memberEmail")
                             .passwordParameter("memberPassword")
                             .permitAll()
                     )
+                    .logout(logout -> logout
+                            .logoutUrl("/member/logout")
+                            .logoutSuccessUrl("/member/login")
+                            .invalidateHttpSession(true)
+                            .deleteCookies("JSESSIONID")
+                            .permitAll()
+                    )
                     .userDetailsService(memberDetailsService)
-                    .csrf().disable();
+                    .csrf().disable()
+                    .exceptionHandling()
+                    .authenticationEntryPoint((request, response, authException) ->
+                            response.sendRedirect("/member/login"));
 
             return http.build();
         }

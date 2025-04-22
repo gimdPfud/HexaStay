@@ -1,10 +1,9 @@
 /***********************************************
  * 클래스명 : StoreClientController
- * 기능 : 고객전용 페이지 (1. 스토어 목록보기,
- * 2. 스토어 상세 및 3. 메뉴 목록, 4. 메뉴 상세, 5. 장바구니, 6. 외부메뉴결제까지.)
+ * 기능 : principal을 사용한 고객전용 페이지
  * 작성자 : 김예령
- * 작성일 : 2025-04-07
- * 수정 : 2025-04-07
+ * 작성일 : 2025-04-22
+ * 수정 : 2025-04-22
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
@@ -27,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,17 +38,22 @@ public class StoreClientController {
     private final StoreService storeService;
     private final StoremenuService storemenuService;
     private final StorecartService storecartService;
-    Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
 
 
 /* 1. 스토어 목록 보기
         get. */
     @GetMapping("/list")
-    public String list(Model model, Pageable pageable){
+    public String list(Model model, Pageable pageable, Principal principal){
+        if(principal==null){
+            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+        }
+        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
         log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
         model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
         model.addAttribute("list",storeDTOPage);
+
+//        storeService.
         return "mobilestore/list";
     }
 
@@ -80,5 +86,39 @@ public class StoreClientController {
         StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum);
         model.addAttribute("data",storemenuDTO);
         return "mobilestore/menuread";
+    }
+
+    /*5. 스토어 좋아요~ 또는 싫어요~?*/
+    @ResponseBody
+    @GetMapping("/like/{storeNum}")
+    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){//todo 프린시펄사용함
+        if(principal==null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String email = principal.getName();
+        try {
+            storeService.storeLiketoggle(storeNum, email);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/like/list/{storeNum}")
+    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){//todo 프린시펄사용함
+        if(principal==null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            Long likes = storeService.getStoreLikeCount(storeNum);
+            boolean check = storeService.isLiked(storeNum, principal.getName());
+            Map<String,Object> datas = new HashMap<>();
+            datas.put("likes",likes);
+            datas.put("check",check);
+            return new ResponseEntity<>(datas,HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

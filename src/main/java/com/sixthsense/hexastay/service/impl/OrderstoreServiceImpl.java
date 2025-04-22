@@ -32,7 +32,6 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     private final OrderstoreRepository orderstoreRepository;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
-    private final StoremenuRepository storemenuRepository;
     private final StorecartitemRepository storecartitemRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -88,6 +87,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         order.setRoom(room);
         order.setOrderstoreStatus("unpaid");
 
+        if(itemIdList==null||itemIdList.isEmpty()){return 3;}
+
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
             Storecartitem cartItem = storecartitemRepository.findById(itemid).orElse(null);
@@ -103,6 +104,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             itemlist.add(orderItem);
         }
         order.setOrderstoreitemList(itemlist);
+        order.setStore(itemlist.stream().findFirst().orElseThrow().getStoremenu().getStore());
         orderstoreRepository.save(order);
         return 1;
     }
@@ -169,6 +171,21 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         return viewOrderList;
     }
 
+    @Override
+    public Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable) {
+        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum, pageable);
+        Page<OrderstoreViewDTO> viewOrderPage = orderlist.map(orderstore->{
+            OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
+            List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
+            itemlist.forEach(item->{
+                OrderstoreitemDTO dto = modelMapper.map(item,OrderstoreitemDTO.class);
+                orderstoreViewDTO.addOrderstoreitemDTOList(dto);
+            });
+            return orderstoreViewDTO;
+        });
+        return viewOrderPage;
+    }
+
     //완료된 주문들만 가져오기
     @Override
     public List<OrderstoreDTO> getAllList() {
@@ -188,7 +205,13 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     public List<OrderstoreDTO> getOrderedList(Long storeNum) {
         List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
         list.forEach(log::info);//됨
-        List<OrderstoreDTO> result = list.stream().map(data->modelMapper.map(data, OrderstoreDTO.class)).toList();
+        List<OrderstoreDTO> result = list.stream().map(data -> {
+            OrderstoreDTO dto = modelMapper.map(data, OrderstoreDTO.class);
+            dto.setOrderstoreitemDTOList(
+                    data.getOrderstoreitemList().stream().map(a->modelMapper.map(a,OrderstoreitemDTO.class)).toList()
+            );
+            return dto;
+        }).toList();
         log.info("서비스에서 찾음? "+result.size());
         result.forEach(log::info);
         return result;

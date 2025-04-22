@@ -11,6 +11,9 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Store;
+import com.sixthsense.hexastay.entity.StoreLike;
+import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.StoreLikeRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final MemberRepository memberRepository;
+    private final StoreLikeRepository storeLikeRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -107,26 +112,26 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
-        if(storeDTO.getStoreProfile()!=null) {//이미지 새로 넣었고
-            if (store.getStoreProfileMeta()!=null) {//기존 이미지가 있다면
+        if(storeDTO.getStoreProfile()!=null && !storeDTO.getStoreProfile().isEmpty()) {//이미지 새로 넣었고
+            if (store.getStoreProfileMeta()!=null  && !store.getStoreProfileMeta().isEmpty()) {//기존 이미지가 있다면
                 Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta().substring(1));
                 Files.deleteIfExists(filePath);//삭제
             }
-                /*이미지 등록 절차...*/
-                String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
-                String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
-                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-                String fileName = fileFirstName + fileSubName;
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+            String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
 
-                storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
-                Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-                Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
-                if (!Files.exists(createPath)) {
-                    Files.createDirectory(createPath);
-                storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+            storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
             }
+            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+            store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         }
-        store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         store.setStoreName(storeDTO.getStoreName());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
@@ -211,12 +216,12 @@ public class StoreServiceImpl implements StoreService {
         return list;
     }
     @Override
-    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable) {
+    public Page<StoreDTO> searchlist(String status, Long companyNum,String searchType, String keyword, Pageable pageable) {
 //        log.info("서비스 들어옴 : ");
 //        log.info(companyNum);
 //        log.info(searchType);
 //        log.info(keyword);
-        Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable);
+        Page<Store> storeList = storeRepository.listStoreSearch(status, companyNum, searchType, keyword, pageable);
 //        log.info(storeList.getSize());
 //        storeList.forEach(log::info);
         Page<StoreDTO> list = storeList.map(data -> {
@@ -224,9 +229,7 @@ public class StoreServiceImpl implements StoreService {
             storeDTO.setCompanyName(data.getCompany().getCompanyName());
             return storeDTO;
         });
-//        list.forEach(log::info);
         return list;
-//        return null;
     }
 
 
@@ -305,6 +308,29 @@ public class StoreServiceImpl implements StoreService {
         }
         //상위관리자도 아니고 스토어소속도 아니면 무조건 거짓.
         else {return false;}
+    }
+
+    @Override
+    public void storeLiketoggle(Long storeNum, String email) {
+        StoreLike storeLike = storeLikeRepository.findByMember_MemberEmailAndStore_StoreNum(email,storeNum);
+        if(storeLike==null){ //좋아요 안했음
+            storeLike = new StoreLike();
+            storeLike.setMember(memberRepository.findByMemberEmail(email));
+            storeLike.setStore(storeRepository.findById(storeNum).orElseThrow(EntityNotFoundException::new));
+            storeLikeRepository.save(storeLike); //좋아요 추가
+        }else { //좋아요 했음
+            storeLikeRepository.delete(storeLike);//좋아요 취소
+        }
+    }
+
+    @Override
+    public long getStoreLikeCount(Long storeNum) {
+        return storeLikeRepository.countByStore_StoreNum(storeNum);
+    }
+
+    @Override
+    public boolean isLiked(Long storeNum, String email) {
+        return storeLikeRepository.existsByStore_StoreNumAndMember_MemberEmail(storeNum, email);
     }
 
     //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.

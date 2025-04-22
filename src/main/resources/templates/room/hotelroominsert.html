@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}"
->
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>회원 기준 호텔룸 등록</title>
+    <title>HotelRoom 배정 등록(회원확인)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
 <div layout:fragment="content" class="container mt-4"><!--레이아웃 fragment 시작점-->
 
     <div class="container mt-5"><!--숙박 예약등록 시작 지점 -->
-        <h2 class="mb-4">회원 기준 호텔룸 등록</h2>
+        <h2 class="mb-4">HotelRoom 배정 등록회원검색_호텔룸 검색</h2>
 
         <!-- Flash 메시지 표시 -->
         <div th:if="${successMessage}" class="alert alert-success" role="alert">
@@ -23,75 +22,242 @@
         </div>
 
         <form th:action="@{/register-hotelroom}" th:object="${hotelRoomDTO}" method="post" class="row g-3">
-
-            <!-- 회원 정보 입력 -->
+            <!-- 회원 선택 버튼 -->
             <div class="col-md-6">
                 <label class="form-label">Member_PK:</label>
-                <input type="number" class="form-control" th:field="*{memberNum}" required />
+                <div class="input-group">
+                    <input type="number" class="form-control" id="memberNum" name="memberNum" th:field="*{memberNum}" readonly required />
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#memberModal">검색</button>
+                </div>
             </div>
 
             <div class="col-md-6">
                 <label class="form-label">회원 이름:</label>
-                <input type="text" class="form-control" th:field="*{memberDTO.memberName}" disabled />
+                <input type="text" class="form-control" id="memberName" th:field="*{memberDTO.memberName}" readonly />
             </div>
 
-            <!-- 호텔룸 정보 입력 -->
-            <div class="col-md-6">
-                <label class="form-label">방 이름:</label>
-                <input type="text" class="form-control" th:field="*{hotelRoomName}" required />
+            <!--이부분은 수정 해야 할것 입니다. -->
+            <!-- 체크인/체크아웃/비밀번호 입력 -->
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="checkInDate" class="form-label">체크인 날짜</label>
+                    <input type="date" class="form-control" id="checkInDate" name="checkInDate" th:field="*{checkInDate}" required />
+                </div>
+                <div class="col-md-4">
+                    <label for="checkOutDate" class="form-label">체크아웃 날짜</label>
+                    <input type="date" class="form-control" id="checkOutDate" name="checkOutDate" th:field="*{checkOutDate}" required />
+                </div>
+                <div class="col-md-4">
+                    <label for="roomPassword" class="form-label">룸 비밀번호</label>
+                    <input type="number" class="form-control" id="roomPassword" name="roomPassword" th:field="*{hotelRoomPassword}"  placeholder="숫자 4자리" required />
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="form-label">룸 전화번호:</label>
-                <input type="text" class="form-control" th:field="*{hotelRoomPhone}" required />
+            <div class="mt-4">
+                <h4>호텔룸 선택</h4>
+                <div class="row" id="hotelRoomList"></div>
+                <div class="d-flex justify-content-center mt-3" id="paginationControls"></div>
             </div>
+            <input type="hidden" id="hotelRoomNum" name="hotelRoomNum" th:field="*{hotelRoomNum}" />
 
-            <div class="col-md-6">
-                <label class="form-label">방 종류:</label>
-                <select class="form-select" th:field="*{hotelRoomType}">
-                    <option value="SINGLE">싱글</option>
-                    <option value="DOUBLE">더블</option>
-                    <option value="SUITE">스위트</option>
-                </select>
-            </div>
 
-            <div class="col-md-6">
-                <label class="form-label">숙박 일수:</label>
-                <input type="number" class="form-control" th:field="*{hotelRoomLodgment}" required />
-            </div>
 
-            <div class="col-md-6">
-                <label class="form-label">호텔룸 가격:</label>
-                <input type="number" class="form-control" th:field="*{hotelRoomPrice}" required />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">룸 비밀번호:</label>
-                <input type="text" class="form-control" th:field="*{hotelRoomPassword}" required />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">체크인 날짜:</label>
-                <input type="date" class="form-control" th:field="*{checkInDate}" required />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">체크아웃 날짜:</label>
-                <input type="date" class="form-control" th:field="*{checkOutDate}" required />
-            </div>
 
             <div class="col-12">
                 <button type="submit" class="btn btn-primary btn-lg">MemberPK_등록</button>
-                <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">HotelRommPk_룸배정</a>
+                <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">HotelRoomPk_룸배정</a>
                 <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">호텔룸 목록</a>
             </div>
-
         </form>
+        <!-- 페이지네이션 컨트롤은 밖에서 독립적으로 위치 -->
+        <div class="d-flex justify-content-center mt-3" id="hotelRoomPagination"></div>
+
+
     </div><!--숙박예약 등록 끝 지점-->
 
+    <!-- 회원 검색 모달 -->
+    <div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberModalLabel">회원 검색</h5>
+                    <button type="button" id="modalexit" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- 검색창 -->
+                    <div class="mb-3">
+                        <input type="text" id="memberSearchInput" class="form-control" placeholder="이름 또는 이메일 검색..."  />
+                        <button class="btn btn-outline-primary" type="button" onclick="searchMembers()">검색</button>
+                    </div>
+
+                    <!-- 검색 결과 테이블 -->
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>번호</th>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>선택</th>
+                        </tr>
+                        </thead>
+                        <tbody id="memberSearchResults">
+                        <!-- JavaScript로 채워짐 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 영역 -->
+    <script th:inline="javascript">
+        // 회원 검색 요청 함수
+        function searchMembers() {
+            const query = document.getElementById('memberSearchInput').value;
+            if (!query.trim()) {
+                alert("검색어를 입력해주세요.");
+                return;
+            }
+
+            fetch(`/admin/member/search?keyword=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('memberSearchResults');
+                    tbody.innerHTML = "";
+
+                    if (data.length === 0) {
+                        tbody.innerHTML = "<tr><td colspan='4' class='text-center'>검색 결과가 없습니다.</td></tr>";
+                        return;
+                    }
+
+                    data.forEach(member => {
+                        const row = `
+                            <tr>
+                                <td>${member.memberNum}</td>
+                                <td>${member.memberName}</td>
+                                <td>${member.memberEmail}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="selectMember(${member.memberNum}, '${member.memberName}')">
+                                        선택
+                                    </button>
+                                </td>
+                            </tr>`;
+                        tbody.insertAdjacentHTML("beforeend", row);
+                    });
+                })
+                .catch(error => {
+                    console.error("회원 검색 오류:", error);
+                    alert("회원 검색 중 오류가 발생했습니다.");
+                });
+        }
+
+        // 회원 선택 후 모달 닫기
+        function selectMember(memberNum, memberName) {
+            document.getElementById("memberNum").value = memberNum;
+            document.getElementById("memberName").value = memberName;
+
+
+            // ✅ getOrCreateInstance 를 사용하면 아직 초기화되지 않은 모달도 안전하게 닫힘
+            // modalexit 버튼을 클릭하여 모달을 닫기
+            const modalExitButton = document.getElementById('modalexit');
+            modalExitButton.click(); // 모달 닫기
+
+
+        }
+
+
+
+
+            // 페이지 로드시 memberNum이 이미 입력돼 있다면 이름 불러오기
+            function fetchMemberName() {
+            const memberNum = document.getElementById("memberNum").value;
+            if (!memberNum) return;
+
+            fetch(`/admin/member/find?memberNum=` + memberNum)
+            .then(res => res.ok ? res.json() : Promise.reject("회원이 없습니다"))
+            .then(data => {
+            document.getElementById("memberName").value = data.memberName;
+        })
+            .catch(err => {
+            alert("❌ 회원 조회 실패: " + err);
+            document.getElementById("memberName").value = "";
+        });
+        }
+
+            // 페이지 진입 시 이전 값 자동 조회
+           /* window.addEventListener("DOMContentLoaded", fetchMemberName);*/
+
+        /*호테룸 정보를 가져 오는 script*/
+        let currentPage = 0;
+
+        function loadHotelRooms(page = 0) {
+            fetch(`/admin/hotelroom/listpage?page=${page}&size=6`)
+                .then(res => res.json())
+                .then(data => {
+                    const listContainer = document.getElementById('hotelRoomList');
+                    listContainer.innerHTML = '';
+
+                    if (data.content.length === 0) {
+                        listContainer.innerHTML = "<p>등록된 호텔룸이 없습니다.</p>";
+                        return;
+                    }
+
+                    data.content.forEach(room => {
+                        const card = `
+                        <div class="col-md-4 mb-3">
+                            <div class="card" onclick="selectHotelRoom(${room.hotelRoomNum}, this)">
+                                <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지" style="height:200px; object-fit:cover;">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">${room.hotelRoomName}</h5>
+                                    <p class="card-text">전화: ${room.hotelRoomPhone} / 가격: ${room.hotelRoomPrice}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                        listContainer.insertAdjacentHTML('beforeend', card);
+                    });
+
+                    setupPagination(data);
+                })
+                .catch(err => {
+                    console.error("호텔룸 불러오기 오류:", err);
+                });
+        }
+
+        function setupPagination(data) {
+            const pagination = document.getElementById('hotelRoomPagination');
+            pagination.innerHTML = '';
+
+            for (let i = 0; i < data.totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.type = 'button'; // 👉 이거 추가
+                btn.className = 'btn btn-sm mx-1 ' + (i === data.number ? 'btn-primary' : 'btn-outline-secondary');
+                btn.innerText = i + 1;
+                btn.onclick = () => loadHotelRooms(i);
+                pagination.appendChild(btn);
+            }
+        }
+
+        function selectHotelRoom(hotelRoomNum, element) {
+            document.getElementById('hotelRoomNum').value = hotelRoomNum;
+
+            const allCards = document.querySelectorAll('#hotelRoomList .card');
+            allCards.forEach(card => card.classList.remove('border-primary'));
+            element.classList.add('border-primary');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchMemberName(); // 기존 1단계 함수
+            loadHotelRooms();  // 호텔룸 페이지네이션 포함해서 불러오기
+        });
+
+
+
+    </script>
+
 </div><!--레이아웃 fragment 끝지점-->
-
-
-
 </body>
 </html>

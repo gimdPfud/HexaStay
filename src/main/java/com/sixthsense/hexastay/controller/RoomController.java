@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.dto.MemberDTO;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.service.HotelRoomService;
+import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,9 +31,19 @@ public class RoomController {
 
     private final HotelRoomService hotelRoomService;
 
+    private final MemberService memberService;
+
+
+    /*키워드로 받는 검색 */
+    @GetMapping("/admin/member/search")
+    @ResponseBody
+    public List<MemberDTO> searchMembers(@RequestParam("keyword") String keyword) {
+        return memberService.searchByNameOrEmail(keyword);
+    }
+
 
     // 회원을 기준으로 호텔룸 등록 페이지
-    //todo:http://localhost:8090/register-hotelroom
+    //todo:http://localhost:8090/register-hotelroom?continue
     @GetMapping("/register-hotelroom")
     public String showRegisterHotelRoomPage(Model model) {
         model.addAttribute("memberDTO", new MemberDTO());
@@ -41,23 +52,26 @@ public class RoomController {
     }
 
     // 회원을 기준으로 호텔룸 등록 처리
+    //memberPkRoominsert
+    //todo:http://localhost:8090/register-hotelroom?continue
     @PostMapping("/register-hotelroom")
     public String registerHotelRoomForMember(@ModelAttribute MemberDTO memberDTO,
                                              @ModelAttribute HotelRoomDTO hotelRoomDTO,
                                              RedirectAttributes redirectAttributes) {
         try {
-            roomServiceimpl.registerHotelRoomForMember(memberDTO, hotelRoomDTO);
+            roomServiceimpl.memberPkRoominsert(memberDTO, hotelRoomDTO);
             redirectAttributes.addFlashAttribute("message", "회원 기준 호텔룸이 성공적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("회원 기준 호텔룸 등록 실패: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "회원 기준 호텔룸 등록에 실패했습니다.");
         }
-        return "redirect:/roomlist";
+        return "redirect://register-hotelroom";
     }
 
     /**
      * 회원이 특정 호텔룸에 배정되는 등록 페이지 이동
      */
+    //todo:http://localhost:8090/member-insertroom
     @GetMapping("/member-insertroom")
     public String insertMemberGet(Model model,@PageableDefault(page=1)Pageable pageable) {
         Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList(pageable); // 호텔룸 목록 조회
@@ -69,7 +83,7 @@ public class RoomController {
     /**
      * 회원을 특정 호텔룸에 배정하고 Room 테이블에도 저장
      */
-    //todo:/member-insertroom
+    //todo:http://localhost:8090/member-insertroom
     @PostMapping("/member-insertroom")
     public String registerMember(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
         try {
@@ -80,7 +94,7 @@ public class RoomController {
             log.info("회원 등록 요청 - 회원: {}, 배정 호텔룸: {}", memberDTO.getMemberName(), hotelRoomDTO.getHotelRoomNum());
 
             // 회원을 호텔룸에 배정하고, Room 엔티티에도 저장
-            roomServiceimpl.registerMemberForHotelRoom(hotelRoomDTO, memberDTO);
+            roomServiceimpl.hotelRoomPkMemberinsert(hotelRoomDTO, memberDTO);
 
             redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 호텔룸에 배정되었습니다.");
             return "redirect:/member-insertroom"; // 성공 시 다시 등록 페이지로 이동

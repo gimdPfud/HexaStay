@@ -1,12 +1,35 @@
 <!-- templates/roommenu/orderList.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title th:text="#{orderList.title}">주문 내역</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    /* 이미지 스타일 (필요에 따라 조정) */
+    .order-img {
+        width: 100%;
+        height: auto;
+    }
+
+    .bg-accept {
+        background-color: #28a745; /* 초록색 */
+    }
+
+    .bg-order {
+        background-color: #ffc107; /* 노란색 */
+    }
+
+    .bg-cancel {
+        background-color: #dc3545; /* 빨간색 */
+    }
+
+    .bg-complete {
+        background-color: #007bff; /* 파란색 */
+    }
+</style>
 <body>
 <div class="container mt-4">
     <h2 class="mb-4 text-center" th:text="#{orderList.title}">🧾 주문 내역</h2>
@@ -17,11 +40,15 @@
 
     <div th:each="order : ${orderList}" class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <div><strong th:text="#{orderList.orderNumber}">주문번호:</strong> <span th:text="${order.roomMenuOrderNum}"></span></div>
+            <div>
+                <strong th:text="#{orderList.orderNumber}">주문번호:</strong>
+                <span th:text="${order.roomMenuOrderNum}"></span>
+            </div>
             <div>
                 <span class="badge bg-primary" th:text="${order.roomMenuOrderStatus}"></span>
             </div>
         </div>
+
 
         <ul class="list-group list-group-flush">
             <li th:each="item : ${order.orderItemList}" class="list-group-item">
@@ -29,6 +56,8 @@
                     <div class="col-12 col-md-6 mb-2">
                         <strong th:text="#{orderList.menuName}">메뉴 이름:</strong> <span th:text="${item.roomMenuOrderItemName}"></span>
                     </div>
+
+
                     <div class="col-6 col-md-3 mb-2">
                         <strong th:text="#{orderList.quantity}">수량:</strong> <span th:text="${item.roomMenuOrderItemAmount}"></span>
                     </div>
@@ -36,19 +65,33 @@
                         <strong th:text="#{orderList.totalPrice}">총 가격:</strong>
                         ₩<span th:text="${item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount}"></span>
                     </div>
+
+                    <!-- 이미지 시작 -->
+                    <div class="card-body text-center">
+                        <div class="row justify-content-center">
+                            <div class="col-6 col-md-4">
+                                <img th:if="${order.orderItemList[0].roomMenuImageMeta != null}"
+                                     th:src="@{${order.orderItemList[0].roomMenuImageMeta}}"
+                                     class="img-fluid rounded" alt="메뉴 이미지">
+
+                                <img th:unless="${order.orderItemList[0].roomMenuImageMeta != null}"
+                                     th:src="@{/profile/default.png}"
+                                     class="img-fluid rounded" alt="기본 이미지">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 이미지 끝 -->
+
+                    <div class="card-footer text-muted text-end">
+                        <small>
+                            <span>주문 시간:</span>
+                            <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
+                        </small>
+                    </div>
                 </div>
             </li>
         </ul>
 
-        <div class="card-footer text-end">
-            <button type="button"
-                    th:if="${order.roomMenuOrderStatus.name() == 'ORDER'}"
-                    th:attr="data-order-id=${order.roomMenuOrderNum}"
-                    class="btn btn-danger btn-sm"
-                    onclick="cancelOrder(this)"
-                    th:text="#{orderList.cancelOrder}">🗑 주문 취소
-            </button>
-        </div>
     </div>
 
     <div class="text-center">
@@ -56,33 +99,42 @@
     </div>
 </div>
 
+<!-- 페이지 네비게이션 -->
+<nav>
+    <ul class="pagination justify-content-center align-items-center mt-3">
+        <!-- 첫 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo; 처음</a>
+        </li>
+
+        <!-- 이전 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}">이전</a>
+        </li>
+
+        <!-- 페이지 번호 링크 -->
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${i == currentPage} ? 'active'">
+            <a class="page-link"
+               th:href="@{/roommenu/orderList(page=${i - 1})}"
+               th:text="${i}">1</a>
+        </li>
+
+        <!-- 다음 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}">다음</a>
+        </li>
+
+        <!-- 마지막 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">마지막 &raquo;</a>
+        </li>
+    </ul>
+</nav>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
-    /*------ 주문을 취소하는 스크립트 시작 ------*/
-
-        function cancelOrder(button) {
-        if (!confirm("정말 주문을 취소하시겠습니까?")) return;
-
-        const orderNum = button.getAttribute("data-order-id");
-
-        fetch('/roommenu/deleteOrder', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    },
-        body: new URLSearchParams({orderNum})
-    })
-        .then(response => response.text())
-        .then(data => {
-        alert(data); // 성공 메시지
-        window.location.reload(); // 새로고침으로 반영
-    })
-        .catch(error => {
-        alert("오류 발생: " + error);
-    });
-    }
-    /*------ 주문을 취소하는 스크립트 끝 ------*/
 
 </script>
 

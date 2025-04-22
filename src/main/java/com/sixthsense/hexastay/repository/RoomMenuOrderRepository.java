@@ -5,7 +5,10 @@ import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /***********************************************
  * 클래스명 : RoomMenuOrderRepository
@@ -27,6 +30,13 @@ public interface RoomMenuOrderRepository extends JpaRepository<RoomMenuOrder, Lo
     List<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member);
 
     // 오더된 정보만 빼오기.
-    List<RoomMenuOrder> findAllByRoomMenuOrderStatusOrderByRegDateDesc(RoomMenuOrderStatus status);
+    List<RoomMenuOrder> findAllByRoomMenuOrderStatusInOrderByRegDateDesc(Collection<RoomMenuOrderStatus> statuses);
 
+    // 페이징을 위한 메서드: Pageable 인자를 추가하면 Page<RoomMenuOrder> 반환
+    Page<RoomMenuOrder> findAllByRoomMenuOrderStatusInOrderByRegDateDesc(Collection<RoomMenuOrderStatus> statuses, Pageable pageable);
+
+    // 기존 메서드: List<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member);
+    // 페이징을 위해 Pageable 인자를 추가하여 Page를 반환하도록 수정
+    Page<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member, Pageable pageable);
 }
+

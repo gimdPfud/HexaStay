@@ -7,12 +7,9 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +30,7 @@ public class HotelRoomDTO {
 
     private String hotelRoomContent;            //방 상세설명
 
-    private boolean hotelRoomStatus;            //활성화 상태
+    private String hotelRoomStatus;            //활성화 상태
 
     private Integer hotelRoomLodgment;              //숙박일수
 
@@ -63,11 +60,11 @@ public class HotelRoomDTO {
 
 
     //*********숙박 일정 필드명********//
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkInDate; //체크인
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkOutDate; //체크아웃
+    private LocalDateTime checkInDate; //체크인
+
+
+    private LocalDateTime checkOutDate; //체크아웃
 
 
 

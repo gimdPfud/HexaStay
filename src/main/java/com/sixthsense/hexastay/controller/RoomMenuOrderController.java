@@ -9,9 +9,11 @@ package com.sixthsense.hexastay.controller;
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.AdminRole;
+import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
@@ -20,6 +22,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +41,8 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 
@@ -46,6 +55,7 @@ public class RoomMenuOrderController {
     private final RoomMenuOrderService roomMenuOrderService;
     private final RoomMenuOrderRepository roomMenuOrderRepository;
     private final MemberRepository memberRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     /***************************************************
      *
@@ -102,9 +112,9 @@ public class RoomMenuOrderController {
         Long roomMenuOrderNum = null;
 
         try {
-            // 주문 서비스 호출 → 주문 생성 및 저장
+            log.info("1️⃣ 주문 insert 시작");
             roomMenuOrderNum = roomMenuOrderService.roomMenuOrderInsert(roomMenuOrderDTO, email);
-            log.info(String.format("주문이 완료됨 - DTO: %s, Email: %s", roomMenuOrderDTO, email));
+            log.info("2️⃣ 주문 insert 완료 - 주문번호: {}", roomMenuOrderNum);
 
 
         } catch (IllegalStateException e) {
@@ -133,7 +143,7 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @PostMapping("/roommenu/cart")
-    public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage) {
+    public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO, RoomMenuOrder roomMenuOrder) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -145,9 +155,13 @@ public class RoomMenuOrderController {
         String email = principal.getName();
 
         try {
-            Long orderNum = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage);
-            log.info("주문 생성 완료 - 주문번호: {}", orderNum);
-            return ResponseEntity.ok(orderNum);
+            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage);
+            log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
+            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order);
+            log.info("3️⃣ 알람 전송 완료");
+
+
+            return ResponseEntity.ok(order.getRoomMenuOrderNum());
         } catch (IllegalStateException | EntityNotFoundException e) {
             log.error("주문 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -171,16 +185,41 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @GetMapping("/roommenu/orderList")
-    public String getOrderList(Principal principal, Model model) {
+    public String getOrderList(Principal principal,
+                               Model model,
+                               @RequestParam(name = "page", defaultValue = "0") int page) {
         log.info("주문 리스트 페이지 컨트롤러 진입");
         if (principal == null) {
-            return "redirect:/member/login"; // 로그인 안됐으면 로그인 페이지로
+            return "redirect:/member/login"; // 로그인 안 되었으면 로그인 페이지로 이동
         }
 
         String email = principal.getName();
 
-        List<RoomMenuOrderDTO> orderList = roomMenuOrderService.getOrderListByEmail(email);
-        model.addAttribute("orderList", orderList);
+        // 한 페이지당 10건씩, 등록일 기준 내림차순 정렬 (페이지 번호는 0부터 시작)
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "regDate"));
+
+        Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getOrderListByEmail(email, pageable);
+        model.addAttribute("orderList", orderPage.getContent());
+
+        // 페이징 네비게이션에 사용할 값들
+        int totalPages = orderPage.getTotalPages();
+        model.addAttribute("totalPages", totalPages);
+
+        // 현재 페이지(사용자에게는 1부터 보이도록 변환)
+        int currentPage = page + 1;
+        model.addAttribute("currentPage", currentPage);
+
+        // 화면에 표시할 페이지 번호 범위를 계산 (예: 현재 페이지 기준 앞뒤 2페이지)
+        int startPage = Math.max(1, currentPage - 2);
+        int endPage = Math.min(totalPages, currentPage + 2);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        // 이전, 다음 페이지 처리 (단순 계산)
+        int prevPage = currentPage > 1 ? currentPage - 1 : 1;
+        int nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
 
         return "roommenu/orderList"; // templates/roommenu/orderList.html
     }
@@ -249,9 +288,12 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @GetMapping("/roommenu/adminOrderList")
-    public String viewAllOrders(Model model, Principal principal) {
-        log.info("로그인한 사용자 : " + principal.getName());
+    public String viewAllOrders(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            Model model,
+            Principal principal) {
 
+        log.info("로그인한 사용자 : " + principal.getName());
         Member member = memberRepository.findByMemberEmail(principal.getName());
 
         // String → AdminRole enum으로 변환
@@ -261,11 +303,29 @@ public class RoomMenuOrderController {
             isAdminRole = Arrays.stream(AdminRole.values())
                     .anyMatch(role -> role == userRole);
         } catch (IllegalArgumentException e) {
-            isAdminRole = false; // enum에 없는 문자열일 경우 예외 발생함
+            isAdminRole = false;
         }
 
-        List<RoomMenuOrderDTO> orders = roomMenuOrderService.getAllOrdersForAdmin();
+        // 한 페이지당 10건, 최신순 정렬 기준. 페이지 번호 0부터 시작.
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "regDate"));
+        Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getAllOrdersForAdmin(pageable);
+        List<RoomMenuOrderDTO> orders = orderPage.getContent();
         model.addAttribute("orders", orders);
+
+        // 페이지 네비게이션용 값들을 계산 (화면에는 1부터 보이지만 실제 번호는 0부터 시작)
+        int totalPages = orderPage.getTotalPages();
+        int currentPage = page + 1;
+        int startPage = Math.max(1, currentPage - 2);
+        int endPage = Math.min(totalPages, currentPage + 2);
+        int prevPage = currentPage > 1 ? currentPage - 1 : 1;
+        int nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
 
         return "roommenu/adminOrderList";
     }
@@ -289,11 +349,73 @@ public class RoomMenuOrderController {
     public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
         try {
             for (Long orderId : orderIds) {
-                roomMenuOrderRepository.deleteById(orderId);  // 삭제 or 상태변경 로직
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.COMPLETE);
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
             }
-            return ResponseEntity.ok("처리 완료");
+
+            return ResponseEntity.ok("주문이 완료 처리되었습니다.");
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("에러: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/roommenu/cancel-orders")
+    public ResponseEntity<?> cancelOrders(@RequestBody List<Long> orderIds) {
+        try {
+            for (Long orderId : orderIds) {
+                // 주문 ID를 이용해 해당 주문을 찾습니다.
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+
+                    // 주문 상태를 CANCEL로 변경
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
+
+                    // 변경된 주문을 저장
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    // 주문이 존재하지 않으면 에러 메시지 반환
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
+            }
+
+            return ResponseEntity.ok("주문이 취소 처리되었습니다.");
+        } catch (Exception e) {
+            // 예외 발생 시 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/roommenu/accept-orders")
+    public ResponseEntity<?> acceptOrders(@RequestBody List<Long> orderIds) {
+        try {
+            for (Long orderId : orderIds) {
+                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
+
+                if (optionalOrder.isPresent()) {
+                    RoomMenuOrder order = optionalOrder.get();
+                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.ACCEPT);
+                    roomMenuOrderRepository.save(order);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
+                }
+            }
+
+            return ResponseEntity.ok("주문이 접수 처리되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("에러: " + e.getMessage());
         }
     }
 }

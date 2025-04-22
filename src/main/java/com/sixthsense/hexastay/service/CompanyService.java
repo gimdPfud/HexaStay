@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 public interface CompanyService {
@@ -17,8 +18,7 @@ public interface CompanyService {
     //company 목록
     List<CompanyDTO> companyList ();
     Page<CompanyDTO> companyList (Pageable pageable);
-
-    Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Pageable pageable);
+    Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable);
 
     //company 상세보기
     CompanyDTO companyRead(Long companyNum);

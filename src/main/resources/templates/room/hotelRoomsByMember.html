@@ -87,9 +87,10 @@
 <div class="modal fade" id="editHotelRoomModal" tabindex="-1" aria-labelledby="editHotelRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form th:action="@{/admin/hotelroom/update}" method="post">
+            <!-- 이미지 업로드 위해 enctype 추가 -->
+            <form th:action="@{/admin/hotelroom/update}" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editHotelRoomModalLabel">호텔룸 정보 수정</h5>
+                    <h5 class="modal-title" id="editHotelRoomModalLabel">Room배정 변경</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
@@ -100,31 +101,43 @@
                     <input type="hidden" id="editMemberNum" name="memberNum" th:value="${memberNum}">
 
                     <div class="col-md-6">
-                        <label for="editHotelRoomName" class="form-label">방 이름</label>
+                        <label for="editHotelRoomName" class="form-label">방 이름수정</label>
                         <input type="text" class="form-control" id="editHotelRoomName" name="hotelRoomName">
                     </div>
 
                     <div class="col-md-6">
-                        <label for="editHotelRoomType" class="form-label">방 종류</label>
+                        <label for="editHotelRoomType" class="form-label">방 종류수정</label>
                         <input type="text" class="form-control" id="editHotelRoomType" name="hotelRoomType">
                     </div>
 
                     <div class="col-md-6">
-                        <label for="editHotelRoomPrice" class="form-label">가격</label>
+                        <label for="editHotelRoomPrice" class="form-label">가격수정</label>
                         <input type="number" class="form-control" id="editHotelRoomPrice" name="hotelRoomPrice">
                     </div>
 
                     <div class="col-md-6">
-                        <label for="editHotelRoomPhone" class="form-label">전화번호</label>
+                        <label for="editHotelRoomPhone" class="form-label">방전화번호수정</label>
                         <input type="text" class="form-control" id="editHotelRoomPhone" name="hotelRoomPhone">
                     </div>
 
                     <div class="col-md-12">
-                        <label for="editHotelRoomContent" class="form-label">방 설명</label>
-                        <textarea class="form-control" id="editHotelRoomContent" name="hotelRoomContent" rows="3"></textarea>
+                        <label for="editHotelRoomContent" class="form-label">QR수정</label>
+                        <input class="form-control" id="editHotelRoomContent" name="hotelRoomQr" rows="3"></input>
+                    </div>
+
+                    <!-- ✅ 이미지 업로드 추가 -->
+                    <div class="col-md-12">
+                        <label for="editHotelRoomProfile" class="form-label">대표 이미지</label>
+                        <input type="file" class="form-control" id="editHotelRoomProfile" name="hotelRoomProfile">
+                    </div>
+
+                    <!-- ✅ 기존 이미지 미리보기 (선택) -->
+                    <div class="col-md-12">
+                        <label class="form-label">기존 이미지 미리보기</label><br>
+                        <img id="previewHotelRoomImage" src="" alt="기존 이미지" style="max-width: 100%; height: auto;">
                     </div>
                 </div>
-                <div class="modal-footer  d-flex justify-content-center">
+                <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
                 </div>
@@ -135,6 +148,51 @@
 
 <!-- 모달에 데이터 자동 채우기 -->
 <script>
+    window.addEventListener('load', function () {
+        const fileInput = document.getElementById('adminProfile');
+        const fileBtn = document.getElementById('PictureBtn');
+        console.log('버튼:', fileBtn);
+        console.log('파일 input:', fileInput);
+        const errorMessage = document.getElementById('fileError');
+        const previewImage = document.getElementById('pictureTemp');
+        const fileNameLabel = document.querySelector('.file-name');
+
+        if (!fileInput || !fileBtn) return; // 요소가 없으면 중단
+
+        fileBtn.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+                fileNameLabel.textContent = '올바르지 않은 파일입니다.';
+                return;
+            }
+
+            errorMessage.classList.add('d-none');
+            fileNameLabel.textContent = file.name;
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+
+
+
     function openEditModal(button) {
         const roomNum = button.getAttribute('data-roomNum');
         const roomName = button.getAttribute('data-roomName');
@@ -142,14 +200,22 @@
         const roomPrice = button.getAttribute('data-roomPrice');
         const roomPhone = button.getAttribute('data-roomPhone');
         const roomContent = button.getAttribute('data-roomContent');
+        const memberNum = button.getAttribute('data-memberNum');
 
-        document.getElementById('editHotelRoomNum').value = button.getAttribute('data-roomNum');
-        document.getElementById('editHotelRoomName').value = button.getAttribute('data-roomName');
-        document.getElementById('editHotelRoomType').value = button.getAttribute('data-roomType');
-        document.getElementById('editHotelRoomPrice').value = button.getAttribute('data-roomPrice');
-        document.getElementById('editHotelRoomPhone').value = button.getAttribute('data-roomPhone');
-        document.getElementById('editHotelRoomContent').value = button.getAttribute('data-roomContent');
-        document.getElementById('editMemberNum').value = button.getAttribute('data-memberNum'); // ✅ 추가
+        document.getElementById('editHotelRoomNum').value = roomNum;
+        document.getElementById('editHotelRoomName').value = roomName;
+        document.getElementById('editHotelRoomType').value = roomType;
+        document.getElementById('editHotelRoomPrice').value = roomPrice;
+        document.getElementById('editHotelRoomPhone').value = roomPhone;
+        document.getElementById('editHotelRoomContent').value = roomContent;
+        document.getElementById('editMemberNum').value = memberNum;
+
+        // ✅ 기존 이미지 경로가 있다면 미리보기 세팅
+        const imgPreview = document.getElementById('previewHotelRoomImage');
+        imgPreview.src = '/hotelroom/' + roomName + '_' + roomNum + '.jpg'; // 혹은 .png 등 확장자 고려
+        imgPreview.onerror = function () {
+            this.style.display = 'none';
+        };
 
         const editModal = new bootstrap.Modal(document.getElementById('editHotelRoomModal'));
         editModal.show();
