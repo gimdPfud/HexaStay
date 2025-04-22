@@ -306,14 +306,12 @@
                         const orderData = JSON.parse(message.body);
                         console.log("📦 메시지 수신:", orderData);
 
-                        // 모달 내용 채우기
                         const content = `
                     주문자: <strong>${orderData.memberEmail}</strong><br>
-                    총 금액: <strong>${orderData.roomMenuPrice}원</strong>
+                    총 금액: <strong>${orderData.totalPrice}원</strong>
                 `;
                         document.getElementById("orderAlertContent").innerHTML = content;
 
-                        // 부트스트랩 모달 띄우기
                         const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
                         modal.show();
 
