@@ -23,6 +23,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -181,16 +185,41 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @GetMapping("/roommenu/orderList")
-    public String getOrderList(Principal principal, Model model) {
+    public String getOrderList(Principal principal,
+                               Model model,
+                               @RequestParam(name = "page", defaultValue = "0") int page) {
         log.info("주문 리스트 페이지 컨트롤러 진입");
         if (principal == null) {
-            return "redirect:/member/login"; // 로그인 안됐으면 로그인 페이지로
+            return "redirect:/member/login"; // 로그인 안 되었으면 로그인 페이지로 이동
         }
 
         String email = principal.getName();
 
-        List<RoomMenuOrderDTO> orderList = roomMenuOrderService.getOrderListByEmail(email);
-        model.addAttribute("orderList", orderList);
+        // 한 페이지당 10건씩, 등록일 기준 내림차순 정렬 (페이지 번호는 0부터 시작)
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "regDate"));
+
+        Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getOrderListByEmail(email, pageable);
+        model.addAttribute("orderList", orderPage.getContent());
+
+        // 페이징 네비게이션에 사용할 값들
+        int totalPages = orderPage.getTotalPages();
+        model.addAttribute("totalPages", totalPages);
+
+        // 현재 페이지(사용자에게는 1부터 보이도록 변환)
+        int currentPage = page + 1;
+        model.addAttribute("currentPage", currentPage);
+
+        // 화면에 표시할 페이지 번호 범위를 계산 (예: 현재 페이지 기준 앞뒤 2페이지)
+        int startPage = Math.max(1, currentPage - 2);
+        int endPage = Math.min(totalPages, currentPage + 2);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        // 이전, 다음 페이지 처리 (단순 계산)
+        int prevPage = currentPage > 1 ? currentPage - 1 : 1;
+        int nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
 
         return "roommenu/orderList"; // templates/roommenu/orderList.html
     }
@@ -259,9 +288,12 @@ public class RoomMenuOrderController {
      ****************************************************/
 
     @GetMapping("/roommenu/adminOrderList")
-    public String viewAllOrders(Model model, Principal principal) {
-        log.info("로그인한 사용자 : " + principal.getName());
+    public String viewAllOrders(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            Model model,
+            Principal principal) {
 
+        log.info("로그인한 사용자 : " + principal.getName());
         Member member = memberRepository.findByMemberEmail(principal.getName());
 
         // String → AdminRole enum으로 변환
@@ -271,11 +303,29 @@ public class RoomMenuOrderController {
             isAdminRole = Arrays.stream(AdminRole.values())
                     .anyMatch(role -> role == userRole);
         } catch (IllegalArgumentException e) {
-            isAdminRole = false; // enum에 없는 문자열일 경우 예외 발생함
+            isAdminRole = false;
         }
 
-        List<RoomMenuOrderDTO> orders = roomMenuOrderService.getAllOrdersForAdmin();
+        // 한 페이지당 10건, 최신순 정렬 기준. 페이지 번호 0부터 시작.
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "regDate"));
+        Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getAllOrdersForAdmin(pageable);
+        List<RoomMenuOrderDTO> orders = orderPage.getContent();
         model.addAttribute("orders", orders);
+
+        // 페이지 네비게이션용 값들을 계산 (화면에는 1부터 보이지만 실제 번호는 0부터 시작)
+        int totalPages = orderPage.getTotalPages();
+        int currentPage = page + 1;
+        int startPage = Math.max(1, currentPage - 2);
+        int endPage = Math.min(totalPages, currentPage + 2);
+        int prevPage = currentPage > 1 ? currentPage - 1 : 1;
+        int nextPage = currentPage < totalPages ? currentPage + 1 : totalPages;
+
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
 
         return "roommenu/adminOrderList";
     }
