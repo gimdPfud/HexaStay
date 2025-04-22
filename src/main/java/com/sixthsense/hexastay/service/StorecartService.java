@@ -15,23 +15,23 @@ import java.util.List;
 
 public interface StorecartService {
     /*0. principal로 hotelroomNum 반환*/
-    public Long principalToHotelroomNum(Principal principal);
+    Long principalToHotelroomNum(Principal principal);
 
     /*1. 등록*/
-    public Long addCart(StorecartitemDTO dto, Long hotelroomNum);
+    Long addCart(StorecartitemDTO dto, Long hotelroomNum);
 
     /*2. 목록*/
-    public List<StorecartitemViewDTO> getCartList(Long hotelroomNum);
+    List<StorecartitemViewDTO> getCartList(Long hotelroomNum);
 
     /*3. 카트 주인 찾기*/
-    public boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum);
+    boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum);
 
     /*4. 수정 (카트 수량 변경)*/
-    public Integer updateCount(Long storeCartItemId, Integer count);
+    Integer updateCount(Long storeCartItemId, Integer count);
 
     /*5. 카트 삭제*/
-    public void deleteCartItem(Long storeCartItemId);
+    void deleteCartItem(Long storeCartItemId);
 
     /*6. 카트 비우기*/
-    public void clearCartItems(Long hotelroomNum);
+    void clearCartItems(Long hotelroomNum);
 }

@@ -32,7 +32,6 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     private final OrderstoreRepository orderstoreRepository;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
-    private final StoremenuRepository storemenuRepository;
     private final StorecartitemRepository storecartitemRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -88,6 +87,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         order.setRoom(room);
         order.setOrderstoreStatus("unpaid");
 
+        if(itemIdList==null||itemIdList.isEmpty()){return 3;}
+
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
             Storecartitem cartItem = storecartitemRepository.findById(itemid).orElse(null);
@@ -103,6 +104,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             itemlist.add(orderItem);
         }
         order.setOrderstoreitemList(itemlist);
+        order.setStore(itemlist.stream().findFirst().orElseThrow().getStoremenu().getStore());
         orderstoreRepository.save(order);
         return 1;
     }

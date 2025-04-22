@@ -107,26 +107,26 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Long modify(StoreDTO storeDTO) throws IOException {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
-        if(storeDTO.getStoreProfile()!=null) {//이미지 새로 넣었고
-            if (store.getStoreProfileMeta()!=null) {//기존 이미지가 있다면
+        if(storeDTO.getStoreProfile()!=null && !storeDTO.getStoreProfile().isEmpty()) {//이미지 새로 넣었고
+            if (store.getStoreProfileMeta()!=null  && !store.getStoreProfileMeta().isEmpty()) {//기존 이미지가 있다면
                 Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta().substring(1));
                 Files.deleteIfExists(filePath);//삭제
             }
-                /*이미지 등록 절차...*/
-                String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
-                String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
-                String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-                String fileName = fileFirstName + fileSubName;
+            /*이미지 등록 절차...*/
+            String fileOriginalName = storeDTO.getStoreProfile().getOriginalFilename();
+            String fileFirstName = store.getStoreNum() + "_" + storeDTO.getStoreNum() + "_" + storeDTO.getStoreName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
 
-                storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
-                Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-                Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
-                if (!Files.exists(createPath)) {
-                    Files.createDirectory(createPath);
-                storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+            storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
             }
+            storeDTO.getStoreProfile().transferTo(uploadPath.toFile());
+            store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         }
-        store.setStoreProfileMeta(storeDTO.getStoreProfileMeta());
         store.setStoreName(storeDTO.getStoreName());
         store.setStorePhone(storeDTO.getStorePhone());
         store.setStoreStatus(storeDTO.getStoreStatus());
@@ -224,9 +224,7 @@ public class StoreServiceImpl implements StoreService {
             storeDTO.setCompanyName(data.getCompany().getCompanyName());
             return storeDTO;
         });
-//        list.forEach(log::info);
         return list;
-//        return null;
     }
 
 

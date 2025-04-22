@@ -60,7 +60,7 @@ public class StoreOrderController {
             }
         }
         /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        int result = orderstoreService.insert(cartitemidList, hotelroomNum);// todo 반환하는거를 orderid가 되도록?
+        int result = orderstoreService.insert(cartitemidList, hotelroomNum);
         if(result==1){
             log.info("정상주문되었습니다.");
             storecartService.clearCartItems(hotelroomNum);

@@ -50,8 +50,8 @@ public class StorecartServiceImpl implements StorecartService {
 
         @Override
     public Long addCart(StorecartitemDTO dto, Long hotelroomNum) {
-        log.info(dto);
-        log.info(dto.getStorecartitemCount());
+//        log.info(dto);
+//        log.info(dto.getStorecartitemCount());
 
         //1. 메뉴 조회
         Storemenu storemenu = storemenuRepository.findById(dto.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
@@ -62,17 +62,17 @@ public class StorecartServiceImpl implements StorecartService {
 
         //3. 장바구니 조회
         Storecart storecart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
-        log.info("메뉴, 룸(중간), 카트 찾음.");
-        log.info(storemenu);
-        log.info(room);
-        log.info(storecart);
+//        log.info("메뉴, 룸(중간), 카트 찾음.");
+//        log.info(storemenu);
+//        log.info(room);
+//        log.info(storecart);
         //4. 장바구니가 없으면 하나 만들기.
         if(storecart==null){
             Storecart newcart = new Storecart();
             newcart.setRoom(room);
             storecart = storecartRepository.save(newcart);
-            log.info("카트 없어서 새로 만들기");
-            log.info(storecart);
+//            log.info("카트 없어서 새로 만들기");
+//            log.info(storecart);
         }
         //4-2. 장바구니 있음.
         //8. 넣으려는 장바구니아이템의 가게번호를 가져옴.
@@ -92,24 +92,18 @@ public class StorecartServiceImpl implements StorecartService {
                 .findByStorecart_StorecartNumAndStoremenu_StoremenuNum(
                         storecart.getStorecartNum(), storemenu.getStoremenuNum()
                 );
-        log.info(storecartitem);
+//        log.info(storecartitem);
         //6. 장바구니아이템이 없다면 새로만들기
         if(storecartitem==null){
-            log.info("카트아이템 없어서 새로 만들어야함");
             Storecartitem newitem = new Storecartitem();
             newitem.setStorecart(storecart);
             newitem.setStoremenu(storemenu);
-            log.info(newitem.getStorecart());
-            log.info(newitem.getStoremenu());
             newitem.setStorecartitemCount(dto.getStorecartitemCount());//여기서 문제 발생?
-            log.info(dto.getStorecartitemCount());
-            log.info(newitem.getStorecartitemCount());
             storecartitem = storecartitemRepository.save(newitem);
-            log.info(storecartitem.getStorecartitemCount());
         }
         //7. 장바구니아이템이 있음, 개수 조정
         else {
-            log.info("카트아이템 이미 있음");
+//            log.info("카트아이템 이미 있음");
             storecartitem.setStorecartitemCount(storecartitem.getStorecartitemCount() + dto.getStorecartitemCount());
         }
         return storecartitem.getStorecartitemNum();

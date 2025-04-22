@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class StoremenuOptionServiceImpl implements StoremenuOptionService {
     private final ModelMapper modelMapper = new ModelMapper();
-    private final StoremenuRepository storemenuRepository;
     private final StoremenuOptionRepository storemenuOptionRepository;
 
     /*
