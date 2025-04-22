@@ -47,6 +47,40 @@
     </div>
 </div>
 
+<!-- 페이지 네비게이션 -->
+<nav>
+    <ul class="pagination justify-content-center align-items-center mt-3">
+        <!-- 첫 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo; 처음</a>
+        </li>
+
+        <!-- 이전 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}">이전</a>
+        </li>
+
+        <!-- 페이지 번호 링크 -->
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${i == currentPage} ? 'active'">
+            <a class="page-link"
+               th:href="@{/roommenu/orderList(page=${i - 1})}"
+               th:text="${i}">1</a>
+        </li>
+
+        <!-- 다음 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}">다음</a>
+        </li>
+
+        <!-- 마지막 페이지 링크 -->
+        <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">마지막 &raquo;</a>
+        </li>
+    </ul>
+</nav>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
