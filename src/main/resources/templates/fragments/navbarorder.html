@@ -18,7 +18,7 @@
 
             <!-- 우측: 장바구니 -->
             <div style="width: 100px; text-align: right;">
-                <a href="/gocart" class="position-relative d-inline-block">
+                <a href="/cart/gocart" class="position-relative d-inline-block">
                     <i class="bi bi-cart fs-1"></i>
                     <span id="cartnumber"
                           class="position-absolute top-0 start-80 translate-middle badge rounded-pill bg-danger">
@@ -34,7 +34,7 @@
     <script th:inline="javascript">
         let cartnumber = document.getElementById("cartnumber");
         document.addEventListener("DOMContentLoaded",function () {
-            fetch("/member/getlength",{
+            fetch("/cart/getlength",{
                 credentials: 'same-origin'
             })
                 .then(response=>{
