@@ -387,17 +387,26 @@
 
         <!-- 다국어 시작 -->
 
-        <form method="get" th:action="@{/roommenu/orderpage}" class="mb-3">
+        <form method="get" th:action="@{/roommenu/orderpage}" class="mb-3" id="langForm">
             <input type="hidden" name="type" th:value="${type}" />
             <input type="hidden" name="keyword" th:value="${keyword}" />
             <input type="hidden" name="category" th:value="${category}" />
+            <input type="hidden" name="lang" id="langInput" />
 
-            <select name="lang" onchange="this.form.submit()" class="form-select" style="width: 150px;">
-                <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
-                <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
-                <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
-            </select>
+            <div style="display: flex; gap: 10px; font-size: 24px;">
+                <button type="button" onclick="submitLang('ko')" style="background: none; border: none;" title="한국어">
+                    🇰🇷
+                </button>
+                <button type="button" onclick="submitLang('en')" style="background: none; border: none;" title="English">
+                    🇺🇸
+                </button>
+                <button type="button" onclick="submitLang('ja')" style="background: none; border: none;" title="日本語">
+                    🇯🇵
+                </button>
+                <button type="button" onclick="submitLang('cn')" style="background: none; border: none;" title="中國語">
+                    🇨🇳
+                </button>
+            </div>
         </form>
 
         <!-- 검색창 (항상 표시되도록 설정) -->
@@ -406,8 +415,8 @@
                 <div class="search-box">
                     <select id="search-option" name="type" class="form-select">
                         <option value="S" th:selected="${type == 'S'}" th:text="#{search.option.name}"></option>
-                        <option value="PL" th:selected="${type == 'PL'}">가격 낮은 순</option>
-                        <option value="PH" th:selected="${type == 'PH'}">가격 높은 순</option>
+                        <option value="P" th:selected="${type == 'P'}" th:text="#{search.option.price}"></option>
+                        <option value="N" th:selected="${type == 'N'}" th:text="#{search.option.nameprice}"></option>
                     </select>
                     <input type="text" th:placeholder="#{search.placeholder}" name="keyword" />
                     <button type="submit" th:text="#{search.button}">검색</button>
@@ -426,8 +435,6 @@
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
             <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
-            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">가격높은순</div>
-            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PL&keyword='">가격낮은순</div>
 
         </div>
 
@@ -551,6 +558,11 @@
                     });
             });
         });
+
+        function submitLang(lang) {
+            document.getElementById('langInput').value = lang;
+            document.getElementById('langForm').submit();
+        }
     </script>
     <!-- 스크립트 끝 -->
 
