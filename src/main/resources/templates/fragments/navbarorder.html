@@ -18,11 +18,39 @@
 
             <!-- 우측: 장바구니 -->
             <div style="width: 100px; text-align: right;">
-                <a href="/gocart">
+                <a href="/cart/gocart" class="position-relative d-inline-block">
                     <i class="bi bi-cart fs-1"></i>
+                    <span id="cartnumber" style="display: none"
+                          class="position-absolute top-0 start-80 translate-middle badge rounded-pill bg-danger">
+                        <span class="visually-hidden">장바구니 아이템 개수</span>
+                    </span>
                 </a>
             </div>
 
         </div>
     </nav>
+
+    <script th:inline="javascript">
+        let cartnumber = document.getElementById("cartnumber");
+        document.addEventListener("DOMContentLoaded",function () {
+            fetch("/cart/getlength",{
+                credentials: 'same-origin'
+            })
+                .then(response=>{
+                    if(response.ok){
+                        return response.json();
+                    }
+                })
+                .then(data=>{
+                    if(cartnumber){
+                        if(data==0){
+                            cartnumber.style.display="none";
+                        }else{
+                            cartnumber.textContent = data;
+                            cartnumber.style.display = "inline-block";
+                        }
+                    }
+                })
+        })
+    </script>
 </div>

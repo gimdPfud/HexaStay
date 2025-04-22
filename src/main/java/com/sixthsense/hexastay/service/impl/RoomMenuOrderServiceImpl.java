@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.RoomMenuOrderAlertDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.*;
@@ -10,10 +11,12 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /***************************************************
      *
@@ -111,7 +115,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * ***********************************************/
 
     @Override
-    public Long roomMenuOrderInsertFromCart(String email, String requestMessage) {
+    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
@@ -166,7 +170,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         // 8. 장바구니 비우기
         roomMenuCartItemRepository.deleteAll(cartItems);
 
-        return savedOrder.getRoomMenuOrderNum();
+        return roomMenuOrder;
     }
 
     /***********************************************
@@ -298,5 +302,52 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setOrderItemList(itemDTOList);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order) {
+        if (order == null || order.getMember() == null) {
+            log.warn("알람 전송 실패: 주문 또는 회원 정보가 없음");
+            return;
+        }
+
+        // 총 금액 계산 (RoomMenuOrder 내부 기준)
+        int totalPrice = order.getOrderItems().stream()
+                .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                .sum();
+
+
+
+        // RoomMenuOrderItemDTO 리스트 가져오기
+        List<RoomMenuOrderItemDTO> itemDtoList = orderDto.getOrderItemList();
+        log.info(" orderDto 전체 내용: {}", orderDto);
+        log.info(" 주문 항목 리스트: {}", orderDto.getOrderItemList());
+
+        String requestMessages = "";
+        int totalAmount = 0;
+
+        if (itemDtoList != null && !itemDtoList.isEmpty()) {
+            requestMessages = itemDtoList.stream()
+                    .map(RoomMenuOrderItemDTO::getRoomMenuOrderRequestMessage)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(", ")); // 줄바꿈 원하면 "\n"
+
+            totalAmount = itemDtoList.stream()
+                    .mapToInt(RoomMenuOrderItemDTO::getRoomMenuOrderItemAmount)
+                    .sum();
+        }
+
+        // DTO 생성
+        RoomMenuOrderAlertDTO alertDto = new RoomMenuOrderAlertDTO();
+        alertDto.setMemberEmail(order.getMember().getMemberEmail());
+        alertDto.setTotalPrice(totalPrice);
+        alertDto.setRoomMenuOrderRequestMessage(requestMessages);
+        alertDto.setRoomMenuOrderAmount(totalAmount);
+
+        log.info("🚀 알람 전송 DTO: {}", alertDto);
+
+        // 메시지 전송
+        messagingTemplate.convertAndSend("/topic/new-order", alertDto);
+
     }
 }

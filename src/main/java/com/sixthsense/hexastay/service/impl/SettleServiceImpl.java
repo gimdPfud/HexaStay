@@ -5,7 +5,10 @@ import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Orderstore;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.repository.*;
+import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.HotelRoomRepository;
+import com.sixthsense.hexastay.repository.OrderstoreRepository;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.SettleService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,11 +35,9 @@ public class SettleServiceImpl implements SettleService {
     private final RoomRepository roomRepository;
     private final HotelRoomRepository hotelRoomRepository;
     private final OrderstoreRepository orderstoreRepository;
-    private final StoreRepository storeRepository;
-    private final AdminRepository adminRepository;
 
 
-    // 정산용 본사 지사 지점
+    // 정산용
     @Override
     public Page<RoomDTO> getSettleList(Long companyNum, Pageable pageable) {
         List<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum);
@@ -62,8 +62,9 @@ public class SettleServiceImpl implements SettleService {
 
     // 정산용 (스토어)
     public Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
-        Page<Orderstore> orderstoreList = orderstoreRepository.findByOrderstoreStoreNum(storeNum, pageable);
-        return orderstoreList.map(order -> modelMapper.map(order, OrderstoreDTO.class));
+        Page<Orderstore> orderstoreList = orderstoreRepository.findByStore_StoreNum(storeNum, pageable);
+        Page<OrderstoreDTO> orderstoreDTOList = orderstoreList.map(order -> modelMapper.map(order, OrderstoreDTO.class));
+        return orderstoreDTOList;
     }
 
 

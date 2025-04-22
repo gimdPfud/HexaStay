@@ -242,35 +242,134 @@
             </ul>
         </nav>
     </div>
-</div>
 
-<script>
-    /*------ 카테고리 드롭다운 활성화 시작 ------*/
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchOptionSelect = document.getElementById("search-option");
-        const categorySelect = document.getElementById("category-select");
+    <!-- 모달창 시작 -->
 
-        // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
-        searchOptionSelect.addEventListener("change", function() {
+    <!-- 모달창 -->
+    <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 룸서비스 주문</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="orderAlertContent" class="mb-0"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebSocket 관련 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        /*------ 카테고리 드롭다운 활성화 시작 ------*/
+        console.log("JS 로딩됨");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchOptionSelect = document.getElementById("search-option");
+            const categorySelect = document.getElementById("category-select");
+
+            // '카테고리 선택' 옵션을 선택했을 때 카테고리 선택 드롭다운 활성화
+            searchOptionSelect.addEventListener("change", function() {
+                if (searchOptionSelect.value === "C") {
+                    categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
+                } else {
+                    categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
+                    categorySelect.value = "";  // 카테고리 선택 초기화
+                }
+            });
+
+            // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
             if (searchOptionSelect.value === "C") {
-                categorySelect.disabled = false;  // 카테고리 선택 드롭다운 활성화
-            } else {
-                categorySelect.disabled = true;  // 카테고리 선택 드롭다운 비활성화
-                categorySelect.value = "";  // 카테고리 선택 초기화
+                categorySelect.disabled = false;
             }
         });
 
-        // 페이지 로드 시 카테고리 선택 상태에 따라 category-select 상태 설정
-        if (searchOptionSelect.value === "C") {
-            categorySelect.disabled = false;
-        }
-    });
+        /*------ 카테고리 드롭다운 활성화 끝 ------*/
 
-    /*------ 카테고리 드롭다운 활성화 끝 ------*/
-</script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const orderDto = {
+                memberEmail: "test@example.com",  // 예시 회원 이메일
+                orderItemList: [
+                    {
+                        roomMenuOrderItemNum: "ITEM001",
+                        roomMenuOrderItemAmount: 2,
+                        roomMenuOrderItemPrice: 10000,
+                        roomMenuOrderRequestMessage: "덜 맵게 해주세요",
+                        roomMenuOrderItemName: "불고기 피자"
+                    },
+                    {
+                        roomMenuOrderItemNum: "ITEM002",
+                        roomMenuOrderItemAmount: 1,
+                        roomMenuOrderItemPrice: 8000,
+                        roomMenuOrderRequestMessage: "케첩 빼주세요",
+                        roomMenuOrderItemName: "핫도그"
+                    }
+                ]
+            };
 
-    </div>
+            // 서버로 주문 데이터 전송
+            fetch("/api/room-order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderDto)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("주문 생성 성공:", data);
+                })
+                .catch(error => {
+                    console.error("주문 생성 실패:", error);
+                });
+        });
+
+
+        /* ----- 주문페이지 알람 시작 -----*/
+        document.addEventListener("DOMContentLoaded", function () {
+            const socket = new SockJS("/ws-order-alert");
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                console.log("✅ 웹소켓 연결됨: ", frame);
+
+                stompClient.subscribe("/topic/new-order", function (message) {
+                    try {
+                        const orderData = JSON.parse(message.body);
+                        console.log("📦 메시지 수신:", orderData);
+
+                        const content = `
+                    주문자: <strong>${orderData.memberEmail}</strong><br>
+                    총 금액: <strong>${orderData.totalPrice}원</strong>
+                    요구사항: <strong>${orderData.roomMenuOrderRequestMessage || '없음'}</strong><br>
+                    수량: <strong>${orderData.roomMenuOrderAmount}개</strong>
+                `;
+                        document.getElementById("orderAlertContent").innerHTML = content;
+
+                        const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
+                        modal.show();
+
+                    } catch (error) {
+                        console.error("❌ 메시지 처리 오류", error);
+                    }
+                });
+
+            }, function (error) {
+                console.error("❌ 웹소켓 연결 실패", error);
+            });
+        });
+        /* ----- 주문페이지 알람 끝 -----*/
+
+    </script>
+</div>
+</div>
 
 </body>
 </html>
