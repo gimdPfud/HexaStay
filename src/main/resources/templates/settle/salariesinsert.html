@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>급여 등록</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin-top: 50px;
+        }
+        .form-label {
+            font-size: 0.9rem;
+        }
+        .form-control {
+            font-size: 0.9rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+        }
+        .modal-dialog {
+            max-width: 400px;
+        }
+        .list-group-item {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container">
+    <h2 class="text-center mb-4">급여 등록</h2>
+    <form action="#" method="POST">
+        <div class="mb-3">
+            <label for="salDate" class="form-label">급여 기간</label>
+            <input type="month" class="form-control form-control-sm" id="salDate" name="salDate" required>
+        </div>
+        <div class="mb-3">
+            <label for="salBase" class="form-label">기본급</label>
+            <input type="number" class="form-control form-control-sm" id="salBase" name="salBase" required>
+        </div>
+        <div class="mb-3">
+            <label for="salDedu" class="form-label">공제액</label>
+            <input type="number" class="form-control form-control-sm" id="salDedu" name="salDedu" required>
+        </div>
+        <div class="mb-3">
+            <label for="salDuty" class="form-label">직무 수당</label>
+            <input type="number" class="form-control form-control-sm" id="salDuty" name="salDuty" required>
+        </div>
+        <div class="mb-3">
+            <label for="salIncen" class="form-label">인센티브</label>
+            <input type="number" class="form-control form-control-sm" id="salIncen" name="salIncen" required>
+        </div>
+        <div class="mb-3">
+            <label for="salPosition" class="form-label">직급</label>
+            <input type="text" class="form-control form-control-sm" id="salPosition" name="salPosition" required>
+        </div>
+        <div class="mb-3">
+            <label for="admin" class="form-label">직원 선택</label>
+            <input type="text" class="form-control form-control-sm" id="admin" name="admin" readonly required>
+            <button type="button" class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#employeeModal">직원 선택</button>
+        </div>
+        <button type="submit" class="btn btn-success btn-sm w-100">등록</button>
+    </form>
+
+    <!-- 직원 선택 모달 -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalLabel">직원 선택</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        <li class="list-group-item" data-id="1" data-name="홍길동">홍길동</li>
+                        <li class="list-group-item" data-id="2" data-name="김철수">김철수</li>
+                        <li class="list-group-item" data-id="3" data-name="이영희">이영희</li>
+                        <!-- 직원 목록은 서버에서 동적으로 가져오면 됩니다 -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 모달
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', function () {
+            const employeeName = item.getAttribute('data-name');
+            document.getElementById('admin').value = employeeName;
+            const employeeId = item.getAttribute('data-id');
+            document.getElementById('admin').setAttribute('data-id', employeeId);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('employeeModal'));
+            modal.hide();
+        });
+    });
+</script>
+
+</body>
+</html>

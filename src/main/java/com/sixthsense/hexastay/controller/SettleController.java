@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.List;
@@ -54,6 +55,29 @@ public class SettleController {
         return "/settle/salaries";
     }
 
+    @GetMapping("/salariesinsert")
+    public String salariesInsert() {
+        return "/settle/salariesinsert";
+    }
 
+
+    @GetMapping("/salarieslist")
+    @ResponseBody
+    public String salariesList(Principal principal) {
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+
+        if (adminDTO.getCompanyNum() != null) {
+
+
+            adminDTO.getCompanyNum();
+        } else if (adminDTO.getStoreNum() != null) {
+            adminDTO.getStoreNum();
+        }
+
+
+
+
+        return "/settle/salarieslist";
+    }
 
 }
