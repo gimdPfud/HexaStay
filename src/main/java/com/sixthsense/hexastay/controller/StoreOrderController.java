@@ -18,6 +18,10 @@ import com.sixthsense.hexastay.service.StorecartService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,14 +39,18 @@ public class StoreOrderController {
     private final StorecartService storecartService;
     private final AdminService adminService;
     private final StoreService storeService;
-    Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
-    /* 6. 결제하기
-        get? post? */
+
+
+
     /*1. 주문하기 (등록)*/
     //장바구니에서 주문 버튼을 누르면 주문확인창(결제창)으로 이동
     @ResponseBody
     @PostMapping("/member/store/order/insert")
-    public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList, Model model){
+    public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList, Principal principal){
+        if(principal==null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
@@ -67,11 +75,18 @@ public class StoreOrderController {
     }
     /*2. 내역보기 (목록)*/
     @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
-    public String clientOrderList(Model model){
-        List<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum);
+    public String clientOrderList(Model model, Principal principal,
+                                  @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable){
+        if(principal==null){
+            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+        }
+        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
         model.addAttribute("list",list);
         return "mobilestore/order/list";
     }
+
+
     @GetMapping("/admin/store/order/list")
     public String adminOrderList(Principal principal,
                                  @RequestParam(required = false) Long storeNum,
@@ -141,7 +156,11 @@ public class StoreOrderController {
     }
     @ResponseBody
     @GetMapping("/member/store/order/getlastorder")
-    public ResponseEntity getlastorder(){
+    public ResponseEntity getlastorder(Principal principal){
+        if(principal==null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
         Long orderid = orderstoreService.getLastOrder(hotelroomNum);
         if(orderid==null){
             return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);

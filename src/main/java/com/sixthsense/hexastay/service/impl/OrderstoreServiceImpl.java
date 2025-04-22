@@ -169,6 +169,21 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         return viewOrderList;
     }
 
+    @Override
+    public Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable) {
+        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum, pageable);
+        Page<OrderstoreViewDTO> viewOrderPage = orderlist.map(orderstore->{
+            OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
+            List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
+            itemlist.forEach(item->{
+                OrderstoreitemDTO dto = modelMapper.map(item,OrderstoreitemDTO.class);
+                orderstoreViewDTO.addOrderstoreitemDTOList(dto);
+            });
+            return orderstoreViewDTO;
+        });
+        return viewOrderPage;
+    }
+
     //완료된 주문들만 가져오기
     @Override
     public List<OrderstoreDTO> getAllList() {
