@@ -26,10 +26,10 @@ public interface StoreService {
     /*수정*/
     Long modify(StoreDTO storeDTO) throws IOException;
 
-    /*추가목록 : 전부 가져오기*/
+    /*목록 : 전부 가져오기*/
     List<StoreDTO> getAllList();
     Map<Long, String> getCompanyMap();
-    /*목록?
+    /*목록
     * 활성화된 외부업체만 목록으로 보여주기
     * 모든 외부 업체 목록 보여주기*/
     Page<StoreDTO> list(String status, Pageable pageable);
@@ -46,4 +46,9 @@ public interface StoreService {
 
     //검증하기 admin과 store의 주인!!...
     boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO);
+
+    /*좋아요... 좋아요한 스토어의 좋아요 수 리턴*/
+    void storeLiketoggle(Long storeNum, String email);
+    long getStoreLikeCount(Long storeNum);
+    boolean isLiked(Long storeNum, String email);
 }

@@ -11,6 +11,9 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Store;
+import com.sixthsense.hexastay.entity.StoreLike;
+import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.StoreLikeRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final MemberRepository memberRepository;
+    private final StoreLikeRepository storeLikeRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -303,6 +308,29 @@ public class StoreServiceImpl implements StoreService {
         }
         //상위관리자도 아니고 스토어소속도 아니면 무조건 거짓.
         else {return false;}
+    }
+
+    @Override
+    public void storeLiketoggle(Long storeNum, String email) {
+        StoreLike storeLike = storeLikeRepository.findByMember_MemberEmailAndStore_StoreNum(email,storeNum);
+        if(storeLike==null){ //좋아요 안했음
+            storeLike = new StoreLike();
+            storeLike.setMember(memberRepository.findByMemberEmail(email));
+            storeLike.setStore(storeRepository.findById(storeNum).orElseThrow(EntityNotFoundException::new));
+            storeLikeRepository.save(storeLike); //좋아요 추가
+        }else { //좋아요 했음
+            storeLikeRepository.delete(storeLike);//좋아요 취소
+        }
+    }
+
+    @Override
+    public long getStoreLikeCount(Long storeNum) {
+        return storeLikeRepository.countByStore_StoreNum(storeNum);
+    }
+
+    @Override
+    public boolean isLiked(Long storeNum, String email) {
+        return storeLikeRepository.existsByStore_StoreNumAndMember_MemberEmail(storeNum, email);
     }
 
     //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.
