@@ -114,4 +114,10 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     // read 룸 메뉴 가져오기
     RoomMenu findByRoomMenuNum(Long roomMenuNum);
 
+    // 가격 낮은 순
+    Page<RoomMenu> findBySupportsMultilangFalseOrApprovedByDevTrueOrderByRoomMenuPriceAsc(Pageable pageable);
+
+    // 가격 높은 순
+    Page<RoomMenu> findBySupportsMultilangFalseOrApprovedByDevTrueOrderByRoomMenuPriceDesc(Pageable pageable);
+
 }

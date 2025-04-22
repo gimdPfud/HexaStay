@@ -171,7 +171,11 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             }
         } else if ("L".equals(type)) {
             roomMenuPage = roomMenuRepository.findAllOrderByLikeCountDescForUser(pageable);
-        } else {
+        } else if ("PL".equals(type)) {
+            roomMenuPage = roomMenuRepository.findBySupportsMultilangFalseOrApprovedByDevTrueOrderByRoomMenuPriceAsc(pageable);
+        } else if ("PH".equals(type)) {
+            roomMenuPage = roomMenuRepository.findBySupportsMultilangFalseOrApprovedByDevTrueOrderByRoomMenuPriceDesc(pageable);
+        }else {
             roomMenuPage = roomMenuRepository.findBySupportsMultilangFalseOrApprovedByDevTrue(pageable);
         }
 
@@ -192,6 +196,8 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        dtoList.forEach(dto -> log.info(" - {}원", dto.getRoomMenuPrice()));
 
         return new PageImpl<>(dtoList, pageable, roomMenuPage.getTotalElements());
     }

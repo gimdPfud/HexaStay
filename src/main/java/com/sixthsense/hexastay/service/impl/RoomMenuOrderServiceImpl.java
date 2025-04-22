@@ -11,10 +11,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -186,16 +189,17 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * ***********************************************/
 
     @Override
-    public List<RoomMenuOrderDTO> getOrderListByEmail(String email) {
+    public Page<RoomMenuOrderDTO> getOrderListByEmail(String email, Pageable pageable) {
         log.info("주문 리스트 서비스 진입 : " + email);
         Member member = memberRepository.findByMemberEmail(email);
-        List<RoomMenuOrder> orders = roomMenuOrderRepository.findByMemberOrderByRegDateDesc(member);
+        Page<RoomMenuOrder> orderPage = roomMenuOrderRepository.findByMemberOrderByRegDateDesc(member, pageable);
 
-        return orders.stream().map(order -> {
+        // Page의 map 메서드를 활용하여 DTO로 변환
+        Page<RoomMenuOrderDTO> dtoPage = orderPage.map(order -> {
             RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
-            dto.setRegDate(order.getRegDate());
+            dto.setRegDate(order.getRegDate() != null ? order.getRegDate() : order.getCreateDate());
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -208,8 +212,10 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             }).collect(Collectors.toList());
 
             dto.setOrderItemList(itemDTOList);
+            log.info("주문번호 {} -> regDate: {}", order.getRoomMenuOrderNum(), order.getRegDate());
             return dto;
-        }).collect(Collectors.toList());
+        });
+        return dtoPage;
     }
 
     /***********************************************
@@ -278,11 +284,15 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     // 주문어드민
     @Override
-    public List<RoomMenuOrderDTO> getAllOrdersForAdmin() {
-        List<RoomMenuOrder> orders = roomMenuOrderRepository
-                .findAllByRoomMenuOrderStatusOrderByRegDateDesc(RoomMenuOrderStatus.ORDER);
+    public Page<RoomMenuOrderDTO> getAllOrdersForAdmin(Pageable pageable) {
+        // ORDER와 ACCEPT 상태인 주문 페이징 조회
+        Page<RoomMenuOrder> orderPage = roomMenuOrderRepository.findAllByRoomMenuOrderStatusInOrderByRegDateDesc(
+                Arrays.asList(RoomMenuOrderStatus.ORDER, RoomMenuOrderStatus.ACCEPT),
+                pageable
+        );
 
-        return orders.stream().map(order -> {
+        // Page.map() 메서드를 이용해 DTO로 변환
+        Page<RoomMenuOrderDTO> dtoPage = orderPage.map(order -> {
             RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
@@ -295,13 +305,14 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
-                log.info("불러온 주문 개수: {}", orders.size());
                 return itemDTO;
             }).collect(Collectors.toList());
 
             dto.setOrderItemList(itemDTOList);
             return dto;
-        }).collect(Collectors.toList());
+        });
+
+        return dtoPage;
     }
 
     @Override

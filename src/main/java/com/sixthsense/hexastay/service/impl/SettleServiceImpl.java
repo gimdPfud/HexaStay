@@ -1,14 +1,8 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.*;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.HotelRoom;
-import com.sixthsense.hexastay.entity.Orderstore;
-import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.repository.CompanyRepository;
-import com.sixthsense.hexastay.repository.HotelRoomRepository;
-import com.sixthsense.hexastay.repository.OrderstoreRepository;
-import com.sixthsense.hexastay.repository.RoomRepository;
+import com.sixthsense.hexastay.entity.*;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.SettleService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +29,7 @@ public class SettleServiceImpl implements SettleService {
     private final RoomRepository roomRepository;
     private final HotelRoomRepository hotelRoomRepository;
     private final OrderstoreRepository orderstoreRepository;
+    private final SettleRepository settleRepository;
 
 
     // 정산용
@@ -67,5 +62,26 @@ public class SettleServiceImpl implements SettleService {
         return orderstoreDTOList;
     }
 
+
+
+
+    // 월급용
+    @Override
+    public Page<SalariesDTO> getSalariesList(AdminDTO adminDTO, Pageable pageable) {
+        String role = adminDTO.getAdminRole();
+        Page<Salaries> salariesList;
+
+        switch (role) {
+            case "crew", "agent", "partner", "staff" ->
+                    salariesList = settleRepository.findByAdmin_AdminNum(adminDTO.getAdminNum(), pageable);
+            case "exec", "head", "gm", "sv" ->
+                    salariesList = settleRepository.findByAdmin_Company_CompanyNum(adminDTO.getCompanyNum(), pageable);
+            case "mgr", "submgr" ->
+                    salariesList = settleRepository.findByAdmin_Store_StoreNum(adminDTO.getStoreNum(), pageable);
+            default ->
+                    throw new IllegalStateException("Role 에러: " + role);
+        }
+        return salariesList.map(salary -> modelMapper.map(salary, SalariesDTO.class));
+    }
 
 }

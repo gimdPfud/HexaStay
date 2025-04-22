@@ -9,10 +9,9 @@
         .table td {
             vertical-align: middle;
         }
-
         .table {
             width: 100%;
-            table-layout: fixed; /* 고정된 테이블 너비 설정 */
+            table-layout: fixed;
         }
     </style>
 </head>
@@ -20,72 +19,120 @@
 <div layout:fragment="content">
 
     <div class="d-flex justify-content-center mt-4 gap-3">
-        <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
         <button type="button" onclick="handleConfirm('ACCEPT')" class="btn btn-warning px-4">주문 접수</button>
         <button type="button" onclick="handleConfirm('COMPLETE')" class="btn btn-success px-4">주문 완료</button>
         <button type="button" onclick="handleConfirm('CANCEL')" class="btn btn-danger px-4">주문 취소</button>
+        <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
     </div>
-
 
     <div class="container mt-4 w-100 bg-light">
         <h3 class="fw-bold mb-4 text-center">관리자 전용 주문 내역 목록</h3>
+        <form id="orderForm">
+            <div class="row mt-4">
+                <div class="col-12">
+                    <table class="table table-bordered text-company mb-0">
+                        <thead class="table-light text-center">
+                        <tr>
+                            <th style="width: 10%;">주문번호</th>
+                            <th style="width: 20%;">주문자</th>
+                            <th style="width: 10%;">상태</th>
+                            <!-- 체크박스가 있는 열의 헤더에 전체 선택 체크박스 추가 -->
+                            <th style="width: 10%;">
+                                <input type="checkbox" id="selectAll"> 전체 선택
+                            </th>
+                            <th style="width: 50%;">주문내용</th>
+                        </tr>
+                        </thead>
 
-    <form id="orderForm">
-        <div class="row mt-4">
-            <div class="col-12">
-                <table class="table table-bordered text-company mb-0">
-                    <thead class="table-light text-center">
-                    <tr>
-                        <th style="width: 10%;">주문번호</th>
-                        <th style="width: 20%;">주문자</th>
-                        <th style="width: 10%;">상태</th>
-                        <th style="width: 10%;">주문완료여부</th>
-<!--                        <th style="width: 20%;">기능</th>-->
-                        <th style="width: 50%;">주문내용</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr th:each="order : ${orders}">
-                        <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
-                        <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
-                        <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
-                        <td class="text-center">
-                            <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
-                        </td>
-                        <td class="text-center" style="vertical-align: middle;">
-                            <ul>
-                                <li th:each="item : ${order.orderItemList}">
-                                    <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
-                                    <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
-                                    <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
-                                    (합계) <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원
-                                    <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-            </tbody>
-        </table>
-
-        <!-- 버튼 추가 영역 -->
-        <div class="d-flex justify-content-center mt-4 gap-3">
-            <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
-            <button type="button" onclick="handleConfirm()" class="btn btn-success px-4">확인</button>
-        </div>
+                        <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
+                            <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
+                            <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
+                            <td class="text-center">
+                                <!-- 각 체크박스에는 주문번호를 data-id 속성에 할당 -->
+                                <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
+                            </td>
+                            <td class="text-center" style="vertical-align: middle;">
+                                <ul>
+                                    <li th:each="item : ${order.orderItemList}">
+                                        <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
+                                        <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
+                                        <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
+                                        (합계) <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원
+                                        <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
     </div>
 
+    <!-- 페이지 네비게이션 -->
+    <nav>
+        <ul class="pagination justify-content-center align-items-center mt-3">
+            <!-- 첫 페이지 -->
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">
+                    &laquo; 처음
+                </a>
+            </li>
+
+            <!-- 이전 페이지 -->
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}">
+                    이전
+                </a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/roommenu/orderList(page=${i - 1})}"
+                   th:text="${i}">1</a>
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}">
+                    다음
+                </a>
+            </li>
+
+            <!-- 마지막 페이지 -->
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">
+                    마지막 &raquo;
+                </a>
+            </li>
+        </ul>
+    </nav>
+
     <script>
+        // 페이지 로딩 후 전체 선택 체크박스 이벤트 등록
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectAll = document.getElementById('selectAll');
+            selectAll.addEventListener('change', function () {
+                // tbody 내의 모든 체크박스를 가져와서 전체 선택 여부에 따라 체크 상태 변경
+                const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                checkboxes.forEach(chk => {
+                    chk.checked = this.checked;
+                });
+            });
+        });
 
         function handleConfirm(actionType) {
             const checkedOrders = [];
 
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            // tbody의 모든 체크박스를 순회
+            document.querySelectorAll('tbody input[type="checkbox"]').forEach(checkbox => {
                 if (checkbox.checked) {
-                    // 체크박스에 data-id 속성을 사용하여 주문번호 추출
                     const row = checkbox.closest('tr');
                     const orderIdStr = checkbox.dataset.id;
                     const orderId = parseInt(orderIdStr, 10);
@@ -96,9 +143,14 @@
                         checkedOrders.push(orderId);
                     }
 
-                    // 주문 접수(ACCEPT)인 경우, 나중에 주문 완료를 위해 목록에 남겨둡니다.
-                    // 다른 상태(COMPLETE, CANCEL)는 UI에서 제거합니다.
-                    if (actionType !== 'ACCEPT') {
+                    // 주문 접수(ACCEPT)인 경우, 상태 셀 업데이트 후 행 유지
+                    if (actionType === 'ACCEPT') {
+                        const statusCell = row.querySelector("td:nth-child(3)");
+                        if (statusCell) {
+                            statusCell.textContent = "ACCEPT";
+                        }
+                    } else {
+                        // COMPLETE나 CANCEL인 경우엔 행 제거
                         row.remove();
                     }
                 }
@@ -111,15 +163,9 @@
 
             let url = "";
             switch (actionType) {
-                case 'COMPLETE':
-                    url = '/roommenu/complete-orders';
-                    break;
-                case 'CANCEL':
-                    url = '/roommenu/cancel-orders';
-                    break;
-                case 'ACCEPT':
-                    url = '/roommenu/accept-orders';
-                    break;
+                case 'COMPLETE': url = '/roommenu/complete-orders'; break;
+                case 'CANCEL': url = '/roommenu/cancel-orders'; break;
+                case 'ACCEPT': url = '/roommenu/accept-orders'; break;
             }
 
             fetch(url, {
@@ -137,10 +183,7 @@
                 alert("요청 실패: " + error);
             });
         }
-
-
     </script>
 </div>
-
 </body>
 </html>
