@@ -32,7 +32,6 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     private final OrderstoreRepository orderstoreRepository;
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
-    private final StoremenuRepository storemenuRepository;
     private final StorecartitemRepository storecartitemRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -88,6 +87,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         order.setRoom(room);
         order.setOrderstoreStatus("unpaid");
 
+        if(itemIdList==null||itemIdList.isEmpty()){return 3;}
+
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
             Storecartitem cartItem = storecartitemRepository.findById(itemid).orElse(null);
@@ -103,6 +104,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             itemlist.add(orderItem);
         }
         order.setOrderstoreitemList(itemlist);
+        order.setStore(itemlist.stream().findFirst().orElseThrow().getStoremenu().getStore());
         orderstoreRepository.save(order);
         return 1;
     }
@@ -167,6 +169,21 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             viewOrderList.add(orderstoreViewDTO);
         }
         return viewOrderList;
+    }
+
+    @Override
+    public Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable) {
+        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum, pageable);
+        Page<OrderstoreViewDTO> viewOrderPage = orderlist.map(orderstore->{
+            OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
+            List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
+            itemlist.forEach(item->{
+                OrderstoreitemDTO dto = modelMapper.map(item,OrderstoreitemDTO.class);
+                orderstoreViewDTO.addOrderstoreitemDTOList(dto);
+            });
+            return orderstoreViewDTO;
+        });
+        return viewOrderPage;
     }
 
     //완료된 주문들만 가져오기

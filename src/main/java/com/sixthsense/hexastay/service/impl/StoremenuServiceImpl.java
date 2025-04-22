@@ -127,7 +127,7 @@ public class StoremenuServiceImpl implements StoremenuService {
         entity.setStoremenuPrice(storemenuDTO.getStoremenuPrice());
         entity.setStoremenuCategory(storemenuDTO.getStoremenuCategory());
         entity.setStoremenuName(storemenuDTO.getStoremenuName());
-        entity.setStoremenuStatus("alive");
+        entity.setStoremenuStatus(storemenuDTO.getStoremenuStatus());
         return entity.getStoremenuNum();
     }
 

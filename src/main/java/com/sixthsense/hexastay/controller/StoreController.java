@@ -152,10 +152,6 @@ public class StoreController {
         model.addAttribute("list",list);
         model.addAttribute("deletedList",listA);
         model.addAttribute("companyMap", storeService.getCompanyMap());
-//        /*친구찬스*/
-//        Map<Long,String>maps= storeService.getCompanyMap();
-//        model.addFlashAttribute("companyMap", maps);
-//        /*친구찬스끝*/
         model.addAttribute("searchType",searchType);
         model.addAttribute("keyword",keyword);
         return "store/list";
@@ -200,10 +196,12 @@ public class StoreController {
         StoreDTO data = storeService.read(id);
         storeService.validStoreAdmin(adminDTO,data);
         model.addAttribute("data",data);
+        model.addAttribute("storeCategoryList",List.of("한식", "중식", "일식", "아시안", "양식", "패스트푸드", "카페"));
         return "store/modify";
     }
     @PostMapping("/modify")
     public String modify(StoreDTO storeDTO) throws IOException {
+        log.info(storeDTO.toString());
         Long storeNum = storeService.modify(storeDTO);
         return "redirect:/admin/store/read?idid="+storeNum;
     }

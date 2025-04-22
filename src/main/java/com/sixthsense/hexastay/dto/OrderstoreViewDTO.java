@@ -33,6 +33,7 @@ public class OrderstoreViewDTO {
     private String orderstoreStoreName;
     private String orderstoreFirstItemName;
     private String orderstoreMessage;
+    private String imgName;             //이미지
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 
     public OrderstoreViewDTO(Orderstore orders) {
@@ -53,6 +54,7 @@ public class OrderstoreViewDTO {
         this.orderstoreStatus = orders.getOrderstoreStatus();
         this.orderstoreStoreName = orders.getOrderstoreitemList().getFirst().getStoremenu().getStore().getStoreName();
         this.orderstoreFirstItemName = orders.getOrderstoreitemList().getFirst().getStoremenu().getStoremenuName();
+        this.imgName = orders.getStore().getStoreProfileMeta();
     }
     public void addOrderstoreitemDTOList(OrderstoreitemDTO orderstoreitemDTO){
         orderstoreitemDTOList.add(orderstoreitemDTO);

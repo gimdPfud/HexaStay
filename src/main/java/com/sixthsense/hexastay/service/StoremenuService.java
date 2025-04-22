@@ -15,25 +15,25 @@ import java.util.List;
 
 public interface StoremenuService {
     /*등록*/
-    public Long insert(StoremenuDTO storemenuDTO) throws IOException;
+    Long insert(StoremenuDTO storemenuDTO) throws IOException;
 
     /*상세보기*/
-    public StoremenuDTO read(Long pk);
+    StoremenuDTO read(Long pk);
 
     /*수정*/
-    public Long modify(StoremenuDTO storemenuDTO) throws IOException;
+    Long modify(StoremenuDTO storemenuDTO) throws IOException;
 
     /*목록*/
-    public List<StoremenuDTO> list(Long storeNum, String status);
+    List<StoremenuDTO> list(Long storeNum, String status);
     /*목록2 페이징없는 모든 목록*/
-    public List<StoremenuDTO> list(Long storeNum);
+    List<StoremenuDTO> list(Long storeNum);
     /*목록3 카테고리별 목록*/
-    public List<StoremenuDTO> list(Long storeNum, String category, String status);
+    List<StoremenuDTO> list(Long storeNum, String category, String status);
 
     /*삭제인척 하는 활성화->비활성화*/
-    public Long delete(Long pk);
+    Long delete(Long pk);
 
-    public Long soldout(Long pk);
+    Long soldout(Long pk);
     /*비활성화->활성화*/
-    public Long restore(Long pk);
+    Long restore(Long pk);
 }

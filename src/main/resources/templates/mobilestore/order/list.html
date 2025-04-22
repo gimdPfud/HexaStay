@@ -16,6 +16,13 @@
             <div class="col" th:each="item : ${list}">
                 <div class="card shadow-sm rounded">
                     <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <img th:if="${item.imgName != null}"
+                                 th:src="@{${item.imgName}}" alt="menu image" class="me-3" width="100px" height="100px">
+                            <img th:if="${item.imgName == null}"
+                                 th:src="@{/store/default.png}" alt="menu image" class="me-3" width="100px" height="100px">
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <small class="text-muted" th:text="${item.formatDate}">2025.04.20</small>
                             <span class="badge"

@@ -19,6 +19,8 @@
             <input type="hidden" id="storeLatitude" name="storeLatitude" th:value="${data.storeLatitude}">
             <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}">
             <input type="hidden" id="originalAddress" th:value="${data.storeAddress}">
+            <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+            <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
 
             <div class="mb-3 user-box text-center">
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
@@ -64,7 +66,7 @@
 
             <div class="mb-3">
                 <label class="form-label d-block">카테고리</label>
-                <div th:each="cat : ${#lists.arrayList('한식','중식','일식','아시안','양식','패스트푸드','카페')}" class="form-check form-check-inline">
+                <div th:each="cat : ${storeCategoryList}" class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="storeCategory"
                            th:id="${cat}" th:value="${cat}" th:checked="${data.storeCategory == cat}">
                     <label class="form-check-label" th:for="${cat}" th:text="${cat}"></label>
@@ -101,7 +103,21 @@
                         var result = results[0];
                         document.getElementById("storeLatitude").value = result.y;
                         document.getElementById("storeLongitude").value = result.x;
-                        button.closest("form").submit();
+                        fetch(`https://dapi.kakao.com/v2/local/geo/transcoord.json?x=${result.x}&y=${result.y}&output_coord=WTM`, {
+                            headers: {
+                                Authorization: 'KakaoAK 7cb5773218158eba334d7c0a3f26cd9d'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById("storeWtmX").value = data.documents[0].x;
+                                document.getElementById("storeWtmY").value = data.documents[0].y;
+                                button.closest("form").submit();
+                            })
+                            .catch(error=>{
+                                console.error(error);
+                                alert("좌표 변환 중 오류")
+                            })
                     } else {
                         alert("주소를 다시 확인해주세요.");
                     }
