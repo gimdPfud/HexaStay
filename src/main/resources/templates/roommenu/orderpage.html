@@ -388,6 +388,9 @@
 <body th:classappend="${#locale.language == 'en'} ? 'lang-en' : ''">
 <div layout:fragment="contentorder">
 
+    <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">가격높은순</div>
+    <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PL&keyword='">가격낮은순</div>
+
     <div class="container">
 
         <!-- 다국어 시작 -->
