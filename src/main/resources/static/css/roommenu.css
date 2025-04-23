@@ -1,0 +1,14 @@
+.flag {
+    width: 24px;
+    height: 18px;
+    background-image: url('flags.png'); /* ✅ 상대경로 */
+    background-repeat: no-repeat;
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+}
+
+.flag-ko { background-position: -29px -207px; }
+.flag-ja { background-position: -87px -178px; }
+.flag-en { background-position: -116px -352px; }
+.flag-cn { background-position: 0px -62px; }
