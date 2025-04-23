@@ -6,21 +6,8 @@
 <head>
     <meta charset="UTF-8">
     <title>급여 조회</title>
-
-</head>
-
-<body>
-<div layout:fragment="content" class="container" style="margin-top: 90px;">
-
     <style>
-        .form-select {
-            max-width: 200px;
-            margin-right: 15px;
-        }
 
-        .download-btn {
-            float: right;
-        }
 
         table {
             font-size: 0.9rem;
@@ -38,51 +25,58 @@
             text-align: center;
         }
     </style>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content" >
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="mb-4 fw-bold text-primary" style="text-align: center;">급여 조회</h2>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+            <select class="form-select" style="flex: 1; max-width: 25%; height: 40px; font-size: 0.9rem;">
+                <option selected>직책 선택</option>
+                <option>인사부</option>
+                <option>회계부</option>
+                <option>영업부</option>
+            </select>
+            <select class="form-select" style="flex: 1; max-width: 30%; height: 40px; font-size: 0.9rem;">
+                <option selected>직원 선택</option>
+                <option>김철수 (사번: 12345)</option>
+                <option>이영희 (사번: 67890)</option>
+                <option>박상민 (사번: 11223)</option>
+            </select>
+            <input type="month" class="form-control date-input" style="flex: 2; max-width: 25%; height: 40px; font-size: 0.9rem;" />
+            <button class="btn btn-success" style="flex: 1; min-width: 20%; height: 40px; font-size: 0.9rem;">엑셀로 다운로드</button>
+        </div>
 
-
-    <h2 class="mb-4 fw-bold text-primary">급여 조회</h2>
-
-    <!-- 🔽 선택 필터 -->
-    <div class="d-flex flex-wrap align-items-center mb-4">
-        <select class="form-select" id="departmentSelect">
-            <option selected>직책 선택</option>
-            <option>인사부</option>
-            <option>회계부</option>
-            <option>영업부</option>
-        </select>
-        <select class="form-select" id="employeeSelect">
-            <option selected>직원 선택</option>
-            <option>김철수 (사번: 12345)</option>
-            <option>이영희 (사번: 67890)</option>
-            <option>박상민 (사번: 11223)</option>
-        </select>
-        <input type="month" class="form-control date-input" id="salaryMonth" placeholder="월급 조회 기간" />
-        <button class="btn btn-success download-btn">엑셀로 다운로드</button>
+        <!-- 📊 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                <tr>
+                    <th>이름</th>
+                    <th>사번</th>
+                    <th>날짜</th>
+                    <th>기본급</th>
+                    <th>수당</th>
+                    <th>세금</th>
+                    <th>공제 금액</th>
+                    <th>실수령액</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="salary : ${salariesList.content}">
+                    <td th:text="${salary.name}">이름</td>
+                    <td th:text="${salary.empId}">사번</td>
+                    <td th:text="${salary.date}">날짜</td>
+                    <td th:text="${salary.basePay}">기본급</td>
+                    <td th:text="${salary.allowance}">수당</td>
+                    <td th:text="${salary.tax}">세금</td>
+                    <td th:text="${salary.deduction}">공제 금액</td>
+                    <td th:text="${salary.totalPay}">실수령액</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <!-- 📊 테이블 -->
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="table-primary">
-            <tr>
-                <th>이름</th>
-                <th>사번</th>
-                <th>날짜</th>
-                <th>기본급</th>
-                <th>수당</th>
-                <th>세금</th>
-                <th>공제 금액</th>
-                <th>실수령액</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="salary : ${salariesList.content}">
-                <td th:text="${salary.salNum}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
 </body>

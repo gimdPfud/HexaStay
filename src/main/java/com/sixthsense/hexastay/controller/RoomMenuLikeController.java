@@ -46,6 +46,7 @@ public class RoomMenuLikeController {
         log.info("룸메뉴 좋아요 컨트롤러 진입");
         log.info("로그인한 사용자" + customMemberDetails.getMember().getMemberEmail());
         String email = customMemberDetails.getName();
+
         int likes = roomMenuLikeService.roomMenuLike(roomMenuNum, email);
         return ResponseEntity.ok(likes);
     }
@@ -99,7 +100,7 @@ public class RoomMenuLikeController {
     // 좋아요 취소
     @PostMapping("/roommenu/orderpage/cancellike/{roomMenuNum}")
     @ResponseBody
-    public ResponseEntity<Integer> RoomMenuLikeCancelPost(@PathVariable Long roomMenuNum, Principal principal) {
+    public ResponseEntity<Integer> RoomMenuLikeCancelPost(@PathVariable Long roomMenuNum, Principal principal, @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         log.info("룸메뉴 좋아요 캔슬 컨트롤러 진입");
         String email = principal.getName();
         int likes = roomMenuLikeService.roomMenuLikeCancel(roomMenuNum, email);

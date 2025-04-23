@@ -12,6 +12,7 @@ import com.sixthsense.hexastay.dto.StoremenuDTO;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.StoremenuService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,12 @@ public class StoreClientController {
         if(principal==null){
             return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+        }
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
         log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
         model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());

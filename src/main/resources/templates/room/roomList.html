@@ -20,18 +20,17 @@
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center">Room 예약 목록</h3>
+        <h3 class="fw-bold mb-4 text-center" style="font-size: 30px;">Room 예약 목록</h3>
 
         <!-- 검색 폼 -->
         <form action="/roomlist" method="get" class="row g-3 align-items-end">
-            <div class="col-md-10">
-                <label class="form-label">검색어</label>
-                <input name="keyword" type="text" class="form-control" placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+            <div class="col-md-10" style=" width: 70%;">
+                <input name="keyword" type="text" class="form-control" style="height: 40px; font-size: 0.9rem;" placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
             </div>
 
-            <div class="col-md-2 d-flex gap-3">
-                <button type="submit" id="searchBtn" class="btn btn-primary w-50">검색</button>
-                <a href="/roomlist" class="btn btn-secondary w-50">초기화</a>
+            <div class="col-md-2 d-flex gap-3" style=" width: 30%;">
+                <button type="submit" id="searchBtn" class="btn btn-primary w-50" style="height: 40px; font-size: 0.9rem;">검색</button>
+                <a href="/roomlist" class="btn btn-secondary w-50" style="height: 40px; font-size: 0.9rem;">초기화</a>
             </div>
         </form>
 
@@ -42,13 +41,13 @@
                     <thead class="table-light text-center">
                     <tr>
                         <th style="width: 5%;">번호</th>
-                        <th style="width: 17%;">room명</th>
+                        <th style="width: 17%;">룸 명</th>
                         <th style="width: 10%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 10%;">room연락처</th>
+                        <th style="width: 10%;">룸 연락처</th>
                         <th style="width: 10%;">체크인</th>
                         <th style="width: 10%;">체크아웃</th>
-                        <th style="width: 10%;">room비밀번호</th>
+                        <th style="width: 10%;">룸 비밀번호</th>
                     </tr>
                     </thead>
 
@@ -60,7 +59,7 @@
                             <a href="javascript:void(0);"
                                onclick="openHotelRoomPopup(this)"
                                class="hover-grow-text"
-                               th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
+                               th:attr="data-hotelRoomNum=${room.hotelRoomNum} ,data-roomNum=${room.roomNum}"
                                th:text="${room.hotelRoomName}"></a>
                         </td>
 
@@ -69,13 +68,13 @@
                             <a href="javascript:void(0);"
                                onclick="openMemberPopup(this)"
                                class="hover-grow-text"
-                               th:attr="data-memberNum=${room.memberNum}"
+                               th:attr="data-memberNum=${room.memberNum},data-roomNum=${room.roomNum}"
                                th:text="${room.memberName}"></a>
                         </td>
                         <td class="text-center" th:text="${room.memberEmail}"></td>
                         <td class="text-center" th:text="${room.hotelRoomPhone}"></td>
-                        <td class="text-center" th:text="${room.checkInDate}"></td>
-                        <td class="text-center" th:text="${room.checkOutDate}"></td>
+                        <td th:text="${#temporals.format(room.checkInDate,'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(room.checkOutDate,'yyyy-MM-dd HH:mm')}"></td>
                         <td class="text-center text-danger" th:text="${room.roomPassword}"></td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">
@@ -108,40 +107,39 @@
 
     <!-- 하단 버튼 -->
     <div class="d-flex justify-content-center mt-4 gap-3">
-        <a th:href="@{/register-hotelroom}" class="btn btn-dark">HotelRoomPk_룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
-        <a th:href="@{/member-insertroom}" class="btn btn-danger">MemberPk_룸배정</a>
+        <a th:href="@{/register-hotelroom}" class="btn btn-dark" style="height: 40px; font-size: 0.9rem;">회원 룸배정</a><!--todo:http://localhost:8090/register-hotelroom-->
+        <a th:href="@{/member-insertroom}" class="btn btn-danger" style="height: 40px; font-size: 0.9rem;">비회원 룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
     </div>
 
     <!--Room 정보 클릭시 팝업 스크립트 -->
     <script th:inline="javascript">
         function openHotelRoomPopup(element) {
             const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+            const roomNum = element.getAttribute("data-roomNum");
+
             if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
+            if (!roomNum) return alert("룸 번호를 찾을 수 없습니다.");
 
-            const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
+            // hotelRoomNum은 path variable, roomNum은 query param으로 전달
+            const popupUrl = `/membersByHotelRoom/${hotelRoomNum}?roomNum=${roomNum}`;
 
-            // 팝업 기본 사이즈
             const popupWidth = 1200;
             const popupHeight = 700;
 
-            // 화면 가운데 정렬 좌표 계산
             const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
             const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
-
             const width = window.innerWidth || document.documentElement.clientWidth || screen.width;
             const height = window.innerHeight || document.documentElement.clientHeight || screen.height;
 
             const left = screenLeft + (width - popupWidth) / 2;
             const top = screenTop + (height - popupHeight) / 2;
 
-            // 팝업 열기
             const newWindow = window.open(
                 popupUrl,
                 "room/membersByHotelRoom",
                 `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
             );
 
-            // 팝업 창에 포커스
             if (window.focus && newWindow) {
                 newWindow.focus();
             }
@@ -150,9 +148,12 @@
         <!--member 정보 클릭시 팝업 스크립트 -->
         function openMemberPopup(element) {
             const memberNum = element.getAttribute("data-memberNum");
-            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+            const roomNum = element.getAttribute("data-roomNum"); // 🔥 추가된 부분
 
-            const popupUrl = "/hotelRoomsByMember/" + memberNum;
+            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+            if (!roomNum) return alert("룸 번호를 찾을 수 없습니다.");
+
+            const popupUrl = `/hotelRoomsByMember/${memberNum}?roomNum=${roomNum}`;
 
             // 팝업 기본 사이즈
             const popupWidth = 1200;

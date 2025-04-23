@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -121,9 +122,14 @@ public class MemberController {
     //todo:roomlist
     @PostMapping("/update/ajax")
     @ResponseBody
-    public ResponseEntity<MemberDTO> updateMemberAjax(@RequestBody MemberDTO memberDTO) {
-        MemberDTO updatedMember = memberService.memberModify(memberDTO);
-        return ResponseEntity.ok(updatedMember); // 수정된 회원 정보를 반환
+    public ResponseEntity<String> updateMemberAjax(@RequestBody MemberDTO memberDTO) {
+        
+        try {
+            memberService.memberModify(memberDTO);  // 서비스 로직 내부에서 예외 처리 및 검증 수행
+            return ResponseEntity.ok().body("success");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("fail");
+        }
     }
 
 

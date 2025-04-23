@@ -36,5 +36,6 @@ public interface CompanyService {
     List<AdminDTO> getCompanyAdmins (Long companyNum);
 
     List<CompanyDTO> getCompanyList (Long companyNum);
+    List<CompanyDTO> getBnFList();
 
 }

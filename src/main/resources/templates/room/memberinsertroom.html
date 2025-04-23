@@ -10,7 +10,7 @@
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center">HotelRoom 배정 등록(회원확인)</h3>
+        <h3 class="fw-bold mb-4 text-center"  style="height: 40px;">예약정보 등록</h3>
 
             <!-- 메시지 출력 -->
             <div th:if="${message}" class="alert alert-success text-center" role="alert">
@@ -90,9 +90,9 @@
 
                     <!-- 버튼 그룹 -->
                     <div class="col-12 text-center mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
-                        <button type="submit" class="btn btn-primary">HotelRoomPk 등록</button>
-                        <a th:href="@{/register-hotelroom}" class="btn btn-warning">MemberPk 룸배정</a>
-                        <a th:href="@{/roomlist}" class="btn btn-secondary">룸배정 목록</a>
+                        <a th:href="@{/register-hotelroom}" class="btn btn-dark px-2 py-1">회원 룸배정</a>
+                        <button type="submit" class="btn btn-danger px-2 py-1">비회원 룸배정</button>
+                        <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1">룸배정 목록</a>
                     </div>
                 </div>
             </form>

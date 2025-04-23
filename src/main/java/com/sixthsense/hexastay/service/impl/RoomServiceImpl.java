@@ -87,8 +87,8 @@ public class RoomServiceImpl {
         log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
-        LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate().atStartOfDay());
-        LocalDateTime checkOutDate = LocalDateTime.from(memberDTO.getCheckOutDate().atStartOfDay());
+        LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate());
+        LocalDateTime checkOutDate = LocalDateTime.from(memberDTO.getCheckOutDate());
 
         // 5️⃣ Room 엔티티 저장
         Room room = Room.builder()
@@ -165,9 +165,24 @@ public class RoomServiceImpl {
         });
     }
 
+    //todo:main 페이지 가기 전에 중간 페이지 - 필수 페이지 입니다.
     //roompassword 을 찾아와서 패스워드를 인증 하는 메소드
     public boolean RoomPassword(String roomPassword) {
         return roomRepository.findRoomByRoomPassword(roomPassword).isPresent();
+    }
+
+    //Room pk 랑 member pk 을 찾아 오는 로직
+    //todo:memberByhotelRoom.html 에서 쓰이는 메소드
+    @Transactional
+    public void updateRoomMember(Long roomNum, Long newMemberNum) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new RuntimeException("Room 찾을 수 없음"));
+
+        Member newMember = memberRepository.findById(newMemberNum)
+                .orElseThrow(() -> new RuntimeException("회원 찾을 수 없음"));
+
+        room.setMember(newMember); // 기존 member FK → 새 member FK로 교체
+        roomRepository.save(room);
     }
 
 

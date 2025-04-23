@@ -17,7 +17,7 @@
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-
+    <h3 class="fw-bold mb-4 text-center" style="font-size: 30px;">관리자 전용 주문 내역 목록</h3>
     <div class="d-flex justify-content-center mt-4 gap-3">
         <button type="button" onclick="handleConfirm('ACCEPT')" class="btn btn-warning px-4">주문 접수</button>
         <button type="button" onclick="handleConfirm('COMPLETE')" class="btn btn-success px-4">주문 완료</button>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="container mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center">관리자 전용 주문 내역 목록</h3>
+
         <form id="orderForm">
             <div class="row mt-4">
                 <div class="col-12">
@@ -54,15 +54,82 @@
                                 <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
                             </td>
                             <td class="text-center" style="vertical-align: middle;">
-                                <ul>
-                                    <li th:each="item : ${order.orderItemList}">
-                                        <span th:text="${item.roomMenuOrderItemName}">치킨</span> -
-                                        <span th:text="${item.roomMenuOrderItemAmount}">2</span>개 -
-                                        <span th:text="${item.roomMenuOrderItemPrice}">15000</span>원 -
-                                        (합계) <span th:text="${item.roomMenuOrderItemAmount * item.roomMenuOrderItemPrice}">30000</span>원
-                                        <div><small>요청: <span th:text="${item.roomMenuOrderRequestMessage}">양념 많이</span></small></div>
-                                    </li>
-                                </ul>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"
+                                            th:each="item, iterStat : ${order.orderItemList}"
+                                            th:if="${iterStat.index == 0}">
+                                            <div class="row text-center text-md-start">
+                                                <div class="col-12 col-md-6 mb-2">
+                                                    <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
+                                                    <span th:text="${item.roomMenuOrderItemName}"></span>
+                                                </div>
+                                                <div class="col-6 col-md-3 mb-2">
+                                                    <strong th:text="#{orderList.quantity}">수량:</strong>
+                                                    <span th:text="${item.roomMenuOrderItemAmount}"></span>
+                                                </div>
+                                                <div class="col-6 col-md-3 mb-2">
+                                                    <strong th:text="#{orderList.totalPrice}">총 가격:</strong>
+                                                    <span th:text="${order.totalPrice}"></span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    요청: <span th:text="${item.roomMenuOrderRequestMessage}"></span>
+                                                </small>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시 -->
+                                    <div class="mt-2" th:if="${order.orderItemList.size() > 1}">
+                                        <small th:text="'외 ' + (${order.orderItemList.size()} - 1) + '건 추가 주문됨'"></small>
+                                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
+                                                th:data-bs-target="'#orderModal-' + ${order.roomMenuOrderNum}">
+                                            상세보기
+                                        </button>
+                                    </div>
+                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시  끝-->
+
+                                    <!-- 주문 상세 모달창 (요청사항 제거, 최종 총 금액 추가) -->
+                                    <div class="modal fade" th:id="'orderModal-' + ${order.roomMenuOrderNum}" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="orderModalLabel">주문 상세 정보</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <ul class="list-group list-group-flush">
+                                                        <!-- 주문 항목 목록 전체 출력 (요청사항은 생략) -->
+                                                        <li class="list-group-item" th:each="item : ${order.orderItemList}">
+                                                            <div>
+                                                                <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
+                                                                <span th:text="${item.roomMenuOrderItemName}"></span>
+                                                            </div>
+                                                            <div>
+                                                                <strong th:text="#{orderList.quantity}">수량:</strong>
+                                                                <span th:text="${item.roomMenuOrderItemAmount}"></span>
+                                                            </div>
+                                                            <div>
+                                                                <strong th:text="#{orderList.totalPrice}">총 가격:</strong>
+                                                                ₩<span th:text="${item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount}"></span>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
+                                                    <div class="me-auto">
+                                                        <strong>총 금액: </strong> ₩<span th:text="${order.totalPrice}"></span>
+                                                    </div>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 해당 주문의 상세 모달 (각 주문마다 생성) 끝-->
+                                </div>
                             </td>
                         </tr>
                         </tbody>
@@ -77,14 +144,14 @@
         <ul class="pagination justify-content-center align-items-center mt-3">
             <!-- 첫 페이지 -->
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">
+                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=0)}">
                     &laquo; 처음
                 </a>
             </li>
 
             <!-- 이전 페이지 -->
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}">
+                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${prevPage - 1})}">
                     이전
                 </a>
             </li>
@@ -94,20 +161,20 @@
                 th:each="i : ${#numbers.sequence(startPage, endPage)}"
                 th:classappend="${i == currentPage} ? 'active'">
                 <a class="page-link"
-                   th:href="@{/roommenu/orderList(page=${i - 1})}"
+                   th:href="@{/roommenu/adminOrderList(page=${i - 1})}"
                    th:text="${i}">1</a>
             </li>
 
             <!-- 다음 페이지 -->
             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}">
+                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${nextPage - 1})}">
                     다음
                 </a>
             </li>
 
             <!-- 마지막 페이지 -->
             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">
+                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${totalPages - 1})}">
                     마지막 &raquo;
                 </a>
             </li>

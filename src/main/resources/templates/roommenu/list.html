@@ -42,44 +42,46 @@
 <div layout:fragment="content">
 
     <div class="container-fluid mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center" th:text="#{roomServiceListTitle}">룸 서비스 메뉴 목록</h3>
+        <!-- 타이틀 + 번역 영역 감싸기 -->
+        <div class="position-relative mb-4" style="min-height: 40px;">
+            <!-- 가운데 정렬된 타이틀 -->
+            <h3 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
+                th:text="#{roomServiceListTitle}" style="font-size: 30px;">룸 서비스 메뉴 목록</h3>
 
+            <!-- 오른쪽 상단에 붙은 번역 영역 -->
+            <div class="position-absolute top-0 end-0">
+                <form method="get"
+                      th:action="@{/roommenu/list}"
+                      class="d-flex align-items-center gap-2"
+                      style="width: auto;">
+                    <a href="/roommenu/dev/translation"
+                       class="btn btn-outline-secondary btn-sm"
+                       style="padding: 0.3rem 0.6rem; font-size: 0.9rem; width: 120px;"
+                       th:text="#{menu.translationPage}"></a>
 
-        <!-- 언어선택 및 번역페이지 버튼을 오른쪽 정렬 -->
-        <div class="d-flex justify-content-end mb-3">
-            <form method="get"
-                  th:action="@{/roommenu/list}"
-                  class="d-flex align-items-center gap-2"
-                  style="width: auto;">
+                    <input type="hidden" name="type" th:value="${type}" />
+                    <input type="hidden" name="keyword" th:value="${keyword}" />
+                    <input type="hidden" name="category" th:value="${category}" />
 
-                <a href="/roommenu/dev/translation"
-                   class="btn btn-outline-secondary btn-sm"
-                   style="padding: 0.3rem 0.6rem; font-size: 0.85rem; width: 120px;"
-                   th:text="#{menu.translationPage}"></a>
-
-                <!-- 숨김처리 -->
-                <input type="hidden" name="type" th:value="${type}" />
-                <input type="hidden" name="keyword" th:value="${keyword}" />
-                <input type="hidden" name="category" th:value="${category}" />
-                <!-- 숨김처리 끝 -->
-
-                <select name="lang"
-                        onchange="this.form.submit()"
-                        class="form-select form-select-sm"
-                        style="width: 150px; padding: 0.3rem 0.6rem; font-size: 0.85rem;">
-                    <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
-                    <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                    <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
-                    <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
-                </select>
-            </form>
+                    <select name="lang"
+                            onchange="this.form.submit()"
+                            class="form-select form-select-sm"
+                            style="width: 150px; padding: 0.3rem 0.6rem; font-size: 0.9rem;">
+                        <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
+                        <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                        <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
+                        <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
+                    </select>
+                </form>
+            </div>
         </div>
 
-        <form action="/roommenu/list" class="d-flex flex-wrap align-items-end gap-2 mb-4 w-100" method="get">
 
-            <div class="flex-fill" style="min-width: 150px;">
-                <label class="form-label" th:text="#{searchOptionLabel}">검색 조건</label>
-                <select name="type" id="search-option" class="form-select">
+        <form action="/roommenu/list" class="d-flex flex-wrap align-items-end gap-2 mb-4 w-100" method="get" style="margin-top: 40px;">
+
+            <div class="flex-fill" style="width: 10%;">
+                <select name="type" id="search-option" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                    <option selected>검색 조건</option>
                     <option value="S" th:selected="${type == 'S'}" th:text="#{searchOption.name}">이름</option>
                     <option value="P" th:selected="${type == 'P'}" th:text="#{searchOption.price}">가격</option>
                     <option value="A" th:selected="${type == 'A'}" th:text="#{searchOption.amount}">재고량</option>
@@ -88,25 +90,23 @@
                 </select>
             </div>
 
-            <div class="flex-fill" style="min-width: 150px;">
-                <label class="form-label" th:text="#{categorySelectLabel}">카테고리 선택</label>
-                <select name="category" id="category-select" class="form-select">
+            <div class="flex-fill" style="width: 10%;">
+                <select name="category" id="category-select" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                    <option selected> 카테고리 선택</option>
                     <option value="" th:text="#{category.all}">전체 카테고리</option>
                     <option value="한식" th:selected="${category == '한식'}" th:text="#{category.hansik}">한식</option>
                     <option value="양식" th:selected="${category == '양식'}" th:text="#{category.yangsik}">양식</option>
                     <option value="중식" th:selected="${category == '중식'}" th:text="#{category.jungsik}">중식</option>
-                    <option value="에피타이저" th:selected="${category == '에피타이저'}" th:text="#{category.appetizer}">에피타이저</option>
+                    <option value="디저트" th:selected="${category == '디저트'}" th:text="#{category.appetizer}">디저트</option>
                 </select>
             </div>
 
-            <div class="flex-grow-1">
-                <label class="form-label">검색어</label>
-                <input type="text" name="keyword" id="search-input" class="form-control" placeholder="">
+            <div class="flex-grow-1" style="width: 40%;">
+                <input type="text" name="keyword" id="search-input" class="form-control" style="height: 40px; font-size: 0.9rem;" placeholder="검색어 입력">
             </div>
 
             <div class="d-flex flex-column justify-content-end gap-1">
-                <label class="form-label invisible">작업</label>
-                <div class="d-flex gap-1 flex-wrap">
+                <div class="d-flex gap-1 flex-wrap" style="height: 40px; font-size: 0.9rem;">
                     <button type="submit" class="btn btn-primary" th:text="#{searchButton}">검색</button>
                     <a href="/roommenu/insert" class="btn btn-success" th:text="#{registerButton}">등록</a>
                     <a href="/roommenu/orderpage" class="btn btn-outline-danger" th:text="#{customerButton}">고객용</a>
@@ -134,7 +134,7 @@
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
-                <a class="nav-link [[${category} == '에피타이저' ? 'active' : '']]" href="/roommenu/list?type=C&category=에피타이저" th:text="#{category.appetizer}">에피타이저</a>
+                <a class="nav-link [[${category} == '디저트' ? 'active' : '']]" href="/roommenu/list?type=C&category=디저트" th:text="#{category.appetizer}">디저트</a>
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
@@ -153,13 +153,13 @@
                     <thead class="table-light text-center">
                     <tr>
                         <th scope="col" th:text="#{table.header.number}" style="width: 5%;">#</th>
-                        <th scope="col" th:text="#{table.header.image}" style="width: 15%;">이미지</th>
-                        <th scope="col" th:text="#{table.header.category}" style="width: 10%;">카테고리</th>
-                        <th scope="col" th:text="#{table.header.name}" style="width: 15%;">메뉴이름</th>
-                        <th scope="col" th:text="#{table.header.price}" style="width: 10%;">상품가격</th>
-                        <th scope="col" th:text="#{table.header.amount}" style="width: 10%;">재고량</th>
-                        <th scope="col" th:text="#{table.header.status}" style="width: 10%;">판매여부</th>
-                        <th scope="col" th:text="#{table.header.action}" style="width: 20%;">기능</th>
+                        <th scope="col" th:text="#{table.header.image}" style="width: 10%;">이미지</th>
+                        <th scope="col" th:text="#{table.header.category}" style="width: 12%;">카테고리</th>
+                        <th scope="col" th:text="#{table.header.name}" style="width: 22%;">메뉴이름</th>
+                        <th scope="col" th:text="#{table.header.price}" style="width: 12%;">상품가격</th>
+                        <th scope="col" th:text="#{table.header.amount}" style="width: 12%;">재고량</th>
+                        <th scope="col" th:text="#{table.header.status}" style="width: 12%;">판매여부</th>
+                        <th scope="col" th:text="#{table.header.action}" style="width: 10%;">기능</th>
                     </tr>
                     </thead>
 
@@ -169,10 +169,10 @@
                         <td>
                             <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                                  th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                                 style="width: 60px; height: 80px;">
+                                 style="width: 90px; height: 80px;">
                             <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                                  th:src="@{/profile/default.png}"
-                                 style="width: 60px; height: 80px;">
+                                 style="width: 90px; height: 80px;">
                         </td>
                         <td th:text="${roomMenuDTO.roomMenuCategory}"></td>
                         <td>
@@ -258,7 +258,8 @@
                     <p id="orderAlertContent" class="mb-0"></p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">확인</button>
+                    <!-- 확인 버튼 클릭 시 페이지 이동 -->
+                    <button type="button" class="btn btn-success px-4" id="orderAlertConfirmBtn">확인</button>
                 </div>
             </div>
         </div>
@@ -346,15 +347,20 @@
                         console.log("📦 메시지 수신:", orderData);
 
                         const content = `
-                    주문자: <strong>${orderData.memberEmail}</strong><br>
-                    총 금액: <strong>${orderData.totalPrice}원</strong>
-                    요구사항: <strong>${orderData.roomMenuOrderRequestMessage || '없음'}</strong><br>
-                    수량: <strong>${orderData.roomMenuOrderAmount}개</strong>
-                `;
+                        주문자: <strong>${orderData.memberEmail}</strong><br>
+                        총 금액: <strong>${orderData.totalPrice}원</strong><br>
+                        상품내용 : null
+                        관리자용 페이지를 확인하세요! 확인을 누르시면 관리자용 페이지로 갑니다.
+                    `;
                         document.getElementById("orderAlertContent").innerHTML = content;
 
                         const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
                         modal.show();
+
+                        // 확인 버튼 클릭 시 페이지 이동
+                        document.getElementById("orderAlertConfirmBtn").addEventListener("click", function () {
+                            window.location.href = "http://localhost:8090/roommenu/adminOrderList"; // 페이지 이동
+                        });
 
                     } catch (error) {
                         console.error("❌ 메시지 처리 오류", error);
@@ -368,7 +374,6 @@
         /* ----- 주문페이지 알람 끝 -----*/
 
     </script>
-</div>
 </div>
 
 </body>
