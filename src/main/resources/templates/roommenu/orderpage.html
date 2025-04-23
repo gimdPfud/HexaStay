@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/roommenu.css"><!-- 국기 아이콘 가져오기 -->
     <title>모바일 주문 페이지</title>
     <style>
         /* 기본 스타일: 모든 요소에 기본 마진, 패딩 제거 및 박스 크기 설정 */
@@ -401,19 +402,11 @@
             <input type="hidden" name="category" th:value="${category}" />
             <input type="hidden" name="lang" id="langInput" />
 
-            <div style="display: flex; gap: 10px; font-size: 24px;">
-                <button type="button" onclick="submitLang('ko')" style="background: none; border: none;" title="한국어">
-                    🇰🇷
-                </button>
-                <button type="button" onclick="submitLang('en')" style="background: none; border: none;" title="English">
-                    🇺🇸
-                </button>
-                <button type="button" onclick="submitLang('ja')" style="background: none; border: none;" title="日本語">
-                    🇯🇵
-                </button>
-                <button type="button" onclick="submitLang('cn')" style="background: none; border: none;" title="中國語">
-                    🇨🇳
-                </button>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="flag flag-ko" onclick="submitLang('ko')" title="한국어"></button>
+                <button type="button" class="flag flag-en" onclick="submitLang('en')" title="English"></button>
+                <button type="button" class="flag flag-ja" onclick="submitLang('ja')" title="日本語"></button>
+                <button type="button" class="flag flag-cn" onclick="submitLang('cn')" title="中國語"></button>
             </div>
         </form>
 
