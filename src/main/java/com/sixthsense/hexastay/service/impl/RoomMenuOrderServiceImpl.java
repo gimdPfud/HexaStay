@@ -208,6 +208,10 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
+
+                // 이미지 정보 추가
+                itemDTO.setRoomMenuImageMeta(item.getRoomMenu().getRoomMenuImageMeta());
+
                 return itemDTO;
             }).collect(Collectors.toList());
 

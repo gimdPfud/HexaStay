@@ -7,73 +7,82 @@
     <meta charset="UTF-8">
     <title>외부업체 서비스 등록</title>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-            <h1 class="text-center mb-4" th:text="${valid}"></h1>
+    <div class="container mt-4 w-100 bg-light">
+        <h1 class="text-center mb-4" th:text="${valid}"></h1>
                 <!-- 검색 조건 및 등록 버튼 -->
-                <form class="row g-3 mb-4">
-                    <div class="col-md-2">
-                        <select class="form-select">
-                            <option selected>검색 조건</option>
-                            <option value="업체명">업체명</option>
-                            <option value="이름">이름</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="검색어 입력">
-                    </div>
-                    <div class="d-flex gap-3 col-md-4">
-                        <button type="submit" class="btn btn-primary  w-50">조회(기능X)</button>
-                    </div>
-                </form>
+        <form class="d-flex mb-4 w-100">
+                    <!-- 검색 조건 셀렉트 -->
+            <select class="form-select flex-shrink-0"
+                            style="width: 150px; height: 40px; font-size: 0.9rem; margin-right: 5px;">
+                        <option selected>검색 조건</option>
+                        <option value="업체명">업체명</option>
+                        <option value="이름">이름</option>
+            </select>
 
-                <!-- 테이블 -->
-                <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
-                    <table class="table table-bordered table-sm align-middle" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
-                        <thead style="background-color: #f1f1f1;">
-                        <tr>
-                            <th style="text-align: center; vertical-align: middle;">이미지</th>
-                            <th style="text-align: center; vertical-align: middle;">업체명</th>
-                            <th style="text-align: center; vertical-align: middle;">전화번호</th>
-                            <th style="text-align: center; vertical-align: middle;">주소</th>
-                            <th style="text-align: center; vertical-align: middle;">대표자</th>
-                            <th style="text-align: center; vertical-align: middle;">상세보기</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="data : ${list}">
-                            <td style="text-align: center;">
-                                <img th:if="${data.storeProfileMeta != null}"
-                                     th:src="@{${data.storeProfileMeta}}"
-                                     style="width: 80px; height: 80px;">
+                    <!-- 검색어 입력창 -->
+            <input type="text"
+                           class="form-control flex-grow-1"
+                           placeholder="검색어 입력"
+                           style="margin-right: 5px; height: 40px; font-size: 0.9rem;">
 
-                                <img th:unless="${data.storeProfileMeta != null}"
-                                     th:src="@{/store/default.png}"
-                                     style="width: 80px; height: 80px;">
-                            </td>
+                    <!-- 조회 버튼 -->
+            <button type="submit"
+                            class="btn btn-primary flex-shrink-0" style="height: 40px; font-size: 0.9rem;">
+                        조회
+            </button>
+        </form>
 
-                            <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
-                            <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
-                            <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
-                            <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
-                            <td style="text-align: center; vertical-align: middle;">
-                                <a th:href="@{'/admin/store/menu/selected?storeNum='+${data.storeNum}}" class="btn btn-success btn-sm">선택</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
 
-                    <div class="text-center mt-5" th:if="${list == null or list.empty}">
-                        <h2 class="text-secondary">목록이 없습니다.</h2>
-                    </div>
-                </div>
-            <script>
-                function toggleButton() {
-                    const selectBox = document.getElementById("storeSelect");
-                    const submitButton = document.getElementById("submitButton");
-                    submitButton.disabled = !selectBox.value; // 값이 없으면 비활성화, 있으면 활성화
-                }
-            </script>
+    <!-- 테이블 -->
+        <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 10px; background-color: #fff;">
+            <table class="table table-bordered table-sm align-middle" style="margin-bottom: 0;" th:if="${list != null and !list.empty}">
+                <thead style="background-color: #f1f1f1;">
+                    <tr>
+                        <th style="text-align: center; vertical-align: middle;">이미지</th>
+                        <th style="text-align: center; vertical-align: middle;">업체명</th>
+                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
+                        <th style="text-align: center; vertical-align: middle;">주소</th>
+                        <th style="text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="text-align: center; vertical-align: middle;">상세보기</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr th:each="data : ${list}">
+                    <td style="text-align: center;">
+                        <img th:if="${data.storeProfileMeta != null}"
+                             th:src="@{${data.storeProfileMeta}}"
+                             style="width: 80px; height: 80px;">
+
+                        <img th:unless="${data.storeProfileMeta != null}"
+                             th:src="@{/store/default.png}"
+                             style="width: 80px; height: 80px;">
+                    </td>
+
+                    <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
+                    <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
+                    <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
+                    <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
+                    <td style="text-align: center; vertical-align: middle;">
+                        <a th:href="@{'/admin/store/menu/selected?storeNum='+${data.storeNum}}" class="btn btn-success btn-sm">선택</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="text-center mt-5" th:if="${list == null or list.empty}">
+                <h2 class="text-secondary">목록이 없습니다.</h2>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleButton() {
+            const selectBox = document.getElementById("storeSelect");
+            const submitButton = document.getElementById("submitButton");
+            submitButton.disabled = !selectBox.value; // 값이 없으면 비활성화, 있으면 활성화
+        }
+    </script>
 </div>
 </body>
 </html>
