@@ -216,12 +216,12 @@ public class StoreServiceImpl implements StoreService {
         return list;
     }
     @Override
-    public Page<StoreDTO> searchlist(String status, Long companyNum,String searchType, String keyword, Pageable pageable) {
+    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable, String... status) {
 //        log.info("서비스 들어옴 : ");
 //        log.info(companyNum);
 //        log.info(searchType);
 //        log.info(keyword);
-        Page<Store> storeList = storeRepository.listStoreSearch(status, companyNum, searchType, keyword, pageable);
+        Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable, status);
 //        log.info(storeList.getSize());
 //        storeList.forEach(log::info);
         Page<StoreDTO> list = storeList.map(data -> {
