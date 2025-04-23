@@ -36,7 +36,7 @@ public interface StoreService {
     Page<StoreDTO> list(Pageable pageable);
     List<StoreDTO> list(Long companyNum);
     Page<StoreDTO> list(Long companyNum, Pageable pageable);
-    Page<StoreDTO> searchlist(String status, Long companyNum, String searchType, String keyword, Pageable pageable);
+    Page<StoreDTO> searchlist(Long companyNum, String searchType, String keyword, Pageable pageable, String... status);
 
     Page<StoreDTO> clientlist(Pageable pageable);
 

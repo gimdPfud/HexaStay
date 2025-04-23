@@ -62,9 +62,9 @@
                         <th style="text-align: center; vertical-align: middle;">제공호텔</th>
                         <th style="text-align: center; vertical-align: middle;">이미지</th>
                         <th style="text-align: center; vertical-align: middle;">업체명</th>
-                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
                         <th style="text-align: center; vertical-align: middle;">주소</th>
                         <th style="text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
                         <th style="text-align: center; vertical-align: middle;">상세보기</th>
                     </tr>
                     </thead>
@@ -81,13 +81,20 @@
                                  style="width: 80px; height: 80px;">
                         </td>
 
-                        <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
-                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <a th:href="@{/admin/store/read(idid=${data.storeNum})}" style="color: black;" th:text="${data.storeName}"></a>
+                        </td>
                         <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                         <td style="text-align: center; vertical-align: middle;">
-                            <a th:href="@{/admin/store/read(idid=${data.storeNum})}" class="btn btn-success btn-sm">보기</a>
                             <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger btn-sm">삭제</a>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'DELETED'}"
+                                  class="badge bg-danger">비활성화</span>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'ALIVE'}"
+                                  class="badge bg-success">영업중</span>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'CLOSED'}"
+                                  class="badge bg-secondary">영업종료</span>
                         </td>
                     </tr>
                     </tbody>
@@ -130,9 +137,9 @@
                         <th style="text-align: center; vertical-align: middle;">제공호텔</th>
                         <th style="text-align: center; vertical-align: middle;">이미지</th>
                         <th style="text-align: center; vertical-align: middle;">업체명</th>
-                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
                         <th style="text-align: center; vertical-align: middle;">주소</th>
                         <th style="text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
                         <th style="text-align: center; vertical-align: middle;">상세보기</th>
                     </tr>
                     </thead>
@@ -150,11 +157,17 @@
                         </td>
 
                         <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
-                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                         <td style="text-align: center; vertical-align: middle;">
                             <a th:href="@{'/admin/store/restore/'+${data.storeNum}}" class="btn btn-success btn-sm">복원</a>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'DELETED'}"
+                                  class="badge bg-danger">비활성화</span>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'ALIVE'}"
+                                  class="badge bg-success">영업중</span>
+                            <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'CLOSED'}"
+                                  class="badge bg-secondary">영업종료</span>
                         </td>
                     </tr>
                     </tbody>

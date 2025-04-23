@@ -80,9 +80,9 @@ public class StoreController {
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) Long companyNum,
                        @RequestParam(required = false) String keyword){
-        Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable, "alive", "closed");
         model.addAttribute("list",list);
-        Page<StoreDTO> listA = storeService.searchlist("deleted", companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable, "deleted");
         model.addAttribute("deletedList",listA);
 
         model.addAttribute("companyList",companyService.getBnFList());
@@ -127,8 +127,8 @@ public class StoreController {
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
-        Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
-        Page<StoreDTO> listA = storeService.searchlist("deleted", companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable,"alive","closed");
+        Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable,"deleted");
         model.addAttribute("list",list);
         model.addAttribute("deletedList",listA);
         model.addAttribute("companyMap", storeService.getCompanyMap());
