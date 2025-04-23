@@ -25,9 +25,9 @@
     <form th:action="@{/notice/list}" method="get" class="row g-3 align-items-end mb-4">
 
       <!-- 검색 조건 -->
-      <div class="col-md-3">
-        <label class="form-label">검색 조건</label>
-        <select name="type" class="form-select" style="height: 35px; font-size: 0.9rem;">
+      <div class="col-md-3" style="width: 15%;">
+        <select name="type" class="form-select" style=" height: 40px; font-size: 0.9rem;">
+          <option selected> 검색 조건 </option>
           <option value="S" th:selected="${type=='S'}">제목</option>
           <option value="C" th:selected="${type=='C'}">내용</option>
           <option value="SC" th:selected="${type=='SC'}">제목+내용</option>
@@ -35,13 +35,12 @@
       </div>
 
       <!-- 검색어 입력 -->
-      <div class="col-md-6">
-        <label class="form-label">검색어</label>
-        <input class="form-control" th:value="${keyword}"  placeholder="검색어 입력" name="keyword" type="text" style="height: 40px;">
+      <div class="col-md-6" style="width: 70%;">
+        <input class="form-control" th:value="${keyword}"  placeholder="검색어 입력" name="keyword" type="text" style="height: 40px; font-size: 0.9rem;">
       </div>
 
       <!-- 버튼 -->
-      <div class="col-md-3 d-flex align-items-end gap-2">
+      <div class="col-md-3 d-flex align-items-end gap-2" style="width: 15%; height: 40px;">
         <button class="btn btn-primary w-50" type="submit">검색</button>
         <button class="btn btn-success w-50" type="button" th:onclick="|location.href='@{/notice/insert}'|">등록</button>
       </div>
