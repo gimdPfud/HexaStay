@@ -12,6 +12,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -143,5 +144,27 @@ public class CompanyController {
         return ResponseEntity.ok(admins);
     }
 
+
+
+
+
+    @ResponseBody
+    @GetMapping("/list/store")
+    public ResponseEntity listCompanyForStoreInsert(@RequestParam(required = false) String choice,
+                              @RequestParam(required = false) String select,
+                              @RequestParam(required = false) String keyword,
+                              Pageable pageable, Principal principal) {
+
+        String email = principal.getName();
+        Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+
+        if (choice == null || choice.trim().isEmpty()) {
+            choice = "center";
+        }
+
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
+
+        return new ResponseEntity<>(companyDTOS, HttpStatus.OK);
+    }
 
 }

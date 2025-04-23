@@ -1,10 +1,12 @@
-
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutmobile}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모바일 주문 페이지</title>
+    <title>모바일 장바구니 페이지</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
@@ -62,19 +64,19 @@
         .pricing-section {
             margin-top: 20px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center; /* 가운데 정렬 추가 */
         }
 
         .pricing-section div {
             font-size: 16px;
         }
 
-        .pricing-section .discount {
-            color: red;
-        }
-
         .pricing-section .final-total {
             font-weight: bold;
+            color: red;
+            font-size: 20px;
         }
 
         /* 버튼 스타일 */
@@ -86,25 +88,17 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .add-to-cart-btn {
-            background-color: #ffeb3b;
+            background-color: #77b1fb;
             color: black;
-        }
-
-        .add-to-cart-btn:hover {
-            background-color: #fdd835;
         }
 
         .back-btn {
             background-color: #ddd;
             color: black;
-        }
-
-        .back-btn:hover {
-            background-color: #ccc;
         }
 
         /* 버튼 전체 컨테이너 정렬 */
@@ -114,6 +108,7 @@
             gap: 6px;
             align-items: flex-start;
             margin-top: 10px;
+            margin-left: -4px;
         }
 
         /* 공통 버튼 스타일 */
@@ -127,25 +122,36 @@
             transition: background-color 0.2s ease;
         }
 
-        /* 수량 변경 버튼 - 초록 */
-        .update-btn {
-            background-color: #4CAF50;
-            color: white;
+        .mini-btn.delete-btn {
+            margin-left: -10px; /* 또는 -6px 등으로 조절 */
         }
 
-        .update-btn:hover {
-            background-color: #45a049;
+        .quantity {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
 
-        /* 삭제 버튼 - 빨강 */
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
+        .quantity button {
+            width: 20px;
+            height: 30px;
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #77b1fb;
         }
 
-        .delete-btn:hover {
-            background-color: #e53935;
+        .quantity-input {
+            width: 30px;
+            text-align: center;
+            font-size: 18px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0 5px;
         }
+
         .cart-image {
             margin-right: 20px;
         }
@@ -155,6 +161,7 @@
             height: 100px;
             border-radius: 6px;
         }
+
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -193,7 +200,12 @@
             cursor: pointer;
         }
 
+        .food-item:hover {
+            background-color: transparent; /* 호버 시 배경색을 투명으로 설정 */
+        }
+
     </style>
+
 </head>
 <body>
 <!---------------------------------------------------------
@@ -209,62 +221,56 @@
 * 수정일    : 2025-04-13
 *
 -------------------------------------------------------------->
+
+<div layout:fragment="contentorder">
+
 <!-- 장바구니가 비어있는 경우 -->
 <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
     <p th:text="#{cart.emptyTitle}">웹에서 주문</p>
-    <span th:text="#{cart.emptyMessage}">🛒 장바구니의<br> 아이템이 존재하지 않습니다</span>
+    <span th:text="#{cart.emptyMessage}">🛒 장바구니의<br>아이템이 존재하지 않습니다</span>
 </div>
 
 <!-- 장바구니에 아이템이 있는 경우 -->
 <div th:unless="${isCartEmpty}" class="container">
-    <div class="header">
-        <div th:text="#{cart.orderTitle}">주문</div>
-    </div>
-
-
     <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
     <ul class="food-list">
-        <li th:each="roomMenuCartDTO : ${cartDetailDTOList}"
-            class="food-item"
-            th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
-
-
-            <div class="food-info col-6">
-                <span th:text="#{cart.price}">가격</span>:
-                <span class="item-price" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice}"></span>
-                <p>
-                    <span th:text="#{cart.quantity}">수량</span>:
-                    <span class="item-quantity" th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}"></span>
-                </p>
-                <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
-                    <p>
-                        <span th:text="#{cart.total}">총 금액</span>:
-                        <span class="item-total"
-                              th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}"></span>
-                    </p>
-                </th:block>
-            </div>
-            <div class="col-4 cart-image"> <!-- 이미지 시작 -->
+        <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
+            <!-- 이미지: 왼쪽에 위치 -->
+            <div class="col-4 cart-image">
                 <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
                      th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
                      class="cart-img">
-
                 <img th:unless="${roomMenuCartDTO.roomMenuImageMeta != null}"
                      th:src="@{/profile/default.png}"
                      class="cart-img">
             </div>
-            <!-- 이미지 끝 -->
 
-            <!-- 수량변경, 장바구니 삭제 시작 -->
+            <!-- 메뉴 이름, 수량, 금액: 이미지 오른쪽에 위치 -->
+            <div class="food-info col-6">
+                <p class="item-name">
+                    <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
+                </p>
+                <div class="quantity" style="display: flex; align-items: center;">
+                    <button class="decrease">-</button>
+                    <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
+                    <button class="increase">+</button>
+                </div>
+                <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
+                    <p>
+                        <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
+                        <span th:text="#{item.currency}" style="font-weight: bold;"></span>
+                    </p>
+                </th:block>
+            </div>
+
+            <!-- 수량 변경 버튼 -->
             <div class="col-2 button-container">
                 <button class="mini-btn delete-btn" th:text="#{cart.delete}">삭제</button>
-                <button class="mini-btn update-btn" th:text="#{cart.update}">수량 변경</button>
             </div>
-            <!-- 수량변경, 장바구니 삭제 끝 -->
         </li>
     </ul>
 
-<!--    &lt;!&ndash; 현금으로 결제하기 체크박스 시작 &ndash;&gt;-->
+    <!--    &lt;!&ndash; 현금으로 결제하기 체크박스 시작 &ndash;&gt;-->
 <!--    <div class="payment-option">-->
 <!--        <label>-->
 <!--            <input type="checkbox" id="cashPaymentCheckbox">-->
@@ -273,7 +279,6 @@
 <!--    </div>-->
 <!--    &lt;!&ndash; 현금으로 결제하기 체크박스 끝 &ndash;&gt;-->
 
-
     <div class="request-section">
         <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
         <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
@@ -281,19 +286,20 @@
 
     <!-- 할인금액과 최종결제금액 표시 -->
     <!-- 결제금액 -->
-    <div class="pricing-section">
+    <div class="pricing-section" style="flex-direction: column; gap: 10px;">
         <div class="discount">
-            <span th:text="#{cart.discount}">할인금액</span>:
-        </div>
+            <span th:text="#{cart.discount}">할인금액</span> :
+            <span th:if="${finalDiscount != null}" th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+            <span th:unless="${finalDiscount != null}">0원</span>        </div>
         <div class="final-total">
-            <span th:text="#{cart.finalTotal.full(${finalTotal})}">최종결제금액:</span>
+            <span th:if="${finalTotal != null}" th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
+            <span th:unless="${finalTotal != null}">최종결제금액: 0원</span>
         </div>
     </div>
 
     <!-- 결제하기 및 목록으로 버튼 -->
     <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
     <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}">목록으로</button>
-
 
     <!-- 모달 -->
     <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
@@ -303,263 +309,150 @@
         </div>
     </div>
 
-
 </div>
-
-
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-
-
-    // ----- 총 결제 금액을 계산해주는 스크립트 시작 ----
-    document.addEventListener('DOMContentLoaded', function () {
-        const totalSpans = document.querySelectorAll('.item-total');
-        let total = 0;
-
-        totalSpans.forEach(span => {
-            const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
-            if (!isNaN(value)) {
-                total += value;
-            }
-        });
-
-        // 총 금액을 "최종결제금액" 영역에 표시
-        let tossprice = total;
-
-        const finalTotalEl = document.querySelector('.final-total');
-        if (finalTotalEl) {
-            finalTotalEl.textContent = `최종결제금액: ${total.toLocaleString()}원`;
-        }
-    });
-    // ----- 총 결제 금액을 계산해주는 스크립트 끝 ----
-
-
-    // ----- 목록으로 이동시키기 시작 ----
+    <script>
 
         function goToOrderPage() {
-        // 특정 URL로 이동하기
-        window.location.href = "/roommenu/orderpage";  // 목록 페이지로 이동
-    }
+            // 이동할 URL로 리디렉션
+            window.location.href = "/roommenu/orderpage";
+        }
 
-    // ----- 목록으로 이동시키기 끝 ----
 
-    // ----- 음식 아이템의 수량을 동적으로 업데이트하는 기능을 구현하기 시작 ----
-    let currentItem = null;
+        document.addEventListener('DOMContentLoaded', () => {
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('quantityModal');
-        const input = document.getElementById('modalQuantityInput');
-        const confirmBtn = document.getElementById('modalConfirmBtn');
-        const cancelBtn = document.getElementById('modalCancelBtn');
+            function updateFinalTotal() {
+                let total = 0;
+                // 각 음식 아이템의 총 금액을 계산해서 더해줍니다.
+                document.querySelectorAll('.item-total').forEach(span => {
+                    const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(value)) total += value;
+                });
 
-        let currentItem = null;
-
-        // ✅ 취소 버튼 클릭 시 모달 닫기
-        cancelBtn.addEventListener('click', function () {
-            modal.style.display = 'none';
-        });
-
-        // ✅ 수량 수정 버튼 클릭 시
-        document.querySelectorAll('.update-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                currentItem = button.closest('.food-item');
-                const qtySpan = currentItem.querySelector('.item-quantity');
-                const newQty = parseInt(qtySpan.textContent) || 1;
-
-                input.value = newQty;
-                modal.style.display = 'flex';
-            });
-        });
-
-        // ✅ 확인 버튼은 오직 한 번만 이벤트 리스너 등록
-        confirmBtn.addEventListener('click', function () {
-            if (!currentItem) return;
-
-            const updatedQty = parseInt(input.value);
-
-            if (!updatedQty || updatedQty < 1) {
-                alert("수량은 1 이상이어야 합니다.");
-                return;
-            }
-
-            const availableStock = parseInt(currentItem.dataset.stock);
-            if (updatedQty > availableStock) {
-                alert("수량이 부족합니다. 현재 재고는 " + availableStock + "개 입니다.");
-                return;
-            }
-
-            const itemId = currentItem.dataset.itemId;
-
-            $.ajax({
-                url: `/roommenu/orderpage/read/${itemId}/${updatedQty}`,
-                type: 'PUT',
-                success: function () {
-                    console.log(`수량 ${updatedQty}개로 변경 성공`);
-
-                    currentItem.querySelector('.item-quantity').textContent = updatedQty;
-
-                    const price = parseInt(currentItem.querySelector('.item-price').textContent.replace(/[^0-9]/g, ''), 10);
-                    const totalElement = currentItem.querySelector('.item-total');
-                    const newTotal = updatedQty * price;
-                    totalElement.textContent = newTotal.toLocaleString();
-
-                    updateFinalTotal();
-                },
-                error: function (jqXHR) {
-                    if (jqXHR.status === 401) {
-                        alert("로그인이 필요합니다.");
-                        window.location.href = "/member/login";
-                    } else if (jqXHR.status === 403) {
-                        alert("해당 항목에 접근 권한이 없습니다.");
+                const finalTotalEl = document.querySelector('.final-total');
+                if (finalTotalEl) {
+                    if (total === 0) {
+                        finalTotalEl.textContent = '최종 결제 금액 : 0원';  // 기본값 설정
                     } else {
-                        alert("수량 변경에 실패했습니다.");
-                        console.error(jqXHR.responseText);
+                       finalTotalEl.textContent = `최종 결제 금액 : ${total.toLocaleString()}원`;
                     }
                 }
-            });
+            }
 
-            modal.style.display = 'none';
-        });
-    // ----- 음식 아이템의 수량을 동적으로 업데이트하는 기능을 구현하기 수정 끝 ----
+            document.querySelectorAll('.food-item').forEach(item => {
+                const decreaseBtn = item.querySelector('.decrease');
+                const increaseBtn = item.querySelector('.increase');
+                const input = item.querySelector('.quantity-input');
+                const itemTotalSpan = item.querySelector('.item-total');
 
-        // ----- 삭제하기 시작 ----
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const item = button.closest('.food-item');
-
-                if (!item) {
-                    alert("삭제할 항목을 찾을 수 없습니다.");
-                    return;
-                }
-
+                // 가격 계산을 위해 pricePerItem을 추출할 때 텍스트가 존재하는지 확인
+                const pricePerItem = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) / parseInt(input.value, 10);
                 const itemId = item.getAttribute('data-item-id');
 
-                if (!itemId) {
-                    alert("아이템 정보가 없습니다.");
-                    return;
-                }
-
-                if (!confirm("정말 삭제하시겠습니까?")) return;
-
-                $.ajax({
-                    url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
-                    type: 'DELETE',
-                    success: function () {
-                        alert("아이템이 삭제되었습니다.");
-                        item.remove();
+                decreaseBtn.addEventListener('click', () => {
+                    let quantity = parseInt(input.value);
+                    if (quantity > 1) {
+                        quantity--;
+                        input.value = quantity;
+                        const newTotal = pricePerItem * quantity;
+                        itemTotalSpan.textContent = newTotal.toLocaleString();
                         updateFinalTotal();
-                        // ⭐ 삭제 후 남은 아이템이 없으면 메시지 보여주기
-                        // 삭제?
-                        const remainingItems = document.querySelectorAll('.food-item');
-                        if (remainingItems.length === 0) {
-                            const emptyMsg = document.createElement('div');
-                            emptyMsg.textContent = '🛒 장바구니의 아이템이 존재하지 않습니다.';
-                            emptyMsg.style.textAlign = 'center';
-                            emptyMsg.style.padding = '50px';
-                            emptyMsg.style.color = '#888';
-                            emptyMsg.setAttribute('id', 'emptyCartMsg');
-
-                            document.querySelector('.container').appendChild(emptyMsg);
-
-                            // 결제 버튼 등 숨기기
-                            document.querySelector('.add-to-cart-btn').style.display = 'none';
-                            document.querySelector('.back-btn').style.display = 'none';
-                            document.querySelector('.pricing-section').style.display = 'none';
-                            document.querySelector('.request-section').style.display = 'none';
-                            document.querySelector('.payment-option').style.display = 'none';
-                        }
-                    },
-                    error: function (jqXHR) {
-                        if (jqXHR.status === 401) {
-                            alert("로그인이 필요합니다.");
-                            window.location.href = "/member/login";
-                        } else if (jqXHR.status === 403) {
-                            alert("해당 항목에 접근 권한이 없습니다.");
-                        } else {
-                            alert("삭제에 실패했습니다.");
-                            console.error(jqXHR.responseText);
-                        }
+                        updateQuantity(itemId, quantity);
                     }
+                });
+
+                increaseBtn.addEventListener('click', () => {
+                    let quantity = parseInt(input.value);
+                    quantity++;
+                    input.value = quantity;
+                    const newTotal = pricePerItem * quantity;
+                    itemTotalSpan.textContent = newTotal.toLocaleString();
+                    updateFinalTotal();
+                    updateQuantity(itemId, quantity);
+                });
+                updateFinalTotal(); // 페이지 로드 시 총 금액 자동 계산
+            });
+
+            function updateQuantity(itemId, quantity) {
+                fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('수량 변경 성공');
+                            location.reload(); // 또는 수량/가격만 업데이트
+                        } else {
+                            alert('❌ 수량 변경 실패');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('에러 발생:', error);
+                        alert('❌ 수량 변경 중 오류가 발생했습니다.');
+                    });
+            }
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const item = button.closest('.food-item');
+                    const itemId = item.getAttribute('data-item-id');
+                    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+                    $.ajax({
+                        url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
+                        type: 'DELETE',
+                        success: () => {
+                            item.remove();
+                            updateFinalTotal();
+
+                            const remainingItems = document.querySelectorAll('.food-item');
+                            if (remainingItems.length === 0) {
+                                document.querySelector('.container').innerHTML = `
+                            <div style="text-align:center; padding:50px; color:#888;">
+                                🛒 장바구니의 아이템이 존재하지 않습니다.
+                            </div>`;
+                            }
+                        },
+                        error: () => alert("❌ 삭제 실패")
+                    });
                 });
             });
         });
-        // ----- 삭제하기 끝 ----
 
-        // ----- 결제하기 최종 결제 금액을 업데이트 시작 ----
-        function updateFinalTotal() {
-            let total = 0;
-            document.querySelectorAll('.item-total').forEach(span => {
-                const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
-                if (!isNaN(value)) total += value;
-                tossprice = total
-            });
-            document.querySelector('.final-total').textContent = `최종결제금액: ${total.toLocaleString()}원`;
-        }
-        updateFinalTotal();
-    });
-    // ----- 결제하기 최종 결제 금액을 업데이트 끝 ----
+        // 결제여부에 따라서 이동되는 페이지
+        function processPayment() {
+            const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
 
-    // 결제여부에 따라서 이동되는 페이지
-    function processPayment() {
-        const requestMessage = document.getElementById('request-input').value;
-
-        fetch("/roommenu/cart", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ requestMessage: requestMessage })
-        })
-            .then(res => res.text())
-            .then(data => {
-                alert("결제 페이지로 이동합니다!");
-
-                // 주문 완료 후 toss 결제 페이지로 이동 (옵션)
-                const url = "/payment?tossprice=" + tossprice;
-                const popup = window.open(url, "_blank", "width=600,height=800");
-                if (!popup) {
-                    alert("팝업 차단 해제해 주세요.");
-                }
-
-                // 로딩 페이지로도 이동 (필요 시)
-                window.location.href = "/tossloading";
+            fetch('/roommenu/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    requestMessage: roomMenuOrderRequestMessage
+                })
             })
-            .catch(err => {
-                alert("에러 발생: " + err.message);
-            });
-    }
+                .then(res => res.text())
+                .then(result => {
+                    alert("결제가 완료되었습니다.");
+                    window.location.href = '/roommenu/orderList';
+                })
+                .catch(error => {
+                    alert("결제 중 오류 발생: " + error);
+                });
+        }
 
-    // fetch("/roommenu/cart", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    //     body: new URLSearchParams({ requestMessage: "기타 요청 사항" })
-    // })
-    //     .then(res => res.json()) // 또는 res.text() depending on response
-    //     .then(data => {
-    //         alert("주문이 완료되었습니다!");
-    //         window.location.href = "/roommenu/orderList"; // ✅ 주문 내역으로 이동
-    //     })
-    //     .catch(err => {
-    //         alert("에러 발생: " + err.message);
-    //     });
+        // 목록으로 돌아가기
+        function goToOrderPage() {
+            window.location.href = '/roommenu/orderpage';
+        }
 
+    </script>
 
-
-
-</script>
-
-<!-- 모달창 팝업 시작 -->
-<div id="quantityModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <h3>수량 변경</h3>
-        <input type="number" id="modalQuantityInput" min="1" value="1">
-        <div class="modal-buttons">
-            <button id="modalConfirmBtn">확인</button>
-            <button id="modalCancelBtn">취소</button>
-        </div>
-    </div>
 </div>
-
-
 </body>
 </html>

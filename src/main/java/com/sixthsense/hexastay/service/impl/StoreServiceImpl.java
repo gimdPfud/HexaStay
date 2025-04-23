@@ -123,9 +123,9 @@ public class StoreServiceImpl implements StoreService {
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
-            storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            storeDTO.setStoreProfileMeta("/store/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "store/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -216,12 +216,12 @@ public class StoreServiceImpl implements StoreService {
         return list;
     }
     @Override
-    public Page<StoreDTO> searchlist(String status, Long companyNum,String searchType, String keyword, Pageable pageable) {
+    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable, String... status) {
 //        log.info("서비스 들어옴 : ");
 //        log.info(companyNum);
 //        log.info(searchType);
 //        log.info(keyword);
-        Page<Store> storeList = storeRepository.listStoreSearch(status, companyNum, searchType, keyword, pageable);
+        Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable, status);
 //        log.info(storeList.getSize());
 //        storeList.forEach(log::info);
         Page<StoreDTO> list = storeList.map(data -> {
@@ -254,15 +254,13 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public Page<StoreDTO> clientlist(Pageable pageable) {
-        Page<Store> storePage = storeRepository.findByStoreStatus("alive", pageable);
-        log.info("스토어 목록 찾았니? : "+storePage.getSize());
-        Page<StoreDTO> storeDTOPage = storePage.map(data -> {
+        Page<Store> storeList = storeRepository.listStoreSearch(null, "", "", pageable, "alive","closed");
+        Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
             storeDTO.setCompanyName(data.getCompany().getCompanyName());
             return storeDTO;
         });
-        log.info("스토어 목록 반환했니? : "+storeDTOPage.getSize());
-        return storeDTOPage;
+        return list;
     }
 
 

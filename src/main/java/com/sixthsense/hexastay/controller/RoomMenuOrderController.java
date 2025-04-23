@@ -292,6 +292,7 @@ public class RoomMenuOrderController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             Model model,
             Principal principal) {
+        log.info("관리자용 룸 메뉴 오더 컨트롤러 진입");
 
         log.info("로그인한 사용자 : " + principal.getName());
         Member member = memberRepository.findByMemberEmail(principal.getName());
@@ -347,6 +348,7 @@ public class RoomMenuOrderController {
     // 임시임.. 체크여부에 따라서 삭제 기능
     @PostMapping("/roommenu/complete-orders")
     public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
+        log.info("관리자용 오더 컨트롤러 주문완료 컨트롤러 진입");
         try {
             for (Long orderId : orderIds) {
                 Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);

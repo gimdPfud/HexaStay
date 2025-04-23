@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>스토어 등록</title>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
+
+    <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+        <h1 class="text-center mb-4">스토어 등록</h1>
+        <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
+
+            <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                </div>
+                <p class="file-name">이미지가 선택되지 않았습니다.</p>
+                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
+                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+            </div>
+            <label class="form-label">제공할 호텔(모달만 있고 현재 기능 X)</label>
+            <div class="mb-3 input-group">
+                <input type="text" class="form-control"  required>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#companySearchModal">검색</button><!--모달버튼? 누르면 검색가능한 창 뜸.-->
+            </div>
+            <div class="mb-3">
+                <label class="form-label">임시조치(모달에서 선택 대신 여기서 고르기..)</label>
+                <select name="companyNum">
+                    <option th:each="data:${companyList}" th:value="${data.companyNum}" th:text="${data.companyName}"></option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">스토어 이름</label>
+                <input type="text" class="form-control" name="storeName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">스토어 전화번호</label>
+                <input type="text" class="form-control" name="storePhone" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="storeAddress">스토어 주소</label>
+                <div class="input-group">
+                    <input style="background-color: #ced4da;" readonly
+                            type="text" id="storeAddress" class="form-control" name="storeAddress" required>
+                    <button class="btn btn-outline-secondary"
+                            type="button" onclick="insertAddress()">주소 검색</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">스토어 대표자명</label>
+                <input type="text" class="form-control" name="storeCeoName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">스토어 패스워드</label>
+                <input type="password" class="form-control" name="storePassword" required>
+            </div>
+            <input type="hidden" name="storeStatus" value="alive" readonly>
+            <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
+            <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
+            <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+            <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
+            <div class="mb-3">
+                <label class="form-label d-block">카테고리</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
+                    <label class="form-check-label" for="korean">한식</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
+                    <label class="form-check-label" for="chinese">중식</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
+                    <label class="form-check-label" for="japanese">일식</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
+                    <label class="form-check-label" for="asian">아시안</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
+                    <label class="form-check-label" for="western">양식</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
+                    <label class="form-check-label" for="fastfood">패스트푸드</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
+                    <label class="form-check-label" for="cafe">카페</label>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
+                <a href="/admin/store/list" class="btn btn-danger">취소</a>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="companySearchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">호텔 검색</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 검색 폼 -->
+                    <form action="/company/list" method="get" class="row g-3 align-items-end">
+
+                        <div class="col-md-3" style="width: 15%;">
+                            <select name="choice" id="choice" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
+                                <option selected>소속</option>
+                                <option value="center" th:selected="${choice} == 'center'">본사</option>
+                                <option value="branch" th:selected="${choice} == 'branch'">지사</option>
+                                <option value="facility" th:selected="${choice} == 'facility'">지점</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3" style="width: 15%;">
+                            <select name="select" class="form-select" style=" height: 35px; font-size: 0.9rem;">
+                                <option selected>검색 조건</option>
+                                <option value="company" th:selected="${select == 'company'}">조직명</option>
+                                <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
+                                <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4" style="width: 50%;">
+                            <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;" th:value="${keyword}">
+                        </div>
+
+                        <div class="col-md-2 d-flex gap-2" style="width: 20%;">
+                            <button type="button" id="searchBtn" class="btn btn-primary w-50">검색</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <!-- 결과 테이블 -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <table class="table table-bordered text-company mb-0">
+                                <thead class="table-light text-center">
+                                <tr>
+                                    <th style="width: 11%">프로필 사진</th>
+                                    <th style="width: 14%;">브랜드명</th>
+                                    <th style="width: 14%;">본사명</th>
+                                    <th style="width: 14%;">지사명</th>
+                                    <th style="width: 14%;">지점명</th>
+                                    <th style="width: 14%;">전화번호</th>
+                                    <th style="width: 12%;"></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <!--반복시작-->
+                                    <tr class="text-center">
+                                        <td>
+                                            <img th:if="${item.companyPictureMeta != null}"
+                                                 th:src="@{${item.companyPictureMeta}}"
+                                                 style="width: 60px; height: 80px;">
+                                            <img th:unless="${item.companyPictureMeta != null}"
+                                                 th:src="@{/profile/default.png}"
+                                                 style="width: 60px; height: 80px;">
+                                        </td>
+                                        <td th:text="${item.companyBrand}"></td>
+                                        <td th:text="${item.companyParentName}">본사명</td>
+                                        <td th:text="${item.branchName}">지사명</td>
+                                        <td th:text="${item.facilityName}">지점명</td>
+                                        <td th:text="${item.companyPhone}"></td>
+                                        <td>
+                                            <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}"
+                                               class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
+                                                상세보기
+                                            </a>
+                                            <button type="button"
+                                                    class="btn btn-outline-success px-2 py-1"
+                                                    style="font-size: 0.8rem; line-height: 1;"
+                                                    th:attr="data-companynum=${item.companyNum}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#adminModal"
+                                                    onclick="loadAdmins(this)">
+                                                직원조회
+                                            </button>
+                                            <!-- 비활성화 상태 배지 -->
+                                            <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}"
+                                                  class="badge badge-outline-danger">비활성화</span>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
+    <script>
+        //주소-좌표 변환 객체를 생성
+        var geocoder = new daum.maps.services.Geocoder();
+
+        function insertAddress() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var addr = data.address; // 최종 주소 변수
+                    // 주소 정보를 해당 필드에 넣는다.
+                    document.getElementById("storeAddress").value = addr;
+                }
+            }).open();
+        }
+
+        function formSubmitHandler(button) {
+            let storeAddress = document.getElementById("storeAddress").value;
+            if(storeAddress&&storeAddress.trim().length>0){
+                // 주소로 상세 정보를 검색
+                geocoder.addressSearch(storeAddress, function(results, status) {
+                    // 정상적으로 검색이 완료됐으면
+                    if (status === daum.maps.services.Status.OK) {
+                        var result = results[0];
+                        document.getElementById("storeLatitude").value=result.y;
+                        document.getElementById("storeLongitude").value=result.x;
+                        fetch(`https://dapi.kakao.com/v2/local/geo/transcoord.json?x=${result.x}&y=${result.y}&output_coord=WTM`, {
+                            headers: {
+                                Authorization: 'KakaoAK 7cb5773218158eba334d7c0a3f26cd9d'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById("storeWtmX").value = data.documents[0].x;
+                                document.getElementById("storeWtmY").value = data.documents[0].y;
+                                button.closest("form").submit();
+                            })
+                            .catch(error=>{
+                                console.error(error);
+                                alert("좌표 변환 중 오류")
+                            })
+                    } else {
+                        alert("주소를 다시 확인해주세요.")
+                    }
+                });
+            }
+            return false;
+        }
+    </script>
+    <script>
+        // 프로필 사진
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (file.size > 1024 * 1024) {
+                alert("파일 용량이 너무 큽니다. (최대 1MB)");
+                this.value = null;
+                document.querySelector('.file-name').textContent = "사진이 선택되지 않았습니다.";
+                return;
+            }
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('adminProfile').click();
+        });
+
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+
+    </script>
+
+</div>
+</body>
+</html>

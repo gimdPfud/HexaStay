@@ -53,6 +53,21 @@ public class CartController {
         return "redirect:/member/main";
     }
 
+    @GetMapping("/receipt")
+    public String goreceipt(HttpServletRequest request) {
+        String referer = request.getHeader("Referer");
+        System.out.println("이전 페이지: " + referer);
+        if (referer != null) {
+            if (referer.contains("/roommenu")) {
+                return "redirect:/roommenu/orderList";
+            } else if (referer.contains("/member/store")) {
+                return "redirect:/member/store/order/list";
+            }
+        }
+        // 기본 fallback
+        return "redirect:/member/main";
+    }
+
     @ResponseBody
     @GetMapping("/getlength")
     public ResponseEntity getlength(HttpServletRequest request, Principal principal){ //todo 일단 로그인으로...?
