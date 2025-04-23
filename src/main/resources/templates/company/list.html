@@ -29,18 +29,17 @@
     <!-- 검색 폼 -->
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
-      <div class="col-md-3">
-        <label class="form-label">소속</label>
+      <div class="col-md-3" style="width: 15%;">
         <select name="choice" id="choice" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
+          <option selected>소속</option>
           <option value="center" th:selected="${choice} == 'center'">본사</option>
           <option value="branch" th:selected="${choice} == 'branch'">지사</option>
           <option value="facility" th:selected="${choice} == 'facility'">지점</option>
         </select>
       </div>
 
-      <div class="col-md-3">
-        <label class="form-label">검색 조건</label>
-        <select name="select" class="form-select" style="height: 35px; font-size: 0.9rem;">
+      <div class="col-md-3" style="width: 15%;">
+        <select name="select" class="form-select" style=" height: 35px; font-size: 0.9rem;">
           <option selected>검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
@@ -48,12 +47,11 @@
         </select>
       </div>
 
-      <div class="col-md-4">
-        <label class="form-label">검색어</label>
+      <div class="col-md-4" style="width: 50%;">
         <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;" th:value="${keyword}">
       </div>
 
-      <div class="col-md-2 d-flex gap-2">
+      <div class="col-md-2 d-flex gap-2" style="width: 20%;">
         <button type="submit" id="searchBtn" class="btn btn-primary w-50">검색</button>
         <a href="/company/insert" class="btn btn-success w-50">등록</a>
       </div>

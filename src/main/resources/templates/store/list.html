@@ -21,9 +21,8 @@
         <!-- 검색 조건 및 등록 버튼 -->
         <form class="row g-3 align-items-end" action="/admin/store/list" method="post">
 
-            <div class="col-md-3">
-                <label class="form-label">호텔 선택</label>
-                <select class="form-select" name="chosenCompany" style="height: 35px; font-size: 0.9rem;">
+            <div class="col-md-3" style=" width:20%;">
+                <select class="form-select" name="chosenCompany" style="height: 40px; font-size: 0.9rem;">
                     <option th:each="data : ${companyMap}"
                             th:value="${data.key}"
                             th:text="${data.value}"
@@ -31,26 +30,25 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
-                <label class="form-label">검색 조건</label>
-                <select class="form-select" name="searchType" style="height: 35px; font-size: 0.9rem;">
+            <div class="col-md-3" style=" width:20%;">
+                <select class="form-select" name="searchType" style="height: 40px; font-size: 0.9rem;">
                     <option th:selected="${searchType}=='storeName'" value="storeName">상호명</option>
                     <option th:selected="${searchType}=='storeAddress'" value="storeAddress">스토어주소</option>
                     <option th:selected="${searchType}=='storeCeoName'" value="storeCeoName">대표자명</option>
                 </select>
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label">검색어</label>
-                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;">
+            <div class="col-md-4" style=" width:40%;">
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력" style="height: 40px; font-size: 0.9rem;">
             </div>
 
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-md-2 d-flex gap-2" style=" width:20%; height: 40px; font-size: 0.9rem;" >
                 <button type="submit" class="btn btn-primary w-50">조회</button>
                 <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
                     등록
                 </button>
             </div>
+
         </form>
 
         <!-- 테이블 -->

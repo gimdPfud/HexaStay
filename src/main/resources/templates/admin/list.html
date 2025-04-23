@@ -21,9 +21,9 @@
         <!-- 검색 폼 -->
         <form action="/admin/list" method="post" class="row g-3 align-items-end">
 
-            <div class="col-md-3">
-                <label class="form-label">소속</label>
-                <select name="select" id="select" class="form-select" style="height: 35px; font-size: 0.9rem;" onchange="this.form.submit()">
+            <div class="col-md-3" style="width: 15%; ">
+                <select name="select" id="select" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
+                    <option selected>소속</option>
                     <option value="all"      th:selected="${select} == 'all'">전체</option>
                     <option value="center"   th:selected="${select} == 'center'">본사</option>
                     <option value="branch"   th:selected="${select} == 'branch'">지사</option>
@@ -32,9 +32,8 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
-                <label class="form-label">검색 조건</label>
-                <select name="choice" class="form-select" style="height: 35px; font-size: 0.9rem;">
+            <div class="col-md-3" style="width: 15%;">
+                <select name="choice" class="form-select" style="height: 40px; font-size: 0.9rem;">
                     <option selected>검색 조건</option>
                     <option value="adminEmployeeNum" th:selected="${choice} == 'adminEmployeeNum'">사번</option>
                     <option value="adminRole"         th:selected="${choice} == 'adminRole'">직급</option>
@@ -43,17 +42,16 @@
                 </select>
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label">검색어</label>
+            <div class="col-md-4" style="width: 50%;">
                 <input name="keyword" type="text" class="form-control"
                        placeholder="검색어 입력"
-                       style="height: 35px; font-size: 0.9rem;"
+                       style="height: 40px; font-size: 0.9rem;"
                        th:value="${keyword}">
             </div>
 
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" id="searchBtn" class="btn btn-primary w-50">검색</button>
-                <a href="/admin/insert" class="btn btn-success w-50">등록</a>
+            <div class="col-md-2 d-flex gap-2" style="width: 20%;">
+                <button type="submit" id="searchBtn" class="btn btn-primary w-50" style="height: 40px; font-size: 0.9rem;">검색</button>
+                <a href="/admin/insert" class="btn btn-success w-50"  style="height: 40px; font-size: 0.9rem;">등록</a>
             </div>
         </form>
 
