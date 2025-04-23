@@ -46,7 +46,9 @@ public class StoreOrderController {
     //장바구니에서 주문 버튼을 누르면 주문확인창(결제창)으로 이동
     @ResponseBody
     @PostMapping("/member/store/order/insert")
-    public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList, Principal principal){
+    public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList,
+                                      @RequestParam("orderstoreMessage") String orderstoreMessage,
+                                      Principal principal){
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -60,7 +62,7 @@ public class StoreOrderController {
             }
         }
         /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        int result = orderstoreService.insert(cartitemidList, hotelroomNum);
+        int result = orderstoreService.insert(cartitemidList, hotelroomNum, orderstoreMessage);
         if(result==1){
             log.info("정상주문되었습니다.");
             storecartService.clearCartItems(hotelroomNum);
