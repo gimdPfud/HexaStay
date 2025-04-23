@@ -1,3 +1,7 @@
+<!--fixme 디자인 다 갈아 엎어도 대용 ~ !! 화이팅 !! -->
+
+
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -16,6 +20,7 @@
         <!-- 장바구니 리스트 -->
         <div class="container cart-container mt-3">
             <div class="list-group">
+                <!--반복시작 : 주문한 아이템들...-->
                 <div th:if="${list!=null && !list.isEmpty()}" th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <img th:if="${item.imgName != null}"
@@ -42,36 +47,25 @@
                 <div th:unless="${list!=null && !list.isEmpty()}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
                     <h1>장바구니가 비었습니다.</h1>
                 </div>
+
+                <!--같은 모양인데 여기는 요청사항 입력 구간-->
+                <div class="list-group-item cart-item">
+                    <label>요청사항</label>
+                    <textarea class="form-control" maxlength="500" name="orderstoreMessage" placeholder="500자 까지 작성 가능합니다."></textarea>
+                </div>
+                <!--같은 모양, 금액구간-->
+                <div class="list-group-item cart-item d-flex justify-content-between align-items-center">
+                    <span>최종 주문 금액 : <span th:text="${totalPrice+'원'}"></span></span>
+                </div>
             </div>
         </div>
 
         <!-- 총 가격 및 주문 버튼 -->
         <div th:if="${list != null}" class="position-fixed d-grid bottom-0 start-0 w-100 bg-white p-3 shadow" style="z-index: 10;">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal"
-                    th:text="'주문 ('+(${list.size()})+')'" th:disabled="${list==null || list.isEmpty()}"></button>
+            <button type="button" class="btn btn-success" th:data-price="${totalPrice}"
+                    onclick="processPayment(this)"
+                    th:disabled="${list==null || list.isEmpty()}">결제하기</button>
         </div>
-
-
-        <!--todo 주문정보 입력하는 모달창-->
-        <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <!--전체화면이 되면 이 부분이 마치 네비게이션바처럼 보일거니까.. 동일하게 꾸며주면 이쁠듯-->
-                        <h1 class="modal-title fs-5" id="orderLabel">주문하기</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <textarea class="form-control" maxlength="500" name="orderstoreMessage" placeholder="500자 까지 작성 가능합니다."></textarea>
-                    </div>
-                    <div class="modal-footer text-center">
-                        <button type="button" class="btn btn-primary" th:data-price="${totalPrice}"
-                                onclick="processPayment(this)">결제하기</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
 
     </form>
 
