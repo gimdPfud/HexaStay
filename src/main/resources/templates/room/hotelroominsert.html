@@ -39,44 +39,38 @@
         </div>
 
 
-        <h2 class="mb-4">HotelRoom 배정 등록회원검색_호텔룸 검색</h2>
+        <h2 class="text-center mb-4" >호텔 룸 배정 </h2>
 
 
         <form th:action="@{/register-hotelroom}" th:object="${memberDTO}" method="post" class="row g-3">
             <!-- 회원 선택 버튼 -->
-            <div class="col-md-6">
-                <label class="form-label">Member_PK:</label>
-                <div class="input-group">
-                    <input type="number" class="form-control" id="memberNum" name="memberNum" th:field="*{memberNum}" readonly required />
+            <div class="col-md-6" style="width: 30%;">
+                <div class="input-group" style="height: 40px; font-size: 0.9rem;">
+                    <input type="number" class="form-control" id="memberNum" name="memberNum" placeholder="회원 키 입력" th:field="*{memberNum}" readonly required />
                     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#memberModal">검색</button>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="form-label">회원 이름:</label>
-                <input type="text" class="form-control" id="memberName" th:field="*{memberName}" readonly />
+            <div class="col-md-6" style="width: 20%;">
+                <input type="text" class="form-control" id="memberName" style="height: 40px; font-size: 0.9rem;" placeholder="회원 이름" th:field="*{memberName}" readonly />
             </div>
-
-
-            <!-- 체크인/체크아웃/비밀번호 입력 -->
-
-            <div class="row mt-3">
-                <div class="col-md-4">
-                    <label for="checkInDate" class="form-label">체크인 날짜</label>
-                    <input type="datetime-local" class="form-control" id="checkInDate" name="checkInDate" th:field="*{checkInDate}" required />
+                <div class="col-md-4" style="width: 20%;">
+                    <input type="datetime-local" class="form-control" id="checkInDate" name="checkInDate"
+                           th:field="*{checkInDate}" placeholder="체크인 날짜" style="height: 40px; font-size: 0.9rem;" required />
                 </div>
-                <div class="col-md-4">
-                    <label for="checkOutDate" class="form-label">체크아웃 날짜</label>
-                    <input type="datetime-local" class="form-control" id="checkOutDate" name="checkOutDate" th:field="*{checkOutDate}" required />
+                <div class="col-md-4" style="width: 20%;">
+                    <input type="datetime-local" class="form-control" id="checkOutDate" name="checkOutDate"
+                           th:field="*{checkOutDate}" placeholder="체크아웃 날짜"
+                           style="height: 40px; font-size: 0.9rem;" required />
                 </div>
-                <div class="col-md-4">
-                    <label for="roomPassword" class="form-label">룸 비밀번호</label>
-                    <input type="text" class="form-control" id="roomPassword" name="roomPassword" th:field="*{roomPassword}" placeholder="숫자 4자리"
+                <div class="col-md-4" style="width: 10%;">
+                    <input type="text" class="form-control" id="roomPassword" name="roomPassword"
+                           th:field="*{roomPassword}" placeholder="숫자 4자리"
+                           style="height: 40px; font-size: 0.9rem;"
                            pattern="^\d{4}$"
                            maxlength="4"
                            inputmode="numeric" required />
                 </div>
-            </div>
 
             <!--호텔룸 이미지로 보여주는 레이아웃 메소드-->
             <div class="mt-4">
@@ -89,10 +83,20 @@
 
 
 
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary btn-lg">회원_룸배정</button>
-                <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">비회원_룸배정</a>
-                <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">룸배정목록</a>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button type="submit" class="btn btn-dark px-2 py-1" style="height: 40px; font-size: 0.9rem;">
+                    회원룸 배정
+                </button>
+
+                <a th:href="@{/member-insertroom}" class="btn btn-danger px-2 py-1 d-flex align-items-center justify-content-center"
+                   style="height: 40px; font-size: 0.9rem;">
+                    비회원룸 배정
+                </a>
+
+                <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1 d-flex align-items-center justify-content-center"
+                   style="height: 40px; font-size: 0.9rem;">
+                    룸배정 목록
+                </a>
             </div>
         </form>
         <!-- 페이지네이션 컨트롤은 밖에서 독립적으로 위치 -->
