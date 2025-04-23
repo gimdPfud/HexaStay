@@ -329,7 +329,9 @@
     <div class="container">
         <ul class="store-list card-list">
             <li th:each="store : ${list}" class="store-item">
-                <div class="div-card">
+                <div class="div-card"
+                     th:style="${store.storeStatus == 'closed'} ? 'background-color: #f5f5f5; color: #999;' : ''">
+                    <!--영업 종료된 가게라면 이런 스타일을 줍니다...-->
                     <a style="text-decoration: none; color: inherit; display: block; width: 100%;"
                        th:href="@{'/member/store/read/'+${store.storeNum}}">
                         <div class="inner-wrapper">
