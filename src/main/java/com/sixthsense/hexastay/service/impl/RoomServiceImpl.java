@@ -165,9 +165,24 @@ public class RoomServiceImpl {
         });
     }
 
+    //todo:main 페이지 가기 전에 중간 페이지 - 필수 페이지 입니다.
     //roompassword 을 찾아와서 패스워드를 인증 하는 메소드
     public boolean RoomPassword(String roomPassword) {
         return roomRepository.findRoomByRoomPassword(roomPassword).isPresent();
+    }
+
+    //Room pk 랑 member pk 을 찾아 오는 로직
+    //todo:memberByhotelRoom.html 에서 쓰이는 메소드
+    @Transactional
+    public void updateRoomMember(Long roomNum, Long newMemberNum) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new RuntimeException("Room 찾을 수 없음"));
+
+        Member newMember = memberRepository.findById(newMemberNum)
+                .orElseThrow(() -> new RuntimeException("회원 찾을 수 없음"));
+
+        room.setMember(newMember); // 기존 member FK → 새 member FK로 교체
+        roomRepository.save(room);
     }
 
 

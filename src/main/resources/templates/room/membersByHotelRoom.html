@@ -15,7 +15,12 @@
 <body>
 
 <div class="container mt-5">
-    <h3 class="fw-bold mb-4 text-center">룸 배정 회원 목록</h3>
+
+    <p>룸 번호: [[${roomNum}]]</p>
+
+    <p>룸번호 확인: [[${roomNum} != null ? ${roomNum} : '넘어오지 않음']]</p>
+
+    <h3 class="fw-bold mb-4 text-center">room 배정 회원 목록</h3>
 
     <table class="table table-bordered text-company mb-0">
         <thead class="table-light text-center">
@@ -39,20 +44,19 @@
                         data-bs-toggle="modal"
                         data-bs-target="#editMemberModal"
                         th:attr="data-member-num=${member.memberNum},
-                         data-member-name=${member.memberName},
-                         data-member-phone=${member.memberPhone},
-                         data-member-email=${member.memberEmail}">
+                                 data-member-name=${member.memberName},
+                                 data-member-phone=${member.memberPhone},
+                                 data-member-email=${member.memberEmail}">
                     수정
                 </button>
-                <a th:href="@{/member/delete/{memberNum}(memberNum=${member.memberNum})}"
-                   class="btn btn-danger btn-sm btn-icon"
-                   onclick="return confirm('정말 삭제하시겠습니까?');">
-                    삭제
-                </a>
+                <button onclick="openMemberModalWithRoomNum(101)">회원 수정</button>
             </td>
         </tr>
         </tbody>
     </table>
+    <!-- ✅ 테스트용으로 강제로 roomNum 전달 -->
+    <button type="button" class="btn btn-outline-secondary"
+            onclick="openMemberModalWithRoomNum(123)">회원 수정</button>
 
     <!-- 페이지네이션 -->
     <nav aria-label="회원 페이지네이션">
@@ -81,6 +85,41 @@
     </nav>
 </div>
 
+<!-- 회원 검색후 수정 모달 -->
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="memberModalLabel">회원 검색</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- ✅ 숨겨진 룸 넘버 input -->
+                <input type="hidden" id="roomNumHidden">
+                <div class="mb-3">
+                    <input type="text" id="memberSearchInput" class="form-control" placeholder="이름 또는 이메일 검색..."/>
+                    <button class="btn btn-outline-primary mt-2" type="button" onclick="searchMembers()">검색</button>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>전화번호</th>
+                        <th>선택</th>
+                    </tr>
+                    </thead>
+                    <tbody id="memberSearchResults"></tbody>
+                </table>
+                <button type="button" class="btn btn-outline-secondary" onclick="openMemberModalWithRoomNum(123)">회원 수정</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- 회원 수정 모달 -->
 <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -92,23 +131,19 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="memberNum" id="modalMemberNum">
-
                     <div class="mb-3">
                         <label for="modalMemberName" class="form-label">이름</label>
                         <input type="text" class="form-control" id="modalMemberName" name="memberName" required>
                     </div>
-
                     <div class="mb-3">
                         <label for="modalMemberPhone" class="form-label">전화번호</label>
                         <input type="text" class="form-control" id="modalMemberPhone" name="memberPhone" required>
                     </div>
-
                     <div class="mb-3">
                         <label for="modalMemberEmail" class="form-label">이메일</label>
                         <input type="email" class="form-control" id="modalMemberEmail" name="memberEmail" required>
                     </div>
                 </div>
-
                 <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="submit" class="btn btn-primary">저장</button>
@@ -119,67 +154,154 @@
 </div>
 
 <script>
-    const editMemberModal = document.getElementById('editMemberModal');
-    editMemberModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
+    function openMemberModalWithRoomNum(roomNum) {
+        console.log("열린 룸 넘버:", roomNum);
+        document.getElementById('roomNumHidden').value = roomNum;
+        const modal = new bootstrap.Modal(document.getElementById('memberModal'));
+        modal.show();
+    }
 
-        // data-* 속성으로부터 값 가져오기
-        const memberNum = button.getAttribute('data-member-num');
-        const memberName = button.getAttribute('data-member-name');
-        const memberPhone = button.getAttribute('data-member-phone');
-        const memberEmail = button.getAttribute('data-member-email');
+    function searchMembers() {
+        const query = document.getElementById('memberSearchInput').value;
+        if (!query.trim()) {
+            alert("검색어를 입력해주세요.");
+            return;
+        }
 
-        // 모달 폼 요소에 값 설정
-        document.getElementById('modalMemberNum').value = memberNum;
-        document.getElementById('modalMemberName').value = memberName;
-        document.getElementById('modalMemberPhone').value = memberPhone;
-        document.getElementById('modalMemberEmail').value = memberEmail;
-    });
-
-    // 회원 정보 수정 후 AJAX로 변경 사항 서버에 전송
-    const editMemberForm = document.getElementById('editMemberForm');
-    editMemberForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        // 수정된 데이터 가져오기
-        const memberNum = document.getElementById('modalMemberNum').value;
-        const memberName = document.getElementById('modalMemberName').value;
-        const memberPhone = document.getElementById('modalMemberPhone').value;
-        const memberEmail = document.getElementById('modalMemberEmail').value;
-
-        const updatedMember = {
-            memberNum: memberNum,
-            memberName: memberName,
-            memberPhone: memberPhone,
-            memberEmail: memberEmail
-        };
-
-        // AJAX 요청
-        fetch('/member/update/ajax', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedMember),
-        })
-            .then(response => response.json())
+        fetch(`/admin/member/search?keyword=${encodeURIComponent(query)}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`서버 응답 오류: ${res.status}`);
+                return res.json();
+            })
             .then(data => {
-                // 서버로부터 받은 수정된 데이터로 테이블 업데이트
-                const row = document.querySelector(`tr[data-member-num='${data.memberNum}']`);
-                if (row) {
-                    row.querySelector('.member-name').textContent = data.memberName;
-                    row.querySelector('.member-phone').textContent = data.memberPhone;
-                    row.querySelector('.member-email').textContent = data.memberEmail;
+                const tbody = document.getElementById('memberSearchResults');
+                tbody.innerHTML = "";
+                if (data.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='5' class='text-center'>검색 결과가 없습니다.</td></tr>";
+                    return;
                 }
 
-                // 모달 닫기
-                const modal = bootstrap.Modal.getInstance(editMemberModal);
-                modal.hide();
+                const roomNum = document.getElementById('roomNumHidden').value;
+
+                data.forEach(member => {
+                    const row = `
+                    <tr>
+                        <td>${member.memberNum}</td>
+                        <td>${member.memberName}</td>
+                        <td>${member.memberEmail}</td>
+                        <td>${member.memberPhone}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary select-member-btn"
+                                data-room-num="${roomNum}"
+                                data-member-num="${member.memberNum}"
+                                data-member-name="${member.memberName}"
+                                data-member-email="${member.memberEmail}"
+                                data-member-phone="${member.memberPhone}">
+                                검색수정
+                            </button>
+                        </td>
+                    </tr>`;
+                    tbody.insertAdjacentHTML("beforeend", row);
+                });
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error("회원 검색 오류:", error);
+                alert("회원 검색 중 오류가 발생했습니다.");
             });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('select-member-btn')) {
+            const btn = e.target;
+            const memberNum = btn.getAttribute('data-member-num');
+            const memberName = btn.getAttribute('data-member-name');
+            const memberEmail = btn.getAttribute('data-member-email');
+            const memberPhone = btn.getAttribute('data-member-phone');
+            const roomNum = btn.getAttribute('data-room-num');
+
+            selectMember(memberNum, memberName, memberEmail, memberPhone, roomNum);
+        }
     });
+
+    function selectMember(memberNum, memberName, memberEmail, memberPhone, roomNum) {
+        if (!roomNum) {
+            alert("roomNum 정보가 없습니다.");
+            return;
+        }
+
+        if (!confirm(`${memberName} 회원으로 수정하시겠습니까?`)) return;
+
+        fetch("/admin/room/update-member", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `roomNum=${roomNum}&newMemberNum=${memberNum}`
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("회원 수정 실패");
+                return res.text();
+            })
+            .then(msg => {
+                alert(msg);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('memberModal'));
+                modal.hide();
+                location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("회원 변경 중 오류가 발생했습니다.");
+            });
+    }
+
+
+
+
+
+        /*수동 modal 수정 script 메소드*/
+        // 🟢 DOM이 로드된 후 실행
+        document.addEventListener('DOMContentLoaded', function () {
+            const editMemberModal = document.getElementById('editMemberModal');
+            editMemberModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('modalMemberNum').value = button.getAttribute('data-member-num');
+                document.getElementById('modalMemberName').value = button.getAttribute('data-member-name');
+                document.getElementById('modalMemberPhone').value = button.getAttribute('data-member-phone');
+                document.getElementById('modalMemberEmail').value = button.getAttribute('data-member-email');
+            });
+
+            const editMemberForm = document.getElementById('editMemberForm');
+            editMemberForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = {
+                    memberNum: document.getElementById('modalMemberNum').value,
+                    memberName: document.getElementById('modalMemberName').value,
+                    memberPhone: document.getElementById('modalMemberPhone').value,
+                    memberEmail: document.getElementById('modalMemberEmail').value
+                };
+
+                fetch('/member/update/ajax', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("✅ 수정 완료");
+                            window.location.reload();
+                        } else {
+                            return response.text().then(text => {
+                                throw new Error(text);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        alert("❌ 수정 실패: " + error.message);
+                    });
+            });
+        });
+
 </script>
 
 </body>
