@@ -8,30 +8,21 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -91,6 +82,8 @@ public class StoreController {
                        @RequestParam(required = false) String keyword){
         Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
+        Page<StoreDTO> listA = storeService.searchlist("deleted", companyNum, searchType, keyword, pageable);
+        model.addAttribute("deletedList",listA);
 
         model.addAttribute("companyList",companyService.getBnFList());
 
@@ -135,7 +128,7 @@ public class StoreController {
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
         Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
-        Page<StoreDTO> listA = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
+        Page<StoreDTO> listA = storeService.searchlist("deleted", companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
         model.addAttribute("deletedList",listA);
         model.addAttribute("companyMap", storeService.getCompanyMap());
@@ -197,6 +190,12 @@ public class StoreController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id){
         storeService.delete(id);
+        return "redirect:/admin/store/list";
+    }
+
+    @GetMapping("/restore/{id}")
+    public String restore(@PathVariable Long id){
+        storeService.restore(id);
         return "redirect:/admin/store/list";
     }
 }

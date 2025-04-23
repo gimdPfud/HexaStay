@@ -122,6 +122,50 @@
             </ul>
         </div>
 
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered text-company mb-0">
+                    <thead class="table-light text-center">
+                    <tr>
+                        <th style="text-align: center; vertical-align: middle;">제공호텔</th>
+                        <th style="text-align: center; vertical-align: middle;">이미지</th>
+                        <th style="text-align: center; vertical-align: middle;">업체명</th>
+                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
+                        <th style="text-align: center; vertical-align: middle;">주소</th>
+                        <th style="text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="text-align: center; vertical-align: middle;">상세보기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="data : ${deletedList}">
+                        <td th:text="${data.companyName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td style="text-align: center;">
+                            <img th:if="${data.storeProfileMeta != null}"
+                                 th:src="@{${data.storeProfileMeta}}"
+                                 style="width: 80px; height: 80px;">
+
+                            <img th:unless="${data.storeProfileMeta != null}"
+                                 th:src="@{/store/default.png}"
+                                 style="width: 80px; height: 80px;">
+                        </td>
+
+                        <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
+                        <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <a th:href="@{'/admin/store/restore/'+${data.storeNum}}" class="btn btn-success btn-sm">복원</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-5" th:if="${deletedList == null or deletedList.empty}">
+                <h2 class="text-secondary">목록이 없습니다.</h2>
+            </div>
+        </div>
+
         <!-- 등록 모달 -->
         <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-md modal-dialog-centered">
