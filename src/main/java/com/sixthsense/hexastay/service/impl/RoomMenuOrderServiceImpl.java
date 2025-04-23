@@ -285,6 +285,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     // 주문어드민
     @Override
     public Page<RoomMenuOrderDTO> getAllOrdersForAdmin(Pageable pageable) {
+        log.info("관리자용 오더 승인 리스트 진입 (서비스)");
         // ORDER와 ACCEPT 상태인 주문 페이징 조회
         Page<RoomMenuOrder> orderPage = roomMenuOrderRepository.findAllByRoomMenuOrderStatusInOrderByRegDateDesc(
                 Arrays.asList(RoomMenuOrderStatus.ORDER, RoomMenuOrderStatus.ACCEPT),
@@ -309,6 +310,13 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             }).collect(Collectors.toList());
 
             dto.setOrderItemList(itemDTOList);
+
+            // ★ 총 금액 계산 부분: 주문 항목들의 (가격 * 수량) 합계를 구해서 totalPrice에 저장
+            int total = order.getOrderItems().stream()
+                    .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                    .sum();
+            dto.setTotalPrice(total);
+
             return dto;
         });
 
