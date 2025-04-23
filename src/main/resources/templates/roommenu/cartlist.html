@@ -416,6 +416,30 @@
             });
         });
 
+        // 결제여부에 따라서 이동되는 페이지
+        function processPayment() {
+            const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
+
+            fetch('/roommenu/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    requestMessage: roomMenuOrderRequestMessage
+                })
+            })
+                .then(res => res.text())
+                .then(result => {
+                    alert("결제가 완료되었습니다.");
+                    window.location.href = '/roommenu/orderList';
+                })
+                .catch(error => {
+                    alert("결제 중 오류 발생: " + error);
+                });
+        }
+
+
     </script>
 
 </div>
