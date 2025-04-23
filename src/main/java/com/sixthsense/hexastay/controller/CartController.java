@@ -53,8 +53,8 @@ public class CartController {
         return "redirect:/member/main";
     }
 
-    @GetMapping("/goorderlist")
-    public String goorderlist(HttpServletRequest request) {
+    @GetMapping("/receipt")
+    public String goreceipt(HttpServletRequest request) {
         String referer = request.getHeader("Referer");
         System.out.println("이전 페이지: " + referer);
         if (referer != null) {
