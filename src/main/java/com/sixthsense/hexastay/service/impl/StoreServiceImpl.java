@@ -123,9 +123,9 @@ public class StoreServiceImpl implements StoreService {
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
-            storeDTO.setStoreProfileMeta("/store/menu/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            storeDTO.setStoreProfileMeta("/store/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "store/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
