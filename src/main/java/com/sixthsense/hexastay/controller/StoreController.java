@@ -120,9 +120,9 @@ public class StoreController {
 //            }
 //        }
         Long companyNum = 0L;
-        if(chosenCompany!=null && !chosenCompany.trim().isEmpty() && !chosenCompany.equals("호텔목록")){
-            companyNum = Long.valueOf(chosenCompany);
-        }
+        try {companyNum = Long.valueOf(chosenCompany);}
+        catch (NumberFormatException ignored){}
+        //todo <option value="">모두 보기</option> 추가 (26번째 줄)
         model.addAttribute("companyNum",companyNum);
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);

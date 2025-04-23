@@ -20,8 +20,8 @@ public interface OrderstoreService {
     boolean validOrder(Long orderId, String email);
 
     /*2. 주문하기 */
-    int insert(List<Long> itemIdList, String email);
-    int insert(List<Long> itemIdList, Long hotelRoomNum);
+    int insert(List<Long> itemIdList, String email, String orderstoreMessage);
+    int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage);
 
     /*3. 주문취소*/
     void cancel(Long orderId);

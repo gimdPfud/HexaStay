@@ -59,7 +59,7 @@ public class CartController {
         System.out.println("이전 페이지: " + referer);
         if (referer != null) {
             if (referer.contains("/roommenu")) {
-                return "redirect:/roommenu/orderlist";
+                return "redirect:/roommenu/orderList";
             } else if (referer.contains("/member/store")) {
                 return "redirect:/member/store/order/list";
             }

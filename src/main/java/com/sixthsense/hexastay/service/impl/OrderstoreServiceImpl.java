@@ -45,7 +45,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
 
     /*예외처리 orelse로 구분... 1:정상 2:room못찾음 3:cartItem못찾음*/
     @Override
-    public int insert(List<Long> itemIdList, String email) {
+    public int insert(List<Long> itemIdList, String email, String orderstoreMessage) {
         Member member = memberRepository.findByMemberEmail(email);
         //추가 : room레포지토리에서 멤버로 가장 최근의 room을 찾아 setRoom() 때린다.
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
@@ -55,6 +55,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         Orderstore order = new Orderstore();
         order.setRoom(room);
         order.setOrderstoreStatus("alive");
+        order.setOrderstoreMessage(orderstoreMessage);
 
         List<Orderstoreitem> itemlist = new ArrayList<>();
         for (Long itemid : itemIdList){
@@ -77,7 +78,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     /*이거 사용함
     * hotelRoomNum*/
     @Override
-    public int insert(List<Long> itemIdList, Long hotelRoomNum) {
+    public int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage) {
         //추가 : room레포지토리에서 방번호로 가장 최근의 room(예약정보)을 찾아 setRoom() 때린다.
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
         Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelRoomNum, pageable)
@@ -86,6 +87,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         Orderstore order = new Orderstore();
         order.setRoom(room);
         order.setOrderstoreStatus("unpaid");
+        order.setOrderstoreMessage(orderstoreMessage);
 
         if(itemIdList==null||itemIdList.isEmpty()){return 3;}
 
@@ -204,16 +206,21 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     @Override
     public List<OrderstoreDTO> getOrderedList(Long storeNum) {
         List<Orderstore> list = orderstoreRepository.findByStoreNum(storeNum);
-        list.forEach(log::info);//됨
+//        list.forEach(log::info);//됨
         List<OrderstoreDTO> result = list.stream().map(data -> {
             OrderstoreDTO dto = modelMapper.map(data, OrderstoreDTO.class);
             dto.setOrderstoreitemDTOList(
-                    data.getOrderstoreitemList().stream().map(a->modelMapper.map(a,OrderstoreitemDTO.class)).toList()
+                    data.getOrderstoreitemList().stream().map(
+                            a->{
+                                OrderstoreitemDTO itemDTO = modelMapper.map(a,OrderstoreitemDTO.class);
+                                itemDTO.setStoremenuDTO(modelMapper.map(a.getStoremenu(),StoremenuDTO.class));
+                                return itemDTO;
+                            }).toList()
             );
             return dto;
         }).toList();
         log.info("서비스에서 찾음? "+result.size());
-        result.forEach(log::info);
+//        result.forEach(log::info);
         return result;
     }
 }
