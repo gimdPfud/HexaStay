@@ -49,14 +49,14 @@
                                  data-member-email=${member.memberEmail}">
                     수정
                 </button>
-                <button onclick="openMemberModalWithRoomNum(101)">회원 수정</button>
+                <button onclick="openMemberModalWithRoomNum()">회원 수정</button>
             </td>
         </tr>
         </tbody>
     </table>
     <!-- ✅ 테스트용으로 강제로 roomNum 전달 -->
     <button type="button" class="btn btn-outline-secondary"
-            onclick="openMemberModalWithRoomNum(123)">회원 수정</button>
+            onclick="openMemberModalWithRoomNum()">회원 수정</button>
 
     <!-- 페이지네이션 -->
     <nav aria-label="회원 페이지네이션">
@@ -91,6 +91,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="memberModalLabel">회원 검색</h5>
+                <p>룸 번호: [[${roomNum}]]</p>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -112,7 +113,7 @@
                     </thead>
                     <tbody id="memberSearchResults"></tbody>
                 </table>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMemberModalWithRoomNum(123)">회원 수정</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="openMemberModalWithRoomNum()">회원 수정</button>
             </div>
         </div>
     </div>
@@ -212,31 +213,36 @@
 
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('select-member-btn')) {
+
             const btn = e.target;
             const memberNum = btn.getAttribute('data-member-num');
-            const memberName = btn.getAttribute('data-member-name');
-            const memberEmail = btn.getAttribute('data-member-email');
-            const memberPhone = btn.getAttribute('data-member-phone');
             const roomNum = btn.getAttribute('data-room-num');
 
-            selectMember(memberNum, memberName, memberEmail, memberPhone, roomNum);
+            selectMember(memberNum, roomNum);
         }
     });
 
-    function selectMember(memberNum, memberName, memberEmail, memberPhone, roomNum) {
-        if (!roomNum) {
-            alert("roomNum 정보가 없습니다.");
+    /*roomNum MemberNum 다 들어와야 함 들어 와라 제발 제발 */
+    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+
+
+    function selectMember(memberNum, roomNum) {
+        if (!roomNum || !memberNum) {
+            alert("필수 정보가 누락되었습니다.");
             return;
         }
 
-        if (!confirm(`${memberName} 회원으로 수정하시겠습니까?`)) return;
+        if (!confirm("선택한 회원으로 수정하시겠습니까?")) return;
 
         fetch("/admin/room/update-member", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `roomNum=${roomNum}&newMemberNum=${memberNum}`
+            body: `roomNum=${roomNum}&memberNum=${memberNum}`
         })
             .then(res => {
                 if (!res.ok) throw new Error("회원 수정 실패");
@@ -249,9 +255,10 @@
                 location.reload();
             })
             .catch(err => {
-                console.error(err);
+                console.error("회원 변경 중 오류:", err);
                 alert("회원 변경 중 오류가 발생했습니다.");
             });
+
     }
 
 
