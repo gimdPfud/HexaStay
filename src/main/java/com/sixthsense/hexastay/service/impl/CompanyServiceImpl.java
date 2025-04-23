@@ -229,6 +229,20 @@ public class CompanyServiceImpl implements CompanyService {
         return companyDTOList;
     }
 
+    @Override
+    public List<CompanyDTO> getBnFList() {
+        List<CompanyDTO> list = new ArrayList<>();
+        List<CompanyDTO> fcL = companyRepository.findByCompanyType("facility")
+                .stream().map(data->modelMapper.map(data,CompanyDTO.class))
+                .toList();
+        List<CompanyDTO> brL = companyRepository.findByCompanyType("branch")
+                .stream().map(data->modelMapper.map(data,CompanyDTO.class))
+                .toList();
+        list.addAll(brL);
+        list.addAll(fcL);
+        return list;
+    }
+
     private CompanyDTO convertToCompanyDTO(Company company) {
         CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
 

@@ -40,8 +40,6 @@ import java.util.stream.Collectors;
 public class StoreController {
     private final StoreService storeService;
     private final CompanyService companyService;
-    private final ModelMapper modelMapper = new ModelMapper();//todo 임시조치 끝나면 지우기
-    private final CompanyRepository companyRepository;
     private final AdminService adminService; //adminRepository에는 email로 찾아오는게 있는데.. 여긴 없음.
 
     /*
@@ -71,13 +69,7 @@ public class StoreController {
 //                return "redirect:/admin/logout";
 //            }
 //        }
-        //todo 임시조치
-        List<CompanyDTO> list = new ArrayList<>();
-        List<CompanyDTO> fcL = companyRepository.findByCompanyType("facility").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
-        List<CompanyDTO> brL = companyRepository.findByCompanyType("branch").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
-        list.addAll(brL);
-        list.addAll(fcL);
-        model.addAttribute("companyList",list);
+        model.addAttribute("companyList",companyService.getBnFList());
 //         정상적인 호텔 소속 어드민
 //        CompanyDTO companyDTO = companyService.companyRead(adminDTO.getCompanyNum());
 //        model.addAttribute("data", companyDTO);
@@ -100,12 +92,7 @@ public class StoreController {
         Page<StoreDTO> list = storeService.searchlist("alive", companyNum, searchType, keyword, pageable);
         model.addAttribute("list",list);
 
-        List<CompanyDTO> comlist = new ArrayList<>();
-        List<CompanyDTO> fcL = companyRepository.findByCompanyType("facility").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
-        List<CompanyDTO> brL = companyRepository.findByCompanyType("branch").stream().map(data->modelMapper.map(data,CompanyDTO.class)).toList();
-        comlist.addAll(brL);
-        comlist.addAll(fcL);
-        model.addAttribute("companyList",comlist);
+        model.addAttribute("companyList",companyService.getBnFList());
 
         model.addAttribute("companyMap", storeService.getCompanyMap());
         model.addAttribute("searchType",searchType);
