@@ -32,7 +32,9 @@ public class RoomMenuOrderItemDTO {
 
     private String roomMenuOrderRequestMessage; // 요청사항
 
-
     private String roomMenuOrderItemName; // 아이템 이름
+
+    // 새로 추가한 이미지 필드
+    private String roomMenuImageMeta;
 
 }
