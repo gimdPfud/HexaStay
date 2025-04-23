@@ -48,7 +48,12 @@ public class StoreCartController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         /*todo DTO 유효성 확인*/
         try {
             Long result = storecartService.addCart(dto, hotelroomNum);
@@ -69,7 +74,12 @@ public class StoreCartController {
         if(principal==null){
             return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return "redirect:/member/login";
+        }
         List<StorecartitemViewDTO> list = storecartService.getCartList(hotelroomNum);
         AtomicReference<Long> totalpirce = new AtomicReference<>(0L);
         list.forEach(dto -> {
@@ -86,7 +96,12 @@ public class StoreCartController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         if(count<=0){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -102,7 +117,12 @@ public class StoreCartController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         if(!storecartService.validCartItemOwner(cartItemId,hotelroomNum)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -115,7 +135,12 @@ public class StoreCartController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = null;
+        try {
+            hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         try {
             storecartService.clearCartItems(hotelroomNum);
             cartInsert(dto, principal);//저 위에 있는 등록 맞음 ^_^ ;;

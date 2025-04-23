@@ -29,6 +29,8 @@ public class RoomMenuOrderDTO {
 
     private  int roomMenuOrderAmount; // 주문의 수량
 
+    private int totalPrice; // 주문의 총 합계 < -- AdminOrderList 에서 사용중
+
     private Member member;
 
     private RoomMenuOrderStatus roomMenuOrderStatus;

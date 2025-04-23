@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile}">
+      layout:decorate="~{layouts/layoutmobile}" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,11 +127,6 @@
         .form-select option {
             padding: 10px;
             font-size: 16px;
-        }
-
-        /* 선택한 항목 hover시 변화 */
-        .form-select:hover {
-            border-color: #66bb6a;
         }
 
         /* select 요소 화살표 커스터마이징 */
@@ -317,7 +312,6 @@
         }
 
         /* 다국어 */
-
         .lang-en .tab {
             font-size: 13px;
             padding: 8px 10px;
@@ -386,7 +380,7 @@
 
     </style>
 </head>
-<body th:classappend="${#locale.language == 'en'} ? 'lang-en' : ''">
+<body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
 <div layout:fragment="contentorder">
 
     <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">가격높은순</div>
@@ -414,9 +408,9 @@
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
                 <div class="search-box">
-                    <input hidden name="type" th:value="S">
-                    <input type="text" th:placeholder="#{search.placeholder}" name="keyword" />
-                    <button type="submit" th:text="#{search.button}">검색</button>
+                    <input type="hidden" name="type" th:value="S">
+                    <input type="text" th:placeholder="#{search.placeholder}" name="keyword" id="searchInput">
+                    <button type="submit" th:text="#{search.button}" id="searchBtn">검색</button>
                 </div>
             </form>
         </div>
@@ -439,8 +433,7 @@
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
         <ul class="food-list card-list">
             <li th:each="roomMenuDTO : ${list}" class="food-item">
-                <div class="div-card">
-                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                <div class="div-card"
                        style="text-decoration: none; color: inherit; display: block; width: 100%;">
                         <div class="inner-wrapper">
                             <div class="d-flex">
@@ -456,27 +449,32 @@
 
                                 <!-- 오른쪽 메뉴명, 설명, 가격, 카테고리 뱃지, 하트 아이콘 -->
                                 <div class="text-info">
-                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
-                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
-                                    <div class="price-box">
-                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
-                                        <span th:text="#{item.currency}">원</span>
-                                    </div>
+                                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                                       style="text-decoration: none; color: inherit; display: block; width: 100%;">
+                                        <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                        <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                        <div class="price-box">
+                                            <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                            <span th:text="#{item.currency}">원</span>
+                                        </div>
+                                    </a>
+
                                     <div class="d-flex justify-content-between align-items-center">
                                         <!-- 카테고리 뱃지 -->
                                         <div class="category-wrapper">
                                             <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
                                         </div>
-                                        <!-- 좋아요 아이콘 -->
-                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                                              class="like-icon">🤍</span>
-                                        <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                        <div class="like-section">
+                                            <!-- 좋아요 아이콘 (a 태그 바깥!) -->
+                                            <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                                  th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                                  class="like-icon">🤍</span>
+                                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </a>
                 </div>
             </li>
         </ul>
@@ -487,9 +485,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
-        function goToCartList() {
-            window.location.href = '/roommenu/cartlist';
-        }
 
         // 상태 저장
         const likedStates = {};
@@ -513,7 +508,10 @@
 
                     likeIcon.textContent = liked ? '🤍' : '❤️';
                     likeIcon.style.color = liked ? 'gray' : 'red';
-                    likeCount.textContent = data.count;  // data.count로 업데이트
+                    likeCount.textContent =
+                        typeof data.likeCount === 'number' ? data.likeCount : (
+                            parseInt(likeCount.textContent) + (liked ? -1 : 1)
+                        );
 
                     likedStates[menuId] = !liked;
                 })
@@ -574,6 +572,53 @@
             document.getElementById('langInput').value = lang;
             document.getElementById('langForm').submit();
         }
+
+        // 다국어 변경시 ..?
+        document.addEventListener('DOMContentLoaded', function () {
+            const userLang = navigator.language || navigator.userLanguage;
+
+            // 기본 언어를 한국어로 설정하고, 다른 언어도 지원
+            let lang = 'ko'; // 기본 한국어
+            if (userLang.startsWith('en')) {
+                lang = 'en';
+            } else if (userLang.startsWith('ja')) {
+                lang = 'ja';
+            } else if (userLang.startsWith('cn')) {
+                lang = 'cn';
+            }
+
+            // 메시지 객체 (여기서는 미리 정의된 메시지를 사용)
+            const messages = {
+                ko: {
+                    search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다."
+                },
+                en: {
+                    search_disabled_message: "Search is not supported when changing languages."
+                },
+                ja: {
+                    search_disabled_message: "言語を変更すると検索はサポートされません。"
+                },
+                cn: {
+                    search_disabled_message: "更改语言时不支持搜索。"
+                }
+            };
+
+            // 현재 언어에 맞는 메시지 가져오기
+            const message = messages[lang].search_disabled_message;
+
+            // body에 'lang-non-ko' 클래스가 있다면 현재 언어가 한국어가 아닌 것으로 가정
+            if (document.body.classList.contains('lang-non-ko')) {
+                const searchInput = document.getElementById('searchInput');
+                const searchBtn = document.getElementById('searchBtn');
+                if (searchInput && searchBtn) {
+                    // 입력창과 버튼을 비활성화
+                    searchInput.disabled = true;
+                    searchBtn.disabled = true;
+                    searchInput.placeholder = message; // 다국어 메시지를 동적으로 적용
+                }
+            }
+        });
+
     </script>
     <!-- 스크립트 끝 -->
 

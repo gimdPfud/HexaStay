@@ -35,7 +35,7 @@ public class OrderstoreitemDTO {
 
     //*********************************
     //외부업체 상품 가져올 PK - Storemenu
-    private Long storemenuNum;
+    private StoremenuDTO storemenuDTO;
 
     //**********************************
     //멤버 정보를 가져올 PK - orderstoreNum

@@ -206,7 +206,7 @@
     <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품정보"</p>
     <p>
         <span th:text="#{item.price}">가격</span> :
-        <span th:text="${roomMenuDTO.roomMenuPrice}"></span>
+        <span id="formattedPrice" th:text="${roomMenuDTO.roomMenuPrice}"></span>
         <span th:text="#{item.currency}">원</span>
     </p>
 
@@ -228,15 +228,14 @@
     </div>
 
         <!-- 가격 변동을 표시할 부분 -->
-         <span th:text="#{item.totalPrice}">총 가격</span> : <span id="totalPrice">가격</span>
-         <span th:text="#{item.currency}"></span>
+    <span th:text="#{item.totalPrice}">총 가격</span> :
+    <span id="totalPrice">10,000</span><span th:text="#{item.currency}">원</span>
 
 
     <!-- 버튼들 -->
     <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.addToCart}">장바구니 담기</button>
     <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
     <button class="order-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.orderNow}">바로 주문하기</button>
-</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -248,7 +247,7 @@
     $(document).ready(function () {
         //  1. 초기 총 가격 표시
         let initialCount = parseInt($("#count").val());
-        $("#totalPrice").text((initialCount * price) + '원');
+        $("#totalPrice").text((initialCount * price).toLocaleString());
 
         //  2. 수량 변경 시 총 가격 업데이트 및 재고 체크
         $("#count").on("change", function () {
@@ -266,7 +265,7 @@
                 count = maxCount;
             }
 
-            $("#totalPrice").text((count * price) + '원');
+            $("#totalPrice").text((count * price).toLocaleString());
         });
 
         // 장바구니 버튼 이벤트
@@ -344,6 +343,13 @@
     function goBack() {
         window.history.back();
     }
+
+    // 체크포맷팅 지우지마!! 10000 ---> 10,000
+    document.addEventListener('DOMContentLoaded', function () {
+        var price = parseInt(document.getElementById('formattedPrice').textContent);
+        var formattedPrice = price.toLocaleString();  // 10000 -> "10,000"
+        document.getElementById('formattedPrice').textContent = formattedPrice;
+    });
 </script>
 
 
