@@ -15,6 +15,15 @@
 <body>
 
 <div class="container mt-5">
+    <p>룸 번호: [[${roomNum}]]</p>
+
+    <p>룸번호 확인: [[${roomNum} != null ? ${roomNum} : '넘어오지 않음']]</p>
+    <span th:text="${roomNum}">기본값</span>
+
+    <!-- hidden input으로 담을 때 -->
+    <input type="hidden" th:value="${roomNum}" id="roomNum">
+
+
     <!-- 메시지 출력 -->
     <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
@@ -62,6 +71,7 @@
         </tr>
         </tbody>
     </table>
+
 
     <!-- 페이지네이션 -->
     <nav aria-label="Page navigation">

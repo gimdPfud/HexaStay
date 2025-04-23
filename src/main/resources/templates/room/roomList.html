@@ -60,7 +60,7 @@
                             <a href="javascript:void(0);"
                                onclick="openHotelRoomPopup(this)"
                                class="hover-grow-text"
-                               th:attr="data-hotelRoomNum=${room.hotelRoomNum}"
+                               th:attr="data-hotelRoomNum=${room.hotelRoomNum} ,data-roomNum=${room.roomNum}"
                                th:text="${room.hotelRoomName}"></a>
                         </td>
 
@@ -69,7 +69,7 @@
                             <a href="javascript:void(0);"
                                onclick="openMemberPopup(this)"
                                class="hover-grow-text"
-                               th:attr="data-memberNum=${room.memberNum}"
+                               th:attr="data-memberNum=${room.memberNum},data-roomNum=${room.roomNum}"
                                th:text="${room.memberName}"></a>
                         </td>
                         <td class="text-center" th:text="${room.memberEmail}"></td>
@@ -116,32 +116,31 @@
     <script th:inline="javascript">
         function openHotelRoomPopup(element) {
             const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+            const roomNum = element.getAttribute("data-roomNum");
+
             if (!hotelRoomNum) return alert("호텔룸 번호를 찾을 수 없습니다.");
+            if (!roomNum) return alert("룸 번호를 찾을 수 없습니다.");
 
-            const popupUrl = "/membersByHotelRoom/" + hotelRoomNum;
+            // hotelRoomNum은 path variable, roomNum은 query param으로 전달
+            const popupUrl = `/membersByHotelRoom/${hotelRoomNum}?roomNum=${roomNum}`;
 
-            // 팝업 기본 사이즈
             const popupWidth = 1200;
             const popupHeight = 700;
 
-            // 화면 가운데 정렬 좌표 계산
             const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
             const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
-
             const width = window.innerWidth || document.documentElement.clientWidth || screen.width;
             const height = window.innerHeight || document.documentElement.clientHeight || screen.height;
 
             const left = screenLeft + (width - popupWidth) / 2;
             const top = screenTop + (height - popupHeight) / 2;
 
-            // 팝업 열기
             const newWindow = window.open(
                 popupUrl,
                 "room/membersByHotelRoom",
                 `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
             );
 
-            // 팝업 창에 포커스
             if (window.focus && newWindow) {
                 newWindow.focus();
             }
@@ -150,9 +149,12 @@
         <!--member 정보 클릭시 팝업 스크립트 -->
         function openMemberPopup(element) {
             const memberNum = element.getAttribute("data-memberNum");
-            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+            const roomNum = element.getAttribute("data-roomNum"); // 🔥 추가된 부분
 
-            const popupUrl = "/hotelRoomsByMember/" + memberNum;
+            if (!memberNum) return alert("회원 번호를 찾을 수 없습니다.");
+            if (!roomNum) return alert("룸 번호를 찾을 수 없습니다.");
+
+            const popupUrl = `/hotelRoomsByMember/${memberNum}?roomNum=${roomNum}`;
 
             // 팝업 기본 사이즈
             const popupWidth = 1200;

@@ -138,6 +138,7 @@
 
     <!-- JavaScript 영역 -->
     <script th:inline="javascript">
+
         //roomPassword 패스워드 4자리로 제한적 설정
         document.getElementById('roomPassword').addEventListener('input', function (e) {
             this.value = this.value.replace(/\D/g, '').slice(0, 4); // 숫자만, 최대 4자리
@@ -151,7 +152,7 @@
                 alert("검색어를 입력해주세요.");
                 return;
             }
-
+            //링크 주소 membercontroller 에 있음
             fetch(`/admin/member/search?keyword=${query}`)
                 .then(res => res.json())
                 .then(data => {
@@ -169,6 +170,7 @@
                                 <td>${member.memberNum}</td>
                                 <td>${member.memberName}</td>
                                 <td>${member.memberEmail}</td>
+                                <td>${member.memberPhone}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary" onclick="selectMember(${member.memberNum}, '${member.memberName}')">
                                         선택
@@ -198,9 +200,6 @@
 
         }
 
-
-
-
             // 페이지 로드시 memberNum이 이미 입력돼 있다면 이름 불러오기
             function fetchMemberName() {
             const memberNum = document.getElementById("memberNum").value;
@@ -223,6 +222,7 @@
         /*호테룸 정보를 가져 오는 script*/
         let currentPage = 0;
 
+        //hotelRoomController에 링크 주소 있음
         function loadHotelRooms(page = 0) {
             fetch(`/admin/hotelroom/listpage?page=${page}&size=6`)
                 .then(res => res.json())
