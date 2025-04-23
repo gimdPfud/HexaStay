@@ -49,7 +49,12 @@
                                  data-member-email=${member.memberEmail}">
                     수정
                 </button>
-                <button onclick="openMemberModalWithRoomNum()">회원 수정</button>
+                <!-- ✅ 이렇게 수정 -->
+                <button type="button"
+                        class="btn btn-outline-secondary open-member-modal-btn"
+                        th:attr="data-room-num=${roomNum}">
+                    회원 수정
+                </button>
             </td>
         </tr>
         </tbody>
@@ -155,9 +160,26 @@
 </div>
 
 <script>
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('open-member-modal-btn')) {
+
+            const roomNum = e.target.getAttribute('data-room-num');
+            console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum);
+            console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum);
+            console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum);
+
+            openMemberModalWithRoomNum(roomNum);
+        }
+    });
+
     function openMemberModalWithRoomNum(roomNum) {
-        console.log("열린 룸 넘버:", roomNum);
+
+        console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum); // 여기를 확인!
+        console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum); // 여기를 확인!
+        console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum); // 여기를 확인!
+        console.log("openMemberModalWithRoomNum 호출됨, 전달된 roomNum:", roomNum); // 여기를 확인!
         document.getElementById('roomNumHidden').value = roomNum;
+
         const modal = new bootstrap.Modal(document.getElementById('memberModal'));
         modal.show();
     }
@@ -216,20 +238,26 @@
 
             const btn = e.target;
             const memberNum = btn.getAttribute('data-member-num');
-            const roomNum = btn.getAttribute('data-room-num');
+            // const roomNum = btn.getAttribute('data-room-num');  ✅ roomNum은 내부에서 가져오도록
 
-            selectMember(memberNum, roomNum);
+            selectMember(memberNum);
         }
     });
 
-    /*roomNum MemberNum 다 들어와야 함 들어 와라 제발 제발 */
-    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
-    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
-    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
-    console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
 
 
-    function selectMember(memberNum, roomNum) {
+
+    function selectMember(memberNum) {
+
+        const roomNum = document.getElementById('roomNumHidden').value;
+
+        /*roomNum MemberNum 다 들어와야 함 들어 와라 제발 제발 */
+        console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+        console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+        console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+        console.log("roomNum:", roomNum, "memberNum:", memberNum+"룸키랑 멤버키 들오오기는 하니 왜 안들어 오냐구");
+
+
         if (!roomNum || !memberNum) {
             alert("필수 정보가 누락되었습니다.");
             return;
