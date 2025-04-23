@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.dto;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -61,10 +62,11 @@ public class HotelRoomDTO {
 
     //*********숙박 일정 필드명********//
 
-    private LocalDateTime checkInDate; //체크인
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime checkInDate;
 
-
-    private LocalDateTime checkOutDate; //체크아웃
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime checkOutDate;
 
 
 

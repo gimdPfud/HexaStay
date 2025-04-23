@@ -74,8 +74,8 @@
                         </td>
                         <td class="text-center" th:text="${room.memberEmail}"></td>
                         <td class="text-center" th:text="${room.hotelRoomPhone}"></td>
-                        <td class="text-center" th:text="${room.checkInDate}"></td>
-                        <td class="text-center" th:text="${room.checkOutDate}"></td>
+                        <td th:text="${#temporals.format(room.checkInDate,'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(room.checkOutDate,'yyyy-MM-dd HH:mm')}"></td>
                         <td class="text-center text-danger" th:text="${room.roomPassword}"></td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">
@@ -108,8 +108,8 @@
 
     <!-- 하단 버튼 -->
     <div class="d-flex justify-content-center mt-4 gap-3">
-        <a th:href="@{/register-hotelroom}" class="btn btn-dark">HotelRoomPk_룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
-        <a th:href="@{/member-insertroom}" class="btn btn-danger">MemberPk_룸배정</a>
+        <a th:href="@{/register-hotelroom}" class="btn btn-dark">회원_룸배정</a><!--todo:http://localhost:8090/register-hotelroom-->
+        <a th:href="@{/member-insertroom}" class="btn btn-danger">비회원_룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
     </div>
 
     <!--Room 정보 클릭시 팝업 스크립트 -->
