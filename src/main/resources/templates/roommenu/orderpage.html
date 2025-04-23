@@ -95,6 +95,11 @@
             padding: 10px;
             font-size: 14px;
         }
+        .tabs .tab.active {
+            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
+            background-color: #f0f0f0 !important; /* 배경 색상도 강제로 지정 */
+            color: #333 !important; /* 텍스트 색상 강제로 지정 */
+        }
 
         /* 검색 박스 스타일 */
         .search-box {
@@ -212,19 +217,6 @@
             margin-top: 0;
         }
 
-        /* 가격 정렬 버튼 간격 조정 */
-        .d-flex.justify-content-end {
-            display: flex;
-            justify-content: flex-end;
-            gap: 4px; /* 버튼 간 간격 좁히기 */
-            margin-top: 10px; /* 위쪽 여백 조정 */
-        }
-
-        .d-flex.justify-content-end .tab {
-            font-size: 14px; /* 폰트 크기 통일 */
-            padding: 5px 12px; /* 패딩 조정 */
-        }
-
         .text-info-container {
             display: flex;
             flex-direction: column;
@@ -237,7 +229,7 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            padding-right: 10px;
+            padding-left: 10px;
             margin-top: 15px;
         }
 
@@ -282,6 +274,7 @@
             object-fit: cover;
             border-radius: 10px;
         }
+
         .menu-badge {
             display: inline-block;
             background-color: #e0f7fa;
@@ -292,12 +285,12 @@
             margin-bottom: 4px;
             font-weight: bold;
         }
+
         .like-section {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            padding: 0 15px 15px 15px;
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            gap: 5px;
         }
 
         .like-icon {
@@ -309,6 +302,7 @@
         .like-count {
             font-size: 1rem;
             font-weight: bold;
+            color: #80b3ff;
         }
 
         .cart-count {
@@ -455,7 +449,7 @@
                 <div class="div-card"
                        style="text-decoration: none; color: inherit; display: block; width: 100%;">
                         <div class="inner-wrapper">
-                            <div class="d-flex">
+                            <div class="d-flex justify-content-center align-items-center">
                                 <!-- 이미지 왼쪽 배치 -->
                                 <div class="menu-image-container">
                                     <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
@@ -476,19 +470,15 @@
                                             <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
                                             <span th:text="#{item.currency}">원</span>
                                         </div>
-                                    </a>
-
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <!-- 카테고리 뱃지 -->
-
-                                        <div class="like-section">
-                                            <!-- 좋아요 아이콘 (a 태그 바깥!) -->
+                                        <div class="d-flex justify-content-end">
+                                            <div class="like-section">
                                             <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
                                                   th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
                                                   class="like-icon">🤍</span>
-                                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                                <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -561,27 +551,15 @@
             });
         });
 
-        // 탭 클릭 시 active 클래스 추가
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // 모든 탭에서 active 클래스를 제거
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // 탭 클릭 이벤트 처리
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab');
 
-                // 클릭한 탭에 active 클래스 추가
-                this.classList.add('active');
-            });
-        });
-
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // 모든 탭에서 active 클래스를 제거
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-
-                // 클릭한 탭에 active 클래스 추가
-                this.classList.add('active');
-
-                // 스타일 강제 적용을 위해 body에서 active 상태를 처리할 수 있도록 할 수 있음
-                this.style.fontWeight = 'bold'; // 클릭한 탭에 글씨 굵기 적용
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));  // 모든 탭에서 active 클래스 제거
+                    this.classList.add('active');  // 클릭한 탭에 active 클래스 추가
+                });
             });
         });
 
