@@ -9,16 +9,15 @@
     <link rel="stylesheet" href="/css/roommenu.css"><!-- 국기 아이콘 가져오기 -->
     <title>모바일 주문 페이지</title>
     <style>
-        /* 기본 스타일: 모든 요소에 기본 마진, 패딩 제거 및 박스 크기 설정 */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f9f9f9; } /* 배경 색상 설정 */
+        body { background-color: #f9f9f9; }
 
         .container {
             width: 100%;
             max-width: 400px;
-            margin: 0 auto; /* 화면 중앙 정렬 */
+            margin: 0 auto;
             background: white;
-            padding: 10px; /* 내부 여백 설정 */
+            padding: 10px;
         }
 
         /* 검색창 */
@@ -35,7 +34,7 @@
             flex-wrap: nowrap;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 0.3rem;
             margin-bottom: 0;
         }
@@ -78,8 +77,8 @@
         .search-box input[type="text"]:focus,
         .search-box button:focus {
             border-color: #80b3ff;
-            outline: none; /* 포커스 시 외곽선 제거 */
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* 포커스 시 테두리 그림자 */
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
         /* 탭 메뉴 스타일 */
@@ -89,13 +88,12 @@
             padding: 3px;
             background-color: #ffffff;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .tab {
             cursor: pointer;
-            padding: 15px 15px;
-            font-size: 12px;
-            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
         }
 
         /* 검색 박스 스타일 */
@@ -103,7 +101,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px; /* 여백 조정 */
+            margin-bottom: 20px;
         }
 
         .form-select {
@@ -121,7 +119,7 @@
         .form-select:focus {
             border-color: #4CAF50; /* 초록색 테두리 */
             outline: none;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* 포커스시 그림자 */
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
         }
 
         .form-select option {
@@ -135,7 +133,7 @@
         }
 
         .form-select {
-            width: 115px; /* ✅ 가로 너비 조정 */
+            width: 115px;
             padding: 5px 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -198,18 +196,40 @@
 
         .category-wrapper {
             background-color: white;
-            padding: 15px;
+            padding: 2px;
             text-align: left;
+            font-size: 0.8rem;
         }
 
         .inner-wrapper {
-            padding: 15px;
+            padding: 4px;
         }
 
         .d-flex {
             display: flex;
-            justify-content: space-between;
-            align-items: start;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 0;
+        }
+
+        /* 가격 정렬 버튼 간격 조정 */
+        .d-flex.justify-content-end {
+            display: flex;
+            justify-content: flex-end;
+            gap: 4px; /* 버튼 간 간격 좁히기 */
+            margin-top: 10px; /* 위쪽 여백 조정 */
+        }
+
+        .d-flex.justify-content-end .tab {
+            font-size: 14px; /* 폰트 크기 통일 */
+            padding: 5px 12px; /* 패딩 조정 */
+        }
+
+        .text-info-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin-left: 15px;
         }
 
         .text-info {
@@ -218,6 +238,7 @@
             flex-direction: column;
             justify-content: flex-start;
             padding-right: 10px;
+            margin-top: 15px;
         }
 
         .text-info .menu-name {
@@ -241,8 +262,9 @@
 
         .image-like-container {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* 이미지 세로 중앙 배치 */
@@ -251,24 +273,33 @@
             justify-content: center;
             align-items: center;
             height: 100%;
+            min-height: 150px;
+            margin-bottom: 30px;
         }
-
         .menu-image {
             width: 120px;
             height: 120px;
-            justify-content: center;
-            align-items: center;
             object-fit: cover;
             border-radius: 10px;
         }
-
+        .menu-badge {
+            display: inline-block;
+            background-color: #e0f7fa;
+            color: #00796b;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
         .like-section {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 5px; /* 카테고리와 하트 아이콘 사이의 간격을 줄여서 가까운 위치로 */
+            justify-content: flex-start;
+            gap: 10px;
             padding: 0 15px 15px 15px;
         }
+
         .like-icon {
             font-size: 1.5rem;
             cursor: pointer;
@@ -278,22 +309,6 @@
         .like-count {
             font-size: 1rem;
             font-weight: bold;
-        }
-
-        .add-to-cart-btn {
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px; /* 버튼 상단 마진 조정 */
-        }
-
-        .add-to-cart-btn:hover {
-            background-color: #fdd835;
         }
 
         .cart-count {
@@ -383,13 +398,9 @@
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
 <div layout:fragment="contentorder">
 
-    <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">가격높은순</div>
-    <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PL&keyword='">가격낮은순</div>
-
     <div class="container">
 
         <!-- 다국어 시작 -->
-
         <form method="get" th:action="@{/roommenu/orderpage}" class="mb-3" id="langForm">
             <input type="hidden" name="type" th:value="${type}" />
             <input type="hidden" name="keyword" th:value="${keyword}" />
@@ -425,10 +436,18 @@
             <div class="tab" th:text="#{tab.korean}" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
-            <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=에피타이저&keyword='">에피타이저</div>
+            <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=디저트&keyword='">디저트</div>
         </div>
 
-
+        <!-- 가격 정렬 버튼 추가 -->
+        <div class="d-flex justify-content-end">
+            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PL&keyword='">
+                <i class="bi bi-caret-down-fill"></i>가격낮은순
+            </div>
+            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">
+                <i class="bi bi-caret-down-fill"></i>가격높은순
+            </div>
+        </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
         <ul class="food-list card-list">
@@ -447,10 +466,10 @@
                                          class="menu-image">
                                 </div>
 
-                                <!-- 오른쪽 메뉴명, 설명, 가격, 카테고리 뱃지, 하트 아이콘 -->
                                 <div class="text-info">
                                     <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
                                        style="text-decoration: none; color: inherit; display: block; width: 100%;">
+                                        <span class="menu-badge" th:text="${roomMenuDTO.roomMenuCategory}"></span>
                                         <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
                                         <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
                                         <div class="price-box">
@@ -461,9 +480,7 @@
 
                                     <div class="d-flex justify-content-between align-items-center">
                                         <!-- 카테고리 뱃지 -->
-                                        <div class="category-wrapper">
-                                            <span th:text="${roomMenuDTO.roomMenuCategory}" class="category-label"></span>
-                                        </div>
+
                                         <div class="like-section">
                                             <!-- 좋아요 아이콘 (a 태그 바깥!) -->
                                             <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
