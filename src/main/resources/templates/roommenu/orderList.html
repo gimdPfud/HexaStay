@@ -66,21 +66,21 @@
                         ₩<span th:text="${item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount}"></span>
                     </div>
 
-                    <!-- 이미지 시작 -->
-                    <div class="card-body text-center">
-                        <div class="row justify-content-center">
-                            <div class="col-6 col-md-4">
-                                <img th:if="${order.orderItemList[0].roomMenuImageMeta != null}"
-                                     th:src="@{${order.orderItemList[0].roomMenuImageMeta}}"
-                                     class="img-fluid rounded" alt="메뉴 이미지">
+<!--                    &lt;!&ndash; 이미지 시작 &ndash;&gt;-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="row justify-content-center">-->
+<!--                            <div class="col-6 col-md-4">-->
+<!--                                <img th:if="${order.orderItemList[0].roomMenuImageMeta != null}"-->
+<!--                                     th:src="@{${order.orderItemList[0].roomMenuImageMeta}}"-->
+<!--                                     class="img-fluid rounded" alt="메뉴 이미지">-->
 
-                                <img th:unless="${order.orderItemList[0].roomMenuImageMeta != null}"
-                                     th:src="@{/profile/default.png}"
-                                     class="img-fluid rounded" alt="기본 이미지">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 이미지 끝 -->
+<!--                                <img th:unless="${order.orderItemList[0].roomMenuImageMeta != null}"-->
+<!--                                     th:src="@{/profile/default.png}"-->
+<!--                                     class="img-fluid rounded" alt="기본 이미지">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; 이미지 끝 &ndash;&gt;-->
 
                     <div class="card-footer text-muted text-end">
                         <small>
