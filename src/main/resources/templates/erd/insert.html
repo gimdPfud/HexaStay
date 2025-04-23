@@ -10,7 +10,7 @@
 <div layout:fragment="content">
 
 <div class="container my-5">
-    <h1 class="mb-4">새 품목 추가</h1>
+    <h1 class="mb-4 text-center" >새 품목 추가</h1>
 
 
     <form action="/erd/insert" method="post" enctype="multipart/form-data">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="erdSku" class="form-label">sku번호</label>
+            <label for="erdSku" class="form-label">SKU번호</label>
             <input type="text" class="form-control" id="erdSku" name="erdSku" required>
         </div>
 
@@ -60,7 +60,7 @@
             <input type="text" class="form-control" id="erdNote" name="erdNote" required>
         </div>
 
-        <div class="d-flex">
+        <div class="d-flex" style="align-items: center; justify-content: center;">
             <button type="submit" class="btn btn-success me-2">저장</button>
             <a th:href="@{/erd/list}" class="btn btn-outline-secondary">취소</a>
         </div>
