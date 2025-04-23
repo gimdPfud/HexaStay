@@ -41,11 +41,11 @@ public class MemberDTO {
     private LocalDateTime createDate;       //가입 일자
 
     //체크인 - 체크아웃 데이터 가져 오기
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkInDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime checkInDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkOutDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime checkOutDate;
 
 
     private String memberRole;

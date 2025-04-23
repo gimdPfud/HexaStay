@@ -87,8 +87,8 @@ public class RoomServiceImpl {
         log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
-        LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate().atStartOfDay());
-        LocalDateTime checkOutDate = LocalDateTime.from(memberDTO.getCheckOutDate().atStartOfDay());
+        LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate());
+        LocalDateTime checkOutDate = LocalDateTime.from(memberDTO.getCheckOutDate());
 
         // 5️⃣ Room 엔티티 저장
         Room room = Room.builder()
