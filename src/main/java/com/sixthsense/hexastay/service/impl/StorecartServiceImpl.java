@@ -58,7 +58,7 @@ public class StorecartServiceImpl implements StorecartService {
         //2. room 조회. (왜냐면?? room과 일대일 관계를 맺도록 바꿈. > room은 1번의 숙박/고객/예약 이니까...)
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
         Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
-        if(room==null){return null;}//room 못찾으면 1 반환
+        if(room==null){return null;}
 
         //3. 장바구니 조회
         Storecart storecart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
@@ -106,6 +106,7 @@ public class StorecartServiceImpl implements StorecartService {
 //            log.info("카트아이템 이미 있음");
             storecartitem.setStorecartitemCount(storecartitem.getStorecartitemCount() + dto.getStorecartitemCount());
         }
+        log.info("리턴 전 확인 : "+storecartitem.getStorecartitemNum());
         return storecartitem.getStorecartitemNum();
     }
 
