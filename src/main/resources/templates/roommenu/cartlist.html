@@ -108,6 +108,7 @@
             gap: 6px;
             align-items: flex-start;
             margin-top: 10px;
+            margin-left: -4px;
         }
 
         /* 공통 버튼 스타일 */
@@ -121,6 +122,10 @@
             transition: background-color 0.2s ease;
         }
 
+        .mini-btn.delete-btn {
+            margin-left: -10px; /* 또는 -6px 등으로 조절 */
+        }
+
         .quantity {
             display: flex;
             align-items: center;
@@ -128,7 +133,7 @@
         }
 
         .quantity button {
-            width: 30px;
+            width: 20px;
             height: 30px;
             font-size: 20px;
             background-color: transparent;
@@ -245,15 +250,15 @@
                 <p class="item-name">
                     <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
                 </p>
-                <div class="quantity">
+                <div class="quantity" style="display: flex; align-items: center;">
                     <button class="decrease">-</button>
                     <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
                     <button class="increase">+</button>
                 </div>
                 <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
                     <p>
-                        <span th:text="#{cart.total}" style="font-weight: bold;">총 금액</span> :
                         <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
+                        <span th:text="#{item.currency}" style="font-weight: bold;"></span>
                     </p>
                 </th:block>
             </div>
