@@ -71,7 +71,10 @@
                 </div>
                 <div class="col-md-4">
                     <label for="roomPassword" class="form-label">룸 비밀번호</label>
-                    <input type="text" class="form-control" id="roomPassword" name="roomPassword" th:field="*{roomPassword}" placeholder="숫자 4자리" required />
+                    <input type="text" class="form-control" id="roomPassword" name="roomPassword" th:field="*{roomPassword}" placeholder="숫자 4자리"
+                           pattern="^\d{4}$"
+                           maxlength="4"
+                           inputmode="numeric" required />
                 </div>
             </div>
 
@@ -87,9 +90,9 @@
 
 
             <div class="col-12">
-                <button type="submit" class="btn btn-primary btn-lg">MemberPK_등록</button>
-                <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">HotelRoomPk_룸배정</a>
-                <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">호텔룸 목록</a>
+                <button type="submit" class="btn btn-primary btn-lg">회원_룸배정</button>
+                <a th:href="@{/member-insertroom}" class="btn btn-warning btn-lg">비회원_룸배정</a>
+                <a th:href="@{/roomlist}" class="btn btn-secondary btn-lg">룸배정목록</a>
             </div>
         </form>
         <!-- 페이지네이션 컨트롤은 밖에서 독립적으로 위치 -->
@@ -135,6 +138,12 @@
 
     <!-- JavaScript 영역 -->
     <script th:inline="javascript">
+        //roomPassword 패스워드 4자리로 제한적 설정
+        document.getElementById('roomPassword').addEventListener('input', function (e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 4); // 숫자만, 최대 4자리
+        });
+
+
         // 회원 검색 요청 함수
         function searchMembers() {
             const query = document.getElementById('memberSearchInput').value;

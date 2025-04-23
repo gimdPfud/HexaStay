@@ -9,27 +9,27 @@
 <body class="container py-4">
 <div layout:fragment="content">
 
-    <h1 class="mb-4">ERD 목록</h1>
+    <h1 class="mb-4" style="text-align: center" >ERD 목록</h1>
 
-    <div class="mb-3">
-        <a href="/erd/insert" class="btn btn-success">새 항목 추가</a>
+    <div class="mb-3 text-end" >
+        <a href="/erd/insert" class="btn btn-success px-2 py-1">새 항목 추가</a>
     </div>
 
     <div class="table-responsive">
         <table class="table table-bordered align-middle">
             <thead class="table-light">
-            <tr>
-                <th style="width:80px">사진</th>
-                <th>품목</th>
-                <th>sku번호</th>
-                <th>종류</th>
-                <th>수량</th>
-                <th>비고</th>
-                <th style="width: 65px"></th>
+            <tr style="text-align: center">
+                <th style="width:10%;">사진</th>
+                <th style="width:20%;">품목</th>
+                <th style="width:20%;">sku번호</th>
+                <th style="width:20%;">종류</th>
+                <th style="width:7%;">수량</th>
+                <th style="width:16%;">비고</th>
+                <th style="width:7%;"></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="erd : ${erd.content}">
+            <tr th:each="erd : ${erd.content}" style="text-align: center">
                 <td>
                     <img th:if="${erd.erdPictureMeta != null}"
                          th:src="@{${erd.erdPictureMeta}}"
