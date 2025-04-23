@@ -50,12 +50,17 @@ public class StoreCartController {
         }
         Long hotelroomNum = null;
         try {
+            log.info("로그인한사람"+principal.getName());
+            log.info(principal.toString());
             hotelroomNum = storecartService.principalToHotelroomNum(principal);
+            log.info("호텔방번호: "+hotelroomNum);
         }catch (EntityNotFoundException e){
+            log.info("hotelroomNum을 찾을 수 없음");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         /*todo DTO 유효성 확인*/
         try {
+            log.info("두번째트라이 호텔방번호: "+hotelroomNum);
             Long result = storecartService.addCart(dto, hotelroomNum);
             if(result!=null){
                 log.info("카트 담김");
@@ -85,7 +90,7 @@ public class StoreCartController {
         list.forEach(dto -> {
             totalpirce.updateAndGet(v -> v + (long) dto.getStoremenuCount() * dto.getStoremenuPrice());
         });
-        log.info(totalpirce);
+        log.info("최종금액 : "+totalpirce);
         model.addAttribute("list",list);
         model.addAttribute("totalPrice",totalpirce);
         return "mobilestore/cart/list";
