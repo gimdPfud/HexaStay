@@ -97,7 +97,7 @@
                     <option value="한식" th:selected="${category == '한식'}" th:text="#{category.hansik}">한식</option>
                     <option value="양식" th:selected="${category == '양식'}" th:text="#{category.yangsik}">양식</option>
                     <option value="중식" th:selected="${category == '중식'}" th:text="#{category.jungsik}">중식</option>
-                    <option value="에피타이저" th:selected="${category == '에피타이저'}" th:text="#{category.appetizer}">에피타이저</option>
+                    <option value="디저트" th:selected="${category == '디저트'}" th:text="#{category.appetizer}">디저트</option>
                 </select>
             </div>
 
@@ -134,7 +134,7 @@
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
-                <a class="nav-link [[${category} == '에피타이저' ? 'active' : '']]" href="/roommenu/list?type=C&category=에피타이저" th:text="#{category.appetizer}">에피타이저</a>
+                <a class="nav-link [[${category} == '디저트' ? 'active' : '']]" href="/roommenu/list?type=C&category=디저트" th:text="#{category.appetizer}">디저트</a>
             </li>
             <li class="px-2 align-self-center">|</li>
             <li class="nav-item">
