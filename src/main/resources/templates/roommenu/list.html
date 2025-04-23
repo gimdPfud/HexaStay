@@ -260,7 +260,8 @@
                     <p id="orderAlertContent" class="mb-0"></p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">확인</button>
+                    <!-- 확인 버튼 클릭 시 페이지 이동 -->
+                    <button type="button" class="btn btn-success px-4" id="orderAlertConfirmBtn">확인</button>
                 </div>
             </div>
         </div>
@@ -348,15 +349,20 @@
                         console.log("📦 메시지 수신:", orderData);
 
                         const content = `
-                    주문자: <strong>${orderData.memberEmail}</strong><br>
-                    총 금액: <strong>${orderData.totalPrice}원</strong>
-                    요구사항: <strong>${orderData.roomMenuOrderRequestMessage || '없음'}</strong><br>
-                    수량: <strong>${orderData.roomMenuOrderAmount}개</strong>
-                `;
+                        주문자: <strong>${orderData.memberEmail}</strong><br>
+                        총 금액: <strong>${orderData.totalPrice}원</strong><br>
+                        상품내용 : null
+                        관리자용 페이지를 확인하세요! 확인을 누르시면 관리자용 페이지로 갑니다.
+                    `;
                         document.getElementById("orderAlertContent").innerHTML = content;
 
                         const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
                         modal.show();
+
+                        // 확인 버튼 클릭 시 페이지 이동
+                        document.getElementById("orderAlertConfirmBtn").addEventListener("click", function () {
+                            window.location.href = "http://localhost:8090/roommenu/adminOrderList"; // 페이지 이동
+                        });
 
                     } catch (error) {
                         console.error("❌ 메시지 처리 오류", error);
