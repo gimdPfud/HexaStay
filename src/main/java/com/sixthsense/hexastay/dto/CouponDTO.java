@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.Coupon;
 import com.sixthsense.hexastay.entity.Member;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -31,5 +33,24 @@ public class CouponDTO {
         private LocalDate expirationDate; // 쿠폰 만료일자.
 
         private boolean isGuest; // 비회원 여부
+
+        private boolean used; // 사용여부 (단일용)
+
+        private Integer repeatCouponCount; // 반복사용 쿠폰 (횟수)
+
+        private LocalDateTime usedTime; // 사용한 날짜
+
+        public CouponDTO(Coupon coupon) {
+                this.couponNum = coupon.getCouponNum();
+                this.memberEmail = coupon.getMember().getMemberEmail();
+                this.type = coupon.getType();
+                this.discountRate = coupon.getDiscountRate();
+                this.issueDate = coupon.getIssueDate();
+                this.expirationDate = coupon.getExpirationDate();
+                this.isGuest = coupon.isGuest();
+                this.used = coupon.isUsed();
+                this.repeatCouponCount = coupon.getRepeatCouponCount();
+                this.usedTime = coupon.getUsedTime();
+        }
 
     }

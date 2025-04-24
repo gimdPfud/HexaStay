@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -31,4 +32,10 @@ public class Coupon {
     private LocalDate expirationDate; // 쿠폰 만료일자.
 
     private boolean isGuest; // 비회원 여부
+
+    private boolean used; // 사용여부 (단일용)
+
+    private Integer repeatCouponCount; // 반복사용 쿠폰 (횟수)
+
+    private LocalDateTime usedTime; // 사용한 날짜
 }
