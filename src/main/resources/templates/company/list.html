@@ -32,6 +32,7 @@
       <div class="col-md-3" style="width: 15%;">
         <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
           <option selected>소속</option>
+          <option value="전체" th:selected="${choice} == '전체'">전체</option>
           <option value="center" th:selected="${choice} == 'center'">본사</option>
           <option value="branch" th:selected="${choice} == 'branch'">지점</option>
           <option value="facility" th:selected="${choice} == 'facility'">외부시설</option>
