@@ -1,6 +1,6 @@
 /***********************************************
  * 클래스명 : StoreOrderController
- * 기능 :
+ * 기능 : todo principal 지우기
  * 작성자 :
  * 작성일 : 2025-04-09
  * 수정 : 2025-04-09
@@ -11,10 +11,7 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.OrderstoreDTO;
 import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.service.AdminService;
-import com.sixthsense.hexastay.service.OrderstoreService;
-import com.sixthsense.hexastay.service.StoreService;
-import com.sixthsense.hexastay.service.StorecartService;
+import com.sixthsense.hexastay.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -39,6 +36,7 @@ public class StoreOrderController {
     private final StorecartService storecartService;
     private final AdminService adminService;
     private final StoreService storeService;
+    private final ZzService zzService;
 
 
 
@@ -52,7 +50,7 @@ public class StoreOrderController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
@@ -82,7 +80,7 @@ public class StoreOrderController {
         if(principal==null){
             return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
         model.addAttribute("list",list);
         return "mobilestore/order/list";
@@ -162,7 +160,7 @@ public class StoreOrderController {
         if(principal==null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long hotelroomNum = storecartService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         Long orderid = orderstoreService.getLastOrder(hotelroomNum);
         if(orderid==null){
             return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);
