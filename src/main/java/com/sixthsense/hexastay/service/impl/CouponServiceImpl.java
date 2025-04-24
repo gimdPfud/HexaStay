@@ -27,11 +27,11 @@ import java.util.List;
 
 public class CouponServiceImpl implements CouponService {
 
-    private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
+    private final CouponRepository couponRepository;
 
     @Override
     public void createCoupon(CouponDTO couponDTO) {

@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-    // 회원의 모든 쿠폰
     List<Coupon> findByMember_MemberEmail(String memberEmail);
 
     // 특정 회원의 사용 가능한 쿠폰들 (예: 마이페이지용)
