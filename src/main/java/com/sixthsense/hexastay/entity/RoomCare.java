@@ -15,7 +15,7 @@ import lombok.*;
 public class RoomCare extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomCareNum; // 룸메뉴 케어 넘버 pk
 
     @ManyToOne
@@ -24,7 +24,7 @@ public class RoomCare extends BaseEntity {
     @ManyToOne(optional = false)
     private HotelRoom hotelRoom; // 항상 필요
 
-    private String roomMenuRequestMessage; // 요구사항
+    private String roomCareRequestMessage; // 요구사항
 
     @Column(nullable = false)
     private Boolean isGuest; // 비회원 여부

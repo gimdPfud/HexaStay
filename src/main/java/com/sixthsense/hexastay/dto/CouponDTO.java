@@ -1,0 +1,35 @@
+package com.sixthsense.hexastay.dto;
+
+import com.sixthsense.hexastay.entity.Member;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+public class CouponDTO {
+
+        private Long couponNum;
+
+        private String memberEmail; // 멤버의 이메일을 조회해서 쿠폰 사용가능 멤버의 pk
+
+        private String type; // 가입첫 쿠폰, 회원 상시쿠폰 2개
+
+        private Integer discountRate; // 할인율
+
+        private LocalDate issueDate; // 쿠폰 발급일자.
+
+        private LocalDate expirationDate; // 쿠폰 만료일자.
+
+        private boolean isGuest; // 비회원 여부
+
+    }

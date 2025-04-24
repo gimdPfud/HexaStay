@@ -36,6 +36,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final MemberRepository memberRepository;
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
+    private final CouponRepository couponRepository;
 
     /***********************************************
      * 메서드명 : RoomMenuList
@@ -344,6 +345,42 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     public Integer getTotalCartItemCount(String memberEmail) {
         Integer count = roomMenuCartItemRepository.getTotalItemCountByMemberEmail(memberEmail);
         return count != null ? count : 0;
+    }
+
+    // 쿠폰 할인
+    @Override
+    public Integer getTotalPriceWithCoupon(String email, Long couponNum) {
+        Member member = memberRepository.findByMemberEmail(email);
+        Coupon coupon = couponRepository.findById(couponNum).orElseThrow();
+
+        // 총 금액 계산
+        int originalPrice = getCartTotal(member); // 장바구니 금액 계산 메서드
+
+        // 쿠폰 할인 적용
+        int discount = (originalPrice * coupon.getDiscountRate()) / 100;
+
+        return originalPrice - discount;
+    }
+
+    // 장바구니 조회 후 쿠폰 적용
+    @Override
+    public Integer getCartTotal(Member member) {
+        // 1. 해당 멤버의 장바구니 조회
+        RoomMenuCart cart = roomMenuCartRepository.findByMember(member)
+                .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
+
+        // 2. 장바구니 아이템들 조회
+        List<RoomMenuCartItem> items = roomMenuCartItemRepository.findByRoomMenuCart(cart);
+
+        // 3. 가격 × 수량 합산
+        int total = 0;
+        for (RoomMenuCartItem item : items) {
+            int itemPrice = item.getRoomMenu().getRoomMenuPrice();
+            int quantity = item.getRoomMenuCartItemAmount();
+            total += itemPrice * quantity;
+        }
+
+        return total;
     }
 
 }

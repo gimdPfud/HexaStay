@@ -3,6 +3,7 @@ import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
 import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,5 +41,11 @@ public interface RoomMenuCartService {
 
     // 장바구니의 아이템 수를 보여주는 서비스
     public Integer getTotalCartItemCount(String memberEmail);
+
+    // 쿠폰 적용을 위한 서비스
+    public Integer getTotalPriceWithCoupon(String email, Long couponNum);
+
+    // 장바구니 검색 후 쿠폰 적용을 위한 서비스
+    public Integer getCartTotal(Member member);
 
 }

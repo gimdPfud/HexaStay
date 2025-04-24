@@ -37,6 +37,7 @@ public interface RoomMenuCartRepository extends JpaRepository<RoomMenuCart, Long
 
     // RoomMenuCartRepository
     Optional<RoomMenuCart> findByMember(Member member);
+    
 
 
 }
