@@ -13,6 +13,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
+        .border-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6; /* 기본 테두리 */
+        }
+
+        .border-card:hover {
+            border-color: #0d6efd; /* 부트스트랩 primary 색상 */
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.25);
+        }
+
+
         .hotel-img {
             height: 180px;
             object-fit: cover;
@@ -27,33 +38,8 @@
             font-size: 0.95rem;
         }
 
-        .card-horizontal {
-            display: flex;
-            flex-direction: row;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-
-        .card-horizontal img {
-            width: 180px;
-            object-fit: cover;
-        }
-
         .card-body {
             padding: 1rem;
-            flex: 1;
-        }
-
-        @media (max-width: 576px) {
-            .card-horizontal {
-                flex-direction: column;
-            }
-
-            .card-horizontal img {
-                width: 100%;
-                height: 150px;
-            }
         }
 
         .card {
@@ -108,34 +94,21 @@
         <input type="text" class="form-control" id="filterInput" placeholder="룸 이름, 타입, 가격 검색">
     </div>
 
-    <!-- 카드 리스트 -->
-    <div class="list-group">
-        <div class="list-group-item d-flex align-items-center mb-3 p-3 shadow-sm rounded"
-             th:each="hotelRoom : ${hotelRooms}" style="background-color: #ffffff;">
-
-            <!-- 📷 이미지 (비중 크게) -->
-            <div class="me-4">
-                <img th:src="@{${hotelRoom.hotelRoomProfileMeta}}" alt="이미지"
-                     style="width: 160px; height: 120px; object-fit: cover; border-radius: 10px;">
-            </div>
-
-            <!-- 📄 텍스트 정보 (비중 작게) -->
-            <div class="flex-grow-1 d-flex flex-column justify-content-between" style="min-width: 0;">
-                <div class="fw-bold text-primary fs-5 text-truncate" th:text="${hotelRoom.hotelRoomName}">
-                    호텔 이름
+    <!-- 카드 컨테이너 -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="hotelRoomCards">
+        <div class="col" th:each="hotelRoom : ${hotelRooms}">
+            <div class="card h-100 shadow-sm hotel-room-card border-card">
+                <img th:src="${hotelRoom.hotelRoomProfileMeta}" class="card-img-top object-fit-cover hotel-img" alt="Room Image">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold room-name" th:text="${hotelRoom.hotelRoomName}">룸 이름</h5>
+                    <p class="card-text mb-1"><strong>타입:</strong> <span class="room-type" th:text="${hotelRoom.hotelRoomType}"></span></p>
+                    <p class="card-text mb-1"><strong>가격:</strong> <span class="room-price" th:text="${hotelRoom.hotelRoomPrice} + '원'"></span></p>
+                    <p class="card-text text-muted"><small>룸 번호: <span th:text="${hotelRoom.hotelRoomNum}"></span></small></p>
+                    <button type="button" class="btn btn-outline-primary w-100 mt-2 open-hotelroom-modal-btn"
+                            th:attr="data-room-num=${roomNum}">
+                        Room 배정 수정
+                    </button>
                 </div>
-                <div class="text-muted small mt-2">
-                    <span class="me-3"><strong>타입:</strong> <span th:text="${hotelRoom.hotelRoomType}">타입</span></span>
-                    <span><strong>가격:</strong> <span th:text="${hotelRoom.hotelRoomPrice} + '원'">가격</span></span>
-                </div>
-            </div>
-
-            <!-- 🛠 수정 버튼 -->
-            <div class="ms-4 text-end">
-                <button class="btn btn-outline-primary btn-sm open-hotelroom-modal-btn"
-                        th:attr="data-room-num=${roomNum}">
-                   Romm배정변경
-                </button>
             </div>
         </div>
     </div>
@@ -165,7 +138,7 @@
             </div>
         </div>
     </div>
-</div>
+
     <!-- 페이지네이션 -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center mt-5">
@@ -184,7 +157,7 @@
             </li>
         </ul>
     </nav>
-
+</div>
 
 <script>
     let selectedRoomNum = null;

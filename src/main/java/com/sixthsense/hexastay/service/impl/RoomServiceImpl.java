@@ -161,6 +161,7 @@ public class RoomServiceImpl {
                     .hotelRoomName(hotelRoom.getHotelRoomName())
                     .hotelRoomType(hotelRoom.getHotelRoomType())
                     .hotelRoomPrice(hotelRoom.getHotelRoomPrice())
+                    .hotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta())
                     .build();
         });
     }
