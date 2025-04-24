@@ -70,25 +70,30 @@
                     expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
                 };
 
-                // 쿠폰 발급 요청
                 return fetch('/roommenu/coupon/insert', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(couponData)
-                });
-            })
-            .then(res => res?.text())
-            .then(msg => {
-                if (msg) alert(`${type} 발급 완료: ${msg}`);
-            })
-            .catch(err => {
-                if (err.message !== '중복된 가입쿠폰') {
-                    alert("오류 발생: " + err);
-                }
-            });
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.json().then(err => { throw new Error(err.error); });
+                        }
+                        return res.text(); // 성공 시
+                    })
+                    .then(msg => {
+                        if (msg) alert(`${type} 발급 완료: ${msg}`);
+                    })
+                    .catch(err => {
+                        if (err.message !== '중복된 가입쿠폰') {
+                            alert("오류 발생: " + err.message);
+                        }
+                    });
+            }); // fetch('/roommenu/coupon/exists')의 마지막 .then()에 대한 닫는 괄호 추가
     }
+
 
 </script>
 
