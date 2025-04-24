@@ -33,8 +33,8 @@
         <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
           <option selected>소속</option>
           <option value="center" th:selected="${choice} == 'center'">본사</option>
-          <option value="branch" th:selected="${choice} == 'branch'">지사</option>
-          <option value="facility" th:selected="${choice} == 'facility'">지점</option>
+          <option value="branch" th:selected="${choice} == 'branch'">지점</option>
+          <option value="facility" th:selected="${choice} == 'facility'">외부시설</option>
         </select>
       </div>
 
@@ -66,8 +66,8 @@
             <th style="width: 11%">프로필 사진</th>
             <th style="width: 14%;">브랜드명</th>
             <th style="width: 14%;">본사명</th>
-            <th style="width: 14%;">지사명</th>
             <th style="width: 14%;">지점명</th>
+            <th style="width: 14%;">외부시설명</th>
             <th style="width: 14%;">전화번호</th>
             <th style="width: 12%;"></th>
           </tr>
@@ -86,8 +86,8 @@
             </td>
             <td th:text="${item.companyBrand}"></td>
             <td th:text="${item.companyParentName}">본사명</td>
-            <td th:text="${item.branchName}">지사명</td>
-            <td th:text="${item.facilityName}">지점명</td>
+            <td th:text="${item.branchName}">지점명</td>
+            <td th:text="${item.facilityName}">외부시설명</td>
             <td th:text="${item.companyPhone}"></td>
             <td>
               <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}"
