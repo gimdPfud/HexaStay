@@ -12,16 +12,18 @@
 </head>
 
 <body>
-
 <h1>쿠폰 발급 받기</h1>
 
-<button class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인)</button><br>
-<button class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인)</button><br>
-<button class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인)</button>
+<!-- 이메일 입력 필드 -->
+<div class="mb-3">
+    <label for="email" class="form-label">이메일 입력</label>
+    <input type="email" class="form-control" id="email" placeholder="your@email.com">
+</div>
 
-
-
-
+<!-- 버튼 3개 -->
+<button type="button" class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인)</button><br>
+<button type="button" class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인)</button><br>
+<button type="button" class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인)</button>
 </body>
 
 <script>
@@ -36,10 +38,10 @@
             memberEmail: email,
             type: type,
             discountRate: discountRate,
-            expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0] // 유효기간 30일
+            expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
         };
 
-        fetch('/coupon/create', {
+        fetch('/coupon/insert', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -47,7 +49,7 @@
             body: JSON.stringify(data)
         })
             .then(res => res.text())
-            .then(msg => alert(`${type} 발급 완료: ${msg}`))
+            .then(msg => alert(`${type} 발급 완료: ${msg}`)) // 백틱으로 수정
             .catch(err => alert("오류 발생: " + err));
     }
 </script>

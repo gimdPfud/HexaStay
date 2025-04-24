@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -13,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@RestController
-@RequestMapping("/coupon")
+@RequestMapping("/roommenu")
 @Log4j2
+@Controller
 
 public class CouponController {
 
@@ -23,8 +24,13 @@ public class CouponController {
     private final MemberRepository memberRepository;
 
 
+    @GetMapping("/coupon/insert")
+    public String createCouponGet() {
+        return "coupon//insert";
+    }
+
     @PostMapping("/insert")
-    public ResponseEntity<?> createCoupon(@RequestBody CouponDTO dto) {
+    public ResponseEntity<?> createCouponPost(@RequestBody CouponDTO dto) {
         couponService.createCoupon(dto);
         return ResponseEntity.ok("쿠폰 발급 완료");
     }
