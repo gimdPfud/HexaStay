@@ -85,7 +85,10 @@
             <label for="roomCareRequestMessage">요구사항</label>
             <textarea id="roomCareRequestMessage" name="roomCareRequestMessage" placeholder="요구사항을 입력하세요..." required></textarea>
         </div>
-        <input type="hidden" name="isGuest" value="true" />
+
+        <!-- 동적으로 isGuest 값을 설정 -->
+        <input type="hidden" name="isGuest" th:value="${isGuest ? 'true' : 'false'}" />
+
         <button type="submit" class="btn add-to-cart-btn">제출</button>
     </form>
 </div>

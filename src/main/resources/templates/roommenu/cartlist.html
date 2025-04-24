@@ -279,6 +279,17 @@
 <!--    </div>-->
 <!--    &lt;!&ndash; 현금으로 결제하기 체크박스 끝 &ndash;&gt;-->
 
+    <div class="coupon-select-box">
+        <label for="couponSelect">쿠폰 선택:</label>
+        <select id="couponSelect" name="couponNum">
+            <option value="">쿠폰을 선택하세요</option>
+            <option th:each="coupon : ${couponList}"
+                    th:value="${coupon.couponNum}"
+                    th:text="${coupon.type} + ' (' + coupon.discountRate + '%)'">
+            </option>
+        </select>
+    </div>
+
     <div class="request-section">
         <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
         <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
@@ -288,14 +299,19 @@
     <!-- 결제금액 -->
     <div class="pricing-section" style="flex-direction: column; gap: 10px;">
         <div class="discount">
-            <span th:text="#{cart.discount}">할인금액</span> :
-            <span th:if="${finalDiscount != null}" th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
-            <span th:unless="${finalDiscount != null}">0원</span>        </div>
+            <span>할인금액</span> :
+            <span th:if="${finalDiscount != null}"
+                  th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+            <span th:unless="${finalDiscount != null}" id="discountAmount">0원</span>
+        </div>
         <div class="final-total">
-            <span th:if="${finalTotal != null}" th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
-            <span th:unless="${finalTotal != null}">최종결제금액: 0원</span>
+        <span
+              th:if="${finalTotal != null}"
+              th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
+            <span th:unless="${finalTotal != null}" id="finalAmount">최종결제금액: 0원</span>
         </div>
     </div>
+
 
     <!-- 결제하기 및 목록으로 버튼 -->
     <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
@@ -312,34 +328,62 @@
 </div>
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
+        let couponFinalTotal = null;
 
-        function goToOrderPage() {
-            // 이동할 URL로 리디렉션
-            window.location.href = "/roommenu/orderpage";
-        }
+        // ✅ 전역 함수로 선언
+        function updateFinalTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-total').forEach(span => {
+                const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
+                if (!isNaN(value)) total += value;
+            });
 
-
-        document.addEventListener('DOMContentLoaded', () => {
-
-            function updateFinalTotal() {
-                let total = 0;
-                // 각 음식 아이템의 총 금액을 계산해서 더해줍니다.
-                document.querySelectorAll('.item-total').forEach(span => {
-                    const value = parseInt(span.textContent.replace(/[^0-9]/g, ''), 10);
-                    if (!isNaN(value)) total += value;
-                });
-
-                const finalTotalEl = document.querySelector('.final-total');
-                if (finalTotalEl) {
-                    if (total === 0) {
-                        finalTotalEl.textContent = '최종 결제 금액 : 0원';  // 기본값 설정
-                    } else {
-                       finalTotalEl.textContent = `최종 결제 금액 : ${total.toLocaleString()}원`;
-                    }
+            const finalTotalEl = document.getElementById('finalAmount');
+            if (finalTotalEl) {
+                if (couponFinalTotal !== null) {
+                    finalTotalEl.innerText = `최종결제금액: ${couponFinalTotal.toLocaleString()}원`;
+                } else {
+                    finalTotalEl.innerText = `최종결제금액: ${total.toLocaleString()}원`;
                 }
             }
+        }
+
+        // ✅ 쿠폰 적용 리스너
+        document.addEventListener('DOMContentLoaded', function () {
+            const couponSelect = document.getElementById('couponSelect');
+
+            couponSelect.addEventListener('change', function () {
+                const couponNum = this.value;
+
+                if (couponNum === "") {
+                    document.getElementById('discountAmount').innerText = "0원";
+                    couponFinalTotal = null;
+                    updateFinalTotal(); // 이제 오류 없음!
+                    return;
+                }
+
+                fetch(`/coupon/apply?email=${currentUserEmail}&couponNum=${couponNum}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error("서버 오류 발생");
+                        return response.json();
+                    })
+                    .then(data => {
+                        const discount = data.discount;
+                        const finalTotal = data.finalTotal;
+
+                        document.getElementById('discountAmount').innerText = discount.toLocaleString() + "원";
+                        couponFinalTotal = finalTotal;
+                        updateFinalTotal();
+                    })
+                    .catch(error => {
+                        console.error("쿠폰 적용 실패:", error);
+                        alert("❌ 쿠폰 적용에 실패했습니다.");
+                    });
+            });
+        });
+
 
             document.querySelectorAll('.food-item').forEach(item => {
                 const decreaseBtn = item.querySelector('.decrease');
@@ -421,7 +465,6 @@
                     });
                 });
             });
-        });
 
         // 결제여부에 따라서 이동되는 페이지
         function processPayment() {
