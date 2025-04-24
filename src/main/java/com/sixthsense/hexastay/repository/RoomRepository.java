@@ -2,10 +2,12 @@ package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.Room;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,6 +26,22 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findAll(Pageable pageable);
+
+    //Room pk 을 찾아와서 member fk 만 변경 하는 메소드
+    //todo:membersByHotelRoom.html
+    @Modifying
+    @Transactional
+    @Query("UPDATE Room r SET r.member.memberNum = :memberNum WHERE r.roomNum = :roomNum")
+    void updateRoomMember(@Param("roomNum") Long roomNum, @Param("memberNum") Long memberNum);
+
+    //Room Pk 을 찾아와서 HotelRoom Fk 변경하는 메소드
+    //todo:hotelRoomsByMember.html
+    @Modifying
+    @Query("UPDATE Room r SET r.hotelRoom.hotelRoomNum = :hotelRoomNum WHERE r.roomNum = :roomNum")
+    void updateHotelRoomFk(@Param("roomNum") Long roomNum, @Param("newHotelRoomNum") Long hotelRoomNum);
+
+
+
 
     // 특정 Member ID를 가진 HotelRoom 조회 (해당 멤버가 배정된 호텔룸)
 //    List<Room> findByMember_MemberId(Long memberId);

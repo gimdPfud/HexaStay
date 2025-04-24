@@ -1,9 +1,8 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
-import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.config.Security.CustomMemberDetails;
+import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.service.CouponService;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -48,6 +48,7 @@ public class RoomMenuCartController {
 
     private final RoomMenuCartService roomMenuCartService;
     private final RoomMenuService roomMenuService;
+    private final CouponService couponService;
 
     /***************************************************
      *
@@ -124,29 +125,37 @@ public class RoomMenuCartController {
      ****************************************************/
 
     @GetMapping("/cartlist")
-    public String getRoomMenuCartItems(Principal principal, Model model, Pageable pageable, RoomMenuDTO roomMenuDTO) {
-        log.info("장바구니 리스트 컨트롤러 진입");
-        log.info("로그인한 사용자" + principal.getName());
+    public String getRoomMenuCartItems(
+            Principal principal,
+            Model model,
+            Pageable pageable,
+            RoomMenuDTO roomMenuDTO,
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
-        // 로그인 체크
+        log.info("장바구니 리스트 컨트롤러 진입");
+
         if (principal == null) {
             log.info("로그인되지 않은 사용자의 장바구니 접근 시도");
             return "redirect:/member/login";
         }
 
-        String email = principal.getName();
+        String email = principal.getName(); // 또는 customMemberDetails.getUsername();
+        log.info("로그인한 사용자: {}", email);
+
+        // 장바구니 아이템 리스트 조회
         Page<RoomMenuCartDetailDTO> cartDetailDTOList = roomMenuCartService.RoomMenuCartItemList(email, pageable);
-
-
-        // 장바구니 비어있는지 여부 체크
         boolean isCartEmpty = cartDetailDTOList == null || cartDetailDTOList.isEmpty();
 
-        // 뷰에 데이터 전달
-        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
-        model.addAttribute("isCartEmpty", isCartEmpty); //
-        model.addAttribute("roomMenuDTO", roomMenuDTO);
+        //  쿠폰 리스트 가져오기
+        List<CouponDTO> couponList = couponService.getCoupons(email);
 
-        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getSize());
+        // 모델에 데이터 추가
+        model.addAttribute("cartDetailDTOList", cartDetailDTOList);
+        model.addAttribute("isCartEmpty", isCartEmpty);
+        model.addAttribute("roomMenuDTO", roomMenuDTO);
+        model.addAttribute("couponList", couponList); //
+
+        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
         log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
 
@@ -248,5 +257,11 @@ public class RoomMenuCartController {
             log.error("삭제 중 예외 발생", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("아이템 삭제 중 오류 발생");
         }
+    }
+
+    @PostMapping("/apply-coupon")
+    public ResponseEntity<?> applyCouponToCart(@RequestParam String email, @RequestParam Long couponNum) {
+        int discountedTotal = roomMenuCartService.getTotalPriceWithCoupon(email, couponNum);
+        return ResponseEntity.ok(discountedTotal);
     }
 }

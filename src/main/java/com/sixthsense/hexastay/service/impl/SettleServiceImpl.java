@@ -61,27 +61,4 @@ public class SettleServiceImpl implements SettleService {
         Page<OrderstoreDTO> orderstoreDTOList = orderstoreList.map(order -> modelMapper.map(order, OrderstoreDTO.class));
         return orderstoreDTOList;
     }
-
-
-
-
-    // 월급용
-    @Override
-    public Page<SalariesDTO> getSalariesList(AdminDTO adminDTO, Pageable pageable) {
-        String role = adminDTO.getAdminRole();
-        Page<Salaries> salariesList;
-
-        switch (role) {
-            case "crew", "agent", "partner", "staff" ->
-                    salariesList = settleRepository.findByAdmin_AdminNum(adminDTO.getAdminNum(), pageable);
-            case "exec", "head", "gm", "sv" ->
-                    salariesList = settleRepository.findByAdmin_Company_CompanyNum(adminDTO.getCompanyNum(), pageable);
-            case "mgr", "submgr" ->
-                    salariesList = settleRepository.findByAdmin_Store_StoreNum(adminDTO.getStoreNum(), pageable);
-            default ->
-                    throw new IllegalStateException("Role 에러: " + role);
-        }
-        return salariesList.map(salary -> modelMapper.map(salary, SalariesDTO.class));
-    }
-
 }

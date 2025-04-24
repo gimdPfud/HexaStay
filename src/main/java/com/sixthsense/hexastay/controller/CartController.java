@@ -8,10 +8,12 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomService;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.StorecartService;
+import com.sixthsense.hexastay.service.ZzService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,10 +35,12 @@ import java.security.Principal;
 @Controller
 @RequestMapping("/cart")
 public class CartController {
+    private final ZzService zzService;
     private final StorecartService storecartService;
     private final RoomMenuCartService roomMenuCartService;
     private final MemberRepository memberRepository;
     private final RoomServiceImpl roomService;
+    Long hotelroomNum = 9L; //todo 나중에 qr링크에서 받기
 
     @GetMapping("/gocart")
     public String gocart(HttpServletRequest request) {
@@ -44,7 +48,7 @@ public class CartController {
         System.out.println("이전 페이지: " + referer);
         if (referer != null) {
             if (referer.contains("/roommenu")) {
-                return "redirect:/roommenu/cartlist";//todo 윤겸님 장바구니 경로로 설정해주세요!
+                return "redirect:/roommenu/cartlist";
             } else if (referer.contains("/member/store")) {
                 return "redirect:/member/store/cart/list";
             }
@@ -70,24 +74,17 @@ public class CartController {
 
     @ResponseBody
     @GetMapping("/getlength")
-    public ResponseEntity getlength(HttpServletRequest request, Principal principal){ //todo 일단 로그인으로...?
+    public ResponseEntity getlength(HttpServletRequest request){
         String referer = request.getHeader("Referer");
-        System.out.println("이전 페이지: " + referer);
-        System.out.println("principal: " + principal);
-        if(principal==null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        String email = principal.getName();
-        Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
-
+//        System.out.println("이전 페이지: " + referer);
+        Member member = zzService.hotelroomNumToMember(hotelroomNum);
+        String email = member.getMemberEmail();
         if (referer != null) {
             if (referer.contains("/roommenu")) {
                 Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
                 return new ResponseEntity<>(totalCartItemCount, HttpStatus.OK);
             } else if (referer.contains("/member/store")) {
-                return new ResponseEntity<>(storecartService.getCartList(hotelRoomDTO.getHotelRoomNum()).size(),HttpStatus.OK);
+                return new ResponseEntity<>(storecartService.getCartList(hotelroomNum).size(),HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

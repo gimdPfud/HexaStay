@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:c="">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        /* 요구사항 폼 영역 */
+        .request-section {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .request-section label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .request-section textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            height: 100px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            resize: none;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .add-to-cart-btn {
+            background-color: #77b1fb;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">요구사항 입력</div>
+    <form th:action="@{/roomcare/insert}" method="post">
+
+        <select name="hotelRoomNum">
+            <option th:each="room : ${hotelRooms}"
+                    th:value="${room.hotelRoomNum}"
+                    th:text="${room.hotelRoomName}"></option>
+        </select>
+
+        <div class="request-section">
+            <label for="roomCareRequestMessage">요구사항</label>
+            <textarea id="roomCareRequestMessage" name="roomCareRequestMessage" placeholder="요구사항을 입력하세요..." required></textarea>
+        </div>
+
+        <!-- 동적으로 isGuest 값을 설정 -->
+        <input type="hidden" name="isGuest" th:value="${isGuest ? 'true' : 'false'}" />
+
+        <button type="submit" class="btn add-to-cart-btn">제출</button>
+    </form>
+</div>
+</body>
+</html>

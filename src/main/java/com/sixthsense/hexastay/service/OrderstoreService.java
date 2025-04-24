@@ -17,10 +17,10 @@ import java.util.List;
 
 public interface OrderstoreService {
     /*1. 주문 본인확인*/
-    boolean validOrder(Long orderId, String email);
+//    boolean validOrder(Long orderId, String email);
 
     /*2. 주문하기 */
-    int insert(List<Long> itemIdList, String email, String orderstoreMessage);
+//    int insert(List<Long> itemIdList, String email, String orderstoreMessage);
     int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage);
 
     /*3. 주문취소*/
@@ -32,7 +32,7 @@ public interface OrderstoreService {
     Long getLastOrder(Long hotelRoom);
 
     /*4. 고객용 주문내역 목록*/
-    List<OrderstoreViewDTO> getOrderList(String email);
+//    List<OrderstoreViewDTO> getOrderList(String email);
     List<OrderstoreViewDTO> getOrderList(Long hotelRoomNum);
     Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable);
 

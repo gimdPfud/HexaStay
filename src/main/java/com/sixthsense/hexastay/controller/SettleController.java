@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class SettleController {
     private final AdminRepository adminRepository;
     private final HotelRoomRepository hotelRoomRepository;
     private final HotelRoomService hotelRoomService;
+    private final SalariesService salariesService;
 
     @GetMapping("/chart")
     public String chart(Principal principal, Model model, Pageable pageable)
@@ -51,35 +53,5 @@ public class SettleController {
         return "/settle/chartstore";
     }
 
-
-
-
-
-    //급여용
-
-    @GetMapping("/salaries")
-    public String salaries(Pageable pageable, Principal principal, Model model) {
-        adminRepository.findByAdminEmail(principal.getName());
-        Page<SalariesDTO> salariesList = settleService.getSalariesList(adminService.adminFindEmail(principal.getName()), pageable);
-        model.addAttribute("salariesList", salariesList);
-        return "/settle/salaries";
-    }
-
-    @GetMapping("/salariesinsert")
-    public String salariesInsert() {
-        return "/settle/salariesinsert";
-    }
-
-
-    @GetMapping("/salarieslist")
-    @ResponseBody
-    public String salariesList(Principal principal) {
-        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-
-
-
-
-        return "/settle/salarieslist";
-    }
 
 }

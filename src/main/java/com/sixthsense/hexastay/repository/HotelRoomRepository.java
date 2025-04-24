@@ -22,6 +22,10 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     @Query("select a from HotelRoom a")
     public Page<HotelRoom> findAll(Pageable pageable);
 
+    //리스트로 호텔이름을 찾아 오는 Query DSL 정렬 기준은 hotelRoomNum
+    @Query("SELECT h FROM HotelRoom h WHERE h.hotelRoomName LIKE %:keyword% ORDER BY h.hotelRoomNum DESC")
+    List<HotelRoom> searchByName(@Param("keyword") String keyword);
+
 
 
     // 방 타입을 기준으로 가장 최신의 HotelRoom 가져오기

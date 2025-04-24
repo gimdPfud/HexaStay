@@ -4,13 +4,14 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>조직 등록</title>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center">조직 등록</h3>
+        <h2 class="fw-bold mb-4 text-center">조직 등록</h2>
 
         <form id="insertForm" action="/company/insert" method="post" enctype="multipart/form-data">
             <div class="container p-4" style="max-width: 700px;">
@@ -31,8 +32,8 @@
                     <label class="form-label">소속</label>
                     <select type="text" id="companySelectedBrand" class="form-control" name="companyType">
                         <option value="center">본사</option>
-                        <option value="branch">지사</option>
-                        <option value="facility">지점</option>
+                        <option value="branch">지점</option>
+                        <option value="facility">외부시설</option>
                     </select>
                 </div>
 

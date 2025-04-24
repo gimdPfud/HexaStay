@@ -16,7 +16,7 @@
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h3 class="fw-bold mb-4 text-center">회원 목록</h3>
+        <h2 class="fw-bold mb-4 text-center">회원 목록</h2>
 
         <!-- 검색 폼 -->
         <form action="/admin/list" method="post" class="row g-3 align-items-end">
@@ -26,8 +26,8 @@
                     <option selected>소속</option>
                     <option value="all"      th:selected="${select} == 'all'">전체</option>
                     <option value="center"   th:selected="${select} == 'center'">본사</option>
-                    <option value="branch"   th:selected="${select} == 'branch'">지사</option>
-                    <option value="facility" th:selected="${select} == 'facility'">지점</option>
+                    <option value="branch"   th:selected="${select} == 'branch'">지점</option>
+                    <option value="facility" th:selected="${select} == 'facility'">외부시설</option>
                     <option value="store"    th:selected="${select} == 'store'">스토어</option>
                 </select>
             </div>
@@ -50,8 +50,8 @@
             </div>
 
             <div class="col-md-2 d-flex gap-2" style="width: 20%;">
-                <button type="submit" id="searchBtn" class="btn btn-primary w-50" style="height: 40px; font-size: 0.9rem;">검색</button>
-                <a href="/admin/insert" class="btn btn-success w-50"  style="height: 40px; font-size: 0.9rem;">등록</a>
+                <button type="submit" id="searchBtn" class="btn btn-primary w-50" style="height: 40px;">검색</button>
+                <a href="/admin/insert" class="btn btn-success w-50"  style="height: 40px;">등록</a>
             </div>
         </form>
 

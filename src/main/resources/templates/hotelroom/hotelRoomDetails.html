@@ -75,7 +75,7 @@
 <div class="container my-5">
     <div class="card card-custom">
         <!-- 타이틀 -->
-        <h2 class="mb-4 text-center" th:text="${hotelRoom.hotelRoomName}">호텔룸 이름</h2>
+        <h2 class="mb-4 text-center" th:text="${hotelRoom.hotelRoomName}">객실</h2>
 
         <!-- 3열 구성 -->
         <div class="row g-5">
@@ -96,7 +96,7 @@
             <!-- QR 코드 -->
             <div class="col-md-4 qr-box d-flex flex-column justify-content-center">
                 <p class="fw-bold mb-2">QR 코드</p>
-                <img th:src="@{'/qr/' + ${hotelRoom.hotelRoomQr}}"
+                <img th:src="@{${hotelRoom.hotelRoomQr}}"
                      alt="QR 코드"
                      data-bs-toggle="modal"
                      data-bs-target="#qrModal">
@@ -122,7 +122,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
             </div>
             <div class="modal-body" id="qrPrintSection">
-                <img th:src="@{'/qr/' + ${hotelRoom.hotelRoomQr}}"
+                <img th:src="@{${hotelRoom.hotelRoomQr}}"
                      class="img-fluid border rounded shadow"
                      style="width: 400px; height: 400px; object-fit: cover;"
                      alt="QR 코드">
