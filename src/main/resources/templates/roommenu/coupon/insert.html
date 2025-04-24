@@ -34,24 +34,43 @@
             return;
         }
 
-        const data = {
-            memberEmail: email,
-            type: type,
-            discountRate: discountRate,
-            expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
-        };
-
-        fetch('/roommenu/coupon/insert', {  // ← 수정된 경로
+        // 이메일 존재 여부를 확인하는 POST 요청
+        fetch('/roommenu/coupon/exists', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ email: email })  // 이메일을 JSON 형식으로 보냄
         })
-            .then(res => res.text())
-            .then(msg => alert(`${type} 발급 완료: ${msg}`))
+            .then(res => res.json())  // 응답을 JSON 형식으로 파싱
+            .then(data => {
+                if (!data.exists) {
+                    alert("존재하지 않는 이메일입니다. 회원만 쿠폰을 받을 수 있어요.");
+                    return;
+                }
+
+                const couponData = {
+                    memberEmail: email,
+                    type: type,
+                    discountRate: discountRate,
+                    expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
+                };
+
+                return fetch('/roommenu/coupon/insert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(couponData)
+                });
+            })
+            .then(res => res?.text())
+            .then(msg => {
+                if (msg) alert(`${type} 발급 완료: ${msg}`);
+            })
             .catch(err => alert("오류 발생: " + err));
     }
+
 </script>
 
 </html>

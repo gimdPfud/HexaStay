@@ -27,6 +27,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m WHERE m.memberName LIKE %:keyword% OR m.memberEmail LIKE %:keyword%")
     List<Member> searchByNameOrEmail(@Param("keyword") String keyword);
 
+    // 쿠폰을 발급 받기 위한 이메일 유효성 검사.
+    boolean existsByMemberEmail(String email);
+
 
 
 
