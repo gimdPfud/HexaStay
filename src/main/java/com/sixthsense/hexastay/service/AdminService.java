@@ -38,5 +38,4 @@ public interface AdminService {
     List<StoreDTO> insertStoreList (Long companyNum);
 
     List<CompanyDTO> insertSelectCompany (String companyType);
-
 }

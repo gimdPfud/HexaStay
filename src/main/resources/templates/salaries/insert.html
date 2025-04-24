@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>급여 등록</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin-top: 50px;
+        }
+        .form-label {
+            font-size: 0.9rem;
+        }
+        .form-control {
+            font-size: 0.9rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+        }
+        .modal-dialog {
+            max-width: 400px;
+        }
+        .list-group-item {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" class="container">
+    <h2 class="text-center mb-4">급여 등록</h2>
+    <form action="/salaries/insert" method="POST">
+        <div class="mb-3">
+            <label for="salDate" class="form-label">급여 기간</label>
+            <input type="month" class="form-control form-control-sm" id="salDate" name="salDate" required>
+        </div>
+        <div class="mb-3">
+            <label for="salBase" class="form-label">기본급</label>
+            <input type="number" class="form-control form-control-sm" id="salBase" name="salBase" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="salDuty" class="form-label">직무 수당</label>
+            <input type="number" class="form-control form-control-sm" id="salDuty" name="salDuty" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">인센티브</label>
+            <div class="d-flex gap-2 mb-2">
+                <input type="text" class="form-control form-control-sm" id="incenName">
+                <input type="number" class="form-control form-control-sm" id="incenValue">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addIncentive()">추가</button>
+            </div>
+            <ul id="incenList" class="list-group mb-2"></ul>
+            <input type="hidden" name="salIncen" id="salIncen">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">공제 항목</label>
+            <div class="d-flex gap-2 mb-2">
+                <input type="text" class="form-control form-control-sm" id="deduName">
+                <input type="number" class="form-control form-control-sm" id="deduValue">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="addDeduction()">추가</button>
+            </div>
+            <ul id="deduList" class="list-group mb-2"></ul>
+            <input type="hidden" name="salDedu" id="salDedu">
+        </div>
+
+        <div class="mb-3">
+            <label for="salPosition" class="form-label">직책</label>
+            <input type="text" class="form-control form-control-sm" id="salPosition" name="salPosition" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="admin" class="form-label">직원 선택</label>
+            <input type="text" class="form-control form-control-sm" id="admin" readonly required>
+            <button type="button" class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#employeeModal">직원 선택</button>
+        </div>
+        <button type="submit" class="btn btn-success btn-sm w-100">등록</button>
+
+        <input hidden name="adminDTO.adminNum" id="adminNum"></input>
+    </form>
+
+    <!-- 직원 선택 모달 -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalLabel">직원 선택</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group" th:if="${adminDTOList != null and not #lists.isEmpty(adminDTOList)}" th:each="admin : ${adminDTOList}">
+                        <li class="list-group-item"
+                            th:each="admin : ${adminDTOList}"
+                            th:attr="data-name=${admin.adminName},
+             data-id=${admin.adminNum},
+             data-position=${admin.adminPosition},
+             data-profile=${admin.adminProfileMeta},
+             data-employeeNum=${admin.adminEmployeeNum}">
+
+                            <div class="d-flex align-items-center gap-2">
+                                <img th:src="@{${admin.adminProfileMeta}}" alt="프로필"
+                                     class="rounded-circle border"
+                                     style="width: 36px; height: 36px; object-fit: cover;">
+
+                                <div>
+                                    <div class="fw-semibold" th:text="${admin.adminName}">이름</div>
+                                    <div class="text-muted small" th:text="'사번: ' + ${admin.adminEmployeeNum}">사번</div>
+                                    <div class="text-muted small" th:text="'직급: ' + ${admin.adminPosition}">직책</div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                    <div th:if="${adminDTOList == null or #lists.isEmpty(adminDTOList)}" class="text-center">
+                        등록된 직원이 없습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const incentives = [];
+        const deductions = [];
+
+        function addIncentive() {
+            const name = document.getElementById('incenName').value.trim();
+            const value = document.getElementById('incenValue').value.trim();
+
+            if (name && value) {
+                const entry = `${name}:${value}`;
+                incentives.push(entry);
+                updateList('incenList', incentives);
+                document.getElementById('salIncen').value = incentives.join(', ');
+                document.getElementById('incenName').value = '';
+                document.getElementById('incenValue').value = '';
+            }
+        }
+
+        function addDeduction() {
+            const name = document.getElementById('deduName').value.trim();
+            const value = document.getElementById('deduValue').value.trim();
+
+            if (name && value) {
+                const entry = `${name}:${value}`;
+                deductions.push(entry);
+                updateList('deduList', deductions);
+                document.getElementById('salDedu').value = deductions.join(', ');
+                document.getElementById('deduName').value = '';
+                document.getElementById('deduValue').value = '';
+            }
+        }
+
+        function updateList(listId, items) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.textContent = item;
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-sm btn-outline-secondary';
+                btn.textContent = '삭제';
+                btn.onclick = () => {
+                    items.splice(index, 1);
+                    updateList(listId, items);
+                    if (listId === 'incenList') {
+                        document.getElementById('salIncen').value = items.join(', ');
+                    } else {
+                        document.getElementById('salDedu').value = items.join(', ');
+                    }
+                };
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('employeeModal');
+        const listGroup = modalElement.querySelector('.list-group');
+
+        if (listGroup) {
+            listGroup.addEventListener('click', function (event) {
+                const clicked = event.target.closest('.list-group-item');
+                if (clicked) {
+                    const employeeName = clicked.getAttribute('data-name');
+                    const employeeId = clicked.getAttribute('data-id');
+                    const employeePosition = clicked.getAttribute('data-position');
+
+                    document.getElementById('admin').value = employeeName;
+                    document.getElementById('adminNum').value = employeeId;
+                    document.getElementById('salPosition').value = employeePosition;
+
+                    const closeBtn = modalElement.querySelector('.btn-close');
+                    closeBtn.click();
+                }
+            });
+        }
+    });
+</script>
+
+</div>
+
+</body>
+</html>
