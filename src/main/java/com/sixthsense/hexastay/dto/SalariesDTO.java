@@ -1,10 +1,9 @@
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Member;
-import jakarta.persistence.*;
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 @Getter
@@ -13,14 +12,19 @@ import java.time.YearMonth;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SalariesDTO {
-
+public class SalariesDTO extends BaseEntity {
     private Long salNum;
     private Integer salBase;
-    private Integer salPosition;
+    private String salPosition;
     private Integer salDuty;
     private String salIncen;
     private String salDedu;
     private YearMonth salDate;
-    private Admin admin;
+
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
+
+    @Setter
+    private AdminDTO adminDTO;
+
 }

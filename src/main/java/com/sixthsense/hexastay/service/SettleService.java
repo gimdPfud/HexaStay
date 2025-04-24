@@ -19,7 +19,4 @@ public interface SettleService {
     // 스토어넘 소속 스토어 찾기
     Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable);
 
-
-    // 월급조회용
-    Page<SalariesDTO> getSalariesList(AdminDTO adminDTO, Pageable pageable);
 }
