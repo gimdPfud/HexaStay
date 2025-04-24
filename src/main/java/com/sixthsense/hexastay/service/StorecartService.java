@@ -14,8 +14,6 @@ import java.security.Principal;
 import java.util.List;
 
 public interface StorecartService {
-    /*0. principal로 hotelroomNum 반환*/
-    Long principalToHotelroomNum(Principal principal);
 
     /*1. 등록*/
     Long addCart(StorecartitemDTO dto, Long hotelroomNum);

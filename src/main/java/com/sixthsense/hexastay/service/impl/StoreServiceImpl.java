@@ -15,6 +15,7 @@ import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.StoreLikeRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
+import com.sixthsense.hexastay.service.ZzService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreServiceImpl implements StoreService {
     private final RoomRepository roomRepository;
+    private final ZzService zzService;
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
     private final StoreLikeRepository storeLikeRepository;
@@ -311,11 +313,11 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void storeLiketoggle(Long storeNum, String email) {
-        StoreLike storeLike = storeLikeRepository.findByMember_MemberEmailAndStore_StoreNum(email,storeNum);
+    public void storeLiketoggle(Long storeNum, Member member) {
+        StoreLike storeLike = storeLikeRepository.findByMemberAndStore_StoreNum(member,storeNum);
         if(storeLike==null){ //좋아요 안했음
             storeLike = new StoreLike();
-            storeLike.setMember(memberRepository.findByMemberEmail(email));
+            storeLike.setMember(member);
             storeLike.setStore(storeRepository.findById(storeNum).orElseThrow(EntityNotFoundException::new));
             storeLikeRepository.save(storeLike); //좋아요 추가
         }else { //좋아요 했음
@@ -324,27 +326,13 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void storeLiketoggle(Long storeNum, Long hotelroomNum) {
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum, pageable)
-                .stream().findFirst().orElse(null);
-        if(room==null){return;}
-        Member member = room.getMember();
-    }
-
-    @Override
     public long getStoreLikeCount(Long storeNum) {
         return storeLikeRepository.countByStore_StoreNum(storeNum);
     }
 
     @Override
-    public boolean isLiked(Long storeNum, String email) {
-        return storeLikeRepository.existsByStore_StoreNumAndMember_MemberEmail(storeNum, email);
-    }
-
-    @Override
-    public boolean isLiked(Long storeNum, Long hotelroomNum) {
-        return false;
+    public boolean isLiked(Long storeNum, Member email) {
+        return storeLikeRepository.existsByStore_StoreNumAndMember(storeNum, email);
     }
 
     //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.
