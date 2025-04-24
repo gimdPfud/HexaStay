@@ -398,7 +398,8 @@
             <input type="hidden" name="category" th:value="${category}" />
             <input type="hidden" name="lang" id="langInput" />
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="white-space: nowrap;">lang :</span>
                 <button type="button" class="flag flag-ko" onclick="submitLang('ko')" title="한국어"></button>
                 <button type="button" class="flag flag-en" onclick="submitLang('en')" title="English"></button>
                 <button type="button" class="flag flag-ja" onclick="submitLang('ja')" title="日本語"></button>
