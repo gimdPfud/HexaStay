@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class StoreCartController {
     private final StorecartService storecartService;
     private final OrderstoreService orderstoreService;
-    Long hotelroomNum = 9L; // todo 이거 어떻게 받아오는지 나중에 다시 고쳐야 함. 흠......세션에 저장하나??
+    Long hotelroomNum = 9L; // todo QR에서 받기
 
     /* 5. 장바구니페이지 이동해서 보기.
            ??......get?*/
