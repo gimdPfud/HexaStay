@@ -22,7 +22,7 @@ public class Salaries extends BaseEntity {
     private Integer salBase;
 
     // 직책수당
-    private Integer salPosition;
+    private String salPosition;
 
     // 직무수당
     private Integer salDuty;
