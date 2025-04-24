@@ -9,10 +9,9 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Store;
-import com.sixthsense.hexastay.entity.StoreLike;
+import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.StoreLikeRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.StoreService;
@@ -21,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class StoreServiceImpl implements StoreService {
+    private final RoomRepository roomRepository;
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
     private final StoreLikeRepository storeLikeRepository;
@@ -322,6 +324,15 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
+    public void storeLiketoggle(Long storeNum, Long hotelroomNum) {
+        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum, pageable)
+                .stream().findFirst().orElse(null);
+        if(room==null){return;}
+        Member member = room.getMember();
+    }
+
+    @Override
     public long getStoreLikeCount(Long storeNum) {
         return storeLikeRepository.countByStore_StoreNum(storeNum);
     }
@@ -329,6 +340,11 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public boolean isLiked(Long storeNum, String email) {
         return storeLikeRepository.existsByStore_StoreNumAndMember_MemberEmail(storeNum, email);
+    }
+
+    @Override
+    public boolean isLiked(Long storeNum, Long hotelroomNum) {
+        return false;
     }
 
     //부모가 없으면서 "alive"상태라면, "deleted"상태로 바꿔준다.

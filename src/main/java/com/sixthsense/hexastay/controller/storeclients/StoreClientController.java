@@ -26,7 +26,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //@Controller
 @RequiredArgsConstructor
@@ -44,7 +47,7 @@ public class StoreClientController {
     @GetMapping("/list")
     public String list(Model model, Pageable pageable){
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
-        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
+//        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
         model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
         model.addAttribute("list",storeDTOPage);
         return "mobilestore/list";
@@ -80,4 +83,32 @@ public class StoreClientController {
         model.addAttribute("data",storemenuDTO);
         return "mobilestore/menuread";
     }
+
+
+//    /*5. 스토어 좋아요~ 또는 싫어요~?*/
+//    @ResponseBody
+//    @GetMapping("/like/{storeNum}")
+//    public ResponseEntity liketoggle(@PathVariable Long storeNum){
+//        try {
+//            storeService.storeLiketoggle(storeNum, email);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    @ResponseBody
+//    @GetMapping("/like/list/{storeNum}")
+//    public ResponseEntity likeList(@PathVariable Long storeNum){
+//        try {
+//            Long likes = storeService.getStoreLikeCount(storeNum);
+//            boolean check = storeService.isLiked(storeNum, principal.getName());
+//            Map<String,Object> datas = new HashMap<>();
+//            datas.put("likes",likes);
+//            datas.put("check",check);
+//            return new ResponseEntity<>(datas,HttpStatus.OK);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }
