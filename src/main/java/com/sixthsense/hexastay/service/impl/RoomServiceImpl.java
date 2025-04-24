@@ -174,15 +174,16 @@ public class RoomServiceImpl {
     //Room pk 랑 member pk 을 찾아 오는 로직
     //todo:memberByhotelRoom.html 에서 쓰이는 메소드
     @Transactional
-    public void updateRoomMember(Long roomNum, Long newMemberNum) {
-        Room room = roomRepository.findById(roomNum)
-                .orElseThrow(() -> new RuntimeException("Room 찾을 수 없음"));
+    public void updateRoomMember(Long roomNum, Long memberNum) {
+        // 존재 여부 확인 (예외처리용)
+        roomRepository.findById(roomNum)
+                .orElseThrow(() -> new IllegalArgumentException("해당 룸 번호가 존재하지 않습니다."));
+        memberRepository.findById(memberNum)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원 번호가 존재하지 않습니다."));
 
-        Member newMember = memberRepository.findById(newMemberNum)
-                .orElseThrow(() -> new RuntimeException("회원 찾을 수 없음"));
+        roomRepository.updateRoomMember(roomNum, memberNum);
 
-        room.setMember(newMember); // 기존 member FK → 새 member FK로 교체
-        roomRepository.save(room);
+        log.info("(수정/@Query) Room {} 의 Member가 {} 로 교체되었습니다.", roomNum, memberNum);
     }
 
 

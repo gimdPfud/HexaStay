@@ -47,14 +47,14 @@ public class RoomController {
     //todo:memberByhotelRoom.html 에서 쓰이는 메소드
     @PostMapping("/admin/room/update-member")
     @ResponseBody
-    public ResponseEntity<?> updateRoomMember(@RequestParam("roomNum") Long roomNum,
-                                              @RequestParam("newMemberNum") Long newMemberNum) {
+    public String updateRoomMember(@RequestParam("roomNum") Long roomNum,
+                                   @RequestParam("memberNum") Long memberNum) {
         try {
-            roomServiceimpl.updateRoomMember(roomNum, newMemberNum);
-            return ResponseEntity.ok("회원 변경 성공");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 변경 실패: " + e.getMessage());
+            roomServiceimpl.updateRoomMember(roomNum, memberNum);
+            return "회원 정보가 성공적으로 수정되었습니다.";
+        } catch (IllegalArgumentException e) {
+            log.error("회원 수정 오류: {}", e.getMessage());
+            return "회원 정보 수정에 실패했습니다: " + e.getMessage();
         }
     }
 
