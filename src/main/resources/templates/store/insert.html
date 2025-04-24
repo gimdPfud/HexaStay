@@ -9,7 +9,7 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+    <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 700px;">
         <h2 class="text-center mb-4">스토어 등록</h2>
         <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
 
@@ -25,7 +25,8 @@
             </div>
             <label class="form-label">제공할 호텔</label>
             <div class="mb-3 input-group">
-                <input type="text" id="companyNum" name="companyNum" class="form-control" readonly style="background-color: #ced4da" required>
+                <input type="text" id="companyName" class="form-control" readonly style="background-color: #ced4da" required>
+                <input hidden id="companyNum" name="companyNum" class="form-control">
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#companySearchModal">검색</button><!--모달버튼? 누르면 검색가능한 창 뜸.-->
             </div>
             <div class="mb-3">
@@ -108,9 +109,14 @@
                 </div>
                 <div class="modal-body">
                     <!-- 검색 폼 -->
-                    <form class="row g-3 align-items-end">
-
-                        <div class="col-md-4" style="width: 30%;">
+                    <form class="row g-3 align-items-end" id="companySearchForm">
+                        <div class="col-md-3" style="width: 20%;">
+                            <select name="choice" class="form-select" style=" height: 35px; font-size: 0.9rem;">
+                                <option value="branch">지점</option>
+                                <option value="facility">외부시설</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" style="width: 20%;">
                             <select name="select" class="form-select" style=" height: 35px; font-size: 0.9rem;">
                                 <option selected>검색 조건</option>
                                 <option value="company">조직명</option>
@@ -119,59 +125,19 @@
                             </select>
                         </div>
 
-                        <div class="col-md-5" style="width: 50%;">
+                        <div class="col-md-4" style="width: 45%;">
                             <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" style="height: 35px; font-size: 0.9rem;" th:value="${keyword}">
                         </div>
 
-                        <div class="col-md-3 d-grid" style="width: 20%;">
+                        <div class="col-md-2 d-grid" style="width: 15%;">
                             <button type="button" id="searchBtn" onclick="searchCompanys(this)" class="btn btn-primary">검색</button>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <!-- 결과 테이블 -->
-                    <div class="row w-100">
-                        <div class="col-12">
-                            <table class="table table-bordered">
-                                <thead class="table-light text-center">
-                                <tr>
-                                    <th style="width: 14.5%">프로필 사진</th>
-                                    <th style="width: 17.5%;">브랜드명</th>
-                                    <th style="width: 17.5%;">본사명</th>
-                                    <th style="width: 17.5%;">지사명</th>
-                                    <th style="width: 17.5%;">전화번호</th>
-                                    <th style="width: 15.5%;"></th>
-                                </tr>
-                                </thead>
+                    <div class="row w-100" id="searchedCompanyList">
 
-                                <tbody id="searchedCompanyList"></tbody>
-
-                            </table>
-                        </div><!--col12:테이블-->
-
-                        <div class="col-12">
-                            <div>
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/admin/store/list?page=0}">처음</a>
-                                    </li>
-                                    <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/admin/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
-                                    </li>
-                                    <li class="page-item"
-                                        th:each="pageNum : ${#numbers.sequence((list.number - 2 > 0 ? list.number - 2 : 0), (list.number + 3 < list.totalPages - 1 ? list.number + 3 : list.totalPages - 1))}"
-                                        th:classappend="${pageNum == list.number} ? 'active'">
-                                        <a class="page-link" th:href="@{/admin/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-                                    </li>
-                                    <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/admin/store/list?page={next}(next=${list.number + 1})}">다음</a>
-                                    </li>
-                                    <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/admin/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div><!--col12:페이징-->
                     </div><!--row-->
                 </div><!--modal footer-->
             </div><!--modal content-->
@@ -225,6 +191,61 @@
             let list = document.getElementById("searchedCompanyList");
             let fullstr = "";
 
+            let start = `<div class="col-12">
+                            <table class="table table-bordered">
+                                <thead class="table-light text-center">
+                                <tr>
+                                    <th style="width: 11%">사진</th>
+                                    <th style="width: 14%;">브랜드명</th>
+                                    <th style="width: 14%;">본사명</th>
+                                    <th style="width: 14%;">지점명</th>
+                                    <th style="width: 14%;">외부시설명</th>
+                                    <th style="width: 14%;">전화번호</th>
+                                    <th style="width: 12%;"></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>`
+
+            let endfirst = `</tbody>
+                            </table>
+                        </div><!--col12:테이블-->
+
+                        <div class="col-12">
+                            <div>
+                                <ul class="pagination justify-content-center">
+                                    <li class="${data.number === 0 ? 'page-item disabled':'page-item'}">
+                                        <button class="page-link" data-page="0" onclick="changePage(this)">처음</button>
+                                    </li>
+                                    <li class="${!data.hasPrevious ? 'disabled page-item':'page-item'}">
+                                        <a class="page-link" data-page="${data.number - 1}" onclick="changePage(this)">이전</a>
+                                    </li>`
+
+            let startnum = data.number - 2 > 0 ? data.number - 2 : 0;
+            let endnum = data.number + 3 < data.totalPages - 1 ? data.number + 3 : data.totalPages - 1;
+
+            let endsecond = "";
+            for (let pageNum = startnum; pageNum<endnum; pageNum++ ){
+                endsecond += `
+                                    <li class="page-item"
+                                        class="${pageNum === data.number ? 'active page-item':'page-item'}">
+                                        <button class="page-link" data-page="${pageNum}" onclick="changePage(this)">${pageNum + 1}</button>
+                                    </li>`
+            }
+
+            let endthird = `
+                                <li class="${!data.hasNext ? 'disabled page-item':'page-item'}">
+                                    <button class="page-link" data-page="${data.number + 1}" onclick="changePage(this)">다음</button>
+                                </li>
+                                <li class="${(data.number === data.totalPages - 1) ? 'page-item disabled':'page-item'}">
+                                    <button class="page-link" data-page="${data.totalPages - 1}" onclick="changePage(this)">마지막</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div><!--col12:페이징-->`
+
+            let end = endfirst + endsecond + endthird;
+
             for(let i=0;i<data.content.length;i++){
 
                 let first = `<!--반복시작-->
@@ -245,12 +266,14 @@
                             <td>${data.content[i].companyBrand}</td>
                             <td>${data.content[i].companyParentName}</td>
                             <td>${data.content[i].branchName}</td>
+                            <td>${data.content[i].facilityName}</td>
                             <td>${data.content[i].companyPhone}</td>
                             <td>
                                 <button type="button"
                                         class="btn btn-outline-success px-2 py-1"
                                         style="font-size: 0.8rem; line-height: 1;"
-                                        data-companynum=${data.content[i].companyNum}
+                                        data-companynum="${data.content[i].companyNum}"
+                                        data-companyname="${data.content[i].companyName}"
                                         onclick="selectBranch(this)">
                                     선택
                                 </button>
@@ -269,13 +292,36 @@
 
                 fullstr += first + second + third + fourth;
             }
-            list.innerHTML = fullstr;
+            list.innerHTML = start + fullstr + end;
         }
 
         function selectBranch(button) {
             let companyNumInput = document.getElementById("companyNum");
+            let companyNameInput = document.getElementById("companyName");
             companyNumInput.value = button.dataset.companynum;
+            companyNameInput.value = button.dataset.companyname;
+            console.log(button)
             bootstrap.Modal.getInstance(document.getElementById("companySearchModal")).hide();
+        }
+
+        function changePage(button) {
+            const formData = new FormData(document.getElementById("companySearchForm"));
+            let pageNum = button.dataset.page;
+            fetch(`/company/list/store?page=${pageNum}`,{
+                method: "POST",
+                body: formData
+            })
+            .then(response=>{
+                if(!response.ok){
+                    return response.text()
+                        .then(body=>alert(body))
+                }else{/*응답 오케이라면??*/
+                    return response.json();
+                }
+            })
+            .then(data => {
+                listCompanys(data)
+            })
         }
     </script>
 
