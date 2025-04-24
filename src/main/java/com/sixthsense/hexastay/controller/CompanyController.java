@@ -50,7 +50,9 @@ public class CompanyController {
         log.info("pageable : " + pageable.getPageNumber(), pageable.getPageSize());
 
         if (choice == null || choice.trim().isEmpty()) {
-            choice = "center";
+            choice = "center";  // 기본값 설정
+        } else if ("전체".equals(choice)) {
+            choice = null;  // "전체"를 선택했을 때는 필터링 없이 전체 조회
         }
 
         Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
@@ -59,13 +61,6 @@ public class CompanyController {
         model.addAttribute("choice", choice);
         model.addAttribute("select", select);
         model.addAttribute("keyword", keyword);
-
-        return "company/list";
-    }
-
-    @PostMapping("/list")
-    public String listPost (@RequestParam("select") String select, @RequestParam("choice") String choice, @RequestParam ("keyword") String keyword) {
-
 
         return "company/list";
     }

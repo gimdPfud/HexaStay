@@ -30,7 +30,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
 
     @Query("SELECT c FROM Company c " +
-            "WHERE (:choice IS NULL OR c.companyType = :choice) " +
+            "WHERE (:choice = '전체' OR c.companyType = :choice) " +  // 여기 수정
             "AND (c.companyNum = :companyNum OR c.companyParent = :companyNum) " +
             "AND (" +
             "(:select = '전체') OR " +
@@ -48,8 +48,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                    @Param("keyword") String keyword,
                                    @Param("companyNum") Long companyNum,
                                    Pageable pageable);
-
-
 
     List<Company> findByCompanyType(String companyType);
 

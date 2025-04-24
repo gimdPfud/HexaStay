@@ -33,26 +33,25 @@
                     <table class="table table-bordered text-company mb-0">
                         <thead class="table-light text-center">
                         <tr>
+                            <th style="width: 10%;">
+                                <input type="checkbox" id="selectAll"> 선택
+                            </th>
                             <th style="width: 10%;">주문번호</th>
                             <th style="width: 20%;">주문자</th>
                             <th style="width: 10%;">상태</th>
-                            <!-- 체크박스가 있는 열의 헤더에 전체 선택 체크박스 추가 -->
-                            <th style="width: 10%;">
-                                <input type="checkbox" id="selectAll"> 전체 선택
-                            </th>
                             <th style="width: 50%;">주문내용</th>
                         </tr>
                         </thead>
 
                         <tbody>
                         <tr th:each="order : ${orders}">
-                            <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
-                            <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
-                            <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
                             <td class="text-center">
                                 <!-- 각 체크박스에는 주문번호를 data-id 속성에 할당 -->
                                 <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
                             </td>
+                            <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
+                            <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
+                            <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
                             <td class="text-center" style="vertical-align: middle;">
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
