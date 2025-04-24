@@ -151,6 +151,7 @@ public class CompanyController {
     @ResponseBody
     @PostMapping("/list/store")
     public ResponseEntity listCompanyForStoreInsert(
+                              @RequestParam(required = false) String choice,
                               @RequestParam(required = false) String select,
                               @RequestParam(required = false) String keyword,
                               Pageable pageable, Principal principal) {
@@ -158,7 +159,11 @@ public class CompanyController {
         String email = principal.getName();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, "branch", keyword, companyNum, pageable);
+        if (choice == null || choice.trim().isEmpty()) {
+            choice = "branch";
+        }
+
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
 
         return new ResponseEntity<>(companyDTOS, HttpStatus.OK);
     }

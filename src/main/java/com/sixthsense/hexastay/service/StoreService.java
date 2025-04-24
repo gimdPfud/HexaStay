@@ -49,6 +49,8 @@ public interface StoreService {
 
     /*좋아요... 좋아요한 스토어의 좋아요 수 리턴*/
     void storeLiketoggle(Long storeNum, String email);
+    void storeLiketoggle(Long storeNum, Long hotelroomNum);
     long getStoreLikeCount(Long storeNum);
     boolean isLiked(Long storeNum, String email);
+    boolean isLiked(Long storeNum, Long hotelroomNum);
 }

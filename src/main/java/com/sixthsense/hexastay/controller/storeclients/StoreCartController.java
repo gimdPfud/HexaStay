@@ -58,7 +58,7 @@ public class StoreCartController {
         list.forEach(dto -> {
             totalpirce.updateAndGet(v -> v + (long) dto.getStoremenuCount() * dto.getStoremenuPrice());
         });
-        log.info(totalpirce);
+//        log.info(totalpirce);
         model.addAttribute("list",list);
         model.addAttribute("totalPrice",totalpirce);
         return "mobilestore/cart/list";
