@@ -147,7 +147,31 @@
                                 <tbody id="searchedCompanyList"></tbody>
 
                             </table>
-                        </div><!--col12-->
+                        </div><!--col12:테이블-->
+
+                        <div class="col-12">
+                            <div>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/store/list?page=0}">처음</a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/store/list?page={prev}(prev=${list.number - 1})}">이전</a>
+                                    </li>
+                                    <li class="page-item"
+                                        th:each="pageNum : ${#numbers.sequence((list.number - 2 > 0 ? list.number - 2 : 0), (list.number + 3 < list.totalPages - 1 ? list.number + 3 : list.totalPages - 1))}"
+                                        th:classappend="${pageNum == list.number} ? 'active'">
+                                        <a class="page-link" th:href="@{/admin/store/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/store/list?page={next}(next=${list.number + 1})}">다음</a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/store/list?page={last}(last=${list.totalPages - 1})}">마지막</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div><!--col12:페이징-->
                     </div><!--row-->
                 </div><!--modal footer-->
             </div><!--modal content-->
