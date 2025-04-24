@@ -23,10 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -215,6 +212,23 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 다시 한번 전체 정보 저장 (이미 PK가 있어서 update처럼 동작함)
         hotelRoomRepository.save(hotelRoom);
     }
+
+    @Override
+    public Page<HotelRoomDTO> searchHotelRoomsByName(String keyword, Pageable pageable) {
+        List<HotelRoom> filteredList = hotelRoomRepository.searchByName(keyword);
+
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        int start = Math.min(page * size, filteredList.size());
+        int end = Math.min(start + size, filteredList.size());
+
+        List<HotelRoomDTO> pagedList = filteredList.subList(start, end).stream()
+                .map(room -> modelMapper.map(room, HotelRoomDTO.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(pagedList, pageable, filteredList.size());
+    }
+
 
 
 

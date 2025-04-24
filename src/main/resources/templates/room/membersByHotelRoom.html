@@ -12,56 +12,80 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+<style>
+    /*부트스랩 card 마우스 가져다 됐을때 테두리 효과 Class=""*/
+    .member-card {
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6; /* 기본 테두리 */
+    }
+
+    .member-card:hover {
+        border-color: #0d6efd; /* 부트스트랩 primary 색상 */
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.25);
+    }
+
+    /*form-control : 효과 style Class="" */
+    .form-control:focus {
+        border-color: #0d6efd; /* Bootstrap primary */
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-control:valid {
+        border-color: #198754; /* Bootstrap success */
+    }
+
+    .form-control:invalid {
+        border-color: #dc3545; /* Bootstrap danger */
+    }
+    /*form-control : 효과 style*/
+
+</style>
 <body>
 
 <div class="container mt-5">
 
-    <p>룸 번호: [[${roomNum}]]</p>
+    <h3 class="fw-bold mb-4 text-center text-dark"
+        th:text="${roomNum} + '번: Room에 배정된 회원 목록'">
+    </h3>
 
-    <p>룸번호 확인: [[${roomNum} != null ? ${roomNum} : '넘어오지 않음']]</p>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col" th:each="member : ${members}">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body member-card">
+                    <h5 class="card-title fw-semibold text-primary">
+                        <span th:text="${member.memberName}">이름</span>
+                        <small class="text-muted">(#<span th:text="${member.memberNum}"></span>)</small>
+                    </h5>
+                    <p class="card-text mb-1">
+                        <strong>전화번호:</strong> <span th:text="${member.memberPhone}"></span>
+                    </p>
+                    <p class="card-text mb-3">
+                        <strong>이메일:</strong> <span th:text="${member.memberEmail}"></span>
+                    </p>
 
-    <h2 class="fw-bold mb-4 text-center">객실 배정 회원 목록</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editMemberModal"
+                                th:attr="data-member-num=${member.memberNum},
+                                     data-member-name=${member.memberName},
+                                     data-member-phone=${member.memberPhone},
+                                     data-member-email=${member.memberEmail}">
+                            회원정보 수정
+                        </button>
 
-    <table class="table table-bordered text-company mb-0">
-        <thead class="table-light text-center">
-        <tr>
-            <th style="width: 20%;">회원 번호</th>
-            <th style="width: 20%;">이름</th>
-            <th style="width: 20%;">전화번호</th>
-            <th style="width: 20%;">이메일</th>
-            <th style="width: 20%;"></th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr th:each="member : ${members}" th:data-member-num="${member.memberNum}" class="text-center">
-            <td class="member-num" th:text="${member.memberNum}"></td>
-            <td class="member-name" th:text="${member.memberName}"></td>
-            <td class="member-phone" th:text="${member.memberPhone}"></td>
-            <td class="member-email" th:text="${member.memberEmail}"></td>
-            <td>
-                <button class="btn btn-primary btn-sm btn-icon"
-                        data-bs-toggle="modal"
-                        data-bs-target="#editMemberModal"
-                        th:attr="data-member-num=${member.memberNum},
-                                 data-member-name=${member.memberName},
-                                 data-member-phone=${member.memberPhone},
-                                 data-member-email=${member.memberEmail}">
-                    수정
-                </button>
-                <!-- ✅ 이렇게 수정 -->
-                <button type="button"
-                        class="btn btn-outline-secondary open-member-modal-btn"
-                        th:attr="data-room-num=${roomNum}">
-                    회원 수정
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <!-- ✅ 테스트용으로 강제로 roomNum 전달 -->
-    <button type="button" class="btn btn-outline-secondary"
-            onclick="openMemberModalWithRoomNum()">회원 수정</button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary w-100 open-member-modal-btn"
+                                th:attr="data-room-num=${roomNum}">
+                            Room 배정 수정
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 페이지네이션 -->
     <nav aria-label="회원 페이지네이션">
@@ -90,13 +114,13 @@
     </nav>
 </div>
 
-<!-- 회원 검색후 수정 모달 -->
-<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+<!-- 회원 검색후 수정 모달 Room DB 에 RoomPK  기준으로 가져와서 memberFK만 변경 가능-->
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true"><!--검색 modal 시작점-->
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="memberModalLabel">회원 검색</h5>
-                <p>룸 번호: [[${roomNum}]]</p>
+                <h5 class="modal-title" id="memberModalLabel">회원 검색</h5><!--회원 검색으로 room 배정 변경-->
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -118,11 +142,10 @@
                     </thead>
                     <tbody id="memberSearchResults"></tbody>
                 </table>
-                <button type="button" class="btn btn-outline-secondary" onclick="openMemberModalWithRoomNum()">회원 수정</button>
             </div>
         </div>
     </div>
-</div>
+</div><!--검색 modal 끝점-->
 
 
 

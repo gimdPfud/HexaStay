@@ -89,6 +89,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/register-hotelroom/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/register-hotelroom/");
 
+        registry.addResourceHandler("/hotelRoomsByMember/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
+
 
         // 다국어 설정
 

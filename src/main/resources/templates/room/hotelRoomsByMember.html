@@ -11,68 +11,161 @@
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        .hotel-img {
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+        }
+
+        .card-horizontal {
+            display: flex;
+            flex-direction: row;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-horizontal img {
+            width: 180px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        @media (max-width: 576px) {
+            .card-horizontal {
+                flex-direction: column;
+            }
+
+            .card-horizontal img {
+                width: 100%;
+                height: 150px;
+            }
+        }
+
+        .card {
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 576px) {
+            .hotel-img {
+                height: 140px;
+            }
+        }
+
+        /* 필터 스타일 */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-bar input {
+            flex: 1 1 300px;
+        }
+
+        .table img {
+            object-fit: cover;
+            height: 40px;
+            width: 60px;
+            border-radius: 0.25rem;
+        }
+    </style>
 </head>
+
 <body>
-
 <div class="container mt-5">
-    <p>룸 번호: [[${roomNum}]]</p>
-
-    <p>룸번호 확인: [[${roomNum} != null ? ${roomNum} : '넘어오지 않음']]</p>
-    <span th:text="${roomNum}">기본값</span>
-
-    <!-- hidden input으로 담을 때 -->
     <input type="hidden" th:value="${roomNum}" id="roomNum">
-
 
     <!-- 메시지 출력 -->
     <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
 
-    <h2 class="fw-bold mb-4 text-center">객실 목록</h2>
+    <h2 class="fw-bold mb-4 text-center">회원이 예약한 Room 배정목록</h2>
 
-    <table class="table table-bordered text-company mb-0">
-        <thead class="table-light text-center">
-        <tr>
-            <th style="width: 20%;">객실 번호</th>
-            <th style="width: 20%;">방 이름</th>
-            <th style="width: 20%;">방 종류</th>
-            <th style="width: 20%;">방 가격</th>
-            <th style="width: 20%;"></th>
-        </tr>
-        </thead>
+    <!-- 필터 입력창 -->
+    <div class="filter-bar mb-4">
+        <input type="text" class="form-control" id="filterInput" placeholder="룸 이름, 타입, 가격 검색">
+    </div>
 
-        <tbody>
-        <tr th:each="hotelRoom : ${hotelRooms}" class="text-center">
-            <td th:text="${hotelRoom.hotelRoomNum}"></td>
-            <td th:text="${hotelRoom.hotelRoomName}"></td>
-            <td th:text="${hotelRoom.hotelRoomType}"></td>
-            <td th:text="${hotelRoom.hotelRoomPrice}"></td>
-            <td>
-                <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-primary btn-sm btn-icon"
-                            th:attr="data-roomNum=${hotelRoom.hotelRoomNum},
-                         data-roomName=${hotelRoom.hotelRoomName},
-                         data-roomType=${hotelRoom.hotelRoomType},
-                         data-roomPrice=${hotelRoom.hotelRoomPrice},
-                         data-roomPhone=${hotelRoom.hotelRoomPhone},
-                         data-roomContent=${hotelRoom.hotelRoomContent},
-                         data-memberNum=${memberNum}"
-                            onclick="openEditModal(this)">
-                        수정
-                    </button>
+    <!-- 카드 리스트 -->
+    <div class="list-group">
+        <div class="list-group-item d-flex align-items-center mb-3 p-3 shadow-sm rounded"
+             th:each="hotelRoom : ${hotelRooms}" style="background-color: #ffffff;">
 
-                    <form th:action="@{/admin/hotelroom/delete}" method="post"
-                          onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                        <input type="hidden" name="hotelRoomNum" th:value="${hotelRoom.hotelRoomNum}">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon">삭제</button>
-                    </form>
+            <!-- 📷 이미지 (비중 크게) -->
+            <div class="me-4">
+                <img th:src="@{${hotelRoom.hotelRoomProfileMeta}}" alt="이미지"
+                     style="width: 160px; height: 120px; object-fit: cover; border-radius: 10px;">
+            </div>
+
+            <!-- 📄 텍스트 정보 (비중 작게) -->
+            <div class="flex-grow-1 d-flex flex-column justify-content-between" style="min-width: 0;">
+                <div class="fw-bold text-primary fs-5 text-truncate" th:text="${hotelRoom.hotelRoomName}">
+                    호텔 이름
                 </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                <div class="text-muted small mt-2">
+                    <span class="me-3"><strong>타입:</strong> <span th:text="${hotelRoom.hotelRoomType}">타입</span></span>
+                    <span><strong>가격:</strong> <span th:text="${hotelRoom.hotelRoomPrice} + '원'">가격</span></span>
+                </div>
+            </div>
 
+            <!-- 🛠 수정 버튼 -->
+            <div class="ms-4 text-end">
+                <button class="btn btn-outline-primary btn-sm open-hotelroom-modal-btn"
+                        th:attr="data-room-num=${roomNum}">
+                   Romm배정변경
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- 호텔 룸 선택 모달 -->
+    <div class="modal fade" id="hotelRoomModal" tabindex="-1" aria-labelledby="hotelRoomModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="hotelRoomModalLabel">호텔 룸 선택</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="hotelRoomSearchKeyword" class="form-control mb-3" placeholder="호텔룸 이름으로 검색">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>이미지</th>
+                            <th>호텔룸 번호</th>
+                            <th>호텔룸 이름</th>
+                            <th>선택</th>
+                        </tr>
+                        </thead>
+                        <tbody id="hotelRoomSearchResult"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- 페이지네이션 -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center mt-5">
@@ -91,145 +184,75 @@
             </li>
         </ul>
     </nav>
-</div>
 
-<!-- 수정 모달 -->
-<div class="modal fade" id="editHotelRoomModal" tabindex="-1" aria-labelledby="editHotelRoomModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <!-- 이미지 업로드 위해 enctype 추가 -->
-            <form th:action="@{/admin/hotelroom/update}" method="post" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editHotelRoomModalLabel">Room배정 변경</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body row g-3">
-                    <!-- 숨겨진 hotel_room_num -->
-                    <input type="hidden" id="editHotelRoomNum" name="hotelRoomNum">
 
-                    <!-- 숨겨진 memberNum 전달 -->
-                    <input type="hidden" id="editMemberNum" name="memberNum" th:value="${memberNum}">
-
-                    <div class="col-md-6">
-                        <label for="editHotelRoomName" class="form-label">방 이름수정</label>
-                        <input type="text" class="form-control" id="editHotelRoomName" name="hotelRoomName">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="editHotelRoomType" class="form-label">방 종류수정</label>
-                        <input type="text" class="form-control" id="editHotelRoomType" name="hotelRoomType">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="editHotelRoomPrice" class="form-label">가격수정</label>
-                        <input type="number" class="form-control" id="editHotelRoomPrice" name="hotelRoomPrice">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="editHotelRoomPhone" class="form-label">방전화번호수정</label>
-                        <input type="text" class="form-control" id="editHotelRoomPhone" name="hotelRoomPhone">
-                    </div>
-
-                    <div class="col-md-12">
-                        <label for="editHotelRoomContent" class="form-label">QR수정</label>
-                        <input class="form-control" id="editHotelRoomContent" name="hotelRoomQr" rows="3"></input>
-                    </div>
-
-                    <!-- ✅ 이미지 업로드 추가 -->
-                    <div class="col-md-12">
-                        <label for="editHotelRoomProfile" class="form-label">대표 이미지</label>
-                        <input type="file" class="form-control" id="editHotelRoomProfile" name="hotelRoomProfile">
-                    </div>
-
-                    <!-- ✅ 기존 이미지 미리보기 (선택) -->
-                    <div class="col-md-12">
-                        <label class="form-label">기존 이미지 미리보기</label><br>
-                        <img id="previewHotelRoomImage" src="" alt="기존 이미지" style="max-width: 100%; height: auto;">
-                    </div>
-                </div>
-                <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn btn-primary">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- 모달에 데이터 자동 채우기 -->
 <script>
-    window.addEventListener('load', function () {
-        const fileInput = document.getElementById('adminProfile');
-        const fileBtn = document.getElementById('PictureBtn');
-        console.log('버튼:', fileBtn);
-        console.log('파일 input:', fileInput);
-        const errorMessage = document.getElementById('fileError');
-        const previewImage = document.getElementById('pictureTemp');
-        const fileNameLabel = document.querySelector('.file-name');
+    let selectedRoomNum = null;
 
-        if (!fileInput || !fileBtn) return; // 요소가 없으면 중단
-
-        fileBtn.addEventListener('click', function () {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', function () {
-            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-            const filePath = this.value;
-            const file = this.files[0];
-
-            if (!allowedExtensions.exec(filePath)) {
-                this.value = '';
-                errorMessage.classList.remove('d-none');
-                previewImage.classList.add('d-none');
-                fileNameLabel.textContent = '올바르지 않은 파일입니다.';
-                return;
-            }
-
-            errorMessage.classList.add('d-none');
-            fileNameLabel.textContent = file.name;
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImage.src = e.target.result;
-                    previewImage.classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+    // 모달 오픈
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('open-hotelroom-modal-btn')) {
+            selectedRoomNum = e.target.getAttribute('data-room-num');
+            const modal = new bootstrap.Modal(document.getElementById('hotelRoomModal'));
+            modal.show();
+        }
     });
 
+    // 실시간 검색
+    document.getElementById('hotelRoomSearchKeyword').addEventListener('input', function () {
+        const keyword = this.value;
+        fetch(`/admin/hotelroom/search?keyword=${keyword}`)
+            .then(res => res.json())
+            .then(data => {
+                const resultArea = document.getElementById('hotelRoomSearchResult');
+                resultArea.innerHTML = '';
+                data.forEach(hotelRoom => {
+                    const row = `
+                    <tr>
+                        <td><img src="${hotelRoom.hotelRoomProfileMeta}" width="60"></td>
+                        <td>${hotelRoom.hotelRoomNum}</td>
+                        <td>${hotelRoom.hotelRoomName}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success select-hotelroom-btn" data-hotelroom-num="${hotelRoom.hotelRoomNum}">
+                                선택
+                            </button>
+                        </td>
+                    </tr>`;
+                    resultArea.insertAdjacentHTML('beforeend', row);
+                });
+            });
+    });
 
+    // 호텔룸 선택 → DB 업데이트
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('select-hotelroom-btn')) {
+            const newHotelRoomNum = e.target.getAttribute('data-hotelroom-num');
 
+            fetch("/admin/room/update-hotelroom", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `roomNum=${selectedRoomNum}&hotelRoomNum=${newHotelRoomNum}`
+            })
+                .then(res => res.text())
+                .then(msg => {
+                    alert(msg);
+                    location.reload();
+                })
+                .catch(err => alert("수정 실패: " + err));
+        }
+    });
 
-    function openEditModal(button) {
-        const roomNum = button.getAttribute('data-roomNum');
-        const roomName = button.getAttribute('data-roomName');
-        const roomType = button.getAttribute('data-roomType');
-        const roomPrice = button.getAttribute('data-roomPrice');
-        const roomPhone = button.getAttribute('data-roomPhone');
-        const roomContent = button.getAttribute('data-roomContent');
-        const memberNum = button.getAttribute('data-memberNum');
-
-        document.getElementById('editHotelRoomNum').value = roomNum;
-        document.getElementById('editHotelRoomName').value = roomName;
-        document.getElementById('editHotelRoomType').value = roomType;
-        document.getElementById('editHotelRoomPrice').value = roomPrice;
-        document.getElementById('editHotelRoomPhone').value = roomPhone;
-        document.getElementById('editHotelRoomContent').value = roomContent;
-        document.getElementById('editMemberNum').value = memberNum;
-
-        // ✅ 기존 이미지 경로가 있다면 미리보기 세팅
-        const imgPreview = document.getElementById('previewHotelRoomImage');
-        imgPreview.src = '/hotelroom/' + roomName + '_' + roomNum + '.jpg'; // 혹은 .png 등 확장자 고려
-        imgPreview.onerror = function () {
-            this.style.display = 'none';
-        };
-
-        const editModal = new bootstrap.Modal(document.getElementById('editHotelRoomModal'));
-        editModal.show();
-    }
+    // 카드 필터링
+    document.getElementById('filterInput').addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+        document.querySelectorAll('.hotel-room-card').forEach(card => {
+            const name = card.querySelector('.room-name').textContent.toLowerCase();
+            const type = card.querySelector('.room-type').textContent.toLowerCase();
+            const price = card.querySelector('.room-price').textContent.toLowerCase();
+            card.closest('.col').style.display =
+                (name.includes(keyword) || type.includes(keyword) || price.includes(keyword)) ? '' : 'none';
+        });
+    });
 </script>
 
 </body>
