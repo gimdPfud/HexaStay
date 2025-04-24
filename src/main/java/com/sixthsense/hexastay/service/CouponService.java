@@ -22,6 +22,7 @@ public interface CouponService {
     // 쿠폰을 추가
     public void addToCoupon(String email);
 
-
+    // 쿠폰의 반복사용을 막기 위한 매소드
+    public CouponDTO applyCoupon(String memberEmail, Long couponNum);
 
 }

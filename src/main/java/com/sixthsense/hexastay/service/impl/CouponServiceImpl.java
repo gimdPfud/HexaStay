@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,11 +28,13 @@ import java.util.List;
 
 public class CouponServiceImpl implements CouponService {
 
-    private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
+    private final CouponRepository couponRepository;
+
+
 
     @Override
     public void createCoupon(CouponDTO couponDTO) {
@@ -112,4 +115,33 @@ public class CouponServiceImpl implements CouponService {
                 .build();
         couponRepository.save(coupon);
     }
+
+    @Override
+    public CouponDTO applyCoupon(String memberEmail, Long couponNum) {
+        log.info("다중 쿠폰 사용 서비스 진입");
+
+        Coupon coupon = couponRepository.findByMember_MemberEmailAndCouponNum(memberEmail, couponNum);
+
+        //  사용 제한 체크
+        if (coupon.isUsed()) {
+            throw new IllegalStateException("이미 사용한 쿠폰입니다.");
+        }
+
+        if (coupon.getRepeatCouponCount() != null && coupon.getRepeatCouponCount() <= 0) {
+            throw new IllegalStateException("쿠폰 사용 횟수를 초과했습니다.");
+        }
+
+        //  사용 처리
+        coupon.setUsed(true); // 단일 사용 쿠폰
+        coupon.setUsedTime(LocalDateTime.now());
+        if (coupon.getRepeatCouponCount() != null) {
+            coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
+        }
+
+        couponRepository.save(coupon);
+
+        return new CouponDTO(coupon);
+    }
+
+
 }
