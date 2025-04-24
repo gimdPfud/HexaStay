@@ -21,9 +21,9 @@
 </div>
 
 <!-- 버튼 3개 -->
-<button type="button" class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인)</button><br>
-<button type="button" class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인)</button><br>
-<button type="button" class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인)</button>
+<button type="button" class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인) - 생일 7일전~생일당일</button><br>
+<button type="button" class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인) - 무제한</button><br>
+<button type="button" class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인) - 가입당 1개</button>
 </body>
 
 <script>
@@ -34,21 +34,35 @@
             return;
         }
 
-        // 이메일 존재 여부를 확인하는 POST 요청
+        // 이메일 존재 여부를 확인
         fetch('/roommenu/coupon/exists', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email: email })  // 이메일을 JSON 형식으로 보냄
+            body: JSON.stringify({ email: email })
         })
-            .then(res => res.json())  // 응답을 JSON 형식으로 파싱
+            .then(res => res.json())
             .then(data => {
                 if (!data.exists) {
                     alert("존재하지 않는 이메일입니다. 회원만 쿠폰을 받을 수 있어요.");
                     return;
                 }
 
+                // 가입쿠폰 중복 발급 여부 확인
+                if (type === '가입쿠폰') {
+                    return fetch(`/roommenu/coupon/already-issued?email=${email}&type=${type}`)
+                        .then(res => res.json())
+                        .then(dupCheck => {
+                            if (dupCheck.issued) {
+                                alert("이미 발급된 가입쿠폰입니다.");
+                                throw new Error("중복된 가입쿠폰");
+                            }
+                        });
+                }
+            })
+            .then(() => {
+                // 쿠폰 발급 데이터 준비
                 const couponData = {
                     memberEmail: email,
                     type: type,
@@ -56,6 +70,7 @@
                     expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
                 };
 
+                // 쿠폰 발급 요청
                 return fetch('/roommenu/coupon/insert', {
                     method: 'POST',
                     headers: {
@@ -68,7 +83,11 @@
             .then(msg => {
                 if (msg) alert(`${type} 발급 완료: ${msg}`);
             })
-            .catch(err => alert("오류 발생: " + err));
+            .catch(err => {
+                if (err.message !== '중복된 가입쿠폰') {
+                    alert("오류 발생: " + err);
+                }
+            });
     }
 
 </script>

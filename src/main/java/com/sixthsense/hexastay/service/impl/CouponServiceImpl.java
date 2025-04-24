@@ -143,5 +143,10 @@ public class CouponServiceImpl implements CouponService {
         return new CouponDTO(coupon);
     }
 
+    @Override
+    public boolean hasCoupon(String email, String type) {
+        return couponRepository.existsByMember_MemberEmailAndType(email, type);
+    }
+
 
 }

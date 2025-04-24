@@ -264,6 +264,7 @@
     <div class="coupon-select-box">
         <label for="couponSelect">쿠폰 선택:</label>
         <select id="couponSelect" name="couponNum">
+            <option value="">쿠폰 선택</option>
             <option th:each="coupon : ${couponList}"
                     th:value="${coupon.couponNum}"
                     th:text="|${coupon.type} (${coupon.discountRate}%)|">
