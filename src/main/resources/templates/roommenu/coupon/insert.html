@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+<h1>쿠폰 발급 받기</h1>
+
+<button class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인)</button><br>
+<button class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인)</button><br>
+<button class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인)</button>
+
+
+
+
+</body>
+
+<script>
+    function createCoupon(type, discountRate) {
+        const email = document.getElementById('email').value;
+        if (!email) {
+            alert("이메일을 입력해주세요!");
+            return;
+        }
+
+        const data = {
+            memberEmail: email,
+            type: type,
+            discountRate: discountRate,
+            expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0] // 유효기간 30일
+        };
+
+        fetch('/coupon/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.text())
+            .then(msg => alert(`${type} 발급 완료: ${msg}`))
+            .catch(err => alert("오류 발생: " + err));
+    }
+</script>
+
+</html>

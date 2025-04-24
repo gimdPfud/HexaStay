@@ -23,7 +23,7 @@ public class CouponController {
     private final MemberRepository memberRepository;
 
 
-    @PostMapping("/create")
+    @PostMapping("/insert")
     public ResponseEntity<?> createCoupon(@RequestBody CouponDTO dto) {
         couponService.createCoupon(dto);
         return ResponseEntity.ok("쿠폰 발급 완료");
