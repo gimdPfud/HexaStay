@@ -13,22 +13,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Controller  // 여기 변경!
+@RequestMapping("/roommenu/coupon")
 @RequiredArgsConstructor
-@RequestMapping("/roommenu")
 @Log4j2
-@Controller
 
 public class CouponController {
 
     private final CouponService couponService;
     private final MemberRepository memberRepository;
 
-
-    @GetMapping("/coupon/insert")
+    @GetMapping("/insert")
     public String createCouponGet() {
-        return "coupon//insert";
+        return "roommenu/coupon/insert"; // templates/coupon/insert.html
     }
 
+    @ResponseBody
     @PostMapping("/insert")
     public ResponseEntity<?> createCouponPost(@RequestBody CouponDTO dto) {
         couponService.createCoupon(dto);
@@ -53,7 +53,5 @@ public class CouponController {
         result.put("finalTotal", finalPrice);
         return result;
     }
-
-
-
 }
+

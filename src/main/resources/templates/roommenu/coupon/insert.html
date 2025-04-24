@@ -41,7 +41,7 @@
             expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
         };
 
-        fetch('/coupon/insert', {
+        fetch('/roommenu/coupon/insert', {  // ← 수정된 경로
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -49,7 +49,7 @@
             body: JSON.stringify(data)
         })
             .then(res => res.text())
-            .then(msg => alert(`${type} 발급 완료: ${msg}`)) // 백틱으로 수정
+            .then(msg => alert(`${type} 발급 완료: ${msg}`))
             .catch(err => alert("오류 발생: " + err));
     }
 </script>
