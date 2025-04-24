@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -48,9 +49,7 @@ public interface StoreService {
     boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO);
 
     /*좋아요... 좋아요한 스토어의 좋아요 수 리턴*/
-    void storeLiketoggle(Long storeNum, String email);
-    void storeLiketoggle(Long storeNum, Long hotelroomNum);
+    void storeLiketoggle(Long storeNum, Member member);
     long getStoreLikeCount(Long storeNum);
-    boolean isLiked(Long storeNum, String email);
-    boolean isLiked(Long storeNum, Long hotelroomNum);
+    boolean isLiked(Long storeNum, Member member);
 }

@@ -36,18 +36,6 @@ public class StorecartServiceImpl implements StorecartService {
     private final StorecartitemRepository storecartitemRepository;
     private final RoomRepository roomRepository;
 
-    /*메소드 : principal으로 hotelroomNum반환하는 메소드 */
-    private final MemberRepository memberRepository;
-    private final RoomServiceImpl roomService;
-    @Override
-    public Long principalToHotelroomNum(Principal principal){
-        String email = principal.getName();
-        Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
-        return hotelRoomDTO.getHotelRoomNum();
-    }
-
         @Override
     public Long addCart(StorecartitemDTO dto, Long hotelroomNum) {
 //        log.info(dto);
