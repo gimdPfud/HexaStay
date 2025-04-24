@@ -48,13 +48,13 @@
 //    @GetMapping("/list")
 //    public String list(Model model, Pageable pageable, Principal principal){
 //        if(principal==null){
-//            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+//            return "redirect:/member/login";
 //        }
 //        Long hotelroomNum = null;
 //        try {
 //            hotelroomNum = zzService.principalToHotelroomNum(principal);
 //        }catch (EntityNotFoundException e){
-//            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+//            return "redirect:/member/login";
 //        }
 //        Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
 //        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
@@ -99,7 +99,7 @@
 //    /*5. 스토어 좋아요~ 또는 싫어요~?*/
 //    @ResponseBody
 //    @GetMapping("/like/{storeNum}")
-//    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){//todo 프린시펄사용함
+//    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){
 //        if(principal==null){
 //            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //        }
@@ -114,7 +114,7 @@
 //
 //    @ResponseBody
 //    @GetMapping("/like/list/{storeNum}")
-//    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){//todo 프린시펄사용함
+//    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){
 //        if(principal==null){
 //            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //        }

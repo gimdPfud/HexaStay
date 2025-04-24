@@ -74,7 +74,7 @@
 //    @GetMapping("/list")
 //    public String cartList(Model model, Principal principal){
 //        if(principal==null){
-//            return "redirect:/member/login";//todo principal이 null이라면 보낼 페이지 고민해보기
+//            return "redirect:/member/login";
 //        }
 //        Long hotelroomNum = null;
 //        try {
