@@ -261,22 +261,12 @@
         </li>
     </ul>
 
-    <!--    &lt;!&ndash; 현금으로 결제하기 체크박스 시작 &ndash;&gt;-->
-<!--    <div class="payment-option">-->
-<!--        <label>-->
-<!--            <input type="checkbox" id="cashPaymentCheckbox">-->
-<!--            현금으로 결제-->
-<!--        </label>-->
-<!--    </div>-->
-<!--    &lt;!&ndash; 현금으로 결제하기 체크박스 끝 &ndash;&gt;-->
-
     <div class="coupon-select-box">
         <label for="couponSelect">쿠폰 선택:</label>
         <select id="couponSelect" name="couponNum">
-            <option value="">쿠폰을 선택하세요</option>
             <option th:each="coupon : ${couponList}"
                     th:value="${coupon.couponNum}"
-                    th:text="${coupon.type} + ' (' + coupon.discountRate + '%)'">
+                    th:text="|${coupon.type} (${coupon.discountRate}%)|">
             </option>
         </select>
     </div>
@@ -319,6 +309,7 @@
 </div>
 
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
         const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
         let couponFinalTotal = null;
@@ -355,7 +346,7 @@
                     return;
                 }
 
-                fetch(`/coupon/apply?email=${currentUserEmail}&couponNum=${couponNum}`)
+                fetch(`/roommenu/coupon/apply?email=${encodeURIComponent(currentUserEmail)}&couponNum=${encodeURIComponent(couponNum)}`)
                     .then(response => {
                         if (!response.ok) throw new Error("서버 오류 발생");
                         return response.json();
