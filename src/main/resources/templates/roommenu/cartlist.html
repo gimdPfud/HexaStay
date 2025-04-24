@@ -19,15 +19,6 @@
             padding: 10px;
         }
 
-        .header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            font-size: 20px;
-            border-bottom: 2px solid #ddd;
-        }
-
         .food-list { list-style: none; padding: 10px; }
         .food-item {
             display: flex;
@@ -36,6 +27,7 @@
             border-bottom: 1px solid #ddd;
             position: relative;
         }
+
         .food-info { flex-grow: 1; }
         .food-info p { margin: 2px 0; }
 
@@ -226,8 +218,7 @@
 
 <!-- 장바구니가 비어있는 경우 -->
 <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
-    <p th:text="#{cart.emptyTitle}">웹에서 주문</p>
-    <span th:text="#{cart.emptyMessage}">🛒 장바구니의<br>아이템이 존재하지 않습니다</span>
+    <div th:text="#{cart.emptyMessage}">장바구니에 아이템이 존재하지 않습니다</div>
 </div>
 
 <!-- 장바구니에 아이템이 있는 경우 -->

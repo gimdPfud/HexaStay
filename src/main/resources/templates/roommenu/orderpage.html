@@ -68,10 +68,6 @@
             white-space: nowrap;
         }
 
-        .search-box button:hover {
-            background-color: #b3dcff;
-        }
-
         /* 버튼, 입력창 외곽선 스타일 변경 */
         .search-box select:focus,
         .search-box input[type="text"]:focus,
@@ -268,6 +264,7 @@
             min-height: 150px;
             margin-bottom: 30px;
         }
+
         .menu-image {
             width: 120px;
             height: 120px;
@@ -448,41 +445,41 @@
         <ul class="food-list card-list">
             <li th:each="roomMenuDTO : ${list}" class="food-item">
                 <div class="div-card"
-                       style="text-decoration: none; color: inherit; display: block; width: 100%;">
-                        <div class="inner-wrapper">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <!-- 이미지 왼쪽 배치 -->
-                                <div class="menu-image-container">
-                                    <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                                         th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                                         class="menu-image">
-                                    <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                                         th:src="@{/profile/default.png}"
-                                         class="menu-image">
-                                </div>
+                   style="text-decoration: none; color: inherit; display: block; width: 100%;">
+                    <div class="inner-wrapper">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <!-- 이미지 왼쪽 배치 -->
+                            <div class="menu-image-container">
+                                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                     class="menu-image">
+                                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                                     th:src="@{/profile/default.png}"
+                                     class="menu-image">
+                            </div>
 
-                                <div class="text-info">
-                                    <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
-                                       style="text-decoration: none; color: inherit; display: block; width: 100%;">
-                                        <span class="menu-badge" th:text="${roomMenuDTO.roomMenuCategory}"></span>
-                                        <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
-                                        <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
-                                        <div class="price-box">
-                                            <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
-                                            <span th:text="#{item.currency}">원</span>
+                            <div class="text-info">
+                                <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                                   style="text-decoration: none; color: inherit; display: block; width: 100%;">
+                                    <span class="menu-badge" th:text="${roomMenuDTO.roomMenuCategory}"></span>
+                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                    <div class="price-box">
+                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="#{item.currency}">원</span>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="like-section">
+                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                              class="like-icon">🤍</span>
+                                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                                         </div>
-                                        <div class="d-flex justify-content-end">
-                                            <div class="like-section">
-                                            <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                                                  th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                                                  class="like-icon">🤍</span>
-                                                <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
+                    </div>
                 </div>
             </li>
         </ul>
@@ -492,8 +489,6 @@
     <!-- 스크립트 시작 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-
-
         // 상태 저장
         const likedStates = {};
 

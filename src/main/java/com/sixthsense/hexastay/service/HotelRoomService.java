@@ -37,6 +37,9 @@ public interface HotelRoomService {
     //2-2.리스트(pageable) todo: member의 참조 값을 가지고 있는 메서드
     public Page<HotelRoomDTO> hotelroomList(Pageable page);
 
+    //2.3. 검색에서 활용할 service - 검색 기준은 hotelRoomName (호텔 이름)
+    public Page<HotelRoomDTO> searchHotelRoomsByName(String keyword, Pageable pageable);
+
     //읽기
     public HotelRoomDTO hotelroomrRead(Long hotelRoomNum);
 

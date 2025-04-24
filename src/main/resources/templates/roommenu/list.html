@@ -27,6 +27,7 @@
             text-decoration: underline;
             border: none;
         }
+
         .table {
             width: 100%;
             table-layout: fixed; /* 고정된 테이블 너비 설정 */
@@ -35,6 +36,7 @@
         option[disabled] {
             display: none;
         }
+
     </style>
 </head>
 <!-- fixme : value 값과, name명 수정하지 마세요!! 오류생깁니다. 그리고 th:text 지워버리면 번역 실행 안됩니다.. 예) th:text="#{menu.translationPage}" -->
@@ -45,8 +47,8 @@
         <!-- 타이틀 + 번역 영역 감싸기 -->
         <div class="position-relative mb-4" style="min-height: 40px;">
             <!-- 가운데 정렬된 타이틀 -->
-            <h3 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
-                th:text="#{roomServiceListTitle}" style="font-size: 30px;">룸 서비스 메뉴 목록</h3>
+            <h2 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
+                th:text="#{roomServiceListTitle}" >룸 서비스 메뉴 목록</h2>
 
             <!-- 오른쪽 상단에 붙은 번역 영역 -->
             <div class="position-absolute top-0 end-0">

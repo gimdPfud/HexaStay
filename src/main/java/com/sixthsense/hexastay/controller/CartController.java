@@ -78,15 +78,16 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String email = principal.getName();
-        Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
 
         if (referer != null) {
             if (referer.contains("/roommenu")) {
                 Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
                 return new ResponseEntity<>(totalCartItemCount, HttpStatus.OK);
             } else if (referer.contains("/member/store")) {
+                Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
+                Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
+                HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
+
                 return new ResponseEntity<>(storecartService.getCartList(hotelRoomDTO.getHotelRoomNum()).size(),HttpStatus.OK);
             }
         }

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:margin-bottom="http://www.w3.org/1999/xhtml">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutmobile}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,59 +19,91 @@
             padding: 20px;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            font-size: 20px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .item-details {
-            padding: 20px 0;
+        .item-image {
+            width: 100%;
             text-align: center;
-        }
-
-        .item-details h2 {
-            font-size: 24px;
             margin-bottom: 10px;
         }
 
-        .item-details p {
-            font-size: 16px;
-            margin-bottom: 15px;
+        /* 실제 이미지 크기 조정 */
+        .item-img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
         }
-
-
-        .quantity-input button {
-            background-color: #ffeb3b;
-            border: none;
-            padding: 8px 12px;
+        .menu-name {
             font-size: 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 3px;
+            margin-left: 10px;
         }
 
-        .quantity-input button:hover {
-            background-color: #fdd835;
+        .menu-content {
+            font-size: 16px;
+            text-align: left;
+            margin-top: 3px;
+            margin-left: 10px;
+        }
+
+        .price-text {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 3px;
+            margin-left: 10px;
+        }
+
+        .item-details {
+            padding: 10px 0;
+            text-align: left;
+            margin-bottom: 5px; /* 추가: 아래 여백 줄이기 */
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        input[type="number"] {
+            text-align: center;
         }
 
         .quantity-input input {
             width: 60px;
             height: 35px;
             text-align: center;
-            border: none;
             font-size: 16px;
-            margin: 0 10px;
+            margin: 0 5px;
             background-color: #fff;
             border-radius: 5px;
+            border: 1px solid #ddd;
         }
 
-        .quantity-input input:focus {
-            outline: none;
-            border: 1px solid #ffeb3b;
+        .quantity-input button {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #77b1fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .total-price-display {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
         }
 
         .add-to-cart-btn {
@@ -84,10 +118,6 @@
             margin-top: 20px;
         }
 
-        .add-to-cart-btn:hover {
-            background-color: #fdd835;
-        }
-
         .back-to-list-btn {
             background-color: #4CAF50;
             color: black;
@@ -100,10 +130,6 @@
             margin-top: 20px;
         }
 
-        .back-to-list-btn:hover {
-            background-color: #fdd835;
-        }
-
         .custom-input {
             font-size: 18px;               /* 숫자 크기 */
             padding: 10px 15px;            /* 여백 조정 */
@@ -114,25 +140,16 @@
             transition: all 0.3s ease-in-out; /* 부드러운 효과 */
         }
 
-        /* 입력창에 포커스 했을 때 스타일 */
-        .custom-input:focus {
-            outline: none;                /* 기본 포커스 아웃라인 제거 */
-            border-color: #ffeb3b;        /* 포커스 시 테두리 색상 변경 */
-            box-shadow: 0 0 5px rgba(255, 235, 59, 0.8); /* 테두리 그림자 추가 */
-        }
-
         /* 라벨 스타일 */
         .col-form-label {
-            font-size: 18px;
+            font-size: 15px;
             color: #333;
             font-weight: bold;
         }
 
-        /* container와 col 간의 간격 조정 */
-        .container {
-            background-color: #f9f9f9;    /* 배경 색상 */
-            padding: 20px;                 /* 내부 여백 */
-            border-radius: 10px;           /* 둥근 모서리 */
+        .label-center {
+            text-align: center;
+            width: 100%;  /* 전체 너비를 차지하게 */
         }
 
         /* 부트스트랩 클래스와 겹치는 스타일 */
@@ -155,10 +172,6 @@
             margin-top: 20px;
         }
 
-        .order-cart-btn:hover {
-            background-color: #fdd835;
-        }
-
         .order-cart-btn {
             background-color: #0054FF;
             color: black;
@@ -171,66 +184,56 @@
             margin-top: 20px;
         }
 
-        .back-to-list-btn:hover {
-            background-color: #fdd835;
-        }
-
     </style>
+
 </head>
 <body>
+
+<div layout:fragment="contentorder">
 
 <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
 
 <div class="container">
-    <!-- 헤더: 제목과 뒤로가기 버튼 -->
-    <div class="header">
-        <div onclick="goBack()" th:text="#{back}">🔙 뒤로가기</div>
-        <div th:text="#{page.title}">아이템 상세보기</div>
-    </div>
 
     <!-- 아이템 상세 정보 -->
     <div class="item-details">
         <!-- 대표 이미지 -->
-        <td>
+        <div class="item-image">
             <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                  th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                 style="width: 200px; height: 140px;">
+                 class="item-img">
 
             <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                  th:src="@{/profile/default.png}"
-                 style="width: 200px; height: 140px;">
-        </td>
+                 class="item-img">
+        </div>
+        <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name">상품이름</p>
+        <p th:text="${roomMenuDTO.roomMenuContent}" class="menu-content">상품정보"</p>
+        <p class="price-text">
+            <span id="formattedPrice" th:text="${roomMenuDTO.roomMenuPrice}"></span>
+            <span th:text="#{item.currency}">원</span>
+        </p>
     </div>
 
-    <h2 class="col-sm-9" th:text="${roomMenuDTO.roomMenuName}">상품이름</h2>
-    <p class="col-sm-9" th:text="${roomMenuDTO.roomMenuContent}">상품정보"</p>
-    <p>
-        <span th:text="#{item.price}">가격</span> :
-        <span id="formattedPrice" th:text="${roomMenuDTO.roomMenuPrice}"></span>
-        <span th:text="#{item.currency}">원</span>
-    </p>
-
-
-
-
     <!-- 수량 입력 필드 -->
-    <div class="container mt-4">
-        <div class="row justify-content-center mb-3">
-            <!-- 주문수량 라벨 -->
-            <label for="count" class="col-sm-3 col-form-label text-end fw-bold" th:text="#{item.quantity}">주문수량</label>
-            <div class="col-sm-6">
-                <div class="input-group">
-                    <!-- 수량 입력창 -->
-                    <input type="number" min="1" value="1" name="count" id="count" class="form-control custom-input" required>
-                </div>
+    <div class="row align-items-center">
+        <div class="col-4 text-end">
+            <label for="count" class="col-form-label fw-bold label-center" th:text="#{item.quantity}">주문수량</label>
+        </div>
+        <div class="col-8 d-flex justify-content-center">
+            <div class="quantity-input">
+                <button type="button" id="decreaseBtn">-</button>
+                <input type="number" min="1" value="1" name="count" id="count" readonly>
+                <button type="button" id="increaseBtn">+</button>
             </div>
         </div>
     </div>
 
-        <!-- 가격 변동을 표시할 부분 -->
-    <span th:text="#{item.totalPrice}">총 가격</span> :
-    <span id="totalPrice">10,000</span><span th:text="#{item.currency}">원</span>
-
+    <!-- 가격 변동을 표시할 부분 -->
+    <div class="total-price-display">
+        <span th:text="#{item.totalPrice}">총 가격</span> :
+        <span id="totalPrice">10,000</span><span th:text="#{item.currency}">원</span>
+    </div>
 
     <!-- 버튼들 -->
     <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.addToCart}">장바구니 담기</button>
@@ -239,119 +242,128 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script th:inline="javascript">
-    let price = [[${roomMenuDTO.roomMenuPrice}]];
-    let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
-    let cartAdd = $(".add-to-cart-btn");
+    <script th:inline="javascript">
+        let price = [[${roomMenuDTO.roomMenuPrice}]];
+        let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
+        let cartAdd = $(".add-to-cart-btn");
 
-    $(document).ready(function () {
-        //  1. 초기 총 가격 표시
-        let initialCount = parseInt($("#count").val());
-        $("#totalPrice").text((initialCount * price).toLocaleString());
+        $(document).ready(function () {
+            // 초기 총 가격 표시
+            let initialCount = parseInt($("#count").val());
+            $("#totalPrice").text((initialCount * price).toLocaleString());
 
-        //  2. 수량 변경 시 총 가격 업데이트 및 재고 체크
-        $("#count").on("change", function () {
-            let count = parseInt($(this).val());
+            // 수량 입력 직접 변경 시 총 가격 업데이트
+            $("#count").on("change", function () {
+                let count = parseInt($(this).val());
 
-            if (isNaN(count) || count < 1) {
-                alert("수량은 1개 이상이어야 합니다.");
-                $(this).val(1);
-                count = 1;
-            }
-
-            if (count > maxCount) {
-                alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
-                $(this).val(maxCount);
-                count = maxCount;
-            }
-
-            $("#totalPrice").text((count * price).toLocaleString());
-        });
-
-        // 장바구니 버튼 이벤트
-        cartAdd.on("click", function () {
-            cart();
-        });
-    });
-
-    // 장바구니 담기 Ajax
-    function cart() {
-        let countVal = $("#count").val();
-        let paramData = {
-            roomMenuCartItemNum: cartAdd.val(),
-            roomMenuCartItemAmount: countVal
-        };
-
-        $.ajax({
-            url: "/roommenu/orderpage/orderread",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(paramData),
-            dataType: "json",
-            success: function (data) {
-                alert(data + "번 아이템 담기 완료되었습니다.");
-            },
-            error: function (jqxHR) {
-                if (jqxHR.status === 401) {
-                    alert("로그인 후 이용해주세요");
-                    location.href = "/member/login";
-                } else {
-                    console.log(jqxHR.responseText);
+                if (isNaN(count) || count < 1) {
+                    alert("수량은 1개 이상이어야 합니다.");
+                    $(this).val(1);
+                    count = 1;
                 }
-            }
+
+                if (count > maxCount) {
+                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
+                    $(this).val(maxCount);
+                    count = maxCount;
+                }
+
+                $("#totalPrice").text((count * price).toLocaleString());
+            });
+
+            // - 버튼 클릭 시
+            $("#decreaseBtn").on("click", function () {
+                let current = parseInt($("#count").val()) || 1;
+                if (current > 1) {
+                    $("#count").val(current - 1).trigger("change");
+                }
+            });
+
+            // + 버튼 클릭 시
+            $("#increaseBtn").on("click", function () {
+                let current = parseInt($("#count").val()) || 1;
+                if (current < maxCount) {
+                    $("#count").val(current + 1).trigger("change");
+                } else {
+                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
+                }
+            });
+
+            // 장바구니 담기
+            cartAdd.on("click", function () {
+                cart();
+            });
+
+            // 바로 주문하기
+            $(".order-cart-btn").on("click", function () {
+                const count = $("#count").val();
+                const roomMenuNum = $(this).val();
+
+                if (!count || isNaN(count) || count <= 0) {
+                    alert("수량을 올바르게 입력해주세요.");
+                    return;
+                }
+
+                const paramData = {
+                    roomMenuCartItemNum: roomMenuNum,
+                    roomMenuCartItemAmount: count
+                };
+
+                $.ajax({
+                    url: "/roommenu/orderpage/orderread",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(paramData),
+                    dataType: "json",
+                    success: function (data) {
+                        alert(data + "번 아이템 장바구니 담기 완료! 장바구니 리스트 페이지로 이동합니다.");
+                        location.href = "/roommenu/cartlist";
+                    },
+                    error: function (jqxHR) {
+                        if (jqxHR.status === 401) {
+                            alert("로그인 후 이용해주세요.");
+                            location.href = "/member/login";
+                        } else {
+                            alert("주문 처리 중 오류 발생.");
+                            console.log(jqxHR.responseText);
+                        }
+                    }
+                });
+            });
+
+            // 가격 포맷팅 (처음 로딩 시)
+            var formatted = price.toLocaleString();
+            $("#formattedPrice").text(formatted);
         });
-    }
 
-    // 바로 주문하기
-    $(".order-cart-btn").on("click", function () {
-        const count = $("#count").val();
-        const roomMenuNum = $(this).val();
+        // 장바구니 담기 Ajax 함수
+        function cart() {
+            let countVal = $("#count").val();
+            let paramData = {
+                roomMenuCartItemNum: cartAdd.val(),
+                roomMenuCartItemAmount: countVal
+            };
 
-        if (!count || isNaN(count) || count <= 0) {
-            alert("수량을 올바르게 입력해주세요.");
-            return;
+            $.ajax({
+                url: "/roommenu/orderpage/orderread",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(paramData),
+                dataType: "json",
+                success: function (data) {
+                    alert(data + "번 아이템 담기 완료되었습니다.");
+                },
+                error: function (jqxHR) {
+                    if (jqxHR.status === 401) {
+                        alert("로그인 후 이용해주세요");
+                        location.href = "/member/login";
+                    } else {
+                        console.log(jqxHR.responseText);
+                    }
+                }
+            });
         }
-
-        const paramData = {
-            roomMenuCartItemNum: roomMenuNum,
-            roomMenuCartItemAmount: count
-        };
-
-        $.ajax({
-            url: "/roommenu/orderpage/orderread",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(paramData),
-            dataType: "json",
-            success: function (data) {
-                alert(data + "번 아이템 장바구니 담기 완료! 장바구니 리스트 페이지로 이동합니다.");
-                location.href = "/roommenu/cartlist";
-            },
-            error: function (jqxHR) {
-                if (jqxHR.status === 401) {
-                    alert("로그인 후 이용해주세요.");
-                    location.href = "/member/login";
-                } else {
-                    alert("주문 처리 중 오류 발생.");
-                    console.log(jqxHR.responseText);
-                }
-            }
-        });
-    });
-
-    // 뒤로가기
-    function goBack() {
-        window.history.back();
-    }
-
-    // 체크포맷팅 지우지마!! 10000 ---> 10,000
-    document.addEventListener('DOMContentLoaded', function () {
-        var price = parseInt(document.getElementById('formattedPrice').textContent);
-        var formattedPrice = price.toLocaleString();  // 10000 -> "10,000"
-        document.getElementById('formattedPrice').textContent = formattedPrice;
-    });
-</script>
-
+    </script>
 
 </body>
 </html>

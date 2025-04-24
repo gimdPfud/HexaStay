@@ -28,10 +28,18 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     Page<Room> findAll(Pageable pageable);
 
     //Room pk 을 찾아와서 member fk 만 변경 하는 메소드
+    //todo:membersByHotelRoom.html
     @Modifying
     @Transactional
     @Query("UPDATE Room r SET r.member.memberNum = :memberNum WHERE r.roomNum = :roomNum")
     void updateRoomMember(@Param("roomNum") Long roomNum, @Param("memberNum") Long memberNum);
+
+    //Room Pk 을 찾아와서 HotelRoom Fk 변경하는 메소드
+    //todo:hotelRoomsByMember.html
+    @Modifying
+    @Query("UPDATE Room r SET r.hotelRoom.hotelRoomNum = :hotelRoomNum WHERE r.roomNum = :roomNum")
+    void updateHotelRoomFk(@Param("roomNum") Long roomNum, @Param("newHotelRoomNum") Long hotelRoomNum);
+
 
 
 
