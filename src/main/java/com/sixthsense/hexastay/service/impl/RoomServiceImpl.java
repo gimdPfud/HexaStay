@@ -171,7 +171,7 @@ public class RoomServiceImpl {
         return roomRepository.findRoomByRoomPassword(roomPassword).isPresent();
     }
 
-    //Room pk 랑 member pk 을 찾아 오는 로직
+    //Room pk 을 찾아와서 Member FK 만 수정 하는 로직
     //todo:memberByhotelRoom.html 에서 쓰이는 메소드
     @Transactional
     public void updateRoomMember(Long roomNum, Long memberNum) {
@@ -184,6 +184,20 @@ public class RoomServiceImpl {
         roomRepository.updateRoomMember(roomNum, memberNum);
 
         log.info("(수정/@Query) Room {} 의 Member가 {} 로 교체되었습니다.", roomNum, memberNum);
+    }
+
+    //Room Pk을 찾아와서 HotelRoom FK만 수정 하는 로직
+    //todo:hotelRoomsByMember.html
+    @Transactional
+    public void updateHotelRoomInRoom(Long roomNum, Long hotelRoomNum) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new IllegalArgumentException("Room을 찾을 수 없습니다."));
+        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
+                .orElseThrow(() -> new IllegalArgumentException("HotelRoom을 찾을 수 없습니다."));
+
+        room.setHotelRoom(hotelRoom);
+        // @Transactional 이므로 save 없이도 flush됨 (옵션이지만 명시하면 명확)
+        roomRepository.save(room);
     }
 
 
