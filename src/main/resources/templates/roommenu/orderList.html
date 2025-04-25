@@ -136,6 +136,7 @@
                             <strong th:text="#{orderList.totalPrice}">주문 금액 : </strong>
                             ₩<span th:text="${T(java.lang.String).format('%,d', item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount)}"></span>
                         </div>
+
                     </div>
                     <!-- 동적으로 메뉴 가져오기 끝 -->
                 </div>
@@ -147,6 +148,15 @@
                 <span>주문 시간:</span>
                 <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
             </small>
+            <div class="card-body text-end">
+                <strong>총 주문 금액:</strong>
+                <span th:text="|₩${T(java.lang.String).format('%,d', order.totalPrice)}|"></span><br>
+
+                <span th:if="${order.discountedPrice != null}">
+                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
+                </span>
+            </div>
         </div>
     </div>
 
@@ -172,6 +182,7 @@
             </li>
         </ul>
     </nav>
+</div>
 
 </div>
 
