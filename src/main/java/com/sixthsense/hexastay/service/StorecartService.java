@@ -16,10 +16,11 @@ import java.util.List;
 public interface StorecartService {
 
     /*1. 등록*/
-    Long addCart(StorecartitemDTO dto, Long hotelroomNum);
+    int addCart(StorecartitemDTO dto, Long hotelroomNum);
 
     /*2. 목록*/
     List<StorecartitemViewDTO> getCartList(Long hotelroomNum);
+    long getItemCount(Long hotelroomNum);
 
     /*3. 카트 주인 찾기*/
     boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum);

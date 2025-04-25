@@ -34,17 +34,20 @@ public class StoreCartController {
     /* 5. 장바구니페이지 이동해서 보기.
            ??......get?*/
     /*1. 장바구니에 담기 (등록)*/
+    @ResponseBody
     @PostMapping("/insert")
     public ResponseEntity cartInsert(StorecartitemDTO dto){
         /*todo DTO 유효성 확인*/
         try {
-            Long result = storecartService.addCart(dto, hotelroomNum);
-            if(result!=null){
-                log.info("카트 담김");
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            log.info("다른가게의 메뉴 담기 또는 Room 없음");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//
+            int result = storecartService.addCart(dto, hotelroomNum);
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+            return switch (result) {
+                case 4 -> new ResponseEntity<>(HttpStatus.OK);
+                case 3 -> new ResponseEntity<>("over",status); //log.info("아이템 수량이 99개 넘은")
+                case 2 -> new ResponseEntity<>("other",status); //log.info("다른 가게의 메뉴 담은")
+                case 1 -> new ResponseEntity<>("found",status); //log.info("room없음")
+                default -> new ResponseEntity<>("else",status); //log.info("머임?")
+            };
         } catch (Exception e) {
             log.info("알수없는오류");
             throw new RuntimeException(e);
