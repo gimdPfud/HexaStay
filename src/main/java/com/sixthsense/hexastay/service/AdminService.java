@@ -13,11 +13,10 @@ public interface AdminService {
 
     void insertAdmin(AdminDTO adminDTO) throws IOException;
 
-    Page<AdminDTO> list (Pageable pageable);
+    // 리스트 페이지용
 
-
-    // 리스트 검색용
-    Page<AdminDTO> searchAdmins(String select, String choice, String keyword, Pageable pageable);
+    Page<AdminDTO> listAdmin(String email, Pageable pageable);
+    public Page<AdminDTO> listAdminSearch(String email, String type, String keyword, Pageable pageable);
 
     //가입대기자 리스트
     List<AdminDTO> getWaitAdminList();
@@ -31,7 +30,7 @@ public interface AdminService {
 
     void adminDelete(Long adminNum) throws IOException;
 
-    AdminDTO adminFindEmail(String adminEmail);
+    AdminDTO adminFindEmail(String email);
 
     List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice);
 

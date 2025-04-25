@@ -30,7 +30,7 @@
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
+        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="submitForm()">
           <option value="" th:selected="${choice == null || choice == ''}">전체</option>
           <option value="center" th:selected="${choice == 'center'}">본사</option>
           <option value="branch" th:selected="${choice == 'branch'}">지점</option>
@@ -39,8 +39,8 @@
       </div>
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;">
-          <option selected>검색 조건</option>
+        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;" onchange="submitForm()">
+          <option value="전체" th:selected="${select == null || select == '전체'}">검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
           <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
@@ -116,41 +116,41 @@
     </div>
   </div>
 
-  <!--    &lt;!&ndash;페이징&ndash;&gt;-->
-  <!--    <div class="row m-0 p-0 mt-3">-->
-  <!--      <div class="col-3"></div>-->
-  <!--      <ul class="col-6 pagination justify-content-company col">-->
-  <!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
-  <!--        </li>-->
+<!--    &lt;!&ndash;페이징&ndash;&gt;-->
+<!--    <div class="row m-0 p-0 mt-3">-->
+<!--      <div class="col-3"></div>-->
+<!--      <ul class="col-6 pagination justify-content-company col">-->
+<!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
+<!--        </li>-->
 
-  <!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
-  <!--        </li>-->
+<!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
+<!--        </li>-->
 
-  <!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
-  <!--        <li class="page-item"-->
-  <!--            th:each="pageNum : ${#numbers.sequence(-->
-  <!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
-  <!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
-  <!--    )}"-->
-  <!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
-  <!--        </li>-->
+<!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
+<!--        <li class="page-item"-->
+<!--            th:each="pageNum : ${#numbers.sequence(-->
+<!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
+<!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
+<!--    )}"-->
+<!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
+<!--        </li>-->
 
-  <!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
-  <!--        </li>-->
+<!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
+<!--        </li>-->
 
-  <!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
-  <!--        </li>-->
+<!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
+<!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
+<!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
+<!--        </li>-->
 
-  <!--      </ul>-->
+<!--      </ul>-->
 
 
   <script>
@@ -187,7 +187,10 @@
               });
     }
 
-
+    function submitForm() {
+        const form = document.querySelector('form');
+        form.submit();
+    }
 
   </script>
 

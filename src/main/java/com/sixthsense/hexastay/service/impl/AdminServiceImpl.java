@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-
 @Builder
 @RequiredArgsConstructor
 @Service
@@ -41,10 +40,53 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     private final CompanyRepository companyRepository;
 
+    // 리스트 페이지용
+
+    @Override
+    public Page<AdminDTO> listAdmin(String email, Pageable pageable) {
+        Admin admin = adminRepository.findByAdminEmail(email);
+        Page<Admin> adminList = null;
+
+        if (admin.getCompany() != null) {
+            Long companyNum = admin.getCompany().getCompanyNum();
+            adminList = adminRepository.findByCompany_CompanyNum(companyNum, pageable);
+        } else if (admin.getStore() != null) {
+            Long storeNum = admin.getStore().getStoreNum();
+            adminList = adminRepository.findByStore_StoreNum(storeNum, pageable);
+        }
+        return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
+    }
+
+    @Override
+    public Page<AdminDTO> listAdminSearch(String email, String type, String keyword, Pageable pageable) {
+        try {
+            Admin admin = adminRepository.findByAdminEmail(email);
+            if (admin == null) {
+                throw new NoSuchElementException("Admin not found");
+            }
+
+            Page<Admin> adminList;
+            if (admin.getCompany() != null) {
+                Long companyNum = admin.getCompany().getCompanyNum();
+                adminList = adminRepository.listPageAdminSearch(companyNum, type, keyword, pageable);
+            } else if (admin.getStore() != null) {
+                Long storeNum = admin.getStore().getStoreNum();
+                adminList = adminRepository.listPageAdminStoreSearch(storeNum, type, keyword, pageable);
+            } else {
+                throw new IllegalStateException("Admin has no company or store");
+            }
+
+            return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
+        } catch (Exception e) {
+            log.error("Error in listAdminSearch: ", e);
+            throw e;
+        }
+    }
+
+
     // 가입
     @Override
     public void insertAdmin(AdminDTO adminDTO) throws IOException {
-
         adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
 
         if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
@@ -60,7 +102,6 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectory(createPath);
             }
             adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
-
         }
 
         Admin admin = modelMapper.map(adminDTO, Admin.class);
@@ -75,26 +116,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-    //리스트
-    @Override
-    public Page<AdminDTO> list(Pageable pageable) {
-
-        Page<Admin> adminList = adminRepository.findAll(pageable);
-        Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
-
-        return adminDTOList;
-    }
-
-    // 리스트 검색용
-    @Override
-    public Page<AdminDTO> searchAdmins(String select, String choice, String keyword, Pageable pageable) {
-        Page<Admin> adminList = adminRepository.listAdminSearch(select, choice, keyword, pageable);
-        Page<AdminDTO> adminDTOList = adminList.map(admin -> modelMapper.map(admin, AdminDTO.class));
-
-        return adminDTOList;
-    }
-
-
     //가입대기 리스트
     public List<AdminDTO> getWaitAdminList() {
         List<Admin> adminList = adminRepository.findByAdminActive("PENDING");
@@ -104,7 +125,6 @@ public class AdminServiceImpl implements AdminService {
         }
         return adminDTOList;
     }
-
 
     //가입 승인
     public void setAdminActive(Long adminNum) {
@@ -121,7 +141,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void adminUpdate(AdminDTO adminDTO) throws IOException {
-
         Admin admin = adminRepository.findById(adminDTO.getAdminNum()).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
         if (!adminDTO.getAdminProfileMeta().isEmpty()) {
@@ -140,22 +159,16 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectory(createPath);
             }
             adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
-
-        } else if (adminDTO.getAdminProfileMeta().isEmpty() && !admin.getAdminProfileMeta().isEmpty())
-        {adminDTO.setAdminProfileMeta(admin.getAdminProfileMeta());}
-
+        } else if (adminDTO.getAdminProfileMeta().isEmpty() && !admin.getAdminProfileMeta().isEmpty()) {
+            adminDTO.setAdminProfileMeta(admin.getAdminProfileMeta());
+        }
 
         adminRepository.save(modelMapper.map(adminDTO, Admin.class));
     }
 
-
-
-
-
     // 회원 삭제
     @Override
-    public void adminDelete(Long adminNum) throws IOException{
-        log.info("어드민넘 ㅋㅋ" + adminNum);
+    public void adminDelete(Long adminNum) throws IOException {
         Admin admin = adminRepository.findById(adminNum).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
         if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
@@ -166,13 +179,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public AdminDTO adminFindEmail(String adminEmail){
-        Admin admin = adminRepository.findByAdminEmail(adminEmail);
-        return modelMapper.map(admin, AdminDTO.class);
+    public AdminDTO adminFindEmail(String email) {
+        Admin admin = adminRepository.findByAdminEmail(email);
+        return admin != null ? modelMapper.map(admin, AdminDTO.class) : null;
     }
 
     @Override
-    public List<CompanyDTO> insertSelectCompany (String companyType) {
+    public List<CompanyDTO> insertSelectCompany(String companyType) {
         List<Company> companyList = companyRepository.findByCompanyType(companyType);
         List<CompanyDTO> companyDTOList = new ArrayList<>();
         for (Company company : companyList) {
@@ -183,11 +196,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<CompanyDTO> insertSelectList (Long centerNum, String adminChoice) {
+    public List<CompanyDTO> insertSelectList(Long centerNum, String adminChoice) {
         List<Company> companyList =
                 switch (adminChoice) {
-                    case "branch" ->  companyRepository.findByCompanyTypeAndCompanyParent( "branch", centerNum);
-                    case "facility" ->  companyRepository.findByCompanyTypeAndCompanyParent("facility", centerNum);
+                    case "branch" -> companyRepository.findByCompanyTypeAndCompanyParent("branch", centerNum);
+                    case "facility" -> companyRepository.findByCompanyTypeAndCompanyParent("facility", centerNum);
                     case "store" -> companyRepository.findByCompanyParent(centerNum);
                     default -> new ArrayList<>();
                 };
@@ -195,16 +208,10 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<StoreDTO> insertStoreList (Long branchFacilityNum) {
+    public List<StoreDTO> insertStoreList(Long branchFacilityNum) {
         List<Store> storeList = storeRepository.findByCompanyNum(branchFacilityNum);
         log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
     }
-
-
-
-
-
-
 
 }
