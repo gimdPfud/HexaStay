@@ -31,6 +31,23 @@
         <div class="mb-4"><label class="form-label">수정일자</label><p class="form-control" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}"></p></div>
     </div>
 
+    <h5 class="mt-4">옵션 목록</h5>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>옵션 이름</th>
+            <th>옵션 가격</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="option : ${roomMenuDTO.options}">
+            <td th:text="${option.optionName}"></td>
+            <td th:text="${option.optionPrice}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
     <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/roommenu/list}" class="btn btn-secondary">목록</a>
         <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-success">수정</a>

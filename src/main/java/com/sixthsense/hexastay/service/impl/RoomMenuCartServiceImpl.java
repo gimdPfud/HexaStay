@@ -1,9 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
-import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
@@ -21,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +35,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final MemberRepository memberRepository;
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
     private final CouponRepository couponRepository;
+    private final RoomMenuOptionRepository roomMenuOptionRepository;
 
     /***********************************************
      * 메서드명 : RoomMenuList
@@ -312,23 +311,36 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     public RoomMenuDTO read(Long num, Locale locale) {
         log.info("상세보기 Cart 페이지 서비스 진입" + num);
 
-        RoomMenu roomMenu = roomMenuRepository.findByRoomMenuNum(num); // DB에서 메뉴 정보를 가져옴
-        RoomMenuDTO roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class); // 원본 정보 매핑
+        // DB에서 메뉴 정보를 가져옴
+        RoomMenu roomMenu = roomMenuRepository.findByRoomMenuNum(num);
 
+        // 원본 정보 매핑
+        RoomMenuDTO roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
+
+        // 메뉴에 해당하는 번역 정보 찾기
         Optional<RoomMenuTranslation> translation = roomMenuTranslationRepository
                 .findByRoomMenu_RoomMenuNumAndLocale(roomMenu.getRoomMenuNum(), locale.getLanguage());
 
+        // 번역이 있을 경우
         if (translation.isPresent()) {
             roomMenuDTO.setRoomMenuName(translation.get().getRoomMenuTransLationName());
             roomMenuDTO.setRoomMenuContent(translation.get().getRoomMenuTransLationContent());
-            // 필요한 다른 번역 필드가 있다면 여기 추가
+            // 필요한 다른 번역 필드가 있다면 여기에 추가
         } else {
             log.warn("번역 정보가 없습니다. 기본 언어로 표시됩니다.");
         }
 
+        // 메뉴에 해당하는 옵션들을 가져와서 RoomMenuDTO에 추가
+        List<RoomMenuOption> options = roomMenuOptionRepository.findByRoomMenu(roomMenu); // 메뉴에 관련된 옵션들 조회
+        List<RoomMenuOptionDTO> optionDTOs = options.stream()
+                .map(option -> modelMapper.map(option, RoomMenuOptionDTO.class)) // RoomMenuOption을 DTO로 변환
+                .collect(Collectors.toList());
+
+        roomMenuDTO.setOptions(optionDTOs);  // RoomMenuDTO에 옵션 리스트 추가
+
         log.info("최종 반환되는 roomMenuDTO: " + roomMenuDTO);
 
-        return roomMenuDTO;  // 이걸 그대로 리턴!
+        return roomMenuDTO;  // 최종적으로 옵션을 포함한 DTO 반환
     }
 
     /***********************************************

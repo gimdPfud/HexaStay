@@ -1,8 +1,11 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuOption;
 import com.sixthsense.hexastay.entity.RoomMenuTranslation;
+import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.repository.RoomMenuTranslationRepository;
 import com.sixthsense.hexastay.service.RoomMenuService;
@@ -39,6 +42,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final RoomMenuOptionRepository roomMenuOptionRepository;
 
 
     /**************************************************
@@ -49,13 +53,19 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      **************************************************/
 
     @Override
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException {
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO, List<RoomMenuOptionDTO> optionList) throws IOException {
         log.info("룸서비스 아이템 등록 서비스 진입" + roomMenuDTO);
         log.info("파일" + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
         // 모델맵퍼로 dto 변환
         RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
 
         roomMenu = roomMenuRepository.save(roomMenu);
+
+        for (RoomMenuOptionDTO optionDTO : optionList) {
+            RoomMenuOption option = modelMapper.map(optionDTO, RoomMenuOption.class);
+            option.setRoomMenu(roomMenu); // 메뉴와 연관관계 설정
+            roomMenuOptionRepository.save(option); // 옵션 저장
+        }
 
         // 이미지 파일 처리
         if (roomMenuDTO.getRoomMenuImage() != null && !roomMenuDTO.getRoomMenuImage().isEmpty()) {

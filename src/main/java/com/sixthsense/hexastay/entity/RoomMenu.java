@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -72,6 +73,10 @@ public class RoomMenu extends BaseEntity {
 
     @Column(name = "approvedByDev")
     private Boolean approvedByDev = false; // 개발자 승인 여부
+
+    // 룸메뉴 옵션을 선택하기 위해 맵핑되는 조인문. 하지만, cascade all 이므로 삭제 시 주의한다 !!
+    @OneToMany(mappedBy = "roomMenu", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomMenuOption> options = new ArrayList<>();
 
     public void roomMenuOrderStockNumber(Integer stockNumber) {
         // 수량을 받아 주문이나 주문취소수량을 받아서 재고를 확인 후 재고 수량을 변경

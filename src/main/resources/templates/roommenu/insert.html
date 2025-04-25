@@ -9,6 +9,9 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
+    <input type="hidden" id="roomMenuNum" value="[[${roomMenu.roomMenuNum}]]" /> <!-- 히든 -->
+    <input type="hidden" id="optionListJson" name="optionListJson">
+
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">룸서비스 메뉴 등록</h2>
 
@@ -56,6 +59,7 @@
                     <option value="양식">양식</option>
                     <option value="중식">중식</option>
                     <option value="디저트">디저트</option>
+                    <option value="룸케어">룸케어</option>
                 </select>
             </div>
 
@@ -73,13 +77,67 @@
                 <label class="form-check-label" for="supportsMultilang">이 메뉴는 다국어를 지원해야 합니다.</label>
             </div>
 
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" class="btn btn-primary">등록</button>
-                <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
-            </div>
-
         </div>
+
+        <!-- 옵션 추가하기 -->
+
+        <div class="mb-3">
+            <label class="form-label">옵션</label><br>
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#optionModal">
+                옵션 추가
+            </button>
+        </div>
+
+        <div class="container mt-4">
+            <h5>옵션 목록</h5>
+            <table class="table table-bordered" id="optionTable">
+                <thead>
+                <tr>
+                    <th>옵션 이름</th>
+                    <th>가격</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- JS로 동적으로 채워질 영역 -->
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary">등록</button>
+            <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
+        </div>
+
     </form>
+
+        <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="optionForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="optionModalLabel">옵션 추가</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">옵션 이름</label>
+                                <input type="text" class="form-control" name="optionName">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">옵션 가격</label>
+                                <input type="number" class="form-control" name="optionPrice">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                            <button type="submit" class="btn btn-primary">등록</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
 </div>
 
     <script>
@@ -117,6 +175,55 @@
         document.getElementById('menuImage').addEventListener('change', function () {
             let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
             document.querySelector('.file-name').textContent = fileName;
+        });
+
+
+        /* ajax 를 통해 전달 옵션을 */
+
+        let optionList = [];
+
+        document.getElementById("optionForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const optionName = this.optionName.value;
+            const optionPrice = parseInt(this.optionPrice.value);
+
+            // 새로운 옵션 객체 추가
+            optionList.push({ optionName, optionPrice });
+
+            // 옵션 목록 UI 갱신
+            renderOptionTable();
+
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById("optionModal"));
+            modal.hide();
+
+            this.reset();
+        });
+
+        function renderOptionTable() {
+            const tbody = document.querySelector("#optionTable tbody");
+            tbody.innerHTML = "";
+
+            if (optionList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center">등록된 옵션이 없습니다.</td></tr>`;
+                return;
+            }
+
+            optionList.forEach(opt => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${opt.optionName}</td>
+            <td>${opt.optionPrice.toLocaleString()}원</td>
+        `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 등록 버튼을 누르면 폼의 hidden 필드에 optionListJson을 담아 보내기
+        document.querySelector("#roomMenuForm").addEventListener("submit", function () {
+            // optionList를 JSON 형태로 hidden input에 설정
+            document.getElementById("optionListJson").value = JSON.stringify(optionList);
         });
 
     </script>
