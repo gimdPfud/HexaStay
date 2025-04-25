@@ -453,14 +453,26 @@
         function processPayment() {
             const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
 
+            const selectedCoupon = document.getElementById('couponSelect').value;
+            const discountedTotal = couponFinalTotal; // 전역 변수에서 가져옴
+
+            const formData = new URLSearchParams();
+            formData.append('requestMessage', roomMenuOrderRequestMessage);
+
+            if (selectedCoupon) {
+                formData.append('couponNum', selectedCoupon);
+            }
+
+            if (discountedTotal !== null) {
+                formData.append('discountedTotalPrice', discountedTotal);
+            }
+
             fetch('/roommenu/cart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: new URLSearchParams({
-                    requestMessage: roomMenuOrderRequestMessage
-                })
+                body: formData
             })
                 .then(res => res.text())
                 .then(result => {

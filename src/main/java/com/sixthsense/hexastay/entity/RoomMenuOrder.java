@@ -35,6 +35,12 @@ public class RoomMenuOrder extends BaseEntity {
     @Column(name = "regDate")
     private LocalDateTime regDate;
 
+    private Integer discountedPrice; // 할인된 최종 금액
+
+    private Integer originalTotalPrice; // 쿠폰 사용 전 가격
+
+    private Long usedCouponNum; // 사용된 쿠폰의 넘버
+
     @OneToMany(mappedBy = "roomMenuOrder", cascade = CascadeType.ALL)
     private List<RoomMenuOrderItem> orderItems = new ArrayList<>();
 }

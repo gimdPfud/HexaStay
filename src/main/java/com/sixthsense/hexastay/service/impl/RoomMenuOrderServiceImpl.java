@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final CouponRepository couponRepository;
+
 
     /***************************************************
      *
@@ -118,7 +121,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * ***********************************************/
 
     @Override
-    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage) {
+    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage, Long couponNum, Integer discountedTotalPrice) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
@@ -151,12 +154,27 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
             // 주문 아이템 생성
             RoomMenuOrderItem orderItem = new RoomMenuOrderItem();
+            roomMenuOrder.setMember(member);
+            roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
+            roomMenuOrder.setRegDate(LocalDateTime.now());
             orderItem.setRoomMenu(roomMenu);
             orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());
             orderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());
             orderItem.setRoomMenuOrder(roomMenuOrder);
             orderItem.setRoomMenuOrderRequestMessage(requestMessage);
             log.info("요청사항: {}", requestMessage);
+
+            if (discountedTotalPrice != null) {
+                roomMenuOrder.setDiscountedPrice(discountedTotalPrice); // 새로운 필드 필요
+            }
+
+            // 쿠폰 사용 처리
+            if (couponNum != null) {
+                Coupon coupon = couponRepository.findById(couponNum)
+                        .orElseThrow(() -> new EntityNotFoundException("쿠폰이 존재하지 않습니다."));
+                coupon.setUsed(true); // 사용 처리
+                couponRepository.save(coupon); // 변경 사항 저장
+            }
 
             // 재고 차감
             roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());
@@ -200,6 +218,20 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
             dto.setRegDate(order.getRegDate() != null ? order.getRegDate() : order.getCreateDate());
+            dto.setOriginalTotalPrice(order.getOriginalTotalPrice());
+            dto.setDiscountedPrice(order.getDiscountedPrice());
+            int totalPrice = 0;
+            int originalTotal = order.getOrderItems().stream()
+                    .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                    .sum();
+
+            dto.setOriginalTotalPrice(originalTotal);
+            if (order.getDiscountedPrice() != null) {
+                totalPrice = order.getDiscountedPrice();
+            } else if (order.getOriginalTotalPrice() != null) {
+                totalPrice = order.getOriginalTotalPrice();
+            }
+            dto.setTotalPrice(totalPrice);
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -302,6 +334,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
             dto.setRegDate(order.getRegDate());
+            dto.setDiscountedPrice(order.getDiscountedPrice());
             dto.setMember(order.getMember());
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
@@ -312,13 +345,13 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
                 return itemDTO;
             }).collect(Collectors.toList());
-
             dto.setOrderItemList(itemDTOList);
 
             // ★ 총 금액 계산 부분: 주문 항목들의 (가격 * 수량) 합계를 구해서 totalPrice에 저장
             int total = order.getOrderItems().stream()
                     .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
                     .sum();
+            dto.setOriginalTotalPrice(total);
             dto.setTotalPrice(total);
 
             return dto;
@@ -373,4 +406,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         messagingTemplate.convertAndSend("/topic/new-order", alertDto);
 
     }
+
+
+
 }
