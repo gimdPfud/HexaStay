@@ -35,6 +35,40 @@ public class RoomServiceImpl {
     private final ModelMapper modelMapper = new ModelMapper();
 
 
+    //hotelroom.hotelroomStatus 상태 즉 checkin , checkout 상태에 따른 list page
+    public Page<RoomDTO> findRoomsByHotelRoomStatus(String status, Pageable pageable) {
+        Page<Room> roomPage = roomRepository.findByHotelRoomStatus(status, pageable);
+
+        return roomPage.map(room -> {
+            // 1. 기본 Room → RoomDTO 매핑
+            RoomDTO dto = modelMapper.map(room, RoomDTO.class);
+
+            // 2. hotelRoom 정보 매핑
+            if (room.getHotelRoom() != null) {
+                HotelRoomDTO hotelRoomDTO = modelMapper.map(room.getHotelRoom(), HotelRoomDTO.class);
+                dto.setHotelRoomDTO(hotelRoomDTO);
+
+                dto.setHotelRoomName(room.getHotelRoom().getHotelRoomName());
+                dto.setHotelRoomPhone(room.getHotelRoom().getHotelRoomPhone());
+                dto.setHotelRoomStatus(room.getHotelRoom().getHotelRoomStatus());
+                dto.setHotelRoomNum(room.getHotelRoom().getHotelRoomNum());
+            }
+
+            // 3. member 정보 매핑
+            if (room.getMember() != null) {
+                MemberDTO memberDTO = modelMapper.map(room.getMember(), MemberDTO.class);
+                dto.setMemberDTO(memberDTO);
+
+                dto.setMemberName(room.getMember().getMemberName());
+                dto.setMemberEmail(room.getMember().getMemberEmail());
+                dto.setMemberNum(room.getMember().getMemberNum());
+            }
+
+            return dto;
+        });
+    }
+
+
     //todo: [[Member_PK]] 기준으로 hotelroom FK 를 등록 하는 메서드
     //todo:http://localhost:8090/register-hotelroom
     //RoomController

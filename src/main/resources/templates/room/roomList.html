@@ -94,7 +94,8 @@
                         <td class="text-center text-danger text-truncate" th:text="${room.roomPassword}"></td>
                         <td class="text-center">
                             <div class="d-flex flex-column align-items-center gap-1">
-<!--                                 체크인 버튼 (체크아웃 상태일 때만 노출) -->
+
+                                <!--체크인 버튼 (체크아웃 상태일 때만 노출) -->
                                 <button th:if="${room.hotelRoomStatus} == 'checkout'"
                                         class="btn btn-sm btn-primary btn-checkin"
                                         th:text="'체크인'"
@@ -143,6 +144,22 @@
     <div class="d-flex justify-content-center mt-4 gap-3">
         <a th:href="@{/register-hotelroom}" class="btn btn-dark" style="height: 40px; font-size: 0.9rem;">회원 룸배정</a><!--todo:http://localhost:8090/register-hotelroom-->
         <a th:href="@{/member-insertroom}" class="btn btn-danger" style="height: 40px; font-size: 0.9rem;">비회원 룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
+        <a th:href="@{/roomlist/checkin}"
+           class="btn btn-outline-primary"
+           th:classappend="${currentStatus} == 'checkin' ? ' active fw-bold text-white bg-primary border-primary' : ''">
+            체크인 목록
+        </a>
+
+        <a th:href="@{/roomlist/checkout}"
+           class="btn btn-outline-danger"
+           th:classappend="${currentStatus} == 'checkout' ? ' active fw-bold text-white bg-danger border-danger' : ''">
+            체크아웃 목록
+        </a>
+        <a th:href="@{/roomlist}"
+           class="btn btn-outline-primary">
+            전체 리스트
+        </a>
+
     </div>
 
 
