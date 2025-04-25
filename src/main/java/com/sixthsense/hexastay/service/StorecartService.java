@@ -20,6 +20,7 @@ public interface StorecartService {
 
     /*2. 목록*/
     List<StorecartitemViewDTO> getCartList(Long hotelroomNum);
+    long getItemCount(Long hotelroomNum);
 
     /*3. 카트 주인 찾기*/
     boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum);

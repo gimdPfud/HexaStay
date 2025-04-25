@@ -109,7 +109,12 @@ public class StorecartServiceImpl implements StorecartService {
         return list;
     }
 
-        @Override
+    @Override
+    public long getItemCount(Long hotelroomNum) {
+        return storecartitemRepository.countByStorecart_Room_HotelRoom(hotelroomNum);
+    }
+
+    @Override
     public boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum) {
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
         Room inputRoom = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);

@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
+import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Storecartitem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +33,8 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
             "sci.storemenu.storemenuImgMeta" +
             ") from Storecartitem sci where sci.storecart.room.hotelRoom.hotelRoomNum=:hotelRoomNum")
     List<StorecartitemViewDTO> storeCartViewList(Long hotelRoomNum);
+
+    @Query("select count(s) from Storecartitem s where s.storecart.room.hotelRoom.hotelRoomNum = ?1")
+    long countByStorecart_Room_HotelRoom(Long hotelroomNum);
+
 }
