@@ -19,32 +19,53 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface AdminRepository extends JpaRepository<Admin, Long>, AdminRepositoryCustom {
+public interface AdminRepository extends JpaRepository<Admin, Long>{
     @Query("select distinct a from Admin a left join fetch a.company left join fetch a.store")
     public Page<Admin> findAll(Pageable pageable);
 
     public Admin findByAdminNum(Long adminNum);
     public List<Admin> findByAdminActive(String active);
 
-    // 컴퍼니 삭제용
+    // 리스트
     List<Admin> findByCompany_CompanyNum(Long companyNum);
+
+    Page<Admin> findByCompany_CompanyNum(Long companyNum, Pageable pageable);
+    Page<Admin> findByStore_StoreNum(Long storeNum, Pageable pageable);
+
+    // 리스트 서치
+    @Query("SELECT a FROM Admin a " +
+           "WHERE a.company.companyNum = :companyNum " +
+           "AND (" +
+           "(:type = 'adminName' AND a.adminName LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminEmployeeNum' AND a.adminEmployeeNum LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminRole' AND a.adminRole LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminPosition' AND a.adminPosition LIKE CONCAT('%', :keyword, '%'))" +
+           ")")
+    Page<Admin> listPageAdminSearch(@Param("companyNum") Long companyNum,
+                                   @Param("type") String type,
+                                   @Param("keyword") String keyword,
+                                   Pageable pageable);
+
+    @Query("SELECT a FROM Admin a " +
+           "WHERE a.store.storeNum = :storeNum " +
+           "AND (" +
+           "(:type = 'adminName' AND a.adminName LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminEmployeeNum' AND a.adminEmployeeNum LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminRole' AND a.adminRole LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminPosition' AND a.adminPosition LIKE CONCAT('%', :keyword, '%'))" +
+           ")")
+    Page<Admin> listPageAdminStoreSearch(@Param("storeNum") Long storeNum,
+                                        @Param("type") String type,
+                                        @Param("keyword") String keyword,
+                                        Pageable pageable);
 
     // 시큐리티용
     Admin findByAdminEmail(String adminEmail);
 
-
-    // 월급입력시 사원 조회용
-    List<Admin> findByCompany_CompanyNumAndAdminRoleIn(Long companyNum, List<String> adminRoles, Pageable pageable);
-    List<Admin> findByStore_StoreNumAndAdminRoleIn(Long storeNum, List<String> adminRoles, Pageable pageable);
-
     // 월급 작성 직원 목록
-
     @Query("SELECT a FROM Admin a WHERE a.company.companyNum = :companyNum AND a.adminRole NOT IN ('exec', 'gm')")
     List<Admin> findBySalariesCompany(@Param("companyNum") Long companyNum);
 
-
     @Query("SELECT a FROM Admin a WHERE a.store.storeNum = :storeNum AND a.adminRole <> :excludedRole")
     List<Admin> findBySalariesStore(@Param("storeNum") Long storeNum);
-
-
 }

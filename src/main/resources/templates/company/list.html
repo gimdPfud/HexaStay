@@ -30,7 +30,7 @@
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
+        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="submitForm()">
           <option value="" th:selected="${choice == null || choice == ''}">전체</option>
           <option value="center" th:selected="${choice == 'center'}">본사</option>
           <option value="branch" th:selected="${choice == 'branch'}">지점</option>
@@ -39,8 +39,8 @@
       </div>
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;">
-          <option selected>검색 조건</option>
+        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;" onchange="submitForm()">
+          <option value="전체" th:selected="${select == null || select == '전체'}">검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
           <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
@@ -187,7 +187,10 @@
               });
     }
 
-
+    function submitForm() {
+        const form = document.querySelector('form');
+        form.submit();
+    }
 
   </script>
 
