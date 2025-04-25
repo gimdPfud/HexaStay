@@ -384,6 +384,7 @@
             color: #333 !important; /* 텍스트 색상 강제로 지정 */
         }
 
+        /* 품절관련, 좋아요 관련 CSS 시작*/
         .sold-out {
             opacity: 0.5;
             position: relative;
@@ -401,6 +402,17 @@
             right: 10px;
             border-radius: 4px;
         }
+
+        .sold-out-item {
+            opacity: 0.5;
+            pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
+            position: relative;
+        }
+
+        .sold-out-item .enable-click {
+            pointer-events: auto; /* 좋아요 버튼만 클릭 허용 */
+        }
+        /* 품절관련, 좋아요 관련 CSS 끝*/
 
     </style>
 </head>
@@ -496,16 +508,16 @@
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="like-section">
-                                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                                      th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                                      class="like-icon">🤍</span>
+                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ', event)'"
+                                              class="like-icon">🤍</span>
                                             <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                                         </div>
                                     </div>
                                 </a>
 
                                 <!-- 수량 0이면 품절 표시, 클릭 불가 -->
-                                <div th:if="${roomMenuDTO.roomMenuAmount == 0}" style="pointer-events: none; opacity: 0.5;">
+                                <div th:if="${roomMenuDTO.roomMenuAmount == 0}" class="sold-out-item">
                                     <span class="menu-badge">품절</span>
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
                                     <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
@@ -514,9 +526,11 @@
                                         <span th:text="#{item.currency}">원</span>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <div class="like-section">
-                                            <span class="like-icon">🤍</span>
-                                            <span class="like-count">0</span>
+                                        <div class="like-section enable-click">
+                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                              class="like-icon">🤍</span>
+                                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                                         </div>
                                     </div>
                                 </div>
@@ -536,7 +550,10 @@
         // 상태 저장
         const likedStates = {};
 
-        function toggleLike(menuId) {
+        function toggleLike(menuId, event) {
+            event?.stopPropagation(); // 이벤트 전파 방지
+            event?.preventDefault();  // 링크 이동도 막기
+
             const liked = likedStates[menuId] || false;
             const url = liked
                 ? `/roommenu/orderpage/cancellike/${menuId}`
@@ -563,8 +580,11 @@
                     likedStates[menuId] = !liked;
                 })
                 .catch(err => {
-                    console.error('좋아요 실패:', err);
-                    alert('관리자는 좋아요를 할 수 없습니다.');
+                    if (err.message === '서버 오류') {
+                        alert('해당 기능을 사용할 수 없습니다. 관리자 계정이거나 서버 오류일 수 있습니다.');
+                    } else {
+                        alert('알 수 없는 오류가 발생했습니다.');
+                    }
                 });
         }
 
