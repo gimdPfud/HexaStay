@@ -8,6 +8,7 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.StoremenuDTO;
+import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 import com.sixthsense.hexastay.entity.Storemenu;
 import com.sixthsense.hexastay.entity.StoremenuOption;
 import com.sixthsense.hexastay.repository.StoremenuRepository;
@@ -90,6 +91,12 @@ public class StoremenuServiceImpl implements StoremenuService {
     public StoremenuDTO read(Long pk) {
         Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
         StoremenuDTO data = modelMapper.map(storemenu, StoremenuDTO.class);
+        data.setStoremenuOptionDTOList(
+                storemenu.getStoremenuOptionList().stream()
+                        .filter(option->option.getStoremenuOptionStatus().equals("alive"))
+                        .map(StoremenuOptionDTO::new)
+                        .toList()
+        );
         return data;
     }
 
