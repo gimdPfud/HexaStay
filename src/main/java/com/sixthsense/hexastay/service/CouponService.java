@@ -25,4 +25,7 @@ public interface CouponService {
     // 쿠폰의 반복사용을 막기 위한 매소드
     public CouponDTO applyCoupon(String memberEmail, Long couponNum);
 
+    // 사용한 쿠폰 다시 못하게..
+    boolean hasCoupon(String email, String type);
+
 }

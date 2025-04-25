@@ -39,13 +39,12 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public void createCoupon(CouponDTO couponDTO) {
         log.info("쿠폰 발급 시작");
-        Member member = null;
-        try {
-            member = memberRepository.findByMemberEmail(couponDTO.getMemberEmail());
 
-        } catch (Exception e) {
-            log.info("회원 정보를 찾는 중 오류가 발생했습니다: " + e.getMessage());
-            member = null;
+        Member member = memberRepository.findByMemberEmail(couponDTO.getMemberEmail());
+
+        if (member == null) {
+            log.warn("존재하지 않는 회원 이메일입니다: {}", couponDTO.getMemberEmail());
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
 
         Coupon coupon = Coupon.builder()
@@ -141,6 +140,11 @@ public class CouponServiceImpl implements CouponService {
         couponRepository.save(coupon);
 
         return new CouponDTO(coupon);
+    }
+
+    @Override
+    public boolean hasCoupon(String email, String type) {
+        return couponRepository.existsByMember_MemberEmailAndType(email, type);
     }
 
 

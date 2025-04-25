@@ -20,5 +20,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     Coupon findByMember_MemberEmailAndCouponNum(String memberEmail, Long couponNum);
 
+    // 이미 쿠폰 발급 여부 확인
+    boolean existsByMember_MemberEmailAndType(String memberEmail, String type);
+
 
 }

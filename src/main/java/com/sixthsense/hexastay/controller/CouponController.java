@@ -53,5 +53,32 @@ public class CouponController {
         result.put("finalTotal", finalPrice);
         return result;
     }
+
+    // 이메일 존재 여부 체크 (쿠폰의 중복 발급 중지)
+    @PostMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkMemberExists(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");  // 요청 본문에서 이메일 추출
+        boolean exists = memberRepository.existsByMemberEmail(email);
+
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("exists", exists);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/already-issued")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkCouponAlreadyIssued(
+            @RequestParam String email,
+            @RequestParam String type
+    ) {
+        boolean issued = couponService.hasCoupon(email, type);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("issued", issued);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }
 
