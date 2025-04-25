@@ -8,8 +8,11 @@ package com.sixthsense.hexastay.controller;
  * 작성일 : 2025-04-01
  * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
@@ -28,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -123,10 +127,9 @@ public class RoomMenuController {
      **************************************************/
 
     @PostMapping("/roommenu/insert")
-    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
+    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal, String optionListJson) throws IOException {
         log.info("등록페이지 post 컨트롤러 진입");
         log.info("로그인 : " + principal.getName());
-        log.info("ㅇㅇ"+ roomMenuDTO.getRoomMenuImage().getOriginalFilename());
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
 
 
@@ -135,9 +138,19 @@ public class RoomMenuController {
             return "redirect:/admin/login";  // 로그인 페이지 URL로 변경
         }
 
+        // JSON 문자열 → List<OptionDTO> 파싱
+        ObjectMapper mapper = new ObjectMapper();
+        List<RoomMenuOptionDTO> optionList = new ArrayList<>();
+        try {
+            optionList = mapper.readValue(optionListJson, new TypeReference<>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("옵션 파싱 오류 발생");
+        }
+
 
         // 서비스를 통해 내부처리
-        roomMenuService.insert(roomMenuDTO);
+        roomMenuService.insert(roomMenuDTO, optionList);
 
         return "redirect:/roommenu/list";
     }

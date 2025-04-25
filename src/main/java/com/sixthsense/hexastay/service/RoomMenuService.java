@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import java.util.Locale;
 public interface RoomMenuService {
 
     // 등록하기
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException;
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO, List<RoomMenuOptionDTO> optionList) throws IOException;
 
     // 목록
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale, boolean forUserView);

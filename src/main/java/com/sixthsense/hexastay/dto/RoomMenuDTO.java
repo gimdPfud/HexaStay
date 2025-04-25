@@ -17,7 +17,8 @@ import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -63,6 +64,8 @@ public class RoomMenuDTO {
     private Boolean supportsMultilang = false;  // 다국어 체크 여부
 
     private Boolean approvedByDev = false; // 개발자 승인 여부
+
+    private List<RoomMenuOptionDTO> options = new ArrayList<>(); // 옵션 선택창
 
     public Integer getRoomMenuAmount() {
         if (this.roomMenuAmount == null) {
