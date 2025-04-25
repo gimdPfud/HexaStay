@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.controller;
-
 import com.sixthsense.hexastay.dto.CouponDTO;
+import com.sixthsense.hexastay.entity.Coupon;
+import com.sixthsense.hexastay.repository.CouponRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.CouponService;
 import lombok.RequiredArgsConstructor;
@@ -8,20 +9,22 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller  // 여기 변경!
 @RequestMapping("/roommenu/coupon")
 @RequiredArgsConstructor
 @Log4j2
 
+
 public class CouponController {
 
     private final CouponService couponService;
     private final MemberRepository memberRepository;
+    private final CouponRepository couponRepository;
 
     @GetMapping("/insert")
     public String createCouponGet() {

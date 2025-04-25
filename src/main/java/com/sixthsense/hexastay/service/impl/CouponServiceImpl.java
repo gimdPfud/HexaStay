@@ -65,7 +65,7 @@ public class CouponServiceImpl implements CouponService {
     public List<CouponDTO> getCoupons(String email) {
         log.info("쿠폰 리스트 서비스 진입");
 
-        List<Coupon> coupons = couponRepository.findByMember_MemberEmail(email);
+        List<Coupon> coupons = couponRepository.findUsableCouponsByMemberEmail(email);
 
         return coupons.stream()
                 .map(coupon -> modelMapper.map(coupon, CouponDTO.class))
@@ -96,12 +96,48 @@ public class CouponServiceImpl implements CouponService {
         log.info("장바구니 할인 적용 후 최종 결제 서비스 진입");
         Member member = memberRepository.findByMemberEmail(email);
         Coupon coupon = couponRepository.findById(couponNum)
-                .orElseThrow(() -> new RuntimeException("쿠폰이 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
 
+        // 1. 유효성 검사
+        if (!coupon.getMember().getMemberEmail().equals(email)) {
+            throw new RuntimeException("해당 쿠폰은 이 회원의 것이 아닙니다.");
+        }
+
+        if (coupon.getExpirationDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("쿠폰이 만료되었습니다.");
+        }
+
+        if (coupon.isUsed()) {
+            throw new RuntimeException("이미 사용된 쿠폰입니다.");
+        }
+
+        if (coupon.getRepeatCouponCount() != null && coupon.getRepeatCouponCount() <= 0) {
+            throw new RuntimeException("쿠폰 사용 가능 횟수를 초과했습니다.");
+        }
+
+        // 2. 할인 금액 계산
         int originalPrice = getCartTotal(member);
         int discount = (originalPrice * coupon.getDiscountRate()) / 100;
+        int finalPrice = originalPrice - discount;
 
-        return originalPrice - discount;
+        // 3. 쿠폰 사용 처리
+        if (coupon.getRepeatCouponCount() != null) {
+            coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
+
+            // 반복 사용 쿠폰도 횟수가 0이면 used 처리
+            if (coupon.getRepeatCouponCount() <= 0) {
+                coupon.setUsed(true);
+            }
+
+        } else {
+            // 단일 쿠폰 처리
+            coupon.setUsed(true);
+        }
+
+        coupon.setUsedTime(LocalDateTime.now());
+        couponRepository.save(coupon); // 저장
+
+        return finalPrice;
     }
 
     @Override
