@@ -98,7 +98,7 @@
                             <th style="width: 10%">매출 금액</th>
                             <th style="width: 9%">수수료</th>
                             <th style="width: 9%">공제 금액</th>
-                            <th style="width: 10%; color: green;" >최종 정산 금액</th>
+                            <th style="width: 10%;" class="text-success" >최종 정산 금액</th>
                         </tr>
                         </thead>
                         <tbody class="text-center">
@@ -205,7 +205,7 @@
                 const finalInput = row.querySelector('.final');
                 if (finalInput) {
                     finalInput.value = Math.round(final).toLocaleString() + '원';
-                    finalInput.style.color = 'green';
+                    finalInput.style.color = '#198754';
                 }
             });
         });
