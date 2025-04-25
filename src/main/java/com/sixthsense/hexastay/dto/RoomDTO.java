@@ -42,8 +42,9 @@ public class RoomDTO {
 
 
         // 새로운 필드 추가 (호텔 룸 정보)
-        private String hotelRoomName;
-        private String hotelRoomPhone;
+        private String hotelRoomName;   //호텔룸 이름
+        private String hotelRoomPhone;  //호텔룸 전화번호
+        private String hotelRoomStatus; //호텔룸 상태 checkIn  / checkOut
 
         // 새로운 필드 추가 (멤버 정보)
         private String memberName;
