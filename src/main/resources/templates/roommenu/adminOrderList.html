@@ -67,9 +67,14 @@
                                                     <strong th:text="#{orderList.quantity}">수량:</strong>
                                                     <span th:text="${item.roomMenuOrderItemAmount}"></span>
                                                 </div>
-                                                <div class="col-6 col-md-3 mb-2">
-                                                    <strong th:text="#{orderList.totalPrice}">총 가격:</strong>
-                                                    <span th:text="${order.totalPrice}"></span>
+                                                <div class="col-12 mt-1">
+                                                    <strong>총 주문 금액:</strong>
+                                                    ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span>
+                                                    <span th:if="${order.discountedPrice != null}">
+                                                    <br>
+                                                    <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                                                    ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+                                                </span>
                                                 </div>
                                             </div>
                                             <div>
@@ -120,7 +125,11 @@
                                                 <div class="modal-footer">
                                                     <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
                                                     <div class="me-auto">
-                                                        <strong>총 금액: </strong> ₩<span th:text="${order.totalPrice}"></span>
+                                                        <strong>총 주문 금액:</strong> ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span><br>
+                                                        <span th:if="${order.discountedPrice != null}">
+                                                        <strong style="color: #f75b5b;">할인 적용 후 금액:</strong>
+                                                        ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+                                                        </span>
                                                     </div>
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                                                 </div>

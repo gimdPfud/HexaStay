@@ -220,7 +220,18 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setRegDate(order.getRegDate() != null ? order.getRegDate() : order.getCreateDate());
             dto.setOriginalTotalPrice(order.getOriginalTotalPrice());
             dto.setDiscountedPrice(order.getDiscountedPrice());
-            dto.setTotalPrice(order.getDiscountedPrice() != null ? order.getDiscountedPrice() : order.getOriginalTotalPrice());
+            int totalPrice = 0;
+            int originalTotal = order.getOrderItems().stream()
+                    .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                    .sum();
+
+            dto.setOriginalTotalPrice(originalTotal);
+            if (order.getDiscountedPrice() != null) {
+                totalPrice = order.getDiscountedPrice();
+            } else if (order.getOriginalTotalPrice() != null) {
+                totalPrice = order.getOriginalTotalPrice();
+            }
+            dto.setTotalPrice(totalPrice);
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -323,10 +334,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
             dto.setRegDate(order.getRegDate());
-            dto.setOriginalTotalPrice(order.getOriginalTotalPrice());
             dto.setDiscountedPrice(order.getDiscountedPrice());
             dto.setMember(order.getMember());
-
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -336,13 +345,13 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
                 return itemDTO;
             }).collect(Collectors.toList());
-
             dto.setOrderItemList(itemDTOList);
 
             // ★ 총 금액 계산 부분: 주문 항목들의 (가격 * 수량) 합계를 구해서 totalPrice에 저장
             int total = order.getOrderItems().stream()
                     .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
                     .sum();
+            dto.setOriginalTotalPrice(total);
             dto.setTotalPrice(total);
 
             return dto;
