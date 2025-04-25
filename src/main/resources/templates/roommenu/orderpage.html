@@ -443,6 +443,9 @@
             <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/coupon/insert'">
                 <i class="bi bi-caret-down-fill"></i>쿠폰받기
             </div>
+            <div class="tab" onclick="showMyCoupons()">
+                <i class="bi bi-ticket-perforated"></i>내 쿠폰 보기
+            </div>
         </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
@@ -613,6 +616,35 @@
                 }
             }
         });
+
+        /* 쿠폰 조회 */
+
+        function showMyCoupons() {
+            const email = prompt("쿠폰을 조회할 이메일을 입력하세요:");
+            if (!email) return;
+
+            fetch(`/roommenu/coupon/list?email=${email}`)
+                .then(res => res.json())
+                .then(coupons => {
+                    if (coupons.length === 0) {
+                        alert("보유한 쿠폰이 없습니다.");
+                        return;
+                    }
+
+                    let message = `💌 ${email}님의 쿠폰 목록\n\n`;
+                    coupons.forEach((coupon, index) => {
+                        message += `${index + 1}. [${coupon.type}] - ${coupon.discountRate}% 할인\n`;
+                        message += `   발급일: ${coupon.issueDate}, 만료일: ${coupon.expirationDate}\n`;
+                        message += `   사용여부: ${coupon.used ? '✅ 사용됨' : '❌ 미사용'}\n\n`;
+                    });
+
+                    alert(message);
+                })
+                .catch(err => {
+                    alert("쿠폰을 불러오는 중 오류가 발생했습니다.");
+                    console.error(err);
+                });
+        }
 
 
     </script>
