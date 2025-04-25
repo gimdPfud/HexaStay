@@ -67,8 +67,16 @@
 
                         <!-- 버튼 영역 (왼쪽 정렬) -->
                         <div class="d-flex justify-content-start align-items-center">
-                            <a th:href="@{/admin/hotelroom/modify}"></a><button class="btn btn-outline-dark btn-sm me-2">자세히</button>
-                            <a href="/member-insertroom" class="btn btn-dark btn-sm">예약</a>
+                            <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
+                                <button class="btn btn-outline-dark btn-sm me-2">자세히</button>
+                            </a>
+                            <a href="/register-hotelroom" class="btn btn-dark btn-sm">예약</a>
+
+                            <!-- 상태 버튼 (색상 조건부 적용) -->
+                            <button class="btn btn-sm me-2"
+                                    th:text="${hotelList.hotelRoomStatus} == 'checkin' ? '체크인 중' : '체크아웃 중'"
+                                    th:classappend="${hotelList.hotelRoomStatus} == 'checkin' ? 'btn-primary' : 'btn-danger'">
+                            </button>
                         </div>
 
                     </div>

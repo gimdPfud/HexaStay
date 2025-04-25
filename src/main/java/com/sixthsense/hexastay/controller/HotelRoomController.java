@@ -11,6 +11,7 @@ import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 
 import com.sixthsense.hexastay.service.impl.QrCodeServiceimpl;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -47,6 +49,25 @@ public class HotelRoomController {
     private final HotelRoomService hotelRoomService;
 
     private final QrCodeServiceimpl qrCodeServiceimpl;
+
+
+    @PostMapping("/checkinout/{hotelRoomNum}")
+    @ResponseBody
+    public ResponseEntity<?> checkInOut(@PathVariable Long hotelRoomNum,
+                                        @RequestBody Map<String, String> body) {
+        String status = body.get("status");
+        log.info("호텔룸 번호: {}, 상태: {}", hotelRoomNum, status);
+
+        try {
+            hotelRoomService.checkInOut(hotelRoomNum, status);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body("호텔룸을 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("체크인/아웃 처리 중 예외 발생", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 
     //0411
@@ -221,6 +242,8 @@ public class HotelRoomController {
         Page<HotelRoomDTO> rooms = hotelRoomService.hotelroomList(pageable); // 이미지 포함한 DTO 반환
         return ResponseEntity.ok(rooms);
     }
+
+
 
 
 

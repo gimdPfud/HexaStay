@@ -14,6 +14,25 @@
             width: 100%;
             table-layout: fixed; /* 고정된 테이블 너비 설정 */
         }
+        .btn-checkin {
+            background-color: #0d6efd; /* 파란색 */
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-checkout {
+            background-color: #dc3545; /* 빨간색 */
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-checkin:hover {
+            background-color: #0b5ed7;
+        }
+
+        .btn-checkout:hover {
+            background-color: #bb2d3b;
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -37,51 +56,66 @@
         <!-- 테이블 -->
         <div class="row mt-4">
             <div class="col-12">
-                <table class="table table-bordered text-company mb-0">
+                <table class="table table-bordered text-company mb-0" style="table-layout: fixed; width: 100%;">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="width: 4%;">번호</th>
-                        <th style="width: 17%;">룸 명</th>
-                        <th style="width: 13%;">회원 이름</th>
+                        <th style="width: 5%;">번호</th>
+                        <th style="width: 12%;">룸 명</th>
+                        <th style="width: 12%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 15%;">룸 연락처</th>
+                        <th style="width: 12%;">룸 연락처</th>
                         <th style="width: 10%;">체크인</th>
                         <th style="width: 10%;">체크아웃</th>
                         <th style="width: 10%;">룸 비밀번호</th>
+                        <th style="width: 11%;">룸 상태 변경</th>
                     </tr>
                     </thead>
-
                     <tbody>
                     <tr th:each="room : ${rooms.content}">
-                        <td th:text="${room.roomNum}" class="text-center"></td>
-                        <!-- 호텔룸 이름 -->
-                        <td class="text-center">
+                        <td class="text-center text-truncate" th:text="${room.roomNum}"></td>
+                        <td class="text-center text-truncate">
                             <a href="javascript:void(0);"
                                onclick="openHotelRoomPopup(this)"
-                               class="hover-grow-text"
-                               th:attr="data-hotelRoomNum=${room.hotelRoomNum} ,data-roomNum=${room.roomNum}"
+                               class="hover-grow-text d-inline-block text-truncate w-100"
+                               th:attr="data-hotelRoomNum=${room.hotelRoomNum}, data-roomNum=${room.roomNum}"
                                th:text="${room.hotelRoomName}"></a>
                         </td>
-
-                        <!-- 회원 이름 -->
-                        <td class="text-center">
+                        <td class="text-center text-truncate">
                             <a href="javascript:void(0);"
                                onclick="openMemberPopup(this)"
-                               class="hover-grow-text"
-                               th:attr="data-memberNum=${room.memberNum},data-roomNum=${room.roomNum}"
+                               class="hover-grow-text d-inline-block text-truncate w-100"
+                               th:attr="data-memberNum=${room.memberNum}, data-roomNum=${room.roomNum}"
                                th:text="${room.memberName}"></a>
                         </td>
-                        <td class="text-center" th:text="${room.memberEmail}"></td>
-                        <td class="text-center" th:text="${room.hotelRoomPhone}"></td>
-                        <td class="text-center" th:text="${#temporals.format(room.checkInDate,'yyyy-MM-dd HH:mm')}"></td>
-                        <td class="text-center" th:text="${#temporals.format(room.checkOutDate,'yyyy-MM-dd HH:mm')}"></td>
-                        <td class="text-center text-danger" th:text="${room.roomPassword}"></td>
+                        <td class="text-center text-truncate" th:text="${room.memberEmail}"></td>
+                        <td class="text-center text-truncate" th:text="${room.hotelRoomPhone}"></td>
+                        <td class="text-center text-truncate" th:text="${#temporals.format(room.checkInDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="text-center text-truncate" th:text="${#temporals.format(room.checkOutDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="text-center text-danger text-truncate" th:text="${room.roomPassword}"></td>
+                        <td class="text-center">
+                            <div class="d-flex flex-column align-items-center gap-1">
+<!--                                 체크인 버튼 (체크아웃 상태일 때만 노출) -->
+                                <button th:if="${room.hotelRoomStatus} == 'checkout'"
+                                        class="btn btn-sm btn-primary btn-checkin"
+                                        th:text="'체크인'"
+                                        th:attr="data-hotelRoomNum=${room.hotelRoomNum}, data-status='checkin'"
+                                        onclick="roomStatusUpdate(this)">
+                                </button>
+
+                                <!-- 체크아웃 버튼 (체크인 상태일 때만 노출) -->
+                                <button th:if="${room.hotelRoomStatus} == 'checkin'"
+                                        class="btn btn-sm btn-danger btn-checkout"
+                                        th:text="체크아웃"
+                                        th:attr="data-hotelRoomNum=${room.hotelRoomNum}, data-status='checkout'"
+                                        onclick="roomStatusUpdate(this)">
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">
-                        <td colspan="8" class="text-center text-muted">검색 결과가 없습니다.</td>
+                        <td colspan="9" class="text-center text-muted">검색 결과가 없습니다.</td>
                     </tr>
                     </tbody>
-
                 </table>
             </div>
         </div>
@@ -111,8 +145,67 @@
         <a th:href="@{/member-insertroom}" class="btn btn-danger" style="height: 40px; font-size: 0.9rem;">비회원 룸배정</a><!--todo:http://localhost:8090/member-insertroom-->
     </div>
 
-    <!--Room 정보 클릭시 팝업 스크립트 -->
+
     <script th:inline="javascript">
+
+            /*체크인 체크 아웃 상태 */
+            function roomStatusUpdate(element) {
+
+                const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
+                const status = element.getAttribute("data-status");  // 'checkin' 또는 'checkout'
+
+
+                if (status == "checkin") {
+                    const check = confirm("체크 IN 상태로 변경 하시겠습니까");
+                    if (check == false) {
+                        return;
+                    }
+                    alert("체크 IN 되었습니다.")
+                }else if (status == "checkout") {
+                    const check = confirm("체크 OUT 상태로 변경 하시겠습니까")
+                    if (check == false) {
+                        return;
+                    }
+                    alert("체크 OUT 되었습니다.")
+                }
+
+
+                fetch(`/admin/hotelroom/checkinout/${hotelRoomNum}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: status })
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            alert(`${status} 처리 실패`);
+                            return;
+                        }
+
+                        // ✅ 버튼 전환 (reload 대신)
+                        const parent = element.parentElement;
+                        parent.innerHTML = ''; // 기존 버튼 제거
+
+                        if (status === 'checkin') {
+                            parent.innerHTML = `
+                    <button class="btn btn-sm btn-checkout"
+                            data-hotelRoomNum="${hotelRoomNum}"
+                            data-status="checkout"
+                            onclick="roomStatusUpdate(this)">체크아웃</button>`;
+                        } else {
+                            parent.innerHTML = `
+                    <button class="btn btn-sm btn-checkin"
+                            data-hotelRoomNum="${hotelRoomNum}"
+                            data-status="checkin"
+                            onclick="roomStatusUpdate(this)">체크인</button>`;
+                        }
+                    });
+            }
+
+
+
+        /*<!--Room 정보 클릭시 팝업 스크립트 -->*/
         function openHotelRoomPopup(element) {
             const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
             const roomNum = element.getAttribute("data-roomNum");

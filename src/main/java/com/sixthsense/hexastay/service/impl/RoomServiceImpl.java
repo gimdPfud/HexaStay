@@ -118,7 +118,7 @@ public class RoomServiceImpl {
             if (room.getHotelRoom() != null) {
                 roomDTO.setHotelRoomName(room.getHotelRoom().getHotelRoomName());
                 roomDTO.setHotelRoomPhone(room.getHotelRoom().getHotelRoomPhone());
-            }
+                roomDTO.setHotelRoomStatus(room.getHotelRoom().getHotelRoomStatus());            }
 
             if (room.getMember() != null) {
                 roomDTO.setMemberName(room.getMember().getMemberName());

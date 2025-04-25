@@ -64,6 +64,23 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
 
+    //chekc In / check Out 메소드
+    //체크인 변경 로직
+    @Override
+    public void checkInOut(Long hotelRoomNum, String status) {
+        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 호텔룸이 존재하지 않습니다."));
+
+        if (!"checkin".equals(status) && !"checkout".equals(status)) {
+            throw new IllegalArgumentException("잘못된 상태 값: " + status);
+        }
+
+        hotelRoom.setHotelRoomStatus(status);  // checkin 또는 checkout
+        hotelRoomRepository.save(hotelRoom);   // ⭐️ 꼭 save 호출해야 DB 반영됨
+    }
+
+
+
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
 
     //******************************//

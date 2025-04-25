@@ -26,6 +26,9 @@ public interface HotelRoomService {
     //0411
     public HotelRoomDTO HotelRoomByName(String hotelRoomName);
 
+    //checkInOut 메소드
+    public void checkInOut(Long hotelRoomNum,String status);
+
 
 
 
