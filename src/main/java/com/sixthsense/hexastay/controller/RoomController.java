@@ -36,6 +36,34 @@ public class RoomController {
 
     private final MemberService memberService;
 
+    //todo:0425 카테고리 분류별 페이지 리스트 localhost:8090/roomList
+    //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지
+    @GetMapping("/roomlist/{status}")
+    public String getRoomListByStatus(@PathVariable("status") String status,
+                                      @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
+                                      Model model) {
+        if (!status.equals("checkin") && !status.equals("checkout")) {
+            throw new IllegalArgumentException("잘못된 상태입니다.");
+        }
+
+        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByHotelRoomStatus(status, pageable);
+        model.addAttribute("rooms", rooms);  // ✅ Page 객체 전달
+        model.addAttribute("currentStatus", status);
+        return "room/roomlist"; // ✅ 파일명은 소문자 유지
+    }
+
+    //전체 페이지 보여 주는 로직
+    //todo:http://localhost:8090/roomlist
+    @GetMapping("/roomlist")
+    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("roomNum").descending());
+        Page<RoomDTO> rooms = roomServiceimpl.getRooms(pageable);
+
+        model.addAttribute("rooms", rooms);
+        model.addAttribute("currentPage", page);
+        return "room/roomList";
+    }
+
 
     /*키워드로 받는 멤버 검색용 메소드 */
     @GetMapping(value = "/admin/member/search", produces = "application/json")
@@ -110,18 +138,6 @@ public class RoomController {
     }
     /******************Room 등록 페이지 종료*********************/
 
-
-    //전체 페이지 보여 주는 로직
-    //todo:http://localhost:8090/roomlist
-    @GetMapping("/roomlist")
-    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("roomNum").descending());
-        Page<RoomDTO> rooms = roomServiceimpl.getRooms(pageable);
-
-        model.addAttribute("rooms", rooms);
-        model.addAttribute("currentPage", page);
-        return "room/roomList";
-    }
 
 
     //호텔룸이 가지고 있는 member에 fk 보기

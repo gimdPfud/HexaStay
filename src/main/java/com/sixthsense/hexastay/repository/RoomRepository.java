@@ -27,6 +27,12 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findAll(Pageable pageable);
 
+    //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
+    Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
+
+
+
     //Room pk 을 찾아와서 member fk 만 변경 하는 메소드
     //todo:membersByHotelRoom.html
     @Modifying
