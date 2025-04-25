@@ -49,10 +49,12 @@ public class CompanyController {
         log.info("keyword : " + keyword);
         log.info("pageable : " + pageable.getPageNumber(), pageable.getPageSize());
 
-        if (choice == null || choice.trim().isEmpty()) {
-            choice = "center";  // 기본값 설정
-        } else if ("전체".equals(choice)) {
-            choice = null;  // "전체"를 선택했을 때는 필터링 없이 전체 조회
+        if (choice == null) {
+            choice = "";
+        }
+
+        if (select == null) {
+            select = "전체";
         }
 
         Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);

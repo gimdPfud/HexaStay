@@ -116,41 +116,41 @@
     </div>
   </div>
 
-<!--    &lt;!&ndash;페이징&ndash;&gt;-->
-<!--    <div class="row m-0 p-0 mt-3">-->
-<!--      <div class="col-3"></div>-->
-<!--      <ul class="col-6 pagination justify-content-company col">-->
-<!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
-<!--        </li>-->
+  <!--    &lt;!&ndash;페이징&ndash;&gt;-->
+  <!--    <div class="row m-0 p-0 mt-3">-->
+  <!--      <div class="col-3"></div>-->
+  <!--      <ul class="col-6 pagination justify-content-company col">-->
+  <!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
+  <!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
+  <!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
+  <!--        </li>-->
 
-<!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
-<!--        </li>-->
+  <!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
+  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
+  <!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
+  <!--        </li>-->
 
-<!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
-<!--        <li class="page-item"-->
-<!--            th:each="pageNum : ${#numbers.sequence(-->
-<!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
-<!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
-<!--    )}"-->
-<!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
-<!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
-<!--        </li>-->
+  <!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
+  <!--        <li class="page-item"-->
+  <!--            th:each="pageNum : ${#numbers.sequence(-->
+  <!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
+  <!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
+  <!--    )}"-->
+  <!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
+  <!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
+  <!--        </li>-->
 
-<!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
-<!--        </li>-->
+  <!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
+  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
+  <!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
+  <!--        </li>-->
 
-<!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
-<!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
-<!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
-<!--        </li>-->
+  <!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
+  <!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
+  <!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
+  <!--        </li>-->
 
-<!--      </ul>-->
+  <!--      </ul>-->
 
 
   <script>

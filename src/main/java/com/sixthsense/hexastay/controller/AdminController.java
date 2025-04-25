@@ -83,15 +83,15 @@ public class AdminController {
     @ResponseBody
     @GetMapping("/insertselect")
     public List<CompanyDTO> adminInsertSearch (Model model,
-                                            @RequestParam("centerNum") Long centerNum,
-                                            @RequestParam("adminChoice") String adminChoice) {
+                                               @RequestParam("centerNum") Long centerNum,
+                                               @RequestParam("adminChoice") String adminChoice) {
         return adminService.insertSelectList(centerNum, adminChoice);
     }
 
     @ResponseBody
     @GetMapping("/insertstore")
     public List<StoreDTO> adminInsertStore (Model model,
-                                           @RequestParam("branchFacilityNum") Long branchFacilityNum) {
+                                            @RequestParam("branchFacilityNum") Long branchFacilityNum) {
         return adminService.insertStoreList(branchFacilityNum);
     }
 
