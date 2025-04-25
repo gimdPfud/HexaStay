@@ -40,11 +40,11 @@
                 <table class="table table-bordered text-company mb-0">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="width: 5%;">번호</th>
+                        <th style="width: 4%;">번호</th>
                         <th style="width: 17%;">룸 명</th>
-                        <th style="width: 10%;">회원 이름</th>
+                        <th style="width: 13%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 10%;">룸 연락처</th>
+                        <th style="width: 15%;">룸 연락처</th>
                         <th style="width: 10%;">체크인</th>
                         <th style="width: 10%;">체크아웃</th>
                         <th style="width: 10%;">룸 비밀번호</th>
@@ -73,8 +73,8 @@
                         </td>
                         <td class="text-center" th:text="${room.memberEmail}"></td>
                         <td class="text-center" th:text="${room.hotelRoomPhone}"></td>
-                        <td th:text="${#temporals.format(room.checkInDate,'yyyy-MM-dd HH:mm')}"></td>
-                        <td th:text="${#temporals.format(room.checkOutDate,'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="text-center" th:text="${#temporals.format(room.checkInDate,'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="text-center" th:text="${#temporals.format(room.checkOutDate,'yyyy-MM-dd HH:mm')}"></td>
                         <td class="text-center text-danger" th:text="${room.roomPassword}"></td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">

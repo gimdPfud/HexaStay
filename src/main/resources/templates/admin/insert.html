@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
@@ -14,7 +13,7 @@
         <h2 class="fw-bold mb-4 text-center">회원 등록</h2>
 
         <form method="post" action="/admin/insert" enctype="multipart/form-data">
-            <div class="container p-4" style="max-width: 500px;">
+            <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-3 user-box text-center">
                     <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -81,8 +80,8 @@
                         <div class="col-md-3">
                             <select id="adminChoice" class="form-select">
                                 <option>본사</option>
-                                <option>지사</option>
                                 <option>지점</option>
+                                <option>외부시설</option>
                                 <option>스토어</option>
                             </select>
                         </div>
