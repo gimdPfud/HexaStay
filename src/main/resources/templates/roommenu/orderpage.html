@@ -384,6 +384,24 @@
             color: #333 !important; /* 텍스트 색상 강제로 지정 */
         }
 
+        .sold-out {
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .sold-out::after {
+            content: "품절";
+            color: white;
+            background-color: red;
+            font-weight: bold;
+            padding: 2px 6px;
+            font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 4px;
+        }
+
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
@@ -450,12 +468,11 @@
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
         <ul class="food-list card-list">
-            <li th:each="roomMenuDTO : ${list}" class="food-item">
-                <div class="div-card"
-                   style="text-decoration: none; color: inherit; display: block; width: 100%;">
+            <li th:each="roomMenuDTO : ${list}" class="food-item"
+                th:classappend="${roomMenuDTO.roomMenuAmount == 0} ? 'sold-out'">
+                <div class="div-card" style="display: block; width: 100%;">
                     <div class="inner-wrapper">
                         <div class="d-flex justify-content-center align-items-center">
-                            <!-- 이미지 왼쪽 배치 -->
                             <div class="menu-image-container">
                                 <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                                      th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
@@ -466,7 +483,9 @@
                             </div>
 
                             <div class="text-info">
-                                <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                                <!-- 수량이 남아있으면 링크 허용 -->
+                                <a th:if="${roomMenuDTO.roomMenuAmount > 0}"
+                                   th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
                                    style="text-decoration: none; color: inherit; display: block; width: 100%;">
                                     <span class="menu-badge" th:text="${roomMenuDTO.roomMenuCategory}"></span>
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
@@ -477,14 +496,32 @@
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <div class="like-section">
-                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
-                                              class="like-icon">🤍</span>
+                                <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                      th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                      class="like-icon">🤍</span>
                                             <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                                         </div>
                                     </div>
                                 </a>
+
+                                <!-- 수량 0이면 품절 표시, 클릭 불가 -->
+                                <div th:if="${roomMenuDTO.roomMenuAmount == 0}" style="pointer-events: none; opacity: 0.5;">
+                                    <span class="menu-badge">품절</span>
+                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                    <div class="price-box">
+                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="#{item.currency}">원</span>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="like-section">
+                                            <span class="like-icon">🤍</span>
+                                            <span class="like-count">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
