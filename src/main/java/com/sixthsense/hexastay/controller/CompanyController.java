@@ -49,8 +49,12 @@ public class CompanyController {
         log.info("keyword : " + keyword);
         log.info("pageable : " + pageable.getPageNumber(), pageable.getPageSize());
 
-        if (choice == null || choice.trim().isEmpty()) {
-            choice = "center";
+        if (choice == null) {
+            choice = "";
+        }
+
+        if (select == null) {
+            select = "전체";
         }
 
         Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
@@ -59,13 +63,6 @@ public class CompanyController {
         model.addAttribute("choice", choice);
         model.addAttribute("select", select);
         model.addAttribute("keyword", keyword);
-
-        return "company/list";
-    }
-
-    @PostMapping("/list")
-    public String listPost (@RequestParam("select") String select, @RequestParam("choice") String choice, @RequestParam ("keyword") String keyword) {
-
 
         return "company/list";
     }
@@ -151,6 +148,7 @@ public class CompanyController {
     @ResponseBody
     @PostMapping("/list/store")
     public ResponseEntity listCompanyForStoreInsert(
+                              @RequestParam(required = false) String choice,
                               @RequestParam(required = false) String select,
                               @RequestParam(required = false) String keyword,
                               Pageable pageable, Principal principal) {
@@ -158,7 +156,11 @@ public class CompanyController {
         String email = principal.getName();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, "branch", keyword, companyNum, pageable);
+        if (choice == null || choice.trim().isEmpty()) {
+            choice = "branch";
+        }
+
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
 
         return new ResponseEntity<>(companyDTOS, HttpStatus.OK);
     }

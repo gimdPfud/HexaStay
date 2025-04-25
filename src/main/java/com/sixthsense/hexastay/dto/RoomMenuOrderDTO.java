@@ -37,6 +37,12 @@ public class RoomMenuOrderDTO {
 
     private LocalDateTime regDate;
 
+    private Integer discountedPrice; // 할인된 최종 금액
+
+    private Integer originalTotalPrice; // 쿠폰 사용 전 가격
+
+    private Long usedCouponNum; // 사용된 쿠폰의 넘버
+
     private String roomMenuImageMeta; //룸 메뉴 사진 정보
 
     private String originalImageMeta; // 기존 이미지의 경로

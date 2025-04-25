@@ -18,31 +18,24 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">회원 목록</h2>
 
+        <!-- 에러 메시지 -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
         <!-- 검색 폼 -->
         <form action="/admin/list" method="post" class="row g-3 align-items-end">
-
-            <div class="col-md-3" style="width: 15%; ">
-                <select name="select" id="select" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
-                    <option selected>소속</option>
-                    <option value="all"      th:selected="${select} == 'all'">전체</option>
-                    <option value="center"   th:selected="${select} == 'center'">본사</option>
-                    <option value="branch"   th:selected="${select} == 'branch'">지사</option>
-                    <option value="facility" th:selected="${select} == 'facility'">지점</option>
-                    <option value="store"    th:selected="${select} == 'store'">스토어</option>
+            <div class="col-md-3" style="width: 20%;">
+                <select name="type" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                    <option value="">검색 조건</option>
+                    <option value="adminName" th:selected="${type} == 'adminName'">이름</option>
+                    <option value="adminEmployeeNum" th:selected="${type} == 'adminEmployeeNum'">사번</option>
+                    <option value="adminRole" th:selected="${type} == 'adminRole'">직급</option>
+                    <option value="adminPosition" th:selected="${type} == 'adminPosition'">직책</option>
                 </select>
             </div>
 
-            <div class="col-md-3" style="width: 15%;">
-                <select name="choice" class="form-select" style="height: 40px; font-size: 0.9rem;">
-                    <option selected>검색 조건</option>
-                    <option value="adminEmployeeNum" th:selected="${choice} == 'adminEmployeeNum'">사번</option>
-                    <option value="adminRole"         th:selected="${choice} == 'adminRole'">직급</option>
-                    <option value="adminPosition"     th:selected="${choice} == 'adminPosition'">직책</option>
-                    <option value="adminName"         th:selected="${choice} == 'adminName'">이름</option>
-                </select>
-            </div>
-
-            <div class="col-md-4" style="width: 50%;">
+            <div class="col-md-4" style="width: 60%;">
                 <input name="keyword" type="text" class="form-control"
                        placeholder="검색어 입력"
                        style="height: 40px; font-size: 0.9rem;"
@@ -50,8 +43,12 @@
             </div>
 
             <div class="col-md-2 d-flex gap-2" style="width: 20%;">
-                <button type="submit" id="searchBtn" class="btn btn-primary w-50" style="height: 40px;">검색</button>
-                <a href="/admin/insert" class="btn btn-success w-50"  style="height: 40px;">등록</a>
+                <button type="submit" class="btn btn-primary w-50" style="height: 40px; font-size: 0.9rem;">
+                    검색
+                </button>
+                <a href="/admin/list" class="btn btn-secondary w-50" style="height: 40px; font-size: 0.9rem;">
+                    전체
+                </a>
             </div>
         </form>
 
@@ -73,8 +70,7 @@
                     </thead>
 
                     <tbody>
-                    <tr th:each="adminDTO : ${adminDTOList}" class="text-center">
-
+                    <tr th:each="adminDTO : ${list}" class="text-center">
                         <td>
                             <img th:if="${adminDTO.adminProfileMeta != null}"
                                  th:src="@{${adminDTO.adminProfileMeta}}"

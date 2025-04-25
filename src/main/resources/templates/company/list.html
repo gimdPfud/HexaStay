@@ -30,17 +30,17 @@
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="this.form.submit()">
-          <option selected>소속</option>
-          <option value="center" th:selected="${choice} == 'center'">본사</option>
-          <option value="branch" th:selected="${choice} == 'branch'">지사</option>
-          <option value="facility" th:selected="${choice} == 'facility'">지점</option>
+        <select name="choice" id="choice" class="form-select" style="height: 40px; font-size: 0.9rem;" onchange="submitForm()">
+          <option value="" th:selected="${choice == null || choice == ''}">전체</option>
+          <option value="center" th:selected="${choice == 'center'}">본사</option>
+          <option value="branch" th:selected="${choice == 'branch'}">지점</option>
+          <option value="facility" th:selected="${choice == 'facility'}">외부시설</option>
         </select>
       </div>
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;">
-          <option selected>검색 조건</option>
+        <select name="select" class="form-select" style=" height: 40px; font-size: 0.9rem;" onchange="submitForm()">
+          <option value="전체" th:selected="${select == null || select == '전체'}">검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
           <option value="businessNum" th:selected="${select == 'businessNum'}">사업자번호</option>
@@ -66,8 +66,8 @@
             <th style="width: 11%">프로필 사진</th>
             <th style="width: 14%;">브랜드명</th>
             <th style="width: 14%;">본사명</th>
-            <th style="width: 14%;">지사명</th>
             <th style="width: 14%;">지점명</th>
+            <th style="width: 14%;">외부시설명</th>
             <th style="width: 14%;">전화번호</th>
             <th style="width: 12%;"></th>
           </tr>
@@ -86,8 +86,8 @@
             </td>
             <td th:text="${item.companyBrand}"></td>
             <td th:text="${item.companyParentName}">본사명</td>
-            <td th:text="${item.branchName}">지사명</td>
-            <td th:text="${item.facilityName}">지점명</td>
+            <td th:text="${item.branchName}">지점명</td>
+            <td th:text="${item.facilityName}">외부시설명</td>
             <td th:text="${item.companyPhone}"></td>
             <td>
               <a th:href="@{/company/read/{companyNum}(companyNum=${item.companyNum})}"
@@ -187,7 +187,10 @@
               });
     }
 
-
+    function submitForm() {
+        const form = document.querySelector('form');
+        form.submit();
+    }
 
   </script>
 

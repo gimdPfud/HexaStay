@@ -36,20 +36,8 @@ public class StorecartServiceImpl implements StorecartService {
     private final StorecartitemRepository storecartitemRepository;
     private final RoomRepository roomRepository;
 
-    /*메소드 : principal으로 hotelroomNum반환하는 메소드 */
-    private final MemberRepository memberRepository;
-    private final RoomServiceImpl roomService;
-    @Override
-    public Long principalToHotelroomNum(Principal principal){
-        String email = principal.getName();
-        Long memberNum = memberRepository.findByMemberEmail(email).getMemberNum();
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        HotelRoomDTO hotelRoomDTO = roomService.getHotelRoomsByMember(memberNum,pageable).stream().findFirst().orElseThrow(EntityNotFoundException::new);
-        return hotelRoomDTO.getHotelRoomNum();
-    }
-
         @Override
-    public Long addCart(StorecartitemDTO dto, Long hotelroomNum) {
+    public int addCart(StorecartitemDTO dto, Long hotelroomNum) {
 //        log.info(dto);
 //        log.info(dto.getStorecartitemCount());
 
@@ -58,7 +46,7 @@ public class StorecartServiceImpl implements StorecartService {
         //2. room 조회. (왜냐면?? room과 일대일 관계를 맺도록 바꿈. > room은 1번의 숙박/고객/예약 이니까...)
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
         Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
-        if(room==null){return null;}
+        if(room==null){return 1;}
 
         //3. 장바구니 조회
         Storecart storecart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
@@ -82,7 +70,7 @@ public class StorecartServiceImpl implements StorecartService {
         if(list!=null&&!list.isEmpty()){
             Long itemStoreNum = list.getFirst().getStoremenu().getStore().getStoreNum();
             if(!itemStoreNum.equals(newItemStoreNum)){
-                return null;
+                return 2;
             }
         }
 
@@ -104,10 +92,15 @@ public class StorecartServiceImpl implements StorecartService {
         //7. 장바구니아이템이 있음, 개수 조정
         else {
 //            log.info("카트아이템 이미 있음");
-            storecartitem.setStorecartitemCount(storecartitem.getStorecartitemCount() + dto.getStorecartitemCount());
+            int newCount = storecartitem.getStorecartitemCount() + dto.getStorecartitemCount();
+            if (newCount > 99){
+                return 3;
+            }else {
+                storecartitem.setStorecartitemCount(newCount);
+            }
         }
         log.info("리턴 전 확인 : "+storecartitem.getStorecartitemNum());
-        return storecartitem.getStorecartitemNum();
+        return 4;
     }
 
         @Override
@@ -116,7 +109,12 @@ public class StorecartServiceImpl implements StorecartService {
         return list;
     }
 
-        @Override
+    @Override
+    public long getItemCount(Long hotelroomNum) {
+        return storecartitemRepository.countByStorecart_Room_HotelRoom(hotelroomNum);
+    }
+
+    @Override
     public boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum) {
         Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
         Room inputRoom = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);

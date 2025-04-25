@@ -4,6 +4,7 @@ import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final CompanyService companyService;
+    private final AdminRepository adminRepository;
 
 
     // 시큐리티 체크
@@ -102,29 +105,73 @@ public class AdminController {
         return "redirect:/admin/list";
     }
 
+
+
+    // 리스트
     @GetMapping("/list")
-    public String adminList (@PageableDefault(sort = "adminNum", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
-        model.addAttribute("adminDTOList", adminService.list(pageable));
-        return "/admin/list";
+    public String list(Model model, Principal principal, Pageable pageable) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        
+        try {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if (adminDTO == null) {
+                log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
+                return "redirect:/admin/logout";
+            }
+
+            Page<AdminDTO> list = adminService.listAdmin(principal.getName(), pageable);
+            model.addAttribute("list", list);
+            return "admin/list";
+        } catch (Exception e) {
+            log.error("Admin list error: ", e);
+            model.addAttribute("error", "목록 조회 중 오류가 발생했습니다.");
+            return "admin/list";
+        }
     }
 
     @PostMapping("/list")
-    public String adminListSearch(@RequestParam("select") String select,
-                                  @RequestParam("choice") String choice,
-                                  @RequestParam("keyword") String keyword,
-                                  @PageableDefault(sort = "adminNum", direction = Sort.Direction.DESC) Pageable pageable,
-                                  Model model) {
+    public String list(Model model, Principal principal, Pageable pageable,
+                      @RequestParam(required = false) String type,
+                      @RequestParam(required = false) String keyword) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        
+        try {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if (adminDTO == null) {
+                log.error("Admin not found for email: {}", principal.getName());
+                return "redirect:/admin/logout";
+            }
 
+            Page<AdminDTO> list;
+            if (type != null && keyword != null && !type.isEmpty() && !keyword.isEmpty()) {
+                list = adminService.listAdminSearch(principal.getName(), type, keyword, pageable);
+            } else {
+                list = adminService.listAdmin(principal.getName(), pageable);
+            }
 
-        Page<AdminDTO> adminPage = adminService.searchAdmins(select, choice, keyword, pageable);
-
-        model.addAttribute("adminDTOList", adminPage);
-        model.addAttribute("select", select);
-        model.addAttribute("choice", choice);
-        model.addAttribute("keyword", keyword);
-
-        return "/admin/list";
+            model.addAttribute("list", list);
+            model.addAttribute("type", type);
+            model.addAttribute("keyword", keyword);
+            return "admin/list";
+        } catch (NoSuchElementException e) {
+            log.error("Admin not found: ", e);
+            model.addAttribute("error", "관리자 정보를 찾을 수 없습니다.");
+            return "admin/list";
+        } catch (IllegalStateException e) {
+            log.error("Invalid admin state: ", e);
+            model.addAttribute("error", "잘못된 관리자 상태입니다.");
+            return "admin/list";
+        } catch (Exception e) {
+            log.error("Admin list search error: ", e);
+            model.addAttribute("error", "검색 중 오류가 발생했습니다.");
+            return "admin/list";
+        }
     }
+
 
     //승인
     @GetMapping("/approve")

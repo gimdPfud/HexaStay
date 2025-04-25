@@ -36,7 +36,7 @@
                         <button th:disabled="${item.storemenuCount<=1}" type="button" onclick="minusCount(this)"
                                 th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
                         <span th:text="${item.storemenuCount} + '개'" class="text-end"></span>
-                        <button type="button" onclick="plusCount(this)"
+                        <button type="button" onclick="plusCount(this)" th:disabled="${item.storemenuCount>99}"
                                 th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
                     </div>
                     <div>

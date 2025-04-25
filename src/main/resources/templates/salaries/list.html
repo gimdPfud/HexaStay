@@ -1,198 +1,160 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
-
 <head>
     <meta charset="UTF-8">
     <title>급여 조회</title>
-
-</head>
-
-<body>
-
-<div layout:fragment="content" class="container">
-
     <style>
-        .salary-table {
-            margin-top: 30px;
+        .table td {
+            vertical-align: middle;
+        }
+
+        #detailBox {
             width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 인센티브와 공제 셀 스타일 */
+        .incentive-cell, .deduction-cell {
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        /* 인센티브 셀 */
+        .incentive-cell {
+            color: #77b1fb !important;  /* 텍스트 색상만 변경 */
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        /* 공제 셀 */
+        .deduction-cell {
+            color: #dc3545 !important;  /* 텍스트 색상만 변경 */
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        .incentive-cell:hover, .deduction-cell:hover {
+            background-color: #f0f8ff;
+        }
+
+        .table th {
+            font-size: 1.0rem;
+            text-align: center;
+        }
+
+        .table td {
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* 총 급여와 실수령액을 굵게 표시 */
+        .total-salary, .net-salary {
+            font-weight: bold;
+        }
+
+        .salary-zone td, .salary-zone th {
+            border: 2px solid #000;
+        }
+
+        .salary-zone {
             border-collapse: collapse;
         }
 
-        .salary-item {
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            padding: 15px;
-        }
-
-        .salary-table thead {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .salary-table tbody tr {
-            background-color: #f8f9fa;
-        }
-
-        .salary-table tbody tr:nth-child(even) {
-            background-color: #e9ecef;
-        }
-
-        .salary-table td,
-        .salary-table th {
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #dee2e6;
-        }
-
-        .salary-table img {
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-        }
-
-        .salary-table .profile-cell {
-            text-align: center;
-        }
-
-        .salary-table .salary-date {
-            color: #888;
-        }
-
-        .no-data {
-            text-align: center;
-            margin-top: 50px;
-            font-size: 1.5em;
-            color: #888;
-        }
-
-        .total-row {
-            font-weight: bold;
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .salary-summary {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background-color: #f1f1f1;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .salary-summary div {
-            width: 45%;
-        }
-
-        #detailModal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .modal-content {
-            margin-bottom: 15px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        .deduction-cell, .incentive-cell {
-            cursor: pointer;
-            color: #007bff;
-        }
-
-        .deduction-cell:hover, .incentive-cell:hover {
-            text-decoration: underline;
-        }
     </style>
 
-    <div th:if="${salList.content == null or #lists.isEmpty(salList.content)}" class="no-data">
-        항목 없음
-    </div>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
-    <div th:if="${salList.content != null and !#lists.isEmpty(salList.content)}" class="salary-item">
-        <table class="table salary-table">
-            <thead>
-            <tr>
-                <th>프로필</th>
-                <th>기본급</th>
-                <th>직무수당</th>
-                <th>인센티브</th>
-                <th>공제</th>
-                <th>직책</th>
-                <th>직원명</th>
-                <th>직원번호</th>
-                <th>급여 지급일</th>
-                <th>총 급여</th>
-                <th>실수령액</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="salary : ${salList.content}" class="salary-row">
-                <td class="profile-cell">
-                    <img th:if="${salary.adminDTO.adminProfileMeta != null}"
-                         th:src="@{${salary.adminDTO.adminProfileMeta}}"
-                         style="width: 60px; height: 80px;">
-                    <img th:unless="${salary.adminDTO.adminProfileMeta != null}"
-                         th:src="@{/profile/default.png}"
-                         style="width: 60px; height: 80px;">
-                </td>
-                <td th:text="${salary.salBase}">기본급</td>
-                <td th:text="${salary.salDuty}">직무수당</td>
-                <td class="incentive-cell" th:data-details="${salary.salIncen}">
-                    <span class="incentive-total">0</span>
-                </td>
-                <td class="deduction-cell" th:data-details="${salary.salDedu}">
-                    <span class="deduction-total">0</span>
-                </td>
-                <td th:text="${salary.salPosition}">직책</td>
-                <td th:text="${salary.adminDTO.adminName}">이름</td>
-                <td th:text="${salary.adminDTO.adminEmployeeNum}">사번</td>
-                <td th:text="${salary.salDate}">급여 지급일</td>
-                <td class="total-salary">0</td>
-                <td class="net-salary">0</td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">급여 조회</h2>
 
-        <!-- 페이징 처리 부분 -->
-        <div class="d-flex justify-content-between">
-            <button th:if="${salList.hasPrevious()}" class="btn btn-primary">이전</button>
-            <button th:if="${salList.hasNext()}" class="btn btn-primary">다음</button>
+        <div th:if="${salList.content == null or #lists.isEmpty(salList.content)}" class="no-data">
+            항목 없음
         </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered text-company mb-0">
+                    <thead class="table-light text-center">
+                    <tr>
+                        <th>프로필</th>
+                        <th>직원번호</th>
+                        <th>직원명</th>
+                        <th>직책</th>
+                        <th>기본급</th>
+                        <th>직무수당</th>
+                        <th class="incentive-header">인센티브</th>
+                        <th class="total-salary">총 급여</th>
+                        <th class="deduction-header">공제</th>
+                        <th class="net-salary">실수령액</th>
+                        <th>급여 지급일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="salary : ${salList.content}" class="text-center">
+                        <td class="profile-cell">
+                            <img th:if="${salary.adminDTO.adminProfileMeta != null}"
+                                 th:src="@{${salary.adminDTO.adminProfileMeta}}"
+                                 style="width: 60px; height: 80px;">
+                            <img th:unless="${salary.adminDTO.adminProfileMeta != null}"
+                                 th:src="@{/profile/default.png}"
+                                 style="width: 60px; height: 80px;">
+                        </td>
+                        <td th:text="${salary.adminDTO.adminEmployeeNum}">사번</td>
+                        <td th:text="${salary.adminDTO.adminName}">이름</td>
+                        <td th:text="${salary.salPosition}">직책</td>
+                        <td th:text="${salary.salBase}">기본급</td>
+                        <td th:text="${salary.salDuty}">직무수당</td>
+                        <td class="incentive-cell" th:data-details="${salary.salIncen}">
+                            <span class="incentive-total">0</span>
+                        </td>
+                        <td class="total-salary">0</td>
+                        <td class="deduction-cell" th:data-details="${salary.salDedu}">
+                            <span class="deduction-total">0</span>
+                        </td>
+                        <td class="net-salary">0</td>
+                        <td th:text="${salary.salDate}">급여 지급일</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div id="detailBox" class="mt-4 p-3 border rounded bg-white" style="display: none;" data-current-cell=""></div>
+            </div>
+
+            <!-- 페이징 처리 부분 -->
+            <div class="d-flex justify-content-between">
+                <button th:if="${salList.hasPrevious()}" class="btn btn-primary">이전</button>
+                <button th:if="${salList.hasNext()}" class="btn btn-primary">다음</button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- 모달 창 추가 -->
-    <div id="detailModal">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <h4 id="modalTitle"></h4>
-            <div id="modalDetails"></div>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // 기본급과 직무수당 천 단위 포맷팅
+            document.querySelectorAll('td:nth-child(2)').forEach(cell => {
+                const value = parseFloat(cell.innerText.replace(/,/g, '')) || 0;
+                cell.innerText = value.toLocaleString();
+            });
+
+            document.querySelectorAll('td:nth-child(3)').forEach(cell => {
+                const value = parseFloat(cell.innerText.replace(/,/g, '')) || 0;
+                cell.innerText = value.toLocaleString();
+            });
+
             // 인센티브와 공제 합계 계산
             document.querySelectorAll('.incentive-cell').forEach(cell => {
                 const details = cell.dataset.details;
@@ -219,63 +181,109 @@
             });
 
             // 총급여와 실수령액 계산
-            const rows = document.querySelectorAll('.salary-row');
+            const rows = document.querySelectorAll('tbody tr');
             rows.forEach(row => {
-                const baseSalary = parseFloat(row.querySelector('td:nth-child(2)').innerText.replace(/,/g, '') || 0);
-                const dutySalary = parseFloat(row.querySelector('td:nth-child(3)').innerText.replace(/,/g, '') || 0);
-                const incentive = parseFloat(row.querySelector('.incentive-total').innerText.replace(/,/g, '') || 0);
-                const deductions = parseFloat(row.querySelector('.deduction-total').innerText.replace(/,/g, '') || 0);
+                const baseSalary = parseFloat(row.querySelector('td:nth-child(5)').innerText.replace(/,/g, '') || 0);  // 기본급
+                const dutySalary = parseFloat(row.querySelector('td:nth-child(6)').innerText.replace(/,/g, '') || 0);  // 직무수당
+                const incentive = parseFloat(row.querySelector('.incentive-total').innerText.replace(/,/g, '') || 0);  // 인센티브
+                const deductions = parseFloat(row.querySelector('.deduction-total').innerText.replace(/,/g, '') || 0);  // 공제
 
+                // 총 급여는 기본급 + 직무수당 + 인센티브
                 const total = baseSalary + dutySalary + incentive;
+                // 실수령액은 총 급여 - 공제
                 const net = total - deductions;
 
-                row.querySelector('.total-salary').innerText = total.toLocaleString();
-                row.querySelector('.net-salary').innerText = net.toLocaleString();
+                row.querySelector('.total-salary').innerText = total.toLocaleString();  // 총 급여 출력
+                row.querySelector('.net-salary').innerText = net.toLocaleString();  // 실수령액 출력
             });
+
         });
 
-        function showDetails(title, details) {
-            const modal = document.getElementById('detailModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalDetails = document.getElementById('modalDetails');
-            
-            modalTitle.textContent = title;
-            
-            // "항목:값" 형식의 문자열을 파싱하여 표시
+        // 상세보기 박스 열기
+        function showDetailBox(title, details, cell) {
+            const detailBox = document.getElementById('detailBox');
+
+            // 현재 클릭한 셀과 이전에 열렸던 셀 비교
+            const currentlyOpen = detailBox.dataset.currentCell === cell.dataset.details;
+
+            if (currentlyOpen) {
+                detailBox.style.display = 'none';
+                detailBox.innerHTML = '';
+                detailBox.dataset.currentCell = '';
+                return;
+            }
+
             const items = details.split(',');
             const formattedDetails = items.map(item => {
                 const [name, value] = item.split(':');
-                return `${name}: ${parseInt(value).toLocaleString()}원`;
-            }).join('<br>');
-            
-            modalDetails.innerHTML = formattedDetails;
-            modal.style.display = 'block';
+                return `<div class="mb-1">${name.trim()}: <strong>${parseInt(value).toLocaleString()}원</strong></div>`;
+            }).join('');
+
+            detailBox.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="fw-bold mb-0">${title}</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="hideDetailBox()">닫기</button>
+        </div>
+        ${formattedDetails}
+    `;
+            detailBox.style.display = 'block';
+            detailBox.dataset.currentCell = cell.dataset.details;
+
+            detailBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function closeModal() {
-            document.getElementById('detailModal').style.display = 'none';
+        // 상세보기 박스 숨기기
+        function hideDetailBox() {
+            const detailBox = document.getElementById('detailBox');
+            detailBox.style.display = 'none';
+            detailBox.innerHTML = '';
+            detailBox.dataset.currentCell = '';
         }
 
-        // 모달 외부 클릭 시 닫기
-        window.onclick = function(event) {
-            const modal = document.getElementById('detailModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // 클릭 이벤트: 공제와 인센티브
+            document.querySelectorAll('.deduction-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    // 다른 셀에서 강조된 텍스트를 해제
+                    document.querySelectorAll('.deduction-cell').forEach(otherCell => {
+                        const span = otherCell.querySelector('span');
+                        if (span) {
+                            span.classList.remove('clicked-text');
+                        }
+                    });
 
-        // 공제와 인센티브 셀에 클릭 이벤트 추가
-        document.querySelectorAll('.deduction-cell').forEach(cell => {
-            cell.addEventListener('click', () => {
-                showDetails('공제 상세내역', cell.dataset.details);
+                    // 현재 클릭한 텍스트 강조
+                    const span = cell.querySelector('span');
+                    if (span) {
+                        span.classList.add('clicked-text');
+                    }
+
+                    showDetailBox('공제 상세내역', cell.dataset.details, cell);
+                });
+            });
+
+            document.querySelectorAll('.incentive-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    // 다른 셀에서 강조된 텍스트를 해제
+                    document.querySelectorAll('.incentive-cell').forEach(otherCell => {
+                        const span = otherCell.querySelector('span');
+                        if (span) {
+                            span.classList.remove('clicked-text');
+                        }
+                    });
+
+                    // 현재 클릭한 텍스트 강조
+                    const span = cell.querySelector('span');
+                    if (span) {
+                        span.classList.add('clicked-text');
+                    }
+
+                    showDetailBox('인센티브 상세내역', cell.dataset.details, cell);
+                });
             });
         });
 
-        document.querySelectorAll('.incentive-cell').forEach(cell => {
-            cell.addEventListener('click', () => {
-                showDetails('인센티브 상세내역', cell.dataset.details);
-            });
-        });
+
     </script>
 
 </div>

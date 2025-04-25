@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
@@ -14,7 +13,7 @@
         <h2 class="fw-bold mb-4 text-center">회원 등록</h2>
 
         <form method="post" action="/admin/insert" enctype="multipart/form-data">
-            <div class="container p-4" style="max-width: 500px;">
+            <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-3 user-box text-center">
                     <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -81,8 +80,8 @@
                         <div class="col-md-3">
                             <select id="adminChoice" class="form-select">
                                 <option>본사</option>
-                                <option>지사</option>
                                 <option>지점</option>
+                                <option>외부시설</option>
                                 <option>스토어</option>
                             </select>
                         </div>
@@ -118,9 +117,6 @@
                         <option value="submgr">부매니저</option>
                         <option value="staff">매장 직원</option>
                     </select>
-
-
-
                 </div>
 
 
@@ -179,7 +175,7 @@
                 adminStoreRank.hidden = true;
 
 
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
+            } else if (adminChoice.value === "지점" || adminChoice.value === "외부시설") {
                 adminCenter.value = "";
                 adminBranchFacility.value = "";
                 adminStore.value = "";
@@ -216,8 +212,8 @@
 
             let mappedChoice;
             switch (adminChoice) {
-                case "지사": mappedChoice = "branch"; break;
-                case "지점": mappedChoice = "facility"; break;
+                case "지점": mappedChoice = "branch"; break;
+                case "외부시설": mappedChoice = "facility"; break;
                 case "스토어": mappedChoice = "store"; break;
                 default: mappedChoice = ""; break;
             }
@@ -290,17 +286,17 @@
         function submitForm(event) {
 
             switch (adminChoice.value) {
-                case "센터":
+                case "본사":
                     document.getElementById("adminRole").value = adminCenterRank.value;
                     companyNum.value = adminCenter.value;
                     storeNum.value = "";
                     break;
-                case "지사":
+                case "지점":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
                     companyNum.value = adminBranchFacility.value;
                     storeNum.value = "";
                     break;
-                case "지점":
+                case "외부시설":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
                     companyNum.value = adminBranchFacility.value;
                     storeNum.value = "";

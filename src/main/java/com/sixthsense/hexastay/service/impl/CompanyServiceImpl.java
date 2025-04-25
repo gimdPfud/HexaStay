@@ -129,11 +129,18 @@ public class CompanyServiceImpl implements CompanyService {
 
     // 검색용
     @Override
-    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable) {    //검색조건 적용한 회사 목록
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable) {
         // 소속만 선택하고 검색 조건/키워드가 없을 때
-        if ((keyword == null || keyword.trim().isEmpty()) || "전체".equals(select)) {
-            return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
-                    .map(this::convertToCompanyDTO);
+        if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
+            if (choice == null || choice.isEmpty()) {
+                // 전체 선택 시
+                return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, null, pageable)
+                        .map(this::convertToCompanyDTO);
+            } else {
+                // 특정 타입 선택 시
+                return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
+                        .map(this::convertToCompanyDTO);
+            }
         }
 
         // 검색 조건 + 키워드가 있을 때

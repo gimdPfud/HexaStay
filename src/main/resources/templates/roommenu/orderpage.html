@@ -384,6 +384,36 @@
             color: #333 !important; /* 텍스트 색상 강제로 지정 */
         }
 
+        /* 품절관련, 좋아요 관련 CSS 시작*/
+        .sold-out {
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .sold-out::after {
+            content: "품절";
+            color: white;
+            background-color: red;
+            font-weight: bold;
+            padding: 2px 6px;
+            font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 4px;
+        }
+
+        .sold-out-item {
+            opacity: 0.5;
+            pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
+            position: relative;
+        }
+
+        .sold-out-item .enable-click {
+            pointer-events: auto; /* 좋아요 버튼만 클릭 허용 */
+        }
+        /* 품절관련, 좋아요 관련 CSS 끝*/
+
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
@@ -398,7 +428,8 @@
             <input type="hidden" name="category" th:value="${category}" />
             <input type="hidden" name="lang" id="langInput" />
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="white-space: nowrap;">lang :</span>
                 <button type="button" class="flag flag-ko" onclick="submitLang('ko')" title="한국어"></button>
                 <button type="button" class="flag flag-en" onclick="submitLang('en')" title="English"></button>
                 <button type="button" class="flag flag-ja" onclick="submitLang('ja')" title="日本語"></button>
@@ -439,16 +470,21 @@
             <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">
                 <i class="bi bi-caret-down-fill"></i>가격높은순
             </div>
+            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/coupon/insert'">
+                <i class="bi bi-caret-down-fill"></i>쿠폰받기
+            </div>
+            <div class="tab" onclick="showMyCoupons()">
+                <i class="bi bi-ticket-perforated"></i>내 쿠폰 보기
+            </div>
         </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
         <ul class="food-list card-list">
-            <li th:each="roomMenuDTO : ${list}" class="food-item">
-                <div class="div-card"
-                   style="text-decoration: none; color: inherit; display: block; width: 100%;">
+            <li th:each="roomMenuDTO : ${list}" class="food-item"
+                th:classappend="${roomMenuDTO.roomMenuAmount == 0} ? 'sold-out'">
+                <div class="div-card" style="display: block; width: 100%;">
                     <div class="inner-wrapper">
                         <div class="d-flex justify-content-center align-items-center">
-                            <!-- 이미지 왼쪽 배치 -->
                             <div class="menu-image-container">
                                 <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
                                      th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
@@ -459,7 +495,9 @@
                             </div>
 
                             <div class="text-info">
-                                <a th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
+                                <!-- 수량이 남아있으면 링크 허용 -->
+                                <a th:if="${roomMenuDTO.roomMenuAmount > 0}"
+                                   th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
                                    style="text-decoration: none; color: inherit; display: block; width: 100%;">
                                     <span class="menu-badge" th:text="${roomMenuDTO.roomMenuCategory}"></span>
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
@@ -471,13 +509,33 @@
                                     <div class="d-flex justify-content-end">
                                         <div class="like-section">
                                         <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
-                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ', event)'"
                                               class="like-icon">🤍</span>
                                             <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
                                         </div>
                                     </div>
                                 </a>
+
+                                <!-- 수량 0이면 품절 표시, 클릭 불가 -->
+                                <div th:if="${roomMenuDTO.roomMenuAmount == 0}" class="sold-out-item">
+                                    <span class="menu-badge">품절</span>
+                                    <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
+                                    <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
+                                    <div class="price-box">
+                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="#{item.currency}">원</span>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="like-section enable-click">
+                                        <span th:id="'likeIcon-' + ${roomMenuDTO.roomMenuNum}"
+                                              th:attr="onclick='toggleLike(' + ${roomMenuDTO.roomMenuNum} + ')'"
+                                              class="like-icon">🤍</span>
+                                            <span th:id="'likeCount-' + ${roomMenuDTO.roomMenuNum}" class="like-count">0</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -492,7 +550,10 @@
         // 상태 저장
         const likedStates = {};
 
-        function toggleLike(menuId) {
+        function toggleLike(menuId, event) {
+            event?.stopPropagation(); // 이벤트 전파 방지
+            event?.preventDefault();  // 링크 이동도 막기
+
             const liked = likedStates[menuId] || false;
             const url = liked
                 ? `/roommenu/orderpage/cancellike/${menuId}`
@@ -519,8 +580,11 @@
                     likedStates[menuId] = !liked;
                 })
                 .catch(err => {
-                    console.error('좋아요 실패:', err);
-                    alert('관리자는 좋아요를 할 수 없습니다.');
+                    if (err.message === '서버 오류') {
+                        alert('해당 기능을 사용할 수 없습니다. 관리자 계정이거나 서버 오류일 수 있습니다.');
+                    } else {
+                        alert('알 수 없는 오류가 발생했습니다.');
+                    }
                 });
         }
 
@@ -609,6 +673,36 @@
                 }
             }
         });
+
+        /* 쿠폰 조회 */
+
+        function showMyCoupons() {
+            const email = prompt("쿠폰을 조회할 이메일을 입력하세요:");
+            if (!email) return;
+
+            fetch(`/roommenu/coupon/list?email=${email}`)
+                .then(res => res.json())
+                .then(coupons => {
+                    if (coupons.length === 0) {
+                        alert("보유한 쿠폰이 없습니다.");
+                        return;
+                    }
+
+                    let message = `💌 ${email}님의 쿠폰 목록\n\n`;
+                    coupons.forEach((coupon, index) => {
+                        message += `${index + 1}. [${coupon.type}] - ${coupon.discountRate}% 할인\n`;
+                        message += `   발급일: ${coupon.issueDate}, 만료일: ${coupon.expirationDate}\n`;
+                        message += `   사용여부: ${coupon.used ? '✅ 사용됨' : '❌ 미사용'}\n\n`;
+                    });
+
+                    alert(message);
+                })
+                .catch(err => {
+                    alert("쿠폰을 불러오는 중 오류가 발생했습니다.");
+                    console.error(err);
+                });
+        }
+
 
     </script>
     <!-- 스크립트 끝 -->
