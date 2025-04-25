@@ -85,30 +85,31 @@
             fetch("/member/store/cart/insert", {
                 method: "POST",
                 body: data
-            }).then(response => {
+            }).then(async response => {
                 if (response.ok) {
                     alert("장바구니에 담았습니다!");
                     location.replace("/member/store/read/" + storeNum);
-                } else if (response.status === 401) {
-                    alert("로그인이 필요합니다!");
-                    location.href = "/member/login";
                 } else if (response.status === 400) {
-                    if (confirm("한 번에 하나의 가게에서만 주문할 수 있습니다. 장바구니를 비우고 담으시겠습니까?")) {
-                        fetch("/member/store/cart/clear", {
-                            method: "POST",
-                            body: data
-                        }).then(response => {
-                            if (response.ok) {
-                                alert("장바구니에 담았습니다!");
-                                location.replace("/member/store/read/" + storeNum);
-                            } else if (response.status === 401) {
-                                alert("로그인이 필요합니다!");
-                                location.href = "/member/login";
-                            }
-                        });
+                    const text = await response.text();
+                    if (text === "other") {
+                        if (confirm("한 번에 하나의 가게에서만 주문할 수 있습니다. 장바구니를 비우고 담으시겠습니까?")) {
+                            fetch("/member/store/cart/clear", {
+                                method: "POST",
+                                body: data
+                            }).then(response => {
+                                if (response.ok) {
+                                    alert("장바구니에 담았습니다!");
+                                    location.replace("/member/store/read/" + storeNum);
+                                }
+                            });
+                        } else {
+                            alert("문제가 발생했습니다. 다시 시도해 주세요.");
+                        }
+                    } else if (text === "over") {
+                        alert("상품별로 최대 99개 까지 주문할 수 있습니다. 수량을 변경해주세요.")
+                    } else {
+                        alert("요청 처리 중 문제가 발생했습니다.")
                     }
-                } else {
-                    alert("문제가 발생했습니다. 다시 시도해 주세요.");
                 }
             });
         }
