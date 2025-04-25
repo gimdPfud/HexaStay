@@ -70,6 +70,10 @@
               <input type="text" class="form-control" name="hotelRoomPhone" th:value="${hotelRoomDTO.hotelRoomPhone}">
             </div>
             <div class="mb-3">
+              <label class="form-label">상세설명</label>
+              <input type="text" class="form-control" name="hotelRoomPhone" th:value="${hotelRoomDTO.hotelRoomContent}">
+            </div>
+            <div class="mb-3">
               <label class="form-label">방 종류</label>
               <select class="form-select" name="hotelRoomType">
                 <option th:value="single" th:selected="${hotelRoomDTO.hotelRoomType == 'single'}">싱글</option>
@@ -81,6 +85,7 @@
               <label class="form-label">QR</label>
               <input class="form-control" name="hotelRoomQr">
             </div>
+
           </div>
 
           <div class="col-md-6">
