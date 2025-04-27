@@ -9,44 +9,49 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-<div class="container mt-4 w-100 bg-light">
-    <h2 class="fw-bold mb-4 text-center">룸서비스 메뉴 상세보기</h2>
-    <div class="container p-4" style="max-width: 700px;">
-        <div class="d-flex w-100 justify-content-center">
-            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                 style="width: 194px; height: 172px;">
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">룸서비스 메뉴 상세보기</h2>
+        <div class="container p-4" style="max-width: 700px;">
+            <div class="d-flex w-100 justify-content-center">
+                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                     style="width: 194px; height: 172px;">
 
-            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{/profile/default.png}"
-                 class="rounded" style="width: 103px; height: 133px;">
+                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     class="rounded" style="width: 103px; height: 133px;">
+            </div>
+            <div class="mb-2"><label class="form-label">상품 번호</label><p class="form-control" th:text="${roomMenuDTO.roomMenuNum}"></p></div>
+            <div class="mb-2"><label class="form-label">상품 이름</label><p class="form-control" th:text="${roomMenuDTO.roomMenuName}"></p></div>
+            <div class="mb-2"><label class="form-label">상품 가격</label><p class="form-control" th:text="${roomMenuDTO.roomMenuPrice}"></p></div>
+            <div class="mb-2"><label class="form-label">상품 수량</label><p class="form-control" th:text="${roomMenuDTO.roomMenuAmount}"></p></div>
+            <div class="mb-2"><label class="form-label">카테고리</label><p class="form-control" th:text="${roomMenuDTO.roomMenuCategory}"></p></div>
+            <div class="mb-2"><label class="form-label">등록일자</label><p class="form-control" th:text="${roomMenuDTO.roomMenuStatus}"></p></div>
+            <div class="mb-4"><label class="form-label">수정일자</label><p class="form-control" th:text="${#temporals.format(roomMenuDTO.createDate, 'yyyy-MM-dd HH:mm:ss')}"></p></div>
+            <div class="mb-4"><label class="form-label">수정일자</label><p class="form-control" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}"></p></div>
         </div>
-        <div class="mb-2"><label class="form-label">상품 번호</label><p class="form-control" th:text="${roomMenuDTO.roomMenuNum}"></p></div>
-        <div class="mb-2"><label class="form-label">상품 이름</label><p class="form-control" th:text="${roomMenuDTO.roomMenuName}"></p></div>
-        <div class="mb-2"><label class="form-label">상품 가격</label><p class="form-control" th:text="${roomMenuDTO.roomMenuPrice}"></p></div>
-        <div class="mb-2"><label class="form-label">상품 수량</label><p class="form-control" th:text="${roomMenuDTO.roomMenuAmount}"></p></div>
-        <div class="mb-2"><label class="form-label">카테고리</label><p class="form-control" th:text="${roomMenuDTO.roomMenuCategory}"></p></div>
-        <div class="mb-2"><label class="form-label">등록일자</label><p class="form-control" th:text="${roomMenuDTO.roomMenuStatus}"></p></div>
-        <div class="mb-4"><label class="form-label">수정일자</label><p class="form-control" th:text="${#temporals.format(roomMenuDTO.createDate, 'yyyy-MM-dd HH:mm:ss')}"></p></div>
-        <div class="mb-4"><label class="form-label">수정일자</label><p class="form-control" th:text="${#temporals.format(roomMenuDTO.modifyDate, 'yyyy-MM-dd HH:mm:ss')}"></p></div>
-    </div>
 
-    <h5 class="mt-4">옵션 목록</h5>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>옵션 이름</th>
-            <th>옵션 가격</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="option : ${roomMenuDTO.options}">
-            <td th:text="${option.optionName}"></td>
-            <td th:text="${option.optionPrice}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+        <h5 class="mt-4">옵션 목록</h5>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>옵션 이름</th>
+                <th>옵션 가격</th>
+                <th>옵션 재고</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="option : ${roomMenuDTO.options}">
+                <td th:text="${option.roomMenuOptionName}"></td>
+                <td th:text="${option.roomMenuOptionPrice}"></td>
+                <td th:text="${option.roomMenuOptionStock}"></td>
+            </tr>
+            <tr th:if="${roomMenuDTO.options == null or roomMenuDTO.options.size() == 0}">
+                <td colspan="3">옵션이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/roommenu/list}" class="btn btn-secondary">목록</a>
@@ -57,7 +62,6 @@
         </form>
     </div>
 
-</div>
 </div>
 </body>
 </html>

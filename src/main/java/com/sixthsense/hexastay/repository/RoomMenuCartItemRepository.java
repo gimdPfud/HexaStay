@@ -36,13 +36,21 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     // RoomMenuCart와 RoomMenu를 기반으로 RoomMenuCartItem을 찾는 메서드
     Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart roomMenuCart, RoomMenu roomMenu);
 
+    // 장바구니 리스트 fixme : 2025년 04.27일 오전 6시 이전으로 롤빽할수도 있음.
     @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(" +
-            "rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount, rmi.roomMenuImageMeta) " +
+            "rmci.roomMenuCartItemNum, " +
+            "rmi.roomMenuName, " +
+            "rmi.roomMenuPrice, " +
+            "rmci.roomMenuCartItemAmount, " +
+            "rmci.roomMenuSelectOptionName, " +
+            "rmci.roomMenuSelectOptionPrice, " +
+            "rmi.roomMenuImageMeta) " +
             "FROM RoomMenuCartItem rmci " +
             "JOIN RoomMenu rmi ON rmci.roomMenu.roomMenuNum = rmi.roomMenuNum " +
             "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
             "ORDER BY rmci.roomMenuCartItemNum DESC")
     public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
+
 
     // 장바구니 안의 총 수량 반환 (member 기준)
     @Query("SELECT SUM(i.roomMenuCartItemAmount) FROM RoomMenuCartItem i WHERE i.roomMenuCart.member.memberEmail = :memberEmail")

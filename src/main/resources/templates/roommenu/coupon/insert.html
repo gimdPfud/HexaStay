@@ -1,32 +1,83 @@
-<!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>쿠폰 발급 받기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* 모바일 화면에서 최대 폭 480px로 제한 후 가운데 정렬 */
+        .coupon-container {
+            max-width: 480px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        /* 카드 스타일 추가 */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 헤더 중앙 정렬 및 마진 추가 */
+        h1 {
+            font-size: 1.75rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        /* 버튼은 항상 100% 너비로, 아래 여백 추가 */
+        .btn {
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+    </style>
 </head>
-
 <body>
-<h1>쿠폰 발급 받기</h1>
-
-<!-- 이메일 입력 필드 -->
-<div class="mb-3">
-    <label for="email" class="form-label">이메일 입력</label>
-    <input type="email" class="form-control" id="email" placeholder="your@email.com">
+<div class="coupon-container">
+    <div class="card">
+        <div class="card-body">
+            <h1>쿠폰 발급 받기</h1>
+            <!-- 이메일 입력 필드 -->
+            <div class="mb-3">
+                <label for="email" class="form-label">이메일 입력</label>
+                <input type="email" class="form-control" id="email" placeholder="your@email.com">
+            </div>
+            <!-- 쿠폰 버튼들 -->
+            <button type="button" class="btn btn-primary" onclick="createCoupon('생일쿠폰', 30)">
+                🎂 생일 쿠폰 받기 (30% 할인) <br><small>생일 7일전 ~ 생일 당일</small>
+            </button>
+            <button type="button" class="btn btn-success" onclick="createCoupon('멤버쿠폰', 5)">
+                👤 멤버 쿠폰 받기 (5% 할인) <br><small>무제한</small>
+            </button>
+            <button type="button" class="btn btn-warning" onclick="createCoupon('가입쿠폰', 20)">
+                🆕 첫가입 쿠폰 받기 (20% 할인) <br><small>가입당 1개</small>
+            </button>
+            <button type="button" class="btn btn-info" onclick="createCoupon('이벤트쿠폰', 15)">
+                🎉 이벤트 쿠폰 받기 (15% 할인) <br><small>최대 3개</small>
+            </button>
+        </div>
+    </div>
 </div>
 
-<!-- 버튼 3개 -->
-<button type="button" class="btn btn-primary mb-2" onclick="createCoupon('생일쿠폰', 30)">🎂 생일 쿠폰 받기 (30% 할인) - 생일 7일전~생일당일 --> 보류 일단 무한발급됨</button><br>
-<button type="button" class="btn btn-success mb-2" onclick="createCoupon('멤버쿠폰', 5)">👤 멤버 쿠폰 받기 (5% 할인) - 무제한</button><br>
-<button type="button" class="btn btn-warning mb-2" onclick="createCoupon('가입쿠폰', 20)">🆕 첫가입 쿠폰 받기 (20% 할인) - 가입당 1개</button>
-</body>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // 버튼에서 전달된 쿠폰 타입(한글)을 enum 상수(영문)로 매핑하는 함수
+    function mapCouponType(type) {
+        const mapping = {
+            "생일쿠폰": "BIRTHDAY",
+            "멤버쿠폰": "MEMBER",
+            "가입쿠폰": "SIGNUP",
+            "이벤트쿠폰": "EVENT"
+        };
+        return mapping[type] || type;
+    }
+
     function createCoupon(type, discountRate) {
         const email = document.getElementById('email').value;
         if (!email) {
@@ -34,12 +85,13 @@
             return;
         }
 
-        // 이메일 존재 여부를 확인
+        // 매핑된 쿠폰 타입 (예: '생일쿠폰' → 'BIRTHDAY')
+        const mappedType = mapCouponType(type);
+
+        // 이메일 존재 여부 확인
         fetch('/roommenu/coupon/exists', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email })
         })
             .then(res => res.json())
@@ -50,8 +102,8 @@
                 }
 
                 // 가입쿠폰 중복 발급 여부 확인
-                if (type === '가입쿠폰') {
-                    return fetch(`/roommenu/coupon/already-issued?email=${email}&type=${type}`)
+                if (mappedType === 'SIGNUP') {
+                    return fetch(`/roommenu/coupon/already-issued?email=${email}&couponType=${mappedType}`)
                         .then(res => res.json())
                         .then(dupCheck => {
                             if (dupCheck.issued) {
@@ -62,26 +114,25 @@
                 }
             })
             .then(() => {
-                // 쿠폰 발급 데이터 준비
+                // 프론트엔드에서 보낼 데이터의 키를 couponType으로 변경하고 매핑된 값을 전송
                 const couponData = {
                     memberEmail: email,
-                    type: type,
+                    couponType: mappedType,  // 예: "BIRTHDAY", "MEMBER", "SIGNUP", "EVENT"
                     discountRate: discountRate,
-                    expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
+                    expirationDate: new Date(new Date().setDate(new Date().getDate() + 30))
+                        .toISOString().split('T')[0]
                 };
 
                 return fetch('/roommenu/coupon/insert', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(couponData)
                 })
                     .then(res => {
                         if (!res.ok) {
                             return res.json().then(err => { throw new Error(err.error); });
                         }
-                        return res.text(); // 성공 시
+                        return res.text();
                     })
                     .then(msg => {
                         if (msg) alert(`${type} 발급 완료: ${msg}`);
@@ -93,8 +144,6 @@
                     });
             });
     }
-
-
 </script>
-
+</body>
 </html>

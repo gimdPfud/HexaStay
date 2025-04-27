@@ -13,13 +13,13 @@ import java.util.Locale;
 public interface RoomMenuService {
 
     // 등록하기
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO, List<RoomMenuOptionDTO> optionList) throws IOException;
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException;
 
     // 목록
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale, boolean forUserView);
 
     // 상세보기
-    public RoomMenuDTO read(Long num);
+    public RoomMenuDTO read(Long num, Locale locale);
 
     // 수정하기
     public RoomMenuDTO modify(RoomMenuDTO roomMenuDTO);

@@ -1,6 +1,9 @@
 package com.sixthsense.hexastay.entity;
+import com.sixthsense.hexastay.dto.RoomMenuCartItemOptionDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 /***************************************************
 
@@ -35,6 +38,12 @@ public class RoomMenuCartItem {
 
     private Integer roomMenuCartItemCount; // 카트에 담긴 메뉴 아이템의 갯수
 
+    private String roomMenuSelectOptionName;  // 옵션의 이름.
+
+    private Integer roomMenuSelectOptionPrice; //옵션의 가격
+
+    private Integer roomMenuCartItemPrice; // 상품의 기본 가격
+
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
     @JoinColumn(name = "cart_id")
     private RoomMenuCart roomMenuCart; // 카트참조
@@ -42,5 +51,9 @@ public class RoomMenuCartItem {
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
     @JoinColumn(name = "item_id")
     private RoomMenu roomMenu; // 아이템 참조
+
+    @OneToMany(mappedBy = "roomMenuCartItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomMenuCartItemOption> roomMenuCartItemOptions;
+
 
 }

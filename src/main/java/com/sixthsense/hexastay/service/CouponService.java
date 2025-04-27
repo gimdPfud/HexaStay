@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.CouponDTO;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.enums.CouponType;
 
 import java.util.List;
 
@@ -26,6 +27,6 @@ public interface CouponService {
     public CouponDTO applyCoupon(String memberEmail, Long couponNum);
 
     // 사용한 쿠폰 다시 못하게..
-    boolean hasCoupon(String email, String type);
+    boolean hasCoupon(String email, CouponType type);
 
 }

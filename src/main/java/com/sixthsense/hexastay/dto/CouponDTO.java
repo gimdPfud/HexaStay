@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Coupon;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.enums.CouponType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +25,6 @@ public class CouponDTO {
 
         private String memberEmail; // 멤버의 이메일을 조회해서 쿠폰 사용가능 멤버의 pk
 
-        private String type; // 가입첫 쿠폰, 회원 상시쿠폰 2개
-
         private Integer discountRate; // 할인율
 
         private LocalDate issueDate; // 쿠폰 발급일자.
@@ -40,10 +39,12 @@ public class CouponDTO {
 
         private LocalDateTime usedTime; // 사용한 날짜
 
+        private CouponType couponType;
+
         public CouponDTO(Coupon coupon) {
                 this.couponNum = coupon.getCouponNum();
+                this.couponType = coupon.getCouponType();
                 this.memberEmail = coupon.getMember().getMemberEmail();
-                this.type = coupon.getType();
                 this.discountRate = coupon.getDiscountRate();
                 this.issueDate = coupon.getIssueDate();
                 this.expirationDate = coupon.getExpirationDate();

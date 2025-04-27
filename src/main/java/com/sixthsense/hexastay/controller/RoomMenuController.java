@@ -14,12 +14,15 @@ import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuOption;
+import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -46,6 +49,7 @@ public class RoomMenuController {
     private final RoomMenuService roomMenuService;
     private final RoomMenuCartService roomMenuCartService;
     private final RoomMenuRepository roomMenuRepository;
+    private final RoomMenuOptionRepository roomMenuOptionRepository;
 
     /**************************************************
      * 메인 페이지
@@ -100,7 +104,7 @@ public class RoomMenuController {
     public String roomMenuReadA(Long num, Model model, Locale locale) {
         log.info("상세보기 Roommenu 컨트롤러 진입" + num);
 
-        RoomMenuDTO roomMenuDTO = roomMenuService.read(num);
+        RoomMenuDTO roomMenuDTO = roomMenuService.read(num, locale);
 
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         log.info("모델로 받은 dto" + roomMenuDTO);
@@ -127,7 +131,7 @@ public class RoomMenuController {
      **************************************************/
 
     @PostMapping("/roommenu/insert")
-    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal, String optionListJson) throws IOException {
+    public String RoomServicePost(RoomMenuDTO roomMenuDTO, Principal principal) throws IOException {
         log.info("등록페이지 post 컨트롤러 진입");
         log.info("로그인 : " + principal.getName());
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
@@ -138,19 +142,8 @@ public class RoomMenuController {
             return "redirect:/admin/login";  // 로그인 페이지 URL로 변경
         }
 
-        // JSON 문자열 → List<OptionDTO> 파싱
-        ObjectMapper mapper = new ObjectMapper();
-        List<RoomMenuOptionDTO> optionList = new ArrayList<>();
-        try {
-            optionList = mapper.readValue(optionListJson, new TypeReference<>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("옵션 파싱 오류 발생");
-        }
-
-
         // 서비스를 통해 내부처리
-        roomMenuService.insert(roomMenuDTO, optionList);
+        roomMenuService.insert(roomMenuDTO);
 
         return "redirect:/roommenu/list";
     }
@@ -205,7 +198,7 @@ public class RoomMenuController {
     public String roomMenuOrderRead(@RequestParam Long num, Model model, Locale locale) {
         log.info("상세보기 orderpage 컨트롤러 진입: " + num);
 
-        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale);
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale, model);
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         log.info("모델로 받은 dto: " + roomMenuDTO);
 
@@ -217,11 +210,16 @@ public class RoomMenuController {
     public String roomMenuRead(Long num, Model model, Locale locale) {
         log.info("roommenu/read get 컨트롤러 진입");
 
-        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale);
 
+        // roomMenuDTO를 읽어옴
+        RoomMenuDTO roomMenuDTO = roomMenuCartService.read(num, locale, model);
+
+        // roomMenuDTO를 모델에 추가
         model.addAttribute("roomMenuDTO", roomMenuDTO);
-        log.info("모델로 받은 dto" + roomMenuDTO);
 
+        log.info("모델로 받은 dto: {}", roomMenuDTO);
+
+        // "roommenu/read" 뷰로 리턴
         return "roommenu/read";
 
     }
@@ -232,26 +230,25 @@ public class RoomMenuController {
      **************************************************/
 
     @GetMapping("/roommenu/modify")
-    public String roomMenuModifyGet(Long num, Model model, RoomMenuDTO roomMenuDTO) {
-        log.info("Get 수정 컨트롤러 진입" + num);
+    public String roomMenuModifyGet(Long num, Model model, Locale locale) {
+        log.info("Get 수정 컨트롤러 진입: " + num);
 
         try {
+            // 🔥 옵션 포함된 메뉴 DTO를 가져옴 (locale 추가!)
+            RoomMenuDTO menuDTO = roomMenuService.read(num, locale);
 
-            RoomMenuDTO menuDTO = roomMenuService.read(num);
-
-            if (menuDTO != null){
+            if (menuDTO != null) {
                 model.addAttribute("menuDTO", menuDTO);
-            }else{
+            } else {
                 log.info("해당 메뉴가 없습니다.");
                 return "redirect:/roommenu/list";
             }
 
         } catch (Exception e) {
-
-            log.info("업데이트 GET 컨트롤러 실패");
+            log.error("업데이트 GET 컨트롤러 실패", e);
             return "redirect:/roommenu/list";
-
         }
+
         return "roommenu/modify";
     }
 
@@ -318,6 +315,8 @@ public class RoomMenuController {
     public String roomMenuOrderpageRead(String email, Model model ,RedirectAttributes redirectAttributes) {
         log.info("상품정보 페이지" + email);
         // email을 통해서 상품 정보를 가져오자.
+
+
 
         if (email == null) {
             return "redirect:member/login";

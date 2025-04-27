@@ -155,6 +155,7 @@ public class RoomMenuCartController {
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         model.addAttribute("couponList", couponList); //
 
+
         log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
         log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
         log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());

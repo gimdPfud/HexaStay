@@ -30,8 +30,10 @@ public class RoomMenuOption extends BaseEntity {
     @Column(nullable = false)
     private int roomMenuOptionPrice;
 
+    private int roomMenuOptionStock;
+
     // 옵션이 어떤 메뉴에 속하는지
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "roomMenu")
     private RoomMenu roomMenu;
 

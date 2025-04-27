@@ -172,6 +172,26 @@
             margin-top: 15px;
         }
 
+        /* 옵션창 */
+
+        .card {
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .form-check-label {
+            font-weight: 500;
+        }
+
+        .text-muted {
+            font-style: italic;
+        }
+
     </style>
 
 </head>
@@ -179,122 +199,194 @@
 
 <div layout:fragment="contentorder">
 
-<input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
+    <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
 
-<div class="container">
+    <div class="container">
 
-    <!-- 아이템 상세 정보 -->
-    <div class="item-details">
-        <!-- 대표 이미지 -->
-        <div class="item-image">
-            <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
-                 class="item-img">
-
-            <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
-                 th:src="@{/profile/default.png}"
-                 class="item-img">
+        <!-- 아이템 상세 정보 -->
+        <div class="item-details">
+            <div class="item-image">
+                <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                     class="item-img">
+                <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     class="item-img">
+            </div>
+            <p class="menu-name" th:text="${roomMenuDTO.roomMenuName}">상품이름</p>
+            <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}">상품정보</p>
+            <p class="price-text">
+                <span id="formattedPrice" th:text="${roomMenuDTO.roomMenuPrice}"></span>
+                <span th:text="#{item.currency}">원</span>
+            </p>
         </div>
-        <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name">상품이름</p>
-        <p th:text="${roomMenuDTO.roomMenuContent}" class="menu-content">상품정보"</p>
-        <p class="price-text">
-            <span id="formattedPrice" th:text="${roomMenuDTO.roomMenuPrice}"></span>
-            <span th:text="#{item.currency}">원</span>
-        </p>
-    </div>
 
-    <!-- 수량 입력 필드 -->
-    <div class="row align-items-center">
-        <div class="col-4 text-end">
-            <label for="count" class="col-form-label fw-bold label-center" th:text="#{item.quantity}">주문수량</label>
-        </div>
-        <div class="col-8 d-flex justify-content-center">
-            <div class="quantity-input">
-                <button type="button" id="decreaseBtn">-</button>
-                <input type="number" min="1" value="1" name="count" id="count" readonly>
-                <button type="button" id="increaseBtn">+</button>
+        <!-- 수량 입력 필드 -->
+        <div class="row align-items-center">
+            <div class="col-4 text-end">
+                <label for="count" class="col-form-label fw-bold label-center" th:text="#{item.quantity}">주문수량</label>
+            </div>
+            <div class="col-8 d-flex justify-content-center">
+                <div class="quantity-input">
+                    <button type="button" id="decreaseBtn">-</button>
+                    <input type="number" min="1" value="1" name="count" id="count" readonly>
+                    <button type="button" id="increaseBtn">+</button>
+                </div>
+            </div>
+        </div><br><br>
+
+        <!-- 옵션 모달 열기 버튼 -->
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#optionModal">
+            옵션 보기
+        </button>
+
+        <!-- 선택한 옵션 표시하는 영역 -->
+        <div id="selectedOptionsDisplay" class="mt-2"></div>
+
+        <!-- 옵션 모달창 -->
+        <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="optionModalLabel">추가 옵션 선택</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div th:if="${roomMenuDTO.options != null and !#lists.isEmpty(roomMenuDTO.options)}">
+                            <div th:each="option : ${roomMenuDTO.options}" class="mb-3">
+                                <label th:for="'option-' + ${option.roomMenuOptionName}" class="form-label">
+                                    [[${option.roomMenuOptionName}]] (+[[${option.roomMenuOptionPrice}]] 원)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control option-quantity"
+                                           name="optionQuantities"
+                                           th:id="'option-' + ${option.roomMenuOptionName}"
+                                           min="0" value="0"
+                                           th:data-name="${option.roomMenuOptionName}"
+                                           th:data-price="${option.roomMenuOptionPrice}" />
+                                    <span class="input-group-text">개</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${roomMenuDTO.options != null and !#lists.isEmpty(roomMenuDTO.options)}" class="text-muted">
+                            옵션이 없습니다.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                        <button type="button" class="btn btn-primary" id="confirmOptionsBtn" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- 총 가격 표시 -->
+        <div class="total-price-display">
+            <span th:text="#{item.totalPrice}">총 </span>
+            <span id="totalPrice">0</span><span th:text="#{item.currency}">원</span>
+        </div>
+
+        <!-- 버튼들 -->
+        <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
+        <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.addToCart}">장바구니 담기</button>
+        <button class="order-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.orderNow}">바로 주문하기</button>
+
     </div>
 
-    <!-- 가격 변동을 표시할 부분 -->
-    <div class="total-price-display">
-        <span th:text="#{item.totalPrice}">총 </span>
-        <span id="totalPrice">10,000</span><span th:text="#{item.currency}">원</span>
-    </div>
-
-    <!-- 버튼들 -->
-    <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
-    <button class="add-to-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.addToCart}">장바구니 담기</button>
-    <button class="order-cart-btn" th:value="${roomMenuDTO.roomMenuNum}" th:text="#{btn.orderNow}">바로 주문하기</button>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 스크립트 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
-        let price = [[${roomMenuDTO.roomMenuPrice}]];
-        let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
-        let cartAdd = $(".add-to-cart-btn");
-
         $(document).ready(function () {
-            // 초기 총 가격 표시
-            let initialCount = parseInt($("#count").val());
-            $("#totalPrice").text((initialCount * price).toLocaleString());
+            let price = [[${roomMenuDTO.roomMenuPrice}]];
+            let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
+            let cartAdd = $(".add-to-cart-btn");
 
-            // 수량 변경 시 총 가격 업데이트
-            $("#count").on("change", function () {
-                let count = parseInt($(this).val());
+            // 초기 가격 설정
+            updateFormattedPrice(price);
+            calculateTotalPrice();
 
-                if (isNaN(count) || count < 1) {
-                    alert("수량은 1개 이상이어야 합니다.");
-                    $(this).val(1);
-                    count = 1;
-                }
-
-                if (count > maxCount) {
-                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
-                    $(this).val(maxCount);
-                    count = maxCount;
-                }
-
-                $("#totalPrice").text((count * price).toLocaleString());
-            });
-
-            // - 버튼 클릭 시
+            // 수량 버튼
             $("#decreaseBtn").on("click", function () {
-                let current = parseInt($("#count").val()) || 1;
-                if (current > 1) {
-                    $("#count").val(current - 1).trigger("change");
+                let count = parseInt($("#count").val());
+                if (count > 1) {
+                    $("#count").val(count - 1).trigger("change");
                 }
             });
 
-            // + 버튼 클릭 시
             $("#increaseBtn").on("click", function () {
-                let current = parseInt($("#count").val()) || 1;
-                if (current < maxCount) {
-                    $("#count").val(current + 1).trigger("change");
+                let count = parseInt($("#count").val());
+                if (count < maxCount) {
+                    $("#count").val(count + 1).trigger("change");
                 } else {
                     alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
                 }
             });
 
+            // 수량 변경 감지
+            $("#count").on("change", function () {
+                let count = parseInt($(this).val());
+                if (isNaN(count) || count < 1) {
+                    alert("수량은 1개 이상이어야 합니다.");
+                    $(this).val(1);
+                    count = 1;
+                }
+                if (count > maxCount) {
+                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
+                    $(this).val(maxCount);
+                }
+                calculateTotalPrice();
+            });
+
+            // 옵션 수량 변경 시 총 가격 재계산
+            $("input[name='optionQuantities']").on("input", calculateTotalPrice);
+
             // 장바구니 담기
             cartAdd.on("click", function () {
-                cart();
+                sendCartData();
             });
 
             // 바로 주문하기
             $(".order-cart-btn").on("click", function () {
-                const count = $("#count").val();
-                const roomMenuNum = $(this).val();
+                sendCartData(true);
+            });
 
-                if (!count || isNaN(count) || count <= 0) {
-                    alert("수량을 올바르게 입력해주세요.");
-                    return;
-                }
+            function updateFormattedPrice(price) {
+                $("#formattedPrice").text(price.toLocaleString());
+            }
 
+            function calculateTotalPrice() {
+                let count = parseInt($("#count").val()) || 1;
+                let optionTotal = 0;
+                $("input[name='optionQuantities']").each(function () {
+                    let quantity = parseInt($(this).val()) || 0;
+                    let optionPrice = parseInt($(this).data("price")) || 0;
+                    optionTotal += quantity * optionPrice;
+                });
+                let total = (price + optionTotal) * count;
+                $("#totalPrice").text(total.toLocaleString());
+            }
+
+            function collectOptionData() {
+                const options = [];
+                $("input[name='optionQuantities']").each(function () {
+                    const quantity = parseInt($(this).val()) || 0;
+                    if (quantity > 0) {
+                        options.push({
+                            name: $(this).data("name"),
+                            price: $(this).data("price"),
+                            quantity: quantity
+                        });
+                    }
+                });
+                return options;
+            }
+
+            function sendCartData(isOrder = false) {
                 const paramData = {
-                    roomMenuCartItemNum: roomMenuNum,
-                    roomMenuCartItemAmount: count
+                    roomMenuCartItemNum: cartAdd.val(),
+                    roomMenuCartItemAmount: $("#count").val(),
+                    selectedOptions: collectOptionData(),
+                    optionTotalPrice: collectOptionData().reduce((acc, opt) => acc + (opt.price * opt.quantity), 0)
                 };
 
                 $.ajax({
@@ -304,76 +396,77 @@
                     data: JSON.stringify(paramData),
                     dataType: "json",
                     success: function (data) {
-                        location.href = "/roommenu/cartlist";
+                        if (isOrder) {
+                            location.href = "/roommenu/cartlist";
+                        } else {
+                            updateCartBadge();
+                            alert(data + "번 아이템 담기 완료되었습니다.");
+                        }
                     },
                     error: function (jqxHR) {
                         if (jqxHR.status === 401) {
                             alert("로그인 후 이용해주세요.");
                             location.href = "/member/login";
                         } else {
-                            alert("주문 처리 중 오류 발생.");
                             console.log(jqxHR.responseText);
+                            alert("처리 중 오류 발생");
                         }
                     }
                 });
-            });
+            }
 
-            // 가격 포맷팅 (처음 로딩 시)
-            var formatted = price.toLocaleString();
-            $("#formattedPrice").text(formatted);
-        });
-
-        // 장바구니 담기 Ajax 함수
-        function cart() {
-            let countVal = $("#count").val();
-            let paramData = {
-                roomMenuCartItemNum: cartAdd.val(),
-                roomMenuCartItemAmount: countVal
-            };
-
-            $.ajax({
-                url: "/roommenu/orderpage/orderread",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(paramData),
-                dataType: "json",
-                success: function (data) {
-                    // 장바구니 뱃지 숫자 업데이트
-                    updateCartBadge();
-
-                    // alert 창을 뱃지 업데이트 후에 실행
-                    alert(data + "번 아이템 담기 완료되었습니다.");
-                },
-                error: function (jqxHR) {
-                    if (jqxHR.status === 401) {
-                        alert("로그인 후 이용해주세요");
-                        location.href = "/member/login";
-                    } else {
+            function updateCartBadge() {
+                $.ajax({
+                    url: "/roommenu/cart/count",
+                    type: "GET",
+                    success: function (data) {
+                        if ($("#cartBadge").length) {
+                            $("#cartBadge").text(data.cartCount);
+                        }
+                    },
+                    error: function (jqxHR) {
                         console.log(jqxHR.responseText);
                     }
+                });
+            }
+        });
+
+        // 모달 확인 버튼 클릭 시 선택된 옵션 표시
+        $("#confirmOptionsBtn").on("click", function () {
+            updateSelectedOptionsDisplay();
+        });
+
+        // 옵션 선택 표시 함수
+        function updateSelectedOptionsDisplay() {
+            const selectedOptions = [];
+
+            $("input[name='optionQuantities']").each(function () {
+                const quantity = parseInt($(this).val()) || 0;
+                if (quantity > 0) {
+                    selectedOptions.push({
+                        name: $(this).data("name"),
+                        quantity: quantity
+                    });
                 }
             });
-        }
 
-        // 장바구니 뱃지 숫자 업데이트 함수
-        function updateCartBadge() {
-            $.ajax({
-                url: "/roommenu/cart/count",  // 장바구니 아이템 수를 가져오는 API
-                type: "GET",
-                success: function (data) {
-                    // 네비게이션 아이콘의 뱃지 숫자 업데이트
-                    if ($("#cartBadge").length) {
-                        $("#cartBadge").text(data.cartCount);  // #cartBadge는 네비게이션의 장바구니 아이콘 뱃지 ID
-                    }
-                },
-                error: function (jqxHR) {
-                    console.log(jqxHR.responseText);
-                }
-            });
-        }
+            const displayArea = $("#selectedOptionsDisplay");
+            displayArea.empty(); // 기존 표시 내용 비우기
 
+            if (selectedOptions.length > 0) {
+                selectedOptions.forEach(opt => {
+                    displayArea.append(`<div>${opt.name} x ${opt.quantity}</div>`);
+                });
+            } else {
+                displayArea.append(`<div class="text-muted">선택된 옵션이 없습니다.</div>`);
+            }
+        }
 
     </script>
+
+</div>
+
+
 
 </body>
 </html>

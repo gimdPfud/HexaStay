@@ -65,7 +65,8 @@ public class RoomMenuDTO {
 
     private Boolean approvedByDev = false; // 개발자 승인 여부
 
-    private List<RoomMenuOptionDTO> options = new ArrayList<>(); // 옵션 선택창
+    private List<RoomMenuOptionDTO> options = new ArrayList<>();
+
 
     public Integer getRoomMenuAmount() {
         if (this.roomMenuAmount == null) {

@@ -60,9 +60,11 @@
                         <option th:value="한식" th:selected="${menuDTO.roomMenuCategory == '한식'}">한식</option>
                         <option th:value="양식" th:selected="${menuDTO.roomMenuCategory == '양식'}">양식</option>
                         <option th:value="중식" th:selected="${menuDTO.roomMenuCategory == '중식'}">중식</option>
-                        <option th:value="에피타이저" th:selected="${menuDTO.roomMenuCategory == '에피타이저'}">에피타이저</option>
+                        <option th:value="디저트" th:selected="${menuDTO.roomMenuCategory == '디저트'}">디저트</option>
+                        <option th:value="룸케어" th:selected="${menuDTO.roomMenuCategory == '룸케어'}">룸케어</option>
                     </select>
                 </div>
+
 
                 <div class="mb-3">
                     <label for="roomMenuStatus" class="form-label">판매여부</label>
@@ -70,6 +72,47 @@
                         <option th:value="판매중" th:selected="${menuDTO.roomMenuStatus == '판매중'}">판매중</option>
                         <option th:value="품절" th:selected="${menuDTO.roomMenuStatus == '품절'}">품절</option>
                     </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">옵션 목록</label>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>옵션 이름</th>
+                            <th>옵션 가격</th>
+                            <th>옵션 재고</th>
+                            <th>삭제</th>
+                        </tr>
+                        </thead>
+                        <tbody id="optionTable">
+                        <tr th:each="option, iterStat : ${menuDTO.options}">
+                            <input type="hidden"
+                                   th:name="'options[' + ${iterStat.index} + '].roomMenuOptionNum'"
+                                   th:value="${option.roomMenuOptionNum}" />
+
+                            <td>
+                                <input type="text" class="form-control"
+                                       th:name="'options[' + ${iterStat.index} + '].roomMenuOptionName'"
+                                       th:value="${option.roomMenuOptionName}" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control"
+                                       th:name="'options[' + ${iterStat.index} + '].roomMenuOptionPrice'"
+                                       th:value="${option.roomMenuOptionPrice}" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control"
+                                       th:name="'options[' + ${iterStat.index} + '].roomMenuOptionStock'"
+                                       th:value="${option.roomMenuOptionStock}" /> <!-- 재고 추가 -->
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeOptionRow(this)">삭제</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-outline-primary" onclick="addOptionRow()">+ 옵션 추가</button>
                 </div>
 
                 <div class="mb-3 form-check">
@@ -144,6 +187,28 @@
             }
         });
         // ----- 품절 여부에 따라서 셀렉트창을 선택할 수 없도록 변경 끝 -----
+
+        // -- 옵션 스크립트 --
+
+        function addOptionRow() {
+            const table = document.getElementById("optionTable");
+            const index = table.rows.length;
+            const row = table.insertRow();
+
+            row.innerHTML = `
+            <input type="hidden" name="options[${index}].roomMenuOptionNum" value="0"/>
+            <td><input type="text" class="form-control" name="options[${index}].roomMenuOptionName" /></td>
+            <td><input type="text" class="form-control" name="options[${index}].roomMenuOptionPrice" /></td>
+            <td><input type="number" class="form-control" name="options[${index}].roomMenuOptionStock" value="0" /></td> <!-- 재고 input 추가 -->
+            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeOptionRow(this)">삭제</button></td>
+            `;
+        }
+
+        function removeOptionRow(btn) {
+            const row = btn.closest("tr");
+            row.remove();
+        }
+
     </script>
 </div>
 </body>
