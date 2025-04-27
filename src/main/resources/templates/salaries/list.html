@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>급여 조회</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         .table td {
             vertical-align: middle;
@@ -100,6 +101,19 @@
             text-align: left;
             border-top: none;
         }
+        
+        /* 엑셀 다운로드 버튼 스타일 */
+        .excel-btn {
+            background-color: #1D6F42;
+            color: white;
+            border: none;
+            margin-bottom: 15px;
+        }
+        
+        .excel-btn:hover {
+            background-color: #145a35;
+            color: white;
+        }
 
     </style>
 
@@ -130,6 +144,11 @@
                 </div>
                 <div class="col-auto">
                     <button type="button" id="resetButton" class="btn btn-secondary">전체 조회</button>
+                </div>
+                <div class="col-auto ms-auto">
+                    <button type="button" id="excelDownloadBtn" class="btn excel-btn">
+                        <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
+                    </button>
                 </div>
             </form>
         </div>
@@ -331,6 +350,11 @@
                     showDetailBoxUnderRow('인센티브 상세내역', this.dataset.details, this);
                 });
             });
+            
+            // 엑셀 다운로드 기능
+            document.getElementById('excelDownloadBtn').addEventListener('click', function() {
+                exportToExcel();
+            });
         });
 
         // 상세보기 박스 열기 (해당 행 바로 아래에 표시)
@@ -386,6 +410,61 @@
             if (detailRow) {
                 detailRow.remove();
             }
+        }
+        
+        // 엑셀 파일로 내보내기 함수
+        function exportToExcel() {
+            // 현재 시간을 파일명에 사용
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+            const fileName = `급여_목록_${dateStr}_${timeStr}.xlsx`;
+            
+            // 테이블 데이터를 수집
+            const table = document.getElementById('salaryTable');
+            const data = [];
+            
+            // 헤더 행 추가
+            const headers = [];
+            table.querySelectorAll('thead th').forEach((th, index) => {
+                // 프로필 열은 제외
+                if (index !== 0) {
+                    headers.push(th.textContent.trim());
+                }
+            });
+            data.push(headers);
+            
+            // 데이터 행 추가 (보이는 행만)
+            const rows = table.querySelectorAll('tbody tr.salary-row');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const rowData = [];
+                    // 모든 셀 순회
+                    row.querySelectorAll('td').forEach((td, index) => {
+                        // 프로필 열은 제외
+                        if (index !== 0) {
+                            // 인센티브와 공제 셀은 span 태그 내의 값 사용
+                            if (td.classList.contains('incentive-cell') || td.classList.contains('deduction-cell')) {
+                                const span = td.querySelector('span');
+                                rowData.push(span ? span.textContent.trim() : '');
+                            } else {
+                                rowData.push(td.textContent.trim());
+                            }
+                        }
+                    });
+                    data.push(rowData);
+                }
+            });
+            
+            // 시트 생성
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // 워크북 생성
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '급여 목록');
+            
+            // 엑셀 파일 다운로드
+            XLSX.writeFile(wb, fileName);
         }
     </script>
 
