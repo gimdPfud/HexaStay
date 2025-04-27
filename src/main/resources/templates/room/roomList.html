@@ -126,15 +126,36 @@
     <div class="d-flex justify-content-center align-items-center mt-3">
         <nav>
             <ul class="pagination mb-0">
+
+                <!-- 이전 -->
+                <!-- 이전 버튼 -->
                 <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number - 1}, keyword=${keyword})}">이전</a>
+                    <a class="page-link"
+                       th:href="${currentStatus} != null ?
+                @{/roomlist/{status}(status=${currentStatus}, page=${rooms.number - 1})} :
+                @{/roomlist(page=${rooms.number - 1})}">
+                        이전
+                    </a>
                 </li>
+
+                <!-- 번호 버튼 -->
                 <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
                     class="page-item" th:classappend="${rooms.number == i} ? 'active'">
-                    <a class="page-link" th:href="@{/roomlist(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
+                    <a class="page-link"
+                       th:href="${currentStatus} != null ?
+                @{/roomlist/{status}(status=${currentStatus}, page=${i})} :
+                @{/roomlist(page=${i})}"
+                       th:text="${i + 1}"></a>
                 </li>
+
+                <!-- 다음 버튼 -->
                 <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roomlist(page=${rooms.number + 1}, keyword=${keyword})}">다음</a>
+                    <a class="page-link"
+                       th:href="${currentStatus} != null ?
+                @{/roomlist/{status}(status=${currentStatus}, page=${rooms.number + 1})} :
+                @{/roomlist(page=${rooms.number + 1})}">
+                        다음
+                    </a>
                 </li>
             </ul>
         </nav>
