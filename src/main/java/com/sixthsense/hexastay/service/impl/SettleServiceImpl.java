@@ -13,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,12 +56,65 @@ public class SettleServiceImpl implements SettleService {
 
         return roomDTOList;
     }
+    
+    // 날짜 범위로 정산용 데이터 조회
+    @Override
+    public Page<RoomDTO> getSettleListByDateRange(Long companyNum, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        // 시작일과 종료일을 LocalDateTime으로 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        
+        // 해당 회사의 호텔룸 목록 조회
+        List<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum);
+        List<Long> hotelRoomNums = hotelRoomList.stream()
+                .map(HotelRoom::getHotelRoomNum)
+                .collect(Collectors.toList());
+        
+        // 날짜 범위와 호텔룸 목록으로 필터링하여 조회
+        // 참고: 실제 Repository에 해당 메서드가 구현되어 있어야 함
+        Page<Room> roomList = roomRepository.findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
+                hotelRoomNums, startDateTime, endDateTime, pageable);
+        
+        // DTO로 변환
+        Page<RoomDTO> roomDTOList = roomList.map(room -> {
+            RoomDTO roomDTO = modelMapper.map(room, RoomDTO.class);
+            if (room.getHotelRoom() != null) {
+                roomDTO.setHotelRoomDTO(modelMapper.map(room.getHotelRoom(), HotelRoomDTO.class));
+            }
+            if (room.getMember() != null) {
+                roomDTO.setMemberDTO(modelMapper.map(room.getMember(), MemberDTO.class));
+            }
+            return roomDTO;
+        });
+
+        return roomDTOList;
+    }
 
 
     // 정산용 (스토어)
+    @Override
     public Page<OrderstoreDTO> getSettleStoreList(Long storeNum, Pageable pageable) {
         Page<Orderstore> orderstoreList = orderstoreRepository.findByStore_StoreNum(storeNum, pageable);
         Page<OrderstoreDTO> orderstoreDTOList = orderstoreList.map(order -> modelMapper.map(order, OrderstoreDTO.class));
+        return orderstoreDTOList;
+    }
+    
+    // 날짜 범위로 정산용 (스토어) 데이터 조회
+    @Override
+    public Page<OrderstoreDTO> getSettleStoreListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        // 시작일과 종료일을 LocalDateTime으로 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        
+        // 날짜 범위와 스토어 번호로 필터링하여 조회
+        // 참고: 실제 Repository에 해당 메서드가 구현되어 있어야 함
+        Page<Orderstore> orderstoreList = orderstoreRepository.findByStore_StoreNumAndCreateDateBetween(
+                storeNum, startDateTime, endDateTime, pageable);
+        
+        // DTO로 변환
+        Page<OrderstoreDTO> orderstoreDTOList = orderstoreList.map(order -> 
+                modelMapper.map(order, OrderstoreDTO.class));
+        
         return orderstoreDTOList;
     }
 }

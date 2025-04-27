@@ -16,9 +16,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
 
@@ -34,14 +36,36 @@ public class SalariesController {
 
     //급여용
     @GetMapping("/list")
-    public String salaries(Pageable pageable, Principal principal, Model model) {
+    public String salaries(Pageable pageable, 
+                           Principal principal, 
+                           Model model,
+                           @RequestParam(required = false) String startMonth,
+                           @RequestParam(required = false) String endMonth) {
         Admin admin = adminRepository.findByAdminEmail(principal.getName());
         if (admin == null) {
             model.addAttribute("error", "직원 정보를 찾을 수 없습니다.");
             return "/salaries/list";
         }
 
-        Page<SalariesDTO> salariesList = salariesService.getSalariesList(admin.getAdminEmail(), pageable);
+        // 월별 필터링 적용
+        YearMonth startYearMonth = null;
+        YearMonth endYearMonth = null;
+        
+        if (startMonth != null && !startMonth.isEmpty()) {
+            startYearMonth = YearMonth.parse(startMonth);
+        }
+        
+        if (endMonth != null && !endMonth.isEmpty()) {
+            endYearMonth = YearMonth.parse(endMonth);
+        }
+        
+        Page<SalariesDTO> salariesList;
+        if (startYearMonth != null && endYearMonth != null) {
+            salariesList = salariesService.getSalariesListByMonthRange(admin.getAdminEmail(), startYearMonth, endYearMonth, pageable);
+        } else {
+            salariesList = salariesService.getSalariesList(admin.getAdminEmail(), pageable);
+        }
+        
         model.addAttribute("salList", salariesList);
         return "/salaries/list";
     }

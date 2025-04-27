@@ -11,10 +11,11 @@
             vertical-align: middle;
         }
 
-        #detailBox {
+        .detailBox {
             width: 100%;
             max-width: 100%;
-            margin: 0 auto;
+            margin: 10px 0;
+            display: none;
         }
 
         /* 인센티브와 공제 셀 스타일 */
@@ -70,6 +71,35 @@
         .salary-zone {
             border-collapse: collapse;
         }
+        
+        /* 클릭된 텍스트 강조 스타일 */
+        .clicked-text {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        /* 날짜 선택 폼 스타일 */
+        .date-search-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        /* 행 상세 정보 */
+        .detail-row {
+            background-color: #f8f9fa;
+        }
+        
+        .detail-row td {
+            padding: 0;
+        }
+        
+        .detail-content {
+            padding: 15px;
+            text-align: left;
+            border-top: none;
+        }
 
     </style>
 
@@ -79,6 +109,30 @@
 
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">급여 조회</h2>
+        
+        <!-- 날짜 선택 폼 -->
+        <div class="date-search-form">
+            <form id="dateSearchForm" th:action="@{/salaries/list}" method="get" class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="startMonth" class="col-form-label">시작 월</label>
+                </div>
+                <div class="col-auto">
+                    <input type="month" class="form-control" id="startMonth" name="startMonth" th:value="${param.startMonth}">
+                </div>
+                <div class="col-auto">
+                    <label for="endMonth" class="col-form-label">종료 월</label>
+                </div>
+                <div class="col-auto">
+                    <input type="month" class="form-control" id="endMonth" name="endMonth" th:value="${param.endMonth}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">월별 조회</button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" id="resetButton" class="btn btn-secondary">전체 조회</button>
+                </div>
+            </form>
+        </div>
 
         <div th:if="${salList.content == null or #lists.isEmpty(salList.content)}" class="no-data">
             항목 없음
@@ -86,7 +140,7 @@
 
         <div class="row mt-4">
             <div class="col-12">
-                <table class="table table-bordered text-company mb-0">
+                <table class="table table-bordered text-company mb-0" id="salaryTable">
                     <thead class="table-light text-center">
                     <tr>
                         <th>프로필</th>
@@ -103,7 +157,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="salary : ${salList.content}" class="text-center">
+                    <tr th:each="salary, stat : ${salList.content}" class="text-center salary-row" th:data-row-index="${stat.index}">
                         <td class="profile-cell">
                             <img th:if="${salary.adminDTO.adminProfileMeta != null}"
                                  th:src="@{${salary.adminDTO.adminProfileMeta}}"
@@ -117,11 +171,11 @@
                         <td th:text="${salary.salPosition}">직책</td>
                         <td th:text="${salary.salBase}">기본급</td>
                         <td th:text="${salary.salDuty}">직무수당</td>
-                        <td class="incentive-cell" th:data-details="${salary.salIncen}">
+                        <td class="incentive-cell" th:data-details="${salary.salIncen}" th:data-row-index="${stat.index}">
                             <span class="incentive-total">0</span>
                         </td>
                         <td class="total-salary">0</td>
-                        <td class="deduction-cell" th:data-details="${salary.salDedu}">
+                        <td class="deduction-cell" th:data-details="${salary.salDedu}" th:data-row-index="${stat.index}">
                             <span class="deduction-total">0</span>
                         </td>
                         <td class="net-salary">0</td>
@@ -129,7 +183,6 @@
                     </tr>
                     </tbody>
                 </table>
-                <div id="detailBox" class="mt-4 p-3 border rounded bg-white" style="display: none;" data-current-cell=""></div>
             </div>
 
             <!-- 페이징 처리 부분 -->
@@ -144,13 +197,54 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // 월 필드 초기화 (현재 월과 6개월 전)
+            const today = new Date();
+            const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+            
+            // YYYY-MM 형식으로 변환
+            const formatMonth = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return `${year}-${month}`;
+            };
+            
+            // URL 파라미터에서 월 값을 가져옴
+            const urlParams = new URLSearchParams(window.location.search);
+            const startMonthParam = urlParams.get('startMonth');
+            const endMonthParam = urlParams.get('endMonth');
+            
+            // 월 필드 값 설정 (URL 파라미터가 있으면 해당 값, 없으면 기본값)
+            if (!startMonthParam && !endMonthParam) {
+                document.getElementById('startMonth').value = formatMonth(sixMonthsAgo);
+                document.getElementById('endMonth').value = formatMonth(today);
+            }
+            
+            // 전체 조회 버튼 클릭 이벤트
+            document.getElementById('resetButton').addEventListener('click', function() {
+                window.location.href = '/salaries/list';
+            });
+            
+            // 월별 조회 폼 제출 처리
+            document.getElementById('dateSearchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const startMonth = document.getElementById('startMonth').value;
+                const endMonth = document.getElementById('endMonth').value;
+                
+                if (!startMonth || !endMonth) {
+                    alert('시작 월과 종료 월을 모두 선택해주세요.');
+                    return;
+                }
+                
+                window.location.href = `/salaries/list?startMonth=${startMonth}&endMonth=${endMonth}`;
+            });
+            
             // 기본급과 직무수당 천 단위 포맷팅
-            document.querySelectorAll('td:nth-child(2)').forEach(cell => {
+            document.querySelectorAll('td:nth-child(5)').forEach(cell => {
                 const value = parseFloat(cell.innerText.replace(/,/g, '')) || 0;
                 cell.innerText = value.toLocaleString();
             });
 
-            document.querySelectorAll('td:nth-child(3)').forEach(cell => {
+            document.querySelectorAll('td:nth-child(6)').forEach(cell => {
                 const value = parseFloat(cell.innerText.replace(/,/g, '')) || 0;
                 cell.innerText = value.toLocaleString();
             });
@@ -181,7 +275,7 @@
             });
 
             // 총급여와 실수령액 계산
-            const rows = document.querySelectorAll('tbody tr');
+            const rows = document.querySelectorAll('tbody tr.salary-row');
             rows.forEach(row => {
                 const baseSalary = parseFloat(row.querySelector('td:nth-child(5)').innerText.replace(/,/g, '') || 0);  // 기본급
                 const dutySalary = parseFloat(row.querySelector('td:nth-child(6)').innerText.replace(/,/g, '') || 0);  // 직무수당
@@ -197,53 +291,9 @@
                 row.querySelector('.net-salary').innerText = net.toLocaleString();  // 실수령액 출력
             });
 
-        });
-
-        // 상세보기 박스 열기
-        function showDetailBox(title, details, cell) {
-            const detailBox = document.getElementById('detailBox');
-
-            // 현재 클릭한 셀과 이전에 열렸던 셀 비교
-            const currentlyOpen = detailBox.dataset.currentCell === cell.dataset.details;
-
-            if (currentlyOpen) {
-                detailBox.style.display = 'none';
-                detailBox.innerHTML = '';
-                detailBox.dataset.currentCell = '';
-                return;
-            }
-
-            const items = details.split(',');
-            const formattedDetails = items.map(item => {
-                const [name, value] = item.split(':');
-                return `<div class="mb-1">${name.trim()}: <strong>${parseInt(value).toLocaleString()}원</strong></div>`;
-            }).join('');
-
-            detailBox.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="fw-bold mb-0">${title}</h5>
-            <button class="btn btn-sm btn-outline-secondary" onclick="hideDetailBox()">닫기</button>
-        </div>
-        ${formattedDetails}
-    `;
-            detailBox.style.display = 'block';
-            detailBox.dataset.currentCell = cell.dataset.details;
-
-            detailBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        // 상세보기 박스 숨기기
-        function hideDetailBox() {
-            const detailBox = document.getElementById('detailBox');
-            detailBox.style.display = 'none';
-            detailBox.innerHTML = '';
-            detailBox.dataset.currentCell = '';
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
             // 클릭 이벤트: 공제와 인센티브
             document.querySelectorAll('.deduction-cell').forEach(cell => {
-                cell.addEventListener('click', () => {
+                cell.addEventListener('click', function() {
                     // 다른 셀에서 강조된 텍스트를 해제
                     document.querySelectorAll('.deduction-cell').forEach(otherCell => {
                         const span = otherCell.querySelector('span');
@@ -253,17 +303,17 @@
                     });
 
                     // 현재 클릭한 텍스트 강조
-                    const span = cell.querySelector('span');
+                    const span = this.querySelector('span');
                     if (span) {
                         span.classList.add('clicked-text');
                     }
 
-                    showDetailBox('공제 상세내역', cell.dataset.details, cell);
+                    showDetailBoxUnderRow('공제 상세내역', this.dataset.details, this);
                 });
             });
 
             document.querySelectorAll('.incentive-cell').forEach(cell => {
-                cell.addEventListener('click', () => {
+                cell.addEventListener('click', function() {
                     // 다른 셀에서 강조된 텍스트를 해제
                     document.querySelectorAll('.incentive-cell').forEach(otherCell => {
                         const span = otherCell.querySelector('span');
@@ -273,17 +323,70 @@
                     });
 
                     // 현재 클릭한 텍스트 강조
-                    const span = cell.querySelector('span');
+                    const span = this.querySelector('span');
                     if (span) {
                         span.classList.add('clicked-text');
                     }
 
-                    showDetailBox('인센티브 상세내역', cell.dataset.details, cell);
+                    showDetailBoxUnderRow('인센티브 상세내역', this.dataset.details, this);
                 });
             });
         });
 
+        // 상세보기 박스 열기 (해당 행 바로 아래에 표시)
+        function showDetailBoxUnderRow(title, details, cell) {
+            const table = document.getElementById('salaryTable');
+            const tbody = table.querySelector('tbody');
+            const rowIndex = parseInt(cell.dataset.rowIndex);
+            
+            // 이미 상세 정보 행이 있는지 확인
+            const existingDetailRow = document.getElementById(`detail-row-${rowIndex}`);
+            
+            // 현재 열려있는 모든 상세 행 제거
+            document.querySelectorAll('.detail-row').forEach(row => {
+                row.remove();
+            });
+            
+            // 같은 행의 상세 정보를 클릭한 경우 (토글)
+            if (existingDetailRow) {
+                return;
+            }
+            
+            // 상세 정보 항목 생성
+            const items = details.split(',');
+            const formattedDetails = items.map(item => {
+                const [name, value] = item.split(':');
+                return `<div class="mb-1">${name.trim()}: <strong>${parseInt(value).toLocaleString()}원</strong></div>`;
+            }).join('');
+            
+            // 새로운 상세 정보 행 생성
+            const detailRow = document.createElement('tr');
+            detailRow.className = 'detail-row';
+            detailRow.id = `detail-row-${rowIndex}`;
+            
+            // 상세 정보 내용
+            detailRow.innerHTML = `
+                <td colspan="11" class="detail-content p-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold mb-0">${title}</h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="hideDetailRow(${rowIndex})">닫기</button>
+                    </div>
+                    ${formattedDetails}
+                </td>
+            `;
+            
+            // 현재 행의 바로 다음에 상세 정보 행 삽입
+            const currentRow = tbody.querySelectorAll('tr.salary-row')[rowIndex];
+            currentRow.after(detailRow);
+        }
 
+        // 상세 행 숨기기
+        function hideDetailRow(rowIndex) {
+            const detailRow = document.getElementById(`detail-row-${rowIndex}`);
+            if (detailRow) {
+                detailRow.remove();
+            }
+        }
     </script>
 
 </div>
