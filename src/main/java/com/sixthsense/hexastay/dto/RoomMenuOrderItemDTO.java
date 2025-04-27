@@ -34,6 +34,10 @@ public class RoomMenuOrderItemDTO {
 
     private String roomMenuOrderItemName; // 아이템 이름
 
+    private String roomMenuSelectOptionName;  // 옵션의 이름.
+
+    private Integer roomMenuSelectOptionPrice; //옵션의 가격
+
     // 새로 추가한 이미지 필드
     private String roomMenuImageMeta;
 

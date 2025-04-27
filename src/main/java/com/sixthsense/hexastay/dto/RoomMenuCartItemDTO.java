@@ -1,12 +1,10 @@
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuCart;
-import com.sixthsense.hexastay.entity.RoomMenuCartItem;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.List;
 
 /***************************************************
  *
@@ -33,6 +31,16 @@ public class RoomMenuCartItemDTO {
     private Integer roomMenuCartItemAmount;
 
     private Integer roomMenuCartItemCount; // 카트에 담긴 메뉴 아이템의 갯수
+
+    private String roomMenuSelectOptionName;  // 옵션의 이름.
+
+    private Integer roomMenuSelectOptionPrice; //옵션의 가격
+
+    private Integer roomMenuCartItemPrice; // 상품의 기본 가격
+
+    private List<RoomMenuCartItemOptionDTO> selectedOptions;
+
+
 
 
 }

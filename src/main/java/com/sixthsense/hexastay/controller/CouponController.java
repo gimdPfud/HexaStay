@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.CouponDTO;
 import com.sixthsense.hexastay.entity.Coupon;
+import com.sixthsense.hexastay.enums.CouponType;
 import com.sixthsense.hexastay.repository.CouponRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.CouponService;
@@ -9,6 +10,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +25,9 @@ import java.util.stream.Collectors;
 
 public class CouponController {
 
-    private final CouponService couponService;
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
+    private final CouponService couponService;
 
     @GetMapping("/insert")
     public String createCouponGet() {
@@ -72,14 +75,36 @@ public class CouponController {
     @ResponseBody
     public ResponseEntity<Map<String, Boolean>> checkCouponAlreadyIssued(
             @RequestParam String email,
-            @RequestParam String type
+            @RequestParam CouponType couponType
     ) {
-        boolean issued = couponService.hasCoupon(email, type);
+        // 대소문자 문제를 고려하여 변환
+        CouponType type;
+        try {
+            type = CouponType.valueOf(couponType.getCode());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("issued", false));
+        }
+
+        boolean issued = couponService.hasCoupon(email, couponType);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("issued", issued);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<List<Map<String, String>>> getCouponTypes() {
+        List<Map<String, String>> types = Arrays.stream(CouponType.values())
+                .map(couponType -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("name", couponType.name());           // Enum 상수명 (예: EVENT)
+                    map.put("code", couponType.getCode());          // 실제 코드 문자열 (예: EventCoupon)
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(types);
     }
 
 

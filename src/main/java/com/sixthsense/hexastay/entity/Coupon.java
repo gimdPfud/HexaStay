@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.enums.CouponType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,4 +39,6 @@ public class Coupon {
     private Integer repeatCouponCount; // 반복사용 쿠폰 (횟수)
 
     private LocalDateTime usedTime; // 사용한 날짜
+
+    private CouponType couponType;
 }

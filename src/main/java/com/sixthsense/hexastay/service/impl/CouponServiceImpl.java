@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.entity.Coupon;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
+import com.sixthsense.hexastay.enums.CouponType;
 import com.sixthsense.hexastay.repository.CouponRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuCartItemRepository;
@@ -49,7 +50,7 @@ public class CouponServiceImpl implements CouponService {
 
         Coupon coupon = Coupon.builder()
                 .member(member)
-                .type(couponDTO.getType())
+                .couponType(couponDTO.getCouponType())
                 .discountRate(couponDTO.getDiscountRate())
                 .issueDate(LocalDate.now())
                 .expirationDate(couponDTO.getExpirationDate())
@@ -179,8 +180,8 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public boolean hasCoupon(String email, String type) {
-        return couponRepository.existsByMember_MemberEmailAndType(email, type);
+    public boolean hasCoupon(String email, CouponType type) {
+        return couponRepository.existsByMember_MemberEmailAndCouponType(email, type);
     }
 
 

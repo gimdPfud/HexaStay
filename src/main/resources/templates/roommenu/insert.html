@@ -76,7 +76,6 @@
                 <input type="checkbox" class="form-check-input" id="supportsMultilang" name="supportsMultilang" value="true">
                 <label class="form-check-label" for="supportsMultilang">이 메뉴는 다국어를 지원해야 합니다.</label>
             </div>
-
         </div>
 
         <!-- 옵션 추가하기 -->
@@ -95,6 +94,7 @@
                 <tr>
                     <th>옵션 이름</th>
                     <th>가격</th>
+                    <th>재고 수량</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -105,6 +105,7 @@
 
 
         <div class="d-flex justify-content-center gap-3">
+            <div id="optionContainer"></div> <!-- 옵션 컨테이너 불러오기 -->
             <button type="submit" class="btn btn-primary">등록</button>
             <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
         </div>
@@ -114,26 +115,29 @@
         <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form id="optionForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="optionModalLabel">옵션 추가</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <!-- 폼 제거 -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="optionModalLabel">옵션 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">옵션 이름</label>
+                            <input type="text" class="form-control" id="optionName">
                         </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">옵션 이름</label>
-                                <input type="text" class="form-control" name="optionName">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">옵션 가격</label>
-                                <input type="number" class="form-control" name="optionPrice">
-                            </div>
+                        <div class="mb-3">
+                            <label for="optionStock" class="form-label">재고 수량</label>
+                            <input type="number" class="form-control" id="optionStock" placeholder="옵션 재고 수량 입력">
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                            <button type="submit" class="btn btn-primary">등록</button>
+                        <div class="mb-3">
+                            <label class="form-label">옵션 가격</label>
+                            <input type="number" class="form-control" id="optionPrice">
                         </div>
-                    </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="addOptionBtn" class="btn btn-primary">등록</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -178,53 +182,59 @@
         });
 
 
-        /* ajax 를 통해 전달 옵션을 */
+        /* 옵션 */
+        let optionIndex = 0;
 
-        let optionList = [];
+        document.getElementById("addOptionBtn").addEventListener("click", function () {
+            const optionName = document.getElementById("optionName").value.trim();
+            const optionPrice = document.getElementById("optionPrice").value.trim();
+            const optionStock = document.getElementById("optionStock").value.trim();
 
-        document.getElementById("optionForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const optionName = this.optionName.value;
-            const optionPrice = parseInt(this.optionPrice.value);
-
-            // 새로운 옵션 객체 추가
-            optionList.push({ optionName, optionPrice });
-
-            // 옵션 목록 UI 갱신
-            renderOptionTable();
-
-            // 모달 닫기
-            const modal = bootstrap.Modal.getInstance(document.getElementById("optionModal"));
-            modal.hide();
-
-            this.reset();
-        });
-
-        function renderOptionTable() {
-            const tbody = document.querySelector("#optionTable tbody");
-            tbody.innerHTML = "";
-
-            if (optionList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="text-center">등록된 옵션이 없습니다.</td></tr>`;
+            if (!optionName || !optionPrice || !optionStock) {
+                alert("옵션 이름, 가격, 재고를 모두 입력해주세요.");
                 return;
             }
 
-            optionList.forEach(opt => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-            <td>${opt.optionName}</td>
-            <td>${opt.optionPrice.toLocaleString()}원</td>
-        `;
-                tbody.appendChild(row);
-            });
-        }
+            const container = document.getElementById("optionTable").querySelector("tbody");
 
-        // 등록 버튼을 누르면 폼의 hidden 필드에 optionListJson을 담아 보내기
-        document.querySelector("#roomMenuForm").addEventListener("submit", function () {
-            // optionList를 JSON 형태로 hidden input에 설정
-            document.getElementById("optionListJson").value = JSON.stringify(optionList);
+            // 테이블에 옵션 표시
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${optionName}</td><td>${optionPrice}</td><td>${optionStock}</td>`; // 재고 추가
+            container.appendChild(row);
+
+            // form에 숨겨진 input으로 값 전달
+            const form = document.querySelector("form");
+
+            const nameInput = document.createElement("input");
+            nameInput.type = "hidden";
+            nameInput.name = `options[${optionIndex}].roomMenuOptionName`;
+            nameInput.value = optionName;
+
+            const priceInput = document.createElement("input");
+            priceInput.type = "hidden";
+            priceInput.name = `options[${optionIndex}].roomMenuOptionPrice`;
+            priceInput.value = optionPrice;
+
+            const stockInput = document.createElement("input"); // 재고 input 추가
+            stockInput.type = "hidden";
+            stockInput.name = `options[${optionIndex}].roomMenuOptionStock`;
+            stockInput.value = optionStock;
+
+            form.appendChild(nameInput);
+            form.appendChild(priceInput);
+            form.appendChild(stockInput); // 재고 추가
+
+            optionIndex++;
+
+            // 모달 닫기
+            bootstrap.Modal.getInstance(document.getElementById('optionModal')).hide();
+
+            // 입력값 초기화
+            document.getElementById("optionName").value = "";
+            document.getElementById("optionPrice").value = "";
+            document.getElementById("optionStock").value = ""; // 재고 초기화
         });
+
 
     </script>
 </div>

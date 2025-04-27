@@ -216,98 +216,123 @@
 
 <div layout:fragment="contentorder">
 
-<!-- 장바구니가 비어있는 경우 -->
-<div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
-    <div th:text="#{cart.emptyMessage}">장바구니에 아이템이 존재하지 않습니다</div>
-</div>
+    <!-- 장바구니가 비어있는 경우 -->
+    <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
+        <div th:text="#{cart.emptyMessage}">장바구니에 아이템이 존재하지 않습니다</div>
+    </div>
 
-<!-- 장바구니에 아이템이 있는 경우 -->
-<div th:unless="${isCartEmpty}" class="container">
-    <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
-    <ul class="food-list">
-        <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
-            <!-- 이미지: 왼쪽에 위치 -->
-            <div class="col-4 cart-image">
-                <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
-                     th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
-                     class="cart-img">
-                <img th:unless="${roomMenuCartDTO.roomMenuImageMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     class="cart-img">
-            </div>
-
-            <!-- 메뉴 이름, 수량, 금액: 이미지 오른쪽에 위치 -->
-            <div class="food-info col-6">
-                <p class="item-name">
-                    <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
-                </p>
-                <div class="quantity" style="display: flex; align-items: center;">
-                    <button class="decrease">-</button>
-                    <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
-                    <button class="increase">+</button>
+    <!-- 장바구니에 아이템이 있는 경우 -->
+    <div th:unless="${isCartEmpty}" class="container">
+        <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
+        <ul class="food-list">
+            <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
+                <!-- 이미지: 왼쪽에 위치 -->
+                <div class="col-4 cart-image">
+                    <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
+                         th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
+                         class="cart-img">
+                    <img th:unless="${roomMenuCartDTO.roomMenuImageMeta != null}"
+                         th:src="@{/profile/default.png}"
+                         class="cart-img">
                 </div>
-                <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
-                    <p>
-                        <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
-                        <span th:text="#{item.currency}" style="font-weight: bold;"></span>
+
+                <!-- 메뉴 이름, 수량, 금액: 이미지 오른쪽에 위치 -->
+                <div class="food-info col-6">
+                    <p class="item-name">
+                        <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
                     </p>
-                </th:block>
-            </div>
+                    <div class="quantity" style="display: flex; align-items: center;">
+                        <button class="decrease">-</button>
+                        <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
+                        <button class="increase">+</button>
+                    </div>
+                    <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
+                        <p>
+                            <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
+                            <span th:text="#{item.currency}" style="font-weight: bold;"></span>
+                        </p>
+                    </th:block>
 
-            <!-- 수량 변경 버튼 -->
-            <div class="col-2 button-container">
-                <button class="mini-btn delete-btn" th:text="#{cart.delete}">삭제</button>
-            </div>
-        </li>
-    </ul>
+                    <!--옵션-->
+                    <div class="option-list" style="margin-top: 10px;">
+                        <div th:if="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
+                            <details>
+                                <summary style="cursor: pointer; color: #007bff;">옵션 상세 보기</summary>
+                                <ul style="padding-left: 15px;">
+                                    <li th:each="opt : ${roomMenuCartDTO.optionList}">
+                                        <span th:text="${opt.roomMenuCartItemOptionName}">옵션이름</span> /
+                                        <span th:text="${opt.roomMenuCartItemOptionAmount}">개수</span>개 /
+                                        +<span th:text="${opt.roomMenuCartItemOptionPrice}">가격</span>원
+                                    </li>
+                                </ul>
+                            </details>
+                        </div>
+                        <div th:unless="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
+                            <span style="font-size: 0.9em; color: #888;">옵션 없음</span>
+                        </div>
+                    </div>
 
-    <div class="coupon-select-box">
-        <label for="couponSelect">쿠폰 선택:</label>
-        <select id="couponSelect" name="couponNum">
-            <option value="">쿠폰 선택</option>
-            <option th:each="coupon : ${couponList}"
-                    th:value="${coupon.couponNum}"
-                    th:text="|${coupon.type} (${coupon.discountRate}%)|">
-            </option>
-        </select>
-    </div>
+                </div>
 
-    <div class="request-section">
-        <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
-        <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
-    </div>
+                <!-- 수량 변경 버튼 -->
+                <div class="col-2 button-container">
+                    <button class="mini-btn delete-btn" th:text="#{cart.delete}">삭제</button>
+                </div>
 
-    <!-- 할인금액과 최종결제금액 표시 -->
-    <!-- 결제금액 -->
-    <div class="pricing-section" style="flex-direction: column; gap: 10px;">
-        <div class="discount">
-            <span>할인금액</span> :
-            <span th:if="${finalDiscount != null}"
-                  th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
-            <span th:unless="${finalDiscount != null}" id="discountAmount">0원</span>
+
+            </li>
+        </ul>
+
+
+
+
+        <div class="coupon-select-box">
+            <label for="couponSelect">쿠폰 선택:</label>
+            <select id="couponSelect" name="couponNum">
+                <option value="">쿠폰 선택</option>
+                <option th:each="coupon : ${couponList}"
+                        th:value="${coupon.couponNum}"
+                        th:text="|${coupon.couponType.name()} (${coupon.discountRate}%)|">
+                </option>
+            </select>
         </div>
-        <div class="final-total">
+
+        <div class="request-section">
+            <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
+            <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
+        </div>
+
+        <!-- 할인금액과 최종결제금액 표시 -->
+        <!-- 결제금액 -->
+        <div class="pricing-section" style="flex-direction: column; gap: 10px;">
+            <div class="discount">
+                <span>할인금액</span> :
+                <span th:if="${finalDiscount != null}"
+                      th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                <span th:unless="${finalDiscount != null}" id="discountAmount">0원</span>
+            </div>
+            <div class="final-total">
         <span
-              th:if="${finalTotal != null}"
-              th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
-            <span th:unless="${finalTotal != null}" id="finalAmount">최종결제금액: 0원</span>
+                th:if="${finalTotal != null}"
+                th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
+                <span th:unless="${finalTotal != null}" id="finalAmount">최종결제금액: 0원</span>
+            </div>
         </div>
-    </div>
 
 
-    <!-- 결제하기 및 목록으로 버튼 -->
-    <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
-    <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}">목록으로</button>
+        <!-- 결제하기 및 목록으로 버튼 -->
+        <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
+        <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}">목록으로</button>
 
-    <!-- 모달 -->
-    <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
-        <div style="position:relative; width:90%; max-width:600px; margin:5% auto; background:white; border-radius:10px; padding:20px;">
-            <iframe id="paymentFrame" style="width:100%; height:600px; border:none;"></iframe>
-            <button onclick="closeModal()" style="position:absolute; top:10px; right:10px;">X</button>
+        <!-- 모달 -->
+        <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+            <div style="position:relative; width:90%; max-width:600px; margin:5% auto; background:white; border-radius:10px; padding:20px;">
+                <iframe id="paymentFrame" style="width:100%; height:600px; border:none;"></iframe>
+                <button onclick="closeModal()" style="position:absolute; top:10px; right:10px;">X</button>
+            </div>
         </div>
-    </div>
 
-</div>
+    </div>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -368,86 +393,86 @@
         });
 
 
-            document.querySelectorAll('.food-item').forEach(item => {
-                const decreaseBtn = item.querySelector('.decrease');
-                const increaseBtn = item.querySelector('.increase');
-                const input = item.querySelector('.quantity-input');
-                const itemTotalSpan = item.querySelector('.item-total');
+        document.querySelectorAll('.food-item').forEach(item => {
+            const decreaseBtn = item.querySelector('.decrease');
+            const increaseBtn = item.querySelector('.increase');
+            const input = item.querySelector('.quantity-input');
+            const itemTotalSpan = item.querySelector('.item-total');
 
-                // 가격 계산을 위해 pricePerItem을 추출할 때 텍스트가 존재하는지 확인
-                const pricePerItem = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) / parseInt(input.value, 10);
-                const itemId = item.getAttribute('data-item-id');
+            // 가격 계산을 위해 pricePerItem을 추출할 때 텍스트가 존재하는지 확인
+            const pricePerItem = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) / parseInt(input.value, 10);
+            const itemId = item.getAttribute('data-item-id');
 
-                decreaseBtn.addEventListener('click', () => {
-                    let quantity = parseInt(input.value);
-                    if (quantity > 1) {
-                        quantity--;
-                        input.value = quantity;
-                        const newTotal = pricePerItem * quantity;
-                        itemTotalSpan.textContent = newTotal.toLocaleString();
-                        updateFinalTotal();
-                        updateQuantity(itemId, quantity);
-                    }
-                });
-
-                increaseBtn.addEventListener('click', () => {
-                    let quantity = parseInt(input.value);
-                    quantity++;
+            decreaseBtn.addEventListener('click', () => {
+                let quantity = parseInt(input.value);
+                if (quantity > 1) {
+                    quantity--;
                     input.value = quantity;
                     const newTotal = pricePerItem * quantity;
                     itemTotalSpan.textContent = newTotal.toLocaleString();
                     updateFinalTotal();
                     updateQuantity(itemId, quantity);
-                });
-                updateFinalTotal(); // 페이지 로드 시 총 금액 자동 계산
+                }
             });
 
-            function updateQuantity(itemId, quantity) {
-                fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
+            increaseBtn.addEventListener('click', () => {
+                let quantity = parseInt(input.value);
+                quantity++;
+                input.value = quantity;
+                const newTotal = pricePerItem * quantity;
+                itemTotalSpan.textContent = newTotal.toLocaleString();
+                updateFinalTotal();
+                updateQuantity(itemId, quantity);
+            });
+            updateFinalTotal(); // 페이지 로드 시 총 금액 자동 계산
+        });
+
+        function updateQuantity(itemId, quantity) {
+            fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('수량 변경 성공');
+                        location.reload(); // 또는 수량/가격만 업데이트
+                    } else {
+                        alert('❌ 수량 변경 실패');
                     }
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            console.log('수량 변경 성공');
-                            location.reload(); // 또는 수량/가격만 업데이트
-                        } else {
-                            alert('❌ 수량 변경 실패');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('에러 발생:', error);
-                        alert('❌ 수량 변경 중 오류가 발생했습니다.');
-                    });
-            }
+                .catch(error => {
+                    console.error('에러 발생:', error);
+                    alert('❌ 수량 변경 중 오류가 발생했습니다.');
+                });
+        }
 
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const item = button.closest('.food-item');
-                    const itemId = item.getAttribute('data-item-id');
-                    if (!confirm("정말 삭제하시겠습니까?")) return;
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const item = button.closest('.food-item');
+                const itemId = item.getAttribute('data-item-id');
+                if (!confirm("정말 삭제하시겠습니까?")) return;
 
-                    $.ajax({
-                        url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
-                        type: 'DELETE',
-                        success: () => {
-                            item.remove();
-                            updateFinalTotal();
+                $.ajax({
+                    url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
+                    type: 'DELETE',
+                    success: () => {
+                        item.remove();
+                        updateFinalTotal();
 
-                            const remainingItems = document.querySelectorAll('.food-item');
-                            if (remainingItems.length === 0) {
-                                document.querySelector('.container').innerHTML = `
+                        const remainingItems = document.querySelectorAll('.food-item');
+                        if (remainingItems.length === 0) {
+                            document.querySelector('.container').innerHTML = `
                             <div style="text-align:center; padding:50px; color:#888;">
                                 🛒 장바구니의 아이템이 존재하지 않습니다.
                             </div>`;
-                            }
-                        },
-                        error: () => alert("❌ 삭제 실패")
-                    });
+                        }
+                    },
+                    error: () => alert("❌ 삭제 실패")
                 });
             });
+        });
 
         // 결제여부에 따라서 이동되는 페이지
         function processPayment() {

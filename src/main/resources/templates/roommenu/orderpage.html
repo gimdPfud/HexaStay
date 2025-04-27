@@ -690,7 +690,7 @@
 
                     let message = `💌 ${email}님의 쿠폰 목록\n\n`;
                     coupons.forEach((coupon, index) => {
-                        message += `${index + 1}. [${coupon.type}] - ${coupon.discountRate}% 할인\n`;
+                        message += `${index + 1}. [${coupon.couponType}] - ${coupon.discountRate}% 할인\n`;
                         message += `   발급일: ${coupon.issueDate}, 만료일: ${coupon.expirationDate}\n`;
                         message += `   사용여부: ${coupon.used ? '✅ 사용됨' : '❌ 미사용'}\n\n`;
                     });

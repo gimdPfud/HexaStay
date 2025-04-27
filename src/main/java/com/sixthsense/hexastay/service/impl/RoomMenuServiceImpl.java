@@ -26,10 +26,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,18 +51,25 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      **************************************************/
 
     @Override
-    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO, List<RoomMenuOptionDTO> optionList) throws IOException {
+    public RoomMenuDTO insert(RoomMenuDTO roomMenuDTO) throws IOException {
         log.info("룸서비스 아이템 등록 서비스 진입" + roomMenuDTO);
-        log.info("파일" + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
+        if (roomMenuDTO.getRoomMenuImage() != null && !roomMenuDTO.getRoomMenuImage().isEmpty()) {
+            log.info("파일: " + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
+        } else {
+            log.info("업로드된 이미지가 없습니다.");
+        }
         // 모델맵퍼로 dto 변환
+
         RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
+        roomMenuRepository.save(roomMenu); // 이게 먼저 되어야 함!
 
-        roomMenu = roomMenuRepository.save(roomMenu);
-
-        for (RoomMenuOptionDTO optionDTO : optionList) {
-            RoomMenuOption option = modelMapper.map(optionDTO, RoomMenuOption.class);
-            option.setRoomMenu(roomMenu); // 메뉴와 연관관계 설정
-            roomMenuOptionRepository.save(option); // 옵션 저장
+        // 2. 옵션 저장
+        if (roomMenuDTO.getOptions() != null) {
+            for (RoomMenuOptionDTO optDTO : roomMenuDTO.getOptions()) {
+                RoomMenuOption option = modelMapper.map(optDTO, RoomMenuOption.class);
+                option.setRoomMenu(roomMenu);  // 저장된 객체 참조
+                roomMenuOptionRepository.save(option);  // 이제 저장 가능!
+            }
         }
 
         // 이미지 파일 처리
@@ -221,17 +226,30 @@ public class RoomMenuServiceImpl implements RoomMenuService {
      **************************************************/
 
     @Override
-    public RoomMenuDTO read(Long num) {
+    public RoomMenuDTO read(Long num, Locale locale) {
         log.info("상세보기 페이지 서비스 진입" + num);
 
-        Optional<RoomMenu> optionalRoomMenu =
-                roomMenuRepository.findById(num);
-        // inter를 long으로 형 변환
+        RoomMenu roomMenu = roomMenuRepository.findByRoomMenuNum(num);
+        RoomMenuDTO roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
 
-        RoomMenuDTO menuDTO = modelMapper.map(optionalRoomMenu, RoomMenuDTO.class);
-        log.info("변환된 dto read service의 값" + menuDTO);
+        // 번역 처리
+        Optional<RoomMenuTranslation> translation = roomMenuTranslationRepository
+                .findByRoomMenu_RoomMenuNumAndLocale(roomMenu.getRoomMenuNum(), locale.getLanguage());
 
-        return menuDTO;
+        if (translation.isPresent()) {
+            roomMenuDTO.setRoomMenuName(translation.get().getRoomMenuTransLationName());
+            roomMenuDTO.setRoomMenuContent(translation.get().getRoomMenuTransLationContent());
+        }
+
+        List<RoomMenuOption> options = roomMenuOptionRepository.findByRoomMenu(roomMenu);
+        List<RoomMenuOptionDTO> optionDTOs = options.stream()
+                .map(option -> modelMapper.map(option, RoomMenuOptionDTO.class))
+                .collect(Collectors.toList());
+        log.info("RoomMenuOptionDTO: {}", optionDTOs);  // DTO 출력 (roomMenuOptionStock 값 확인)
+
+        roomMenuDTO.setOptions(optionDTOs);
+
+        return roomMenuDTO;
 
     }
 
@@ -250,6 +268,39 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         RoomMenu roomMenu = roomMenuRepository.findById(roomMenuDTO.getRoomMenuNum())
                 .orElseThrow(() -> new EntityNotFoundException("해당 룸메뉴가 존재하지 않습니다."));
 
+        // 옵션 처리
+        List<RoomMenuOptionDTO> optionDTOs = roomMenuDTO.getOptions();
+        List<RoomMenuOption> currentOptions = roomMenuOptionRepository.findByRoomMenu(roomMenu);
+
+        // 기존 옵션 ID들 모으기
+        Set<Long> submittedIds = optionDTOs.stream()
+                .map(RoomMenuOptionDTO::getRoomMenuOptionNum)
+                .filter(id -> id != null && id > 0)
+                .collect(Collectors.toSet());
+
+        // 기존 옵션 중 삭제 대상 제거
+        for (RoomMenuOption existingOption : currentOptions) {
+            if (!submittedIds.contains(existingOption.getRoomMenuOptionNum())) {
+                roomMenuOptionRepository.delete(existingOption);
+            }
+        }
+
+        // 새로 추가되거나 수정된 옵션 저장
+        for (RoomMenuOptionDTO dto : optionDTOs) {
+            RoomMenuOption option;
+            if (dto.getRoomMenuOptionNum() != null && dto.getRoomMenuOptionNum() > 0) {
+                option = roomMenuOptionRepository.findById(dto.getRoomMenuOptionNum())
+                        .orElseThrow(() -> new RuntimeException("옵션 없음"));
+            } else {
+                option = new RoomMenuOption();
+                option.setRoomMenu(roomMenu);
+            }
+            option.setRoomMenuOptionName(dto.getRoomMenuOptionName());
+            option.setRoomMenuOptionPrice(dto.getRoomMenuOptionPrice());
+            option.setRoomMenuOptionStock(dto.getRoomMenuOptionStock()); //
+            roomMenuOptionRepository.save(option);
+        }
+
         try {
 
             roomMenu.setRoomMenuName(roomMenuDTO.getRoomMenuName());
@@ -258,7 +309,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             roomMenu.setRoomMenuCategory(roomMenuDTO.getRoomMenuCategory());
             roomMenu.setRoomMenuStatus(roomMenuDTO.getRoomMenuStatus());
             roomMenu.setRoomMenuContent(roomMenuDTO.getRoomMenuContent());
-
             MultipartFile newImageFile = roomMenuDTO.getRoomMenuImage();
             if (newImageFile != null && !newImageFile.isEmpty()) {
 

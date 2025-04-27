@@ -17,5 +17,7 @@ public class RoomMenuOptionDTO {
 
     private int roomMenuOptionPrice;
 
-    private RoomMenu roomMenu;
+    private int roomMenuOptionStock;
+
+    private Long roomMenuNum; // 룸메뉴의 관계키
 }

@@ -162,7 +162,19 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             orderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());
             orderItem.setRoomMenuOrder(roomMenuOrder);
             orderItem.setRoomMenuOrderRequestMessage(requestMessage);
+            orderItem.setRoomMenu(roomMenu);
+            orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());
             log.info("요청사항: {}", requestMessage);
+
+            int totalPrice = roomMenu.getRoomMenuPrice();
+            if (cartItem.getRoomMenuSelectOptionPrice() != null) {
+                totalPrice += cartItem.getRoomMenuSelectOptionPrice();
+            }
+            orderItem.setRoomMenuOrderPrice(totalPrice);
+
+            // 옵션 이름/가격도 주문에 복사
+            orderItem.setRoomMenuSelectOptionName(cartItem.getRoomMenuSelectOptionName());
+            orderItem.setRoomMenuSelectOptionPrice(cartItem.getRoomMenuSelectOptionPrice());
 
             if (discountedTotalPrice != null) {
                 roomMenuOrder.setDiscountedPrice(discountedTotalPrice); // 새로운 필드 필요
@@ -240,6 +252,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
+                itemDTO.setRoomMenuSelectOptionName(item.getRoomMenuSelectOptionName());
+                itemDTO.setRoomMenuSelectOptionPrice(item.getRoomMenuSelectOptionPrice());
 
                 // 이미지 정보 추가
                 itemDTO.setRoomMenuImageMeta(item.getRoomMenu().getRoomMenuImageMeta());

@@ -4,6 +4,8 @@ import com.sixthsense.hexastay.entity.RoomMenu;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /***************************************************
  *
  * 클래스명   : RoomMenuCartDetailDTO
@@ -39,18 +41,26 @@ public class RoomMenuCartDetailDTO {
 
     private String originalImageMeta; // 기존 이미지의 경로
 
+    private String roomMenuSelectOptionName;  // 옵션 이름
+    private Integer roomMenuSelectOptionPrice; // 옵션 가격
+
+    private List<RoomMenuCartItemOptionDTO> optionList;
+
 
     public RoomMenuCartDetailDTO(Long roomMenuCartItemNum, String roomMenuCartDetailMenuItemName,
                                  Integer roomMenuCartDetailMenuItemPrice, Integer roomMenuCartDetailMenuItemAmount,
+                                 String roomMenuSelectOptionName, Integer roomMenuSelectOptionPrice,
                                  String roomMenuImageMeta) {
         this.roomMenuCartDetailNum = roomMenuCartItemNum;
         this.roomMenuCartDetailMenuItemName = roomMenuCartDetailMenuItemName;
         this.roomMenuCartDetailMenuItemPrice = roomMenuCartDetailMenuItemPrice;
         this.roomMenuCartDetailMenuItemAmount = roomMenuCartDetailMenuItemAmount;
+        this.roomMenuSelectOptionName = roomMenuSelectOptionName;
+        this.roomMenuSelectOptionPrice = roomMenuSelectOptionPrice;
         this.roomMenuImageMeta = roomMenuImageMeta;
     }
-        // DTO를 참조
-        private RoomMenuDTO roomMenuDTO;
+
+
 
 
     }
