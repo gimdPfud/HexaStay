@@ -15,7 +15,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +86,68 @@ public class SalariesServiceImpl implements SalariesService {
         Page<Salaries> salariesList = new PageImpl<>(oriSalariesList, pageable, oriSalariesList.size());
         Page<SalariesDTO> salariesDTOList = salariesList.map(salary -> salary != null ? modelMapper.map(salary, SalariesDTO.class) : null);
         return salariesDTOList;
+    }
+    
+    // 월별 범위로 급여 목록 조회
+    @Override
+    public Page<SalariesDTO> getSalariesListByMonthRange(String email, YearMonth startMonth, YearMonth endMonth, Pageable pageable) {
+        // 기존 목록 조회
+        Admin admin = adminRepository.findByAdminEmail(email);
+        String role = admin.getAdminRole();
+        Long companyNum = null;
+        Long storeNum = null;
 
+        if (admin.getCompany().getCompanyNum() != null) {
+            companyNum = admin.getCompany().getCompanyNum();
+        } else if (admin.getStore().getStoreNum() != null) {
+            storeNum = admin.getStore().getStoreNum();
+        }
+
+        List<Salaries> oriSalariesList = new ArrayList<>();
+
+        // 본사 계열
+        if (role.equals("exec") || role.equals("head") || role.equals("crew")) {
+            oriSalariesList = salariesRepository.findHeadOfficeSalaries(email, role, companyNum);
+        }
+        // 지사/지점 계열
+        else if (role.equals("gm") || role.equals("sv") || role.equals("agent") || role.equals("partner")) {
+            oriSalariesList = salariesRepository.findBranchSalaries(email, role, companyNum);
+        }
+        // 스토어 계열
+        else if (role.equals("mgr") || role.equals("submgr") || role.equals("staff")) {
+            oriSalariesList = salariesRepository.findStoreSalaries(email, role, storeNum);
+        }
+
+        if (oriSalariesList.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+        
+        // 월별 필터링 적용
+        List<Salaries> filteredList = oriSalariesList.stream()
+            .filter(salary -> {
+                YearMonth salaryMonth = salary.getSalDate();
+                // null 체크와 월별 범위 체크
+                return salaryMonth != null && 
+                       (salaryMonth.compareTo(startMonth) >= 0 && 
+                        salaryMonth.compareTo(endMonth) <= 0);
+            })
+            .collect(Collectors.toList());
+        
+        if (filteredList.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        // 페이징 처리
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredList.size());
+        List<Salaries> pageContent = filteredList.subList(start, end);
+        
+        Page<Salaries> salariesList = new PageImpl<>(pageContent, pageable, filteredList.size());
+        Page<SalariesDTO> salariesDTOList = salariesList.map(salary -> 
+            salary != null ? modelMapper.map(salary, SalariesDTO.class) : null
+        );
+        
+        return salariesDTOList;
     }
 
 

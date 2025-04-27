@@ -13,7 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
@@ -26,6 +28,14 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
 
 //    Page<Orderstore> findByOrderstoreStoreNum(Long orderstoreStoreNum,Pageable pageable);
     Page<Orderstore> findByStore_StoreNum(Long storeNum,Pageable pageable);
+    
+    // 날짜 범위로 정산용 데이터 조회
+    Page<Orderstore> findByStore_StoreNumAndCreateDateBetween(
+            Long storeNum, 
+            LocalDateTime startDate, 
+            LocalDateTime endDate, 
+            Pageable pageable);
+    
     /*페이지로 가져오기*/
     Page<Orderstore> findByRoom_Member_MemberEmail (String email, Pageable pageable);
     Page<Orderstore> findByRoom_HotelRoom_HotelRoomNum (Long hotelRoomNum, Pageable pageable);

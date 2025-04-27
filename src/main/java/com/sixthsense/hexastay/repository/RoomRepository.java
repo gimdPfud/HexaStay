@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,4 +62,11 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findByHotelRoom_HotelRoomNumIn(List<Long> hotelRoomNums, Pageable pageable);
 
+    // 날짜 범위로 정산용 데이터 조회
+    @EntityGraph(attributePaths = {"hotelRoom", "member"})
+    Page<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
+            List<Long> hotelRoomNums, 
+            LocalDateTime startDate, 
+            LocalDateTime endDate, 
+            Pageable pageable);
 }

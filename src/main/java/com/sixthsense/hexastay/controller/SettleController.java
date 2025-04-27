@@ -10,13 +10,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -35,23 +38,46 @@ public class SettleController {
     private final SalariesService salariesService;
 
     @GetMapping("/chart")
-    public String chart(Principal principal, Model model, Pageable pageable)
+    public String chart(Principal principal, 
+                       Model model, 
+                       Pageable pageable,
+                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
-
         Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
-        Page<RoomDTO> roomDTOList = settleService.getSettleList(companyNum, pageable);
+        Page<RoomDTO> roomDTOList;
+        
+        if (startDate != null && endDate != null) {
+            // 날짜 범위로 조회
+            roomDTOList = settleService.getSettleListByDateRange(companyNum, startDate, endDate, pageable);
+        } else {
+            // 전체 조회
+            roomDTOList = settleService.getSettleList(companyNum, pageable);
+        }
+        
         model.addAttribute("roomDTOList", roomDTOList);
         return "/settle/chart";
     }
 
     @GetMapping("/chartstore")
-    public String chartStore(Principal principal, Model model, Pageable pageable)
+    public String chartStore(Principal principal, 
+                            Model model, 
+                            Pageable pageable,
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
     {
         Long storeNum = adminRepository.findByAdminEmail(principal.getName()).getStore().getStoreNum();
-        Page<OrderstoreDTO> orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
+        Page<OrderstoreDTO> orderstoreDTOList;
+        
+        if (startDate != null && endDate != null) {
+            // 날짜 범위로 조회
+            orderstoreDTOList = settleService.getSettleStoreListByDateRange(storeNum, startDate, endDate, pageable);
+        } else {
+            // 전체 조회
+            orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
+        }
+        
         model.addAttribute("storeDTOList", orderstoreDTOList);
         return "/settle/chartstore";
     }
-
-
 }
