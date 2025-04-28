@@ -222,6 +222,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     public Page<RoomMenuOrderDTO> getOrderListByEmail(String email, Pageable pageable) {
         log.info("주문 리스트 서비스 진입 : " + email);
         Member member = memberRepository.findByMemberEmail(email);
+
         Page<RoomMenuOrder> orderPage = roomMenuOrderRepository.findByMemberOrderByRegDateDesc(member, pageable);
 
         // Page의 map 메서드를 활용하여 DTO로 변환
