@@ -57,14 +57,6 @@ public class RoomMenu extends BaseEntity {
     private String roomMenuImageMeta; //룸 메뉴 대표 이미지
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotelRoomNum")
-    private HotelRoom hotelRoom;                    //방 참조
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member")
-    private Member member;   // 회원 참조
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room")
     private Room room;   // 룸(방)의 정보 참조
 
@@ -74,7 +66,6 @@ public class RoomMenu extends BaseEntity {
     @Column(name = "approvedByDev")
     private Boolean approvedByDev = false; // 개발자 승인 여부
 
-    // 룸메뉴 옵션을 선택하기 위해 맵핑되는 조인문. 하지만, cascade all 이므로 삭제 시 주의한다 !!
 
     public void roomMenuOrderStockNumber(Integer stockNumber) {
         // 수량을 받아 주문이나 주문취소수량을 받아서 재고를 확인 후 재고 수량을 변경
