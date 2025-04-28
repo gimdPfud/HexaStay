@@ -37,6 +37,6 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
     List<StorecartitemViewDTO> storeCartViewList(Long hotelRoomNum);
 
     @Query("select sum(s.storecartitemCount) from Storecartitem s where s.storecart.room.hotelRoom.hotelRoomNum = ?1")
-    long countByStorecart_Room_HotelRoom(Long hotelroomNum);
+    Long countByStorecart_Room_HotelRoom(Long hotelroomNum);
 
 }

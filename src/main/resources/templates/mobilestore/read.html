@@ -8,6 +8,22 @@
     <title>매장 상세</title>
     <link rel="stylesheet" href="/css/roommenu.css">
     <style>
+        a { text-decoration: none; }
+        .underline { text-decoration: underline;}
+        .store-header { margin-bottom: 20px; }
+        .item-image {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .item-img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
         .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
@@ -15,12 +31,7 @@
         .menu-image { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
         .text-info { display: flex; flex-direction: column; padding-left: 10px; }
         .menu-name { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
-        .menu-content { color: black; font-size: 0.8rem; }
         .price-box { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
-        .menu-badge { display: inline-block; background-color: #e0f7fa; color: #00796b; font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; margin-bottom: 4px; font-weight: bold; }
-        .like-section { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
-        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
-        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
         .div-card { background: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 10px; margin-bottom: 10px; }
         .sold-out { opacity: 0.5; position: relative; pointer-events: none; }
         .sold-out::after { content: "품절"; color: white; background-color: red; font-weight: bold; padding: 2px 6px; font-size: 12px; position: absolute; top: 10px; right: 10px; border-radius: 4px; }
@@ -28,28 +39,41 @@
 </head>
 <body>
 <div layout:fragment="contentorder">
+
+    <!-- 매장 정보 -->
     <div class="container">
-        <!-- 매장 정보 -->
         <div class="store-header text-center">
+            <div class="item-image">
+                <img th:if="${data.storeProfileMeta != null}"
+                     th:src="@{${data.storeProfileMeta}}" class="item-img">
+                <img th:unless="${data.storeProfileMeta != null}"
+                     th:src="@{/store/default.png}" class="item-img">
+            </div>
             <h5 class="mb-2" th:text="${data.storeName}"></h5>
             <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
-            <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
+            <small class="text-muted"><i class="bi bi-telephone"></i>
+                <a class="text-muted underline" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a>
+            </small><br>
             <small class="text-muted"><i class="bi bi-geo-alt"></i>
-                <a class="text-muted" th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
+                <a class="text-muted underline" th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
             </small>
+            <br>
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mapmodal" onclick="showMapBox()">지도보기</button>
         </div>
 
+        <input type="hidden" id="storeLatitude" name="storeLatitude" th:value="${data.storeLatitude}" readonly>
+        <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
+
         <!-- 카테고리 탭 -->
         <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
-            <li class="nav-item"><a class="nav-link active" href="#" onclick="filterCategory('메인')">메인</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('사이드')">사이드</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('음료')">음료</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('추가')">추가</a></li>
+            <li class="nav-item"><a class="nav-link" href="#메인">메인</a></li>
+            <li class="nav-item"><a class="nav-link" href="#사이드">사이드</a></li>
+            <li class="nav-item"><a class="nav-link" href="#음료">음료</a></li>
+            <li class="nav-item"><a class="nav-link" href="#추가">추가</a></li>
         </ul>
 
-        <!-- 메뉴 카드 리스트 -->
-        <div class="menu-list mt-3"></div>
+        <!-- 메뉴 리스트 -->
+        <div class="menu-list mt-3" id="menuList"></div>
     </div>
 
     <!-- 지도 모달 -->
@@ -67,68 +91,86 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script th:inline="javascript">
         let storenum = [[${data.storeNum}]];
-        let menuListEl = document.querySelector('.menu-list');
-        let likedStates = {};
+        let menuListEl = document.getElementById('menuList');
 
         document.addEventListener("DOMContentLoaded", function () {
             fetch(`/member/store/menu/list/${storenum}`)
-                .then(res => res.json())
-                .then(list => renderMenuCards(list));
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('메뉴를 불러올 수 없습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => renderMenuSections(data))
+                .catch(error => {
+                    console.log("에러발생...")
+                    console.error(error);
+                    menuListEl.innerHTML = `<p class="text-center text-muted mt-4">메뉴 정보를 불러올 수 없습니다.</p>`;
+                });
         });
 
-        function renderMenuCards(list) {
-            let tags = '';
-            list.forEach(item => {
-                const soldOut = item.storemenuAmount === 0 ? 'sold-out' : '';
-                const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
+        const categories = {
+            main : "메인",
+            side : "사이드",
+            drink : "음료",
+            plus : "추가"
+        };
+        function renderMenuSections(list) {
+            let html = '';
 
-                tags += `
-                <div class="div-card ${soldOut}" data-category="${item.storemenuCategory}">
-                    <div class="d-flex">
-                        <div class="menu-image-container">
-                            <img src="${image}" class="menu-image">
-                        </div>
-                        <div class="text-info">
+            Object.entries(categories).forEach(([categoryKey, categoryValue]) => {
+                const filtered = list.filter(item => item.storemenuCategory === categoryKey);
 
-                            <p class="menu-name">${item.storemenuName}</p>
-                            <div class="price-box">${item.storemenuPrice.toLocaleString()} 원</div>
-                        </div>
-                    </div>
-                    <div class="like-section">
-                        <span id="likeIcon-${item.storemenuNum}" onclick="toggleLike(${item.storemenuNum}, event)" class="like-icon">🤍</span>
-                        <span id="likeCount-${item.storemenuNum}" class="like-count">0</span>
-                    </div>
-                </div>`;
+                if (filtered.length > 0) {
+                    html += `<div id="${categoryValue}" class="mb-4">
+                                <h5 class="mt-4 mb-2">${categoryValue}</h5>`;
+
+                    filtered.forEach(item => {
+                        const soldOutClass = item.storemenuStatus === 'soldout' ? 'sold-out' : '';
+                        const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
+
+                        html += `
+                        <a href="/member/store/menu/read/${item.storemenuNum}" class="text-decoration-none">
+                            <div class="div-card ${soldOutClass}">
+                                <div class="d-flex">
+                                    <div class="menu-image-container">
+                                        <img src="${image}" class="menu-image">
+                                    </div>
+                                    <div class="text-info">
+                                        <p class="menu-name">${item.storemenuName}</p>
+                                        <div class="price-box">${item.storemenuPrice} 원</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>`;
+                    });
+
+                    html += `</div>`; // category section 끝
+                }
             });
-            menuListEl.innerHTML = tags;
+
+            menuListEl.innerHTML = html;
         }
 
-        function filterCategory(category) {
-            document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            document.querySelectorAll('.div-card').forEach(card => {
-                card.style.display = card.dataset.category === category ? 'block' : 'none';
-            });
-        }
-
-        function toggleLike(menuId, event) {
-            event.stopPropagation(); event.preventDefault();
-            const liked = likedStates[menuId] || false;
-            const url = liked ? `/member/store/menu/unlike/${menuId}` : `/member/store/menu/like/${menuId}`;
-
-            fetch(url, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    const icon = document.getElementById(`likeIcon-${menuId}`);
-                    const count = document.getElementById(`likeCount-${menuId}`);
-                    icon.textContent = liked ? '🤍' : '❤️';
-                    icon.style.color = liked ? 'gray' : 'red';
-                    count.textContent = data.likeCount;
-                    likedStates[menuId] = !liked;
+        // 카테고리 탭 클릭 시 부드러운 스크롤 이동
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#categoryTabs a').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 70,
+                            behavior: 'smooth'
+                        });
+                    }
                 });
-        }
+            });
+        });
 
         function showMapBox() {
             let yy = document.getElementById("storeLatitude").value;
@@ -140,7 +182,8 @@
             marker.setMap(map);
         }
     </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
 </div>
 </body>
