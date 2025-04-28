@@ -28,12 +28,10 @@
                             <div class="flex-grow-1">
                                 <h5 class="card-title mb-1" th:text="${item.storemenuName}">메뉴명</h5>
                                 <p class="card-text small text-muted mb-1" th:text="${#numbers.formatInteger(item.storemenuPrice, 3, 'COMMA')} + '원'"></p>
-
-                                <div th:each="optionList : ${optionMap[item.storecartitemNum]}">
-                                    <span class="card-text small text-muted mb-1" th:each="optionInfo : ${optionList}"
-                                       th:text="${optionInfo}"></span>
-                                </div>
-
+                                <p class="card-text small text-muted mb-1" th:each="optionList : ${optionMap[item.storecartitemNum]}">
+                                    <span th:text="'+'+ ${optionList[1]}"></span>
+                                    <span th:text="${optionList[2]}+' 원'"></span>
+                                </p>
                                 <p class="fw-bold text-primary" th:text="'총 ' + ${#numbers.formatInteger(item.storemenuPrice * item.storemenuCount, 3, 'COMMA')} + '원'"></p>
                             </div>
 
