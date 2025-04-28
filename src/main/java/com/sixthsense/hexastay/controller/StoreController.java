@@ -39,7 +39,7 @@ public class StoreController {
      * 리턴 값 :
      * 기  능 :
      * */
-    @GetMapping("/insert") // TODO: 호텔 GM만 접근 가능한 페이지
+    @GetMapping("/insert")
     public String insert(Principal principal, Model model) {
         if (principal == null) {
             return "redirect:/admin/login";
@@ -91,7 +91,7 @@ public class StoreController {
         model.addAttribute("keyword",keyword);
         return "store/list";
     }
-    @PostMapping("/list")/*todo superAdmin만 접근 가능한 페이지*/
+    @PostMapping("/list")
     public String list(Model model, Principal principal, Pageable pageable,
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) String chosenCompany,

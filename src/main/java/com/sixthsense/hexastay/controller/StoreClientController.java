@@ -15,6 +15,7 @@ import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import com.sixthsense.hexastay.service.ZzService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,6 @@ public class StoreClientController {
     private final StoreService storeService;
     private final StoremenuService storemenuService;
     private final StorecartService storecartService;
-    Long hotelroomNum = 9L; // todo qr에서부터 물려받기
 
 
 /* 1. 스토어 목록 보기
@@ -54,9 +55,11 @@ public class StoreClientController {
     @GetMapping("/list")
     public String typelist(@RequestParam(required = false) String type,
                            @RequestParam(required = false) String keyword,
-                           Model model, Pageable pageable){
+                           Model model, Pageable pageable, Principal principal){
         log.info("type : "+type);
         log.info("keyword : "+keyword);
+        log.info("session : "+principal.toString());
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
 
         Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
 
@@ -101,8 +104,9 @@ public class StoreClientController {
     /*5. 스토어 좋아요~ 또는 싫어요~?*/
     @ResponseBody
     @GetMapping("/like/{storeNum}")
-    public ResponseEntity liketoggle(@PathVariable Long storeNum){
+    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){
         try {
+            Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Member member = zzService.hotelroomNumToMember(hotelroomNum);
             storeService.storeLiketoggle(storeNum, member);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -113,8 +117,9 @@ public class StoreClientController {
 
     @ResponseBody
     @GetMapping("/like/list/{storeNum}")
-    public ResponseEntity likeList(@PathVariable Long storeNum){
+    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){
         try {
+            Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Long likes = storeService.getStoreLikeCount(storeNum);
             Member member = zzService.hotelroomNumToMember(hotelroomNum);
             boolean check = storeService.isLiked(storeNum, member);

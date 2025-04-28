@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
+
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/cart")
@@ -27,7 +29,6 @@ public class CartController {
     private final ZzService zzService;
     private final StorecartService storecartService;
     private final RoomMenuCartService roomMenuCartService;
-    Long hotelroomNum = 9L; //todo 나중에 qr링크에서 받기
 
     @GetMapping("/gocart")
     public String gocart(HttpServletRequest request) {
@@ -61,17 +62,17 @@ public class CartController {
 
     @ResponseBody
     @GetMapping("/getlength")
-    public ResponseEntity getlength(HttpServletRequest request){
+    public ResponseEntity getlength(HttpServletRequest request, Principal principal){
         String referer = request.getHeader("Referer");
 //        System.out.println("이전 페이지: " + referer);
-        Member member = zzService.hotelroomNumToMember(hotelroomNum);
-        String email = member.getMemberEmail();
+        if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
+        String email = principal.getName();
         if (referer != null) {
             if (referer.contains("/roommenu")) {
                 Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
                 return new ResponseEntity<>(totalCartItemCount, HttpStatus.OK);
             } else if (referer.contains("/member/store")) {
-                return new ResponseEntity<>(storecartService.getItemCount(hotelroomNum),HttpStatus.OK);
+                return new ResponseEntity<>(storecartService.getItemCount(zzService.principalToHotelroomNum(principal)),HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

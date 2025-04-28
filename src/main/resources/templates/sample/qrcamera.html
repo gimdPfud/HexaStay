@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR 코드 로그인</title>
+</head>
+<body>
+<h2>QR 코드 스캔</h2>
+<video id="camera" width="100%" height="auto" autoplay></video>
+<canvas id="canvas" style="display: none;"></canvas>
+
+<script src="https://unpkg.com/jsqr/dist/jsQR.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!confirm("qr을 다시 찍어주세요. (테스트 환경에서는 취소 버튼을 누르면 localhost:8090/으로 이동합니다.)")) {
+            window.location.href = "http://localhost:8090/";
+        }
+    });
+
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    // 카메라 스트림 시작
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch((error) => {
+            console.error('카메라를 열 수 없습니다:', error);
+        });
+
+    // QR 코드 스캔 기능
+    function scanQRCode() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
+
+            if (qrCode) {
+                const qrContent = qrCode.data;
+
+                // QR 코드 내용이 URL이라면 confirm 창을 띄운다
+                if (isValidURL(qrContent)) {
+                    const userConfirmed = confirm(`링크로 이동하시겠습니까? \n${qrContent}`);
+                    if (userConfirmed) {
+                        window.location.href = qrContent;
+                    }
+                }
+            }
+        }
+
+        requestAnimationFrame(scanQRCode);
+    }
+
+    // URL 유효성 체크 함수
+    function isValidURL(url) {
+        const pattern = /^(https?:\/\/)/i; // http:// 또는 https://로 시작하는 URL 체크
+        return pattern.test(url);
+    }
+
+    scanQRCode(); // QR 코드 스캔 시작
+</script>
+</body>
+</html>
