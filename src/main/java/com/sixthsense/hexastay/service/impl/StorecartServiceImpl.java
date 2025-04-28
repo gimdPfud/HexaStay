@@ -75,10 +75,11 @@ public class StorecartServiceImpl implements StorecartService {
         }
 
         //5. 장바구니아이템 조회
+            //추가추가 : 옵션 추가추가!!!!!!!!! 옵션까지 같아야 됨.
         Storecartitem storecartitem
                 = storecartitemRepository
-                .findByStorecart_StorecartNumAndStoremenu_StoremenuNum(
-                        storecart.getStorecartNum(), storemenu.getStoremenuNum()
+                .findByStorecart_StorecartNumAndStoremenu_StoremenuNumAndStoremenuOptions(
+                        storecart.getStorecartNum(), storemenu.getStoremenuNum(), dto.getStoremenuOptions()
                 );
 //        log.info(storecartitem);
         //6. 장바구니아이템이 없다면 새로만들기
@@ -86,7 +87,8 @@ public class StorecartServiceImpl implements StorecartService {
             Storecartitem newitem = new Storecartitem();
             newitem.setStorecart(storecart);
             newitem.setStoremenu(storemenu);
-            newitem.setStorecartitemCount(dto.getStorecartitemCount());//여기서 문제 발생?
+            newitem.setStorecartitemCount(dto.getStorecartitemCount());
+            newitem.setStoremenuOptions(dto.getStoremenuOptions());
             storecartitem = storecartitemRepository.save(newitem);
         }
         //7. 장바구니아이템이 있음, 개수 조정

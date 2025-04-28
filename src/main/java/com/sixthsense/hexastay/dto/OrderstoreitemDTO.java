@@ -40,4 +40,7 @@ public class OrderstoreitemDTO {
     //**********************************
     //멤버 정보를 가져올 PK - orderstoreNum
     private Long orderstoreNum;
+
+    private String storemenuOptions;
+
 }

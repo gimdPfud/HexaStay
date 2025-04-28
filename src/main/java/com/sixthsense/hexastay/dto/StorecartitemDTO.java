@@ -7,11 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.Storecart;
-import com.sixthsense.hexastay.entity.Storemenu;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +21,5 @@ public class StorecartitemDTO {
     private Long storecartNum;
     private Long storemenuNum;
     private Integer storecartitemCount;          //장바구니에 담은 수량
+    private String storemenuOptions;  //주문한 상품의 옵션들??
 }
