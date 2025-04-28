@@ -1,54 +1,145 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}">
+      layout:decorate="~{layouts/layoutmobile}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장바구니</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{orderList.title}">주문 내역</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+        }
+
+        .order-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        .back-to-list-btn {
+            background-color: #ddd;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                border-radius: 10px;
+                border: none;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                background-color: #ffffff;
+                margin-bottom: 20px;
+                transition: all 0.3s ease;
+                height: 350px;
+            }
+
+            .card-header {
+                background-color: #f7f7f7;
+                border-bottom: 1px solid #ddd;
+                border-radius: 10px 10px 0 0;
+                padding: 10px;
+                height: 50px;
+            }
+
+            .card-body {
+                padding: 15px;
+                height: 200px;
+                overflow-y: auto;
+            }
+
+            .card-footer {
+                background-color: #f7f7f7;
+                padding: 10px;
+                text-align: right;
+                border-top: 1px solid #ddd;
+                border-radius: 0 0 10px 10px;
+                height: 50px;
+            }
+
+            .pagination .page-link {
+                font-size: 12px;
+                padding: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
-
 <div layout:fragment="contentorder">
-    <div class="container mt-4">
-        <h5 class="mb-3">주문 내역</h5>
-        <div class="row row-cols-1 gy-3">
-            <div class="col" th:each="item : ${list}">
-                <div class="card shadow-sm rounded">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img th:if="${item.imgName != null}"
-                                 th:src="@{${item.imgName}}" alt="menu image" class="me-3" width="100px" height="100px">
-                            <img th:if="${item.imgName == null}"
-                                 th:src="@{/store/default.png}" alt="menu image" class="me-3" width="100px" height="100px">
-                        </div>
+    <div class="container">
+        <div th:if="${list == null or list.isEmpty()}">
+            <div class="alert alert-info text-center">주문 내역이 없습니다.</div>
+        </div>
 
-                        <div class="d-flex justify-content-between">
-                            <small class="text-muted" th:text="${item.formatDate}">2025.04.20</small>
-                            <span class="badge"
-                                  th:classappend="${item.orderstoreStatus == 'paid' ? 'bg-primary' : (item.orderstoreStatus == 'end' ? 'bg-success' : 'bg-secondary')}"
-                                  th:text="${item.orderstoreStatus}">상태</span>
-                        </div>
-
-                        <h6 class="mt-2 mb-1">
-                            <a href="#"
-                               class="text-decoration-none text-dark fw-bold"
-                               th:text="${item.orderstoreStoreName}">스토어 이름</a>
-                        </h6>
-
-                        <p class="mb-1">
-                            <span th:text="${item.orderstoreFirstItemName}">일반 우동</span>
-                            <span th:if="${item.orderstoreitemDTOList.size()>1}"
-                                  th:text="' 외 ' + ${item.orderstoreitemDTOList.size() - 1} + ' 개'"></span>
-                        </p>
-
-                        <p class="fw-bold text-end mb-0" th:text="${item.orderstoreFinalPrice} + '원'">총 금액</p>
-                    </div>
+        <div th:each="item : ${list}" class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <strong>주문번호:</strong>
+                    <span th:text="${item.orderstoreNum}"></span>
+                </div>
+                <div>
+                    <span class="badge" th:classappend="${item.orderstoreStatus == 'paid' ? 'bg-primary' : (item.orderstoreStatus == 'end' ? 'bg-success' : 'bg-secondary')}"
+                          th:text="${item.orderstoreStatus}"></span>
                 </div>
             </div>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row text-center text-md-start">
+                        <div class="col-4">
+                            <img th:if="${item.imgName != null}" th:src="@{${item.imgName}}" class="order-img">
+                            <img th:unless="${item.imgName != null}" th:src="@{/store/default.png}" class="order-img">
+                        </div>
+                        <div class="col-8 d-flex flex-column justify-content-center">
+                            <div><strong>스토어:</strong> <span th:text="${item.orderstoreStoreName}"></span></div>
+                            <div>
+                                <strong>메뉴:</strong> <span th:text="${item.orderstoreFirstItemName}"></span>
+                                <span th:if="${item.orderstoreitemDTOList.size()>1}" th:text="' 외 ' + ${item.orderstoreitemDTOList.size() - 1} + ' 개'"></span>
+                            </div>
+                            <div><strong>주문시간:</strong> <span th:text="${item.formatDate}"></span></div>
+                            <div><strong>총 주문 금액:</strong> <span th:text="${item.orderstoreFinalPrice} + '원'"></span></div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
+
+        <button class="back-to-list-btn" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
+
+        <nav>
+            <ul class="pagination justify-content-center align-items-center mt-3">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo; 처음</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}">이전</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${i - 1})}" th:text="${i}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}">다음</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">마지막 &raquo;</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
-
 </body>
 </html>
