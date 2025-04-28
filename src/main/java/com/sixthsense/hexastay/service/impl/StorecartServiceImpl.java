@@ -112,7 +112,7 @@ public class StorecartServiceImpl implements StorecartService {
     }
 
     @Override
-    public long getItemCount(Long hotelroomNum) {
+    public Long getItemCount(Long hotelroomNum) {
         return storecartitemRepository.countByStorecart_Room_HotelRoom(hotelroomNum);
     }
 
