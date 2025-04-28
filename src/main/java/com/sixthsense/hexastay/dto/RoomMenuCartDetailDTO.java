@@ -44,13 +44,15 @@ public class RoomMenuCartDetailDTO {
     private String roomMenuSelectOptionName;  // 옵션 이름
     private Integer roomMenuSelectOptionPrice; // 옵션 가격
 
+    private Integer roomMenuTotalPrice; // 총 가격
+
     private List<RoomMenuCartItemOptionDTO> optionList;
 
 
     public RoomMenuCartDetailDTO(Long roomMenuCartItemNum, String roomMenuCartDetailMenuItemName,
                                  Integer roomMenuCartDetailMenuItemPrice, Integer roomMenuCartDetailMenuItemAmount,
                                  String roomMenuSelectOptionName, Integer roomMenuSelectOptionPrice,
-                                 String roomMenuImageMeta) {
+                                 String roomMenuImageMeta, Integer roomMenuTotalPrice) {
         this.roomMenuCartDetailNum = roomMenuCartItemNum;
         this.roomMenuCartDetailMenuItemName = roomMenuCartDetailMenuItemName;
         this.roomMenuCartDetailMenuItemPrice = roomMenuCartDetailMenuItemPrice;
@@ -58,6 +60,7 @@ public class RoomMenuCartDetailDTO {
         this.roomMenuSelectOptionName = roomMenuSelectOptionName;
         this.roomMenuSelectOptionPrice = roomMenuSelectOptionPrice;
         this.roomMenuImageMeta = roomMenuImageMeta;
+        this.roomMenuTotalPrice = roomMenuTotalPrice;
     }
 
 
