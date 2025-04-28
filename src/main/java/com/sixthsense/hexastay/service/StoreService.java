@@ -40,6 +40,7 @@ public interface StoreService {
     Page<StoreDTO> searchlist(Long companyNum, String searchType, String keyword, Pageable pageable, String... status);
 
     Page<StoreDTO> clientlist(Pageable pageable);
+    Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable);
 
     /*삭제: 활성화->비활성화 바꾸기*/
     void delete(Long pk);

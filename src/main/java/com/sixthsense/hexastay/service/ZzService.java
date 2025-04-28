@@ -8,8 +8,10 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
@@ -32,6 +34,7 @@ public class ZzService {
     private final MemberRepository memberRepository;
     private final RoomServiceImpl roomService;
     private final RoomRepository roomRepository;
+    private final HotelRoomRepository hotelRoomRepository;
     /*
      * 메소드명 :
      * 인수 값 :
@@ -52,5 +55,10 @@ public class ZzService {
         Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum, pageable)
                 .stream().findFirst().orElseThrow(EntityNotFoundException::new);
         return room.getMember();
+    }
+
+    public Company hotelroomNumToCompany(Long hotelroomNum){
+        return hotelRoomRepository.findById(hotelroomNum).orElseThrow(EntityNotFoundException::new)
+                .getCompany();
     }
 }
