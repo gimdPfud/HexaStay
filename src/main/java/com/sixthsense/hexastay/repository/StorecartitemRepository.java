@@ -19,6 +19,7 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
 
     //장바구니에 상품이 있는지 확인하기.
     Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNum(Long cartNum, Long menuNum);
+    Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNumAndStoremenuOptions(Long storecartNum, Long storemenuNum, String storemenuOptions);
 
     //장바구니의 아무 아이템 가져오기
     List<Storecartitem> findByStorecart_StorecartNum(Long storecartStorecartNum);
@@ -30,7 +31,8 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
             "sci.storemenu.storemenuName, " +
             "sci.storemenu.storemenuPrice, " +
             "sci.storecartitemCount, " +
-            "sci.storemenu.storemenuImgMeta" +
+            "sci.storemenu.storemenuImgMeta, " +
+            "sci.storemenuOptions " +
             ") from Storecartitem sci where sci.storecart.room.hotelRoom.hotelRoomNum=:hotelRoomNum")
     List<StorecartitemViewDTO> storeCartViewList(Long hotelRoomNum);
 

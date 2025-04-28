@@ -1,17 +1,21 @@
 /***********************************************
  * 클래스명 : Storecartitem
  * 기능 :
- * 작성자 :
+ * 작성자 : 김예령
  * 작성일 : 2025-04-07
- * 수정 : 2025-04-07
+ * 수정 : 2025-04-25, 옵션 추가
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
+import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,4 +36,6 @@ public class Storecartitem {
     private Storemenu storemenu;
 
     private Integer storecartitemCount;          //장바구니에 담은 수량
+
+    private String storemenuOptions;  //주문한 상품의 옵션들??
 }

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Log4j2
@@ -53,17 +53,40 @@ public class StoreCartController {
             throw new RuntimeException(e);
         }
     }
+
+
     /*2. 장바구니 보기 (목록)*/
     @GetMapping("/list")
     public String cartList(Model model){
         List<StorecartitemViewDTO> list = storecartService.getCartList(hotelroomNum);
-        AtomicReference<Long> totalpirce = new AtomicReference<>(0L);
+        final Long[] totalPrice = {0L};
+
+        //옵션용 map ??
+        Map<Long, List<List<String>>> optionMap = new HashMap<>();
+
         list.forEach(dto -> {
-            totalpirce.updateAndGet(v -> v + (long) dto.getStoremenuCount() * dto.getStoremenuPrice());
+            if(dto.getStoremenuOptions()!=null&&!dto.getStoremenuOptions().isBlank()){
+
+                List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
+
+                //옵션가격 더하기
+                List<List<String>> optionList = new ArrayList<>();
+                for (String option : options) {
+                    List<String> optionInfo = Arrays.stream(option.split(":")).toList();
+                    totalPrice[0] += Long.parseLong(optionInfo.get(2))*dto.getStoremenuCount();
+                    optionList.add(optionInfo);
+                }
+
+                optionMap.put(dto.getStorecartitemNum(),optionList);
+
+            }
+            //메뉴가격 더하기
+            totalPrice[0] += (long) dto.getStoremenuCount() * dto.getStoremenuPrice();
         });
-//        log.info(totalpirce);
+        optionMap.forEach((key, value) -> value.forEach(data->log.info("Key: {}, Value: {}", key, data)));
+        model.addAttribute("optionMap",optionMap);
         model.addAttribute("list",list);
-        model.addAttribute("totalPrice",totalpirce);
+        model.addAttribute("totalPrice", totalPrice[0]);
         return "mobilestore/cart/list";
     }
     /*3. 장바구니 수정 (수정)*/
