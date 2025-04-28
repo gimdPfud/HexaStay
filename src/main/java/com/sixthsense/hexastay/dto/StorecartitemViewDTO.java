@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import groovy.transform.Sealed;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +22,5 @@ public class StorecartitemViewDTO {
     private Integer storemenuPrice;     //상품가격
     private Integer storemenuCount;     //상품개수
     private String imgName;             //이미지
+    private String storemenuOptions;  //주문한 상품의 옵션들??
 }

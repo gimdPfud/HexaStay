@@ -3,6 +3,7 @@ package com.sixthsense.hexastay.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sixthsense.hexastay.entity.QStoremenu;
 import com.sixthsense.hexastay.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,53 @@ import static com.sixthsense.hexastay.entity.QStore.store;
 public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    QStoremenu storemenu = QStoremenu.storemenu;
+
+
+    @Override
+    public Page<Store> storeTypeSearch(Long companyNum, String storeType, String menuKeyword, Pageable pageable) {
+        BooleanExpression conditions = filteringConditions(companyNum,storeType);
+
+        List<Store> content = queryFactory
+                .selectDistinct(store)
+                .join(storemenu).on(storemenu.store.eq(store))
+                .leftJoin(store.company).fetchJoin()
+                .where(
+                        conditions,
+                        menuKeyword!=null && !menuKeyword.isBlank() ? storemenu.storemenuName.contains(menuKeyword) : null
+                        )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(store.storeNum.desc())
+                .fetch();
+        long total = queryFactory
+                .select(store.countDistinct())
+                .from(store)
+                .join(storemenu).on(storemenu.store.eq(store))
+                .where(
+                        conditions,
+                        menuKeyword!=null && !menuKeyword.isBlank() ? storemenu.storemenuName.contains(menuKeyword) : null
+                )
+                .fetchOne();
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    private BooleanExpression filteringConditions(Long companyNum, String storeType) {
+        BooleanExpression condition = Expressions.TRUE;
+        if(companyNum!=null&&companyNum!=0L){
+            condition = condition.and(store.company.companyNum.eq(companyNum));
+        }
+        if(storeType!=null&&!storeType.isBlank()){
+            condition = condition.and(store.storeCategory.eq(storeType));
+        }
+        return condition;
+    }
+
+
+
+
+
 
     @Override
     public Page<Store> listStoreSearch(Long companyNum, String searchType, String keyword, Pageable pageable, String... status) {

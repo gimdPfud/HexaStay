@@ -40,4 +40,5 @@ public class Salaries extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin")
     private Admin admin;
+
 }

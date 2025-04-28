@@ -34,4 +34,6 @@ public class Orderstoreitem {
     private Integer orderstoreitemPrice;
     //주문한 메뉴들의 총가격
     private Integer orderstoreitemTotalPrice;
+
+    private String storemenuOptions;
 }

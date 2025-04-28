@@ -7,4 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface StoreRepositoryCustom {
     Page<Store> listStoreSearch(Long companyNum,String searchType ,String keyword, Pageable pageable,String... status);
+    Page<Store> storeTypeSearch(Long companyNum, String storeType, String menuKeyword, Pageable pageable);
 }

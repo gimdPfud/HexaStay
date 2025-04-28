@@ -42,7 +42,7 @@
         <h2 class="text-center mb-4" >객실 배정</h2>
 
 
-        <form th:action="@{/register-hotelroom}" th:object="${memberDTO}" method="post" class="row g-3">
+        <form th:action="@{/register-hotelroom}" th:object="${memberDTO}" method="post" class="row g-3"><!--등록form 시작점-->
             <!-- 회원 선택 버튼 -->
             <div class="col-md-6" style="width: 30%;">
                 <div class="input-group" style="height: 40px; font-size: 0.9rem;">
@@ -98,7 +98,7 @@
                     룸배정 목록
                 </a>
             </div>
-        </form>
+        </form><!--등록 form 끝나는 지점-->
         <!-- 페이지네이션 컨트롤은 밖에서 독립적으로 위치 -->
         <div class="d-flex justify-content-center mt-3" id="hotelRoomPagination"></div>
 
@@ -241,17 +241,16 @@
 
                     data.content.forEach(room => {
                         const card = `
-                        <div class="col-md-4 mb-3">
-                            <div class="card" onclick="selectHotelRoom(${room.hotelRoomNum}, this)">
-                                <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지" style="height:200px; object-fit:cover;">
-
-                                <div class="card-body">
-                                    <h5 class="card-title">${room.hotelRoomName}</h5>
-                                    <p class="card-text">전화: ${room.hotelRoomPhone} / 가격: ${room.hotelRoomPrice}</p>
+                            <div class="col-md-4 mb-3">
+                                <div class="card" onclick="selectHotelRoom(${room.hotelRoomNum}, this)">
+                                    <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지" style="height:200px; object-fit:cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${room.hotelRoomName}</h5>
+                                        <p class="card-text">전화: ${room.hotelRoomPhone} / 가격: ${room.hotelRoomPrice}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
                         listContainer.insertAdjacentHTML('beforeend', card);
                     });
 

@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -28,9 +29,21 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findAll(Pageable pageable);
 
+
+    // hotelRoomNum 기준으로 연결된 member 리스트로 가져오는 repository  가져오기
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
+    List<Room> findByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+    // hotelRoomNum 기준으로 연결된 member들만 가져오기
+    @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
+    Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
     //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
     Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
+
+
 
 
 

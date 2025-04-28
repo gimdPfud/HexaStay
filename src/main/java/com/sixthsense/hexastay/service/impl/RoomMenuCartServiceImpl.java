@@ -125,8 +125,30 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             log.info("총 수량 설정됨 - Count {}", roomMenuCartItemDTO.getRoomMenuCartItemCount());
 
             int finalPrice = roomMenu.getRoomMenuPrice();
+            int optionTotalPrice = 0; // 옵션 가격 총합
+
+            List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions();
+
+            if (optionDTOList != null && !optionDTOList.isEmpty()) {
+                for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
+                    RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRooMenuCartItemOptionNum())
+                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다."));
+
+                    RoomMenuCartItemOption option = new RoomMenuCartItemOption();
+                    option.setRoomMenuCartItem(insertCartItem); // FK 연결
+                    option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName()); // 이름 복사
+                    option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 단가
+                    option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 수량
+
+                    optionTotalPrice += menuOption.getRoomMenuOptionPrice() * optionDTO.getRoomMenuCartItemOptionAmount();
+
+                    roomMenuCartItemOptionRepository.save(option);
+                }
+            }
+
+
             if (roomMenuCartItemDTO.getRoomMenuSelectOptionPrice() != null) {
-                finalPrice += roomMenuCartItemDTO.getRoomMenuSelectOptionPrice();
+                finalPrice = (roomMenu.getRoomMenuPrice() + optionTotalPrice) * roomMenuCartItemDTO.getRoomMenuCartItemAmount();
             }
             insertCartItem.setRoomMenuCartItemPrice(finalPrice);
             insertCartItem.setRoomMenuSelectOptionName(roomMenuCartItemDTO.getRoomMenuSelectOptionName());
@@ -140,7 +162,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             // 장바구니에 아이템이 추가된 후 로그 출력
             log.info("장바구니에 아이템 추가됨 장바구니에 추가된 pk 넘버: " + roomMenu.getRoomMenuNum());
 
-            List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions();
 
             if (optionDTOList != null && !optionDTOList.isEmpty()) {
                 for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
@@ -176,13 +197,17 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             roomMenuCartItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice());
 
             //  가격도 다시 계산
-            int finalPrice = roomMenu.getRoomMenuPrice();
-            if (roomMenuCartItemDTO.getRoomMenuSelectOptionPrice() != null) {
-                finalPrice += roomMenuCartItemDTO.getRoomMenuSelectOptionPrice();
-            }
-            roomMenuCartItem.setRoomMenuCartItemPrice(finalPrice);
+            int basePrice = roomMenu.getRoomMenuPrice(); // 기본 가격
+            Integer optionPrice = roomMenuCartItemDTO.getRoomMenuSelectOptionPrice(); // 옵션 가격
 
-            roomMenuCartItemRepository.save(roomMenuCartItem); // 수정사항 저장
+            if (optionPrice == null) {
+                optionPrice = 0;
+            }
+
+            int totalPricePerOne = basePrice + optionPrice;
+            int finalPrice = totalPricePerOne * newAmount; // newAmount는 최종 수량
+
+            roomMenuCartItem.setRoomMenuCartItemPrice(finalPrice);
 
             return roomMenuCartItem.getRoomMenuCartItemNum();
         }
