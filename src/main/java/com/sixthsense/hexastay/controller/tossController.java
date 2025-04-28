@@ -37,7 +37,7 @@ public class tossController {
 
     @RequestMapping(value = "/storepayment", method = {RequestMethod.GET, RequestMethod.POST})
     public String storetossControl (@RequestParam Integer tossprice, @RequestParam Long o, Model model) {
-        log.info("히히 주문 토스");
+        log.info("히히 주문 토스 store");
         model.addAttribute("tossprice", tossprice);
         model.addAttribute("o", o);
         return "toss/store/payment";
