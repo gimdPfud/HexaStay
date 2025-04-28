@@ -6,54 +6,55 @@
     <meta charset="UTF-8">
     <title>외부업체 서비스 등록</title>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <h2 class="text-center">외부업체 메뉴 등록</h2>
-    <div class="card p-4">
+    <h2 class="text-center">요식업체 메뉴 등록</h2>
+    <div class="card p-4 mt-4 w-100 bg-light" >
         <form action="/admin/store/menu/insert" method="post" enctype="multipart/form-data">
-
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+            <div class="container" style="max-width: 700px;">
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                    </div>
+                    <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="storemenuImg" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
-                <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storemenuImg" class="btn btn-light form-control rounded-pill"
-                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">메뉴 이름</label>
-                <input type="text" class="form-control" name="storemenuName">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 가격</label>
-                <input type="number" class="form-control" name="storemenuPrice">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 설명</label>
-                <textarea class="form-control" maxlength="255" name="storemenuContent" placeholder="용량 또는 크기를 꼭 기입해주세요."></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 카테고리</label>
-                <select name="storemenuCategory" class="form-select form-control">
-                    <option value="main">메인</option>
-                    <option value="side">사이드</option>
-                    <option value="drink">음료</option>
-                    <option value="plus">추가</option>
-                </select>
-            </div>
-            <div class="mb-3 d-grid">
-                <button type="button" class="btn btn-outline-primary" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
-                <input hidden type="number" class="form-control" name="storeNum" th:value="${storeNum}" readonly>
-            </div>
-            <div class="mb-3">
-                <div id="storemenuOptionInputs"></div>
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">등록</button>
-                <a th:href="@{'/admin/store/read?idid='+${storeNum}}" class="btn btn-danger">취소</a>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 이름</label>
+                    <input type="text" class="form-control" name="storemenuName">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 가격</label>
+                    <input type="number" class="form-control" name="storemenuPrice">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 설명</label>
+                    <textarea class="form-control" maxlength="255" name="storemenuContent" placeholder="용량 또는 크기를 꼭 기입해주세요."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 카테고리</label>
+                    <select name="storemenuCategory" class="form-select form-control">
+                        <option value="main">메인</option>
+                        <option value="side">사이드</option>
+                        <option value="drink">음료</option>
+                        <option value="plus">추가</option>
+                    </select>
+                </div>
+                <div class="mb-3 d-grid">
+                    <button type="button" class="btn btn-outline-primary" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
+                    <input hidden type="number" class="form-control" name="storeNum" th:value="${storeNum}" readonly>
+                </div>
+                <div class="mb-3">
+                    <div id="storemenuOptionInputs"></div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">등록</button>
+                    <a th:href="@{'/admin/store/read?idid='+${storeNum}}" class="btn btn-danger">취소</a>
+                </div>
             </div>
         </form>
     </div>
