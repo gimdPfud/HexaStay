@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import jakarta.persistence.*;
@@ -28,6 +29,8 @@ public class RoomMenuCartDTO {
     private Long roomMenuCartNum; // 장바구니의 pk
 
     private Member member;  // 사용자와 장바구니의 연관관계
+
+    private Room room;
 
 
 }

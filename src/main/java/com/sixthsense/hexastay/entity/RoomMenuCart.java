@@ -40,8 +40,12 @@ public class RoomMenuCart {
     private Long roomMenuCartNum; // 장바구니의 pk
 
     @OneToOne
-    @JoinColumn(name = "memberNum")
+    @JoinColumn(name = "member")
     private Member member;  // 사용자와 장바구니의 연관관계
+
+    @OneToOne // 하나의 Room (투숙)에 하나의 활성화된 장바구니만 있다고 가정
+    @JoinColumn(name = "room") // Room 테이블의 PK 컬럼 이름
+    private Room room;
 
 }
 
