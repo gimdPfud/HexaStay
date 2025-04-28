@@ -20,6 +20,26 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+
+    @Override
+    public Page<Store> storeTypeSearch(Long hotelroomNum, String storeType, String menuKeyword, Pageable pageable) {
+        BooleanExpression conditions = searchConditions(hotelroomNum,storeType, menuKeyword);
+        return null;
+    }
+
+    private BooleanExpression searchConditions(Long hotelroomNum, String storeType, String menuKeyword) {
+        BooleanExpression condition = Expressions.TRUE;
+
+        if(hotelroomNum!=null&&hotelroomNum!=0L){
+            condition = condition.and(store.company)
+        }
+    }
+
+
+
+
+
+
     @Override
     public Page<Store> listStoreSearch(Long companyNum, String searchType, String keyword, Pageable pageable, String... status) {
         //조건

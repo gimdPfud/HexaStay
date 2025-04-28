@@ -14,6 +14,7 @@ import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.StoreLikeRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
+import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.ZzService;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreServiceImpl implements StoreService {
     private final RoomRepository roomRepository;
+    private final CompanyService companyService;
     private final ZzService zzService;
     private final StoreRepository storeRepository;
     private final MemberRepository memberRepository;
@@ -258,6 +260,17 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public Page<StoreDTO> clientlist(Pageable pageable) {
+
+        Page<Store> storeList = storeRepository.storeTypeSearch(null, "", "", pageable);
+        Page<StoreDTO> list = storeList.map(data -> {
+            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
+            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+            return storeDTO;
+        });
+        return list;
+    }
+    @Override
+    public Page<StoreDTO> clientlist(String type, String keyword, Pageable pageable) {
         Page<Store> storeList = storeRepository.listStoreSearch(null, "", "", pageable, "alive","closed");
         Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);

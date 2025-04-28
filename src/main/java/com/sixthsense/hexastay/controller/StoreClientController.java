@@ -23,10 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,16 +43,31 @@ public class StoreClientController {
 
 /* 1. 스토어 목록 보기
         get. */
+//    @GetMapping("/list")
+//    public String list(Model model, Pageable pageable){
+//        Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
+////        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
+//        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
+//        model.addAttribute("list",storeDTOPage);
+//        return "mobilestore/list";
+//    }
+
     @GetMapping("/list")
-    public String list(Model model, Pageable pageable){
+    public String typelist(@RequestParam(required = false) String type,
+                           @RequestParam(required = false) String keyword,
+                           Model model, Pageable pageable){
+        log.info("type : "+type);
+        log.info("keyword : "+keyword);
+
         Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
-//        log.info("스토어 목록 불러왔니?? : "+storeDTOPage.getSize());
-        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
+
+        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());//맨 아래 버튼 (숫자)를 위해..
         model.addAttribute("list",storeDTOPage);
         return "mobilestore/list";
     }
 
-/* 2. 스토어 상세 보기
+
+    /* 2. 스토어 상세 보기
         get. */
     @GetMapping("/read/{storeNum}")
     public String storeRead(@PathVariable Long storeNum, Model model){
