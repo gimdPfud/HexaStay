@@ -1,61 +1,58 @@
-<!--일단 모양만 만듬-->
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}"
->
+      layout:decorate="~{layouts/layoutmobile.html}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>매장 상세</title>
+    <link rel="stylesheet" href="/css/roommenu.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
+        .menu-image-container { display: flex; justify-content: center; align-items: center; height: 100%; min-height: 150px; margin-bottom: 30px; }
+        .menu-image { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
+        .text-info { display: flex; flex-direction: column; padding-left: 10px; }
+        .menu-name { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
+        .menu-content { color: black; font-size: 0.8rem; }
+        .price-box { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
+        .menu-badge { display: inline-block; background-color: #e0f7fa; color: #00796b; font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; margin-bottom: 4px; font-weight: bold; }
+        .like-section { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
+        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
+        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
+        .div-card { background: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 10px; margin-bottom: 10px; }
+        .sold-out { opacity: 0.5; position: relative; pointer-events: none; }
+        .sold-out::after { content: "품절"; color: white; background-color: red; font-weight: bold; padding: 2px 6px; font-size: 12px; position: absolute; top: 10px; right: 10px; border-radius: 4px; }
+    </style>
 </head>
 <body>
 <div layout:fragment="contentorder">
+    <div class="container">
+        <!-- 매장 정보 -->
+        <div class="store-header text-center">
+            <h5 class="mb-2" th:text="${data.storeName}"></h5>
+            <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
+            <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
+            <small class="text-muted"><i class="bi bi-geo-alt"></i>
+                <a class="text-muted" th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
+            </small>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mapmodal" onclick="showMapBox()">지도보기</button>
+        </div>
 
-    <!-- 매장 정보 -->
-    <div class="store-header text-center">
-        <h5 class="mb-2" th:text="${data.storeName}"></h5>
-        <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
-        <small class="text-muted"><i class="bi bi-telephone"></i> <a class="text-muted" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a></small><br>
-        <small class="text-muted"><i class="bi bi-geo-alt"></i>
-            <a class="text-muted"
-               th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
-        </small>
-        <button type="button" class="btn btn-sm btn-outline-secondary"
-                data-bs-toggle="modal" data-bs-target="#mapmodal"
-                onclick="showMapBox()">지도보기</button>
-    </div>
-    <input type="hidden" id="storeLatitude"  name="storeLatitude" th:value="${data.storeLatitude}" readonly>
-    <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
+        <!-- 카테고리 탭 -->
+        <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
+            <li class="nav-item"><a class="nav-link active" href="#" onclick="filterCategory('메인')">메인</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('사이드')">사이드</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('음료')">음료</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="filterCategory('추가')">추가</a></li>
+        </ul>
 
-    <!-- 카테고리 기능 X 애초에 메뉴들 목록을 카테고리별로 정렬도 안했습니다... -->
-    <!-- Bootstrap nav-tabs 스타일 적용 -->
-    <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
-        <li class="nav-item">
-            <a class="nav-link active" href="#section-메인" onclick="setActiveTab(this)">메인</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#section-사이드" onclick="setActiveTab(this)">사이드</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#section-음료" onclick="setActiveTab(this)">음료</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#section-추가" onclick="setActiveTab(this)">추가</a>
-        </li>
-    </ul>
-
-    <!-- 메뉴 리스트 -->
-    <div class="container mt-3">
-        <div class="list-group storemenulist"></div>
+        <!-- 메뉴 카드 리스트 -->
+        <div class="menu-list mt-3"></div>
     </div>
 
-    <!--지도 모달-->
+    <!-- 지도 모달 -->
     <div class="modal" id="mapmodal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -70,102 +67,81 @@
         </div>
     </div>
 
-
-
-
-    <!--지도 javascript api app key-->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
-        let storemenulist = document.querySelector(".storemenulist");
-        let storenum = [[${data.storeNum}]]
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("페이지 로드 됨")
+        let storenum = [[${data.storeNum}]];
+        let menuListEl = document.querySelector('.menu-list');
+        let likedStates = {};
 
+        document.addEventListener("DOMContentLoaded", function () {
             fetch(`/member/store/menu/list/${storenum}`)
-                .then(response => {
-                    if(!response.ok){
-                        if(response.status===404){
-                            return response.text()
-                                .then(errmsg=> {
-                                    let error = new Error(errmsg)
-                                    error.status = 404;
-                                    throw error;
-                                })
-                        }
-                    }
-                    return response.json();
-                })
+                .then(res => res.json())
+                .then(list => renderMenuCards(list));
+        });
+
+        function renderMenuCards(list) {
+            let tags = '';
+            list.forEach(item => {
+                const soldOut = item.storemenuAmount === 0 ? 'sold-out' : '';
+                const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
+
+                tags += `
+                <div class="div-card ${soldOut}" data-category="${item.storemenuCategory}">
+                    <div class="d-flex">
+                        <div class="menu-image-container">
+                            <img src="${image}" class="menu-image">
+                        </div>
+                        <div class="text-info">
+
+                            <p class="menu-name">${item.storemenuName}</p>
+                            <div class="price-box">${item.storemenuPrice.toLocaleString()} 원</div>
+                        </div>
+                    </div>
+                    <div class="like-section">
+                        <span id="likeIcon-${item.storemenuNum}" onclick="toggleLike(${item.storemenuNum}, event)" class="like-icon">🤍</span>
+                        <span id="likeCount-${item.storemenuNum}" class="like-count">0</span>
+                    </div>
+                </div>`;
+            });
+            menuListEl.innerHTML = tags;
+        }
+
+        function filterCategory(category) {
+            document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.div-card').forEach(card => {
+                card.style.display = card.dataset.category === category ? 'block' : 'none';
+            });
+        }
+
+        function toggleLike(menuId, event) {
+            event.stopPropagation(); event.preventDefault();
+            const liked = likedStates[menuId] || false;
+            const url = liked ? `/member/store/menu/unlike/${menuId}` : `/member/store/menu/like/${menuId}`;
+
+            fetch(url, { method: 'POST' })
+                .then(res => res.json())
                 .then(data => {
-                    showstoremenu(data)
-                })
-                .catch(error => {
-                    if(error.status===404) {
-                        showemptymenu(error.message);
-                    } else {
-                        console.log(error)
-                    }
+                    const icon = document.getElementById(`likeIcon-${menuId}`);
+                    const count = document.getElementById(`likeCount-${menuId}`);
+                    icon.textContent = liked ? '🤍' : '❤️';
+                    icon.style.color = liked ? 'gray' : 'red';
+                    count.textContent = data.likeCount;
+                    likedStates[menuId] = !liked;
                 });
-        })
+        }
 
         function showMapBox() {
-            let yy = document.getElementById("storeLatitude").value
-            let xx = document.getElementById("storeLongitude").value
+            let yy = document.getElementById("storeLatitude").value;
+            let xx = document.getElementById("storeLongitude").value;
             var container = document.getElementById('map');
-            var options = {
-                center: new kakao.maps.LatLng(yy, xx),
-                level: 2
-            };
+            var options = { center: new kakao.maps.LatLng(yy, xx), level: 2 };
             var map = new kakao.maps.Map(container, options);
-            var marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(yy, xx)
-            });
+            var marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(yy, xx) });
             marker.setMap(map);
         }
-
-        /*
-                 * 메소드명 : showstoremenu
-                 * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
-                 * 리턴 값 :
-                 * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
-                 * */
-        function showstoremenu(list) {
-            let tagscontent = "";
-            let imageTag = "";
-            for (let i=0; i<list.length;i++){
-                if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
-                    imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 80px; height: 80px;">`;
-                } else {
-                    imageTag = `<img src="/store/menu/default.png" style="width: 80px; height: 80px;">`;
-                }
-                tagscontent += `<a href="/member/store/menu/read/${list[i].storemenuNum}" class="text-decoration-none">
-    <div class="list-group-item d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    ${imageTag}
-                    <div>
-                        <strong>${list[i].storemenuName}</strong><br>
-                        <small>${list[i].storemenuPrice} 원</small>
-                    </div>
-                </div>
-            </div></a>`
-            }
-            storemenulist.innerHTML=tagscontent;
-        }
-        /*
-                 * 메소드명 : showemptymenu
-                 * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
-                 * 리턴 값 :
-                 * 기  능 : 선언될 때 메시지를 로그로 출력함
-                 * */
-        function showemptymenu(msg) {
-            console.log(msg)
-        }
-
-        function setActiveTab(tab) {
-            document.querySelectorAll(".nav-link").forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-        }
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
 </div>
 </body>
 </html>
