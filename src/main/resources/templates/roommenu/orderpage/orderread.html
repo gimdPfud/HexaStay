@@ -262,6 +262,7 @@
                                            name="optionQuantities"
                                            th:id="'option-' + ${option.roomMenuOptionName}"
                                            min="0" value="0"
+                                           th:data-id="${option.roomMenuOptionNum}"
                                            th:data-name="${option.roomMenuOptionName}"
                                            th:data-price="${option.roomMenuOptionPrice}" />
                                     <span class="input-group-text">개</span>
@@ -372,9 +373,10 @@
                     const quantity = parseInt($(this).val()) || 0;
                     if (quantity > 0) {
                         options.push({
-                            name: $(this).data("name"),
-                            price: $(this).data("price"),
-                            quantity: quantity
+                            rooMenuCartItemOptionNum: $(this).data("id"),
+                            roomMenuCartItemOptionName: $(this).data("name"),
+                            roomMenuCartItemOptionPrice: $(this).data("price"),
+                            roomMenuCartItemOptionAmount: quantity // dto 필드명과 일치
                         });
                     }
                 });
@@ -382,12 +384,18 @@
             }
 
             function sendCartData(isOrder = false) {
+                const options = collectOptionData(); // 한번만 호출
                 const paramData = {
                     roomMenuCartItemNum: cartAdd.val(),
-                    roomMenuCartItemAmount: $("#count").val(),
-                    selectedOptions: collectOptionData(),
-                    optionTotalPrice: collectOptionData().reduce((acc, opt) => acc + (opt.price * opt.quantity), 0)
+                    roomMenuCartItemAmount: parseInt($("#count").val()) || 1,
+                    selectedOptions: options,
+                    optionTotalPrice: options.reduce(
+                        (acc, opt) => acc + (opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount),
+                        0
+                    )
                 };
+
+                console.log("전송 데이터 확인:", JSON.stringify(paramData, null, 2));
 
                 $.ajax({
                     url: "/roommenu/orderpage/orderread",
