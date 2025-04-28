@@ -25,7 +25,7 @@ public class RoomMenuOrderItem extends BaseEntity {
     private RoomMenu roomMenu;
 
     @ManyToOne(fetch = FetchType.LAZY)  //다대일
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "roomMenuOrderNum")
     private RoomMenuOrder roomMenuOrder;
 
     private Integer roomMenuOrderPrice;  //주문가격
