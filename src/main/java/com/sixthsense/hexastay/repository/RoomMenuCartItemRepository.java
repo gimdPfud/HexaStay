@@ -59,6 +59,13 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     // RoomMenuCartItemRepository
     List<RoomMenuCartItem> findByRoomMenuCart(RoomMenuCart cart);
 
+//     @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(" +
+//            "rmci.roomMenuCartItemNum, rmi.roomMenuName, rmi.roomMenuPrice, rmci.roomMenuCartItemAmount, rmi.roomMenuImageMeta) " +
+//            "FROM RoomMenuCartItem rmci " +
+//            "JOIN RoomMenu rmi ON rmci.roomMenu.roomMenuNum = rmi.roomMenuNum " +
+//            "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
+//            "ORDER BY rmci.roomMenuCartItemNum DESC")
+//    public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
 
 }
 
