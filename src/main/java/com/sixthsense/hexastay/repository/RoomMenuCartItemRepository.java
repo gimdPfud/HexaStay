@@ -44,7 +44,8 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
             "rmci.roomMenuCartItemAmount, " +
             "rmci.roomMenuSelectOptionName, " +
             "rmci.roomMenuSelectOptionPrice, " +
-            "rmi.roomMenuImageMeta) " +
+            "rmi.roomMenuImageMeta, " +
+            "(rmi.roomMenuPrice + COALESCE(rmci.roomMenuSelectOptionPrice, 0) * rmci.roomMenuCartItemAmount) ) " +  // 가격 계산 추가
             "FROM RoomMenuCartItem rmci " +
             "JOIN RoomMenu rmi ON rmci.roomMenu.roomMenuNum = rmi.roomMenuNum " +
             "WHERE rmci.roomMenuCart.member.memberEmail = :email " +

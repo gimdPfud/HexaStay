@@ -197,13 +197,17 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             roomMenuCartItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice());
 
             //  가격도 다시 계산
-            int finalPrice = roomMenu.getRoomMenuPrice();
-            if (roomMenuCartItemDTO.getRoomMenuSelectOptionPrice() != null) {
-                finalPrice += roomMenuCartItemDTO.getRoomMenuSelectOptionPrice();
-            }
-            roomMenuCartItem.setRoomMenuCartItemPrice(finalPrice);
+            int basePrice = roomMenu.getRoomMenuPrice(); // 기본 가격
+            Integer optionPrice = roomMenuCartItemDTO.getRoomMenuSelectOptionPrice(); // 옵션 가격
 
-            roomMenuCartItemRepository.save(roomMenuCartItem); // 수정사항 저장
+            if (optionPrice == null) {
+                optionPrice = 0;
+            }
+
+            int totalPricePerOne = basePrice + optionPrice;
+            int finalPrice = totalPricePerOne * newAmount; // newAmount는 최종 수량
+
+            roomMenuCartItem.setRoomMenuCartItemPrice(finalPrice);
 
             return roomMenuCartItem.getRoomMenuCartItemNum();
         }
