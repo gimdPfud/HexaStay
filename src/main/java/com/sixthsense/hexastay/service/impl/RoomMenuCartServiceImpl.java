@@ -38,7 +38,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final RoomMenuOptionRepository roomMenuOptionRepository;
     private final RoomMenuService roomMenuService;
     private final RoomMenuCartItemOptionRepository roomMenuCartItemOptionRepository;
-    private final RoomRepository roomRepository;
 
 
     /***************************************************
@@ -80,116 +79,103 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     public Long RoomMenuCartInsert(String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
         log.info("장바구니 추가 시스템 도입, 회원 이메일: {}", email);
 
-        // 1. 룸서비스 메뉴에서 해당된 ID값을 찾아 엔티티 가져오기
+        // 룸서비스 메뉴에서 해당된 ID값을 찾아 해당된 회원을 설정하기.
         RoomMenu roomMenu =
                 roomMenuRepository.findById(roomMenuCartItemDTO.getRoomMenuCartItemNum())
-                        .orElseThrow(() -> new EntityNotFoundException("해당 룸 메뉴를 찾을 수 없습니다. ID: " + roomMenuCartItemDTO.getRoomMenuCartItemNum()));
-        log.info("조회된 RoomMenu: {}", roomMenu.getRoomMenuName());
+                        .orElseThrow(EntityNotFoundException::new);
+        log.info("roomMenuCartItemDTO.getRoomMenuCartItemNum() = {}", roomMenuCartItemDTO.getRoomMenuCartItemNum());
+        log.info("누가 산 장바구니?" + email);
 
-        // 2. 누가 샀는가? - Member 엔티티 가져오기
+        // 누가 샀는가?
         Member member = memberRepository.findByMemberEmail(email);
-        if (member == null) {
-            throw new EntityNotFoundException("해당 이메일의 멤버를 찾을 수 없습니다. Email: " + email);
+        log.info("멤버 찾음" + member);
+
+
+        // 내 장바구니 구현
+        RoomMenuCart roomMenuCart =
+                roomMenuCartRepository.findByMember_MemberEmail(email);
+
+
+
+        if (roomMenuCart == null) {
+            log.info("회원의 장바구니가 존재하지 않습니다.");
+            RoomMenuCart insertCart = new RoomMenuCart();
+            insertCart.setMember(member);
+            roomMenuCart =
+                    roomMenuCartRepository.save(insertCart);     // 장바구니가 없다면 새로 만들기
         }
-        log.info("조회된 Member: {}", member.getMemberEmail());
+        //장바구니에 담겨진 아이템 찾기
+        RoomMenuCartItem roomMenuCartItem =
+                roomMenuCartItemRepository
+                        .findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu)
+                        .orElse(null);
 
-        // ★★★ 3. 이 멤버의 현재 활성화된 Room (투숙) 정보 찾기 ★★★
-        // 추가하신 findByMemberAndCheckOutDateIsNull 메서드를 사용합니다.
-        Optional<Room> currentRoomOptional = roomRepository.findByMemberAndCheckOutDateIsNull(member);
-
-        // 현재 투숙 중인 Room 정보가 없는 경우 예외 발생
-        Room currentRoom = currentRoomOptional.orElseThrow(
-                () -> new EntityNotFoundException("현재 투숙 중인 방이 없습니다. 룸서비스 주문은 체크인 후에 가능합니다.")
-        );
-
-        log.info("조회된 현재 Room (투숙) 정보. Room PK: {}, HotelRoomNum: {}", currentRoom.getRoomNum(), currentRoom.getHotelRoom().getHotelRoomNum());
-
-
-        // ★★★ 4. 현재 Room (투숙)과 연결된 RoomMenuCart (장바구니) 찾거나 생성하기 ★★★
-        // 장바구니는 이제 Room에 연결됩니다. findByRoom(Room room) 메서드를 사용합니다.
-        Optional<RoomMenuCart> roomMenuCartOptional = roomMenuCartRepository.findByRoom(currentRoom);
-
-        RoomMenuCart roomMenuCart;
-
-        if (roomMenuCartOptional.isEmpty()) {
-            log.info("현재 Room (투숙 정보)에 연결된 장바구니가 존재하지 않습니다. 새로 생성합니다.");
-            RoomMenuCart newCart = new RoomMenuCart();
-            newCart.setRoom(currentRoom); // ★ 새로 생성 시, Room 정보 설정 ★
-            newCart.setMember(member);   // ★ RoomMenuCart 엔티티에 Member FK도 있으므로, Member 정보도 설정 ★
-            roomMenuCart = roomMenuCartRepository.save(newCart);     // 장바구니가 없다면 새로 만들기
-            log.info("새 장바구니 생성됨. 장바구니 PK: {}", roomMenuCart.getRoomMenuCartNum());
-        } else {
-            roomMenuCart = roomMenuCartOptional.get(); // Optional에서 엔티티 가져오기
-            log.info("현재 Room (투숙 정보)에 연결된 기존 장바구니 찾음. 장바구니 PK: {}", roomMenuCart.getRoomMenuCartNum());
-            // 기존 장바구니를 찾은 경우에도 Member 정보가 올바른지 한 번 더 확인 (findByRoom으로 찾았으므로 보통 일치해야 함)
-            if (!roomMenuCart.getMember().getMemberNum().equals(member.getMemberNum())) {
-                log.error("찾은 장바구니({}번)의 멤버({})와 현재 멤버({})가 일치하지 않습니다.",
-                        roomMenuCart.getRoomMenuCartNum(), roomMenuCart.getMember().getMemberEmail(), member.getMemberEmail());
-                throw new IllegalStateException("장바구니 정보가 올바르지 않습니다. (멤버 불일치)");
-            }
-        }
-
-        // 5. 장바구니에 담겨진 동일 아이템 찾기 (RoomMenuCart와 RoomMenu 기준으로)
-        // findByRoomMenuCartAndRoomMenu 메서드는 Optional을 반환하도록 수정하는 것이 더 안전합니다.
-        Optional<RoomMenuCartItem> existingItemOptional =
-                roomMenuCartItemRepository.findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu);
-
-
-        if (existingItemOptional.isEmpty()) { // Optional.isEmpty() 사용
-            // 6-1. 장바구니에 동일 아이템이 담겨있지 않다면 새로 생성
-            log.info("장바구니에 신규 아이템 추가: {}", roomMenu.getRoomMenuName());
+        if (roomMenuCartItem == null) {
+            //장바구니에 아이템이 담겨있지 않다면
             RoomMenuCartItem insertCartItem = new RoomMenuCartItem();
-            insertCartItem.setRoomMenuCart(roomMenuCart); // ★ 새로 생성 시, 장바구니 연결 ★
-
+            insertCartItem.setRoomMenuCart(roomMenuCart); // 장바구니
+            // todo : (2) 여기 이상할지도 모름
+            // fixme : 레포지토리에 추가 안될지도 모름.
+            log.info(" RoomMenuCart 연결됨 - cartId: {}", roomMenuCart.getRoomMenuCartNum());
             insertCartItem.setRoomMenu(roomMenu); // 장바구니에 담길 아이템
+            log.info(" 아이템메뉴 설정됨 - pk : roommenunum: {}, roommenu: {}", roomMenu.getRoomMenuNum(), roomMenu.getRoomMenuName());
             insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); // 수량
-            insertCartItem.setRoomMenuCartItemCount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); // Count는 보통 Amount와 같게 시작
+            log.info(" 수량 설정됨 - amount: {}", roomMenuCartItemDTO.getRoomMenuCartItemAmount());
+            insertCartItem.setRoomMenuCartItemCount(roomMenuCartItemDTO.getRoomMenuCartItemAmount());
+            log.info("총 수량 설정됨 - Count {}", roomMenuCartItemDTO.getRoomMenuCartItemCount());
 
-            // 옵션 및 가격 계산 로직 (기존 코드와 유사)
-            int basePrice = roomMenu.getRoomMenuPrice();
-            int optionTotalPrice = 0; // 옵션 가격 총합 (계산을 위한 합계)
+            int finalPrice = roomMenu.getRoomMenuPrice();
+            int optionTotalPrice = 0; // 옵션 가격 총합
 
             List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions();
 
-            // 옵션 가격 먼저 계산
             if (optionDTOList != null && !optionDTOList.isEmpty()) {
                 for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
                     RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRooMenuCartItemOptionNum())
-                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRooMenuCartItemOptionNum()));
+                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다."));
+
+                    RoomMenuCartItemOption option = new RoomMenuCartItemOption();
+                    option.setRoomMenuCartItem(insertCartItem); // FK 연결
+                    option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName()); // 이름 복사
+                    option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 단가
+                    option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 수량
+
                     optionTotalPrice += menuOption.getRoomMenuOptionPrice() * optionDTO.getRoomMenuCartItemOptionAmount();
+
+                    roomMenuCartItemOptionRepository.save(option);
                 }
             }
 
-            // 아이템의 최종 가격 계산
-            int totalPricePerOne = basePrice + optionTotalPrice; // 메뉴 기본 가격 + 선택된 옵션 총 가격 (개당)
-            int finalItemPrice = totalPricePerOne * insertCartItem.getRoomMenuCartItemAmount(); // 최종 수량 반영
-            insertCartItem.setRoomMenuCartItemPrice(finalItemPrice);
 
-            // 선택된 옵션 이름과 가격 설정 (DTO에서 복사 - 이 필드는 선택된 옵션 요약 정보를 저장하는 용도로 보임)
+            if (roomMenuCartItemDTO.getRoomMenuSelectOptionPrice() != null) {
+                finalPrice = (roomMenu.getRoomMenuPrice() + optionTotalPrice) * roomMenuCartItemDTO.getRoomMenuCartItemAmount();
+            }
+            insertCartItem.setRoomMenuCartItemPrice(finalPrice);
             insertCartItem.setRoomMenuSelectOptionName(roomMenuCartItemDTO.getRoomMenuSelectOptionName());
-            insertCartItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice()); // DTO의 총 옵션 가격을 그대로 저장
+            insertCartItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice());
 
-            RoomMenuCartItem roomMenuCartItem = new RoomMenuCartItem();
 
             // 아이템을 저장하자.
-            roomMenuCartItem = roomMenuCartItemRepository.save(insertCartItem);
-            log.info("새로운 RoomMenuCartItem 저장됨. 아이템 PK: {}", roomMenuCartItem.getRoomMenuCartItemNum());
+            roomMenuCartItem =
+                    roomMenuCartItemRepository.save(insertCartItem);
 
-            // 아이템 옵션 저장 (RoomMenuCartItem이 저장된 후에 연결)
+            // 장바구니에 아이템이 추가된 후 로그 출력
+            log.info("장바구니에 아이템 추가됨 장바구니에 추가된 pk 넘버: " + roomMenu.getRoomMenuNum());
+
+
             if (optionDTOList != null && !optionDTOList.isEmpty()) {
                 for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
-                    // RoomMenuOption을 DB에서 다시 조회! (안정성 확보)
+                    // RoomMenuOption을 DB에서 다시 조회!
                     RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRooMenuCartItemOptionNum())
-                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRooMenuCartItemOptionNum()));
+                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다."));
 
                     RoomMenuCartItemOption option = new RoomMenuCartItemOption();
-                    option.setRoomMenuCartItem(roomMenuCartItem); // ★ 저장된 RoomMenuCartItem에 연결 ★
+                    option.setRoomMenuCartItem(roomMenuCartItem); // FK 연결
                     option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName()); // 이름 복사
                     option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 가격 복사
                     option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 수량은 그대로
 
-                    roomMenuCartItemOptionRepository.save(option); // 옵션 저장
-                    log.info("옵션 저장됨: {} (수량: {}, 가격: {})", option.getRoomMenuCartItemOptionName(), option.getRoomMenuCartItemOptionAmount(), option.getRoomMenuCartItemOptionPrice());
+                    roomMenuCartItemOptionRepository.save(option);
                 }
             }
 
@@ -197,41 +183,33 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             return roomMenuCartItem.getRoomMenuCartItemNum();
 
         } else {
-            // 6-2. 이미 장바구니에 동일한 아이템이 있다면 수량 업데이트
-            log.info("장바구니에 동일한 아이템({})이 이미 있습니다. 수량을 업데이트합니다.", roomMenu.getRoomMenuName());
-            RoomMenuCartItem existingItem = existingItemOptional.get(); // Optional에서 엔티티 가져오기
+            log.info("이미 장바구니에 동일한 아이템이 있습니다.");
 
-            // 기존 수량에 새로운 수량 추가
-            int newAmount = existingItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount();
-            existingItem.setRoomMenuCartItemAmount(newAmount);
-            existingItem.setRoomMenuCartItemCount(newAmount); // Count도 동일하게 업데이트
+            int newAmount = roomMenuCartItem.getRoomMenuCartItemAmount() + roomMenuCartItemDTO.getRoomMenuCartItemAmount();
+            roomMenuCartItem.setRoomMenuCartItemAmount(newAmount);
 
-            // 옵션 정보 및 가격 업데이트 (동일 아이템이 있을 때 옵션 처리는 비즈니스 규칙에 따라 다름)
-            // 여기서는 단순히 DTO의 옵션 정보로 기존 아이템의 요약 필드를 덮어쓰는 것으로 예시를 듭니다.
-            // 기존 옵션 항목(RoomMenuCartItemOption)을 어떻게 처리할지는 별도 로직 필요 (예: 모두 삭제 후 새로 추가, 수량 누적 등)
-            // 이 예시에서는 기존 RoomMenuCartItemOption 항목은 그대로 두고, RoomMenuCartItem의 요약 필드만 업데이트합니다.
-            // 실제 요구사항에 맞게 이 부분을 수정해야 합니다.
-            existingItem.setRoomMenuSelectOptionName(roomMenuCartItemDTO.getRoomMenuSelectOptionName());
-            existingItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice());
+            int newCount = (roomMenuCartItem.getRoomMenuCartItemCount() != null ? roomMenuCartItem.getRoomMenuCartItemCount() : 0)
+                    + roomMenuCartItemDTO.getRoomMenuCartItemAmount();
+            roomMenuCartItem.setRoomMenuCartItemCount(newCount);
 
-            // 가격 다시 계산 (업데이트된 수량 반영)
-            int basePrice = roomMenu.getRoomMenuPrice(); // 메뉴 기본 가격
+            //  옵션 정보도 업데이트
+            roomMenuCartItem.setRoomMenuSelectOptionName(roomMenuCartItemDTO.getRoomMenuSelectOptionName());
+            roomMenuCartItem.setRoomMenuSelectOptionPrice(roomMenuCartItemDTO.getRoomMenuSelectOptionPrice());
 
-            // 기존 옵션 항목들의 총 가격을 다시 계산하거나, 업데이트된 요약 옵션 가격 사용 (어떤 방식이 맞는지 설계 확인 필요)
-            // 여기서는 DTO에서 받은 총 옵션 가격을 사용한다고 가정합니다.
-            Integer optionTotalDTOPrice = roomMenuCartItemDTO.getRoomMenuSelectOptionPrice();
+            //  가격도 다시 계산
+            int basePrice = roomMenu.getRoomMenuPrice(); // 기본 가격
+            Integer optionPrice = roomMenuCartItemDTO.getRoomMenuSelectOptionPrice(); // 옵션 가격
 
-            int totalPricePerOne = basePrice + (optionTotalDTOPrice != null ? optionTotalDTOPrice : 0); // 개당 가격
-            int finalPrice = totalPricePerOne * newAmount; // 업데이트된 수량 반영
+            if (optionPrice == null) {
+                optionPrice = 0;
+            }
 
-            existingItem.setRoomMenuCartItemPrice(finalPrice);
+            int totalPricePerOne = basePrice + optionPrice;
+            int finalPrice = totalPricePerOne * newAmount; // newAmount는 최종 수량
 
-            // 기존 아이템 업데이트 저장 (JPA는 변경 감지로 자동 저장되기도 하지만 명시적 save도 가능)
-            roomMenuCartItemRepository.save(existingItem);
-            log.info("RoomMenuCartItem 업데이트됨. 아이템 PK: {}, 새 수량: {}", existingItem.getRoomMenuCartItemNum(), newAmount);
+            roomMenuCartItem.setRoomMenuCartItemPrice(finalPrice);
 
-            // 리턴값 반환 (업데이트된 아이템의 PK 반환)
-            return existingItem.getRoomMenuCartItemNum();
+            return roomMenuCartItem.getRoomMenuCartItemNum();
         }
     }
 
