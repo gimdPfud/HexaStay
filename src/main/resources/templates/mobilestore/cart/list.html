@@ -1,75 +1,90 @@
-<!--fixme 디자인 다 갈아 엎어도 대용 ~ !! 화이팅 !! -->
-
-
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}"
->
+      layout:decorate="~{layouts/layoutmobile.html}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>장바구니</title>
 </head>
 <body>
-
 <div layout:fragment="contentorder">
-
     <form>
-        <!-- 장바구니 리스트 -->
-        <div class="container cart-container mt-3">
-            <div class="list-group">
-                <!--반복시작 : 주문한 아이템들...-->
-                <div th:if="${list!=null && !list.isEmpty()}" th:each="item : ${list}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <img th:if="${item.imgName != null}"
-                             th:src="@{${item.imgName}}" alt="menu image" class="me-3" width="100px" height="100px">
-                        <img th:if="${item.imgName == null}"
-                             th:src="@{/store/menu/default.png}" alt="menu image" class="me-3" width="100px" height="100px">
-                        <div>
-                            <div th:text="${item.storemenuName}" class="fw-bold"></div>
-                            <div th:text="${#numbers.formatInteger(item.storemenuPrice, 0)} + '원'" class="text-muted small"></div>
+        <div class="container mt-3">
+            <!-- 장바구니 리스트 -->
+            <div class="row gy-3">
+                <!-- 아이템 반복 시작 -->
+                <div class="col-12" th:each="item : ${list}" th:if="${list!=null && !list.isEmpty()}">
+                    <div class="card">
+                        <div class="card-body d-flex">
+
+                            <!--왼쪽사진-->
+                            <img th:if="${item.imgName != null}"
+                                 th:src="@{${item.imgName}}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                            <img th:if="${item.imgName == null}"
+                                 th:src="@{/store/menu/default.png}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+
+                            <!--중간 메뉴 글씨들-->
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1" th:text="${item.storemenuName}">메뉴명</h5>
+                                <p class="card-text small text-muted mb-1" th:text="${#numbers.formatInteger(item.storemenuPrice, 3, 'COMMA')} + '원'"></p>
+
+                                <div th:each="optionList : ${optionMap[item.storecartitemNum]}">
+                                    <span class="card-text small text-muted mb-1" th:each="optionInfo : ${optionList}"
+                                       th:text="${optionInfo}"></span>
+                                </div>
+
+                                <p class="fw-bold text-primary" th:text="'총 ' + ${#numbers.formatInteger(item.storemenuPrice * item.storemenuCount, 3, 'COMMA')} + '원'"></p>
+                            </div>
+
+                            <!--오른쪽 수량변경버튼 및 삭제버튼 : 이건 목업에 없던거라.. 일단 이렇게만 배치했어요-->
+                            <div class="d-flex flex-column justify-content-between align-items-end">
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary" th:disabled="${item.storemenuCount <= 1}"
+                                            type="button" onclick="minusCount(this)"
+                                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
+                                    <span class="mx-1" th:text="${item.storemenuCount}"></span>
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" onclick="plusCount(this)"
+                                            th:disabled="${item.storemenuCount > 99}"
+                                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
+                                </div>
+                                <button class="btn btn-outline-danger mt-2" type="button"
+                                        th:onclick="|deleteCart(${item.storecartitemNum})|">삭제</button>
+                            </div>
+
+                            <input type="hidden" name="items" th:value="${item.storecartitemNum}">
+
                         </div>
-                    </div>
-                    <div>
-                        <button th:disabled="${item.storemenuCount<=1}" type="button" onclick="minusCount(this)"
-                                th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
-                        <span th:text="${item.storemenuCount} + '개'" class="text-end"></span>
-                        <button type="button" onclick="plusCount(this)" th:disabled="${item.storemenuCount>99}"
-                                th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
-                    </div>
-                    <div>
-                        <button type="button" th:onclick="|deleteCart(${item.storecartitemNum})|">item 삭제버튼</button>
-                    </div>
-                    <input type="hidden" name="items" th:value="${item.storecartitemNum}">
-                </div>
-                <div th:unless="${list!=null && !list.isEmpty()}" class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                    <h1>장바구니가 비었습니다.</h1>
+                    </div><!--카드 끝-->
+                </div><!--반복 끝-->
+
+                <!-- 비었을 때 보여줄 내용 -->
+                <div class="col-12" th:unless="${list!=null && !list.isEmpty()}">
+                    <div class="alert alert-warning text-center">장바구니가 비었습니다.</div>
                 </div>
 
-                <!--같은 모양인데 여기는 요청사항 입력 구간-->
-                <div class="list-group-item cart-item">
-                    <label>요청사항</label>
+                <!-- 요청사항 -->
+                <div class="col-12">
+                    <label class="form-label fw-bold">요청사항</label>
                     <textarea class="form-control" maxlength="500" name="orderstoreMessage" placeholder="500자 까지 작성 가능합니다."></textarea>
                 </div>
-                <!--같은 모양, 금액구간-->
-                <div class="list-group-item cart-item d-flex justify-content-between align-items-center">
-                    <span>최종 주문 금액 : <span th:text="${totalPrice+'원'}"></span></span>
+
+                <!-- 총금액 -->
+                <div class="col-12 text-end">
+                    <div class="fw-bold">최종 주문 금액 :
+                        <span class="text-danger fs-5" th:text="${#numbers.formatInteger(totalPrice, 3, 'COMMA') + ' 원'}"></span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 총 가격 및 주문 버튼 -->
-        <div th:if="${list != null}" class="position-fixed d-grid bottom-0 start-0 w-100 bg-white p-3 shadow" style="z-index: 10;">
-            <button type="button" class="btn btn-success" th:data-price="${totalPrice}"
+        <!-- 고정 하단 결제 버튼 -->
+        <div th:if="${list != null}" class="position-fixed bottom-0 start-0 w-100 bg-white p-3 shadow">
+            <button type="button" class="btn btn-primary w-100" th:data-price="${totalPrice}"
                     onclick="processPayment(this)"
-                    th:disabled="${list==null || list.isEmpty()}">결제하기</button>
+                    th:disabled="${list==null || list.isEmpty()}">결제 하기</button>
         </div>
-
     </form>
-
-
 
     <script th:inline="javascript">
         function minusCount(button) {
@@ -77,59 +92,56 @@
             let count = parseInt(button.dataset.count);
             if (count <= 1) return;
             count--;
-            console.log(cartItemId);
-            fetch("/member/store/cart/modify/"+cartItemId+"/"+count)
-                .then(()=>location.reload())
+            fetch("/member/store/cart/modify/" + cartItemId + "/" + count)
+                .then(() => location.reload());
         }
+
         function plusCount(button) {
             const cartItemId = button.dataset.cartitemid;
             let count = parseInt(button.dataset.count);
             count++;
-            fetch("/member/store/cart/modify/"+cartItemId+"/"+count)
-                .then(()=>location.reload())
-        }
-        function deleteCart(itemId) {
-            fetch(`/member/store/cart/delete/${itemId}`)
-                .then(()=>location.reload())
+            fetch("/member/store/cart/modify/" + cartItemId + "/" + count)
+                .then(() => location.reload());
         }
 
-        // 결제여부에 따라서 이동되는 페이지
+        function deleteCart(itemId) {
+            fetch(`/member/store/cart/delete/${itemId}`)
+                .then(() => location.reload());
+        }
+
         function processPayment(button) {
             const price = button.dataset.price;
             const formData = new FormData(button.form);
 
-            fetch("/member/store/order/insert",{
+            fetch("/member/store/order/insert", {
                 method: "POST",
                 body: formData
             })
-                .then(response=>{
-                    if(!response.ok){
-                        return response.text()
-                            .then(body=>alert(body))
-                    }else{
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(body => alert(body));
+                    } else {
                         fetch("/member/store/order/getlastorder")
-                            .then(response=>{
-                                if(!response.ok){
-                                    return response.text()
-                                        .then(body=>alert(body))
-                                }else{
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.text().then(body => alert(body));
+                                } else {
                                     return response.text();
                                 }
                             })
-                            .then(orderid=>{
-                                if(!orderid) return;
+                            .then(orderid => {
+                                if (!orderid) return;
                                 const url = `/storepayment?tossprice=${price}&o=${orderid}`;
                                 const popup = window.open(url, "_blank", "width=600,height=800");
                                 if (!popup) {
                                     alert("팝업 차단 해제해 주세요.");
                                 }
                                 window.location.href = "/tossloading";
-                            })
+                            });
                     }
-                })
+                });
         }
     </script>
 </div>
-
 </body>
 </html>
