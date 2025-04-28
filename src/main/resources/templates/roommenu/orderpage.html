@@ -420,23 +420,6 @@
 <div layout:fragment="contentorder">
 
     <div class="container">
-
-        <!-- 다국어 시작 -->
-        <form method="get" th:action="@{/roommenu/orderpage}" class="mb-3" id="langForm">
-            <input type="hidden" name="type" th:value="${type}" />
-            <input type="hidden" name="keyword" th:value="${keyword}" />
-            <input type="hidden" name="category" th:value="${category}" />
-            <input type="hidden" name="lang" id="langInput" />
-
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="white-space: nowrap;">lang :</span>
-                <button type="button" class="flag flag-ko" onclick="submitLang('ko')" title="한국어"></button>
-                <button type="button" class="flag flag-en" onclick="submitLang('en')" title="English"></button>
-                <button type="button" class="flag flag-ja" onclick="submitLang('ja')" title="日本語"></button>
-                <button type="button" class="flag flag-cn" onclick="submitLang('cn')" title="中國語"></button>
-            </div>
-        </form>
-
         <!-- 검색창 (항상 표시되도록 설정) -->
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
@@ -460,22 +443,6 @@
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
             <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=디저트&keyword='">디저트</div>
-        </div>
-
-        <!-- 가격 정렬 버튼 추가 -->
-        <div class="d-flex justify-content-end">
-            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PL&keyword='">
-                <i class="bi bi-caret-down-fill"></i>가격낮은순
-            </div>
-            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/orderpage?type=PH&keyword='">
-                <i class="bi bi-caret-down-fill"></i>가격높은순
-            </div>
-            <div class="tab" onclick="window.location.href='http://localhost:8090/roommenu/coupon/insert'">
-                <i class="bi bi-caret-down-fill"></i>쿠폰받기
-            </div>
-            <div class="tab" onclick="showMyCoupons()">
-                <i class="bi bi-ticket-perforated"></i>내 쿠폰 보기
-            </div>
         </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
@@ -535,7 +502,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
