@@ -80,8 +80,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/hotelroom/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
 
-        registry.addResourceHandler("/qr/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qr/");
+        registry.addResourceHandler("/qrfile/**")
+                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qrfile/");
 
         registry.addResourceHandler("/erd/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/erd/");

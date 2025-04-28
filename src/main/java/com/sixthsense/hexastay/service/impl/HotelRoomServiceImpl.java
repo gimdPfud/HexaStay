@@ -195,12 +195,12 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         try {
             // ✅ QR 코드 만들기 시작!
             // QR 코드에 넣을 URL 주소 (핸드폰으로 찍으면 이 주소로 이동함)
-            String qrText = "https://f66c-116-33-138-85.ngrok-free.app/roomlist/roompassword"; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
+            String qrText = "localhost:8090/qr/" + hotelRoomDTO.getHotelRoomNum();; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
 
             // QR 코드 이미지 파일 이름 만들기 (ex. 방이름_qr.png)
             String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qr/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "qr/");
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qrfile/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "qrfile/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath); // 폴더 없으면 만들기
             }
@@ -360,7 +360,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 6. QR코드 삭제 후 재생성
         if (hotelRoom.getHotelRoomQr() != null) {
             // 기존 QR 코드 삭제
-            Path qrPath = Paths.get(System.getProperty("user.dir"), "qr", hotelRoom.getHotelRoomQr());
+            Path qrPath = Paths.get(System.getProperty("user.dir"), "qrfile", hotelRoom.getHotelRoomQr());
             try {
                 Files.deleteIfExists(qrPath);
             } catch (IOException e) {
@@ -371,7 +371,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // QR 코드 생성 및 경로 설정
         String qrText = "localhost:8090/qr/" + hotelRoomDTO.getHotelRoomNum();
         String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png"; // QR 파일 이름
-        Path qrPath = Paths.get(System.getProperty("user.dir"), "qr", qrFileName); // 파일 경로
+        Path qrPath = Paths.get(System.getProperty("user.dir"), "qrfile", qrFileName); // 파일 경로
         Files.createDirectories(qrPath.getParent()); // 경로 생성
 
         try {
@@ -380,7 +380,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             MatrixToImageWriter.writeToPath(bitMatrix, "PNG", qrPath);
 
             // QR 코드 파일 경로를 hotelRoom 객체에 저장 (view에서 사용할 수 있도록)
-            hotelRoom.setHotelRoomQr("/qr/" + qrFileName); // 경로를 "/qr/{파일명}" 형식으로 설정
+            hotelRoom.setHotelRoomQr("/qrfile/" + qrFileName); // 경로를 "/qr/{파일명}" 형식으로 설정
 
         } catch (Exception e) {
             throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage());
