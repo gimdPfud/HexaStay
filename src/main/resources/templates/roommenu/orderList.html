@@ -151,10 +151,14 @@
             </small>
             <div class="card-body text-end">
 
+                <strong>총 금액:</strong>
+                <span th:text="|₩${T(java.lang.String).format('%,d', order.originalTotalPrice)}|"></span><br>
+
                 <span th:if="${order.discountedPrice != null}">
                 <strong style="color: #f75b5b;">할인 적용 금액:</strong>
                 <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
                 </span>
+
             </div>
         </div>
     </div>
