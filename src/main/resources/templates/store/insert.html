@@ -5,95 +5,103 @@
 <head>
     <meta charset="UTF-8">
     <title>스토어 등록</title>
+    <style>
+        td {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 700px;">
-        <h2 class="text-center mb-4">스토어 등록</h2>
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="text-center mb-4">요식업체 등록</h2>
+
         <form action="/admin/store/insert" method="post" enctype="multipart/form-data">
-
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+            <div class="container p-4" style="max-width: 700px;">
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                    </div>
+                    <p class="file-name">이미지가 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
-                <p class="file-name">이미지가 선택되지 않았습니다.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storeProfile" class="btn btn-light form-control rounded-pill"
-                       accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
-                <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
-            </div>
-            <label class="form-label">제공할 호텔</label>
-            <div class="mb-3 input-group">
-                <input type="text" id="companyName" class="form-control" readonly style="background-color: #ced4da" required>
-                <input hidden id="companyNum" name="companyNum" class="form-control">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#companySearchModal">검색</button><!--모달버튼? 누르면 검색가능한 창 뜸.-->
-            </div>
-            <div class="mb-3">
-                <label class="form-label">스토어 이름</label>
-                <input type="text" class="form-control" name="storeName" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">스토어 전화번호</label>
-                <input type="text" class="form-control" name="storePhone" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="storeAddress">스토어 주소</label>
-                <div class="input-group">
-                    <input style="background-color: #ced4da;" readonly
-                           type="text" id="storeAddress" class="form-control" name="storeAddress" required>
-                    <button class="btn btn-outline-secondary"
-                            type="button" onclick="insertAddress()">주소 검색</button>
+                <label class="form-label">제공할 호텔</label>
+                <div class="mb-3 input-group">
+                    <input type="text" id="companyName" class="form-control" readonly style="background-color: #f1f1f1" required>
+                    <input hidden id="companyNum" name="companyNum" class="form-control">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#companySearchModal">검색</button><!--모달버튼? 누르면 검색가능한 창 뜸.-->
                 </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">스토어 대표자명</label>
-                <input type="text" class="form-control" name="storeCeoName" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">스토어 패스워드</label>
-                <input type="password" class="form-control" name="storePassword" required>
-            </div>
-            <input type="hidden" name="storeStatus" value="alive" readonly>
-            <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
-            <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
-            <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
-            <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
-            <div class="mb-3">
-                <label class="form-label d-block">카테고리</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
-                    <label class="form-check-label" for="korean">한식</label>
+                <div class="mb-3">
+                    <label class="form-label">상호명</label>
+                    <input type="text" class="form-control" name="storeName" required>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
-                    <label class="form-check-label" for="chinese">중식</label>
+                <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="text" class="form-control" name="storePhone" required>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
-                    <label class="form-check-label" for="japanese">일식</label>
+                <div class="mb-3">
+                    <label class="form-label" for="storeAddress">주소</label>
+                    <div class="input-group">
+                        <input style="background-color: #f1f1f1;" readonly
+                               type="text" id="storeAddress" class="form-control" name="storeAddress" required>
+                        <button class="btn btn-secondary"
+                                type="button" onclick="insertAddress()">주소 검색</button>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
-                    <label class="form-check-label" for="asian">아시안</label>
+                <div class="mb-3">
+                    <label class="form-label">대표자명</label>
+                    <input type="text" class="form-control" name="storeCeoName" required>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
-                    <label class="form-check-label" for="western">양식</label>
+                <div class="mb-3">
+                    <label class="form-label">패스워드</label>
+                    <input type="password" class="form-control" name="storePassword" required>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
-                    <label class="form-check-label" for="fastfood">패스트푸드</label>
+                <input type="hidden" name="storeStatus" value="alive" readonly>
+                <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
+                <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
+                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
+                <div class="mb-3">
+                    <label class="form-label d-block">카테고리</label>
+                    <div class="text-center">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="korean" value="한식" required>
+                            <label class="form-check-label" for="korean">한식</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="chinese" value="중식">
+                            <label class="form-check-label" for="chinese">중식</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="japanese" value="일식">
+                            <label class="form-check-label" for="japanese">일식</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="asian" value="아시안">
+                            <label class="form-check-label" for="asian">아시안</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="western" value="양식">
+                            <label class="form-check-label" for="western">양식</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="fastfood" value="패스트푸드">
+                            <label class="form-check-label" for="fastfood">패스트푸드</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
+                            <label class="form-check-label" for="cafe">카페</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory" id="cafe" value="카페">
-                    <label class="form-check-label" for="cafe">카페</label>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
+                    <a href="/admin/store/list" class="btn btn-danger">취소</a>
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-center gap-3">
-                <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
-                <a href="/admin/store/list" class="btn btn-danger">취소</a>
             </div>
         </form>
     </div>
@@ -134,7 +142,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex flex-column justify-content-center">
                     <!-- 결과 테이블 -->
                     <div class="row w-100" id="searchedCompanyList">
 
