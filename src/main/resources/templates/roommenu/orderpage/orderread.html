@@ -235,49 +235,19 @@
             </div>
         </div><br><br>
 
-        <!-- 옵션 모달 열기 버튼 -->
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#optionModal">
-            옵션 보기
-        </button>
 
-        <!-- 선택한 옵션 표시하는 영역 -->
-        <div id="selectedOptionsDisplay" class="mt-2"></div>
-
-        <!-- 옵션 모달창 -->
-        <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content shadow">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="optionModalLabel">추가 옵션 선택</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div th:if="${roomMenuDTO.options != null and !#lists.isEmpty(roomMenuDTO.options)}">
-                            <div th:each="option : ${roomMenuDTO.options}" class="mb-3">
-                                <label th:for="'option-' + ${option.roomMenuOptionName}" class="form-label">
-                                    [[${option.roomMenuOptionName}]] (+[[${option.roomMenuOptionPrice}]] 원)
-                                </label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control option-quantity"
-                                           name="optionQuantities"
-                                           th:id="'option-' + ${option.roomMenuOptionName}"
-                                           min="0" value="0"
-                                           th:data-id="${option.roomMenuOptionNum}"
-                                           th:data-name="${option.roomMenuOptionName}"
-                                           th:data-price="${option.roomMenuOptionPrice}" />
-                                    <span class="input-group-text">개</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div th:unless="${roomMenuDTO.options != null and !#lists.isEmpty(roomMenuDTO.options)}" class="text-muted">
-                            옵션이 없습니다.
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                        <button type="button" class="btn btn-primary" id="confirmOptionsBtn" data-bs-dismiss="modal">확인</button>
-                    </div>
-                </div>
+        <!-- 옵션 선택 영역 -->
+        <div th:each="option : ${roomMenuDTO.options}" th:if="${option != null}" class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input option-checkbox"
+                       type="checkbox"
+                       th:id="'checkbox-' + ${option.roomMenuOptionName}"
+                       th:data-id="${option.roomMenuOptionNum}"
+                       th:data-name="${option.roomMenuOptionName}"
+                       th:data-price="${option.roomMenuOptionPrice}" />
+                <label class="form-check-label" th:for="'checkbox-' + ${option.roomMenuOptionName}">
+                    [[${option.roomMenuOptionName}]] (+[[${option.roomMenuOptionPrice}]] 원)
+                </label>
             </div>
         </div>
 
@@ -296,16 +266,28 @@
     <!-- 스크립트 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
+
         $(document).ready(function () {
             let price = [[${roomMenuDTO.roomMenuPrice}]];
             let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
             let cartAdd = $(".add-to-cart-btn");
 
-            // 초기 가격 설정
-            updateFormattedPrice(price);
-            calculateTotalPrice();
+            // 이벤트 바인딩
+            $(".option-checkbox").on("change", function () {
+                const quantityInput = $(this).closest(".mb-3").find(".option-quantity");
+                quantityInput.prop("disabled", !this.checked);
+                if (!this.checked) {
+                    quantityInput.val(1); // 기본값으로 리셋
+                }
+                updateSelectedOptionsDisplay();
+                calculateTotalPrice();
+            });
 
-            // 수량 버튼
+            $("input[name='optionQuantities']").on("input", function () {
+                calculateTotalPrice();
+                updateSelectedOptionsDisplay();
+            });
+
             $("#decreaseBtn").on("click", function () {
                 let count = parseInt($("#count").val());
                 if (count > 1) {
@@ -322,7 +304,6 @@
                 }
             });
 
-            // 수량 변경 감지
             $("#count").on("change", function () {
                 let count = parseInt($(this).val());
                 if (isNaN(count) || count < 1) {
@@ -337,53 +318,71 @@
                 calculateTotalPrice();
             });
 
-            // 옵션 수량 변경 시 총 가격 재계산
-            $("input[name='optionQuantities']").on("input", calculateTotalPrice);
-
-            // 장바구니 담기
             cartAdd.on("click", function () {
                 sendCartData();
             });
 
-            // 바로 주문하기
             $(".order-cart-btn").on("click", function () {
                 sendCartData(true);
             });
+
+            // 초기 가격 설정
+            updateFormattedPrice(price);
+            calculateTotalPrice();
+
+            // 함수 정의
+            function calculateTotalPrice() {
+                let count = parseInt($("#count").val()) || 1;
+                let optionTotal = 0;
+
+                $(".option-checkbox:checked").each(function () {
+                    const optionPrice = parseInt($(this).data("price")) || 0;
+                    optionTotal += optionPrice;
+                });
+
+                const total = (price + optionTotal) * count;
+                $("#totalPrice").text(total.toLocaleString());
+            }
+
+            function updateSelectedOptionsDisplay() {
+                const selectedOptions = [];
+
+                $(".option-checkbox:checked").each(function () {
+                    const name = $(this).data("name");
+                    selectedOptions.push({ name });
+                });
+
+                const displayArea = $("#selectedOptionsDisplay");
+                displayArea.empty();
+
+                if (selectedOptions.length > 0) {
+                    selectedOptions.forEach(opt => {
+                        displayArea.append(`<div>${opt.name}</div>`);
+                    });
+                } else {
+                    displayArea.append(`<div class="text-muted">선택된 옵션이 없습니다.</div>`);
+                }
+            }
 
             function updateFormattedPrice(price) {
                 $("#formattedPrice").text(price.toLocaleString());
             }
 
-            function calculateTotalPrice() {
-                let count = parseInt($("#count").val()) || 1;
-                let optionTotal = 0;
-                $("input[name='optionQuantities']").each(function () {
-                    let quantity = parseInt($(this).val()) || 0;
-                    let optionPrice = parseInt($(this).data("price")) || 0;
-                    optionTotal += quantity * optionPrice;
-                });
-                let total = (price + optionTotal) * count;
-                $("#totalPrice").text(total.toLocaleString());
-            }
-
             function collectOptionData() {
                 const options = [];
-                $("input[name='optionQuantities']").each(function () {
-                    const quantity = parseInt($(this).val()) || 0;
-                    if (quantity > 0) {
-                        options.push({
-                            rooMenuCartItemOptionNum: $(this).data("id"),
-                            roomMenuCartItemOptionName: $(this).data("name"),
-                            roomMenuCartItemOptionPrice: $(this).data("price"),
-                            roomMenuCartItemOptionAmount: quantity // dto 필드명과 일치
-                        });
-                    }
+                $(".option-checkbox:checked").each(function () {
+                    options.push({
+                        rooMenuCartItemOptionNum: $(this).data("id"),
+                        roomMenuCartItemOptionName: $(this).data("name"),
+                        roomMenuCartItemOptionPrice: $(this).data("price"),
+                        roomMenuCartItemOptionAmount: 1
+                    });
                 });
                 return options;
             }
 
             function sendCartData(isOrder = false) {
-                const options = collectOptionData(); // 한번만 호출
+                const options = collectOptionData();
                 const paramData = {
                     roomMenuCartItemNum: cartAdd.val(),
                     roomMenuCartItemAmount: parseInt($("#count").val()) || 1,
@@ -437,37 +436,6 @@
                 });
             }
         });
-
-        // 모달 확인 버튼 클릭 시 선택된 옵션 표시
-        $("#confirmOptionsBtn").on("click", function () {
-            updateSelectedOptionsDisplay();
-        });
-
-        // 옵션 선택 표시 함수
-        function updateSelectedOptionsDisplay() {
-            const selectedOptions = [];
-
-            $("input[name='optionQuantities']").each(function () {
-                const quantity = parseInt($(this).val()) || 0;
-                if (quantity > 0) {
-                    selectedOptions.push({
-                        name: $(this).data("name"),
-                        quantity: quantity
-                    });
-                }
-            });
-
-            const displayArea = $("#selectedOptionsDisplay");
-            displayArea.empty(); // 기존 표시 내용 비우기
-
-            if (selectedOptions.length > 0) {
-                selectedOptions.forEach(opt => {
-                    displayArea.append(`<div>${opt.name} x ${opt.quantity}</div>`);
-                });
-            } else {
-                displayArea.append(`<div class="text-muted">선택된 옵션이 없습니다.</div>`);
-            }
-        }
 
     </script>
 

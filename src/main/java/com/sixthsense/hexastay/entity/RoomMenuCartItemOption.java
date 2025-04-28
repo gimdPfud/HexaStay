@@ -6,8 +6,8 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "RoomMenuCartItemOption")
@@ -24,6 +24,8 @@ public class RoomMenuCartItemOption {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "roomMenuCartItem")
     private RoomMenuCartItem roomMenuCartItem;
+
+
 
 
 }
