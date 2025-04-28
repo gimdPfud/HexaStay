@@ -21,14 +21,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 @RequiredArgsConstructor
@@ -256,27 +263,38 @@ public class RoomServiceImpl {
 
         // 가장 첫 번째 Room으로 로그인 인증 처리
         Room room = rooms.getFirst();
-
         Member member = room.getMember();
 
-        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member);
+        // 권한 설정
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        String role = member.getMemberRole();
+        if (role == null || role.trim().isEmpty()) {
+            role = "USER";
+        }
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 
+        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
 
-
-        log.info("중간 맴버" + member.toString());
+        log.info("로그인 처리 - 회원: {}, 권한: {}", member.getMemberEmail(), authorities);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                customMemberDetails,
-//                member.getMemberEmail(), // 아이디
-                null,                    // 패스워드는 의미 없음
-                customMemberDetails.getAuthorities()// 권한 비어있
-                                // 권한도 비워둠 (필요하면 ROLE_USER 이런거 넣어도 됨)
+            customMemberDetails,
+            member.getMemberPassword(),  // 실제 비밀번호 사용
+            authorities
         );
-        log.info(authentication + "dkdkdkldjlfjlkdjflkdjlfkjdlkfj");
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // SecurityContext를 생성하고 설정
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
 
-        return room;  // 🔥 전체 Room 리스트 반환
+        // 세션에 SecurityContext 저장
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+
+        log.info("인증 정보 설정 완료: {}", authentication);
+
+        return room;
     }
 
 

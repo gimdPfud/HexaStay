@@ -38,8 +38,8 @@ public class Member extends BaseEntity{
     @Column(name = "memberEmail")
     private String memberEmail;                         //이메일
 
-
-    private String memberRole;                          //시큐리티용 맴버롤
+    @Column(name = "memberRole")
+    private String memberRole = "USER";                 //시큐리티용 맴버롤, 기본값 USER 설정
 
 
     // 🔹 ManyToOne 추가 (여러 Member가 하나의 HotelRoom을 가짐)
