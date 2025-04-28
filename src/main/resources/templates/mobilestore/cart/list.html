@@ -48,15 +48,25 @@
                     <div class="food-info col-6">
                         <p th:text="${item.storemenuName}"></p>
                         <div class="quantity">
-                            <button type="button" class="decrease" th:data-cartitemid="${item.storecartitemNum}" th:data-count="${item.storemenuCount}">-</button>
+                            <button type="button" class="decrease" th:disabled="${item.storemenuCount <= 1}"
+                                    onclick="minusCount(this)"
+                                    th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
                             <input type="text" class="quantity-input" th:value="${item.storemenuCount}" readonly>
-                            <button type="button" class="increase" th:data-cartitemid="${item.storecartitemNum}" th:data-count="${item.storemenuCount}">+</button>
+                            <button type="button" class="increase" onclick="plusCount(this)"
+                                    th:disabled="${item.storemenuCount > 99}"
+                                    th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
                         </div>
+
+                        <p class="card-text small text-muted mb-1" th:each="optionList : ${optionMap[item.storecartitemNum]}">
+                            <span th:text="'+'+ ${optionList[1]}"></span>
+                            <span th:text="${optionList[2]}+' 원'"></span>
+                        </p>
                         <p class="item-total" th:text="${#numbers.formatInteger(item.storemenuPrice * item.storemenuCount, 3, 'COMMA')} + ' 원'"></p>
                     </div>
                     <div class="col-2 button-container">
                         <button class="mini-btn delete-btn" type="button" th:onclick="|deleteCart(${item.storecartitemNum})|">삭제</button>
                     </div>
+                    <input type="hidden" name="items" th:value="${item.storecartitemNum}">
                 </li>
             </ul>
             <div class="request-section">
@@ -71,26 +81,55 @@
         </div>
     </form>
     <script th:inline="javascript">
+
+        function minusCount(button) {
+            const cartItemId = button.dataset.cartitemid;
+            let count = parseInt(button.dataset.count);
+            if (count <= 1) return;
+            count--;
+            fetch("/member/store/cart/modify/" + cartItemId + "/" + count)
+                .then(() => location.reload());
+        }
+
+        function plusCount(button) {
+            const cartItemId = button.dataset.cartitemid;
+            let count = parseInt(button.dataset.count);
+            count++;
+            fetch("/member/store/cart/modify/" + cartItemId + "/" + count)
+                .then(() => location.reload());
+        }
+
         function processPayment(button) {
             const price = button.dataset.price;
             const formData = new FormData(button.form);
+
             fetch("/member/store/order/insert", {
                 method: "POST",
                 body: formData
-            }).then(response => {
-                if (!response.ok) {
-                    return response.text().then(body => alert(body));
-                } else {
-                    fetch("/member/store/order/getlastorder")
-                        .then(response => response.text())
-                        .then(orderid => {
-                            const url = `/storepayment?tossprice=${price}&o=${orderid}`;
-                            const popup = window.open(url, "_blank", "width=600,height=800");
-                            if (!popup) alert("팝업 차단 해제해 주세요.");
-                            window.location.href = "/tossloading";
-                        });
-                }
-            });
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(body => alert(body));
+                    } else {
+                        fetch("/member/store/order/getlastorder")
+                            .then(response => {
+                                if (!response.ok) {
+                                    return response.text().then(body => alert(body));
+                                } else {
+                                    return response.text();
+                                }
+                            })
+                            .then(orderid => {
+                                if (!orderid) return;
+                                const url = `/storepayment?tossprice=${price}&o=${orderid}`;
+                                const popup = window.open(url, "_blank", "width=600,height=800");
+                                if (!popup) {
+                                    alert("팝업 차단 해제해 주세요.");
+                                }
+                                window.location.href = "/tossloading";
+                            });
+                    }
+                });
         }
         function deleteCart(itemId) {
             fetch(`/member/store/cart/delete/${itemId}`)
