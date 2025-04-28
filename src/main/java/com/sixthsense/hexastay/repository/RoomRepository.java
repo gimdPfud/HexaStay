@@ -82,4 +82,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             LocalDateTime startDate, 
             LocalDateTime endDate, 
             Pageable pageable);
+
+    // 체크인, 체크아웃에 따라 장바구니 로직에 추가할 것을 감별
+    Optional<Room> findByMemberAndCheckOutDateIsNull(Member member);
 }

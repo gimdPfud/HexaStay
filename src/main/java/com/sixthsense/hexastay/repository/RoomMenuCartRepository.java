@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.repository;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.RoomMenuCart;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,9 @@ public interface RoomMenuCartRepository extends JpaRepository<RoomMenuCart, Long
 
     // RoomMenuCartRepository
     Optional<RoomMenuCart> findByMember(Member member);
+
+    // 룸을 찾는 레포지토리
+    Optional<RoomMenuCart> findByRoom(Room room);
     
 
 
