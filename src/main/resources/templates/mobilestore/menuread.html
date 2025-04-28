@@ -1,83 +1,182 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}">
+      layout:decorate="~{layouts/layoutmobile}">
 <head>
     <meta charset="UTF-8">
-    <title>메뉴 상세보기</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{page.title}">메뉴 상세보기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+
+        .container {
+            width: 100%; max-width: 400px; margin: 0 auto;
+            background: white; padding: 20px;
+        }
+
+        .item-image {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .item-img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+
+
+        .menu-name { font-size: 20px; font-weight: bold; text-align: left; margin: 3px 0 0 10px; }
+        .menu-content { font-size: 16px; text-align: left; margin: 3px 0 0 10px; }
+        .price-text { font-size: 20px; font-weight: bold; text-align: left; margin: 3px 0 0 10px; }
+
+        .item-details { padding: 10px 0; text-align: left; margin-bottom: 5px; }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .quantity-input input {
+            width: 60px;
+            height: 35px;
+            text-align: center;
+            font-size: 16px;
+            margin: 0 5px;
+            background-color: #fff;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .quantity-input button {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #77b1fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .total-price-display {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 25px;
+        }
+
+        .add-to-cart-btn, .back-to-list-btn {
+            background-color: #77b1fb;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .back-to-list-btn {
+            background-color: #ddd;
+            margin-top: 25px;
+        }
+    </style>
 </head>
 <body>
-<div layout:fragment="contentorder" class="container py-4">
+<div layout:fragment="contentorder">
     <div style="display: none" th:text="${data.storeNum}" id="storeNum"></div>
-
-    <div class="card mx-auto" style="max-width: 400px;">
-        <div class="card-body text-center">
-            <!-- 이미지 -->
-            <div class="mb-3">
+    <div class="container">
+        <div class="item-details">
+            <div class="item-image">
                 <img th:if="${data.storemenuImgMeta != null}"
-                     th:src="@{${data.storemenuImgMeta}}"
-                     class="img-thumbnail rounded" style="width: 150px; height: 150px; object-fit: cover;">
-
+                     th:src="@{${data.storemenuImgMeta}}" class="item-img">
                 <img th:unless="${data.storemenuImgMeta != null}"
-                     th:src="@{/store/menu/default.png}"
-                     class="img-thumbnail rounded" style="width: 150px; height: 150px; object-fit: cover;">
+                     th:src="@{/store/menu/default.png}" class="item-img">
             </div>
+            <p class="menu-name" th:text="${data.storemenuName}">메뉴 이름</p>
+            <p class="menu-content" th:text="${data.storemenuContent}">메뉴 설명</p>
+            <p class="price-text">
+                <span th:id="'storemenuPrice'" th:text="${data.storemenuPrice}">0</span>
+                <span th:text="#{item.currency}">원</span>
+            </p>
+        </div>
 
-            <!-- 메뉴 이름 -->
-            <h4 class="card-title mb-2" th:text="${data.storemenuName}">메뉴 이름</h4>
-
-            <!-- 메뉴 설명 -->
-            <p class="card-text text-muted" th:text="${data.storemenuContent}">메뉴 설명</p>
-
-            <!-- 가격 -->
-            <p class="fw-bold"><span th:text="${data.storemenuPrice}">0</span>원</p>
-
-            <!-- 폼 시작 -->
-            <form>
-                <input th:value="${data.storemenuNum}" name="storemenuNum" type="hidden" readonly>
-
-                <!-- 옵션들 -->
-                <div class="text-start mb-3">
-                    <label class="form-label fw-bold">추가 옵션</label>
-                    <div th:each="option : ${data.storemenuOptionDTOList}" class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                               name="storemenuOptions"
-                               th:value="|${option.storemenuOptionNum}:${option.storemenuOptionName}:${option.storemenuOptionPrice}|">
-                        <label class="form-check-label" th:for="'option-' + ${option.storemenuOptionNum}">
-                            <span th:text="${option.storemenuOptionName}">옵션 이름</span>
-                            (<span th:text="${option.storemenuOptionPrice}">0</span>원)
-                        </label>
+        <form>
+            <input th:value="${data.storemenuNum}" name="storemenuNum" type="hidden" readonly>
+            <div class="row align-items-center">
+                <div class="col-4 text-end">
+                    <label class="col-form-label fw-bold label-center">주문 수량</label>
+                </div>
+                <div class="col-8 d-flex justify-content-center">
+                    <div class="quantity-input">
+                        <button type="button" onclick="changeQty(-1)">-</button>
+                        <input type="number" id="storecartitemCount" name="storecartitemCount" value="1" readonly>
+                        <button type="button" onclick="changeQty(1)">+</button>
                     </div>
                 </div>
+            </div>
+        </form>
 
-                <!-- 수량 -->
-                <div class="mb-3 text-start">
-                    <label for="storecartitemCount" class="form-label fw-bold">수량</label>
-                    <input id="storecartitemCount" name="storecartitemCount" type="number"
-                           class="form-control" min="1" value="1" max="10">
-                </div>
-            </form>
-
-            <!-- 장바구니 버튼 -->
-            <button type="button" onclick="addcart()" class="btn btn-primary w-100 mt-2">
-                장바구니 담기
-            </button>
+        <div class="text-start mt-3">
+            <label class="form-label fw-bold">추가 옵션</label>
+            <div th:each="option : ${data.storemenuOptionDTOList}" class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       name="storemenuOptions"
+                       th:value="|${option.storemenuOptionNum}:${option.storemenuOptionName}:${option.storemenuOptionPrice}|"
+                       onchange="updateTotal()">
+                <label class="form-check-label" th:for="'option-' + ${option.storemenuOptionNum}">
+                    <span th:text="${option.storemenuOptionName}">옵션 이름</span>
+                    (<span th:text="${option.storemenuOptionPrice}">0</span>원)
+                </label>
+            </div>
         </div>
+
+        <div class="total-price-display">
+            총 <span id="totalPrice">0</span> 원
+        </div>
+
+        <button type="button" onclick="addcart()" class="add-to-cart-btn">장바구니 담기</button>
+        <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'">목록으로</button>
     </div>
 
-    <!-- 장바구니 스크립트 -->
     <script th:inline="javascript">
+        function changeQty(delta) {
+            const qtyInput = document.getElementById('storecartitemCount');
+            let qty = parseInt(qtyInput.value);
+            qty += delta;
+            if (qty < 1) qty = 1;
+            if (qty > 99) qty = 99;
+            qtyInput.value = qty;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const base = parseInt(document.getElementById('storemenuPrice').textContent) || 0;
+            const qty = parseInt(document.getElementById('storecartitemCount').value);
+            let optionTotal = 0;
+            document.querySelectorAll("input[name='storemenuOptions']:checked").forEach(opt => {
+                const parts = opt.value.split(":");
+                optionTotal += parseInt(parts[2]);
+            });
+            const total = (base + optionTotal) * qty;
+            document.getElementById('totalPrice').textContent = total.toLocaleString();
+        }
+
         function addcart() {
             const data = new FormData(document.querySelector("form"));
-            const count = parseInt(document.querySelector("[name=storecartitemCount]").value);
-            const storeNum = document.querySelector("#storeNum").textContent;
+            const count = parseInt(document.getElementById("storecartitemCount").value);
+            const storeNum = document.getElementById("storeNum").textContent;
 
             if (isNaN(count) || count <= 0) {
                 alert("수량을 1개 이상 입력하세요.");
-                return;
-            } else if (count>10){
-                alert("한 번에 최대 10개의 상품만 담을 수 있습니다.")
                 return;
             }
 
@@ -101,17 +200,17 @@
                                     location.replace("/member/store/read/" + storeNum);
                                 }
                             });
-                        } else {
-                            alert("문제가 발생했습니다. 다시 시도해 주세요.");
                         }
                     } else if (text === "over") {
-                        alert("상품별로 최대 99개 까지 주문할 수 있습니다. 수량을 변경해주세요.")
+                        alert("상품별로 최대 99개 까지 주문할 수 있습니다. 수량을 변경해주세요.");
                     } else {
-                        alert("요청 처리 중 문제가 발생했습니다.")
+                        alert("요청 처리 중 문제가 발생했습니다.");
                     }
                 }
             });
         }
+
+        window.addEventListener("DOMContentLoaded", updateTotal);
     </script>
 </div>
 </body>
