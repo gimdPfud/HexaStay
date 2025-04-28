@@ -43,27 +43,27 @@ public class StoreClientController {
 
 /* 1. 스토어 목록 보기
         get. */
-//    @GetMapping("/list")
-//    public String list(Model model, Pageable pageable){
-//        Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
-//        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
-//        model.addAttribute("list",storeDTOPage);
-//        return "mobilestore/list";
-//    }
-
     @GetMapping("/list")
-    public String typelist(@RequestParam(required = false) String type,
-                           @RequestParam(required = false) String keyword,
-                           Model model, Pageable pageable){
-        log.info("type : "+type);
-        log.info("keyword : "+keyword);
-
-        Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
-
-        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());//맨 아래 버튼 (숫자)를 위해..
+    public String list(Model model, Pageable pageable){
+        Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
+        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
         model.addAttribute("list",storeDTOPage);
         return "mobilestore/list";
     }
+//
+//    @GetMapping("/list")
+//    public String typelist(@RequestParam(required = false) String type,
+//                           @RequestParam(required = false) String keyword,
+//                           Model model, Pageable pageable){
+//        log.info("type : "+type);
+//        log.info("keyword : "+keyword);
+//
+//        Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
+//
+//        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());//맨 아래 버튼 (숫자)를 위해..
+//        model.addAttribute("list",storeDTOPage);
+//        return "mobilestore/list";
+//    }
 
 
     /* 2. 스토어 상세 보기
