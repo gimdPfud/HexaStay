@@ -1,427 +1,210 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}"
->
+      layout:decorate="~{layouts/layoutmobile.html}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모바일 주문</title>
-</head>
-<body>
-<!-- 매장 리스트 -->
-<div layout:fragment="contentorder">
-
     <style>
-        /* 기본 스타일: 모든 요소에 기본 마진, 패딩 제거 및 박스 크기 설정 */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f9f9f9; } /* 배경 색상 설정 */
+        body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
 
-        .container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto; /* 화면 중앙 정렬 */
-            background: white;
-            padding: 10px; /* 내부 여백 설정 */
-        }
-
-        /* 검색창 */
-        .search-container {
-            display: none;
-            padding: 10px;
-            justify-content: space-between;
-            background: #f1f1f1;
-            border-bottom: 2px solid #ddd;
-        }
+        .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
         .search-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; gap: 0.5rem;
+            background-color: white; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 0.3rem;
         }
-        .search-box input {
-            width: 200px;
-            padding: 5px;
-            border: 2px solid #ddd;
-            border-radius: 5px; /* 입력 필드 둥근 모서리 */
+        .search-box input[type="text"] {
+            flex: 1; height: 40px; font-size: 1rem;
+            border-radius: 6px; border: 1px solid #ced4da; padding: 0 0.75rem;
         }
         .search-box button {
-            background-color: #4CAF50; /* 버튼 배경색 */
-            color: white;
-            border: none;
-            border-radius: 5px; /* 버튼 둥근 모서리 */
-            cursor: pointer;
-            padding: 5px 10px;
+            height: 40px; padding: 0 1rem; font-size: 1rem;
+            border-radius: 6px; background-color: #d0e8ff;
+            border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
         }
 
-
-        /* 탭 메뉴 스타일 */
         .tabs {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            background: #f8f8f8;
-            border-bottom: 2px solid #ddd;
+            display: flex; overflow-x: auto; white-space: nowrap;
+            gap: 10px; padding: 10px 0; margin-bottom: 10px;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .btn-custom {
+            background-color: transparent; color: #ff6b6b;
+            border: 2px solid #ff6b6b; border-radius: 12px;
+            padding: 8px 16px; font-size: 12px; font-weight: normal;
+            cursor: pointer; white-space: nowrap;
         }
         .tab {
-            cursor: pointer;
-            padding: 10px 15px;
-            font-size: 14px;
-            border-radius: 5px;
+            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
+            font-size: 14px; background-color: transparent; color: black;
+        }
+        .tab.active {
+            font-weight: bold; background-color: #f0f0f0; color: #333;
         }
 
-        /* 검색 박스 스타일 */
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px; /* 여백 조정 */
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #f9f9f9;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-select:focus {
-            border-color: #4CAF50; /* 초록색 테두리 */
-            outline: none;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* 포커스시 그림자 */
-        }
-
-        .form-select option {
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        /* 선택한 항목 hover시 변화 */
-        .form-select:hover {
-            border-color: #66bb6a;
-        }
-
-        /* select 요소 화살표 커스터마이징 */
-        .form-select::-ms-expand {
-            display: none; /* Internet Explorer에서 기본 화살표 숨기기 */
-        }
-
-        .form-select {
-            width: 115px; /* ✅ 가로 너비 조정 */
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #f9f9f9;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"%3E%3Cpolygon points="0,0 5,5 10,0" fill="%23666"/%3E%3C/svg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 10px;
-        }
-
-        #search-container {
-            display: block; /* 항상 보이게 설정 */
-        }
-
-        /* 카테고리 텍스트를 꾸미는 스타일 */
-        .category-label {
-            display: inline-block;
-            background-color: #f1fdf1; /* 배경 색상 */
-            color: #333; /* 텍스트 색상 */
-            font-weight: bold; /* 텍스트 굵게 */
-            padding: 5px 10px; /* 여백 */
-            border-radius: 12px; /* 둥근 모서리 */
-            border: 1px solid #ddd; /* 테두리 */
-            font-size: clamp(12px, 1.2vw, 18px);
-            margin: 10px ; /* 위 아래 여백 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-            transition: background-color 0.3s ease; /* 호버 시 색상 변경 효과 */
-        }
-
-        .category-label:hover {
-            background-color: #ffeb3b; /* 호버 시 배경 색상 */
-            color: #000; /* 호버 시 텍스트 색상 */
-            border-color: #fdd835; /* 호버 시 테두리 색상 */
-        }
-
-
-        .add-to-cart-btn {
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .order-list-btn {
-            background-color: #FAE100;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        /* 공통 스타일 */
-        .card-list {
-            list-style: none;
-            padding: 0;
-            display: grid; /* 그리드 레이아웃 사용 */
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
-            gap: 20px; /* 카드 사이 간격 */
-        }
-
+        .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
         .div-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* 카드 높이 유동적으로 */
+            background: white; border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;
         }
-
-        .store-item {
-            padding: 0; /* food-item의 기본 패딩 제거 */
-            border-bottom: none; /* food-item의 하단 테두리 제거 */
-            margin-bottom: 0; /* food-item의 하단 마진 제거 */
+        .inner-wrapper { padding: 15px; }
+        .d-flex { display: flex; gap: 15px; }
+        .menu-image-container {
+            width: 100px; height: 100px; flex-shrink: 0;
         }
-
-        .category-wrapper {
-            padding: 15px;
-            text-align: left;
+        .store-image {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
         }
-
-        /* 카테고리 텍스트 스타일 (기존 스타일 유지) */
-        .category-label {
-            display: inline-block;
-            background-color: #f1fdf1;
-            color: #333;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: clamp(12px, 1.2vw, 18px);
-            margin: 0; /* category-wrapper에 의해 여백 처리 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+        .text-info { flex: 1; }
+        .store-name {
+            font-size: 1.2rem; font-weight: bold; color: black; margin-bottom: 5px;
         }
-
-        .category-label:hover {
-            background-color: #ffeb3b;
-            color: #000;
-            border-color: #fdd835;
-        }
-
-        .inner-wrapper {
-            padding: 15px;
-        }
-
-        .d-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-        }
-
-        .text-info {
-            width: 60%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding-right: 10px;
-        }
-
-        .text-info .store-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin: 5px 0;
-            color: black;
-        }
-
-        .store-content {
-            color: black;
-        }
-
-        .price-box{
-            color: black;
-        }
-
-        .image-like-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        img {
-            width: 150px; /* 가로 크기 변경 */
-            height: 150px; /* 세로 크기 변경 */
-            object-fit: cover;
-            border-radius: 10px;
+        .store-content { font-size: 0.9rem; color: black; }
+        .menu-badge {
+            display: inline-block; font-size: 0.75rem; padding: 3px 8px;
+            border-radius: 12px; background-color: #e0f7fa; color: #00796b;
+            margin-bottom: 5px; font-weight: bold;
         }
 
         .like-section {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 5px;
-            padding: 0 15px 15px 15px; /* 하단 좋아요 섹션 패딩 */
+            display: flex; justify-content: flex-end; align-items: center;
+            gap: 5px; padding: 0 15px 10px;
         }
+        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
+        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
 
-        .like-icon {
-            font-size: 2rem;
-            cursor: pointer;
-            color: gray;
+        .add-to-cart-btn, .order-list-btn {
+            background-color: #ffeb3b; color: black;
+            border: none; border-radius: 5px;
+            padding: 12px 20px; cursor: pointer; font-weight: bold;
+            width: 100%; margin-top: 15px;
         }
-
-        .like-count {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .add-to-cart-btn {
-            background-color: #ffeb3b;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px; /* 버튼 상단 마진 조정 */
-        }
-
-        .add-to-cart-btn:hover {
-            background-color: #fdd835;
-        }
-
+        .order-list-btn { background-color: #FAE100; }
         .cart-count {
-            background-color: #ff5c5c;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            margin-left: 8px;
-            font-weight: bold;
-            font-size: 1.2em;
+            background-color: #ff5c5c; color: white; padding: 4px 10px;
+            border-radius: 4px; margin-left: 8px; font-weight: bold; font-size: 1.2em;
         }
-
-
-
     </style>
-
-
+</head>
+<body>
+<div layout:fragment="contentorder">
     <div class="container">
+
+        <!-- 검색창 -->
+        <div class="search-container">
+            <form th:action="@{/member/store/list}" method="get">
+                <div class="search-box">
+                    <input type="text" name="keyword" th:placeholder="'매장명 검색'">
+                    <button type="submit">검색</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 카테고리 탭 -->
+        <div class="tabs">
+            <button type="button" onclick="window.location.href='/member/store/list?type=L'" class="btn-custom">
+                ❤️ <span>인기순</span>
+                <span class="like-count" th:text="${storeLikes}" style="margin-left: 4px;">0</span>
+            </button>
+            <div class="tab active" onclick="filterByCategory('전체')">전체</div>
+            <div class="tab" onclick="filterByCategory('한식')">한식</div>
+            <div class="tab" onclick="filterByCategory('일식')">일식</div>
+            <div class="tab" onclick="filterByCategory('중식')">중식</div>
+            <div class="tab" onclick="filterByCategory('아시안')">아시안</div>
+            <div class="tab" onclick="filterByCategory('양식')">양식</div>
+            <div class="tab" onclick="filterByCategory('패스트푸드')">패스트푸드</div>
+            <div class="tab" onclick="filterByCategory('카페')">카페</div>
+        </div>
+
+        <!-- 매장 리스트 -->
         <ul class="store-list card-list">
-            <li th:each="store : ${list}" class="store-item">
-                <div class="div-card"
-                     th:style="${store.storeStatus == 'closed'} ? 'background-color: #f5f5f5; color: #999;' : ''">
-                    <!--영업 종료된 가게라면 이런 스타일을 줍니다...-->
-                    <a style="text-decoration: none; color: inherit; display: block; width: 100%;"
-                       th:href="@{'/member/store/read/'+${store.storeNum}}">
+            <li th:each="store : ${list}" class="store-item" th:attr="data-category=${store.storeCategory}">
+                <div class="div-card">
+                    <a th:href="@{'/member/store/read/'+${store.storeNum}}" style="text-decoration: none; color: inherit;">
                         <div class="inner-wrapper">
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex">
+                                <div class="menu-image-container" >
+                                    <img th:if="${store.storeProfileMeta != null}" th:src="@{${store.storeProfileMeta}}" class="store-image">
+                                    <img th:unless="${store.storeProfileMeta != null}" th:src="@{/store/default.png}" class="store-image">
+                                </div>
                                 <div class="text-info">
+                                    <span class="menu-badge" th:text="${store.storeCategory}"></span>
                                     <p class="store-name" th:text="${store.storeName}"></p>
                                     <p class="store-content" th:text="${store.storeAddress}"></p>
-                                    <div class="price-box"><span class="price-text"> </span></div>
-                                </div>
-                                <div class="image-like-container">
-                                    <img style="height: 150px; width: 150px;" th:if="${store.storeProfileMeta != null}"
-                                         th:src="@{${store.storeProfileMeta}}"
-                                         class="store-image">
-                                    <img style="height: 150px; width: 150px;" th:unless="${store.storeProfileMeta != null} "
-                                         th:src="@{/store/default.png}"
-                                         class="store-image">
                                 </div>
                             </div>
                         </div>
                     </a>
                     <div class="like-section">
-                        <div class="category-wrapper">
-                            <span th:text="${store.storeCategory}" class="category-label"></span>
-                        </div>
-                        <button class="btn heart" type="button" th:onclick="|toggleLike(${store.storeNum})|">
-                            <i class="bi bi-heart"></i>
-                            <span class="likespan" th:id="${store.storeNum}"></span>
-                        </button>
+                        <span th:id="'likeIcon-' + ${store.storeNum}" th:attr="onclick='toggleLike(' + ${store.storeNum} + ', event)'" class="like-icon">🤍</span>
+                        <span th:id="'likeCount-' + ${store.storeNum}" class="like-count">0</span>
                     </div>
                 </div>
             </li>
         </ul>
 
-
-        <button class="add-to-cart-btn"
-                onclick="window.location.href='/member/store/cart/list'">
+        <!-- 하단 버튼 -->
+        <button class="add-to-cart-btn" onclick="window.location.href='/member/store/cart/list'">
             🛒 내 카트 리스트로
             <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
         </button>
-        <button class="order-list-btn"
-                onclick="window.location.href='/member/store/order/list'">
+        <button class="order-list-btn" onclick="window.location.href='/member/store/order/list'">
             🛒 내 주문 리스트로
             <span th:text="'(' + ${totalOrderCount} + ')'" class="cart-count">[0]</span>
         </button>
-
     </div>
 
+    <!-- 스크립트 -->
     <script th:inline="javascript">
-        document.addEventListener("DOMContentLoaded",function () {
-            showlikes();
+        const likedStates = {};
+        function toggleLike(storeNum, event) {
+            event?.stopPropagation();
+            event?.preventDefault();
+            const liked = likedStates[storeNum] || false;
+            const url = liked ? `/member/store/unlike/${storeNum}` : `/member/store/like/${storeNum}`;
+            fetch(url, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    const icon = document.getElementById(`likeIcon-${storeNum}`);
+                    const count = document.getElementById(`likeCount-${storeNum}`);
+                    icon.textContent = liked ? '🤍' : '❤️';
+                    icon.style.color = liked ? 'gray' : 'red';
+                    count.textContent = data.likeCount;
+                    likedStates[storeNum] = !liked;
+                });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.like-icon').forEach(el => {
+                const storeNum = el.id.split('-')[1];
+                fetch(`/member/store/like/status/${storeNum}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        likedStates[storeNum] = data.liked;
+                        const icon = document.getElementById(`likeIcon-${storeNum}`);
+                        const count = document.getElementById(`likeCount-${storeNum}`);
+                        icon.textContent = data.liked ? '❤️' : '🤍';
+                        icon.style.color = data.liked ? 'red' : 'gray';
+                        count.textContent = data.likeCount;
+                    });
+            });
         });
 
-        function showlikes() {
-            let likespans = document.querySelectorAll(".likespan");
-            likespans.forEach(span=>{
-                updateLikespan(span.id);
-            })
-        }
-
-        function updateLikespan(storeNum) {
-            fetch(`/member/store/like/list/${storeNum}`,{
-                credentials: 'same-origin'
-            })
-                .then(response=>response.json())
-                .then(data=>{
-                    const span = document.getElementById(storeNum);
-                    span.textContent = data.likes;
-                    const heartIcon = span.closest(".heart").querySelector("i");
-                    if (data.check) {
-                        heartIcon.classList.remove("bi-heart");
-                        heartIcon.classList.add("bi-heart-fill");
-                    } else {
-                        heartIcon.classList.remove("bi-heart-fill");
-                        heartIcon.classList.add("bi-heart");
-                    }
-                })
-        }
-
-        function toggleLike(storeNum) {
-            fetch(`/member/store/like/${storeNum}`,{
-                credentials: "same-origin"
-            })
-                .then(response=>{
-                    if(response.ok){
-                        updateLikespan(storeNum);
-                    }
-                })
+        function filterByCategory(category) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent === category) tab.classList.add('active');
+            });
+            document.querySelectorAll('.store-item').forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                item.style.display = (category === '전체' || itemCategory === category) ? '' : 'none';
+            });
         }
     </script>
 </div>
-
 </body>
 </html>
