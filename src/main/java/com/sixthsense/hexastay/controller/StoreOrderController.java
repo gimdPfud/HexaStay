@@ -37,7 +37,6 @@ public class StoreOrderController {
     private final AdminService adminService;
     private final StoreService storeService;
     private final ZzService zzService;
-    Long hotelroomNum = 9L; // todo qr에서부터 물려받기
 
 
 
@@ -46,7 +45,9 @@ public class StoreOrderController {
     @ResponseBody
     @PostMapping("/member/store/order/insert")
     public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList,
-                                      @RequestParam("orderstoreMessage") String orderstoreMessage){
+                                      @RequestParam("orderstoreMessage") String orderstoreMessage, Principal principal){
+        if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
@@ -72,7 +73,9 @@ public class StoreOrderController {
     /*2. 내역보기 (목록)*/
     @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
     public String clientOrderList(Model model,
-                                  @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable){
+                                  @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable, Principal principal){
+        if(principal == null){return "sample/qrcamera";}
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
         model.addAttribute("list",list);
         return "mobilestore/order/list";
@@ -148,7 +151,9 @@ public class StoreOrderController {
     }
     @ResponseBody
     @GetMapping("/member/store/order/getlastorder")
-    public ResponseEntity getlastorder(){
+    public ResponseEntity getlastorder(Principal principal){
+        if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         Long orderid = orderstoreService.getLastOrder(hotelroomNum);
         if(orderid==null){
             return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);
