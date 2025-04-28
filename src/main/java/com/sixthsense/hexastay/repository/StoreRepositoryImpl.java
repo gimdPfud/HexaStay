@@ -30,7 +30,9 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
         List<Store> content = queryFactory
                 .selectDistinct(store)
-                .join(storemenu).on(storemenu.store.eq(store))
+                .from(store)
+                .join(storemenu)
+                .on(storemenu.store.eq(store))
                 .leftJoin(store.company).fetchJoin()
                 .where(
                         conditions,
@@ -43,7 +45,8 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         long total = queryFactory
                 .select(store.countDistinct())
                 .from(store)
-                .join(storemenu).on(storemenu.store.eq(store))
+                .join(storemenu)
+                .on(storemenu.store.eq(store))
                 .where(
                         conditions,
                         menuKeyword!=null && !menuKeyword.isBlank() ? storemenu.storemenuName.contains(menuKeyword) : null
