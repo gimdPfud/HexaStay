@@ -36,7 +36,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
                 .leftJoin(store.company).fetchJoin()
                 .where(
                         conditions,
-                        menuKeyword!=null && !menuKeyword.isBlank() ? storemenu.storemenuName.contains(menuKeyword) : null
+                        menuKeyword!=null && !menuKeyword.isBlank() ? storemenu.storemenuName.contains(menuKeyword).or(store.storeName.contains(menuKeyword)) : null
                         )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
