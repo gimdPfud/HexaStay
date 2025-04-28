@@ -1,5 +1,7 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.beust.ah.A;
+import com.sixthsense.hexastay.config.Security.CustomMemberDetails;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomDTO;
@@ -16,11 +18,16 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +35,9 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RoomServiceImpl {
     //todo: DB 명 _ Room
+
+    //시큐리티에 있는 함수 및 클래스
+    private final AuthenticationManager authenticationManager;
 
     private final HotelRoomRepository hotelRoomRepository;
     private final MemberRepository memberRepository;
@@ -233,6 +243,40 @@ public class RoomServiceImpl {
         room.setHotelRoom(hotelRoom);
         // @Transactional 이므로 save 없이도 flush됨 (옵션이지만 명시하면 명확)
         roomRepository.save(room);
+    }
+
+    //todo: http://localhost:8090/qr/${hotelRoomNum}
+    //Room DB 에서 HotelRoomNum fk 을 찾아 와서 그 기준으로 member fk을 찾아 오는 로직
+    public Room readRoomByHotelRoomNum(Long hotelRoomNum) {
+        List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
+
+        if (rooms.isEmpty()) {
+            throw new EntityNotFoundException("해당 호텔룸에 연결된 룸 정보가 없습니다.");
+        }
+
+        // 가장 첫 번째 Room으로 로그인 인증 처리
+        Room room = rooms.getFirst();
+
+        Member member = room.getMember();
+
+        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member);
+
+
+
+        log.info("중간 맴버" + member.toString());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                customMemberDetails,
+//                member.getMemberEmail(), // 아이디
+                null,                    // 패스워드는 의미 없음
+                customMemberDetails.getAuthorities()// 권한 비어있
+                                // 권한도 비워둠 (필요하면 ROLE_USER 이런거 넣어도 됨)
+        );
+        log.info(authentication + "dkdkdkldjlfjlkdjflkdjlfkjdlkfj");
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return room;  // 🔥 전체 Room 리스트 반환
     }
 
 

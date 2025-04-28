@@ -34,6 +34,11 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
     List<Room> findByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
+    //최신순으로 정렬 하는 repository리 로직
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
+    List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
     // hotelRoomNum 기준으로 연결된 member들만 가져오기
     @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
     Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);

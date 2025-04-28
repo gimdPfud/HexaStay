@@ -13,10 +13,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -39,13 +43,16 @@ public class SampleController {
         return "sample/password";
     }
     @GetMapping("/main")
-    public String main(@PageableDefault(page = 0) Pageable pageable, Model model) {
+    public String main(@PageableDefault(page = 0) Pageable pageable, Model model,
+                       @Param("hotelRoomNum") Long hotelRoomNum,
+                       Principal principal) {
         log.info("main 진입 : " + pageable);
 
         Page<SampleDTO> main = sampleService.sampleMethod(pageable);
         log.info("main 1 : " + pageable);
         model.addAttribute("main", main);
         log.info("main 2 : " + pageable);
+        log.info(principal.toString());
         return "sample/main";
     }
     @GetMapping("/admin/store/order/pay")

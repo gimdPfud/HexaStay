@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +25,14 @@ import org.springframework.security.web.SecurityFilterChain;
             this.memberDetailsService = memberDetailsService;
         }
 
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+            return authenticationConfiguration.getAuthenticationManager();
+        }
+
+
+
+
         @Bean(name = "memberSecurityFilterChain")
         @Order(2)
         public SecurityFilterChain memberFilterChain(HttpSecurity http) throws Exception {
@@ -37,7 +46,7 @@ import org.springframework.security.web.SecurityFilterChain;
                     .securityMatcher("/main/**", "/member/**", "/branch/**", "/center/**",
                             "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                             "/notice/**", "/review/**", "/room/**", "/roommenu/**",
-                            "/roomMenu/**",
+                            "/roomMenu/**","/qr/**,",
                             "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**,",
                             "/ws-order-alert/**", "/cart/**", "/roomcare/**")
                     .authenticationManager(authManager)

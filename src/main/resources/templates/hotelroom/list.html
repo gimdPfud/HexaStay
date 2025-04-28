@@ -58,7 +58,7 @@
                             <!-- 오른쪽: QR 코드 (중앙 정렬) -->
                             <div class="d-flex justify-content-end align-items-center" style="height: 100%;">
                                 <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}" class="d-flex align-items-center" style="margin-right: 10px;">
-                                    <img th:src="@{${hotelList.hotelRoomQr}}"
+                                    <img th:src="${hotelList.hotelRoomQr}"
                                          alt="QR 코드"
                                          class="zoom-image img-thumbnail"
                                          style="width: 80px; height: 80px;">

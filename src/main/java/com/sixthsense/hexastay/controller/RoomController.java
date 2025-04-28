@@ -4,9 +4,11 @@ import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -241,21 +243,34 @@ public class RoomController {
 
 
     //Room 인즈키 (RoomPassword 확인용)
-    @GetMapping("/roomlist/roompassword")
-    public String showPasswordPage() {
+    @GetMapping("/qr/{hotelRoomNum}")
+    public String showPasswordPage(@PathVariable("hotelRoomNum") Long hotelRoomNum,Model model   ) {
+
+        model.addAttribute("hotelRoomNum", hotelRoomNum);
+
+
+
 
         return "room/password"; // 비밀번호 입력 페이지
     }
 
-    @PostMapping("/roomlist/roompassword")
+    @PostMapping("/qr/{hotelRoomNum}")
     public String checkPassword(@RequestParam("roomPassword") String roomPassword,
+                                @PathVariable("hotelRoomNum") Long hotelRoomNum,
                                 RedirectAttributes redirectAttributes) {
 
-        if (roomServiceimpl.RoomPassword(roomPassword)) {
-            return "redirect:/main"; // 메인 페이지로 이동
-        } else {
-            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
-            return "redirect:/roomlist/roompassword";
+        try {
+            Room rooms = roomServiceimpl.readRoomByHotelRoomNum(hotelRoomNum);// 이제 rooms를 받음
+
+            if (rooms.getRoomPassword().equals(roomPassword)) {
+                return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
+            } else {
+                redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+                return "redirect:/qr/" + hotelRoomNum;
+            }
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", "호텔룸 정보를 찾을 수 없습니다.");
+            return "redirect:/roomlist";
         }
     }
 
