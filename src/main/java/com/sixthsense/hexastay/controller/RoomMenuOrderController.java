@@ -14,10 +14,8 @@ import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.AdminRole;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
-import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
-import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,8 +55,6 @@ public class RoomMenuOrderController {
     private final RoomMenuOrderService roomMenuOrderService;
     private final RoomMenuOrderRepository roomMenuOrderRepository;
     private final MemberRepository memberRepository;
-    private final HotelRoomService hotelRoomService;
-    private final HotelRoomRepository hotelRoomRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /***************************************************
@@ -146,51 +142,30 @@ public class RoomMenuOrderController {
      *
      ****************************************************/
 
-    /*@PostMapping("/roommenu/cart")
+    @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal,
-                                                 @RequestParam(required = false) Long hotelroomNum, // hotelroomNum 파라미터 추가
                                                  @RequestParam String requestMessage,
                                                  @RequestParam(required = false) Long couponNum,
                                                  @RequestParam(required = false) Integer discountedTotalPrice,
                                                  RoomMenuOrderDTO roomMenuOrderDTO, RoomMenuOrder roomMenuOrder) {
-        log.info("POST /roommenu/cart 컨트롤러 진입");
+        log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
-        log.info("요청된 hotelroomNum : " + hotelroomNum);
 
-        Member member = null;
-
-        // hotelroomNum이 제공된 경우 해당 방의 멤버를 찾음
-        if (hotelroomNum != null) {
-            try {
-                member = hotelRoomRepository.findByHotelRoomName(hotelroomNum); // hotelService를 통해 멤버 찾기
-                if (member == null) {
-                    log.warn("해당 hotelroomNum으로 찾을 수 있는 멤버가 없습니다: {}", hotelroomNum);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 객실 번호로 투숙객 정보를 찾을 수 없습니다.");
-                }
-                log.info("hotelroomNum {} 에 해당하는 멤버 찾음: {}", hotelroomNum, member.getMemberEmail());
-            } catch (EntityNotFoundException e) {
-                log.error("해당 hotelroomNum으로 룸을 찾을 수 없습니다: {}", hotelroomNum);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 객실 번호가 존재하지 않습니다.");
-            } catch (Exception e) {
-                log.error("hotelroomNum으로 멤버를 찾는 중 오류 발생: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("객실 정보 확인 중 오류가 발생했습니다.");
-            }
-        } else {
-            // hotelroomNum이 없는 경우, 로그인한 사용자를 기반으로 처리 (기존 로직 유지)
-            if (principal == null) {
-                log.info("객실 번호가 제공되지 않았고, 로그인이 필요합니다.");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-            }
-            member = memberRepository.findByMemberEmail(principal.getName()); // memberService를 통해 멤버 찾기
-            log.info("로그인한 사용자 {} 로 주문 진행", member.getMemberEmail());
+        if (principal == null) {
+            log.info("로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
+
+        String email = principal.getName();
+
 
         try {
             RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(
-                    member.getMemberEmail(), requestMessage, couponNum, discountedTotalPrice);
+                    email, requestMessage, couponNum, discountedTotalPrice);
             log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
             roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order);
             log.info("3️⃣ 알람 전송 완료");
+
 
             return ResponseEntity.ok(order.getRoomMenuOrderNum());
         } catch (IllegalStateException | EntityNotFoundException e) {
@@ -200,7 +175,7 @@ public class RoomMenuOrderController {
             log.error("서버 에러: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 처리 중 오류 발생");
         }
-    }*/
+    }
 
     /***************************************************
      *

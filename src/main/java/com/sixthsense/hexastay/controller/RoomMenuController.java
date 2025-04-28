@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuOption;
 import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
@@ -20,6 +21,7 @@ import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -316,8 +318,6 @@ public class RoomMenuController {
         log.info("상품정보 페이지" + email);
         // email을 통해서 상품 정보를 가져오자.
 
-
-
         if (email == null) {
             return "redirect:member/login";
         }
@@ -364,6 +364,7 @@ public class RoomMenuController {
         String email = principal.getName(); // 로그인한 사용자의 이메일
         Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
 
+
         // ✅ 로케일 처리
         String lang = locale.getLanguage(); // ex) "ko", "en"
 
@@ -380,7 +381,6 @@ public class RoomMenuController {
         model.addAttribute("category", category);
         model.addAttribute("totalCartItemCount", totalCartItemCount);
         model.addAllAttributes(pageInfo);
-
         return "/roommenu/orderpage";
 
     }
