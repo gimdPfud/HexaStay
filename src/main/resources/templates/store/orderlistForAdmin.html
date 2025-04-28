@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>가게 주문 목록</title>
+    <title>요식업체 주문 목록</title>
 </head>
 <body style="background-color: #f8f9fa;">
-
 <div layout:fragment="content">
-    <div class="container mt-4">
 
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">요식업체 서비스 주문 내역</h2>
         <!-- 가게 선택 -->
         <form action="/admin/store/order/list" method="post" class="mb-4">
             <div class="input-group">
-                <label class="input-group-text" for="storeSelect">가게 선택</label>
+                <label class="input-group-text" for="storeSelect">요식업체 선택</label>
                 <select class="form-select" id="storeSelect" name="storeNum" onchange="this.form.submit()">
-                    <option selected disabled>가게를 선택하세요</option>
+                    <option selected disabled>요식업체를 선택하세요</option>
                     <option th:each="store : ${storeList}"
                             th:selected="${storeNum == store.storeNum}"
                             th:value="${store.storeNum}"
@@ -37,7 +36,10 @@
 
                     <!-- 상태 표시 -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold text-primary" th:text="'상태: ' + ${orderDTO.orderstoreStatus}"></span>
+                        <div class="d-flex align-items-center">
+                            <strong class="me-1">주문 상태</strong>
+                            <span class="badge bg-primary" th:text="${orderDTO.orderstoreStatus}" style="font-weight: normal;"></span>
+                        </div>
                         <div>
                             <button type="button" class="btn btn-sm btn-outline-danger me-2"
                                     th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}"
@@ -69,18 +71,18 @@
                             <span class="ms-3"><strong>주문일:</strong> <span th:text="${orderDTO.createDate}"></span></span>
                         </div>
                     </div>
+
                 </div>
             </div>
 
             <!-- 주문 없음 -->
-            <div th:if="${list == null or list.empty}"
+            <div th:if="${(list == null or list.empty) and storeNum != null}"
                  class="col-12 text-center py-5 bg-light border text-muted rounded">
                 <p class="mb-0">주문 내역이 없습니다.</p>
             </div>
         </div>
-
-
     </div>
+</div>
 
     <!-- JS -->
     <script th:inline="javascript">
