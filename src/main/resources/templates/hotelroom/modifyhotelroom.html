@@ -62,7 +62,7 @@
         <div class="row form-section">
           <div class="col-md-6">
             <div class="mb-3">
-              <label class="form-label">방 이름</label>
+              <label class="form-label">[[${hotelRoomDTO.hotelRoomNum}]]방 이름</label>
               <input type="text" class="form-control" name="hotelRoomName" th:value="${hotelRoomDTO.hotelRoomName}">
             </div>
             <div class="mb-3">
@@ -71,7 +71,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">상세설명</label>
-              <input type="text" class="form-control" name="hotelRoomPhone" th:value="${hotelRoomDTO.hotelRoomContent}">
+              <input type="text" class="form-control" name="hotelRoomContent" th:value="${hotelRoomDTO.hotelRoomContent}">
             </div>
             <div class="mb-3">
               <label class="form-label">방 종류</label>
@@ -92,8 +92,8 @@
             <div class="mb-3">
               <label class="form-label">상태</label>
               <select class="form-select" name="hotelRoomStatus">
-                <option th:selected="${hotelRoomDTO.hotelRoomStatus == '체크인'}">체크인</option>
-                <option th:selected="${hotelRoomDTO.hotelRoomStatus == '체크아웃'}">체크아웃</option>
+                <option value="checkin" th:selected="${hotelRoomDTO.hotelRoomStatus == 'checkin'}">체크인</option>
+                <option value="checkout" th:selected="${hotelRoomDTO.hotelRoomStatus == 'checkout'}">체크아웃</option>
               </select>
             </div>
             <div class="mb-3">
@@ -112,6 +112,7 @@
         </div>
 
         <div class="text-center mt-4">
+          <a class="btn btn-primary" th:href="@{/admin/hotelroom/list}">목록으로가기</a>
           <button type="submit" class="btn btn-success px-4">수정하기</button>
         </div>
       </form>

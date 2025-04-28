@@ -137,7 +137,7 @@ public class HotelRoomController {
     @GetMapping("/list")
     public String hotelRoomList(Model model,Principal principal,
                                 HotelRoomDTO hotelRoomDTO,
-          @PageableDefault(page = 1, size = 15, sort = "companyNum", direction = Sort.Direction.ASC) Pageable pageable
+          @PageableDefault(page = 1, size = 20, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
 
     )
     {

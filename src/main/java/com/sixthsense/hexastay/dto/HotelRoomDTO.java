@@ -27,7 +27,7 @@ public class HotelRoomDTO {
 
     private String hotelRoomPhone;              //방 전화번호
 
-    private String hotelRoomType;               //종류 (싱글 더블 스위트 ..)
+    private String hotelRoomType;               //종류 (싱글 더블 스위트 ..) single/double/suite
 
     private String hotelRoomContent;            //방 상세설명
 
