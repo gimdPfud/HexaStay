@@ -70,7 +70,7 @@
         <!-- 🔽 선택 필터 + 다운로드 버튼 -->
         <div class="row align-items-center mb-4 gx-3 gy-2">
             <!-- 필터들 -->
-            <div class="col-lg-10 col-md-12 d-flex flex-wrap align-items-center gap-2">
+            <div class=" d-flex flex-wrap align-items-center gap-2">
                 <select class="form-select" id="hqSelect" style="width: 200px; height: 40px; font-size: 0.9rem;">
                     <option selected>본사 선택</option>
                     <option>서울본사</option>
@@ -91,7 +91,13 @@
                     <option>스토어 A</option>
                     <option>스토어 B</option>
                 </select>
-                
+                <!-- 다운로드 버튼 -->
+                <div class="col d-flex justify-content-center">
+                    <button class="btn btn-success download-btn" style="width: 160px; height: 40px; font-size: 0.9rem;">
+                        Excel Download
+                    </button>
+                </div>
+
                 <!-- 날짜 선택 폼 추가 -->
                 <div class="date-range-form">
                     <input type="date" id="startDate" name="startDate" class="form-control" style="width: 180px; height: 40px; font-size: 0.9rem;">
@@ -101,12 +107,7 @@
                     <button id="resetDateBtn" class="btn btn-secondary" style="height: 40px; width: 120px; font-size: 0.9rem;">전체 조회</button>
                 </div>
             </div>
-            <!-- 다운로드 버튼 -->
-            <div class="col d-flex justify-content-center">
-                <button class="btn btn-success download-btn" style="width: 160px; height: 40px; font-size: 0.9rem;">
-                    Excel Download
-                </button>
-            </div>
+
         </div>
 
         <!-- 📊 테이블 & 차트 -->
