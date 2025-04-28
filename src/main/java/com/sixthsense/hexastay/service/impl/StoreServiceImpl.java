@@ -269,7 +269,7 @@ public class StoreServiceImpl implements StoreService {
     }
     @Override
     public Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable) {
-        Long companyNum = hotelRoomRepository.findById(hotelroomNum).orElseThrow(EntityNotFoundException::new).getCompany().getCompanyNum();
+        Long companyNum = zzService.hotelroomNumToCompany(hotelroomNum).getCompanyNum();
         Page<Store> storeList = storeRepository.storeTypeSearch(companyNum, type, keyword, pageable);
         Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
