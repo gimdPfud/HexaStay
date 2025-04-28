@@ -84,9 +84,7 @@ public class StoreController {
         model.addAttribute("list",list);
         Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable, "deleted");
         model.addAttribute("deletedList",listA);
-
         model.addAttribute("companyList",companyService.getBnFList());
-
         model.addAttribute("companyMap", storeService.getCompanyMap());
         model.addAttribute("searchType",searchType);
         model.addAttribute("chosenCompany",companyNum);
