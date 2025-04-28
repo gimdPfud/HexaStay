@@ -52,7 +52,7 @@ public class SampleController {
         log.info("main 1 : " + pageable);
         model.addAttribute("main", main);
         log.info("main 2 : " + pageable);
-        log.info(principal.toString());
+        log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
         return "sample/main";
     }
     @GetMapping("/admin/store/order/pay")

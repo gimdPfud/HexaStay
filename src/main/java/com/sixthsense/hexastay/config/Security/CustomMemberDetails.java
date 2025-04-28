@@ -15,9 +15,16 @@ import java.util.Optional;
 public class CustomMemberDetails implements UserDetails, Principal {
 
     private final Member member;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomMemberDetails(Member member) {
         this.member = member;
+        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + getMemberRole()));
+    }
+
+    public CustomMemberDetails(Member member, Collection<? extends GrantedAuthority> authorities) {
+        this.member = member;
+        this.authorities = authorities;
     }
 
     @Override
@@ -43,7 +50,7 @@ public class CustomMemberDetails implements UserDetails, Principal {
     public String getMemberRole() {
         return Optional.ofNullable(member)
                 .map(Member::getMemberRole)
-                .orElse(null);
+                .orElse("USER");
     }
 
     public String getMemberPhone() {
@@ -52,10 +59,9 @@ public class CustomMemberDetails implements UserDetails, Principal {
                 .orElse(null);
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + getMemberRole()));
+        return this.authorities;
     }
 
     @Override
@@ -80,6 +86,6 @@ public class CustomMemberDetails implements UserDetails, Principal {
 
     @Override
     public String getName() {
-        return getUsername();  // null-safe 처리됨
+        return getUsername();
     }
 }
