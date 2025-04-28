@@ -72,7 +72,7 @@
                             <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
                                 <button class="btn btn-outline-dark btn-sm me-2">자세히</button>
                             </a>
-                            <button th:onclick="|location.href='/member-insertroom'|" class="btn btn-dark btn-sm"
+                            <button th:onclick="|location.href='/register-hotelroom'|" class="btn btn-dark btn-sm"
                                     th:disabled="${hotelList.hotelRoomStatus}!='checkin'">예약</button>
 
 
