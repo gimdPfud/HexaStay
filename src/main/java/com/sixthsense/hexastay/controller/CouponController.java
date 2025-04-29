@@ -7,6 +7,7 @@ import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,48 +27,74 @@ import java.util.stream.Collectors;
 public class CouponController {
 
     private final MemberRepository memberRepository;
-    private final CouponRepository couponRepository;
     private final CouponService couponService;
 
     @GetMapping("/insert")
     public String createCouponGet() {
-        return "roommenu/coupon/insert"; // templates/coupon/insert.html
+        log.info("쿠폰 발급 받기 페이지 컨트롤러 진입 (GET)");
+        return "roommenu/coupon/insert";
     }
 
     @ResponseBody
     @PostMapping("/insert")
     public ResponseEntity<?> createCouponPost(@RequestBody CouponDTO dto) {
-        couponService.createCoupon(dto);
-        return ResponseEntity.ok("쿠폰 발급 완료");
+        log.info("쿠폰 발급 처리 컨트롤러 진입 (POST)");
+        try {
+            couponService.createCoupon(dto);
+            log.info("쿠폰 발급 성공: 회원 {}", dto.getMemberEmail());
+            return ResponseEntity.ok("쿠폰이 성공적으로 발급되었습니다.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            log.warn("쿠폰 발급 실패 (서비스 예외): {}", e.getMessage(), e);
+            Map<String, String> errorResponse = Map.of("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            log.error("쿠폰 발급 중 예상치 못한 오류 발생", e);
+            Map<String, String> errorResponse = Map.of("error", "쿠폰 발급 중 서버 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @GetMapping("/list")
     public ResponseEntity<?> getCoupons(@RequestParam String email) {
+        log.info("사용자 쿠폰 목록 조회 컨트롤러 진입: {}", email);
         List<CouponDTO> list = couponService.getCoupons(email);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/apply")
     @ResponseBody
-    public Map<String, Integer> applyCoupon(@RequestParam String email, @RequestParam Long couponNum) {
-        Integer original = couponService.getCartTotal(memberRepository.findByMemberEmail(email));
-        Integer finalPrice = couponService.getTotalPriceWithCoupon(email, couponNum);
-        int discount = original - finalPrice;
+    public ResponseEntity<?> applyCoupon(@RequestParam String email, @RequestParam Long couponNum) {
+        log.info("쿠폰 적용 컨트롤러 진입 - email: {}, couponNum: {}", email, couponNum);
+        try {
+            Integer original = couponService.getCartTotal(memberRepository.findByMemberEmail(email));
+            Integer finalPrice = couponService.getTotalPriceWithCoupon(email, couponNum);
+            int discount = original - finalPrice;
 
-        Map<String, Integer> result = new HashMap<>();
-        result.put("discount", discount);
-        result.put("finalTotal", finalPrice);
-        return result;
+            Map<String, Integer> result = new HashMap<>();
+            result.put("discount", discount);
+            result.put("finalTotal", finalPrice);
+            log.info("쿠폰 적용 결과 반환 (성공): {}", result);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            log.warn("쿠폰 적용 실패 (서비스 예외): {}", e.getMessage(), e);
+            Map<String, String> errorResponse = Map.of("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            log.error("쿠폰 적용 중 예상치 못한 오류 발생", e);
+            Map<String, String> errorResponse = Map.of("error", "쿠폰 적용 중 서버 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
-    // 이메일 존재 여부 체크 (쿠폰의 중복 발급 중지)
     @PostMapping("/exists")
     public ResponseEntity<Map<String, Boolean>> checkMemberExists(@RequestBody Map<String, String> requestBody) {
-        String email = requestBody.get("email");  // 요청 본문에서 이메일 추출
+        log.info("회원 존재 여부 체크 컨트롤러 진입");
+        String email = requestBody.get("email");
         boolean exists = memberRepository.existsByMemberEmail(email);
 
         Map<String, Boolean> result = new HashMap<>();
         result.put("exists", exists);
+        log.info("회원 {} 존재 여부: {}", email, exists);
         return ResponseEntity.ok(result);
     }
 
@@ -75,38 +102,40 @@ public class CouponController {
     @ResponseBody
     public ResponseEntity<Map<String, Boolean>> checkCouponAlreadyIssued(
             @RequestParam String email,
-            @RequestParam CouponType couponType
+            @RequestParam String couponType
     ) {
-        // 대소문자 문제를 고려하여 변환
-        CouponType type;
+        log.info("쿠폰 이미 발급 여부 체크 컨트롤러 진입 - email: {}, couponType: {}", email, couponType);
+        CouponType typeEnum;
         try {
-            type = CouponType.valueOf(couponType.getCode());
+            typeEnum = CouponType.valueOf(couponType);
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("issued", false));
+            log.warn("유효하지 않은 쿠폰 타입 문자열 수신: {}", couponType, ex);
+            return ResponseEntity.ok(Map.of("issued", false));
         }
 
-        boolean issued = couponService.hasCoupon(email, couponType);
+        boolean issued = couponService.hasCoupon(email, typeEnum);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("issued", issued);
 
+        log.info("회원 {} 쿠폰 {} 이미 발급 여부: {}", email, typeEnum.name(), issued);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/types")
     public ResponseEntity<List<Map<String, String>>> getCouponTypes() {
+        log.info("쿠폰 타입 목록 조회 컨트롤러 진입");
         List<Map<String, String>> types = Arrays.stream(CouponType.values())
                 .map(couponType -> {
                     Map<String, String> map = new HashMap<>();
-                    map.put("name", couponType.name());           // Enum 상수명 (예: EVENT)
-                    map.put("code", couponType.getCode());          // 실제 코드 문자열 (예: EventCoupon)
+                    map.put("name", couponType.name());
+                    map.put("code", couponType.getCode());
                     return map;
                 })
                 .collect(Collectors.toList());
-
+        log.info("쿠폰 타입 {}개 반환", types.size());
         return ResponseEntity.ok(types);
     }
-
-
 }
+
 

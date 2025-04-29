@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.Coupon;
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.enums.CouponType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +24,9 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             "AND (c.used = false OR (c.repeatCouponCount IS NOT NULL AND c.repeatCouponCount > 0)) " +
             "AND c.expirationDate >= CURRENT_DATE")
     List<Coupon> findUsableCouponsByMemberEmail(@Param("email") String email);
+
+    // 특정 회원과 쿠폰 타입에 해당하는 쿠폰의 개수를 세는 메소드
+    long countByMemberAndCouponType(Member member, CouponType couponType);
 
 
 }
