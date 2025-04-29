@@ -185,7 +185,9 @@ public class RoomServiceImpl {
         try {
             mailService.sendRoomPasswordEmail(memberEmail, roomPassword);
             log.info("메일 발송 성공 - 수신자: {}", memberEmail);
+            log.info("메일 발송 여부가 안들어 옴.... ");
         } catch (Exception e) {
+
             log.error("메일 발송 실패 - 수신자: {}, 오류: {}", memberEmail, e.getMessage());
         }
 
