@@ -203,13 +203,13 @@
                                 }
                             });
                         }
-                    } else if (response.status === 401){
-                        window.location.href = redirectToQR;
                     } else if (text === "over") {
                         alert("상품별로 최대 99개 까지 주문할 수 있습니다. 수량을 변경해주세요.");
                     } else {
                         alert("요청 처리 중 문제가 발생했습니다.");
                     }
+                } else if (response.status === 401){
+                    window.location.href = redirectToQR;
                 }
             });
         }
