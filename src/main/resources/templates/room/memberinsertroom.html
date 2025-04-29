@@ -79,13 +79,13 @@
                     <!-- 체크인 -->
                     <div class="mb-2">
                         <label class="form-label fw-bold">체크인 날짜</label>
-                        <input type="date" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
+                        <input type="datetime-local" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
                     </div>
 
                     <!-- 체크아웃 -->
                     <div class="mb-2">
                         <label class="form-label fw-bold">체크아웃 날짜</label>
-                        <input type="date" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
+                        <input type="datetime-local" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
                     </div>
 
                     <!-- 버튼 그룹 -->
