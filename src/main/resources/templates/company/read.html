@@ -75,6 +75,9 @@
         alert("위치 정보가 없습니다.");
         return;
       }
+
+      myModal.show();
+
       // 처음 지도 객체가 없을 때만 생성
       if (!map) {
         var container = document.getElementById('map');
@@ -92,7 +95,6 @@
         position: new kakao.maps.LatLng(yy, xx)
       });
       marker.setMap(map);
-      myModal.show();
     }
 
   </script>
