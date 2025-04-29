@@ -112,7 +112,7 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label">주소</label>
-                    <input onclick="addressApi()" name="companyAddress" type="text" id="companyAddress" class="form-control" th:value="${companyDTO.companyAddress}">
+                    <input onclick="addressApi()" name="companyAddress" type="text" id="companyAddress" class="form-control" th:value="${companyDTO.companyAddress}" readonly>
 
                     <input type="hidden" id="companyLatitude" name="companyLatitude" th:value="${companyDTO.companyLatitude}">
                     <input type="hidden" id="companyLongitude" name="companyLongitude" th:value="${companyDTO.companyLongitude}">
