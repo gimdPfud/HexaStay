@@ -112,11 +112,17 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label">주소</label>
-                    <input name="companyAddress" type="text" id="companyAddress" class="form-control" th:value="${companyDTO.companyAddress}">
+                    <input onclick="addressApi()" name="companyAddress" type="text" id="companyAddress" class="form-control" th:value="${companyDTO.companyAddress}">
+
+                    <input type="hidden" id="companyLatitude" name="companyLatitude" th:value="${companyDTO.companyLatitude}">
+                    <input type="hidden" id="companyLongitude" name="companyLongitude" th:value="${companyDTO.companyLongitude}">
+                    <input type="hidden" id="originalAddress" th:value="${companyDTO.companyAddress}">
+                    <input type="hidden" id="companyWtmX" name="companyWtmX" readonly>
+                    <input type="hidden" id="companyWtmY" name="companyWtmY" readonly>
                 </div>
                 <div class="d-flex justify-content-center gap-3">
                     <a th:href="@{/company/list}" class="btn btn-secondary">목록</a>
-                    <button type="submit" class="btn btn-success" onclick="submitForm()">등록</button>
+                    <button type="button" class="btn btn-success" onclick="submitForm(this)">등록</button>
 
                 </div>
             </div>
@@ -127,14 +133,59 @@
             <input hidden type="file" id="companyPictureTemp" name="companyPicture" class="btn btn-light form-control rounded-pill">
         </form>
 
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
         <script>
+            //주소 검색
+            var geocoder = new daum.maps.services.Geocoder();
+            function addressApi() {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        var addr = data.address;
+                        document.getElementById("companyAddress").value = addr;
+                    }
+                }).open();
+            }
+            
             // 가입양식 관련
-            function submitForm() {
+            function submitForm(button) {
                 // 주민번호 합체
                 document.getElementById('companyBusinessNum').value = document.getElementById('companyBusinessNumOne').value + "-" + document.getElementById('companyBusinessNumTwo').value + "-" + document.getElementById('companyBusinessNumThree').value;
                 // 폰번호 합체
                 document.getElementById('companyPhone').value = document.getElementById('companyPhoneone').value + "-" + document.getElementById('companyPhonetwo').value + "-" + document.getElementById('companyPhonethree').value;
                 console.log(document.getElementById('companyPhone').value);
+                
+                //주소 좌표 변환 후 form submit
+                let companyAddress = document.getElementById("companyAddress").value;
+                let originalAddress = document.getElementById("originalAddress").value;
+                if (companyAddress!==originalAddress) {
+                    geocoder.addressSearch(companyAddress, function(results, status) {
+                        if (status === daum.maps.services.Status.OK) {
+                            var result = results[0];
+                            document.getElementById("companyLatitude").value = result.y;
+                            document.getElementById("companyLongitude").value = result.x;
+                            fetch(`https://dapi.kakao.com/v2/local/geo/transcoord.json?x=${result.x}&y=${result.y}&output_coord=WTM`, {
+                                headers: {
+                                    Authorization: 'KakaoAK 7cb5773218158eba334d7c0a3f26cd9d'
+                                }
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    document.getElementById("companyWtmX").value = data.documents[0].x;
+                                    document.getElementById("companyWtmY").value = data.documents[0].y;
+                                    button.closest("form").submit();
+                                })
+                                .catch(error=>{
+                                    console.error(error);
+                                    alert("좌표 변환 중 오류")
+                                })
+                        } else {
+                            alert("주소를 다시 확인해주세요.");
+                        }
+                    });
+                }else{
+                    button.closest("form").submit();
+                }
             }
 
             // 소속용
