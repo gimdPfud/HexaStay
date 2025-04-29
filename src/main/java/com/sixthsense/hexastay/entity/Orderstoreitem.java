@@ -36,4 +36,5 @@ public class Orderstoreitem {
     private Integer orderstoreitemTotalPrice;
 
     private String storemenuOptions;
+    private Integer storemenuOptionsPrice;
 }

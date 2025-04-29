@@ -4,14 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR 코드 로그인</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #222;
+        }
+
+        #camera {
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background-color: #000;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            #camera {
+                aspect-ratio: 1/1;
+            }
+        }
+    </style>
 </head>
 <body>
 <h2>QR 코드 스캔</h2>
-<video id="camera" width="100%" height="auto" autoplay></video>
+<video id="camera" autoplay></video>
 <canvas id="canvas" style="display: none;"></canvas>
 
 <script src="https://unpkg.com/jsqr/dist/jsQR.min.js"></script>
 <script>
+    // 여긴 스크립트 그대로 유지
     document.addEventListener("DOMContentLoaded", function () {
         if (!confirm("qr을 다시 찍어주세요. (테스트 환경에서는 취소 버튼을 누르면 localhost:8090/으로 이동합니다.)")) {
             window.location.href = "http://localhost:8090/";
@@ -22,7 +67,6 @@
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    // 카메라 스트림 시작
     function startCamera(constraints) {
         navigator.mediaDevices.getUserMedia(constraints)
             .then((stream) => {
@@ -34,7 +78,6 @@
             });
     }
 
-    // 후방카메라를 우선 요청
     navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
         .then((stream) => {
             video.srcObject = stream;
@@ -42,11 +85,9 @@
         })
         .catch((error) => {
             console.warn('후방카메라를 열 수 없습니다. 전방카메라로 시도합니다.', error);
-            // 후방 실패하면 전방카메라로 재요청
             startCamera({ video: { facingMode: "user" } });
         });
 
-    // QR 코드 스캔 기능
     function scanQRCode() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             canvas.width = video.videoWidth;
@@ -58,7 +99,6 @@
 
             if (qrCode) {
                 const qrContent = qrCode.data;
-
                 if (isValidURL(qrContent)) {
                     const userConfirmed = confirm(`링크로 이동하시겠습니까? \n${qrContent}`);
                     if (userConfirmed) {
@@ -71,13 +111,12 @@
         requestAnimationFrame(scanQRCode);
     }
 
-    // URL 유효성 체크
     function isValidURL(url) {
         const pattern = /^(https?:\/\/)/i;
         return pattern.test(url);
     }
 
-    scanQRCode(); // QR 코드 스캔 시작
+    scanQRCode();
 </script>
 </body>
 </html>

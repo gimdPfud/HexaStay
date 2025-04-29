@@ -38,7 +38,8 @@ public class StorecartServiceImpl implements StorecartService {
 
         @Override
     public int addCart(StorecartitemDTO dto, Long hotelroomNum) {
-//        log.info(dto);
+        log.info(dto.toString());
+        log.info(dto.getOptionPrice());
 //        log.info(dto.getStorecartitemCount());
 
         //1. 메뉴 조회
@@ -89,6 +90,7 @@ public class StorecartServiceImpl implements StorecartService {
             newitem.setStoremenu(storemenu);
             newitem.setStorecartitemCount(dto.getStorecartitemCount());
             newitem.setStoremenuOptions(dto.getStoremenuOptions());
+            newitem.setOptionPrice(dto.getOptionPrice());
             storecartitem = storecartitemRepository.save(newitem);
         }
         //7. 장바구니아이템이 있음, 개수 조정

@@ -70,7 +70,7 @@
                         </p>
                         <!--추가한부분끝-->
 
-                        <p class="item-total" th:text="${#numbers.formatInteger(item.storemenuPrice * item.storemenuCount, 3, 'COMMA')} + ' 원'"></p>
+                        <p class="item-total" th:text="${#numbers.formatInteger((item.storemenuPrice+item.optionPrice) * item.storemenuCount, 3, 'COMMA')} + ' 원'"></p>
                     </div>
                     <div class="col-2 button-container">
                         <button class="mini-btn delete-btn" type="button" th:onclick="|deleteCart(${item.storecartitemNum})|">삭제</button>
@@ -145,8 +145,10 @@
                 });
         }
         function deleteCart(itemId) {
+            console.log("장바구니삭제시작")
             fetch(`/member/store/cart/delete/${itemId}`)
                 .then(response=>{
+                    console.log("갔다옴")
                     if(response.status===401){
                         window.location.href = redirectToQR
                     }
