@@ -344,46 +344,50 @@
             function updateFinalTotal() {
                 let grandTotal = 0; // 최종 결제 금액 (옵션 포함)
 
-                // 모든 장바구니 아이템(.food-item)을 순회
-                document.querySelectorAll('.food-item').forEach(item => {
-                    let itemSubTotal = 0; // 현재 아이템의 소계 (기본 메뉴 가격 + 옵션 가격)
+        // ✅ 전역 함수로 선언
+        function updateFinalTotal() {
+            let grandTotal = 0; // 장바구니 아이템들의 총 금액 (쿠폰 적용 전의 원래 금액)
 
-                    // 1. 기본 메뉴 가격 가져오기 (.item-total)
-                    const mainItemTotalSpan = item.querySelector('.item-total');
-                    if (mainItemTotalSpan) {
-                        // textContent에서 숫자만 추출하여 정수로 변환 (NaN 방지 위해 || 0 사용)
-                        const mainItemTotal = parseInt(mainItemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-                        itemSubTotal += mainItemTotal;
-                    }
+            // 모든 장바구니 아이템(.food-item)을 순회하여 총 금액 계산 (쿠폰 적용 전)
+            document.querySelectorAll('.food-item').forEach(item => {
+                // 각 아이템의 최종 가격 가져오기 (.item-total)
+                const itemTotalSpan = item.querySelector('.item-total');
+                if (itemTotalSpan) {
+                    // textContent에서 숫자만 추출하여 정수로 변환 (NaN 방지 위해 || 0 사용)
+                    const itemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
+                    grandTotal += itemTotal; // 각 아이템의 최종 가격을 합산
+                }
+            });
 
-                    // 2. 해당 아이템의 모든 옵션 가격 가져오기 (HTML 수정으로 추가된 .option-line-total 클래스 사용)
-                    //    item.querySelectorAll을 사용해 현재 아이템 하위의 옵션만 정확히 찾음
-                    item.querySelectorAll('.option-list .option-line-total').forEach(optionSpan => {
-                        const optionLineTotal = parseInt(optionSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-                        itemSubTotal += optionLineTotal; // 옵션 라인별 총 가격을 더함
-                    });
-
-                    // 3. 현재 아이템의 소계를 최종 금액에 합산
-                    grandTotal += itemSubTotal;
-                });
-
-                // 4. 계산된 최종 금액을 화면(#finalAmount)에 업데이트
-                const finalTotalEl = document.getElementById('finalAmount');
-                if (finalTotalEl) {
+            // 4. 최종 결제 금액을 화면(#finalAmount)에 업데이트
+            const finalTotalEl = document.getElementById('finalAmount');
+            if (finalTotalEl) {
+                // >>> **수정: couponFinalTotal 값이 있으면 할인된 금액을 최종 금액으로 표시** <<<
+                if (couponFinalTotal !== null) {
+                    // couponFinalTotal에 이미 백엔드에서 계산된 할인 적용 금액이 있습니다.
+                    finalTotalEl.innerText = `최종결제금액: ${couponFinalTotal.toLocaleString()}원`;
+                } else {
+                    // couponFinalTotal이 null이면 (쿠폰 적용 안 됨) 할인 적용 전 금액 표시
                     finalTotalEl.innerText = `최종결제금액: ${grandTotal.toLocaleString()}원`;
                 }
-
-                // 5. 할인 금액 표시 업데이트 (쿠폰 로직을 무시하므로 0원으로 설정)
-                const discountEl = document.getElementById('discountAmount');
-                if (discountEl) {
-                    discountEl.innerText = `0원`; // 쿠폰 로직 비활성화 상태 반영
-                }
-
+                // >>> **수정 완료** <<<
             }
 
-            // ✅ 쿠폰 적용 리스너
-            document.addEventListener('DOMContentLoaded', function () {
-                const couponSelect = document.getElementById('couponSelect');
+            // 5. 할인 금액 표시 업데이트 (#discountAmount)
+            const discountEl = document.getElementById('discountAmount');
+            if (discountEl) {
+                // >>> **수정: 할인 금액 계산 및 표시** <<<
+                if (couponFinalTotal !== null) {
+                    // 할인 금액은 원래 총 금액(grandTotal)에서 할인된 최종 금액(couponFinalTotal)을 뺀 값입니다.
+                    const discountAmount = grandTotal - couponFinalTotal;
+                    discountEl.innerText = `${discountAmount.toLocaleString()}원`;
+                } else {
+                    // couponFinalTotal이 null이면 할인 없음
+                    discountEl.innerText = `0원`;
+                }
+                // >>> **수정 완료** <<<
+            }
+        }
 
                 couponSelect.addEventListener('change', function () {
                     const couponNum = this.value;

@@ -83,9 +83,9 @@ public class CouponServiceImpl implements CouponService {
 
         int total = 0;
         for (RoomMenuCartItem item : items) {
-            int price = item.getRoomMenu().getRoomMenuPrice();
-            int qty = item.getRoomMenuCartItemAmount();
-            total += price * qty;
+
+            total += item.getRoomMenuCartItemPrice();
+
         }
 
         return total;
@@ -99,7 +99,7 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findById(couponNum)
                 .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
 
-        // 1. 유효성 검사
+        // 1. 유효성 검사 (만료, 사용 여부 등은 여기서 체크합니다.)
         if (!coupon.getMember().getMemberEmail().equals(email)) {
             throw new RuntimeException("해당 쿠폰은 이 회원의 것이 아닙니다.");
         }
@@ -108,37 +108,28 @@ public class CouponServiceImpl implements CouponService {
             throw new RuntimeException("쿠폰이 만료되었습니다.");
         }
 
+        // **수정:** 쿠폰이 이미 사용된 쿠폰인지 체크합니다. (getCoupons 쿼리로 걸러지지만, 혹시 모르니 한 번 더 체크 가능)
         if (coupon.isUsed()) {
-            throw new RuntimeException("이미 사용된 쿠폰입니다.");
+            // 반복 사용 쿠폰인데 횟수가 0이하라면 사용 불가
+            if (coupon.getRepeatCouponCount() == null || coupon.getRepeatCouponCount() <= 0) {
+                throw new RuntimeException("이미 사용된 쿠폰입니다.");
+            }
+            // 반복 사용 쿠폰이고 횟수가 남았다면 사용 가능
         }
 
-        if (coupon.getRepeatCouponCount() != null && coupon.getRepeatCouponCount() <= 0) {
-            throw new RuntimeException("쿠폰 사용 가능 횟수를 초과했습니다.");
-        }
 
         // 2. 할인 금액 계산
-        int originalPrice = getCartTotal(member);
+        int originalPrice = getCartTotal(member); // 수정된 getCartTotal 사용 (옵션 포함)
         int discount = (originalPrice * coupon.getDiscountRate()) / 100;
         int finalPrice = originalPrice - discount;
 
-        // 3. 쿠폰 사용 처리
-        if (coupon.getRepeatCouponCount() != null) {
-            coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
+        // >>> **여기서 쿠폰의 used 상태를 true로 바꾸거나 save()를 호출하는 코드를 모두 삭제합니다.** <<<
+        // 쿠폰 사용 처리는 실제 주문 완료 로직에서 진행합니다.
 
-            // 반복 사용 쿠폰도 횟수가 0이면 used 처리
-            if (coupon.getRepeatCouponCount() <= 0) {
-                coupon.setUsed(true);
-            }
 
-        } else {
-            // 단일 쿠폰 처리
-            coupon.setUsed(true);
-        }
+        log.info("쿠폰 적용 결과: 원 가격 {}, 할인 {}, 최종 {}", originalPrice, discount, finalPrice);
 
-        coupon.setUsedTime(LocalDateTime.now());
-        couponRepository.save(coupon); // 저장
-
-        return finalPrice;
+        return finalPrice; // 계산된 최종 금액만 반환
     }
 
     @Override
