@@ -28,14 +28,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
 
-    /* 메일 발송용 코끼리 추가 - java mailsender */
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2' // 또는 사용하시는 버전에 맞는 아티팩트 및 버전
 
     // 웹 소켓을 이용하기 위해서..
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -44,7 +44,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.google.zxing:javase:3.5.2'
 
-    //테스트용 ......
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 

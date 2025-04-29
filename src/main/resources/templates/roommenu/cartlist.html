@@ -340,115 +340,48 @@
             const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
             let couponFinalTotal = null;
 
-        // ✅ 전역 함수로 선언
-        function updateFinalTotal() {
-            let grandTotal = 0; // 장바구니 아이템들의 총 금액 (쿠폰 적용 전의 원래 금액)
+            // ✅ 전역 함수로 선언
+            // 장바구니 아이템들의 총 금액을 계산하고 화면에 표시합니다.
+            function updateFinalTotal() {
+                let grandTotal = 0; // 장바구니 아이템들의 총 금액 (쿠폰 적용 전의 원래 금액)
 
-            // 모든 장바구니 아이템(.food-item)을 순회하여 총 금액 계산 (쿠폰 적용 전)
-            document.querySelectorAll('.food-item').forEach(item => {
-                // 각 아이템의 최종 가격 가져오기 (.item-total)
-                const itemTotalSpan = item.querySelector('.item-total');
-                if (itemTotalSpan) {
-                    // textContent에서 숫자만 추출하여 정수로 변환 (NaN 방지 위해 || 0 사용)
-                    const itemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-                    grandTotal += itemTotal; // 각 아이템의 최종 가격을 합산
+                // 모든 장바구니 아이템(.food-item)을 순회하여 총 금액 계산 (쿠폰 적용 전)
+                document.querySelectorAll('.food-item').forEach(item => {
+                    // 각 아이템의 최종 가격 가져오기 (.item-total)
+                    const itemTotalSpan = item.querySelector('.item-total');
+                    if (itemTotalSpan) {
+                        const itemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
+                        grandTotal += itemTotal; // 각 아이템의 최종 가격을 합산
+                    }
+                });
+
+                // 최종 결제 금액을 화면(#finalAmount)에 업데이트
+                const finalTotalEl = document.getElementById('finalAmount');
+                if (finalTotalEl) {
+                    // couponFinalTotal 값이 있으면 할인된 금액을 최종 금액으로 표시
+                    if (couponFinalTotal !== null) {
+                        finalTotalEl.innerText = `최종결제금액: ${couponFinalTotal.toLocaleString()}원`;
+                    } else {
+                        // couponFinalTotal이 null이면 (쿠폰 적용 안 됨) 할인 적용 전 금액 표시
+                        finalTotalEl.innerText = `최종결제금액: ${grandTotal.toLocaleString()}원`;
+                    }
                 }
-            });
 
-            // 4. 최종 결제 금액을 화면(#finalAmount)에 업데이트
-            const finalTotalEl = document.getElementById('finalAmount');
-            if (finalTotalEl) {
-                // >>> **수정: couponFinalTotal 값이 있으면 할인된 금액을 최종 금액으로 표시** <<<
-                if (couponFinalTotal !== null) {
-                    // couponFinalTotal에 이미 백엔드에서 계산된 할인 적용 금액이 있습니다.
-                    finalTotalEl.innerText = `최종결제금액: ${couponFinalTotal.toLocaleString()}원`;
-                } else {
-                    // couponFinalTotal이 null이면 (쿠폰 적용 안 됨) 할인 적용 전 금액 표시
-                    finalTotalEl.innerText = `최종결제금액: ${grandTotal.toLocaleString()}원`;
-                }
-                // >>> **수정 완료** <<<
-            }
-
-            // 5. 할인 금액 표시 업데이트 (#discountAmount)
-            const discountEl = document.getElementById('discountAmount');
-            if (discountEl) {
-                // >>> **수정: 할인 금액 계산 및 표시** <<<
-                if (couponFinalTotal !== null) {
+                // 할인 금액 표시 업데이트 (#discountAmount)
+                const discountEl = document.getElementById('discountAmount');
+                if (discountEl) {
                     // 할인 금액은 원래 총 금액(grandTotal)에서 할인된 최종 금액(couponFinalTotal)을 뺀 값입니다.
-                    const discountAmount = grandTotal - couponFinalTotal;
-                    discountEl.innerText = `${discountAmount.toLocaleString()}원`;
-                } else {
-                    // couponFinalTotal이 null이면 할인 없음
-                    discountEl.innerText = `0원`;
+                    if (couponFinalTotal !== null) {
+                        const discountAmount = grandTotal - couponFinalTotal;
+                        discountEl.innerText = `${discountAmount.toLocaleString()}원`;
+                    } else {
+                        // couponFinalTotal이 null이면 할인 없음
+                        discountEl.innerText = `0원`;
+                    }
                 }
-                // >>> **수정 완료** <<<
             }
-        }
 
-                couponSelect.addEventListener('change', function () {
-                    const couponNum = this.value;
-
-                    if (couponNum === "") {
-                        document.getElementById('discountAmount').innerText = "0원";
-                        couponFinalTotal = null;
-                        updateFinalTotal(); // 이제 오류 없음!
-                        return;
-                    }
-
-                    fetch(`/roommenu/coupon/apply?email=${encodeURIComponent(currentUserEmail)}&couponNum=${encodeURIComponent(couponNum)}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error("서버 오류 발생");
-                            return response.json();
-                        })
-                        .then(data => {
-                            const discount = data.discount;
-                            const finalTotal = data.finalTotal;
-
-                            document.getElementById('discountAmount').innerText = discount.toLocaleString() + "원";
-                            couponFinalTotal = finalTotal;
-                            updateFinalTotal();
-                        })
-                        .catch(error => {
-                            console.error("쿠폰 적용 실패:", error);
-                            alert("❌ 쿠폰 적용에 실패했습니다.");
-                        });
-                });
-
-
-            document.querySelectorAll('.food-item').forEach(item => {
-                const decreaseBtn = item.querySelector('.decrease');
-                const increaseBtn = item.querySelector('.increase');
-                const input = item.querySelector('.quantity-input');
-                const itemTotalSpan = item.querySelector('.item-total');
-
-                // 가격 계산을 위해 pricePerItem을 추출할 때 텍스트가 존재하는지 확인
-                const pricePerItem = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) / parseInt(input.value, 10);
-                const itemId = item.getAttribute('data-item-id');
-
-                decreaseBtn.addEventListener('click', () => {
-                    let quantity = parseInt(input.value);
-                    if (quantity > 1) {
-                        quantity--;
-                        input.value = quantity;
-                        const newTotal = pricePerItem * quantity;
-                        itemTotalSpan.textContent = newTotal.toLocaleString();
-                        updateFinalTotal();
-                        updateQuantity(itemId, quantity);
-                    }
-                });
-
-                increaseBtn.addEventListener('click', () => {
-                    let quantity = parseInt(input.value);
-                    quantity++;
-                    input.value = quantity;
-                    const newTotal = pricePerItem * quantity;
-                    itemTotalSpan.textContent = newTotal.toLocaleString();
-                    updateFinalTotal();
-                    updateQuantity(itemId, quantity);
-                });
-                updateFinalTotal(); // 페이지 로드 시 총 금액 자동 계산
-            });
-
+            // 장바구니 아이템 수량 변경 요청을 백엔드에 전송합니다.
             function updateQuantity(itemId, quantity) {
                 fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
                     method: 'PUT',
@@ -459,7 +392,8 @@
                     .then(response => {
                         if (response.ok) {
                             console.log('수량 변경 성공');
-                            location.reload(); // 또는 수량/가격만 업데이트
+                            // 성공 후 페이지 새로고침 (또는 수량/가격만 업데이트)
+                            location.reload();
                         } else {
                             alert('❌ 수량 변경 실패');
                         }
@@ -470,33 +404,7 @@
                     });
             }
 
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const item = button.closest('.food-item');
-                    const itemId = item.getAttribute('data-item-id');
-                    if (!confirm("정말 삭제하시겠습니까?")) return;
-
-                    $.ajax({
-                        url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
-                        type: 'DELETE',
-                        success: () => {
-                            item.remove();
-                            updateFinalTotal();
-
-                            const remainingItems = document.querySelectorAll('.food-item');
-                            if (remainingItems.length === 0) {
-                                document.querySelector('.container').innerHTML = `
-                                <div style="text-align:center; padding:50px; color:#888;">
-                                    🛒 장바구니의 아이템이 존재하지 않습니다.
-                                </div>`;
-                            }
-                        },
-                        error: () => alert("❌ 삭제 실패")
-                    });
-                });
-            });
-
-            // 결제여부에 따라서 이동되는 페이지
+            // 결제 처리를 시작합니다.
             function processPayment() {
                 const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
 
@@ -531,8 +439,198 @@
                     });
             }
 
-            // 목록으로 돌아가기
+            // 주문 페이지로 이동합니다.
             function goToOrderPage() {
+                window.location.href = '/roommenu/orderpage';
+            }
+
+            // --- DOMContentLoaded 이벤트 리스너 시작 ---
+            // DOM 트리가 완전히 로드된 후 실행될 코드를 이곳에 둡니다.
+            document.addEventListener('DOMContentLoaded', function () {
+                const couponSelect = document.getElementById('couponSelect');
+                const foodItems = document.querySelectorAll('.food-item');
+                const deleteButtons = document.querySelectorAll('.delete-btn');
+                const requestInput = document.getElementById('request-input'); // 요청사항 입력 필드
+
+                // 쿠폰 선택 변경 이벤트 리스너
+                couponSelect.addEventListener('change', function () {
+                    const couponNum = this.value;
+
+                    if (couponNum === "") {
+                        // "쿠폰 선택" 옵션 선택 시
+                        document.getElementById('discountAmount').innerText = "0원";
+                        couponFinalTotal = null; // couponFinalTotal 초기화
+                        updateFinalTotal(); // 할인 해제된 상태로 총 금액 업데이트
+                        return;
+                    }
+
+                    // 쿠폰 적용 결과 백엔드에서 가져오기
+                    fetch(`/roommenu/coupon/apply?email=${encodeURIComponent(currentUserEmail)}&couponNum=${encodeURIComponent(couponNum)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                // 서버 오류 응답 처리
+                                return response.json().then(err => { throw new Error(err.error || `서버 오류 (${response.status})`); });
+                            }
+                            return response.json(); // 성공 시 JSON 응답 파싱
+                        })
+                        .then(data => {
+                            const discount = data.discount;
+                            const finalTotal = data.finalTotal;
+
+                            document.getElementById('discountAmount').innerText = discount.toLocaleString() + "원";
+                            couponFinalTotal = finalTotal; // 계산된 최종 금액 저장
+                            updateFinalTotal(); // 화면 업데이트
+                        })
+                        .catch(error => {
+                            console.error("쿠폰 적용 실패:", error);
+                            alert("❌ 쿠폰 적용에 실패했습니다: " + error.message);
+                            // 오류 발생 시 할인 및 최종 금액 초기화
+                            document.getElementById('discountAmount').innerText = "0원";
+                            couponFinalTotal = null;
+                            updateFinalTotal();
+                        });
+                });
+
+
+                // 각 장바구니 아이템에 대한 이벤트 리스너 (수량 변경, 삭제) 연결
+                foodItems.forEach(item => {
+                    const decreaseBtn = item.querySelector('.decrease');
+                    const increaseBtn = item.querySelector('.increase');
+                    const input = item.querySelector('.quantity-input');
+                    const itemTotalSpan = item.querySelector('.item-total');
+
+                    // 아이템 개당 가격 계산 (기본 가격 + 옵션 가격 합계)
+                    const initialQuantity = parseInt(input.value, 10) || 0;
+                    const initialItemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
+                    // 0으로 나누는 경우 방지
+                    const pricePerItem = initialQuantity > 0 ? initialItemTotal / initialQuantity : 0;
+
+                    const itemId = item.getAttribute('data-item-id');
+
+                    // 수량 감소 버튼 리스너
+                    decreaseBtn.addEventListener('click', () => {
+                        let quantity = parseInt(input.value, 10) || 0;
+                        if (quantity > 1) {
+                            quantity--;
+                            input.value = quantity;
+                            const newTotal = pricePerItem * quantity; // 아이템 총액 재계산
+                            itemTotalSpan.textContent = newTotal.toLocaleString();
+                            updateFinalTotal(); // 전체 총액 업데이트
+                            updateQuantity(itemId, quantity); // 백엔드 업데이트 및 페이지 새로고침 (location.reload 포함)
+                        }
+                    });
+
+                    // 수량 증가 버튼 리스너
+                    increaseBtn.addEventListener('click', () => {
+                        let quantity = parseInt(input.value, 10) || 0;
+                        quantity++;
+                        input.value = quantity;
+                        const newTotal = pricePerItem * quantity; // 아이템 총액 재계산
+                        itemTotalSpan.textContent = newTotal.toLocaleString();
+                        updateFinalTotal(); // 전체 총액 업데이트
+                        updateQuantity(itemId, quantity); // 백엔드 업데이트 및 페이지 새로고침
+                    });
+                });
+
+                // 삭제 버튼 리스너 연결
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const item = button.closest('.food-item');
+                        const itemId = item.getAttribute('data-item-id');
+                        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+                        // jQuery AJAX를 사용하여 DELETE 요청 전송
+                        $.ajax({
+                            url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
+                            type: 'DELETE',
+                            success: () => {
+                                item.remove(); // 아이템 제거
+                                updateFinalTotal(); // 전체 총액 업데이트
+
+                                const remainingItems = document.querySelectorAll('.food-item');
+                                if (remainingItems.length === 0) {
+                                    // 아이템이 없으면 장바구니 비어있음 메시지 표시
+                                    const container = document.querySelector('.container');
+                                    if (container) {
+                                        container.innerHTML = `
+                                <div style="text-align:center; padding:50px; color:#888;">
+                                    🛒 장바구니에 아이템이 존재하지 않습니다.
+                                </div>`;
+                                    }
+                                }
+                            },
+                            error: () => alert("❌ 삭제 실패")
+                        });
+                    });
+                });
+
+                // 페이지 로드 시 초기 총 금액 계산 및 표시
+                // 모든 이벤트 리스너가 연결된 후 호출합니다.
+                updateFinalTotal();
+
+
+                // 요청사항 입력 필드에 저장된 값이 있다면 로드
+                const savedRequestMessage = localStorage.getItem('roomMenuRequestMessage');
+                if (savedRequestMessage) {
+                    requestInput.value = savedRequestMessage;
+                }
+
+                // 요청사항 입력 필드 값이 변경될 때마다 저장
+                requestInput.addEventListener('input', function() {
+                    localStorage.setItem('roomMenuRequestMessage', this.value);
+                });
+
+
+            }); // --- DOMContentLoaded 이벤트 리스너 끝 ---
+
+
+            // 결제 처리를 시작합니다. (DOMContentLoaded 밖에서 전역 함수로 선언)
+            function processPayment() {
+                const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
+
+                const selectedCoupon = document.getElementById('couponSelect').value;
+                const discountedTotal = couponFinalTotal; // 전역 변수에서 가져옴
+
+                const formData = new URLSearchParams();
+                formData.append('requestMessage', roomMenuOrderRequestMessage);
+
+                if (selectedCoupon) {
+                    formData.append('couponNum', selectedCoupon);
+                }
+
+                if (discountedTotal !== null) {
+                    formData.append('discountedTotalPrice', discountedTotal);
+                }
+
+                fetch('/roommenu/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
+                        }
+                        return res.text();
+                    })
+                    .then(result => {
+                        alert("결제가 완료되었습니다.");
+                        // 결제 성공 후 요청사항 저장 값 삭제
+                        localStorage.removeItem('roomMenuRequestMessage');
+                        window.location.href = '/roommenu/orderList';
+                    })
+                    .catch(error => {
+                        console.error("결제 중 오류 발생:", error);
+                        alert("❌ 결제 중 오류 발생: " + error.message);
+                    });
+            }
+
+            // 주문 페이지로 이동합니다. (DOMContentLoaded 밖에서 전역 함수로 선언)
+            function goToOrderPage() {
+                // 목록으로 돌아가기 전에 요청사항 저장 값 삭제
+                localStorage.removeItem('roomMenuRequestMessage');
                 window.location.href = '/roommenu/orderpage';
             }
         </script>
