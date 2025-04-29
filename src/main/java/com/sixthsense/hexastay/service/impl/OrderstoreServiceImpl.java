@@ -17,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -112,9 +113,16 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)//영속성 끊어주려고 추가함
     public void paid(Long orderId) {
+        log.info("paid 시작");
         Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        log.info("orderstore1 : "+orderstore);
         orderstore.setOrderstoreStatus("paid");
+        log.info("orderstore2 : "+orderstore);
+        orderstore = orderstoreRepository.save(orderstore);
+        log.info("orderstore3 : "+orderstore);
+        orderstoreRepository.flush(); // 즉시 반영
     }
 
     @Override
@@ -183,7 +191,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             itemlist.forEach(item->{
                 OrderstoreitemDTO dto = modelMapper.map(item,OrderstoreitemDTO.class);
                 dto.setStoremenuDTO(modelMapper.map(item.getStoremenu(),StoremenuDTO.class));
-                log.info("리스트 뽑는 중 : "+dto.getStoremenuDTO());
+//                log.info("리스트 뽑는 중 : "+dto.getStoremenuDTO());
                 orderstoreViewDTO.addOrderstoreitemDTOList(dto);
             });
             return orderstoreViewDTO;

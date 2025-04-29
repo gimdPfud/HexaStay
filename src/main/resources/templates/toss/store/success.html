@@ -74,6 +74,9 @@
 
     document.addEventListener("DOMContentLoaded",function () {
         fetch(`/admin/store/order/paid/${o}`)
+            .then(response=>{
+                console.log("갔다옴")
+            })
     })
     function goHome() {
         // 부모 창 이동
