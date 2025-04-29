@@ -340,10 +340,6 @@
             const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
             let couponFinalTotal = null;
 
-            // ✅ 전역 함수로 선언
-            function updateFinalTotal() {
-                let grandTotal = 0; // 최종 결제 금액 (옵션 포함)
-
         // ✅ 전역 함수로 선언
         function updateFinalTotal() {
             let grandTotal = 0; // 장바구니 아이템들의 총 금액 (쿠폰 적용 전의 원래 금액)
@@ -417,7 +413,6 @@
                             alert("❌ 쿠폰 적용에 실패했습니다.");
                         });
                 });
-            });
 
 
             document.querySelectorAll('.food-item').forEach(item => {
