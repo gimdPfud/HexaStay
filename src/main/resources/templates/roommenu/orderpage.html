@@ -260,18 +260,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            min-height: 150px;
-            margin-bottom: 30px;
-        }
+            /* height: 100%; 삭제 */
 
-        .menu-image {
-            width: 120px;
-            height: 120px;
+        }
+        div.menu-image-container img.menu-image {
+            width: 100px !important;
+            height: 100px !important;
             object-fit: cover;
             border-radius: 10px;
         }
-
         .menu-badge {
             display: inline-block;
             background-color: #e0f7fa;
@@ -454,10 +451,12 @@
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="menu-image-container">
                                 <img th:if="${roomMenuDTO.roomMenuImageMeta != null}"
-                                     th:src="@{${roomMenuDTO.roomMenuImageMeta}}"
+                                     th:src="@{${roomMenuDTO.roomMenuImageMeta}} "
+                                     style="width:100px;height:100px;object-fit:cover;border-radius:10px;"
                                      class="menu-image">
                                 <img th:unless="${roomMenuDTO.roomMenuImageMeta != null}"
                                      th:src="@{/profile/default.png}"
+                                     style="width:100px;height:100px;object-fit:cover;border-radius:10px;"
                                      class="menu-image">
                             </div>
 

@@ -153,16 +153,6 @@
                 </div>
             </li>
         </ul>
-
-        <!-- 하단 버튼 -->
-        <button class="add-to-cart-btn" onclick="window.location.href='/member/store/cart/list'">
-            🛒 내 카트 리스트로
-            <span th:text="'(' + ${totalCartItemCount} + ')'" class="cart-count">[0]</span>
-        </button>
-        <button class="order-list-btn" onclick="window.location.href='/member/store/order/list'">
-            🛒 내 주문 리스트로
-            <span th:text="'(' + ${totalOrderCount} + ')'" class="cart-count">[0]</span>
-        </button>
     </div>
 
     <!-- 스크립트 -->
