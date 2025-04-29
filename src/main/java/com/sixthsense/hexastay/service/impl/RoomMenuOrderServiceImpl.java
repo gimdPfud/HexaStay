@@ -398,6 +398,18 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             dto.setRegDate(order.getRegDate());
             dto.setDiscountedPrice(order.getDiscountedPrice());
             dto.setMember(order.getMember());
+            // DTO의 originalTotalPrice도 계산하여 설정 (일관성을 위해)
+            int originalTotal = order.getOrderItems().stream()
+                    .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
+                    .sum();
+            dto.setOriginalTotalPrice(originalTotal);
+            // DTO의 totalPrice도 설정 (관리자 페이지에서 사용한다면)
+            int totalPrice = originalTotal;
+            if (order.getDiscountedPrice() != null) {
+                totalPrice = order.getDiscountedPrice();
+            }
+            dto.setTotalPrice(totalPrice);
+
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
@@ -405,16 +417,20 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderRequestMessage(item.getRoomMenuOrderRequestMessage());
+                // >>> **추가: 옵션 필드 값을 DTO에 복사** <<<
+                itemDTO.setRoomMenuSelectOptionName(item.getRoomMenuSelectOptionName());
+                itemDTO.setRoomMenuSelectOptionPrice(item.getRoomMenuSelectOptionPrice());
+                // >>> **추가 완료** <<<
                 return itemDTO;
             }).collect(Collectors.toList());
             dto.setOrderItemList(itemDTOList);
 
-            // ★ 총 금액 계산 부분: 주문 항목들의 (가격 * 수량) 합계를 구해서 totalPrice에 저장
-            int total = order.getOrderItems().stream()
-                    .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
-                    .sum();
-            dto.setOriginalTotalPrice(total);
-            dto.setTotalPrice(total);
+            log.info("관리자 오더 DTO 변환 확인 - 주문번호: {}", dto.getRoomMenuOrderNum());
+            if (!dto.getOrderItemList().isEmpty()) {
+                log.info("  첫 번째 아이템 옵션 이름: {}", dto.getOrderItemList().get(0).getRoomMenuSelectOptionName());
+                log.info("  첫 번째 아이템 옵션 가격: {}", dto.getOrderItemList().get(0).getRoomMenuSelectOptionPrice());
+            }
+
 
             return dto;
         });
