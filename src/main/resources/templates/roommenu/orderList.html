@@ -48,7 +48,7 @@
                 background-color: #ffffff;
                 margin-bottom: 20px;
                 transition: all 0.3s ease;
-                height: 350px;  /* 카드의 고정된 높이 */
+                height: auto;  /* 카드의 고정된 높이 */
             }
 
             .card-header {
@@ -60,8 +60,7 @@
             }
 
             .card-body {
-                padding: 15px;
-                height: 200px;  /* 카드 본문 고정 높이 */
+                height: auto;  /* 카드 본문 고정 높이 */
                 overflow-y: auto;  /* 본문 내용이 많을 경우 스크롤 */
             }
 
@@ -136,7 +135,12 @@
                             <strong th:text="#{orderList.totalPrice}">주문 금액 : </strong>
                             ₩<span th:text="${T(java.lang.String).format('%,d', item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount)}"></span>
                         </div>
-
+                        <div class="card-body">
+                            <span th:if="${order.discountedPrice != null}">
+                            <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                            <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
+                            </span>
+                        </div>
                     </div>
                     <!-- 동적으로 메뉴 가져오기 끝 -->
                 </div>
@@ -148,14 +152,6 @@
                 <span>주문 시간:</span>
                 <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
             </small>
-            <div class="card-body text-end">
-
-                <span th:if="${order.discountedPrice != null}">
-                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
-                <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
-                </span>
-
-            </div>
         </div>
     </div>
 
