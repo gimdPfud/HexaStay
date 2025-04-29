@@ -106,9 +106,8 @@
 
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <button type="button" onclick="window.location.href='/member/store/list?type=L'" class="btn-custom">
+            <button type="button" onclick="filterByLikes()" class="btn-custom">
                 ❤️ <span>인기순</span>
-                <span class="like-count" th:text="${storeLikes}" style="margin-left: 4px;">0</span>
             </button>
             <div class="tab active" onclick="filterByCategory('전체')">전체</div>
             <div class="tab" onclick="filterByCategory('한식')">한식</div>
@@ -193,6 +192,24 @@
                     });
             });
         });
+
+        function filterByLikes() {
+            const storeList = document.querySelector('.store-list');
+            const storeItems = Array.from(document.querySelectorAll('.store-item'));
+
+            const sortedItems = storeItems.sort((a, b) => {
+                const aStoreNum = a.querySelector('.like-section .like-count').id.split('-')[1];
+                const bStoreNum = b.querySelector('.like-section .like-count').id.split('-')[1];
+                const aLikeCount = parseInt(document.getElementById(`likeCount-${aStoreNum}`).textContent, 10) || 0;
+                const bLikeCount = parseInt(document.getElementById(`likeCount-${bStoreNum}`).textContent, 10) || 0;
+                return bLikeCount - aLikeCount; // 내림차순 (좋아요 높은 거 -> 낮은 거)
+            });
+
+            // 리스트 비우고 다시 채우기
+            storeList.innerHTML = '';
+            sortedItems.forEach(item => storeList.appendChild(item));
+        }
+
 
         function filterByCategory(category) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
