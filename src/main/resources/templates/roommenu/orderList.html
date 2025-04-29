@@ -109,31 +109,29 @@
 
         <ul class="list-group list-group-flush">
             <li th:each="item : ${order.orderItemList}" class="list-group-item">
-                <div class="row text-center text-md-start">
-                    <!-- 이미지 -->
-                    <div class="col-4">
+                <div class="row align-items-center g-3">
+                    <div class="col-4 col-md-3 text-center">
                         <img th:if="${item.roomMenuImageMeta != null}"
                              th:src="@{${item.roomMenuImageMeta}}"
-                             class="order-img">
+                             class="order-img img-fluid rounded">
                         <img th:unless="${item.roomMenuImageMeta != null}"
                              th:src="@{/profile/default.png}"
-                             class="order-img">
+                             class="order-img img-fluid rounded">
                     </div>
-                    <!-- 이미지 끝 -->
+                    <div class="col-8 col-md-9">
+                        <div class="d-flex align-items-center mb-1">
+                            <strong class="me-2" th:text="#{orderList.menuName} ?: '메뉴명 : '">메뉴명 : </strong>
+                            <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
+                        </div>
 
-                    <!-- 동적으로 메뉴를 가져오기 -->
-                    <div class="col-8 d-flex flex-column justify-content-center">
-                        <div style="display: flex; align-items: center;">
-                            <strong th:text="#{orderList.menuName}">메뉴명 : </strong>
-                            <span th:text="${item.roomMenuOrderItemName}"></span>
+                        <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                             class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
+                            <strong class="me-2" th:text="#{orderList.option} ?: '옵션: '">옵션:</strong>
+                            <span th:text="${item.roomMenuSelectOptionName}" class="flex-grow-1">옵션 요약 정보</span>
                         </div>
-                        <div style="display: flex; align-items: center;">
-                            <strong th:text="#{orderList.quantity}">수량 :</strong>
-                            <span th:text="${item.roomMenuOrderItemAmount}"></span>
-                        </div>
-                        <div style="display: flex; align-items: center;">
-                            <strong th:text="#{orderList.totalPrice}">주문 금액 : </strong>
-                            ₩<span th:text="${T(java.lang.String).format('%,d', item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount)}"></span>
+                        <div class="d-flex align-items-center mb-1">
+                            <strong class="me-2" th:text="#{orderList.quantity}">수량 :</strong>
+                            <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                         </div>
                         <div class="card-body">
                             <span th:if="${order.discountedPrice != null}">
@@ -142,7 +140,6 @@
                             </span>
                         </div>
                     </div>
-                    <!-- 동적으로 메뉴 가져오기 끝 -->
                 </div>
             </li>
         </ul>

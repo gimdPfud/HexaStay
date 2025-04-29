@@ -56,32 +56,40 @@
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item"
-                                            th:each="item, iterStat : ${order.orderItemList}"
-                                            th:if="${iterStat.index == 0}">
-                                            <div class="row text-center text-md-start">
-                                                <div class="col-12 col-md-6 mb-2">
-                                                    <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
-                                                    <span th:text="${item.roomMenuOrderItemName}"></span>
-                                                </div>
-                                                <div class="col-6 col-md-3 mb-2">
-                                                    <strong th:text="#{orderList.quantity}">수량:</strong>
-                                                    <span th:text="${item.roomMenuOrderItemAmount}"></span>
-                                                </div>
-                                                <div class="col-12 mt-1">
-                                                    <strong>총 주문 금액:</strong>
-                                                    ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span>
-                                                    <span th:if="${order.discountedPrice != null}">
-                                                    <br>
-                                                    <strong style="color: #f75b5b;">할인 적용 금액:</strong>
-                                                    ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
-                                                </span>
-                                                </div>
+                                        th:each="item, iterStat : ${order.orderItemList}"
+                                        th:if="${iterStat.index == 0}">
+                                        <div class="row text-center text-md-start g-1">
+                                            <div class="col-12 col-md-6">
+                                                <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
+                                                <span th:text="${item.roomMenuOrderItemName}" class="ms-1"></span>
                                             </div>
-                                            <div>
+                                            <div class="col-6 col-md-3">
+                                                <strong th:text="#{orderList.quantity}">수량:</strong>
+                                                <span th:text="${item.roomMenuOrderItemAmount}" class="ms-1"></span>
+                                            </div>
+                                            <div class="col-12">
+                                                <strong>총 주문 금액:</strong>
+                                                ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span>
+                                                <span th:if="${order.discountedPrice != null}">
+                <br>
+                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+            </span>
+                                            </div>
+
+                                            <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                                                 class="col-12 text-muted mt-1" style="font-size: 0.9em;">
                                                 <small>
-                                                    요청: <span th:text="${item.roomMenuOrderRequestMessage}"></span>
+                                                    <strong>옵션:</strong>
+                                                    <span th:text="${item.roomMenuSelectOptionName}">옵션 요약 정보</span>
                                                 </small>
                                             </div>
+                                        </div>
+                                        <div>
+                                            <small>
+                                                요청: <span th:text="${item.roomMenuOrderRequestMessage}"></span>
+                                            </small>
+                                        </div>
                                         </li>
                                     </ul>
 
@@ -107,17 +115,24 @@
                                                     <ul class="list-group list-group-flush">
                                                         <!-- 주문 항목 목록 전체 출력 (요청사항은 생략) -->
                                                         <li class="list-group-item" th:each="item : ${order.orderItemList}">
-                                                            <div>
-                                                                <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
-                                                                <span th:text="${item.roomMenuOrderItemName}"></span>
+                                                            <div class="d-flex align-items-center mb-1">
+                                                                <strong class="me-2" th:text="#{orderList.menuName}">메뉴 이름:</strong>
+                                                                <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
                                                             </div>
-                                                            <div>
-                                                                <strong th:text="#{orderList.quantity}">수량:</strong>
-                                                                <span th:text="${item.roomMenuOrderItemAmount}"></span>
+
+                                                            <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                                                                 class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
+                                                                <strong class="me-2">옵션:</strong>
+                                                                <span th:text="${item.roomMenuSelectOptionName}">옵션 요약 정보</span>
                                                             </div>
-                                                            <div>
-                                                                <strong th:text="#{orderList.totalPrice}">총 가격:</strong>
-                                                                ₩<span th:text="${item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount}"></span>
+                                                            <div class="d-flex align-items-center mb-1">
+                                                                <strong class="me-2" th:text="#{orderList.quantity}">수량:</strong>
+                                                                <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <strong class="me-2" th:text="#{orderList.totalPrice}">총 가격:</strong>
+                                                                <span class="flex-grow-1"></span>
+                                                                <strong>₩<span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 3, 'COMMA')}">아이템 총 금액</span></strong>
                                                             </div>
                                                         </li>
                                                     </ul>

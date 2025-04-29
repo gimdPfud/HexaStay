@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>room 배정 회원 목록</title>
+    <title>객실 배정 회원 목록</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -24,62 +23,54 @@
         box-shadow: 0 0 10px rgba(13, 110, 253, 0.25);
     }
 
-    /*form-control : 효과 style Class="" */
-    .form-control:focus {
-        border-color: #0d6efd; /* Bootstrap primary */
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        transition: all 0.3s ease-in-out;
-    }
-
-    .form-control:valid {
-        border-color: #198754; /* Bootstrap success */
-    }
-
     .form-control:invalid {
         border-color: #dc3545; /* Bootstrap danger */
     }
     /*form-control : 효과 style*/
 
+    table th {
+        text-align: center;
+    }
 </style>
 <body>
 
 <div class="container mt-5">
 
     <h3 class="fw-bold mb-4 text-center text-dark"
-        th:text="${roomNum} + '번: Room에 배정된 회원 목록'">
+        th:text="${roomNum} + '번 객실에 배정된 회원 목록'">
     </h3>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2">
         <div class="col" th:each="member : ${members}">
             <div class="card h-100 shadow-sm border-0">
-                <div class="card-body member-card">
+                <div class="card-body member-card" style="border-radius: 12px;">
                     <h5 class="card-title fw-semibold text-primary">
                         <span th:text="${member.memberName}">이름</span>
-                        <small class="text-muted">(#<span th:text="${member.memberNum}"></span>)</small>
+                        <small class="text-dark">(#<span th:text="${member.memberNum}"></span>)</small>
                     </h5>
                     <p class="card-text mb-1">
-                        <strong>전화번호:</strong> <span th:text="${member.memberPhone}"></span>
+                        <strong>전화번호 : </strong> <span th:text="${member.memberPhone}"></span>
                     </p>
                     <p class="card-text mb-3">
-                        <strong>이메일:</strong> <span th:text="${member.memberEmail}"></span>
+                        <strong>이메일 : </strong> <span th:text="${member.memberEmail}"></span>
                     </p>
 
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <button type="button"
-                                class="btn btn-sm btn-outline-primary w-100"
+                                class="btn btn-sm btn-outline-dark w-100"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editMemberModal"
                                 th:attr="data-member-num=${member.memberNum},
                                      data-member-name=${member.memberName},
                                      data-member-phone=${member.memberPhone},
                                      data-member-email=${member.memberEmail}">
-                            회원정보 수정
+                            회원 정보 수정
                         </button>
 
                         <button type="button"
-                                class="btn btn-sm btn-outline-secondary w-100 open-member-modal-btn"
+                                class="btn btn-sm btn-outline-dark w-100 open-member-modal-btn"
                                 th:attr="data-room-num=${roomNum}">
-                            Room 배정 수정
+                            객실 배정 수정
                         </button>
                     </div>
                 </div>
@@ -116,7 +107,7 @@
 
 <!-- 회원 검색후 수정 모달 Room DB 에 RoomPK  기준으로 가져와서 memberFK만 변경 가능-->
 <div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true"><!--검색 modal 시작점-->
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="memberModalLabel">회원 검색</h5><!--회원 검색으로 room 배정 변경-->
@@ -126,18 +117,18 @@
             <div class="modal-body">
                 <!-- ✅ 숨겨진 룸 넘버 input -->
                 <input type="hidden" id="roomNumHidden">
-                <div class="mb-3">
-                    <input type="text" id="memberSearchInput" class="form-control" placeholder="이름 또는 이메일 검색..."/>
-                    <button class="btn btn-outline-primary mt-2" type="button" onclick="searchMembers()">검색</button>
+                <div class="mb-3 d-flex">
+                    <input type="text" id="memberSearchInput" class="form-control me-2" placeholder="이름 또는 이메일 입력" style="flex: 9;">
+                    <button class="btn btn-primary" type="button" onclick="searchMembers()" style="flex: 1;">검색</button>
                 </div>
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>번호</th>
-                        <th>이름</th>
-                        <th>이메일</th>
-                        <th>전화번호</th>
-                        <th>선택</th>
+                        <th style="width: 10%;">회원 번호</th>
+                        <th style="width: 15%;">이름</th>
+                        <th style="width: 20%;">이메일</th>
+                        <th style="width: 15%;">전화번호</th>
+                        <th style="width: 15%;"></th>
                     </tr>
                     </thead>
                     <tbody id="memberSearchResults"></tbody>
@@ -146,8 +137,6 @@
         </div>
     </div>
 </div><!--검색 modal 끝점-->
-
-
 
 <!-- 회원 수정 모달 -->
 <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
@@ -232,18 +221,18 @@
                 data.forEach(member => {
                     const row = `
                     <tr>
-                        <td>${member.memberNum}</td>
-                        <td>${member.memberName}</td>
-                        <td>${member.memberEmail}</td>
-                        <td>${member.memberPhone}</td>
-                        <td>
+                        <td class="text-center">${member.memberNum}</td>
+                        <td class="text-center">${member.memberName}</td>
+                        <td class="text-center">${member.memberEmail}</td>
+                        <td class="text-center">${member.memberPhone}</td>
+                        <td class="text-center">
                             <button type="button" class="btn btn-sm btn-primary select-member-btn"
                                 data-room-num="${roomNum}"
                                 data-member-num="${member.memberNum}"
                                 data-member-name="${member.memberName}"
                                 data-member-email="${member.memberEmail}"
                                 data-member-phone="${member.memberPhone}">
-                                검색수정
+                                선택
                             </button>
                         </td>
                     </tr>`;
@@ -266,8 +255,6 @@
             selectMember(memberNum);
         }
     });
-
-
 
 
     function selectMember(memberNum) {
@@ -309,12 +296,7 @@
                 console.error("회원 변경 중 오류:", err);
                 alert("회원 변경 중 오류가 발생했습니다.");
             });
-
     }
-
-
-
-
 
         /*수동 modal 수정 script 메소드*/
         // 🟢 DOM이 로드된 후 실행
