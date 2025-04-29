@@ -10,20 +10,43 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
 
-        .container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
+        /* 이미지 100x100 유지 */
+        .order-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+
+        /* 카드 */
+        .card {
             background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .card-header, .card-footer {
+            background-color: #f7f7f7;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-footer { font-size: 0.9rem; color: #777; }
+
+        /* 주문 항목 요약 */
+        .order-summary {
+            display: flex;
+            gap: 10px;
+            align-items: center;
             padding: 10px;
         }
-
-        .order-img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
+        .order-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.95rem;
         }
+        .order-text div { color: black; }
 
         .back-to-list-btn {
             background-color: #ddd;
@@ -37,45 +60,11 @@
             margin-top: 25px;
         }
 
-        @media (max-width: 480px) {
-            .card {
-                border-radius: 10px;
-                border: none;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                background-color: #ffffff;
-                margin-bottom: 20px;
-                transition: all 0.3s ease;
-                height: 350px;
-            }
-
-            .card-header {
-                background-color: #f7f7f7;
-                border-bottom: 1px solid #ddd;
-                border-radius: 10px 10px 0 0;
-                padding: 10px;
-                height: 50px;
-            }
-
-            .card-body {
-                padding: 15px;
-                height: 200px;
-                overflow-y: auto;
-            }
-
-            .card-footer {
-                background-color: #f7f7f7;
-                padding: 10px;
-                text-align: right;
-                border-top: 1px solid #ddd;
-                border-radius: 0 0 10px 10px;
-                height: 50px;
-            }
-
-            .pagination .page-link {
-                font-size: 12px;
-                padding: 5px;
-            }
-        }
+        /* 배지 색상 */
+        .badge-paid { background-color: #77b1fb; }
+        .badge-end { background-color: #4caf50; }
+        .badge-default { background-color: #6c757d; }
+        .badge { padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; color: white; }
     </style>
 </head>
 <body>
@@ -110,12 +99,17 @@
                                 <strong>메뉴:</strong> <span th:text="${item.orderstoreFirstItemName}"></span>
                                 <span th:if="${item.orderstoreitemDTOList.size()>1}" th:text="' 외 ' + ${item.orderstoreitemDTOList.size() - 1} + ' 개'"></span>
                             </div>
-                            <div><strong>주문시간:</strong> <span th:text="${item.formatDate}"></span></div>
                             <div><strong>총 주문 금액:</strong> <span th:text="${item.orderstoreFinalPrice} + '원'"></span></div>
                         </div>
                     </div>
                 </li>
             </ul>
+            <div class="card-footer text-muted text-end">
+                <small>
+                    <span>주문 시간:</span>
+                    <span th:text="${#temporals.format(item.orderstoreDate, 'yyyy-MM-dd HH:mm')}"></span>
+                </small>
+            </div>
         </div>
 
         <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'">목록으로</button>
