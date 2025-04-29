@@ -195,18 +195,47 @@ public class RoomMenuOrderController {
                                @RequestParam(name = "page", defaultValue = "0") int page) {
         log.info("주문 리스트 페이지 컨트롤러 진입");
         if (principal == null) {
+            log.warn("비로그인 사용자가 주문 리스트 접근 시도");
             return "redirect:/member/login"; // 로그인 안 되었으면 로그인 페이지로 이동
         }
 
         String email = principal.getName();
+        log.info("로그인한 사용자: {}", email);
 
-        // 한 페이지당 10건씩, 등록일 기준 내림차순 정렬 (페이지 번호는 0부터 시작)
-        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "regDate"));
+        // 한 페이지당 5건씩, 등록일 기준 내림차순 정렬 (페이지 번호는 0부터 시작)
+        // Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "regDate")); // 기존 10건
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "regDate")); // 5건으로 수정하신 듯
+
 
         Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getOrderListByEmail(email, pageable);
-        model.addAttribute("orderList", orderPage.getContent());
 
-        // 페이징 네비게이션에 사용할 값들
+        // 서비스로부터 받은 DTO 리스트
+        List<RoomMenuOrderDTO> orderListForModel = orderPage.getContent();
+
+        // >>> **추가된 로직 시작: Controller에서 DTO의 discountedPrice 값 최종 확인** <<<
+        log.info("--- Controller: Debugging orderList DTOs before adding to Model ---");
+        if (orderListForModel != null) {
+            log.info("Number of orders in list: {}", orderListForModel.size());
+            for (int i = 0; i < orderListForModel.size(); i++) {
+                RoomMenuOrderDTO orderDto = orderListForModel.get(i);
+                log.info("  Order {}: OrderNum={}, OriginalTotal={}, DiscountedPrice={} (<<< 최종 확인 값)", // <-- 이 값을 확인합니다!
+                        i, orderDto.getRoomMenuOrderNum(),
+                        orderDto.getOriginalTotalPrice(), orderDto.getDiscountedPrice());
+                if (orderDto.getOrderItemList() != null) {
+                    log.info("    Number of items: {}", orderDto.getOrderItemList().size());
+                }
+            }
+        } else {
+            log.warn("orderListForModel is null after getContent() call.");
+        }
+        log.info("-----------------------------------------------------------------");
+        // >>> **추가된 로직 끝** <<<
+
+
+        // Model에 데이터 추가
+        model.addAttribute("orderList", orderListForModel); // DTO 리스트를 "orderList" 이름으로 Model에 담습니다.
+
+        // 페이징 네비게이션에 사용할 값들 (orderPage 객체에서 가져옴)
         int totalPages = orderPage.getTotalPages();
         model.addAttribute("totalPages", totalPages);
 
@@ -226,7 +255,8 @@ public class RoomMenuOrderController {
         model.addAttribute("prevPage", prevPage);
         model.addAttribute("nextPage", nextPage);
 
-        return "roommenu/orderList"; // templates/roommenu/orderList.html
+        log.info("Model에 orderList 등 데이터 추가 완료. 템플릿 렌더링 시작: roommenu/orderList.html");
+        return "roommenu/orderList"; // templates/roommenu/orderList.html 템플릿 사용
     }
 
     /***************************************************

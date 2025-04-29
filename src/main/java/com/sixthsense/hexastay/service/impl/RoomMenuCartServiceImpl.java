@@ -459,8 +459,16 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         // 쿠폰 할인 적용
         int discount = (originalPrice * coupon.getDiscountRate()) / 100;
+        log.info("--- 쿠폰 할인 계산 값 확인 ---");
+        log.info("원본 장바구니 총액 (originalPrice): {}", originalPrice);
+        log.info("쿠폰 할인율 (coupon.getDiscountRate()): {}", coupon.getDiscountRate());
+        log.info("--------------------------");
+        // 할인 금액 계산
+        int finalPrice = originalPrice - discount; // 최종 가격 계산
 
-        return originalPrice - discount;
+        log.info("쿠폰 적용 결과: 원 가격 {}, 할인 {}, 최종 {}", originalPrice, discount, finalPrice);
+        return finalPrice;
+
     }
 
     // 장바구니 조회 후 쿠폰 적용
