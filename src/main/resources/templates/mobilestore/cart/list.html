@@ -8,7 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모바일 장바구니 페이지</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        html, body {margin: 0;padding: 0;box-sizing: border-box;font-family: Arial, sans-serif;}
+        .nav, .nav-link, .navbar, .tabs {
+            margin: initial;
+            padding: initial;
+            box-sizing: border-box;
+        }
+
         body { background-color: #f9f9f9; }
         .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
         .food-list { list-style: none; padding: 10px; }
@@ -84,6 +90,7 @@
         </div>
     </form>
     <script th:inline="javascript">
+        const redirectToQR = window.location.origin + "/cart/qr";//unAuth 오류 걸리면 여기로 이동함
 
         function minusCount(button) {
             const cartItemId = button.dataset.cartitemid;
@@ -112,6 +119,9 @@
             })
                 .then(response => {
                     if (!response.ok) {
+                        if(response.status===401){
+                            window.location.href=redirectToQR;
+                        }
                         return response.text().then(body => alert(body));
                     } else {
                         fetch("/member/store/order/getlastorder")
@@ -136,6 +146,11 @@
         }
         function deleteCart(itemId) {
             fetch(`/member/store/cart/delete/${itemId}`)
+                .then(response=>{
+                    if(response.status===401){
+                        window.location.href = redirectToQR
+                    }
+                })
                 .then(() => location.reload());
         }
     </script>

@@ -48,7 +48,7 @@
                 background-color: #ffffff;
                 margin-bottom: 20px;
                 transition: all 0.3s ease;
-                height: 350px;  /* 카드의 고정된 높이 */
+                height: auto;  /* 카드의 고정된 높이 */
             }
 
             .card-header {
@@ -60,8 +60,7 @@
             }
 
             .card-body {
-                padding: 15px;
-                height: 200px;  /* 카드 본문 고정 높이 */
+                height: auto;  /* 카드 본문 고정 높이 */
                 overflow-y: auto;  /* 본문 내용이 많을 경우 스크롤 */
             }
 
@@ -134,10 +133,15 @@
                             <strong class="me-2" th:text="#{orderList.quantity}">수량 :</strong>
                             <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                         </div>
-
                         <div class="d-flex align-items-center">
-                            <strong class="me-2" th:text="#{orderList.itemTotalPrice} ?: '아이템 금액 : '">아이템 금액 : </strong>
+                            <strong class="me-2" th:text="#{orderList.itemTotalPrice} ?: '아이템 금액 : '">주문 금액 : </strong>
                             <span class="flex-grow-1"></span> <strong>₩<span th:text="${T(java.lang.String).format('%,d', item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount)}">아이템 총 금액</span></strong>
+                        </div>
+                        <div class="card-body">
+                            <span th:if="${order.discountedPrice != null}">
+                            <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                            <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -149,17 +153,6 @@
                 <span>주문 시간:</span>
                 <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
             </small>
-            <div class="card-body text-end">
-
-                <strong>총 주문 금액:</strong>
-                <span th:text="|₩${T(java.lang.String).format('%,d', order.originalTotalPrice)}|"></span><br>
-
-                <span th:if="${order.discountedPrice != null}">
-                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
-                <span th:text="|₩${T(java.lang.String).format('%,d', order.discountedPrice)}|"></span>
-                </span>
-
-            </div>
         </div>
     </div>
 

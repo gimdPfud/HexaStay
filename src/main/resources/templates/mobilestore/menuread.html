@@ -148,6 +148,8 @@
     </div>
 
     <script th:inline="javascript">
+        const redirectToQR = window.location.origin + "/cart/qr";
+
         function changeQty(delta) {
             const qtyInput = document.getElementById('storecartitemCount');
             let qty = parseInt(qtyInput.value);
@@ -206,6 +208,8 @@
                     } else {
                         alert("요청 처리 중 문제가 발생했습니다.");
                     }
+                } else if (response.status === 401){
+                    window.location.href = redirectToQR;
                 }
             });
         }

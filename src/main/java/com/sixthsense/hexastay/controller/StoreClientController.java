@@ -58,7 +58,8 @@ public class StoreClientController {
                            Model model, Pageable pageable, Principal principal){
         log.info("type : "+type);
         log.info("keyword : "+keyword);
-        log.info("session : "+principal.toString());
+        if(principal==null){return "sample/qrcamera";}
+
         Long hotelroomNum = zzService.principalToHotelroomNum(principal);
 
         Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
@@ -105,6 +106,7 @@ public class StoreClientController {
     @ResponseBody
     @GetMapping("/like/{storeNum}")
     public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){
+        if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
             Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Member member = zzService.hotelroomNumToMember(hotelroomNum);
@@ -118,6 +120,7 @@ public class StoreClientController {
     @ResponseBody
     @GetMapping("/like/list/{storeNum}")
     public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){
+        if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
             Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Long likes = storeService.getStoreLikeCount(storeNum);

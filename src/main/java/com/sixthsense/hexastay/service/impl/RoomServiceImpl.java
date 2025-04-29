@@ -11,6 +11,7 @@ import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,9 @@ public class RoomServiceImpl {
 
     //시큐리티에 있는 함수 및 클래스
     private final AuthenticationManager authenticationManager;
+
+    //google 메일 발송용 서비스 메소드
+    private final MailService mailService;
 
     private final HotelRoomRepository hotelRoomRepository;
     private final MemberRepository memberRepository;
@@ -90,7 +94,7 @@ public class RoomServiceImpl {
     //todo:http://localhost:8090/register-hotelroom
     //RoomController
     @Transactional
-    public void memberPkRoominsert(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) {
+    public void memberPkRoominsert(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) throws MessagingException {
         // 1️⃣ 회원 정보 조회
         Member member = memberRepository.findById(memberDTO.getMemberNum())
                 .orElseThrow(() -> new EntityNotFoundException("회원 정보 없음 - 회원 번호: " + memberDTO.getMemberNum()));
@@ -115,6 +119,23 @@ public class RoomServiceImpl {
                 .roomPassword(memberDTO.getRoomPassword())
                 .build();
         roomRepository.save(room);
+
+        //등록시 메일 발송요 service 로직 추가 하기
+        // 2. Member의 이메일 가져오기
+        String memberEmail = room.getMember().getMemberEmail();
+
+        // 3. Room의 비밀번호 가져오기
+        String roomPassword = room.getRoomPassword();
+
+        // 4. 메일 발송 try-catch 처리
+        try {
+            mailService.sendRoomPasswordEmail(memberEmail, roomPassword);
+            log.info("메일 발송 성공 - 수신자: {}", memberEmail);
+        } catch (Exception e) {
+            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", memberEmail, e.getMessage());
+        }  ;
+
+
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
     }
 
@@ -122,7 +143,7 @@ public class RoomServiceImpl {
     //todo: [[HotelRoom_PK]] 기준으로 member FK 를 등록 하는 메서드v
     //todo: localhost:8090/member-insertroom
     //RoomController
-    public void hotelRoomPkMemberinsert(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) {
+    public void hotelRoomPkMemberinsert(HotelRoomDTO hotelRoomDTO, MemberDTO memberDTO) throws MessagingException {
         // 1️⃣ 호텔룸 정보 조회
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
                 .orElseThrow(() -> new EntityNotFoundException("호텔룸 정보 없음 - 호텔룸 번호: " + hotelRoomDTO.getHotelRoomNum()));
@@ -151,6 +172,24 @@ public class RoomServiceImpl {
                 .build();
         log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);
         roomRepository.save(room);
+
+        //등록시 메일 발송요 service 로직 추가 하기
+        // 2. Member의 이메일 가져오기
+        String memberEmail = room.getMember().getMemberEmail();
+
+        // 3. Room의 비밀번호 가져오기
+        String roomPassword = room.getRoomPassword();
+
+
+        // 4. 메일 발송 try-catch 처리
+        try {
+            mailService.sendRoomPasswordEmail(memberEmail, roomPassword);
+            log.info("메일 발송 성공 - 수신자: {}", memberEmail);
+        } catch (Exception e) {
+            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", memberEmail, e.getMessage());
+        }
+
+
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}, 체크인: {}, 체크아웃: {}",
                 hotelRoom.getHotelRoomNum(), member.getMemberNum(), checkInDate, checkOutDate);
     }
@@ -254,46 +293,65 @@ public class RoomServiceImpl {
 
     //todo: http://localhost:8090/qr/${hotelRoomNum}
     //Room DB 에서 HotelRoomNum fk 을 찾아 와서 그 기준으로 member fk을 찾아 오는 로직
+// 호텔룸 번호를 받아서 룸을 찾고, 로그인 인증까지 해주는 메소드
     public Room readRoomByHotelRoomNum(Long hotelRoomNum) {
+
+        // 1. 호텔룸 번호로 룸 리스트를 가져온다
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
 
+        // 2. 가져온 룸이 없으면 오류를 던진다
         if (rooms.isEmpty()) {
             throw new EntityNotFoundException("해당 호텔룸에 연결된 룸 정보가 없습니다.");
         }
 
-        // 가장 첫 번째 Room으로 로그인 인증 처리
+        // 3. 여러 룸 중에서 첫 번째 룸을 선택한다
         Room room = rooms.getFirst();
+
+        // 4. 선택한 룸에 연결된 회원(Member) 정보를 가져온다
         Member member = room.getMember();
 
-        // 권한 설정
-        List<GrantedAuthority> authorities = new ArrayList<>();
+        // 5. 회원의 역할(Role)을 가져온다 (예: USER, ADMIN)
         String role = member.getMemberRole();
+
+        // 6. 역할이 없으면 기본으로 USER 역할을 넣어준다
         if (role == null || role.trim().isEmpty()) {
             role = "USER";
         }
+
+        // 7. 권한 리스트를 만들어서 ROLE_ 앞에 붙여준다
+        List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 
+        // 8. 회원 정보를 담은 커스텀 객체를 만든다 (UserDetails 역할)
         CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
 
         log.info("로그인 처리 - 회원: {}, 권한: {}", member.getMemberEmail(), authorities);
 
+        // 9. 인증(Authentication) 객체를 만든다
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            customMemberDetails,
-            member.getMemberPassword(),  // 실제 비밀번호 사용
-            authorities
+                customMemberDetails,        // 로그인 사용자 정보 (UserDetails)
+                member.getMemberPassword(), // 비밀번호 (실제로는 필요없지만 넣음)
+                authorities                  // 권한 리스트
         );
 
-        // SecurityContext를 생성하고 설정
+        // 10. 비어있는 SecurityContext를 새로 만든다
         SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+        // 11. 만든 인증 객체를 Context에 넣어준다
         context.setAuthentication(authentication);
+
+        // 12. Context를 SecurityContextHolder에 저장한다 (로그인 완료!)
         SecurityContextHolder.setContext(context);
 
-        // 세션에 SecurityContext 저장
-        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+        // 13. 세션(Session)에도 SecurityContext를 저장해준다 (브라우저 닫기 전까지 기억하게)
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest()
+                .getSession();
         session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
         log.info("인증 정보 설정 완료: {}", authentication);
 
+        // 14. 최종적으로 찾은 룸을 반환한다
         return room;
     }
 
