@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      >
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <title>모바일 레이아웃</title>
@@ -32,38 +31,42 @@
             position: fixed;
             top: 0;
             width: 100%;
-            z-index: 999;
+            z-index: 1050;
             min-height: 80px;
             background-color: white;
             border-bottom: 1px solid #ddd;
         }
+
         .store-item img, .menu-item img {
             width: 60px;
             height: 60px;
             border-radius: 5px;
         }
+
         .category-bar span {
             display: inline-block;
             padding: 10px 15px;
             font-weight: bold;
-            cursor: pointer; }
+            cursor: pointer;
+        }
 
         .card.stretch {
             max-width: 100%;
             width: 100%;
         }
+
         #content {
             transition: all 0.3s ease-in-out;
-            padding-top: 90px; /* 네비 높이보다 약간 크게 */
+            padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
         }
+
         .container-inner {
             max-width: 1200px;
             margin: 0 auto;
         }
-
     </style>
 </head>
-<body style="background-color: #f8f9fa; min-width: 360px; min-height: 100vh;">
+<body>
 
 <!-- ✅ 네비게이션 조각 삽입 (항상 고정) -->
 <div th:replace="fragments/navbarorder :: navbarorder"></div>
@@ -71,7 +74,7 @@
 <!-- ✅ 본문 영역 -->
 <div id="content">
     <div class="container-inner" layout:fragment="contentorder">
-        <!-- 여기 안은 각 페이지마다 다르게 채워짐 -->
+        <!-- 각 페이지에서 내용 삽입 -->
     </div>
 </div>
 

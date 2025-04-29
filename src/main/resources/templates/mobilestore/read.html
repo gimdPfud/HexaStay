@@ -40,6 +40,7 @@
             background-color: #e0f7fa;
             color: #00796b;
             font-weight: bold;
+            max-width: max-content;
         }
         .menu-badge * {
             display: inline;
@@ -55,6 +56,18 @@
         .div-card { background: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 10px; margin-bottom: 10px; }
         .sold-out { opacity: 0.5; position: relative; pointer-events: none; }
         .sold-out::after { content: "품절"; color: white; background-color: red; font-weight: bold; padding: 2px 6px; font-size: 12px; position: absolute; top: 10px; right: 10px; border-radius: 4px; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* nav 관련 요소는 별도 보호 */
+        .nav, .nav-link, .navbar, .tabs {
+            box-sizing: border-box; /* 상속 방지 */
+            margin: initial;
+        }
     </style>
 </head>
 <body>
