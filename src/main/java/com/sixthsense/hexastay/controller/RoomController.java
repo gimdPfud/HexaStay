@@ -271,12 +271,4 @@ public class RoomController {
         }
     }
 
-    @GetMapping("/admin/hotelroom/all")
-    @ResponseBody
-    public List<HotelRoomDTO> getAllHotelRooms() {
-        List<HotelRoomDTO> hotelRooms = hotelRoomService.findAll(); // 모든 객실 조회
-        return hotelRooms;
-    }
-
-
 }
