@@ -106,9 +106,8 @@
 
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <button type="button" onclick="window.location.href='/member/store/list?type=L'" class="btn-custom">
+            <button type="button" onclick="filterByLikes()" class="btn-custom">
                 ❤️ <span>인기순</span>
-                <span class="like-count" th:text="${storeLikes}" style="margin-left: 4px;">0</span>
             </button>
             <div class="tab active" onclick="filterByCategory('전체')">전체</div>
             <div class="tab" onclick="filterByCategory('한식')">한식</div>
@@ -141,7 +140,7 @@
                     </a>
                     <div class="like-section">
                         <span th:id="'likeIcon-' + ${store.storeNum}" th:attr="onclick='toggleLike(' + ${store.storeNum} + ', event)'" class="like-icon">🤍</span>
-                        <span th:id="'likeCount-' + ${store.storeNum}" class="like-count">0</span>
+                        <span th:id="${store.storeNum}" class="like-count">0</span>
                     </div>
                 </div>
             </li>
@@ -160,39 +159,75 @@
 
     <!-- 스크립트 -->
     <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded",function () {
+            showlikes();
+        });
+
+        function showlikes() {
+            let likespans = document.querySelectorAll(".like-count");
+            likespans.forEach(span=>{
+                updateLikespan(span.id);
+            })
+        }
+
         const likedStates = {};
         function toggleLike(storeNum, event) {
             event?.stopPropagation();
             event?.preventDefault();
-            const liked = likedStates[storeNum] || false;
-            const url = liked ? `/member/store/unlike/${storeNum}` : `/member/store/like/${storeNum}`;
-            fetch(url, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    const icon = document.getElementById(`likeIcon-${storeNum}`);
-                    const count = document.getElementById(`likeCount-${storeNum}`);
-                    icon.textContent = liked ? '🤍' : '❤️';
-                    icon.style.color = liked ? 'gray' : 'red';
-                    count.textContent = data.likeCount;
-                    likedStates[storeNum] = !liked;
+
+            fetch(`/member/store/like/${storeNum}`, {
+                credentials: "same-origin"
+            })
+                .then(response => {
+                    if (response.ok) {
+                        updateLikespan(storeNum);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error toggling like:', error);
                 });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.like-icon').forEach(el => {
-                const storeNum = el.id.split('-')[1];
-                fetch(`/member/store/like/status/${storeNum}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        likedStates[storeNum] = data.liked;
-                        const icon = document.getElementById(`likeIcon-${storeNum}`);
-                        const count = document.getElementById(`likeCount-${storeNum}`);
-                        icon.textContent = data.liked ? '❤️' : '🤍';
-                        icon.style.color = data.liked ? 'red' : 'gray';
-                        count.textContent = data.likeCount;
-                    });
+        function updateLikespan(storeNum) {
+            fetch(`/member/store/like/list/${storeNum}`, {
+                credentials: "same-origin"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const icon = document.getElementById(`likeIcon-${storeNum}`);
+                    const count = document.getElementById(`${storeNum}`);
+
+                    if (data.check) {
+                        icon.textContent = '❤️';
+                        icon.style.color = 'red';
+                    } else {
+                        icon.textContent = '🤍';
+                        icon.style.color = 'gray';
+                    }
+                    count.textContent = data.likes;
+                })
+                .catch(error => {
+                    console.error('Error updating like UI:', error);
+                });
+        }
+
+        function filterByLikes() {
+            const storeList = document.querySelector('.store-list');
+            const storeItems = Array.from(document.querySelectorAll('.store-item'));
+
+            const sortedItems = storeItems.sort((a, b) => {
+                const aStoreNum = a.querySelector('.like-section .like-count').id.split('-')[1];
+                const bStoreNum = b.querySelector('.like-section .like-count').id.split('-')[1];
+                const aLikeCount = parseInt(document.getElementById(`${aStoreNum}`).textContent, 10) || 0;
+                const bLikeCount = parseInt(document.getElementById(`${bStoreNum}`).textContent, 10) || 0;
+                return bLikeCount - aLikeCount; // 내림차순 (좋아요 높은 거 -> 낮은 거)
             });
-        });
+
+            // 리스트 비우고 다시 채우기
+            storeList.innerHTML = '';
+            sortedItems.forEach(item => storeList.appendChild(item));
+        }
+
 
         function filterByCategory(category) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
