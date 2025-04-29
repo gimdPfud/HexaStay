@@ -40,7 +40,7 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(" +
             "rmci.roomMenuCartItemNum, " +
             "rmi.roomMenuName, " +
-            "rmi.roomMenuPrice, " +
+            "(rmci.roomMenuCartItemPrice / rmci.roomMenuCartItemAmount), " + // <<< 수정: 총 가격 / 수량으로 개당 가격 계산
             "rmci.roomMenuCartItemAmount, " +
             "rmci.roomMenuSelectOptionName, " +
             "rmci.roomMenuSelectOptionPrice, " +
@@ -50,7 +50,6 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
             "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
             "ORDER BY rmci.roomMenuCartItemNum DESC")
     public Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
-
 
     // 장바구니 안의 총 수량 반환 (member 기준)
     @Query("SELECT SUM(i.roomMenuCartItemAmount) FROM RoomMenuCartItem i WHERE i.roomMenuCart.member.memberEmail = :memberEmail")

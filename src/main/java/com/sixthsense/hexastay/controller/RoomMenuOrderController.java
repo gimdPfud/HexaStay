@@ -212,25 +212,6 @@ public class RoomMenuOrderController {
         // 서비스로부터 받은 DTO 리스트
         List<RoomMenuOrderDTO> orderListForModel = orderPage.getContent();
 
-        // >>> **추가된 로직 시작: Controller에서 DTO의 discountedPrice 값 최종 확인** <<<
-        log.info("--- Controller: Debugging orderList DTOs before adding to Model ---");
-        if (orderListForModel != null) {
-            log.info("Number of orders in list: {}", orderListForModel.size());
-            for (int i = 0; i < orderListForModel.size(); i++) {
-                RoomMenuOrderDTO orderDto = orderListForModel.get(i);
-                log.info("  Order {}: OrderNum={}, OriginalTotal={}, DiscountedPrice={} (<<< 최종 확인 값)", // <-- 이 값을 확인합니다!
-                        i, orderDto.getRoomMenuOrderNum(),
-                        orderDto.getOriginalTotalPrice(), orderDto.getDiscountedPrice());
-                if (orderDto.getOrderItemList() != null) {
-                    log.info("    Number of items: {}", orderDto.getOrderItemList().size());
-                }
-            }
-        } else {
-            log.warn("orderListForModel is null after getContent() call.");
-        }
-        log.info("-----------------------------------------------------------------");
-        // >>> **추가된 로직 끝** <<<
-
 
         // Model에 데이터 추가
         model.addAttribute("orderList", orderListForModel); // DTO 리스트를 "orderList" 이름으로 Model에 담습니다.
