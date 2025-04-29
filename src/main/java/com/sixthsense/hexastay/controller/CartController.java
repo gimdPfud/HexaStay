@@ -30,6 +30,11 @@ public class CartController {
     private final StorecartService storecartService;
     private final RoomMenuCartService roomMenuCartService;
 
+    @GetMapping("/qring")
+    public String goQr(){
+        return "sample/qrcamera";
+    }
+
     @GetMapping("/gocart")
     public String gocart(HttpServletRequest request) {
         String referer = request.getHeader("Referer");
