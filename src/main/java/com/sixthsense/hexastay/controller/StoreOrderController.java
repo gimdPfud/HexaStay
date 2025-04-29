@@ -161,10 +161,14 @@ public class StoreOrderController {
     @GetMapping("/admin/store/order/paid/{orderNum}")
     public ResponseEntity paidOrder(@PathVariable(value = "orderNum") Long orderNum){
         try {
+            log.info("paid로 변환 시작");
             orderstoreService.paid(orderNum);
+            log.info("됨");
         } catch (EntityNotFoundException e){
+            log.info("못찾음");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.info("왜안됨");
             throw new RuntimeException(e);
         }
         return new ResponseEntity<>(HttpStatus.OK);
