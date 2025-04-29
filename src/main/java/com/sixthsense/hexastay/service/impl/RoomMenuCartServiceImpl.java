@@ -101,11 +101,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             log.info("메뉴 찾음: {}", roomMenu.getRoomMenuName());
 
 
-            // >>> **수정된 로직 시작: 기존 아이템 체크 및 업데이트 로직 제거** <<<
-            // 기존 아이템을 찾아서 업데이트하는 대신, 항상 새 아이템을 생성합니다.
-            // RoomMenuCartItem roomMenuCartItem = roomMenuCartItemRepository.findByRoomMenuCartAndRoomMenu(roomMenuCart, roomMenu).orElse(null); // 이 라인 제거 또는 주석 처리
-            // if (roomMenuCartItem == null) { // 이 조건문 시작과 해당 else 블록 전체를 제거합니다.
-            // ===== 새 장바구니 아이템 추가 (기존 if 블록 안의 코드) =====
 
             List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions(); // DTO에서 선택된 옵션 목록 가져옴
 
@@ -170,11 +165,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                 }
                 log.info("RoomMenuCartItemOption 저장 완료.");
             }
-
-
-            // >>> **수정 완료: 기존 아이템 업데이트 로직 제거** <<<
-            // 기존 else 블록 (기존 아이템 업데이트 로직)은 제거됩니다.
-
 
             return savedCartItem.getRoomMenuCartItemNum(); // 새로 저장된 아이템의 ID 반환
         }
