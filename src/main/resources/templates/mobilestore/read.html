@@ -23,14 +23,34 @@
             object-fit: cover;
             border-radius: 10px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
         .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
         .menu-image-container { display: flex; justify-content: center; align-items: center; height: 100%; min-height: 150px; margin-bottom: 30px; }
         .menu-image { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
-        .text-info { display: flex; flex-direction: column; padding-left: 10px; }
+        .menu-badge {
+            display: inline-block;
+            font-size: 12px; /* px로 고정 */
+            padding: 2px 6px; /* 내부 패딩 축소 */
+            line-height: 1;   /* 줄간격으로 높이 제어 */
+            white-space: nowrap; /* 줄바꿈 방지 */
+            height: auto;
+            vertical-align: middle;
+            border-radius: 10px;
+            background-color: #e0f7fa;
+            color: #00796b;
+            font-weight: bold;
+        }
+        .menu-badge * {
+            display: inline;
+            font-size: inherit;
+            padding: 0;
+            margin: 0;
+        }
+
+        .text-info { display: flex; flex-direction: column; margin-top: 10PX; padding-left: 10px; }
         .menu-name { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
+        .menu-content{ font-size: 0.8rem; margin-bottom: 40px; color: black;}
         .price-box { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
         .div-card { background: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 10px; margin-bottom: 10px; }
         .sold-out { opacity: 0.5; position: relative; pointer-events: none; }
@@ -131,7 +151,8 @@
                     filtered.forEach(item => {
                         const soldOutClass = item.storemenuStatus === 'soldout' ? 'sold-out' : '';
                         const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
-
+                        // ✅ JS로 직접 카테고리 한글 변환
+                        const korCategory = categories[item.storemenuCategory] || '기타';
                         html += `
                         <a href="/member/store/menu/read/${item.storemenuNum}" class="text-decoration-none">
                             <div class="div-card ${soldOutClass}">
@@ -140,7 +161,9 @@
                                         <img src="${image}" class="menu-image">
                                     </div>
                                     <div class="text-info">
+                                        <span class="menu-badge">${korCategory}</span>
                                         <p class="menu-name">${item.storemenuName}</p>
+                                        <p class="menu-content">${item.storemenuContent}</p>
                                         <div class="price-box">${item.storemenuPrice} 원</div>
                                     </div>
                                 </div>
@@ -149,6 +172,7 @@
                     });
 
                     html += `</div>`; // category section 끝
+
                 }
             });
 
