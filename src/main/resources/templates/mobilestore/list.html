@@ -157,6 +157,8 @@
 
     <!-- 스크립트 -->
     <script th:inline="javascript">
+        const redirectToQR = window.location.origin + "/cart/qr";//unAuth 오류 걸리면 여기로 이동함
+
         document.addEventListener("DOMContentLoaded",function () {
             showlikes();
         });
@@ -179,6 +181,8 @@
                 .then(response => {
                     if (response.ok) {
                         updateLikespan(storeNum);
+                    } else if(response.status===401){
+                        window.location.href=redirectToQR;
                     }
                 })
                 .catch(error => {
@@ -190,7 +194,13 @@
             fetch(`/member/store/like/list/${storeNum}`, {
                 credentials: "same-origin"
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else if(response.status===401){
+                        window.location.href=redirectToQR;
+                    }
+                })
                 .then(data => {
                     const icon = document.getElementById(`likeIcon-${storeNum}`);
                     const count = document.getElementById(`${storeNum}`);
@@ -214,10 +224,8 @@
             const storeItems = Array.from(document.querySelectorAll('.store-item'));
 
             const sortedItems = storeItems.sort((a, b) => {
-                const aStoreNum = a.querySelector('.like-section .like-count').id.split('-')[1];
-                const bStoreNum = b.querySelector('.like-section .like-count').id.split('-')[1];
-                const aLikeCount = parseInt(document.getElementById(`${aStoreNum}`).textContent, 10) || 0;
-                const bLikeCount = parseInt(document.getElementById(`${bStoreNum}`).textContent, 10) || 0;
+                const aLikeCount = parseInt(a.querySelector('.like-section .like-count').textContent, 10) || 0;
+                const bLikeCount = parseInt(b.querySelector('.like-section .like-count').textContent, 10) || 0;
                 return bLikeCount - aLikeCount; // 내림차순 (좋아요 높은 거 -> 낮은 거)
             });
 
