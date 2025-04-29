@@ -1,29 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>HotelRoom 배정 등록(회원확인)</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <!--부트 스트랩 CDN-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>객실 배정(회원)</title>
+    <style>
+        /* 선택된 카드에 강조 스타일 */
+        .card.selected {
+            border: 2px solid #77b1fb; /* 선택 시 파란색 테두리 */
+            background-color: #e0f7ff; /* 선택된 카드에 부드러운 블루 배경 */
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); /* 선택된 카드에 부드러운 그림자 */
+            transform: scale(1.05); /* 살짝 확대 효과 */
+        }
 
+        .card:hover {
+            cursor: pointer;
+        }
+
+        .card.disabled-room {
+            opacity: 0.6;
+            pointer-events: none;
+            border: 2px solid #e0e0e0; /* 더 부드러운 회색 테두리 */
+            background-color: #f9f9f9; /* 아주 연한 회색 배경 */
+            box-shadow: none; /* 그림자 없애기 */
+        }
+
+        /* 성공 메시지 스타일 */
+        .alert-success {
+            background-color: #d4edda; /* 연한 녹색 배경 */
+            color: #155724; /* 진한 녹색 글자 */
+            border-color: #c3e6cb; /* 테두리 색상 */
+            font-size: 1.1rem; /* 글씨 크기 조정 */
+            border-radius: 10px; /* 둥근 테두리 */
+            padding: 1rem; /* 여백 조정 */
+            text-align: center;
+        }
+
+        /* 오류 메시지 스타일 */
+        .alert-danger {
+            background-color: #f8d7da; /* 연한 빨간색 배경 */
+            color: #721c24; /* 진한 빨간색 글자 */
+            border-color: #f5c6cb; /* 테두리 색상 */
+            font-size: 1.1rem; /* 글씨 크기 조정 */
+            border-radius: 10px; /* 둥근 테두리 */
+            padding: 1rem; /* 여백 조정 */
+            text-align: center;
+        }
+
+        /* 메시지에 있는 닫기 버튼 스타일 */
+        .alert .btn-close {
+            opacity: 0.5; /* 닫기 버튼 투명도 조정 */
+            background: transparent; /* 배경 투명 */
+        }
+    </style>
 </head>
-<!-- 카드 스타일 커스터마이징 -->
-<style>
-    .card.border-primary {
-        border: 3px solid #007bff !important;   /* Bootstrap primary 파란색, 굵기 3px  !important를 붙인 이유는 Bootstrap 기본 border보다 우선되도록 하기 위함입니다.*/
-        box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); /* 살짝 그림자 효과 추가 (선택사항) */
-        transition: border 0.2s ease-in-out;
-    }
-</style>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
-<body>
-<div layout:fragment="content" class="container mt-4"><!--레이아웃 fragment 시작점-->
-
-    <div class="container mt-5"><!--숙박 예약등록 시작 지점 -->
-
+    <div class="container mt-4 w-100 bg-light">
         <!-- Flash 메시지 표시 -->
         <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
             <span th:text="${successMessage}"></span>
@@ -32,79 +67,65 @@
         <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
             <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
         </div>
 
+        <h2 class="fw-bold mb-4 text-center">객실 배정(회원)</h2>
 
-        <h2 class="text-center mb-4" >객실 배정</h2>
-
-
-        <form th:action="@{/register-hotelroom}" th:object="${memberDTO}" method="post" class="row g-3"><!--등록form 시작점-->
+        <form th:action="@{/register-hotelroom}" th:object="${memberDTO}" method="post" class="row g-3 mt-3 mb-2"><!--등록form 시작점-->
             <!-- 회원 선택 버튼 -->
-            <div class="col-md-6" style="width: 30%;">
-                <div class="input-group" style="height: 40px; font-size: 0.9rem;">
-                    <input type="number" class="form-control" id="memberNum" name="memberNum" placeholder="회원 키 입력" th:field="*{memberNum}" readonly required />
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#memberModal">검색</button>
+            <div class="col-md-6" style="width: 22%;">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="memberNum" name="memberNum" placeholder="회원을 선택해주세요" th:field="*{memberNum}" readonly required />
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#memberModal">선택</button>
                 </div>
             </div>
-
-            <div class="col-md-6" style="width: 20%;">
-                <input type="text" class="form-control" id="memberName" style="height: 40px; font-size: 0.9rem;" placeholder="회원 이름" th:field="*{memberName}" readonly />
+            <div class="col-md-6" style="width: 14%;">
+                <input type="text" class="form-control" id="memberName" placeholder="회원 이름" th:field="*{memberName}" readonly />
             </div>
-                <div class="col-md-4" style="width: 20%;">
-                    <input type="datetime-local" class="form-control" id="checkInDate" name="checkInDate"
-                           th:field="*{checkInDate}" placeholder="체크인 날짜" style="height: 40px; font-size: 0.9rem;" required />
-                </div>
-                <div class="col-md-4" style="width: 20%;">
-                    <input type="datetime-local" class="form-control" id="checkOutDate" name="checkOutDate"
-                           th:field="*{checkOutDate}" placeholder="체크아웃 날짜"
-                           style="height: 40px; font-size: 0.9rem;" required />
-                </div>
-                <div class="col-md-4" style="width: 10%;">
-                    <input type="text" class="form-control" id="roomPassword" name="roomPassword"
-                           th:field="*{roomPassword}" placeholder="숫자 4자리"
-                           style="height: 40px; font-size: 0.9rem;"
-                           pattern="^\d{4}$"
-                           maxlength="4"
-                           inputmode="numeric" required />
-                </div>
+            <div class="col-md-4" style="width: 23%;">
+                <input type="datetime-local" class="form-control" id="checkInDate" name="checkInDate"
+                       th:field="*{checkInDate}" placeholder="체크인 날짜" required />
+            </div>
+            <div class="col-md-4" style="width: 23%;">
+                <input type="datetime-local" class="form-control" id="checkOutDate" name="checkOutDate"
+                       th:field="*{checkOutDate}" placeholder="체크아웃 날짜" required />
+            </div>
+            <div class="col-md-4" style="width: 18%;">
+                <input type="text" class="form-control" id="roomPassword" name="roomPassword"
+                       th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리"
+                       pattern="^\d{4}$"
+                       maxlength="4"
+                       inputmode="numeric" required />
+            </div>
 
             <!--호텔룸 이미지로 보여주는 레이아웃 메소드-->
-            <div class="mt-4">
-                <h4>호텔룸 선택</h4>
+            <div class="mt-3">
+                <h5>객실 선택</h5>
                 <div class="row" id="hotelRoomList"></div>
-                <div class="d-flex justify-content-center mt-3" id="paginationControls"></div>
+                <div class="d-flex justify-content-center mt-2" id="paginationControls"></div>
             </div>
             <input type="hidden" id="hotelRoomNum" name="hotelRoomNum" th:field="*{hotelRoomNum}" />
 
+            <div class="d-flex justify-content-center" id="hotelRoomPagination"></div>
 
-
-
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <button type="submit" class="btn btn-dark px-2 py-1" style="height: 40px; font-size: 0.9rem;">
-                    회원룸 배정
-                </button>
-
-                <a th:href="@{/member-insertroom}" class="btn btn-danger px-2 py-1 d-flex align-items-center justify-content-center"
-                   style="height: 40px; font-size: 0.9rem;">
-                    비회원룸 배정
+            <div class="d-flex justify-content-center gap-2 flex-wrap mt-5">
+                <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1 d-flex align-items-center justify-content-center">
+                    예약 목록
                 </a>
-
-                <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1 d-flex align-items-center justify-content-center"
-                   style="height: 40px; font-size: 0.9rem;">
-                    룸배정 목록
+                <button type="submit" class="btn btn-primary px-2 py-1">
+                    예약
+                </button>
+                <a th:href="@{/member-insertroom}" class="btn btn-success px-2 py-1 d-flex align-items-center justify-content-center">
+                    비회원 객실 배정
                 </a>
             </div>
         </form><!--등록 form 끝나는 지점-->
         <!-- 페이지네이션 컨트롤은 밖에서 독립적으로 위치 -->
-        <div class="d-flex justify-content-center mt-3" id="hotelRoomPagination"></div>
-
-
-    </div><!--숙박예약 등록 끝 지점-->
+    </div>
 
     <!-- 회원 검색 모달 -->
-    <div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+    <div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true" style="top: 80px;">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="memberModalLabel">회원 검색</h5>
@@ -114,18 +135,21 @@
                 <div class="modal-body">
                     <!-- 검색창 -->
                     <div class="mb-3">
-                        <input type="text" id="memberSearchInput" class="form-control" placeholder="이름 또는 이메일 검색..."  />
-                        <button class="btn btn-outline-primary" type="button" onclick="searchMembers()">검색</button>
+                        <div class="input-group">
+                            <input type="text" id="memberSearchInput" class="form-control" placeholder="이름 또는 이메일 검색" />
+                            <button class="btn btn-primary" type="button" onclick="searchMembers()">검색</button>
+                        </div>
                     </div>
 
                     <!-- 검색 결과 테이블 -->
-                    <table class="table table-hover">
+                    <table class="table table-hover text-center">
                         <thead>
                         <tr>
-                            <th>번호</th>
-                            <th>이름</th>
-                            <th>이메일</th>
-                            <th>선택</th>
+                            <th style="width: 10%;">번호</th>
+                            <th style="width: 15%;">이름</th>
+                            <th style="width: 20%;">이메일</th>
+                            <th style="width: 15%;">전화번호</th>
+                            <th style="width: 15%;"></th>
                         </tr>
                         </thead>
                         <tbody id="memberSearchResults">
@@ -144,7 +168,6 @@
         document.getElementById('roomPassword').addEventListener('input', function (e) {
             this.value = this.value.replace(/\D/g, '').slice(0, 4); // 숫자만, 최대 4자리
         });
-
 
         // 회원 검색 요청 함수
         function searchMembers() {
@@ -192,13 +215,10 @@
             document.getElementById("memberNum").value = memberNum;
             document.getElementById("memberName").value = memberName;
 
-
             // ✅ getOrCreateInstance 를 사용하면 아직 초기화되지 않은 모달도 안전하게 닫힘
             // modalexit 버튼을 클릭하여 모달을 닫기
             const modalExitButton = document.getElementById('modalexit');
             modalExitButton.click(); // 모달 닫기
-
-
         }
 
             // 페이지 로드시 memberNum이 이미 입력돼 있다면 이름 불러오기
@@ -220,7 +240,7 @@
             // 페이지 진입 시 이전 값 자동 조회
            /* window.addEventListener("DOMContentLoaded", fetchMemberName);*/
 
-        /*호테룸 정보를 가져 오는 script*/
+        /*객실 정보를 가져 오는 script*/
         let currentPage = 0;
 
         //hotelRoomController에 링크 주소 있음
@@ -232,23 +252,25 @@
                     listContainer.innerHTML = '';
 
                     if (data.content.length === 0) {
-                        listContainer.innerHTML = "<p>등록된 호텔룸이 없습니다.</p>";
+                        listContainer.innerHTML = "<p>등록된 객실이 없습니다.</p>";
                         return;
                     }
 
                     data.content.forEach(room => {
-                        // ✅ badge 관련만 JS로 수정
-                        const badgeClass = room.hotelRoomStatus === 'checkin' ? 'bg-primary' : 'bg-danger';
-                        const badgeText = room.hotelRoomStatus === 'checkin' ? '비어있음' : '사용중';
+                        const isDisabled = room.hotelRoomStatus === 'checkin';  // 'checkin' 상태일 때 비활성화
+                        const badgeClass = isDisabled ? 'bg-danger' : 'bg-primary';  // 비활성화된 객실은 빨간색, 활성화된 객실은 파란색
+                        const badgeText = isDisabled ? '사용중' : '비어있음';  // 'checkin' 상태의 객실은 '사용중', 나머지는 '비어있음'
+                        const formattedPrice = Number(room.hotelRoomPrice).toLocaleString();
 
                         const card = `
                     <div class="col-md-4 mb-3">
-                        <div class="card" onclick="selectHotelRoom(${room.hotelRoomNum}, this)">
+                        <div class="card ${isDisabled ? 'disabled-room' : ''}"
+                             ${isDisabled ? '' : `onclick="selectHotelRoom(${room.hotelRoomNum}, this)"`}>
                             <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지" style="height:200px; object-fit:cover;">
                             <div class="card-body">
-                                <span class="badge ${badgeClass}">${badgeText}</span> <!-- ✅ badge만 수정 -->
+                                <span class="badge ${badgeClass}">${badgeText}</span>
                                 <h5 class="card-title mt-2">${room.hotelRoomName}</h5>
-                                <p class="card-text">전화: ${room.hotelRoomPhone} / 가격: ${room.hotelRoomPrice}</p>
+                                <p class="card-text">전화: ${room.hotelRoomPhone} / 가격: ${formattedPrice}원</p>
                             </div>
                         </div>
                     </div>
@@ -256,10 +278,11 @@
                         listContainer.insertAdjacentHTML('beforeend', card);
                     });
 
+                    // 페이지네이션 설정
                     setupPagination(data);
                 })
                 .catch(err => {
-                    console.error("호텔룸 불러오기 오류:", err);
+                    console.error("객실 불러오기 오류:", err);
                 });
         }
 
@@ -269,7 +292,7 @@
 
             for (let i = 0; i < data.totalPages; i++) {
                 const btn = document.createElement('button');
-                btn.type = 'button'; // 👉 이거 추가
+                btn.type = 'button';
                 btn.className = 'btn btn-sm mx-1 ' + (i === data.number ? 'btn-primary' : 'btn-outline-secondary');
                 btn.innerText = i + 1;
                 btn.onclick = () => loadHotelRooms(i);
@@ -277,36 +300,21 @@
             }
         }
 
-
-        /*function selectHotelRoom(hotelRoomNum, element) {
-            document.getElementById('hotelRoomNum').value = hotelRoomNum;
-
-            const allCards = document.querySelectorAll('#hotelRoomList .card');
-            allCards.forEach(card => card.classList.remove('border-primary'));
-            element.classList.add('border-primary');
-        }*/
-
-        /*이미지 클릭시 실행되는 javascript*/
         function selectHotelRoom(hotelRoomNum, element) {
             document.getElementById('hotelRoomNum').value = hotelRoomNum;
 
             const allCards = document.querySelectorAll('#hotelRoomList .card');
-            allCards.forEach(card => card.classList.remove('border-primary'));
+            allCards.forEach(card => {
+                card.classList.remove('border-primary', 'selected');
+            });
 
-            element.classList.add('border-primary'); // 선택된 카드만 강조됨
+            element.classList.add('border-primary', 'selected');
         }
 
-
         window.addEventListener('DOMContentLoaded', () => {
-            fetchMemberName(); // 기존 1단계 함수
+            fetchMemberName();  // 기존 1단계 함수
             loadHotelRooms();  // 호텔룸 페이지네이션 포함해서 불러오기
         });
-
-
-
-
-
-
 
     </script>
 
