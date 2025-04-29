@@ -4,13 +4,13 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>room 등록(회원)</title>
+    <title>객실 배정(비회원)</title>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center" >예약정보 등록</h2>
+        <h2 class="fw-bold mb-4 text-center">객실 배정(비회원)</h2>
 
             <!-- 메시지 출력 -->
             <div th:if="${message}" class="alert alert-success text-center" role="alert">
@@ -24,9 +24,9 @@
                 <div class="container p-4" style="max-width: 700px;">
                     <!-- 방 종류 -->
                     <div class="mb-2">
-                        <label for="hotelRoomName" class="form-label fw-bold">방 이름</label>
+                        <label for="hotelRoomName" class="form-label">객실명</label>
                         <select class="form-select" id="hotelRoomName" name="hotelRoomName" onchange="updateHotelRoomPk()" required>
-                            <option value="">방 이름 선택</option>
+                            <option value="">객실 선택</option>
                             <option th:each="room : ${hotelRoomList}"
                                     th:value="${room.hotelRoomName}"
                                     th:text="${room.hotelRoomName}">
@@ -39,66 +39,64 @@
 
                     <!-- 회원 정보 -->
                     <div class="mb-2">
-                        <label class="form-label fw-bold">회원 이름</label>
+                        <label class="form-label">회원 이름</label>
                         <input type="text" class="form-control" th:field="*{memberName}" placeholder="회원 이름 입력" required>
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label fw-bold">이메일</label>
+                        <label class="form-label">이메일</label>
                         <input type="email" class="form-control" th:field="*{memberEmail}" placeholder="이메일 입력" required>
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label fw-bold">전화번호</label>
+                        <label class="form-label">전화번호</label>
                         <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
                     </div>
                     <!-- 비밀번호 입력 (보이게 수정됨) -->
                     <div class="mb-2">
-                        <label class="form-label fw-bold">호텔룸 이용 비밀번호</label>
+                        <label class="form-label">객실 이용 비밀번호</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                             <input type="text" class="form-control" id="roomPassword" name="roomPassword"
-                                   th:field="*{roomPassword}" placeholder="숫자 4자리 입력"
+                                   th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리 입력"
                                    maxlength="4" pattern="\d{4}" inputmode="numeric" required>
                         </div>
                     </div>
 
                     <!-- 비밀번호 확인 (유효성 검사용 그대로 유지) -->
                     <div class="mb-2">
-                        <label class="form-label fw-bold">비밀번호 확인</label>
+                        <label class="form-label">비밀번호 확인</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
                             <input type="text" class="form-control" id="confirmPassword"
                                    maxlength="4" pattern="\d{4}"
-                                   placeholder="비밀번호 다시 입력" required>
+                                   placeholder="비밀번호 재입력" required>
                         </div>
                         <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
-                            ❗비밀번호가 일치하지 않습니다.
+                            ❗ 비밀번호가 일치하지 않습니다.
                         </div>
                     </div>
                     <!-- 체크인 -->
                     <div class="mb-2">
-                        <label class="form-label fw-bold">체크인 날짜</label>
+                        <label class="form-label">체크인 날짜</label>
                         <input type="datetime-local" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
                     </div>
 
                     <!-- 체크아웃 -->
                     <div class="mb-2">
-                        <label class="form-label fw-bold">체크아웃 날짜</label>
+                        <label class="form-label">체크아웃 날짜</label>
                         <input type="datetime-local" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
                     </div>
 
                     <!-- 버튼 그룹 -->
                     <div class="col-12 text-center mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
-                        <a th:href="@{/register-hotelroom}" class="btn btn-dark px-2 py-1">회원 룸배정</a>
-                        <button type="submit" class="btn btn-danger px-2 py-1">비회원 룸배정</button>
-                        <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1">룸배정 목록</a>
+                        <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1 d-flex align-items-center justify-content-center">예약 목록</a>
+                        <button type="submit" class="btn btn-primary px-2 py-1">예약</button>
+                        <a th:href="@{/register-hotelroom}" class="btn btn-success px-2 py-1 d-flex align-items-center justify-content-center">회원 객실 배정</a>
                     </div>
                 </div>
             </form>
     </div><!--등록 페이지 끝 지점-->
-
-
 
 
 <!-- 호텔룸 자동 선택 JS -->

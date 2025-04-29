@@ -45,8 +45,8 @@
                             <!-- 왼쪽: 호텔 정보 -->
                             <div class="text-start">
                                 <span class="badge mb-2"
-                                      th:text="${hotelList.hotelRoomStatus} == 'checkin' ? '비어있음' : '사용중'"
-                                      th:classappend="${hotelList.hotelRoomStatus} == 'checkin' ? 'bg-primary' : 'bg-danger'">
+                                      th:text="${hotelList.hotelRoomStatus} == 'checkin' ? '사용중' : '비어있음'"
+                                      th:classappend="${hotelList.hotelRoomStatus} == 'checkin' ? 'bg-danger' : 'bg-primary'">
                                 </span>
                                 <h6 class="fw-bold mb-1" th:text="${hotelList.hotelRoomName}">객실명</h6>
                                 <p class="mb-1"><strong>회사:</strong> <span th:text="${hotelList.getCompany().getCompanyName()}"></span></p>
@@ -73,7 +73,7 @@
                                 <button class="btn btn-outline-dark btn-sm me-2">자세히</button>
                             </a>
                             <button th:onclick="|location.href='/register-hotelroom'|" class="btn btn-dark btn-sm"
-                                    th:disabled="${hotelList.hotelRoomStatus}!='checkin'">예약</button>
+                                    th:disabled="${hotelList.hotelRoomStatus}!='checkout'">예약</button>
 
 
                         </div>
