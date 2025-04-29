@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>시설서비스 등록</title>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
+
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
+
+        <form id="insertForm" action="/admin/fs/insert" method="post" enctype="multipart/form-data">
+            <div class="container p-4" style="max-width: 700px;">
+
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+                    </div>
+                    <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                    <button id="pictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="companyPicture" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                </div>
+
+                <!--브랜드-->
+                <div class="mb-2">
+                    <label class="form-label">소속</label>
+                    <select type="text" id="companySelectedBrand" class="form-control" name="companyType">
+                        <option value="center">본사</option>
+                        <option value="branch">지점</option>
+                        <option value="facility">외부시설</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label" id="brandLabel">브랜드명</label>
+                    <input type="text" name="companyBrand" id="inputBrand" class="form-control">
+                </div>
+
+                <label class="form-label" for="companyParent" id="companyParentLabel" hidden>소속 본사 선택</label>
+                <select type="text" id="companyParent" class="form-control" name="companyParent" hidden>
+                    <option th:each="companyDTO : ${company}"
+                            th:if="${companyDTO.companyType == 'center'}"
+                            th:text="${companyDTO.companyName}"
+                            th:value="${companyDTO.companyNum}">
+                    </option>
+                </select>
+
+                <div class="mb-2">
+                    <label class="form-label">상호명</label>
+                    <input type="text" name="companyName" id="companyName" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">사업자등록번호</label>
+                    <div class="row g-2">
+                        <div class="col">
+                            <input type="number" id="companyBusinessNumOne" class="form-control">
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="companyBusinessNumTwo" class="form-control">
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="companyBusinessNumThree" class="form-control">
+                        </div>
+                        <input hidden name="companyBusinessNum" id="companyBusinessNum">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">대표자명</label>
+                    <input type="text" name="companyCeoName" id="companyCeoName" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">전화번호</label>
+                    <div class="row g-2">
+                        <div class="col">
+                            <select id="companyPhoneone" class="form-select">
+                                <option>02</option>
+                                <option>031</option>
+                                <option>032</option>
+                                <option>041</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="companyPhonetwo" class="form-control">
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="companyPhonethree" class="form-control">
+                        </div>
+                        <input hidden name="companyPhone" id="companyPhone">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">이메일</label>
+                    <input type="email" name="companyEmail" id="companyEmail" class="form-control">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">주소</label>
+                    <input onclick="insertAddress()" name="companyAddress" type="text" id="companyAddress" class="form-control" readonly>
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-success" onclick="submitForm(this)">등록</button>
+                    <a th:href="@{/admin/fs/list}" class="btn btn-danger">취소</a>
+                </div>
+            </div>
+
+            <input type="hidden" id="companyLatitude"  name="companyLatitude" readonly>
+            <input type="hidden" id="companyLongitude" name="companyLongitude" readonly>
+            <input type="hidden" id="companyWtmX" name="companyWtmX" readonly>
+            <input type="hidden" id="companyWtmY" name="companyWtmY" readonly>
+        </form>
+
+        <form>
+            <button hidden id="companyPictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+            <input hidden type="file" id="companyPictureTemp" name="companyPicture" class="btn btn-light form-control rounded-pill">
+        </form>
+
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
+        <script>
+            //주소 입력
+            window.geocoder = new daum.maps.services.Geocoder();
+            function insertAddress() {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        var addr = data.address; // 최종 주소 변수
+                        // 주소 정보를 해당 필드에 넣는다.
+                        document.getElementById("companyAddress").value = addr;
+                    }
+                }).open();
+            }
+
+            // 가입양식 관련
+            function submitForm(button) {
+                // 주민번호 합체
+                document.getElementById('companyBusinessNum').value = document.getElementById('companyBusinessNumOne').value + "-" + document.getElementById('companyBusinessNumTwo').value + "-" + document.getElementById('companyBusinessNumThree').value;
+                // 폰번호 합체
+                document.getElementById('companyPhone').value = document.getElementById('companyPhoneone').value + "-" + document.getElementById('companyPhonetwo').value + "-" + document.getElementById('companyPhonethree').value;
+                console.log(document.getElementById('companyPhone').value);
+
+                //주소좌표..등록
+                let companyAddress = document.getElementById("companyAddress").value;
+                if(companyAddress&&companyAddress.trim().length>0){
+                    // 주소로 상세 정보를 검색
+                    geocoder.addressSearch(companyAddress, function(results, status) {
+                        // 정상적으로 검색이 완료됐으면
+                        if (status === daum.maps.services.Status.OK) {
+                            var result = results[0];
+                            document.getElementById("companyLatitude").value=result.y;
+                            document.getElementById("companyLongitude").value=result.x;
+                            fetch(`https://dapi.kakao.com/v2/local/geo/transcoord.json?x=${result.x}&y=${result.y}&output_coord=WTM`, {
+                                headers: {
+                                    Authorization: 'KakaoAK 7cb5773218158eba334d7c0a3f26cd9d'
+                                }
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    document.getElementById("companyWtmX").value = data.documents[0].x;
+                                    document.getElementById("companyWtmY").value = data.documents[0].y;
+                                    button.closest("form").submit();
+                                })
+                                .catch(error=>{
+                                    console.error(error);
+                                    alert("좌표 변환 중 오류")
+                                })
+                        } else {
+                            alert("주소를 다시 확인해주세요.")
+                        }
+                    });
+                }
+                return false;
+            }
+
+                // 소속용
+            companySelectedBrand = document.getElementById("companySelectedBrand")
+            companyParent = document.getElementById("companyParent")
+            companyParentLabel = document.getElementById("companyParentLabel")
+            brandLabel = document.getElementById("brandLabel")
+            inputBrand = document.getElementById("inputBrand")
+
+            companySelectedBrand.addEventListener('change', function () {
+                if (companySelectedBrand.value === "center") {
+                    companyParent.hidden = true;
+                    companyParentLabel.hidden = true;
+                    brandLabel.hidden = false;
+                    inputBrand.hidden = false;
+
+                } else if (companySelectedBrand.value === "branch" || companySelectedBrand.value === "facility") {
+                    companyParent.hidden = false;
+                    companyParentLabel.hidden = false;
+                    brandLabel.hidden = true;
+                    inputBrand.hidden = true;
+                    inputBrand.value = "";
+                }
+            });
+
+            // 프로필 사진
+            document.getElementById('adminProfile').addEventListener('change', function () {
+                const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+                const filePath = this.value;
+                const errorMessage = document.getElementById('fileError');
+                const previewImage = document.getElementById('pictureTemp');
+                const file = this.files[0];
+
+                if (!allowedExtensions.exec(filePath)) {
+                    this.value = '';
+                    errorMessage.classList.remove('d-none');
+                    previewImage.classList.add('d-none');
+                } else {
+                    errorMessage.classList.add('d-none');
+
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewImage.src = e.target.result;
+                            previewImage.classList.remove('d-none');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+
+            document.getElementById('pictureBtn').addEventListener('click', function () {
+                document.getElementById('adminProfile').click();
+            });
+
+
+            document.getElementById('adminProfile').addEventListener('change', function () {
+                let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+                document.querySelector('.file-name').textContent = fileName;
+            });
+
+        </script>
+
+    </div>
+
+</div>
+</body>
+</html>
