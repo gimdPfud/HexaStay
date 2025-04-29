@@ -32,6 +32,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     private final OrderstoreRepository orderstoreRepository;
 //    private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
+    private final RoomServiceImpl roomService;
     private final StorecartitemRepository storecartitemRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -80,10 +81,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     @Override
     public int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage) {
         //추가 : room레포지토리에서 방번호로 가장 최근의 room(예약정보)을 찾아 setRoom() 때린다.
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelRoomNum, pageable)
-                .stream().findFirst().orElse(null);
-        if(room==null){return 2;}
+        Room room = roomService.readRoomByHotelRoomNum(hotelRoomNum);
         Orderstore order = new Orderstore();
         order.setRoom(room);
         order.setOrderstoreStatus("unpaid");
@@ -99,9 +97,11 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             Orderstoreitem orderItem = new Orderstoreitem();
             orderItem.setOrderstore(order);
             orderItem.setStoremenu(menu);
-            orderItem.setOrderstoreitemAmount(cartItem.getStorecartitemCount());
-            orderItem.setOrderstoreitemPrice(cartItem.getStoremenu().getStoremenuPrice());
-            orderItem.setOrderstoreitemTotalPrice(cartItem.getStorecartitemCount()*cartItem.getStoremenu().getStoremenuPrice());
+            orderItem.setOrderstoreitemAmount( cartItem.getStorecartitemCount() );
+            orderItem.setOrderstoreitemPrice( cartItem.getStoremenu().getStoremenuPrice() + cartItem.getOptionPrice() );
+            orderItem.setOrderstoreitemTotalPrice(  cartItem.getStorecartitemCount()  *  ( cartItem.getStoremenu().getStoremenuPrice() + cartItem.getOptionPrice() )  );
+            orderItem.setStoremenuOptions(cartItem.getStoremenuOptions());// 6:면추가:1500
+            orderItem.setStoremenuOptionsPrice(cartItem.getOptionPrice());
             storecartitemRepository.delete(cartItem);
             itemlist.add(orderItem);
         }
@@ -166,6 +166,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
             itemlist.forEach(data->{
                 OrderstoreitemDTO dto = modelMapper.map(data,OrderstoreitemDTO.class);
+                dto.setStoremenuDTO(modelMapper.map(data.getStoremenu(),StoremenuDTO.class));
                 orderstoreViewDTO.addOrderstoreitemDTOList(dto);
             });
             viewOrderList.add(orderstoreViewDTO);
@@ -181,6 +182,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();
             itemlist.forEach(item->{
                 OrderstoreitemDTO dto = modelMapper.map(item,OrderstoreitemDTO.class);
+                dto.setStoremenuDTO(modelMapper.map(item.getStoremenu(),StoremenuDTO.class));
+                log.info("리스트 뽑는 중 : "+dto.getStoremenuDTO());
                 orderstoreViewDTO.addOrderstoreitemDTOList(dto);
             });
             return orderstoreViewDTO;

@@ -30,7 +30,7 @@ public class CartController {
     private final StorecartService storecartService;
     private final RoomMenuCartService roomMenuCartService;
 
-    @GetMapping("/qring")
+    @GetMapping("/qr")
     public String goQr(){
         return "sample/qrcamera";
     }

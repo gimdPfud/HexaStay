@@ -23,4 +23,5 @@ public class StorecartitemViewDTO {
     private Integer storemenuCount;     //상품개수
     private String imgName;             //이미지
     private String storemenuOptions;  //주문한 상품의 옵션들??
+    private Integer optionPrice;  //주문한 상품의 옵션들??
 }

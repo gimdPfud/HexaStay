@@ -27,7 +27,7 @@ import java.util.Objects;
 public class OrderstoreViewDTO {
     private Long orderstoreNum;
     private LocalDateTime orderstoreDate; //modifyDate
-    private String formatDate; //modifyDate
+//    private String formatDate; //modifyDate
     private String orderstoreStatus;
     private int orderstoreFinalPrice;
     private String orderstoreStoreName;
@@ -37,15 +37,15 @@ public class OrderstoreViewDTO {
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 
     public OrderstoreViewDTO(Orderstore orders) {
-        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime now = LocalDateTime.now();
 
         this.orderstoreDate = orders.getModifyDate();
 
-        if(this.orderstoreDate.getYear() == now.getYear()){
-            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("MM-dd"));
-        } else {
-            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        }
+//        if(this.orderstoreDate.getYear() == now.getYear()){
+//            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("MM-dd"));
+//        } else {
+//            this.formatDate = orderstoreDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        }
 
         this.orderstoreNum = orders.getOrderstoreNum();
         this.orderstoreFinalPrice = orders.getOrderstoreitemList().stream().filter(Objects::nonNull)

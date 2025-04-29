@@ -137,6 +137,7 @@
                     </label>
                 </div>
             </div>
+            <input type="hidden" id="optionPrice" name="optionPrice">
         </form>
 
         <div class="total-price-display">
@@ -144,7 +145,7 @@
         </div>
 
         <button type="button" onclick="addcart()" class="add-to-cart-btn">장바구니 담기</button>
-        <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'">목록으로</button>
+        <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'">스토어 목록으로</button>
     </div>
 
     <script th:inline="javascript">
@@ -160,19 +161,26 @@
             updateTotal();
         }
 
-        function updateTotal() {
-            const base = parseInt(document.getElementById('storemenuPrice').textContent) || 0;
-            const qty = parseInt(document.getElementById('storecartitemCount').value);
+        function getOptionTotal() {
             let optionTotal = 0;
             document.querySelectorAll("input[name='storemenuOptions']:checked").forEach(opt => {
                 const parts = opt.value.split(":");
                 optionTotal += parseInt(parts[2]);
             });
+            document.getElementById('optionPrice').value = optionTotal;
+            return optionTotal;
+        }
+
+        function updateTotal() {
+            const base = parseInt(document.getElementById('storemenuPrice').textContent) || 0;
+            const qty = parseInt(document.getElementById('storecartitemCount').value);
+            let optionTotal = getOptionTotal();
             const total = (base + optionTotal) * qty;
             document.getElementById('totalPrice').textContent = total.toLocaleString();
         }
 
         function addcart() {
+            getOptionTotal();
             const data = new FormData(document.querySelector("form"));
             const count = parseInt(document.getElementById("storecartitemCount").value);
             const storeNum = document.getElementById("storeNum").textContent;

@@ -26,7 +26,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -78,6 +81,23 @@ public class StoreOrderController {
         Long hotelroomNum = zzService.principalToHotelroomNum(principal);
         Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
         model.addAttribute("list",list);
+
+        //옵션용 Map 이름가격 > 하나의메뉴
+        Map<Long, List<String>> optionMap = new HashMap<>();
+        list.forEach(order->{
+            order.getOrderstoreitemDTOList().forEach(dto->{ //메뉴1개
+                if(dto.getStoremenuOptions()!=null&&!dto.getStoremenuOptions().isBlank()) {
+                    List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
+                    options = options.stream().map(option->{//옵션1개
+                        List<String> optionInfos = Arrays.stream((option.split(":"))).toList();
+                        option = optionInfos.get(1) + " (" + optionInfos.get(2) + " 원)";
+                        return option;
+                    }).toList();
+                    optionMap.put(dto.getOrderstoreitemNum(),options);
+                }
+            });
+        });
+        model.addAttribute("optionMap",optionMap);
         return "mobilestore/order/list";
     }
 
