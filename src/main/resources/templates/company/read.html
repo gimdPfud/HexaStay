@@ -24,7 +24,10 @@
       <div class="mb-2"><label class="form-label">대표자명</label><p class="form-control" th:text="${companyDTO.companyCeoName}"></p></div>
       <div class="mb-2"><label class="form-label">전화번호</label><p class="form-control" th:text="${companyDTO.companyPhone}"></p></div>
       <div class="mb-2"><label class="form-label">이메일</label><p class="form-control" th:text="${companyDTO.companyEmail}"></p></div>
-      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" th:text="${companyDTO.companyAddress}"></p></div>
+      <div class="mb-4"><label class="form-label">주소</label><p class="form-control" onclick="openMapModal()" th:text="${companyDTO.companyAddress}"></p></div>
+      <!--숨겨진:위도경도-->
+      <input type="hidden" id="companyLatitude"  name="companyLatitude" th:value="${companyDTO.companyLatitude}" readonly>
+      <input type="hidden" id="companyLongitude" name="companyLongitude" th:value="${companyDTO.companyLongitude}" readonly>
 
       <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/company/list}" class="btn btn-secondary">목록</a>
@@ -44,6 +47,57 @@
       </div>
     </div>
   </div>
+
+  <!--모달창-->
+  <div class="modal" id="mapmodal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">지도 보기</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="map" style="width: 100%; height: 300px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
+  <script>
+    let map;//미리선언
+    function openMapModal() {
+      const myModal = new bootstrap.Modal(document.getElementById('mapmodal'));
+      let yy = document.getElementById("companyLatitude").value;
+      let xx = document.getElementById("companyLongitude").value;
+      // 위도와 경도가 없으면 알림
+      if (!yy || !xx) {
+        alert("위치 정보가 없습니다.");
+        return;
+      }
+
+      myModal.show();
+
+      // 처음 지도 객체가 없을 때만 생성
+      if (!map) {
+        var container = document.getElementById('map');
+        var options = {
+          center: new kakao.maps.LatLng(yy, xx),
+          level: 2
+        };
+        map = new kakao.maps.Map(container, options);  // 지도 생성
+      } else {
+        // 이미 지도 객체가 존재하면 위치만 변경
+        map.setCenter(new kakao.maps.LatLng(yy, xx));
+      }
+
+      var marker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(yy, xx)
+      });
+      marker.setMap(map);
+    }
+
+  </script>
 </div>
 
 </body>

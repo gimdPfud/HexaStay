@@ -51,11 +51,8 @@ public class ZzService {
     }
 
     //hotelroomNum으로 Member찾기
-    //todo hotelroomNum으로 room을 찾아서 그 중 status 가 checkin인 room을 찾아서 getMember()
     public Member hotelroomNumToMember(Long hotelroomNum){
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum, pageable)
-                .stream().findFirst().orElseThrow(EntityNotFoundException::new);
+        Room room = roomService.readRoomByHotelRoomNum(hotelroomNum);
         return room.getMember();
     }
 

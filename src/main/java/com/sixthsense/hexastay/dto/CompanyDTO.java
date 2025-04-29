@@ -34,6 +34,10 @@ public class CompanyDTO {
     private String companyEmail;             //이메일
 
     private String companyAddress;           //주소
+    private String companyLatitude;             //좌표1 위도?
+    private String companyLongitude;            //좌표2 경도?
+    private String companyWtmX;                 //좌표3 자세한 x좌표
+    private String companyWtmY;                 //좌표4 자세한 y좌표
 
     private String companyCeoName;           //대표자명
 

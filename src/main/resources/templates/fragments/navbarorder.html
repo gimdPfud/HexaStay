@@ -1,8 +1,7 @@
-<div id="navbarorder" class="navbarorder" th:fragment="navbarorder">
-    <nav class="navbar navbar-light bg-white border-bottom">
-        <div class="container d-flex justify-content-between align-items-center">
-
-            <!-- 좌측: 뒤로가기 -->
+<div id="navbarorder" th:fragment="navbarorder">
+    <nav class="navbar navbar-light bg-white border-bottom fixed-top">
+        <div class="container d-flex justify-content-between align-items-center" style="height: 80px;">
+            <!-- 좌측: 뒤로가기 버튼 -->
             <div style="width: 100px;">
                 <button class="btn btn-link p-0" onclick="history.back()">
                     <i class="bi bi-arrow-left fs-1" style="color: #77b1fb;"></i>
@@ -16,54 +15,34 @@
                 </a>
             </div>
 
+            <!-- 우측: 주문내역, 장바구니 -->
             <div style="width: 100px; text-align: right;">
-                <!-- 주문내역 아이콘 -->
                 <a href="/cart/receipt" class="d-inline-block me-2" style="color: black;">
                     <i class="bi bi-receipt-cutoff fs-3"></i>
                 </a>
-
-                <!-- 장바구니 -->
                 <a href="/cart/gocart" class="position-relative d-inline-block" style="color: black;">
                     <i class="bi bi-cart4 fs-3"></i>
-                    <span id="cartnumber"
-                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                          style="display: none;"></span>
+                    <span id="cartnumber" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;"></span>
                 </a>
             </div>
-
 
         </div>
     </nav>
 
     <script th:inline="javascript">
-        let cartnumber = document.getElementById("cartnumber");
         document.addEventListener("DOMContentLoaded", function () {
-            fetch("/cart/getlength", {
-                credentials: 'same-origin'
-            })
-                .then(response => {
-                    return response.text();  // 서버가 숫자(1,2 등)만 내려주면 text() 써도 OK
-                })
+            fetch("/cart/getlength", { credentials: 'same-origin' })
+                .then(response => response.text())
                 .then(data => {
-                    console.log("응답 테스트:", data);
-
                     const cartnumber = document.getElementById("cartnumber");
-
                     const count = parseInt(data);
-
-                    if (!isNaN(count)) {
-                        if (count > 0) {
-                            cartnumber.textContent = count;
-                            cartnumber.style.display = "inline-block";
-                        } else {
-                            cartnumber.style.display = "none";
-                        }
+                    if (!isNaN(count) && count > 0) {
+                        cartnumber.textContent = count;
+                        cartnumber.style.display = "inline-block";
                     } else {
-                        console.warn("숫자로 파싱 안 됨:", data);
+                        cartnumber.style.display = "none";
                     }
                 });
-
         });
     </script>
-
 </div>

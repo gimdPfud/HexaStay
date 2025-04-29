@@ -107,7 +107,7 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        // 소속된 회사 없음
+// 소속된 회사 없음
 //        if (adminDTO.getCompanyNum() == null) {
 //            if (adminDTO.getStoreNum() != null) {
 //                log.info("어드민이지만 회사 소속 아님. 대신 스토어 소속: {}", adminDTO.getStoreNum());
