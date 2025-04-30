@@ -28,7 +28,13 @@
       <div class="mb-2"><label class="form-label">서비스명</label><p class="form-control" th:text="${data.fsName}"></p></div>
       <div class="mb-2"><label class="form-label">상세설명</label><p class="form-control" th:text="${data.fsContent}"></p></div>
       <div class="mb-2"><label class="form-label">가격</label><p class="form-control" th:text="${data.fsPrice}"></p></div>
-      <div class="mb-2"><label class="form-label">수량(수용인원)</label><p class="form-control" th:text="${data.fsAmount}+' / '+${data.fsAmountMax}"></p></div>
+      <div class="mb-2"><label class="form-label">수량(수용인원)</label>
+        <div class="input-group">
+          <span class="form-control" th:text="${data.fsAmount}+' 명이 이용중입니다.'"></span>
+          <span class="input-group-text" > / </span>
+          <span class="form-control" th:text="${data.fsAmountMax}"></span>
+        </div>
+      </div>
       <div class="mb-2"><label class="form-label">상태</label><p class="form-control" th:text="${data.fsStatus=='yes'?'이용가능':'이용불가'}"></p></div>
 
       <div class="d-flex justify-content-center gap-3">

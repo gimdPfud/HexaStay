@@ -11,6 +11,7 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
@@ -87,27 +88,43 @@ public class FacilitiesController {
         }
         return "redirect:/facility/read/"+num;
     }
+    @PostMapping("/facility/refill/{num}")
+    public String fsRefillPost(@PathVariable Long num, Model model){
+        try {
+            num = fsService.refill(num);
+        } catch (Exception e) {
+            model.addAttribute("errmsg","수량을 변경할 수 없습니다.");
+        }
+        return "redirect:/facility/list/"+num;
+    }
 
     @GetMapping("/facility/modify/{fsNum}")
     public String fsmodify(@PathVariable Long fsNum, Model model){
-        //todo 시설 서비스 수정 (관리자용)
+        model.addAttribute("data",fsService.read(fsNum));
         return "facilities/modify";
     }
     @PostMapping("/facility/modify")
-    public String fsmodifyPost(FacilitiesDTO dto){
-        //todo 시설 서비스 수정 (관리자용)
-        return "redirect:/facility/read/"+dto.getCompanyDTO().getCompanyNum();
+    public String fsmodifyPost(FacilitiesDTO dto, Model model){
+        log.info(dto.toString());
+        try {
+            Long num = fsService.modify(dto);
+            return "redirect:/facility/list/"+num;
+        }catch (Exception e){
+            log.info("수정불가능");
+            model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
+            return "redirect:/facility/modify/"+dto.getFacilitiesNum();
+        }
     }
 
     @GetMapping("/facility/delete/{fsNum}")
-    public String fsdelete(@PathVariable Long fsNum){
-        //todo 시설 서비스 삭제? (관리자용)
+    public String fsdelete(@PathVariable Long fsNum, HttpServletRequest request){
         try {
             Long result = fsService.delete(fsNum);
             return "redirect:/facility/list/"+result;
         } catch (Exception e) {
             log.info("삭제할수엄슴");
-            return "redirect:/facility/read";
+            String referer = request.getHeader("Referer");
+            return "redirect:"+referer;
         }
     }
 
