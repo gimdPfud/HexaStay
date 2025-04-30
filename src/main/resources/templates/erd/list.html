@@ -6,47 +6,49 @@
     <meta charset="UTF-8">
     <title>ERD 목록</title>
 </head>
-<body class="container py-4">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <h2 class="mb-4" style="text-align: center">ERD 목록</h2>
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">ERD 목록</h2>
 
-    <div class="mb-3 text-end" >
-        <a href="/erd/insert" class="btn btn-success px-2 py-1">물품 추가</a>
-    </div>
+        <div class="mb-3 text-end" >
+            <a href="/erd/insert" class="btn btn-success px-2 py-1">물품 추가</a>
+        </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-            <thead class="table-light">
-            <tr style="text-align: center">
-                <th style="width:10%;">이미지</th>
-                <th style="width:15%;">분류</th>
-                <th style="width:15%;">물품명</th>
-                <th style="width:15%;">SKU번호</th>
-                <th style="width:10%;">수량</th>
-                <th style="width:15%;">비고</th>
-                <th style="width:7%;"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="erd : ${erd.content}" style="text-align: center">
-                <td>
-                    <img th:if="${erd.erdPictureMeta != null}"
-                         th:src="@{${erd.erdPictureMeta}}"
-                         style="width: 80px; height: 80px;">
-                    <img th:unless="${erd.erdPictureMeta != null}"
-                         th:src="@{/profile/default.png}"
-                         style="width: 80px; height: 80px;">
-                </td>
-                <td th:text="${erd.erdType}"></td>
-                <td th:text="${erd.erdName}"></td>
-                <td th:text="${erd.erdSku}"></td>
-                <td th:text="${erd.erdUnit}"></td>
-                <td th:text="${erd.erdNote}"></td>
-                <td><button class="btn btn-success px-2 py-1">수정</button></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                <tr style="text-align: center">
+                    <th style="width:10%;">이미지</th>
+                    <th style="width:15%;">분류</th>
+                    <th style="width:15%;">물품명</th>
+                    <th style="width:15%;">SKU번호</th>
+                    <th style="width:10%;">수량</th>
+                    <th style="width:15%;">비고</th>
+                    <th style="width:7%;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="erd : ${erd.content}" style="text-align: center">
+                    <td>
+                        <img th:if="${erd.erdPictureMeta != null}"
+                             th:src="@{${erd.erdPictureMeta}}"
+                             style="width: 80px; height: 80px;">
+                        <img th:unless="${erd.erdPictureMeta != null}"
+                             th:src="@{/profile/default.png}"
+                             style="width: 80px; height: 80px;">
+                    </td>
+                    <td th:text="${erd.erdType}"></td>
+                    <td th:text="${erd.erdName}"></td>
+                    <td th:text="${erd.erdSku}"></td>
+                    <td th:text="${erd.erdUnit}"></td>
+                    <td th:text="${erd.erdNote}"></td>
+                    <td><button class="btn btn-success px-2 py-1">수정</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>
