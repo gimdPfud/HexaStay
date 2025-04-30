@@ -327,7 +327,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
         // 5. 프로필 이미지 수정
-        MultipartFile newProfileFile = hotelRoomDTO.getHotelRoomProfile();
+        MultipartFile newProfileFile = hotelRoomDTO.getHotelRoomProfile();  //지역 변수로 생성 이미지 파일을
 
         if (newProfileFile != null && !newProfileFile.isEmpty()) {
             // ✅ 기존 파일 삭제
