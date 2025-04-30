@@ -39,7 +39,7 @@
         <table class="table table-bordered text-fs mb-0">
           <thead class="table-light text-center">
             <tr>
-              <th style="width: 11%">프로필 사진</th>
+              <th style="width: 11%">사진없습니다</th>
               <th style="width: 14%;">서비스명</th>
               <th style="width: 28%;">상세설명</th>
               <th style="width: 14%;">가격</th>
@@ -52,12 +52,6 @@
             <tr th:each="item : ${list}" class="text-center">
 
               <td>
-                <img th:if="${item.fsPictureMeta != null}"
-                     th:src="@{${item.fsPictureMeta}}"
-                     style="width: 60px; height: 80px;">
-                <img th:unless="${item.fsPictureMeta != null}"
-                     th:src="@{/profile/default.png}"
-                     style="width: 60px; height: 80px;">
               </td>
               <td th:text="${item.fsName}">서비스명</td>
               <td th:text="${item.fsContent}">상세설명</td>

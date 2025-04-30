@@ -31,6 +31,4 @@ public class Facilities {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "companyNum")
     private Company company;
-
-    private String fsPictureMeta;      //등록 이미지
 }
