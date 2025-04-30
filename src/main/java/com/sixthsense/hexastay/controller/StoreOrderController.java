@@ -173,15 +173,15 @@ public class StoreOrderController {
 //        }
 //        return new ResponseEntity<>(HttpStatus.OK);
 //    }
-    @ResponseBody
-    @GetMapping("/member/store/order/getlastorder")
-    public ResponseEntity getlastorder(Principal principal){
-        if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
-        Long orderid = orderstoreService.getLastOrder(hotelroomNum);
-        if(orderid==null){
-            return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(orderid,HttpStatus.OK);
-    }
+//    @ResponseBody
+//    @GetMapping("/member/store/order/getlastorder")
+//    public ResponseEntity getlastorder(Principal principal){
+//        if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+//        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
+//        Long orderid = orderstoreService.getLastOrder(hotelroomNum);
+//        if(orderid==null){
+//            return new ResponseEntity<>("다시 시도해주세요.",HttpStatus.BAD_REQUEST);
+//        }
+//        return new ResponseEntity(orderid,HttpStatus.OK);
+//    }
 }

@@ -43,7 +43,7 @@ public class tossController {
     }
 
     @GetMapping("/storesuccess")
-    public String storesuccessPage(@RequestParam Integer tossprice, @RequestParam Long o, Model model) {
+    public String storesuccessPage(@RequestParam Integer tossprice, Model model) {
         log.info("스토어성공?");
         model.addAttribute("tossprice", tossprice);
         return "toss/store/success";
