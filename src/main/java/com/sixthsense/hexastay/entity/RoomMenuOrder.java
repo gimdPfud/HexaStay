@@ -43,4 +43,16 @@ public class RoomMenuOrder extends BaseEntity {
 
     @OneToMany(mappedBy = "roomMenuOrder", cascade = CascadeType.ALL)
     private List<RoomMenuOrderItem> orderItems = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotelRoomNum") // 이 주문이 발생한 HotelRoom의 외래키
+    private HotelRoom hotelRoom;
+
+    // 연관관계 편의 메소드 (양방향 시 필요할 수 있음)
+    public void addOrderItem(RoomMenuOrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setRoomMenuOrder(this);
+    }
+
+
 }

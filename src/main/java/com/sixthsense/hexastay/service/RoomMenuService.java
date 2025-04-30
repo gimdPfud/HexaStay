@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service;
 
+import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
@@ -31,6 +32,10 @@ public interface RoomMenuService {
     List<RoomMenuDTO> getMenusWithLocale(String locale);
 
     public Page<RoomMenuDTO> searchRoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
+
+    // 조회
+    public List<HotelRoomDTO> searchRoomList(String adminEmail);
+
 
 }
 

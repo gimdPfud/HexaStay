@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>내 호텔 객실 목록</title>
+</head>
+<body>
+<h1>내 호텔 객실 목록</h1>
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+<table border="1" th:unless="${errorMessage}">
+    <thead>
+    <tr>
+        <th>객실 번호</th>
+        <th>객실 이름</th>
+        <th>객실 타입</th>
+        <th>상태</th>
+        <th>가격</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="room : ${hotelRooms}">
+        <td th:text="${room.hotelRoomNum}">101</td>
+        <td th:text="${room.hotelRoomName}">스위트룸</td>
+        <td th:text="${room.hotelRoomType}">SUITE</td>
+        <td th:text="${room.hotelRoomStatus}">ACTIVE</td>
+        <td th:text="${#numbers.formatInteger(room.hotelRoomPrice, 0, 'COMMA')} + '원'">100,000원</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(hotelRooms)}">
+        <td colspan="5">등록된 객실 정보가 없습니다.</td> </tr>
+    </tbody>
+</table>
+</body>
+</html>

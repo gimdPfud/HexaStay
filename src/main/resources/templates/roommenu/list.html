@@ -440,13 +440,10 @@
             }
             console.log("읽음 처리 API 호출 시도:", ids);
             try {
-                // API 경로 수정: /roommenu/notifications/read
                 const response = await fetch('/roommenu/notifications/read', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // CSRF 토큰이 필요하다면 헤더에 추가해야 함
-                        // 'X-CSRF-TOKEN': csrfToken // 예시
                     },
                     body: JSON.stringify(ids) // ID 목록을 JSON으로 전송
                 });

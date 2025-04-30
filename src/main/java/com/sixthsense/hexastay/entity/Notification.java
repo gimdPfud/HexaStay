@@ -31,4 +31,6 @@ public class Notification extends BaseEntity {
     @Column(name = "isRead", nullable = false)
     private boolean isRead = false; // 기본값 false
 
+
+
 }

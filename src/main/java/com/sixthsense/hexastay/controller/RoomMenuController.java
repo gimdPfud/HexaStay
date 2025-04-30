@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
@@ -18,6 +19,7 @@ import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuOption;
 import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
+import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +54,6 @@ public class RoomMenuController {
     private final RoomMenuService roomMenuService;
     private final RoomMenuCartService roomMenuCartService;
     private final RoomMenuRepository roomMenuRepository;
-    private final RoomMenuOptionRepository roomMenuOptionRepository;
 
     /**************************************************
      * 메인 페이지
@@ -409,6 +411,43 @@ public class RoomMenuController {
         return "redirect:/roommenu/dev/translation";
     }
 
+    /* 관리자가 속한 호텔의 객실 목록 */
+
+    @GetMapping("/roommenu/roomList")
+    public String getMyHotelRooms(Model model, Principal principal) { // keyword, Pageable은 현재 사용되지 않으므로 일단 제거 (필요 시 추가)
+
+        String adminEmail = principal.getName();
+
+        if (principal == null) {
+            log.warn("인증되지 않은 사용자가 객실 목록 접근 시도.");
+            return "redirect:/admin/login"; // 적절한 로그인 경로로 수정
+        }
+
+        log.info("관리자 '{}'의 호텔 객실 목록 조회를 요청합니다.", adminEmail);
+
+        try {
+            // Service 메소드 호출 수정 및 주입된 객체 이름 확인!
+            // 만약 주입된 객체 이름이 roomMenuService이고 해당 클래스에 searchRoomList가 있다면 그대로 사용
+            // 여기서는 HotelRoomService를 주입받았다고 가정하고 hotelRoomService 사용
+            List<HotelRoomDTO> hotelRooms = roomMenuService.searchRoomList(adminEmail);
+
+            model.addAttribute("hotelRooms", hotelRooms);
+            // 로그 메시지 수정
+            log.info("관리자 '{}'의 호텔 객실 {}건을 모델에 추가했습니다.", adminEmail, hotelRooms.size());
+
+            // 템플릿 경로 확인
+            return "roommenu/roomList"; // 이 경로에 실제 파일이 있는지 확인
+
+        } catch (EntityNotFoundException e) {
+            log.error("객실 목록 조회 중 오류 발생: {}", e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            return "error/adminError"; // 에러 페이지 경로 확인
+        } catch (Exception e) {
+            log.error("객실 목록 조회 중 예상치 못한 오류 발생", e);
+            model.addAttribute("errorMessage", "객실 목록을 불러오는 중 오류가 발생했습니다.");
+            return "error/adminError";
+        }
+    }
 
 }
 

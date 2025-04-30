@@ -13,15 +13,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +38,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final SimpMessagingTemplate messagingTemplate;
     private final CouponRepository couponRepository;
     private final NotificationService notificationService;
+    private final RoomRepository roomRepository;
+    private final HotelRoomRepository hotelRoomRepository;
 
 
     /***************************************************
@@ -123,13 +123,24 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * ***********************************************/
 
     @Override
-    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage, Long couponNum, Integer discountedTotalPrice) {
+    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage,
+                                                     Long couponNum, Integer discountedTotalPrice,
+                                                     Pageable pageable, Long hotelRoomNum ) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
-        log.info(">>> roomMenuOrderInsertFromCart 메소드 진입 - 받은 discountedTotalPrice 파라미터: {}", discountedTotalPrice); // <-- 이 로그 추가
+
 
         // 1. 로그인한 회원 조회
         Member member = memberRepository.findByMemberEmail(email);
         if (member == null) throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
+
+        if (hotelRoomNum == null) {
+            throw new IllegalArgumentException("주문 객실 번호(hotelRoomNum)가 필요합니다.");
+        }
+
+        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
+                .orElseThrow(() -> new EntityNotFoundException("주문 대상 객실 정보를 찾을 수 없습니다: ID " + hotelRoomNum));
+        log.debug("주문 발생 객실 정보 조회 완료: {}", hotelRoom.getHotelRoomName());
+
 
         // 2. 해당 회원의 장바구니 가져오기
         RoomMenuCart cart = roomMenuCartRepository.findByMember(member)
@@ -144,19 +155,12 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         roomMenuOrder.setMember(member);
         roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
         roomMenuOrder.setRegDate(LocalDateTime.now()); // 주문 등록 시간 설정
+        roomMenuOrder.setHotelRoom(hotelRoom);
 
         List<RoomMenuOrderItem> orderItems = new ArrayList<>();
 
         // 5. 장바구니 아이템 → 주문 아이템으로 변환
         for (RoomMenuCartItem cartItem : cartItems) {
-            log.info("--- 장바구니 아이템 정보 확인 (주문 생성 시) ---");
-            log.info("장바구니 아이템 ID: {}", cartItem.getRoomMenuCartItemNum());
-            log.info("메뉴 이름 (장바구니에서): {}", cartItem.getRoomMenu().getRoomMenuName());
-            log.info("장바구니 수량: {}", cartItem.getRoomMenuCartItemAmount());
-            log.info("장바구니에서 가져온 옵션 이름: {}", cartItem.getRoomMenuSelectOptionName());
-            log.info("장바구니에서 가져온 옵션 가격: {}", cartItem.getRoomMenuSelectOptionPrice()); // 옵션 가격 합계 (개당)
-            log.info("RoomMenuCartItem Price (total for item line): {}", cartItem.getRoomMenuCartItemPrice()); // 아이템 라인 총 가격
-            log.info("---------------------------------------");
 
             RoomMenu roomMenu = cartItem.getRoomMenu();
 
@@ -170,10 +174,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             orderItem.setRoomMenu(roomMenu);  // 주문할 메뉴 설정
             orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());  // 주문 수량 설정
 
-            // RoomMenuOrderItemPrice 필드에 (기본가격 + 옵션가격 합계)를 설정 (개당 가격)
-            // RoomMenuCartItemPrice / RoomMenuCartItemAmount 계산 시 소수점 문제가 발생할 수 있습니다.
-            // RoomMenuCartItem에 개당 가격을 저장했거나, 여기서 다시 계산하는 로직이 필요할 수 있습니다.
-            // 현재는 정수 나눗셈으로 진행합니다.
             int itemPricePerUnit = cartItem.getRoomMenuCartItemPrice() / cartItem.getRoomMenuCartItemAmount();
             orderItem.setRoomMenuOrderPrice(itemPricePerUnit);
             log.info("계산된 주문 아이템 개당 가격 (옵션 포함): {}", itemPricePerUnit);
@@ -188,8 +188,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
             // 재고 차감
             roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());
-            // roomMenuRepository.save(roomMenu); // @Transactional로 자동 저장되거나 필요 시 명시적 저장
-
 
             orderItems.add(orderItem);
         }
@@ -217,14 +215,11 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         }
 
 
-        // 7. >>> **RoomMenuOrder 엔티티 저장 (딱 한 번만 여기에)** <<<
+        // 7. >>> **RoomMenuOrder
         RoomMenuOrder savedOrder = roomMenuOrderRepository.save(roomMenuOrder);
-        log.info("주문 엔티티 저장 완료. 주문 번호: {}", savedOrder.getRoomMenuOrderNum());
+        log.info("주문 엔티티 저장 완료. 주문 번호: {}, 객실 번호: {}", savedOrder.getRoomMenuOrderNum(), savedOrder.getHotelRoom() != null ? savedOrder.getHotelRoom().getHotelRoomNum() : "존재하지 않음");
 
 
-        // >>> **수정/추가된 로직 시작: 쿠폰 사용 처리 (주문 저장 후)** <<<
-        // 이 로직은 주문이 성공적으로 데이터베이스에 저장된 후에 실행되어야 합니다.
-        // (실제 시스템에서는 결제까지 완료된 후에 이 로직이 실행되는 것이 더 안전합니다.)
         if (couponNum != null) {
             log.info("주문 저장 후 쿠폰 사용 처리 시작. 쿠폰 번호: {}", couponNum);
             Coupon coupon = couponRepository.findById(couponNum)
@@ -498,19 +493,24 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     }
 
     @Override
-    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order) {
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order, Pageable pageable) {
         if (order == null || order.getMember() == null) {
             log.warn("알람 전송 실패: 주문 또는 회원 정보가 없음");
             return;
         }
-
-        // --- 주문 ID 가져오기 ---
-        Long orderId = order.getRoomMenuOrderNum(); // RoomMenuOrder 엔티티에 getId() 메소드가 있다고 가정
+        Long orderId = order.getRoomMenuOrderNum();
         if (orderId == null) {
             log.warn("알람 전송 실패: 주문 ID를 가져올 수 없음");
             return;
         }
-        // --- 주문 ID 가져오기 끝 ---
+
+        // --- 수정: 올바른 hotelRoomName 가져오기 ---
+        String hotelRoomName = "객실 정보 없음"; // 기본값
+        if (order.getHotelRoom() != null && order.getHotelRoom().getHotelRoomName() != null) {
+            hotelRoomName = order.getHotelRoom().getHotelRoomName();
+        }
+        log.info("알림 생성 - 사용될 호텔 객실 이름: {}", hotelRoomName);
+        // --- 수정 끝 ---
 
         // 총 금액 계산 (RoomMenuOrder 내부 기준)
         int totalPrice = order.getOrderItems().stream()
@@ -539,19 +539,16 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // === 수정 시작: 알림 저장 및 전송 DTO 재구성 ===
 
-        // 1. 알림 저장에 필요한 정보를 담을 DTO 준비 (기존 DTO 활용)
         RoomMenuOrderAlertDTO alertInfoForDb = new RoomMenuOrderAlertDTO();
         alertInfoForDb.setMemberEmail(memberEmail);
         alertInfoForDb.setTotalPrice(totalPrice);
-        // 필요 시 추가 정보 설정
+        alertInfoForDb.setHotelRoomName(hotelRoomName);
 
-        // 2. NotificationService를 호출하여 알림을 DB에 저장하고 결과 받기
-        //    (NotificationService가 주입되어 있어야 함)
+
         Notification savedNotification = notificationService.createAndSaveNewOrderNotification(orderId, alertInfoForDb);
 
-        // 3. WebSocket으로 전송할 최종 DTO 생성 (Builder 사용 및 추가 정보 설정)
-        //    (RoomMenuOrderAlertDTO에 notificationId, orderId, orderTimestamp 필드가 추가되어 있어야 함)
         RoomMenuOrderAlertDTO alertDtoForWebSocket = RoomMenuOrderAlertDTO.builder()
+
                 .memberEmail(memberEmail)
                 .totalPrice(totalPrice)
                 .roomMenuOrderRequestMessage(requestMessages)
@@ -559,6 +556,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 .notificationId(savedNotification.getNotificationId()) // 저장된 알림 ID 설정
                 .orderId(orderId)                           // 주문 ID 설정
                 .orderTimestamp(savedNotification.getCreateDate()) // 알림 생성 시간 (BaseEntity 상속)
+                .hotelRoomName(hotelRoomName)
                 .build();
 
         log.info("🚀 최종 WebSocket 알람 전송 DTO: {}", alertDtoForWebSocket);

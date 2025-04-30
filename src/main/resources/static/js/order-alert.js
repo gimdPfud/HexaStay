@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div style="text-align: center; color: #007bff; margin-bottom: 10px;">
                             <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i> </div>
                         <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 객실 서비스 주문 알림</h6> <div style="margin-bottom: 5px;">
-                            주문자 : <strong>${orderData.memberEmail}</strong><br> 총 금액 : <strong>${orderData.totalPrice}원</strong> </div>
+                            주문자 : <strong>${orderData.memberEmail}</strong><br> 총 금액 : <strong>${orderData.totalPrice}원</strong> 주문 호텔 : <strong>${orderData.hotelRoomName || '정보 없음'}</strong></div>
                         <hr style="margin: 10px 0;"> <p style="text-align: center; font-size: 0.9em;">객실 서비스 관리자 페이지(주문내역)를 확인하세요!<br>
                             확인을 누르시면 주문 내역 페이지로 이동합니다.
                         </p>
