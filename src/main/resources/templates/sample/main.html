@@ -48,10 +48,12 @@
         .custom-dropdown {
             position: relative;
             display: inline-block;
-            width: 200px;
+            width: 90px;
+            height: 40px;
             font-family: 'Open Sans', sans-serif;
-            font-size: 16px;
-            margin-top: 30px;
+            font-size: 11px;
+            margin-top: 6px;
+
         }
 
         .custom-dropdown .selected-option {
@@ -101,78 +103,79 @@
         .flag-ja { background-position: -87px -178px; }
         .flag-en { background-position: -116px -352px; }
         .flag-cn { background-position: 0px -62px; }
-        button {
-            margin: 20px;
-            outline: none;
-        }
-        .custom-btn {
-            width: 130px;
-            height: 40px;
-            padding: 10px 25px;
-            border: 2px solid #000;
-            font-family: 'Lato', sans-serif;
-            font-weight: 500;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            display: inline-block;
-        }
-        .menu-btn {
-            background: #000;
-            color: #fff;
-            line-height: 42px;
-            padding: 0;
-            border: none;
-            
-        }
-        .menu-btn:hover {
-            background: transparent;
-            color: #000;
-            box-shadow:
-                    -7px -7px 20px 0px #fff9,
-                    -4px -4px 5px 0px #fff9,
-                    7px 7px 20px 0px #0002,
-                    4px 4px 5px 0px #0001;
-        }
-        .menu-btn:before,
-        .menu-btn:after{
-            content:'';
-            position:absolute;
-            top:0;
-            right:0;
-            height:2px;
-            width:0;
-            background: #000;
-            transition:400ms ease all;
-        }
-        .menu-btn:after{
-            right:inherit;
-            top:inherit;
-            left:0;
-            bottom:0;
-        }
-        .menu-btn:hover:before,
-        .menu-btn:hover:after{
-            width:100%;
-            transition:800ms ease all;
-        }
         span{
             text-align: center;
         }
         a {
             text-decoration: none;
         }
+        button {
+            margin: 20px;
+            outline: none;
+
+        }
+        .custom-btn {
+            width: 160px;
+            height: 60px;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px 25px;
+            font-family: 'Lato', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            font-style: normal;
+            text-shadow: 0px -1px 0px rgba(0,0,0,0.4);
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            display: flex; /* 추가 */
+            justify-content: center; /* 가로 중앙 */
+            align-items: center; /* 세로 중앙 */
+            box-shadow: inset 0px 1px 0px rgba(255,255,255,1), 0px 1px 3px rgba(0,0,0,0.3);
+            outline: none;
+            border: 1px solid #ba6;
+            text-align: center;
+        }
+        .custom-btn:active{
+            -webkit-transform: translateY(2px);
+            transform: translateY(2px);
+        }
+        .btn-1{
+            background: -webkit-gradient(linear, left top, left bottom, from(#a95), to(#fea));
+            margin-top: 80px;
+        }
+        .btn-2{
+            border-color: #7c7c7c;
+            background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.25)), to(#e6e6e6));
+        }
+        .btn-3{
+            border-color: #D9A3A9;
+            background: -webkit-gradient(linear, left top, left bottom, from(#D9A3A9), to(#FFE6E9));
+        }
+        .btn-4{
+            box-shadow: inset 0px 1px 0px rgba(255,255,255,.8),0px 1px 3px rgba(0,0,0,0.3);
+            border-color: #111;
+            color: #555;
+            text-shadow: -1px -1px 1px rgba(0,0,0,1);
+            background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#333));
+        }
+
+        @font-face {
+            font-family: 'S-CoreDream-6Bold';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
 
     </style>
 </head>
 <body>
         <div class="container menu-container">
-            <h2 class="mb-4" th:text="#{main.title}">호텔 서비스 메뉴</h2>
-            <a href="/roommenu/orderpage" class="custom-btn menu-btn" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
-            <a href="/member/store/list" class="custom-btn menu-btn" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
-            <a href="/roomcare/insert" class="custom-btn menu-btn" th:text="#{main.roomCare}"><span>객실 케어 서비스</span></a>
-            <a href="#" class="custom-btn menu-btn" th:text="#{main.facilityService}"><span>시설 서비스</span></a>
+            <a href="/roommenu/orderpage" class="custom-btn btn-1" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
+            <a href="/member/store/list" class="custom-btn btn-2" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
+            <a href="/roomcare/insert" class="custom-btn btn-3" th:text="#{main.roomCare}"><span>객실 케어</span></a>
+            <a href="#" class="custom-btn btn-4" th:text="#{main.facilityService}"><span>근처 시설</span></a>
 
             <form method="get" th:action="@{/main}" class="mx-auto" style="display: flex; justify-content: center;">
                 <input type="hidden" name="type" th:value="${type}" />
