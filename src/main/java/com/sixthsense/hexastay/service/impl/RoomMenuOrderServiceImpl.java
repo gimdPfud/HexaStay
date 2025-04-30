@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.ObjectInputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,21 +126,33 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     @Override
     public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage,
                                                      Long couponNum, Integer discountedTotalPrice,
-                                                     Pageable pageable, Long hotelRoomNum ) {
+                                                     Pageable pageable) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
-
         // 1. 로그인한 회원 조회
+        log.debug(">>> 1. 회원 정보 조회 시작...");
         Member member = memberRepository.findByMemberEmail(email);
-        if (member == null) throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
-
-        if (hotelRoomNum == null) {
-            throw new IllegalArgumentException("주문 객실 번호(hotelRoomNum)가 필요합니다.");
+        if (member == null) {
+            log.error("!!! 회원 정보를 찾을 수 없습니다: {}", email);
+            throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
         }
+        log.debug(">>> 1. 회원 정보 조회 완료: MemberNum {}", member.getMemberNum());
 
-        HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
-                .orElseThrow(() -> new EntityNotFoundException("주문 대상 객실 정보를 찾을 수 없습니다: ID " + hotelRoomNum));
-        log.debug("주문 발생 객실 정보 조회 완료: {}", hotelRoom.getHotelRoomName());
+        // --- 현재 사용자가 체크인한 방 찾기 ---
+        log.debug(">>> 현재 체크인된 Room 정보 조회 시작...");
+        Room currentCheckedInRoom = roomRepository.findByMemberAndCheckOutDateIsNull(member)
+                .orElseThrow(() -> {
+                    log.error("!!! 현재 체크인된 객실 정보를 찾을 수 없습니다. MemberNum: {}", member.getMemberNum());
+                    return new IllegalStateException("현재 체크인된 객실 정보를 찾을 수 없습니다. 룸서비스 주문을 진행할 수 없습니다.");
+                });
+        // 찾은 Room과 연결된 HotelRoom 정보 로깅 (null 가능성 있음)
+        HotelRoom associatedHotelRoom = currentCheckedInRoom.getHotelRoom();
+        log.info("주문 사용자({})의 현재 체크인 객실 정보 조회 완료: Room Num {}, HotelRoom Name {}",
+                email,
+                currentCheckedInRoom.getRoomNum(),
+                associatedHotelRoom != null ? associatedHotelRoom.getHotelRoomName() : "연결된 HotelRoom 없음");
+        // --- 조회 로직 끝 ---
+
 
 
         // 2. 해당 회원의 장바구니 가져오기
@@ -155,7 +168,17 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         roomMenuOrder.setMember(member);
         roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
         roomMenuOrder.setRegDate(LocalDateTime.now()); // 주문 등록 시간 설정
-        roomMenuOrder.setHotelRoom(hotelRoom);
+        roomMenuOrder.setRoom(currentCheckedInRoom);
+        log.debug(">>> 주문 객체에 Room 설정: RoomNum {}", currentCheckedInRoom.getRoomNum());
+        roomMenuOrder.setRoom(currentCheckedInRoom);
+
+
+
+        if (currentCheckedInRoom.getHotelRoom() != null) {
+            roomMenuOrder.setHotelRoom(currentCheckedInRoom.getHotelRoom());
+        } else {
+            log.warn("Warning: Room Num {} 에 연결된 HotelRoom 정보가 없습니다.", currentCheckedInRoom.getRoomNum());
+        }
 
         List<RoomMenuOrderItem> orderItems = new ArrayList<>();
 
@@ -215,10 +238,15 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         }
 
 
-        // 7. >>> **RoomMenuOrder
-        RoomMenuOrder savedOrder = roomMenuOrderRepository.save(roomMenuOrder);
-        log.info("주문 엔티티 저장 완료. 주문 번호: {}, 객실 번호: {}", savedOrder.getRoomMenuOrderNum(), savedOrder.getHotelRoom() != null ? savedOrder.getHotelRoom().getHotelRoomNum() : "존재하지 않음");
 
+        // 7. 주문 정보 저장
+        RoomMenuOrder savedOrder = roomMenuOrderRepository.save(roomMenuOrder);
+        // --- 로그 수정: 설정된 Room과 HotelRoom 정보 확인 ---
+        log.info("주문 엔티티 저장 완료. 주문 번호: {}, 연결된 Room 번호: {}, 연결된 객실 이름: {}",
+                savedOrder.getRoomMenuOrderNum(),
+                savedOrder.getRoom() != null ? savedOrder.getRoom().getRoomNum() : "연결된 Room 없음",
+                savedOrder.getHotelRoom() != null ? savedOrder.getHotelRoom().getHotelRoomName() : "연결된 HotelRoom 없음");
+        // --- 로그 수정 끝 ---
 
         if (couponNum != null) {
             log.info("주문 저장 후 쿠폰 사용 처리 시작. 쿠폰 번호: {}", couponNum);
@@ -226,13 +254,10 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                     .orElseThrow(() -> new EntityNotFoundException("쿠폰 정보를 찾을 수 없습니다.")); // 쿠폰 엔티티 다시 로드 (혹시 모를 상태 변경 대비)
 
             // 쿠폰 사용 처리 상세 로직
-            if (coupon.isUsed()) { // 만약 이미 사용 완료된 쿠폰이라면 (동시성 문제 또는 로직 오류)
-                // 반복 사용 쿠폰이고 사용 횟수가 0이하라면 예외 또는 경고
+            if (coupon.isUsed()) {
                 if (coupon.getRepeatCouponCount() == null || coupon.getRepeatCouponCount() <= 0) {
                     log.warn("이미 사용 완료된 쿠폰({})을 주문에 다시 사용 시도 (로직 오류 가능성)", couponNum);
-                    // throw new IllegalStateException("이미 사용된 쿠폰입니다."); // 필요시 예외 발생시켜 주문 취소 유도
                 } else {
-                    // 반복 쿠폰인데 사용 가능 횟수가 남았으므로 사용 처리 진행
                     log.info("반복 사용 쿠폰({}) 남은 횟수 있어 사용 처리 진행", couponNum);
                 }
 
@@ -263,6 +288,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         // 8. 장바구니 비우기
         roomMenuCartItemRepository.deleteAll(cartItems);
         log.info("장바구니 비우기 완료.");
+
+
 
         return savedOrder; // 저장된 주문 엔티티 반환
     }
@@ -494,6 +521,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     @Override
     public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order, Pageable pageable) {
+
+
         if (order == null || order.getMember() == null) {
             log.warn("알람 전송 실패: 주문 또는 회원 정보가 없음");
             return;
@@ -505,12 +534,22 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         }
 
         // --- 수정: 올바른 hotelRoomName 가져오기 ---
-        String hotelRoomName = "객실 정보 없음"; // 기본값
-        if (order.getHotelRoom() != null && order.getHotelRoom().getHotelRoomName() != null) {
-            hotelRoomName = order.getHotelRoom().getHotelRoomName();
+
+        String hotelRoomName = "객실 정보 없음";
+        try {
+            log.info(">>> 호텔 객실 이름 가져오기 시도...");
+            if (order.getRoom() != null && order.getRoom().getHotelRoom() != null) {
+                hotelRoomName = order.getRoom().getHotelRoom().getHotelRoomName();
+                // ... (null/empty 체크) ...
+            }
+            log.info(">>> 호텔 객실 이름: {}", hotelRoomName);
+        } catch (Exception e) {
+            log.error(">>> 호텔 객실 이름 가져오기 중 오류!", e); throw e;
         }
-        log.info("알림 생성 - 사용될 호텔 객실 이름: {}", hotelRoomName);
+
         // --- 수정 끝 ---
+
+
 
         // 총 금액 계산 (RoomMenuOrder 내부 기준)
         int totalPrice = order.getOrderItems().stream()
@@ -560,6 +599,8 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 .build();
 
         log.info("🚀 최종 WebSocket 알람 전송 DTO: {}", alertDtoForWebSocket);
+
+
 
         // 4. 수정된 최종 DTO를 WebSocket으로 전송
         messagingTemplate.convertAndSend("/topic/new-order", alertDtoForWebSocket);

@@ -331,192 +331,311 @@
         });
 
 
-        /* 알람 페이지 시작 */
+        /* 알람 서비스 */
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("통합 알림 스크립트 초기화 시작");
 
-        // 페이지 로드 시 실행될 초기화 함수
-        async function initializeNotifications() { // async 추가
-            console.log("알림 초기화 시도");
-            try {
-                const response = await fetch('/roommenu/notifications/unread');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log("읽지 않은 알림 데이터:", data);
+            // --- UI 업데이트 관련 함수들 ---
 
-                // 배지 업데이트
-                updateNotificationBadge(data.count);
-
-                // 목록 업데이트
-                const menu = document.getElementById('notification-dropdown-menu');
-                menu.innerHTML = ''; // 기존 목록 초기화 (플레이스홀더 포함)
-
-                if (data.notifications && data.notifications.length > 0) {
-                    data.notifications.forEach(notification => {
-                        const notificationDataForHtml = {
-                            ...notification,
-                            orderTimestamp: notification.createDate // DTO 필드 createdAt을 사용
-                        };
-                        const newItemHTML = createNotificationItemHTML(notificationDataForHtml);
-                        menu.insertAdjacentHTML('beforeend', newItemHTML); // 아래쪽에 순서대로 추가
-                    });
-                    // 읽음/읽지 않음 상태 반영 (초기 로드 시)
-                    menu.querySelectorAll('li').forEach(li => {
-                        const notificationId = li.querySelector('a')?.getAttribute('data-notification-id');
-                        const notification = data.notifications.find(n => n.notificationId == notificationId);
-                        if (notification) {
-                            li.classList.add(notification.isRead ? 'read' : 'unread');
-                        }
-                    });
-
+            /**
+             * 알림 배지 숫자 및 표시 여부 업데이트
+             * @param {number} count - 안 읽은 알림 개수
+             */
+            function updateNotificationBadge(count) {
+                const badge = document.getElementById('notification-badge');
+                if (badge) {
+                    const currentCount = parseInt(count) || 0; // 숫자로 변환, NaN이면 0
+                    badge.textContent = currentCount;
+                    badge.style.display = currentCount > 0 ? 'block' : 'none';
+                    console.log(`배지 업데이트: ${currentCount}`);
                 } else {
-                    menu.innerHTML = '<li><p class="dropdown-item text-center text-muted small mb-0">새로운 알림이 없습니다.</p></li>';
+                    console.warn("ID 'notification-badge' 요소를 찾을 수 없습니다.");
                 }
+            }
 
-            } catch (error) {
-                console.error("읽지 않은 알림 로딩 실패:", error);
+            /**
+             * 개별 알림 항목의 HTML 문자열 생성
+             * @param {object} notification - 알림 데이터 객체 (WebSocket DTO 또는 API DTO)
+             * @returns {string} - 생성된 li HTML 문자열
+             */
+            function createNotificationItemHTML(notification) {
+                // API 응답(createDate)과 WebSocket 메시지(orderTimestamp)의 시간 필드 처리
+                const timeValue = notification.createDate || notification.orderTimestamp;
+                const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short'}) : '시간 정보 없음';
+
+                // 메시지에 객실 이름(hotelRoomName) 포함
+                const message = `
+            <strong>${notification.memberEmail || '알 수 없음'}</strong>님이 주문<br>
+            <span class="text-primary">(${notification.totalPrice ? notification.totalPrice.toLocaleString('ko-KR') : '가격 정보 없음'}원 / ${notification.hotelRoomName || '객실 정보 없음'})</span>
+        `; // 객실 이름 표시 추가
+
+                const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
+                // isRead 상태는 li 태그의 클래스로 관리됨 (초기 로드 시 API 데이터 사용, WebSocket 수신 시 'unread'로 간주)
+                const itemClass = notification.isRead ? 'read' : 'unread';
+
+                return `
+<li class="${itemClass}">
+    <a class="dropdown-item notification-item" href="${link}" data-notification-id="${notification.notificationId}">
+        <div class="small text-muted">${timeString}</div>
+        <div>${message}</div>
+    </a>
+</li>
+`;
+            }
+
+            /**
+             * WebSocket으로 수신된 새 알림을 드롭다운 목록 맨 위에 추가
+             * @param {object} notificationData - WebSocket 메시지로 받은 orderData
+             */
+            function addNotificationToList(notificationData) {
                 const menu = document.getElementById('notification-dropdown-menu');
-                menu.innerHTML = '<li><p class="dropdown-item text-center text-danger small mb-0">알림 로딩 실패</p></li>';
-                updateNotificationBadge(0);
-            }
-        }
-
-        // 새로운 알림 항목 HTML 생성 함수 (DTO 필드명 일관성 확인 필요)
-        function createNotificationItemHTML(notification) {
-            // JavaScript는 WebSocket DTO(orderTimestamp)와 API DTO(createdAt)를 모두 처리해야 함
-            const timeValue = notification.createDate || notification.orderTimestamp;
-            console.log('시간 값 (timeValue):', timeValue);
-            const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR') : '시간 정보 없음'; // 한국 시간 형식
-            const message = `<strong>${notification.memberEmail}</strong>님이 주문 (${notification.totalPrice.toLocaleString('ko-KR')}원)`; // 가격 포맷팅
-            const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
-            // isRead 상태 반영을 위해 li 요소에 클래스 추가 준비
-            const itemClass = notification.isRead ? 'read' : 'unread';
-
-            return `
-    <li class="${itemClass}">
-        <a class="dropdown-item notification-item" href="${link}" data-notification-id="${notification.notificationId}">
-            <div class="small text-muted">${timeString}</div>
-            <div>${message}</div>
-        </a>
-    </li>
-    `;
-        }
-
-        // 알림 배지 업데이트 함수 (변경 없음)
-        function updateNotificationBadge(count) {
-            const badge = document.getElementById('notification-badge');
-            if (badge) {
-                badge.textContent = count;
-                badge.style.display = count > 0 ? 'block' : 'none';
-            }
-        }
-
-        // 알림 목록 업데이트 함수 (WebSocket 수신 시 호출됨 - DTO 필드명 주의)
-        function addNotificationToList(notification) { // notification은 WebSocket DTO (orderTimestamp) 기준
-            const menu = document.getElementById('notification-dropdown-menu');
-            const placeholder = menu.querySelector('p.text-muted');
-
-            if (placeholder) {
-                placeholder.parentElement.remove();
-            }
-
-            // WebSocket DTO로 HTML 생성 (isRead는 기본 false(unread)로 처리됨)
-            const newItemHTML = createNotificationItemHTML({...notification, isRead: false}); // isRead: false 명시
-            menu.insertAdjacentHTML('afterbegin', newItemHTML); // 맨 위에 추가
-
-            // 새로 추가된 항목에 unread 클래스 확실히 하기 (create 함수에서 이미 처리하지만 중복해도 무방)
-            const addedLi = menu.firstChild;
-            if (addedLi && addedLi.tagName === 'LI') {
-                addedLi.classList.add('unread');
-                addedLi.classList.remove('read');
-            }
-        }
-
-        // --- 읽음 처리 API 호출 함수 추가 ---
-        async function markNotificationsAsReadApiCall(ids) {
-            if (!ids || ids.length === 0) {
-                console.log("읽음 처리할 알림 ID 없음");
-                return false; // 처리할 ID 없으면 실패 처리
-            }
-            console.log("읽음 처리 API 호출 시도:", ids);
-            try {
-                const response = await fetch('/roommenu/notifications/read', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(ids) // ID 목록을 JSON으로 전송
-                });
-
-                if (!response.ok) {
-                    const errorBody = await response.text(); // 에러 메시지 확인
-                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+                if (!menu) {
+                    console.warn("ID 'notification-dropdown-menu' 요소를 찾을 수 없습니다.");
+                    return;
                 }
 
-                const result = await response.json();
-                console.log("알림 읽음 처리 결과:", result);
-                return true; // 성공 시 true 반환
+                const placeholder = menu.querySelector('p.text-muted');
+                if (placeholder) {
+                    placeholder.parentElement.remove(); // "새로운 알림이 없습니다" 메시지 제거
+                }
 
-            } catch (error) {
-                console.error("알림 읽음 처리 실패:", error);
-                // 사용자에게 에러 알림 표시 고려
-                // alert('알림 읽음 처리에 실패했습니다.');
-                return false; // 실패 시 false 반환
+                // WebSocket DTO로 HTML 생성 (새 알림은 항상 'unread')
+                // createNotificationItemHTML 함수가 hotelRoomName을 사용하도록 수정되었으므로 자동으로 포함됨
+                const newItemHTML = createNotificationItemHTML({...notificationData, isRead: false});
+                menu.insertAdjacentHTML('afterbegin', newItemHTML); // 맨 위에 추가
+
+                console.log(`새 알림 목록에 추가: ID ${notificationData.notificationId}`);
+
+                // 새로 추가된 항목에 unread 클래스 적용 (create 함수에서 이미 하지만 명시적 확인)
+                const addedLi = menu.firstChild;
+                if (addedLi && addedLi.tagName === 'LI') {
+                    addedLi.classList.add('unread');
+                    addedLi.classList.remove('read');
+                }
             }
-        }
-        // --- 읽음 처리 API 호출 함수 끝 ---
 
-        // DOM 로드 완료 후 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            // 알림 초기화 함수 호출
+            /**
+             * 서버에 알림 읽음 처리 요청 API 호출
+             * @param {number[]} ids - 읽음 처리할 알림 ID 배열
+             * @returns {Promise<boolean>} - 성공 여부
+             */
+            async function markNotificationsAsReadApiCall(ids) {
+                if (!ids || ids.length === 0) {
+                    console.log("읽음 처리할 알림 ID 없음");
+                    return false;
+                }
+                console.log("읽음 처리 API 호출 시도:", ids);
+                try {
+                    const response = await fetch('/roommenu/notifications/read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(ids)
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+                    }
+                    const result = await response.json();
+                    console.log("알림 읽음 처리 결과:", result);
+                    return true;
+
+                } catch (error) {
+                    console.error("알림 읽음 처리 실패:", error);
+                    return false;
+                }
+            }
+
+            /**
+             * 페이지 로드 시 안 읽은 알림 목록과 개수를 서버에서 가져와 초기화
+             */
+            async function initializeNotifications() {
+                console.log("알림 초기화 함수 호출됨");
+                const menu = document.getElementById('notification-dropdown-menu');
+                if (!menu) {
+                    console.warn("ID 'notification-dropdown-menu' 요소를 찾을 수 없어 초기화 중단.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/roommenu/notifications/unread');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log("읽지 않은 알림 데이터 수신:", data);
+
+                    // 배지 업데이트
+                    updateNotificationBadge(data.count || 0); // count가 없거나 0이면 0으로
+
+                    // 목록 업데이트
+                    menu.innerHTML = ''; // 기존 목록 초기화
+
+                    if (data.notifications && data.notifications.length > 0) {
+                        data.notifications.forEach(notification => {
+                            // createNotificationItemHTML 함수가 hotelRoomName을 사용하도록 수정되었음
+                            const newItemHTML = createNotificationItemHTML(notification);
+                            menu.insertAdjacentHTML('beforeend', newItemHTML);
+                        });
+                        // 읽음/읽지 않음 상태 반영 (초기 로드 시) - create 함수에서 이미 처리됨
+                    } else {
+                        menu.innerHTML = '<li><p class="dropdown-item text-center text-muted small mb-0">새로운 알림이 없습니다.</p></li>';
+                    }
+                    console.log("알림 목록 초기화 완료");
+
+                } catch (error) {
+                    console.error("읽지 않은 알림 로딩 실패:", error);
+                    menu.innerHTML = '<li><p class="dropdown-item text-center text-danger small mb-0">알림 로딩 실패</p></li>';
+                    updateNotificationBadge(0);
+                }
+            }
+
+            // --- 초기화 실행 ---
             initializeNotifications();
 
-            // 알림 드롭다운 관련 이벤트 리스너
+            // --- 드롭다운 이벤트 리스너 (읽음 처리) ---
             const dropdownElement = document.getElementById('notificationDropdown');
             if (dropdownElement) {
-                dropdownElement.addEventListener('show.bs.dropdown', async function () { // async 추가
-                    console.log("드롭다운 열림");
+                dropdownElement.addEventListener('show.bs.dropdown', async function () {
+                    console.log("알림 드롭다운 열림 이벤트 발생");
+                    const menu = document.getElementById('notification-dropdown-menu');
+                    if (!menu) return;
 
-                    // 현재 목록에서 '읽지 않은(unread)' 상태인 알림 항목들의 ID 수집
-                    const unreadItems = document.querySelectorAll('#notification-dropdown-menu li.unread .notification-item');
+                    const unreadItems = menu.querySelectorAll('li.unread .notification-item');
                     const notificationIdsToRead = Array.from(unreadItems)
                         .map(item => item.getAttribute('data-notification-id'))
                         .filter(id => id)
                         .map(id => parseInt(id));
 
                     if (notificationIdsToRead.length > 0) {
-                        const success = await markNotificationsAsReadApiCall(notificationIdsToRead); // API 호출
+                        const success = await markNotificationsAsReadApiCall(notificationIdsToRead);
                         if (success) {
-                            updateNotificationBadge(0); // 성공 시 배지 0으로
-                            // UI 업데이트: 읽음 처리된 항목들의 스타일 변경
+                            updateNotificationBadge(0); // 성공 시 배지 0
                             unreadItems.forEach(item => {
                                 const li = item.closest('li');
                                 if (li) {
                                     li.classList.remove('unread');
-                                    li.classList.add('read'); // 읽음 클래스 추가
+                                    li.classList.add('read');
                                 }
                             });
-                        } else {
-                            // API 호출 실패 시 사용자에게 알림 등 고려
+                            console.log("알림 읽음 처리 및 UI 업데이트 완료");
                         }
                     } else {
-                        console.log("읽음 처리할 새 알림 없음");
-                        // 읽을 게 없어도 배지는 0으로 만드는 것이 자연스러울 수 있음
+                        console.log("읽음 처리할 새 알림 없음 (UI 업데이트 없음)");
+                        // 드롭다운을 열었을 때 안 읽은 게 없더라도 배지는 0으로 만드는 것이 자연스러움
                         updateNotificationBadge(0);
                     }
                 });
+            } else {
+                console.warn("ID 'notificationDropdown' 요소를 찾을 수 없습니다.");
             }
 
-            // 동적으로 추가된 알림 항목 클릭 이벤트 위임 (현재는 링크 이동만)
-            const dropdownMenu = document.getElementById('notification-dropdown-menu');
-            if (dropdownMenu) {
-                // 클릭 시 기본 동작(링크 이동)만 수행.
-                // 개별 읽음 처리 로직은 현재 구현하지 않음.
-            }
+            // 알림 항목 클릭 이벤트 위임 (기본 링크 이동 외 추가 동작 필요 시)
+            // const dropdownMenu = document.getElementById('notification-dropdown-menu');
+            // if (dropdownMenu) {
+            //     dropdownMenu.addEventListener('click', function(event) {
+            //         const targetItem = event.target.closest('.notification-item');
+            //         if (targetItem) {
+            //             // 특정 항목 클릭 시 추가 동작 구현 (예: 개별 읽음 처리 API 호출 등)
+            //             console.log("알림 항목 클릭됨:", targetItem.getAttribute('data-notification-id'));
+            //         }
+            //     });
+            // }
 
-        });
+            // --- WebSocket 연결 및 처리 ---
+            console.log("WebSocket 연결 시도...");
+            const socket = new SockJS("/ws-order-alert"); // WebSocket 엔드포인트 확인
+            const stompClient = Stomp.over(socket);
+            // Stomp 디버그 메시지 끄기 (콘솔이 너무 지저분해지면 주석 해제)
+            // stompClient.debug = null;
 
-        /* 알람페이지 끝 */
+            stompClient.connect({}, function (frame) {
+                console.log("✅ WebSocket 연결 성공: ", frame);
+
+                // 새 주문 알림 구독
+                stompClient.subscribe("/topic/new-order", function (message) { // 구독 경로 확인
+                    try {
+                        const orderData = JSON.parse(message.body);
+                        console.log("📦 WebSocket 메시지 수신:", orderData);
+
+                        // --- 1. 실시간 모달 알림 표시 ---
+                        const alertContent = document.getElementById("orderAlertContent");
+                        const confirmBtn = document.getElementById("orderAlertConfirmBtn");
+                        const modalElement = document.getElementById("orderAlertModal");
+
+                        if (alertContent && confirmBtn && modalElement) {
+                            // 모달 내용 구성 (객실 이름 포함)
+                            const content = `
+                        <div style="text-align: center; color: #007bff; margin-bottom: 10px;">
+                            <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 객실 서비스 주문 알림</h6>
+                        <div style="margin-bottom: 5px;">
+                            주문자 : <strong>${orderData.memberEmail || '정보 없음'}</strong><br>
+                            총 금액 : <strong>${orderData.totalPrice ? orderData.totalPrice.toLocaleString('ko-KR') : '?'}원</strong><br>
+                            주문 객실 : <strong>${orderData.hotelRoomName || '정보 없음'}</strong> </div>
+                        <hr style="margin: 10px 0;">
+                        <p style="text-align: center; font-size: 0.9em;">
+                            객실 서비스 관리자 페이지(주문내역)를 확인하세요!<br>
+                            확인을 누르시면 주문 내역 페이지로 이동합니다.
+                        </p>
+                    `;
+                            alertContent.innerHTML = content;
+
+                            // 모달 인스턴스 가져오기/생성 및 표시
+                            let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (!modalInstance) {
+                                modalInstance = new bootstrap.Modal(modalElement);
+                            }
+                            modalInstance.show();
+
+                            // 확인 버튼 이벤트 리스너 (중복 방지 및 1회 실행)
+                            const newConfirmBtn = confirmBtn.cloneNode(true);
+                            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                            newConfirmBtn.addEventListener("click", function () {
+                                window.location.href = "/roommenu/adminOrderList"; // 링크 확인
+                            }, { once: true });
+                            console.log("알림 모달 표시 완료");
+
+                        } else {
+                            console.warn("모달 관련 HTML 요소(orderAlertContent, orderAlertConfirmBtn, orderAlertModal)를 찾을 수 없습니다.");
+                        }
+
+                        // --- 2. /roommenu/list 페이지에서 드롭다운 목록 및 배지 업데이트 ---
+                        if (window.location.pathname.includes('/roommenu/list')) {
+                            console.log("'/roommenu/list' 페이지 감지, 알림 목록 및 배지 업데이트 시도");
+                            // 함수 존재 여부 확인 및 호출
+                            if (typeof addNotificationToList === 'function' && typeof updateNotificationBadge === 'function') {
+                                addNotificationToList(orderData); // 목록에 추가 (호텔 방 이름 포함됨)
+
+                                // 배지 숫자 업데이트 (현재 값 읽어서 +1)
+                                const currentBadge = document.getElementById('notification-badge');
+                                let currentCount = 0;
+                                if (currentBadge && currentBadge.style.display !== 'none') {
+                                    currentCount = parseInt(currentBadge.textContent) || 0;
+                                }
+                                updateNotificationBadge(currentCount + 1); // 1 증가시켜 업데이트
+                                console.log("'/roommenu/list' 페이지 UI 업데이트 완료");
+
+                            } else {
+                                console.warn("알림 처리 함수(addNotificationToList, updateNotificationBadge)를 찾을 수 없습니다.");
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error("❌ WebSocket 메시지 처리 오류", error);
+                    }
+                });
+
+            }, function (error) {
+                console.error("❌ WebSocket 연결 실패", error);
+                // 필요 시 재연결 로직 추가
+                // 예: setTimeout(connectWebSocket, 5000); // 5초 후 재시도
+            });
+
+        }); // End DOMContentLoaded
 
 
     </script>
