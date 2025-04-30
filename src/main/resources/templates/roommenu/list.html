@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>룸 서비스 메뉴 목록</title>
+    <title>객실 서비스 목록</title>
     <style>
         .table td,
         .table th {
@@ -48,7 +48,7 @@
         <div class="position-relative mb-4" style="min-height: 40px;">
             <!-- 가운데 정렬된 타이틀 -->
             <h2 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
-                th:text="#{roomServiceListTitle}" >룸 서비스 메뉴 목록</h2>
+                th:text="#{roomServiceListTitle}" >객실 서비스 목록</h2>
 
             <!-- 오른쪽 상단에 붙은 번역 영역 -->
             <div class="position-absolute top-0 end-0">
@@ -100,6 +100,7 @@
                     <option value="양식" th:selected="${category == '양식'}" th:text="#{category.yangsik}">양식</option>
                     <option value="중식" th:selected="${category == '중식'}" th:text="#{category.jungsik}">중식</option>
                     <option value="디저트" th:selected="${category == '디저트'}" th:text="#{category.appetizer}">디저트</option>
+                    <option value="디저트" th:selected="${category == '룸케어'}">룸케어</option>
                 </select>
             </div>
 
@@ -158,10 +159,10 @@
                 <table class="table table-bordered text-company mb-0">
                     <thead class="table-light text-center">
                     <tr>
-                        <th scope="col" th:text="#{table.header.number}" style="width: 5%;">#</th>
+                        <th scope="col" th:text="#{table.header.number}" style="width: 5%;"></th>
                         <th scope="col" th:text="#{table.header.image}" style="width: 10%;">이미지</th>
                         <th scope="col" th:text="#{table.header.category}" style="width: 12%;">카테고리</th>
-                        <th scope="col" th:text="#{table.header.name}" style="width: 22%;">메뉴이름</th>
+                        <th scope="col" th:text="#{table.header.name}" style="width: 22%;">상품명</th>
                         <th scope="col" th:text="#{table.header.price}" style="width: 12%;">상품가격</th>
                         <th scope="col" th:text="#{table.header.amount}" style="width: 12%;">재고량</th>
                         <th scope="col" th:text="#{table.header.status}" style="width: 12%;">판매여부</th>
