@@ -25,10 +25,12 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class MailService {
 
+    //라이브러리 java mailsender
     private final JavaMailSender mailSender;
 
+    //application.properties 설정 발송 메일정보랑 동일
+    //보내는 메일 주소
     private final String senderEmail = "kimbbuhhwan@gmail.com";
-
 
 
 
@@ -50,6 +52,7 @@ public class MailService {
             // 포맷팅 예쁘게
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+            //발송 메일 디자인 수정 여기서 하면 됨
             String htmlContent =
                     "<div style='max-width:600px; margin:0 auto; font-family:Arial, sans-serif; color:#333; border:1px solid #ddd; border-radius:8px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.1);'>"
                             + "<div style='background-color:#004080; color:white; padding:20px;'>"
@@ -79,10 +82,10 @@ public class MailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setTo(toEmail);
-            helper.setSubject("호텔 예약 비밀번호 안내");
-            helper.setFrom(senderEmail);
-            helper.setText(htmlContent, true);
+            helper.setTo(toEmail);  //받는 사람 메일 주소
+            helper.setSubject("호텔 예약 비밀번호 안내"); //메이 제목
+            helper.setFrom(senderEmail);    //보내는 사람 메일 주소
+            helper.setText(htmlContent, true);  //디자인 한거 여기서 set
 
             mailSender.send(message);
             log.info("✅ 메일 발송 성공 - 수신자: {}", toEmail);
