@@ -52,6 +52,16 @@
             color: #888; /* 작은 텍스트 색상 */
             font-size: 0.8em; /* 작은 텍스트 크기 */
         }
+        .back-to-list-btn {
+            background-color: #ddd;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 117.25px;
+            height: 38px;
+        }
 
 
     </style>
@@ -75,7 +85,8 @@
                 🎉 이벤트 쿠폰 받기 (15% 할인) <br><small>최대 3개</small>
             </button>
         </div> <div class="card-footer text-center">
-        <button type="button" class="btn btn-secondary" onclick="fetchAndDisplayMyCoupons()">내 쿠폰 보기</button>
+        <button type="button" class="btn btn-primary" onclick="fetchAndDisplayMyCoupons()">내 쿠폰 보기</button>
+        <button class="back-to-list-btn" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
     </div>
 
     </div> <div id="myCouponsSection" class="card mt-4" style="display: none;">
