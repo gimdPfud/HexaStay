@@ -56,6 +56,28 @@ public class RoomServiceImpl {
     private final ModelMapper modelMapper = new ModelMapper();
 
 
+    //메일 재발송용 서비스 로직
+    @Transactional
+    public void resendRoomReservationMail(Long roomNum) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 Room을 찾을 수 없습니다."));
+
+        Member member = room.getMember();
+        HotelRoom hotelRoom = room.getHotelRoom();
+
+        // 필드만 추출해서 넘김 - mailservice 에 각각의 파라미터로 받는 로직이 구성되어 있음
+        mailService.sendRoomReservationEmailpa(
+                member.getMemberEmail(),
+                member.getMemberName(),
+                hotelRoom.getHotelRoomName(),
+                room.getCheckInDate(),
+                room.getCheckOutDate(),
+                room.getRoomPassword(),
+                hotelRoom.getHotelRoomNum()
+        );
+    }
+
+
     //hotelroom.hotelroomStatus 상태 즉 checkin , checkout 상태에 따른 list page
     public Page<RoomDTO> findRoomsByHotelRoomStatus(String status, Pageable pageable) {
         Page<Room> roomPage = roomRepository.findByHotelRoomStatus(status, pageable);
