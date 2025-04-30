@@ -26,7 +26,7 @@
         <!-- 검색 폼 -->
         <form action="/admin/list" method="post" class="row g-3 align-items-end">
             <div class="col-md-3" style="width: 20%;">
-                <select name="type" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                <select name="type" class="form-select">
                     <option value="">검색 조건</option>
                     <option value="adminName" th:selected="${type} == 'adminName'">이름</option>
                     <option value="adminEmployeeNum" th:selected="${type} == 'adminEmployeeNum'">사번</option>
@@ -38,15 +38,14 @@
             <div class="col-md-4" style="width: 60%;">
                 <input name="keyword" type="text" class="form-control"
                        placeholder="검색어 입력"
-                       style="height: 40px; font-size: 0.9rem;"
                        th:value="${keyword}">
             </div>
 
             <div class="col-md-2 d-flex gap-2" style="width: 20%;">
-                <button type="submit" class="btn btn-primary w-50" style="height: 40px; font-size: 0.9rem;">
+                <button type="submit" class="btn btn-primary w-50">
                     검색
                 </button>
-                <a href="/admin/list" class="btn btn-secondary w-50" style="height: 40px; font-size: 0.9rem;">
+                <a href="/admin/list" class="btn btn-secondary w-50">
                     전체
                 </a>
             </div>
