@@ -15,11 +15,6 @@
         body {
             margin: 0;
             color: #000000;
-            background-image: url('/background/메인배경.png'); /* <- 여기 추가 */
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             font: 600 16px/18px 'Open Sans', sans-serif;
             text-align: center;
             display: flex;
@@ -119,7 +114,7 @@
             height: 60px;
             color: #fff;
             border-radius: 5px;
-            padding: 10px 25px;
+            padding: 20px 25px;
             font-family: 'Lato', sans-serif;
             font-size: 16px;
             font-weight: 900;
@@ -136,6 +131,7 @@
             outline: none;
             border: 1px solid #ba6;
             text-align: center;
+            margin: 6px;
         }
         .custom-btn:active{
             -webkit-transform: translateY(2px);
@@ -144,21 +140,17 @@
         .btn-1{
             background: -webkit-gradient(linear, left top, left bottom, from(#a95), to(#fea));
             margin-top: 80px;
-        }
-        .btn-2{
-            border-color: #7c7c7c;
-            background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.25)), to(#e6e6e6));
-        }
+        }.btn-2{
+             background: -webkit-gradient(linear, left top, left bottom, from(#a95), to(#fea));
+
+         }
         .btn-3{
-            border-color: #D9A3A9;
-            background: -webkit-gradient(linear, left top, left bottom, from(#D9A3A9), to(#FFE6E9));
+            background: -webkit-gradient(linear, left top, left bottom, from(#a95), to(#fea));
+
         }
         .btn-4{
-            box-shadow: inset 0px 1px 0px rgba(255,255,255,.8),0px 1px 3px rgba(0,0,0,0.3);
-            border-color: #111;
-            color: #555;
-            text-shadow: -1px -1px 1px rgba(0,0,0,1);
-            background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#333));
+            background: -webkit-gradient(linear, left top, left bottom, from(#a95), to(#fea));
+
         }
 
         @font-face {
@@ -167,11 +159,22 @@
             font-weight: normal;
             font-style: normal;
         }
+        .logo-center {
+            position: absolute;
+            top: 130px;     /* 원하는 위치 조정 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
 
     </style>
 </head>
 <body>
         <div class="container menu-container">
+            <span class="navbar-brand logo-center text-center">
+                <img src="/images/메인로고.png" alt="HexaStay 로고로" height="75">
+            </span>
             <a href="/roommenu/orderpage" class="custom-btn btn-1" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
             <a href="/member/store/list" class="custom-btn btn-2" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
             <a href="/roomcare/insert" class="custom-btn btn-3" th:text="#{main.roomCare}"><span>객실 케어</span></a>
