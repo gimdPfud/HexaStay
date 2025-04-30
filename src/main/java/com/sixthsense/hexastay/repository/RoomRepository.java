@@ -30,17 +30,25 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     Page<Room> findAll(Pageable pageable);
 
 
-    // 0430 - 작성요
     // hotelRoomNum 기준으로 연결된 member 리스트로 가져오는 repository  가져오기
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
     List<Room> findByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
-    //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
-    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.roomStatus = 'checkin'")
+    //최신순으로 정렬 하는 repository리 로직
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
+    List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
 
-    //상태 비교 하기
+    // hotelRoomNum 기준으로 연결된 member들만 가져오기
+    @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
+    Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
+    //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
     Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
 
@@ -79,18 +87,11 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     // 날짜 범위로 정산용 데이터 조회
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
-            List<Long> hotelRoomNums, 
-            LocalDateTime startDate, 
-            LocalDateTime endDate, 
+            List<Long> hotelRoomNums,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
             Pageable pageable);
 
     // 체크인, 체크아웃에 따라 장바구니 로직에 추가할 것을 감별
     Optional<Room> findByMemberAndCheckOutDateIsNull(Member member);
-
-    List<Room> findByMember_MemberEmail(String email);
-
-
-
 }
-
-
