@@ -89,24 +89,24 @@
                                                     <strong style="color: #f75b5b;">할인 적용 금액:</strong>
                                                     ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
                                                 </span>
+
+                                                <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시 -->
+                                                <div class="mt-2" th:if="${order.orderItemList.size() > 1}">
+                                                    <small th:text="'외 ' + (${order.orderItemList.size()} - 1) + '건 추가 주문됨'"></small>
+                                                    <button type="button" class="btn btn-dark btn-sm px-2 py-1 ms-2" style="font-size: 0.8rem; line-height: 1;" data-bs-toggle="modal"
+                                                            th:data-bs-target="'#orderModal-' + ${order.roomMenuOrderNum}">
+                                                        상세보기
+                                                    </button>
+                                                </div>
+                                                <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시  끝-->
                                                 </div>
                                             </li>
-
                                         </ul>
 
-                                        <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시 -->
-                                        <div class="mt-2" th:if="${order.orderItemList.size() > 1}">
-                                            <small th:text="'외 ' + (${order.orderItemList.size()} - 1) + '건 추가 주문됨'"></small>
-                                            <button type="button" class="btn btn-link" data-bs-toggle="modal"
-                                                    th:data-bs-target="'#orderModal-' + ${order.roomMenuOrderNum}">
-                                                상세보기
-                                            </button>
-                                        </div>
-                                        <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시  끝-->
 
                                         <!-- 주문 상세 모달창 (요청사항 제거, 최종 총 금액 추가) -->
                                         <div class="modal fade" th:id="'orderModal-' + ${order.roomMenuOrderNum}" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog" style="margin-top: 100px;">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="orderModalLabel">주문 상세 정보</h5>
@@ -117,7 +117,7 @@
                                                             <!-- 주문 항목 목록 전체 출력 (요청사항은 생략) -->
                                                             <li class="list-group-item" th:each="item : ${order.orderItemList}">
                                                                 <div class="d-flex align-items-center mb-1">
-                                                                    <strong class="me-2" th:text="#{orderList.menuName}">메뉴 이름:</strong>
+                                                                    <strong class="me-2" th:text="#{orderList.menuName}">메뉴명:</strong>
                                                                     <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
                                                                 </div>
 
@@ -130,25 +130,28 @@
                                                                     <strong class="me-2" th:text="#{orderList.quantity}">수량:</strong>
                                                                     <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                                                                 </div>
-                                                                <div class="d-flex align-items-center">
+                                                                <div class="d-flex align-items-center mb-1">
                                                                     <strong class="me-2" th:text="#{orderList.totalPrice}">총 가격:</strong>
-                                                                    <span class="flex-grow-1"></span>
                                                                     <strong>₩<span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 3, 'COMMA')}">아이템 총 금액</span></strong>
                                                                 </div>
                                                             </li>
                                                         </ul>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
-                                                        <div class="me-auto">
-                                                            <strong>총 주문 금액:</strong> ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span><br>
-                                                            <span th:if="${order.discountedPrice != null}">
-                                                        <strong style="color: #f75b5b;">할인 적용 후 금액:</strong>
-                                                        ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
-                                                        </span>
+
+                                                        <div class="modal-footer">
+                                                            <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
+                                                            <div class="me-auto" style="font-size: 1.1rem;">
+                                                                <strong>총 주문 금액:</strong> ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span><br>
+                                                                <span th:if="${order.discountedPrice != null}">
+                                                                <strong style="color: #f75b5b;">할인 적용 후 금액:</strong>
+                                                                ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+                                                                </span>
+                                                            </div>
+                                                            <div class="text-center mt-5 justify-content-center">
+                                                                <button type="button" class="btn btn-secondary mx-auto" data-bs-dismiss="modal">닫기</button>
+                                                            </div>
                                                         </div>
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </div>
