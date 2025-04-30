@@ -4,7 +4,12 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>룸서비스 메뉴 등록</title>
+    <title>객실 서비스 등록</title>
+    <style>
+        .table td, .table th {
+            font-weight: normal;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
@@ -13,12 +18,11 @@
     <input type="hidden" id="optionListJson" name="optionListJson">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">룸서비스 메뉴 등록</h2>
+        <h2 class="fw-bold mb-4 text-center">객실 서비스 등록</h2>
+        <div class="container p-4" style="max-width: 700px;">
 
-    <!-- 메뉴 등록/수정 폼 -->
-    <form action="/roommenu/insert" method="post" enctype="multipart/form-data">
-        <div class="container p-4" style="max-width: 500px;">
-
+        <!-- 메뉴 등록/수정 폼 -->
+        <form action="/roommenu/insert" method="post" enctype="multipart/form-data">
             <!-- 이미지 파일 -->
             <div class="mb-3 user-box text-center">
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
@@ -32,7 +36,19 @@
             </div> <!-- 이미지 파일 끝 -->
 
             <div class="mb-3">
-                <label for="roomMenuName" class="form-label">메뉴명</label>
+                <label for="roomMenuCategory" class="form-label">카테고리</label>
+                <select class="form-select" id="roomMenuCategory" name="roomMenuCategory">
+                    <option value="" disabled selected>카테고리 선택</option> <!-- 기본값을 빈 값으로 설정 -->
+                    <option value="한식">한식</option>
+                    <option value="양식">양식</option>
+                    <option value="중식">중식</option>
+                    <option value="디저트">디저트</option>
+                    <option value="룸케어">룸케어</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="roomMenuName" class="form-label">상품명</label>
                 <input type="text" class="form-control" id="roomMenuName" name="roomMenuName" required>
             </div>
 
@@ -51,16 +67,25 @@
                 <textarea class="form-control" id="roomMenuContent" name="roomMenuContent" rows="3" required></textarea>
             </div>
 
-            <div class="mb-3">
-                <label for="roomMenuCategory" class="form-label">카테고리</label>
-                <select class="form-select" id="roomMenuCategory" name="roomMenuCategory">
-                    <option value="" disabled selected>카테고리 선택</option> <!-- 기본값을 빈 값으로 설정 -->
-                    <option value="한식">한식</option>
-                    <option value="양식">양식</option>
-                    <option value="중식">중식</option>
-                    <option value="디저트">디저트</option>
-                    <option value="룸케어">룸케어</option>
-                </select>
+            <div class="mb-1">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#optionModal">
+                    옵션 추가
+                </button>
+            </div>
+
+            <div class="w-100">
+                <table class="table table-bordered text-center" id="optionTable">
+                    <thead>
+                    <tr>
+                        <th>옵션 이름</th>
+                        <th>가격</th>
+                        <th>재고 수량</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- JS로 동적으로 채워질 영역 -->
+                    </tbody>
+                </table>
             </div>
 
             <div class="mb-3">
@@ -71,78 +96,50 @@
                 </select>
             </div>
 
-            <!-- 다국어 체크 여부? -->
+            <!-- 다국어 체크 여부 -->
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="supportsMultilang" name="supportsMultilang" value="true">
                 <label class="form-check-label" for="supportsMultilang">이 메뉴는 다국어를 지원해야 합니다.</label>
             </div>
-        </div>
 
-        <!-- 옵션 추가하기 -->
+            <div class="d-flex justify-content-center gap-3">
+                <div id="optionContainer"></div> <!-- 옵션 컨테이너 불러오기 -->
+                <button type="submit" class="btn btn-primary">등록</button>
+                <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">옵션</label><br>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#optionModal">
-                옵션 추가
-            </button>
-        </div>
-
-        <div class="container mt-4">
-            <h5>옵션 목록</h5>
-            <table class="table table-bordered" id="optionTable">
-                <thead>
-                <tr>
-                    <th>옵션 이름</th>
-                    <th>가격</th>
-                    <th>재고 수량</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- JS로 동적으로 채워질 영역 -->
-                </tbody>
-            </table>
-        </div>
-
-
-        <div class="d-flex justify-content-center gap-3">
-            <div id="optionContainer"></div> <!-- 옵션 컨테이너 불러오기 -->
-            <button type="submit" class="btn btn-primary">등록</button>
-            <a th:href="@{/roommenu/list}" class="btn btn-danger">취소</a>
-        </div>
-
-    </form>
-
-        <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- 폼 제거 -->
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="optionModalLabel">옵션 추가</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">옵션 이름</label>
-                            <input type="text" class="form-control" id="optionName">
+            <div class="modal fade" id="optionModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- 폼 제거 -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="optionModalLabel">옵션 추가</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="mb-3">
-                            <label for="optionStock" class="form-label">재고 수량</label>
-                            <input type="number" class="form-control" id="optionStock" placeholder="옵션 재고 수량 입력">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">옵션 이름</label>
+                                <input type="text" class="form-control" id="optionName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="optionStock" class="form-label">재고 수량</label>
+                                <input type="number" class="form-control" id="optionStock">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">옵션 가격</label>
+                                <input type="number" class="form-control" id="optionPrice">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">옵션 가격</label>
-                            <input type="number" class="form-control" id="optionPrice">
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                            <button type="button" id="addOptionBtn" class="btn btn-primary">등록</button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" id="addOptionBtn" class="btn btn-primary">등록</button>
                     </div>
                 </div>
             </div>
+        </form>
         </div>
-
-</div>
+    </div>
 
     <script>
         // 프로필 사진
@@ -187,10 +184,10 @@
 
         document.getElementById("addOptionBtn").addEventListener("click", function () {
             const optionName = document.getElementById("optionName").value.trim();
-            const optionPrice = document.getElementById("optionPrice").value.trim();
             const optionStock = document.getElementById("optionStock").value.trim();
+            const optionPrice = document.getElementById("optionPrice").value.trim();
 
-            if (!optionName || !optionPrice || !optionStock) {
+            if (!optionName || !optionStock || !optionPrice) {
                 alert("옵션 이름, 가격, 재고를 모두 입력해주세요.");
                 return;
             }
@@ -210,19 +207,19 @@
             nameInput.name = `options[${optionIndex}].roomMenuOptionName`;
             nameInput.value = optionName;
 
-            const priceInput = document.createElement("input");
-            priceInput.type = "hidden";
-            priceInput.name = `options[${optionIndex}].roomMenuOptionPrice`;
-            priceInput.value = optionPrice;
-
             const stockInput = document.createElement("input"); // 재고 input 추가
             stockInput.type = "hidden";
             stockInput.name = `options[${optionIndex}].roomMenuOptionStock`;
             stockInput.value = optionStock;
 
+            const priceInput = document.createElement("input");
+            priceInput.type = "hidden";
+            priceInput.name = `options[${optionIndex}].roomMenuOptionPrice`;
+            priceInput.value = optionPrice;
+
             form.appendChild(nameInput);
-            form.appendChild(priceInput);
             form.appendChild(stockInput); // 재고 추가
+            form.appendChild(priceInput);
 
             optionIndex++;
 
@@ -231,14 +228,11 @@
 
             // 입력값 초기화
             document.getElementById("optionName").value = "";
-            document.getElementById("optionPrice").value = "";
             document.getElementById("optionStock").value = ""; // 재고 초기화
+
+            document.getElementById("optionPrice").value = "";
         });
-
-
     </script>
 </div>
-
-
 </body>
 </html>
