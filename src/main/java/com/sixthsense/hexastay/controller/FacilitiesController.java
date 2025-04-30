@@ -36,7 +36,6 @@ public class FacilitiesController {
      * */
     @GetMapping("/facility/insert/{companyNum}")
     public String fsinsert(@PathVariable Long companyNum, Model model){
-        //todo 시설 서비스 등록 (관리자용)
         try {
             model.addAttribute("company", companyService.companyRead(companyNum).getCompanyName());
             model.addAttribute("companyNum", companyService.companyRead(companyNum).getCompanyNum());
@@ -48,32 +47,45 @@ public class FacilitiesController {
     }
     @PostMapping("/facility/insert")
     public String fsinsertPost(FacilitiesDTO dto, @RequestParam Long companyNum) throws IOException {
-        //todo 시설 서비스 등록 (관리자용)
         try {
-
             dto.setCompanyDTO(companyService.companyRead(companyNum));
             Long result = fsService.fsInsert(dto);
             return "redirect:/facility/list/"+result;
-
         } catch (Exception e){
-
             log.info("예외발생");
             return "redirect:/facility/insert/"+companyNum;
-
         }
     }
 
     @GetMapping("/facility/list/{companyNum}")
     public String fslist(@PathVariable Long companyNum, Model model){
-        //todo 시설 서비스 목록 (관리자용)
+        model.addAttribute("list",fsService.list(companyNum));
         return "facilities/list";
     }
 
     @GetMapping("/facility/read/{fsNum}")
     public String fsread(@PathVariable Long fsNum, Model model){
-        //todo 시설 서비스 읽기 (관리자용)
-
+        model.addAttribute("data",fsService.read(fsNum));
         return "facilities/read";
+    }
+
+    @PostMapping("/facility/activate/{num}")
+    public String fsYesPost(@PathVariable Long num, Model model){
+        try {
+            num = fsService.fsYes(num);
+        } catch (Exception e) {
+            model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
+        }
+        return "redirect:/facility/read/"+num;
+    }
+    @PostMapping("/facility/deactivate/{num}")
+    public String fsNoPost(@PathVariable Long num, Model model){
+        try {
+            num = fsService.fsNo(num);
+        } catch (Exception e) {
+            model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
+        }
+        return "redirect:/facility/read/"+num;
     }
 
     @GetMapping("/facility/modify/{fsNum}")

@@ -12,7 +12,7 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
 
-        <form id="insertForm" action="/admin/fs/insert" method="post" enctype="multipart/form-data">
+        <form id="insertForm" action="/facility/insert" method="post" enctype="multipart/form-data">
             <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-3 user-box text-center">
@@ -55,7 +55,7 @@
                 </div>
                 <div class="d-flex justify-content-center gap-3">
                     <button type="submit" class="btn btn-success" >등록</button>
-                    <a th:href="@{/admin/fs/list}" class="btn btn-danger">취소</a>
+                    <a th:href="@{/facility/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
         </form>
