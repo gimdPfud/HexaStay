@@ -46,18 +46,31 @@
             align-items: center;
             margin: 10px;
         }
-        
+
         .date-range-form input[type="date"] {
+            width: 160px; /* 너비 추가 */
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ced4da;
             margin-right: 8px;
-            font-size: 0.9rem;
         }
-        
+
         .date-range-form button {
+            height: 38px; /* 버튼 높이를 input과 맞춤 */
             margin-left: 8px;
-            font-size: 0.9rem;
+        }
+
+        /* 엑셀 다운로드 버튼 스타일 */
+        .excel-btn {
+            background-color: #1D6F42;
+            color: white;
+            border: none;
+            height: 40px;
+        }
+
+        .excel-btn:hover {
+            background-color: #145a35;
+            color: white;
         }
     </style>
 </head>
@@ -71,40 +84,40 @@
         <div class="row align-items-center mb-4 gx-3 gy-2">
             <!-- 필터들 -->
             <div class=" d-flex flex-wrap align-items-center gap-2">
-                <select class="form-select" id="hqSelect" style="width: 200px; height: 40px; font-size: 0.9rem;">
+                <select class="form-select" id="hqSelect" style="width: 200px";>
                     <option selected>본사 선택</option>
                     <option>서울본사</option>
                     <option>부산본사</option>
                 </select>
-                <select class="form-select" id="branchSelect" style="width: 200px; height: 40px; font-size: 0.9rem;">
+                <select class="form-select" id="branchSelect" style="width: 200px";>
                     <option selected>지사 선택</option>
                     <option>중부지사</option>
                     <option>남부지사</option>
                 </select>
-                <select class="form-select" id="officeSelect" style="width: 200px; height: 40px; font-size: 0.9rem;">
+                <select class="form-select" id="officeSelect" style="width: 200px";>
                     <option selected>지점 선택</option>
                     <option>강남지점</option>
                     <option>대구지점</option>
                 </select>
-                <select class="form-select" id="storeSelect" style="width: 200px; height: 40px; font-size: 0.9rem;">
+                <select class="form-select" id="storeSelect" style="width: 200px";>
                     <option selected>스토어 선택</option>
                     <option>스토어 A</option>
                     <option>스토어 B</option>
                 </select>
                 <!-- 다운로드 버튼 -->
                 <div class="col d-flex justify-content-center">
-                    <button class="btn btn-success download-btn" style="width: 160px; height: 40px; font-size: 0.9rem;">
-                        Excel Download
+                    <button type="button" id="excelDownloadBtn" class="btn excel-btn ">
+                        <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
                     </button>
                 </div>
 
                 <!-- 날짜 선택 폼 추가 -->
                 <div class="date-range-form">
-                    <input type="date" id="startDate" name="startDate" class="form-control" style="width: 180px; height: 40px; font-size: 0.9rem;">
+                    <input type="date" id="startDate" name="startDate" class="form-control">
                     <span style="margin: 0 8px;">~</span>
-                    <input type="date" id="endDate" name="endDate" class="form-control" style="width: 180px; height: 40px; font-size: 0.9rem;">
-                    <button id="dateSearchBtn" class="btn btn-primary" style="height: 40px; width: 120px; font-size: 0.9rem;">날짜로 조회</button>
-                    <button id="resetDateBtn" class="btn btn-secondary" style="height: 40px; width: 120px; font-size: 0.9rem;">전체 조회</button>
+                    <input type="date" id="endDate" name="endDate" class="form-control">
+                    <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
+                    <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
                 </div>
             </div>
 

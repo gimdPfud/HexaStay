@@ -43,7 +43,6 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-
     <div class="container-fluid mt-4 w-100 bg-light">
         <div class="position-relative mb-4" style="min-height: 40px;">
             <h2 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
@@ -95,7 +94,7 @@
         <form action="/roommenu/list" class="d-flex flex-wrap align-items-end gap-2 mb-4 w-100" method="get" style="margin-top: 40px;">
 
             <div class="flex-fill" style="width: 10%;">
-                <select name="type" id="search-option" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                <select name="type" id="search-option" class="form-select">
                     <option selected>검색 조건</option>
                     <option value="S" th:selected="${type == 'S'}" th:text="#{searchOption.name}">이름</option>
                     <option value="P" th:selected="${type == 'P'}" th:text="#{searchOption.price}">가격</option>
@@ -106,7 +105,7 @@
             </div>
 
             <div class="flex-fill" style="width: 10%;">
-                <select name="category" id="category-select" class="form-select" style="height: 40px; font-size: 0.9rem;">
+                <select name="category" id="category-select" class="form-select">
                     <option selected> 카테고리 선택</option>
                     <option value="" th:text="#{category.all}">전체 카테고리</option>
                     <option value="한식" th:selected="${category == '한식'}" th:text="#{category.hansik}">한식</option>
@@ -118,11 +117,11 @@
             </div>
 
             <div class="flex-grow-1" style="width: 40%;">
-                <input type="text" name="keyword" id="search-input" class="form-control" style="height: 40px; font-size: 0.9rem;" placeholder="검색어 입력">
+                <input type="text" name="keyword" id="search-input" class="form-control" placeholder="검색어 입력">
             </div>
 
             <div class="d-flex flex-column justify-content-end gap-1">
-                <div class="d-flex gap-1 flex-wrap" style="height: 40px; font-size: 0.9rem;">
+                <div class="d-flex gap-1 flex-wrap">
                     <button type="submit" class="btn btn-primary" th:text="#{searchButton}">검색</button>
                     <a href="/roommenu/insert" class="btn btn-success" th:text="#{registerButton}">등록</a>
                     <a href="/roommenu/orderpage" class="btn btn-outline-danger" th:text="#{customerButton}">고객용</a>
