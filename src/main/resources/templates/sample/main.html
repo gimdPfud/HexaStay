@@ -2,61 +2,58 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobilemenu.html}">
+      >
 <head>
     <meta charset="UTF-8">
     <title>호텔 서비스 메뉴</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/roommenu.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap" rel="stylesheet">
     <style>
-        /* 기존 CSS */
         body {
             margin: 0;
             color: #000000;
-            background: #000000;
+            background-image: url('/background/메인배경.png'); /* <- 여기 추가 */
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             font: 600 16px/18px 'Open Sans', sans-serif;
             text-align: center;
-        }
-        .menu-container {
-            text-align: center;
-        }
-        .menu-btn {
-            width: 250px;
-            height: 60px;
-            font-size: 20px;
-            margin: 15px;
-        }
-        .card {
-            width: 100%;
-            margin: auto;
-            max-width: 400px;
-            min-height: 400px;
-            position: relative;
-            background: #dddddd;
-            box-shadow: 0 12px 15px 0 rgba(0,0,0,.24), 0 17px 50px 0 rgba(0,0,0,.19);
-            border-radius: 10px;
-            padding: 40px 30px;
-            margin-top: 100px;
-            text-align: center;
-        }
-        @media (max-width: 768px) {
-            form.lang-selector {
-                width: 80% !important;
-            }
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        /* 커스텀 드롭다운 */
+        .menu-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+        .card {
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+            margin-top: 0;
+        }
+
         .custom-dropdown {
             position: relative;
             display: inline-block;
             width: 200px;
             font-family: 'Open Sans', sans-serif;
             font-size: 16px;
-            margin-left: 10px;
+            margin-top: 30px;
         }
-        /* 현재 선택된 옵션 영역 */
+
         .custom-dropdown .selected-option {
             border: 1px solid #ccc;
             background: #fff;
@@ -66,7 +63,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        /* 옵션 목록 */
+
         .custom-dropdown .options {
             list-style-type: none;
             padding: 0;
@@ -81,21 +78,22 @@
             display: none;
             z-index: 100;
         }
+
         .custom-dropdown .options li {
             padding: 8px 12px;
             display: flex;
             align-items: center;
             cursor: pointer;
         }
+
         .custom-dropdown .options li:hover {
             background: #f0f0f0;
         }
 
-        /* 국기 아이콘 스타일 */
         .flag {
             width: 24px;
             height: 18px;
-            background-image: url('/roommenu/flags.png'); /* 실제 이미지 파일 경로 */
+            background-image: url('/roommenu/flags.png');
             background-repeat: no-repeat;
             display: inline-block;
         }
@@ -103,33 +101,84 @@
         .flag-ja { background-position: -87px -178px; }
         .flag-en { background-position: -116px -352px; }
         .flag-cn { background-position: 0px -62px; }
+        button {
+            margin: 20px;
+            outline: none;
+        }
+        .custom-btn {
+            width: 130px;
+            height: 40px;
+            padding: 10px 25px;
+            border: 2px solid #000;
+            font-family: 'Lato', sans-serif;
+            font-weight: 500;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: inline-block;
+        }
+        .menu-btn {
+            background: #000;
+            color: #fff;
+            line-height: 42px;
+            padding: 0;
+            border: none;
+            
+        }
+        .menu-btn:hover {
+            background: transparent;
+            color: #000;
+            box-shadow:
+                    -7px -7px 20px 0px #fff9,
+                    -4px -4px 5px 0px #fff9,
+                    7px 7px 20px 0px #0002,
+                    4px 4px 5px 0px #0001;
+        }
+        .menu-btn:before,
+        .menu-btn:after{
+            content:'';
+            position:absolute;
+            top:0;
+            right:0;
+            height:2px;
+            width:0;
+            background: #000;
+            transition:400ms ease all;
+        }
+        .menu-btn:after{
+            right:inherit;
+            top:inherit;
+            left:0;
+            bottom:0;
+        }
+        .menu-btn:hover:before,
+        .menu-btn:hover:after{
+            width:100%;
+            transition:800ms ease all;
+        }
+        span{
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+        }
+
     </style>
 </head>
 <body>
-
-<div layout:fragment="contentorder">
-    <div class="card">
         <div class="container menu-container">
             <h2 class="mb-4" th:text="#{main.title}">호텔 서비스 메뉴</h2>
-            <div class="d-flex flex-column align-items-center">
-                <a href="/roommenu/orderpage" class="btn btn-primary d-flex justify-content-center align-items-center mb-3"
-                   style="height: 60px; width: 250px; font-size: 20px;" th:text="#{main.hotelFood}">호텔 음식 메뉴</a>
-                <a href="/member/store/list" class="btn btn-success d-flex justify-content-center align-items-center mb-3"
-                   style="height: 60px; width: 250px; font-size: 20px;" th:text="#{main.deliveryFood}">배달 음식 메뉴</a>
-                <a href="/roomcare/insert" class="btn btn-warning d-flex justify-content-center align-items-center mb-3"
-                   style="height: 60px; width: 250px; font-size: 20px;" th:text="#{main.roomCare}">룸 케어 서비스</a>
-                <a href="#" class="btn btn-info d-flex justify-content-center align-items-center mb-3"
-                   style="height: 60px; width: 250px; font-size: 20px;" th:text="#{main.facilityService}">시설 서비스</a>
-            </div>
+            <a href="/roommenu/orderpage" class="custom-btn menu-btn" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
+            <a href="/member/store/list" class="custom-btn menu-btn" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
+            <a href="/roomcare/insert" class="custom-btn menu-btn" th:text="#{main.roomCare}"><span>객실 케어 서비스</span></a>
+            <a href="#" class="custom-btn menu-btn" th:text="#{main.facilityService}"><span>시설 서비스</span></a>
 
-            <!-- 폼 내부 언어 선택 영역 -->
-            <form method="get" th:action="@{/main}" class="mb-3 mx-auto" style="width: 50%; display: flex; justify-content: center; margin-top: 30px;">
+            <form method="get" th:action="@{/main}" class="mx-auto" style="display: flex; justify-content: center;">
                 <input type="hidden" name="type" th:value="${type}" />
                 <input type="hidden" name="keyword" th:value="${keyword}" />
                 <input type="hidden" name="category" th:value="${category}" />
 
-                <!-- 기존의 select 대신 커스텀 드롭다운 -->
-                <!-- 기존의 select 대신 커스텀 드롭다운 -->
                 <div class="custom-dropdown" id="languageDropdown">
                     <div class="selected-option" tabindex="0">
                         <span class="flag flag-ko"></span>
@@ -154,18 +203,13 @@
                             <span th:text="#{main.language.chinese}">中國語</span>
                         </li>
                     </ul>
-                    <!-- 선택값 저장: 폼 제출 시 이 값이 전송됨 -->
-
                     <input type="hidden" name="lang" value="ko">
                 </div>
             </form>
         </div>
-    </div>
 
 
-    <!-- Bootstrap JS (옵션) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- 커스텀 드롭다운 JS -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const dropdown = document.getElementById('languageDropdown');
@@ -174,11 +218,6 @@
             const optionsList = optionsContainer.querySelectorAll('li');
             const hiddenInput = dropdown.querySelector('input[name="lang"]');
 
-            if (!dropdown || !selected) {
-                console.warn('드롭다운 또는 선택 요소를 찾을 수 없습니다.');
-                return;
-            }
-
             selected.addEventListener('click', (e) => {
                 e.stopPropagation();
                 optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
@@ -186,14 +225,11 @@
 
             optionsList.forEach(option => {
                 option.addEventListener('click', () => {
-                    // 선택한 옵션의 국기와 텍스트를 가져와서 업데이트
                     const flagHTML = option.querySelector('.flag').outerHTML;
                     const text = option.querySelector('span:nth-of-type(2)').textContent;
                     selected.innerHTML = flagHTML + '<span class="option-text">' + text + '</span><span>&#9662;</span>';
                     hiddenInput.value = option.getAttribute('data-value');
                     optionsContainer.style.display = 'none';
-
-                    // 선택 후 폼 자동 제출: 서버에 언어 변경 값을 전달하여 페이지 재렌더링
                     dropdown.closest('form').submit();
                 });
             });
@@ -214,7 +250,5 @@
             });
         });
     </script>
-</div>
-</div>
 </body>
 </html>
