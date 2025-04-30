@@ -272,6 +272,30 @@
 </div>
 
 
+<!-- 알람 모달 시작 -->
+<div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 주문 알림</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body" id="orderAlertContent">
+                <!-- JS로 채워짐 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="orderAlertConfirmBtn">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 알람 모달 실행 끝 -->
+
+<!-- WebSocket 관련 라이브러리 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<!-- 공통 웹소켓 알림 JS -->
+<script src="/js/order-alert.js"></script>
 
 <!-- 공통 스크립트 -->
 <script>
@@ -327,6 +351,54 @@
                     );
                 };
             });
+        });
+    });
+
+    /* 공통 알람 alert 창 */
+    document.addEventListener("DOMContentLoaded", function () {
+        const socket = new SockJS("/ws-order-alert");
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log("✅ 웹소켓 연결됨: ", frame);
+
+            stompClient.subscribe("/topic/new-order", function (message) {
+                try {
+                    const orderData = JSON.parse(message.body);
+                    console.log("📦 메시지 수신:", orderData);
+
+                    const content = `
+                        주문자: <strong><span class="math-inline">\{orderData\.memberEmail\}</strong\><br\>
+총 금액\: <strong\></span>{orderData.totalPrice}원</strong><br>
+                        관리자용 페이지를 확인하세요! 확인을 누르시면 관리자용 페이지로 갑니다.
+                    `;
+                    const alertContent = document.getElementById("orderAlertContent");
+                    const confirmBtn = document.getElementById("orderAlertConfirmBtn");
+
+                    // 현재 페이지에 모달이 있는 경우만 실행
+                    if (alertContent && confirmBtn) {
+                        alertContent.innerHTML = content;
+
+                        const modal = new bootstrap.Modal(document.getElementById("orderAlertModal"));
+                        modal.show();
+
+                        // 이벤트 리스너 중복 추가 방지
+                        const oldConfirmBtn = confirmBtn.cloneNode(true);
+                        confirmBtn.parentNode.replaceChild(oldConfirmBtn, confirmBtn);
+                        const newConfirmBtn = document.getElementById("orderAlertConfirmBtn"); // 새 버튼 다시 가져오기
+
+                        newConfirmBtn.addEventListener("click", function () {
+                            window.location.href = "/roommenu/adminOrderList";
+                        });
+                    }
+
+                } catch (error) {
+                    console.error("❌ 메시지 처리 오류", error);
+                }
+            });
+
+        }, function (error) {
+            console.error("❌ 웹소켓 연결 실패", error);
         });
     });
 
