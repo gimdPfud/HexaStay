@@ -29,6 +29,12 @@
         <!-- 주문 리스트 -->
         <div class="row g-3">
 
+            <!-- 주문 없음 -->
+            <div th:if="${(list == null or list.empty) and storeNum != null}"
+                 class="col-12 text-center py-5 bg-light border text-muted rounded">
+                <p class="mb-0">주문 내역이 없습니다.</p>
+            </div>
+
             <!-- 주문 항목 -->
             <div th:each="orderDTO : ${list}" th:unless="${list == null or list.empty}"
                  class="col-12">
@@ -41,10 +47,10 @@
                             <span class="badge bg-primary" th:text="${orderDTO.orderstoreStatus}" style="font-weight: normal;"></span>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-sm btn-outline-danger me-2"
+                            <button type="button" class="btn btn-sm btn-danger me-2"
                                     th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}"
                                     th:onclick="|ordercancel(${orderDTO.orderstoreNum})|">주문취소</button>
-                            <button type="button" class="btn btn-sm btn-outline-success"
+                            <button type="button" class="btn btn-sm btn-success"
                                     th:disabled="${orderDTO.orderstoreStatus.equals('end')}"
                                     th:onclick="|orderEnd(${orderDTO.orderstoreNum})|">주문완료</button>
                         </div>
@@ -68,17 +74,12 @@
                         <!-- 룸번호, 주문일 -->
                         <div>
                             <strong>룸번호:</strong> <span th:text="${orderDTO.roomNum}"></span>
-                            <span class="ms-3"><strong>주문일:</strong> <span th:text="${orderDTO.createDate}"></span></span>
+                            <span class="ms-3"><strong>주문일:</strong>
+                            <span th:text="${#temporals.format(orderDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+                            </span>
                         </div>
                     </div>
-
                 </div>
-            </div>
-
-            <!-- 주문 없음 -->
-            <div th:if="${(list == null or list.empty) and storeNum != null}"
-                 class="col-12 text-center py-5 bg-light border text-muted rounded">
-                <p class="mb-0">주문 내역이 없습니다.</p>
             </div>
         </div>
     </div>
