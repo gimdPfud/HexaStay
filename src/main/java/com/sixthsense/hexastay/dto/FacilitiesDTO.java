@@ -30,4 +30,8 @@ public class FacilitiesDTO {
     private String fsPictureMeta;       //등록 이미지
     private MultipartFile fsPicture;    //이미지 경로
 
+    public FacilitiesDTO setCompanyDTO(CompanyDTO companyDTO) {
+        this.companyDTO = companyDTO;
+        return this;
+    }
 }

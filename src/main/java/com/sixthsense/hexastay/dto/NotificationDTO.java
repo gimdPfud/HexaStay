@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.dto;
 
+import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import lombok.*;
 
@@ -21,4 +22,6 @@ public class NotificationDTO {
     private Integer totalPrice; //토탈 금액
 
     private boolean isRead = false; // 기본값 false
+
+
 }

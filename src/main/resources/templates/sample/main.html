@@ -135,8 +135,7 @@
             </span>
             <a href="/roommenu/orderpage" class="btn btn-primary" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
             <a href="/member/store/list" class="btn btn-primary" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
-            <a href="/roomcare/insert" class="btn btn-primary" th:text="#{main.roomCare}"><span>객실 케어</span></a>
-            <a href="#" class="btn btn-primary" th:text="#{main.facilityService}"><span>근처 시설</span></a>
+            <a href="/fs/list" class="btn btn-primary" th:text="#{main.facilityService}"><span>시설</span></a>
 
             <form method="get" th:action="@{/main}" class="mx-auto" style="display: flex; justify-content: center;">
                 <input type="hidden" name="type" th:value="${type}" />
