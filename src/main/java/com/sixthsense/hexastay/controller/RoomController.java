@@ -8,6 +8,7 @@ import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
+import com.sixthsense.hexastay.service.impl.RoomServiceTest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +34,9 @@ import java.util.Map;
 public class RoomController {
 
     private final RoomServiceImpl roomServiceimpl;
+
+    //test용 서비스
+    private final RoomServiceTest roomServiceTest;
 
     private final HotelRoomService hotelRoomService;
 
@@ -255,45 +259,24 @@ public class RoomController {
     public String checkPassword(@RequestParam("roomPassword") String roomPassword,
                                 @PathVariable("hotelRoomNum") Long hotelRoomNum,
                                 RedirectAttributes redirectAttributes) {
-
         try {
-            Room rooms = roomServiceimpl.readRoomByHotelRoomNum(hotelRoomNum);// 이제 rooms를 받음
+            // ✅ 서비스에서 패스워드까지 검증해서 반환
+            Room room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
 
-            if (rooms.getRoomPassword().equals(roomPassword)) {
-                return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
-            } else {
-                redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
-                return "redirect:/qr/" + hotelRoomNum;
-            }
+            // ✅ 성공 → 메인으로 이동
+            return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
+
+        } catch (IllegalArgumentException e) {
+            // ❌ 비밀번호 불일치
+            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/qr/" + hotelRoomNum;
+
         } catch (EntityNotFoundException e) {
+            // ❌ 해당 호텔룸 없음
             redirectAttributes.addFlashAttribute("error", "호텔룸 정보를 찾을 수 없습니다.");
             return "redirect:/roomlist";
         }
     }
 
-    //Room 테이블에서 hotelRoomNum 을 가져 오는데 컬럼에 status 에서 'checkin' 벨류가 같은것만 가져옴
-//    @PostMapping("/qr/{hotelRoomNum}")
-//    public String checkPasswordStatus(@RequestParam("roomPassword") String roomPassword,
-//                                      @PathVariable("hotelRoomNum") Long hotelRoomNum,
-//                                      RedirectAttributes redirectAttributes) {
-//
-//        try {
-//            // 🔐 체크인 상태의 Room 중 비밀번호가 일치하는 Room만 반환
-////            Room room = roomServiceimpl.authenticateRoomByHotelRoomNumAndPassword(hotelRoomNum, roomPassword);
-//
-//            // 🔑 인증 성공 → main 페이지로 리다이렉트
-//            return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
-//
-//        } catch (IllegalArgumentException e) {
-//            // ❌ 비밀번호 틀림
-//            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
-//            return "redirect:/qr/" + hotelRoomNum;
-//
-//        } catch (EntityNotFoundException e) {
-//            // ❌ 해당 호텔룸 or 체크인 상태 room 없음
-//            redirectAttributes.addFlashAttribute("error", "해당 호텔룸 또는 체크인 상태의 룸이 없습니다.");
-//            return "redirect:/roomlist";
-//        }
-//    }
 
 }
