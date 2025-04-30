@@ -11,10 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log("📦 메시지 수신:", orderData);
 
                 const content = `
-                    주문자: <strong>${orderData.memberEmail}</strong><br>
-                    총 금액: <strong>${orderData.totalPrice}원</strong><br>
-                    관리자용 페이지를 확인하세요! 확인을 누르시면 관리자용 페이지로 갑니다.
-                `;
+                    <div style="text-align: center; color: #007bff; margin-bottom: 10px;">
+                        <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i> </div>
+                    <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 룸 서비스 주문 알림</h6> <div style="margin-bottom: 5px;">
+                         주문자: <strong>${orderData.memberEmail}</strong><br> 총 금액: <strong>${orderData.totalPrice}원</strong> </div>
+                    <hr style="margin: 10px 0;"> <p style="text-align: center; font-size: 0.9em;"> 관리자용 페이지를 확인하세요!<br>
+                        확인을 누르시면 관리자용 페이지로 이동합니다.
+                    </p>
+                    `;
                 const alertContent = document.getElementById("orderAlertContent");
                 const confirmBtn = document.getElementById("orderAlertConfirmBtn");
 
