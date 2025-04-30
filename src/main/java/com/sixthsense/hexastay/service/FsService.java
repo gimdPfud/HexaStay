@@ -36,7 +36,7 @@ public class FsService {
     public Long fsInsert(FacilitiesDTO dto) throws IOException {
         log.info("등록시작 "+dto);
         Facilities fs = modelMapper.map(dto,Facilities.class);
-        fs.setFsAmount(dto.getFsAmountMax());
+        fs.setFsAmount(0);
         fs = fsRepository.save(fs);
 
         log.info("1차저장 끝 "+fs);
@@ -65,8 +65,8 @@ public class FsService {
     public List<FacilitiesDTO> list (Long companyNum){
         List<Facilities> facilities = fsRepository.findByCompany_CompanyNum(companyNum);
         return facilities.stream().map((element) ->
-                modelMapper.map(element, FacilitiesDTO.class)
-                        .setCompanyDTO(modelMapper.map(element.getCompany(), CompanyDTO.class)))
+                        modelMapper.map(element, FacilitiesDTO.class)
+                                .setCompanyDTO(modelMapper.map(element.getCompany(), CompanyDTO.class)))
                 .toList();
     }
 
@@ -80,12 +80,11 @@ public class FsService {
     public Long modify (FacilitiesDTO dto) throws IOException {
         Facilities entity = fsRepository.findById(dto.getFacilitiesNum()).orElseThrow(EntityNotFoundException::new);
         entity.setFsAmountMax(dto.getFsAmountMax());
-        if (entity.getFsAmount() > dto.getFsAmountMax()) { entity.setFsAmount(dto.getFsAmountMax()); }
         entity.setFsName(dto.getFsName());
         entity.setFsContent(dto.getFsContent());
         entity.setFsPrice(dto.getFsPrice());
         entity.setFsStatus(dto.getFsStatus());
-        
+
         //이미지 수정
         if(dto.getFsPicture()!=null && !dto.getFsPicture().isEmpty()) {//이미지 새로 넣었고
             if (entity.getFsPictureMeta()!=null  && !entity.getFsPictureMeta().isEmpty()) {//기존 이미지가 있다면
@@ -118,6 +117,12 @@ public class FsService {
     public Long fsNo(Long fsNum){
         fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new).setFsStatus("no");
         return fsNum;
+    }
+    //수량변경
+    public Long refill(Long fsNum){
+        Facilities a = fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new);
+        a.setFsAmount(0);
+        return a.getCompany().getCompanyNum();
     }
 
     //삭제 반환 fsNum
