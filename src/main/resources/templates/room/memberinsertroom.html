@@ -12,159 +12,159 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">객실 배정(비회원)</h2>
 
-            <!-- 메시지 출력 -->
-            <div th:if="${message}" class="alert alert-success text-center" role="alert">
-                <span th:text="${message}"></span>
-            </div>
-            <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-                <span th:text="${error}"></span>
-            </div>
+        <!-- 메시지 출력 -->
+        <div th:if="${message}" class="alert alert-success text-center" role="alert">
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+            <span th:text="${error}"></span>
+        </div>
 
-            <form action="/member-insertroom" th:object="${memberDTO}" method="post" enctype="multipart/form-data">
-                <div class="container p-4" style="max-width: 700px;">
-                    <!-- 방 종류 -->
-                    <div class="mb-2">
-                        <label for="hotelRoomName" class="form-label">객실명</label>
-                        <select class="form-select" id="hotelRoomName" name="hotelRoomName" onchange="updateHotelRoomPk()" required>
-                            <option value="">객실 선택</option>
-                            <option th:each="room : ${hotelRoomList}"
-                                    th:value="${room.hotelRoomName}"
-                                    th:text="${room.hotelRoomName}">
-                            </option>
-                        </select>
-                    </div>
+        <form action="/member-insertroom" th:object="${memberDTO}" method="post" enctype="multipart/form-data">
+            <div class="container p-4" style="max-width: 700px;">
+                <!-- 방 종류 -->
+                <div class="mb-3">
+                    <label for="hotelRoomName" class="form-label">객실명</label>
+                    <select class="form-select" id="hotelRoomName" name="hotelRoomName" onchange="updateHotelRoomPk()" required>
+                        <option value="">객실 선택</option>
+                        <option th:each="room : ${hotelRoomList}"
+                                th:value="${room.hotelRoomName}"
+                                th:text="${room.hotelRoomName}">
+                        </option>
+                    </select>
+                </div>
 
-                    <!-- 숨겨진 호텔룸 PK 값 전송용 -->
-                    <input type="hidden" id="hotelRoomNum" name="hotelRoomNum" th:field="*{hotelRoomNum}">
+                <!-- 숨겨진 호텔룸 PK 값 전송용 -->
+                <input type="hidden" id="hotelRoomNum" name="hotelRoomNum" th:field="*{hotelRoomNum}">
 
-                    <!-- 회원 정보 -->
-                    <div class="mb-2">
-                        <label class="form-label">회원 이름</label>
-                        <input type="text" class="form-control" th:field="*{memberName}" placeholder="회원 이름 입력" required>
-                    </div>
+                <!-- 회원 정보 -->
+                <div class="mb-3">
+                    <label class="form-label">회원 이름</label>
+                    <input type="text" class="form-control" th:field="*{memberName}" placeholder="회원 이름 입력" required>
+                </div>
 
-                    <div class="mb-2">
-                        <label class="form-label">이메일</label>
-                        <input type="email" class="form-control" th:field="*{memberEmail}" placeholder="이메일 입력" required>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-control" th:field="*{memberEmail}" placeholder="이메일 입력" required>
+                </div>
 
-                    <div class="mb-2">
-                        <label class="form-label">전화번호</label>
-                        <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
-                    </div>
-                    <!-- 비밀번호 입력 (보이게 수정됨) -->
-                    <div class="mb-2">
-                        <label class="form-label">객실 이용 비밀번호</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                            <input type="text" class="form-control" id="roomPassword" name="roomPassword"
-                                   th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리 입력"
-                                   maxlength="4" pattern="\d{4}" inputmode="numeric" required>
-                        </div>
-                    </div>
-
-                    <!-- 비밀번호 확인 (유효성 검사용 그대로 유지) -->
-                    <div class="mb-2">
-                        <label class="form-label">비밀번호 확인</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
-                            <input type="text" class="form-control" id="confirmPassword"
-                                   maxlength="4" pattern="\d{4}"
-                                   placeholder="비밀번호 재입력" required>
-                        </div>
-                        <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
-                            ❗ 비밀번호가 일치하지 않습니다.
-                        </div>
-                    </div>
-                    <!-- 체크인 -->
-                    <div class="mb-2">
-                        <label class="form-label">체크인 날짜</label>
-                        <input type="datetime-local" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
-                    </div>
-
-                    <!-- 체크아웃 -->
-                    <div class="mb-2">
-                        <label class="form-label">체크아웃 날짜</label>
-                        <input type="datetime-local" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
-                    </div>
-
-                    <!-- 버튼 그룹 -->
-                    <div class="col-12 text-center mt-4 d-flex flex-column flex-md-row justify-content-center gap-3">
-                        <a th:href="@{/roomlist}" class="btn btn-secondary px-2 py-1 d-flex align-items-center justify-content-center">예약 목록</a>
-                        <button type="submit" class="btn btn-primary px-2 py-1">예약</button>
-                        <a th:href="@{/register-hotelroom}" class="btn btn-success px-2 py-1 d-flex align-items-center justify-content-center">회원 객실 배정</a>
+                <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
+                </div>
+                <!-- 비밀번호 입력 (보이게 수정됨) -->
+                <div class="mb-3">
+                    <label class="form-label">객실 이용 비밀번호</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="text" class="form-control" id="roomPassword" name="roomPassword"
+                               th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리 입력"
+                               maxlength="4" pattern="\d{4}" inputmode="numeric" required>
                     </div>
                 </div>
-            </form>
+
+                <!-- 비밀번호 확인 (유효성 검사용 그대로 유지) -->
+                <div class="mb-3">
+                    <label class="form-label">비밀번호 확인</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
+                        <input type="text" class="form-control" id="confirmPassword"
+                               maxlength="4" pattern="\d{4}"
+                               placeholder="비밀번호 재입력" required>
+                    </div>
+                    <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
+                        비밀번호가 일치하지 않습니다.
+                    </div>
+                </div>
+                <!-- 체크인 -->
+                <div class="mb-3">
+                    <label class="form-label">체크인 날짜</label>
+                    <input type="datetime-local" id="checkInDate" th:field="*{checkInDate}" class="form-control " placeholder="체크인 날짜 선택" required>
+                </div>
+
+                <!-- 체크아웃 -->
+                <div class="mb-3">
+                    <label class="form-label">체크아웃 날짜</label>
+                    <input type="datetime-local" id="checkOutDate" th:field="*{checkOutDate}" class="form-control " placeholder="체크아웃 날짜 선택" required>
+                </div>
+
+                <!-- 버튼 그룹 -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap btn-group-custom">
+                    <a th:href="@{/roomlist}" class="btn btn-secondary px-4">예약 목록</a>
+                    <button type="submit" class="btn btn-primary px-4">예약</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success px-4">회원 객실 배정</a>
+                </div>
+            </div>
+        </form>
     </div><!--등록 페이지 끝 지점-->
 
 
-<!-- 호텔룸 자동 선택 JS -->
-<script>
-    /*호텔룸 pk 을 자동으로 가져 와서 pk 값이 자동으로 room 테이블에 입력되는 메소드*/
-    function updateHotelRoomPk() {
-        let selectedName = document.getElementById("hotelRoomName").value;
+    <!-- 호텔룸 자동 선택 JS -->
+    <script>
+        /*호텔룸 pk 을 자동으로 가져 와서 pk 값이 자동으로 room 테이블에 입력되는 메소드*/
+        function updateHotelRoomPk() {
+            let selectedName = document.getElementById("hotelRoomName").value;
 
-        if (!selectedName) {
-            document.getElementById("hotelRoomNum").value = "";
-            return;
+            if (!selectedName) {
+                document.getElementById("hotelRoomNum").value = "";
+                return;
+            }
+
+            fetch(`/admin/hotelroom/latest?hotelRoomName=` + encodeURIComponent(selectedName))
+                .then(response => {
+                    if (!response.ok) throw new Error("해당 이름의 호텔룸이 존재하지 않습니다.");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.hotelRoomNum) {
+                        document.getElementById("hotelRoomNum").value = data.hotelRoomNum;
+                    } else {
+                        throw new Error("유효한 호텔룸 데이터를 받지 못했습니다.");
+                    }
+                })
+                .catch(error => {
+                    console.error("에러 발생:", error);
+                    alert(error.message);
+                });
         }
 
-        fetch(`/admin/hotelroom/latest?hotelRoomName=` + encodeURIComponent(selectedName))
-            .then(response => {
-                if (!response.ok) throw new Error("해당 이름의 호텔룸이 존재하지 않습니다.");
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.hotelRoomNum) {
-                    document.getElementById("hotelRoomNum").value = data.hotelRoomNum;
+        /*비밀번호 유효성 검사 추가 4 자리로 제안 스크립트*/
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            const passwordInput = document.getElementById("roomPassword");
+            const confirmInput = document.getElementById("confirmPassword");
+            const mismatchText = document.getElementById("passwordMismatch");
+
+            form.addEventListener("submit", function (e) {
+                const passwordValue = passwordInput.value.trim();
+
+                // 비밀번호 4자리 숫자 확인
+                if (!/^\d{4}$/.test(passwordValue)) {
+                    e.preventDefault();
+                    alert("비밀번호는 숫자 4자리여야 합니다.");
+                    passwordInput.classList.add("is-invalid");
+                    return;
                 } else {
-                    throw new Error("유효한 호텔룸 데이터를 받지 못했습니다.");
+                    passwordInput.classList.remove("is-invalid");
                 }
-            })
-            .catch(error => {
-                console.error("에러 발생:", error);
-                alert(error.message);
+
+                // 비밀번호 일치 확인
+                if (passwordValue !== confirmInput.value.trim()) {
+                    e.preventDefault();
+                    mismatchText.style.display = "block";
+                    confirmInput.classList.add("is-invalid");
+                } else {
+                    mismatchText.style.display = "none";
+                    confirmInput.classList.remove("is-invalid");
+                }
             });
-    }
-
-    /*비밀번호 유효성 검사 추가 4 자리로 제안 스크립트*/
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector("form");
-        const passwordInput = document.getElementById("roomPassword");
-        const confirmInput = document.getElementById("confirmPassword");
-        const mismatchText = document.getElementById("passwordMismatch");
-
-        form.addEventListener("submit", function (e) {
-            const passwordValue = passwordInput.value.trim();
-
-            // 비밀번호 4자리 숫자 확인
-            if (!/^\d{4}$/.test(passwordValue)) {
-                e.preventDefault();
-                alert("비밀번호는 숫자 4자리여야 합니다.");
-                passwordInput.classList.add("is-invalid");
-                return;
-            } else {
-                passwordInput.classList.remove("is-invalid");
-            }
-
-            // 비밀번호 일치 확인
-            if (passwordValue !== confirmInput.value.trim()) {
-                e.preventDefault();
-                mismatchText.style.display = "block";
-                confirmInput.classList.add("is-invalid");
-            } else {
-                mismatchText.style.display = "none";
-                confirmInput.classList.remove("is-invalid");
-            }
         });
-    });
 
 
 
-</script>
+    </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </div><!--레이아웃 fragment 끝지점 -->
 </body>
