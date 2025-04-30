@@ -126,6 +126,13 @@
                         <td class="text-center text-truncate"
                             th:text="${room.hotelRoomStatus == 'checkin' ? '사용중' : (room.hotelRoomStatus == 'checkout' ? '비어있음' : room.hotelRoomStatus)}">
                         </td>
+                        <!-- 세영님 여기 부붙 수정 해주세요 발송 버튼 (roomNum 기반으로 요청 보냄) -->
+                        <form method="post" th:action="@{'/room/resend-mail/' + ${room.roomNum}}" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                [[${room.roomNum}]]✉ 메일 재발송
+                            </button>
+                        </form>
+
                         <td class="text-center">
                             <div class="d-flex flex-column align-items-center gap-1">
 
