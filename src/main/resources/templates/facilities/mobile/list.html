@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutmobile.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모바일 주문</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
+
+        .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
+        .search-box {
+            display: flex; align-items: center; gap: 0.5rem;
+            background-color: white; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 0.3rem;
+        }
+        .search-box input[type="text"] {
+            flex: 1; height: 40px; font-size: 1rem;
+            border-radius: 6px; border: 1px solid #ced4da; padding: 0 0.75rem;
+        }
+        .search-box button {
+            height: 40px; padding: 0 1rem; font-size: 1rem;
+            border-radius: 6px; background-color: #d0e8ff;
+            border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
+        }
+
+        .tabs {
+            display: flex; overflow-x: auto; white-space: nowrap;
+            gap: 10px; padding: 10px 0; margin-bottom: 10px;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .btn-custom {
+            background-color: transparent; color: #ff6b6b;
+            border: 2px solid #ff6b6b; border-radius: 12px;
+            padding: 8px 16px; font-size: 12px; font-weight: normal;
+            cursor: pointer; white-space: nowrap;
+        }
+        .tab {
+            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
+            font-size: 14px; background-color: transparent; color: black;
+        }
+        .tab.active {
+            font-weight: bold; background-color: #f0f0f0; color: #333;
+        }
+
+        .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
+        .div-card {
+            background: white; border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;
+        }
+        .inner-wrapper { padding: 15px; }
+        .d-flex { display: flex; gap: 15px; }
+        .menu-image-container {
+            width: 100px; height: 100px; flex-shrink: 0;
+        }
+        .store-image {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
+        }
+        .text-info { flex: 1; }
+        .store-name {
+            font-size: 1.2rem; font-weight: bold; color: black; margin-bottom: 5px;
+        }
+        .store-content { font-size: 0.9rem; color: black; }
+        .menu-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 1px 6px;          /* ✅ padding 축소 */
+            line-height: 1;            /* ✅ 줄 간격 고정 */
+            border-radius: 8px;
+            background-color: #e0f7fa;
+            color: #00796b;
+            font-weight: bold;
+            vertical-align: middle;    /* ✅ 수직 정렬 보정 */
+            height: auto;              /* ✅ 높이 강제 고정 방지 */
+        }
+
+
+        .like-section {
+            display: flex; justify-content: flex-end; align-items: center;
+            gap: 5px; padding: 0 15px 10px;
+        }
+        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
+        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
+
+        .add-to-cart-btn, .order-list-btn {
+            background-color: #ffeb3b; color: black;
+            border: none; border-radius: 5px;
+            padding: 12px 20px; cursor: pointer; font-weight: bold;
+            width: 100%; margin-top: 15px;
+        }
+        .order-list-btn { background-color: #FAE100; }
+        .cart-count {
+            background-color: #ff5c5c; color: white; padding: 4px 10px;
+            border-radius: 4px; margin-left: 8px; font-weight: bold; font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="contentorder">
+
+    <div class="container"></div>
+
+</div>
+</body>
+</html>
