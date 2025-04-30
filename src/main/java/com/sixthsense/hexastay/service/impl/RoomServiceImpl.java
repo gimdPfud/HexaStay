@@ -108,33 +108,26 @@ public class RoomServiceImpl {
 //        log.info("호텔룸 저장 완료 - 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
-        LocalDateTime checkInDate = LocalDateTime.from(hotelRoomDTO.getCheckInDate());
-        LocalDateTime checkOutDate = LocalDateTime.from(hotelRoomDTO.getCheckOutDate());
+        LocalDateTime checkInDateTime = LocalDateTime.from(hotelRoomDTO.getCheckInDate());
+        LocalDateTime checkOutDateTime = LocalDateTime.from(hotelRoomDTO.getCheckOutDate());
         // 3️⃣ Room 엔티티 저장 (HotelRoom과 Member 관계 저장)
         Room room = Room.builder()
                 .hotelRoom(hotelRoom)
                 .member(member)
-                .checkInDate(checkInDate)
-                .checkOutDate(checkOutDate)
+                .checkInDate(checkInDateTime)
+                .checkOutDate(checkOutDateTime)
                 .roomPassword(memberDTO.getRoomPassword())
                 .build();
         roomRepository.save(room);
 
-        //등록시 메일 발송요 service 로직 추가 하기
-        // 2. Member의 이메일 가져오기
-        String memberEmail = room.getMember().getMemberEmail();
-
-        // 3. Room의 비밀번호 가져오기
-        String roomPassword = room.getRoomPassword();
-
-        // 4. 메일 발송 try-catch 처리
+        // 5️⃣ 이메일 발송
         try {
-            mailService.sendRoomPasswordEmail(memberEmail, roomPassword);
-            log.info("메일 발송 성공 - 수신자: {}", memberEmail);
+            // ✅ room 기준으로 mailService 호출
+            mailService.sendRoomReservationEmail(room);
+            log.info("메일 발송 성공 - 수신자: {}", member.getMemberEmail());
         } catch (Exception e) {
-            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", memberEmail, e.getMessage());
-        }  ;
-
+            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", member.getMemberEmail(), e.getMessage());
+        }
 
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
     }
@@ -173,27 +166,18 @@ public class RoomServiceImpl {
         log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);
         roomRepository.save(room);
 
-        //등록시 메일 발송요 service 로직 추가 하기
-        // 2. Member의 이메일 가져오기
-        String memberEmail = room.getMember().getMemberEmail();
-
-        // 3. Room의 비밀번호 가져오기
-        String roomPassword = room.getRoomPassword();
-
-
-        // 4. 메일 발송 try-catch 처리
+        //room 테이블에서 저장후 메일 방송 로직 실행
+        //MailService
+        // 5️⃣ 이메일 발송
         try {
-            mailService.sendRoomPasswordEmail(memberEmail, roomPassword);
-            log.info("메일 발송 성공 - 수신자: {}", memberEmail);
-            log.info("메일 발송 여부가 안들어 옴.... ");
+            // ✅ room 기준으로 mailService 호출
+            mailService.sendRoomReservationEmail(room);
+            log.info("메일 발송 성공 - 수신자: {}", member.getMemberEmail());
         } catch (Exception e) {
-
-            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", memberEmail, e.getMessage());
+            log.error("메일 발송 실패 - 수신자: {}, 오류: {}", member.getMemberEmail(), e.getMessage());
         }
 
-
-        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}, 체크인: {}, 체크아웃: {}",
-                hotelRoom.getHotelRoomNum(), member.getMemberNum(), checkInDate, checkOutDate);
+        log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
     }
 
 
