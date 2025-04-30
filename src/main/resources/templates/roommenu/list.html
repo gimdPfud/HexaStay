@@ -252,7 +252,7 @@
 
     <!-- 모달창 시작 -->
 
-    <!-- 모달창 -->
+    <!-- 알람 모달 시작 -->
     <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
@@ -270,10 +270,15 @@
             </div>
         </div>
     </div>
+    <!-- 알람 모달 끝 -->
+
 
     <!-- WebSocket 관련 라이브러리 추가 -->
+    <!-- 웹소켓 및 STOMP 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- 공통 웹소켓 알림 JS -->
+    <script src="/js/order-alert.js"></script>
     <script>
         /*------ 카테고리 드롭다운 활성화 시작 ------*/
         console.log("JS 로딩됨");
@@ -339,8 +344,8 @@
         });
 
 
-        /* ----- 주문페이지 알람 시작 -----*/
-        document.addEventListener("DOMContentLoaded", function () {
+        /* ----- 주문페이지 알람 시작 ----- todo : 공통 스크립트로 대체 */
+        /*document.addEventListener("DOMContentLoaded", function () {
             const socket = new SockJS("/ws-order-alert");
             const stompClient = Stomp.over(socket);
 
@@ -355,7 +360,6 @@
                         const content = `
                         주문자: <strong>${orderData.memberEmail}</strong><br>
                         총 금액: <strong>${orderData.totalPrice}원</strong><br>
-                        상품내용 : null
                         관리자용 페이지를 확인하세요! 확인을 누르시면 관리자용 페이지로 갑니다.
                     `;
                         document.getElementById("orderAlertContent").innerHTML = content;
@@ -376,7 +380,7 @@
             }, function (error) {
                 console.error("❌ 웹소켓 연결 실패", error);
             });
-        });
+        });*/
         /* ----- 주문페이지 알람 끝 -----*/
 
     </script>
