@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,6 +56,28 @@ public class RoomServiceImpl {
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+
+
+    //메일 재발송용 서비스 로직
+    @Transactional
+    public void resendRoomReservationMail(Long roomNum) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 Room을 찾을 수 없습니다."));
+
+        Member member = room.getMember();
+        HotelRoom hotelRoom = room.getHotelRoom();
+
+        // 필드만 추출해서 넘김 - mailservice 에 각각의 파라미터로 받는 로직이 구성되어 있음
+        mailService.sendRoomReservationEmailpa(
+                member.getMemberEmail(),
+                member.getMemberName(),
+                hotelRoom.getHotelRoomName(),
+                room.getCheckInDate(),
+                room.getCheckOutDate(),
+                room.getRoomPassword(),
+                hotelRoom.getHotelRoomNum()
+        );
+    }
 
 
     //hotelroom.hotelroomStatus 상태 즉 checkin , checkout 상태에 따른 list page
@@ -285,6 +309,25 @@ public class RoomServiceImpl {
         // 1. 호텔룸 번호로 룸 리스트를 가져온다
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
 
+        //1.1 session 정보를 가져 오는 로직
+//        String  email =  Principal.getname = "2@1234.com";
+//
+//      (1)- 해당맴버가 잡고있는 룸 찾기
+//        Room rooms1 = roomRepository.findByMember_MemberEmail(Principal.getname).getFirst();
+
+//      (2) -- 그 찾아온 룸에서   호텔룸넘뽑기
+//      rooms1.getHotel().getHotelNum();
+
+//        List<Room> findByMember_MemberEmail(String email);
+//        List<Room> rooms1 = roomRepository.findByMember_MemberEmail(Principal.getname);
+//      ---- seacrhServcie.asdasd(rooms1.getFirst().getHotelRoom().getHotelRoomNum());
+
+//        Room room1 = rooms1.getFirst();
+//
+//        HotelRoom hotelRoom = room1.getHotelRoom();
+//        hotelRoom.getHotelRoomNum();
+
+
         // 2. 가져온 룸이 없으면 오류를 던진다
         if (rooms.isEmpty()) {
             throw new EntityNotFoundException("해당 호텔룸에 연결된 룸 정보가 없습니다.");
@@ -340,6 +383,38 @@ public class RoomServiceImpl {
         // 14. 최종적으로 찾은 룸을 반환한다
         return room;
     }
+
+//    public Room authenticateRoomByHotelRoomNumAndPassword(Long hotelRoomNum, String inputPassword) {
+//        // 1. 해당 호텔룸에 연결된 '체크인' 상태의 Room 리스트 가져오기
+//        List<Room> rooms = roomRepository.findCheckinRoomsByHotelRoomNum(hotelRoomNum);
+//
+//        if (rooms.isEmpty()) {
+//            throw new EntityNotFoundException("체크인 상태의 룸이 없습니다.");
+//        }
+//
+//        // 2. 입력한 패스워드가 일치하는 Room 찾기
+//        Room matchedRoom = rooms.stream()
+//                .filter(room -> room.getRoomPassword().equals(inputPassword))
+//                .findFirst()
+//                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하지 않습니다."));
+//
+//        // 3. 로그인 처리
+//        Member member = matchedRoom.getMember();
+//        String role = member.getMemberRole() == null ? "USER" : member.getMemberRole();
+//        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+//        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
+//
+//        Authentication authentication = new UsernamePasswordAuthenticationToken(customMemberDetails, member.getMemberPassword(), authorities);
+//        SecurityContext context = SecurityContextHolder.createEmptyContext();
+//        context.setAuthentication(authentication);
+//        SecurityContextHolder.setContext(context);
+//
+//        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+//        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+//
+//        log.info("인증 성공: {} (roomNum: {})", member.getMemberEmail(), matchedRoom.getRoomNum());
+//        return matchedRoom;
+//    }
 
 
 

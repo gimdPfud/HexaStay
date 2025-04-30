@@ -11,6 +11,10 @@
             font-size: 0.85rem;
         }
 
+        .table th {
+            font-size: 0.85rem;
+        }
+
         .table {
             width: 100%;
             table-layout: fixed; /* 고정된 테이블 너비 설정 */
@@ -41,11 +45,21 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center" >객실 예약 목록</h2>
 
+        <!-- 성공 메시지 -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <span th:text="${success}"></span>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
         <!-- 검색 폼 -->
         <form action="/roomlist" method="get" class="d-flex align-items-end gap-2">
 
             <div class="flex-grow-1">
-                <input name="keyword" type="text" class="form-control" style="height: 40px; font-size: 0.9rem;"
+                <input name="keyword" type="text" class="form-control"
                        placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
             </div>
 
@@ -84,12 +98,13 @@
                     <tr>
                         <th style="width: 5%;">번호</th>
                         <th style="width: 13%;">객실명</th>
-                        <th style="width: 11%;">회원 이름</th>
-                        <th style="width: 17%;">회원 이메일</th>
-                        <th style="width: 10%;">객실 연락처</th>
+                        <th style="width: 9%;">회원 이름</th>
+                        <th style="width: 18%;">회원 이메일</th>
+                        <th style="width: 8%;">메일 재발송</th>
+                        <th style="width: 12%;">객실 연락처</th>
                         <th style="width: 8%;">체크인</th>
                         <th style="width: 8%;">체크아웃</th>
-                        <th style="width: 10%;">객실 비밀번호</th>
+                        <th style="width: 8%;">비밀번호</th>
                         <th style="width: 9%;">현재 상태</th>
                         <th style="width: 9%;">상태 변경</th>
                     </tr>
@@ -112,6 +127,16 @@
                                th:text="${room.memberName}"></a>
                         </td>
                         <td class="text-center text-truncate" th:text="${room.memberEmail}"></td>
+                        <td class="text-center">
+                            <form method="post" th:action="@{'/room/resend-mail/' + ${room.roomNum}}" style="display:inline;">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-success"
+                                        onclick="confirmResendMail(this)"
+                                        th:attr="data-member-name=${room.memberName}">
+                                    ✉
+                                </button>
+                            </form>
+                        </td>
                         <td class="text-center text-truncate" th:text="${room.hotelRoomPhone}"></td>
                         <td class="text-center text-truncate">
                             <span th:text="${#temporals.format(room.checkInDate, 'yy-MM-dd')}"></span><br>
@@ -123,9 +148,17 @@
                         </td>
 
                         <td class="text-center text-danger text-truncate" th:text="${room.roomPassword}"></td>
-                        <td class="text-center text-truncate"
-                            th:text="${room.hotelRoomStatus == 'checkin' ? '사용중' : (room.hotelRoomStatus == 'checkout' ? '비어있음' : room.hotelRoomStatus)}">
+                        <td class="text-center text-truncate">
+                            <span th:if="${room.hotelRoomStatus == 'checkout'}"
+                                  class="text-primary"
+                                  th:text="'비어있음'"></span>
+                            <span th:if="${room.hotelRoomStatus == 'checkin'}"
+                                  class="text-danger"
+                                  th:text="'사용중'"></span>
+                            <span th:if="${room.hotelRoomStatus != 'checkout' && room.hotelRoomStatus != 'checkin'}"
+                                  th:text="${room.hotelRoomStatus}"></span>
                         </td>
+
                         <td class="text-center">
                             <div class="d-flex flex-column align-items-center gap-1">
 
@@ -300,6 +333,25 @@
                 newWindow.focus();
             }
         }
+
+        function confirmResendMail(button) {
+            const memberName = button.getAttribute("data-member-name");
+            const form = button.closest("form");
+
+            if (confirm(`${memberName}님에게 메일을 재발송 하시겠습니까?`)) {
+                form.submit();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000); // 3초 뒤 자동 숨김
+            }
+        });
+
     </script>
 </div>
 

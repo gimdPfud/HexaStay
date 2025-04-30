@@ -216,8 +216,7 @@ public class HotelRoomController {
             Model model) throws IOException {
 
         log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
-        log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
-        log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
+
 
         // hotelroomnum 값이 없는 경우 예외 처리
         if (hotelRoomNum == null) {
@@ -227,6 +226,7 @@ public class HotelRoomController {
 
         try {
             hotelRoomService.hotelroomUpdate(hotelRoomNum, hotelRoomDTO);
+
         } catch (Exception e) {
             model.addAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다: " + e.getMessage());
             return "hotelroom/modifyhotelroom";

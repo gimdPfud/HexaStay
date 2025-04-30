@@ -39,6 +39,10 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
 
 
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
+    List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+
     // hotelRoomNum 기준으로 연결된 member들만 가져오기
     @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
     Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
@@ -83,9 +87,9 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     // 날짜 범위로 정산용 데이터 조회
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
-            List<Long> hotelRoomNums, 
-            LocalDateTime startDate, 
-            LocalDateTime endDate, 
+            List<Long> hotelRoomNums,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
             Pageable pageable);
 
     // memberNum 기준으로 hotelRoomNum을 참고하여, hotelRoomName을 가져오기.

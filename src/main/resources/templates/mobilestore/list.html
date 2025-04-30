@@ -30,20 +30,26 @@
         .tabs {
             display: flex; overflow-x: auto; white-space: nowrap;
             gap: 10px; padding: 10px 0; margin-bottom: 10px;
+            height: 65px; text-align: center;
         }
         .tabs::-webkit-scrollbar { display: none; }
+
+        .tab {
+            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
+            font-size: 14px; background-color: transparent; color: black;
+            height: 65px; width: 60px; text-align: center;
+        }
+        .tab.active {
+            font-weight: bold;
+            background-color: #e0f7fa;  /* 선택된 탭 배경 */
+            border-bottom: 3px solid #00796b;  /* 탭 하단 표시선 */
+            color: #00796b;
+        }
         .btn-custom {
             background-color: transparent; color: #ff6b6b;
             border: 2px solid #ff6b6b; border-radius: 12px;
             padding: 8px 16px; font-size: 12px; font-weight: normal;
             cursor: pointer; white-space: nowrap;
-        }
-        .tab {
-            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
-            font-size: 14px; background-color: transparent; color: black;
-        }
-        .tab.active {
-            font-weight: bold; background-color: #f0f0f0; color: #333;
         }
 
         .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
@@ -117,7 +123,7 @@
             <button type="button" onclick="filterByLikes()" class="btn-custom">
                 ❤️ <span>인기순</span>
             </button>
-            <div class="tab active" onclick="filterByCategory('전체')">전체</div>
+            <div class="tab" onclick="filterByCategory('전체')">전체</div>
             <div class="tab" onclick="filterByCategory('한식')">한식</div>
             <div class="tab" onclick="filterByCategory('일식')">일식</div>
             <div class="tab" onclick="filterByCategory('중식')">중식</div>

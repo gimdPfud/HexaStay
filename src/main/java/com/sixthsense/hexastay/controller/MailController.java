@@ -1,14 +1,19 @@
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.impl.MailService;
+import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 
 @Log4j2
@@ -18,6 +23,21 @@ import java.time.LocalDateTime;
 public class MailController {
 
     private final MailService mailService;
+
+    private final RoomServiceImpl roomService;
+
+    //재발송 메일 로직
+    @PostMapping("/room/resend-mail/{roomNum}")
+    public String resendRoomMail(@PathVariable Long roomNum, RedirectAttributes redirectAttributes) {
+        try {
+            roomService.resendRoomReservationMail(roomNum);
+            redirectAttributes.addFlashAttribute("success", "메일이 다시 발송되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "메일 발송 실패: " + e.getMessage());
+        }
+        return "redirect:/roomlist";
+    }
+
 
     @GetMapping("/review/mail")
     private String mailinputaaa() {

@@ -6,24 +6,38 @@
     <meta charset="UTF-8">
     <title>새 ERD 항목 추가</title>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-<div class="container my-5">
-    <h2 class="mb-4 text-center" >새 품목 추가</h2>
-
+<div class="container mt-4 w-100 bg-light">
+    <h2 class="fw-bold mb-4 text-center">물품 추가</h2>
 
     <form action="/erd/insert" method="post" enctype="multipart/form-data">
-        <div class="container p-4" style="max-width: 500px;">
+        <div class="container p-4" style="max-width: 700px;">
+
             <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 300px; height: 300px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
                     <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
                 </div>
-                <p class="file-name">프로필 사진이 선택되지 않았습니다.</p>
+                <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
                 <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
                 <input hidden type="file" id="erdPicture" name="erdPicture" class="btn btn-light form-control rounded-pill"
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
                 <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="erdType" class="form-label">분류</label>
+                <select type="text" class="form-control" id="erdType" name="erdType" required>
+                    <option>호텔용품</option>
+                    <option>설비</option>
+                    <option>시설관리자재</option>
+                    <option>사무/소모품</option>
+                    <option>식음료</option>
+                    <option>청소/위생용품</option>
+                    <option>유니폼/의류</option>
+                    <option>기타</option>
+                </select>
             </div>
 
             <div class="mb-3">
@@ -37,20 +51,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="erdType" class="form-label">분류</label>
-                <select type="text" class="form-control" id="erdType" name="erdType" required>
-                    <option>호텔용품</option>
-                    <option>설비</option>
-                    <option>시설관리자재</option>
-                    <option>사무/소모품품</option>
-                    <option>식음료</option>
-                    <option>청소/위생용품</option>
-                    <option>유니폼/의류</option>
-                    <option>기타</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
                 <label for="erdsku" class="form-label">수량</label>
                 <input type="text" class="form-control" id="erdUnit" name="erdUnit" required>
             </div>
@@ -60,9 +60,9 @@
                 <input type="text" class="form-control" id="erdNote" name="erdNote" required>
             </div>
 
-            <div class="d-flex" style="align-items: center; justify-content: center;">
-                <button type="submit" class="btn btn-success px-2 py-1">저장</button>
-                <a th:href="@{/erd/list}" class="btn btn-danger px-2 py-1">취소</a>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="submit" class="btn btn-success">등록</button>
+                <a th:href="@{/erd/list}" class="btn btn-danger">취소</a>
             </div>
         </div>
     </form>

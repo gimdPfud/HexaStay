@@ -27,7 +27,8 @@ public class FacilitiesDTO {
     private String fsStatus;    //서비스 상태(이용가능 불가능 삭제됨)
     private CompanyDTO companyDTO;
 
-    private String fsPictureMeta;       //등록 이미지
-    private MultipartFile fsPicture;    //이미지 경로
-
+    public FacilitiesDTO setCompanyDTO(CompanyDTO companyDTO) {
+        this.companyDTO = companyDTO;
+        return this;
+    }
 }

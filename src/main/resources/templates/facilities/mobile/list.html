@@ -1,11 +1,21 @@
+<!--todo 여기는 시설(company) 목록-->
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모바일 주문</title>
+    <title>시설 상세</title>
+    <!-- CSS 연결 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/custom.css">
+    <!-- 부트스트랩 아이콘 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- JS 연결 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
@@ -26,7 +36,6 @@
             border-radius: 6px; background-color: #d0e8ff;
             border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
         }
-
         .tabs {
             display: flex; overflow-x: auto; white-space: nowrap;
             gap: 10px; padding: 10px 0; margin-bottom: 10px;
@@ -45,64 +54,109 @@
         .tab.active {
             font-weight: bold; background-color: #f0f0f0; color: #333;
         }
-
         .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
-        .div-card {
-            background: white; border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;
-        }
-        .inner-wrapper { padding: 15px; }
         .d-flex { display: flex; gap: 15px; }
-        .menu-image-container {
-            width: 100px; height: 100px; flex-shrink: 0;
-        }
-        .store-image {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
-        }
-        .text-info { flex: 1; }
-        .store-name {
-            font-size: 1.2rem; font-weight: bold; color: black; margin-bottom: 5px;
-        }
-        .store-content { font-size: 0.9rem; color: black; }
-        .menu-badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            padding: 1px 6px;          /* ✅ padding 축소 */
-            line-height: 1;            /* ✅ 줄 간격 고정 */
-            border-radius: 8px;
-            background-color: #e0f7fa;
-            color: #00796b;
+
+
+
+        .back-to-list-btn {
+            background-color: #ddd;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            cursor: pointer;
             font-weight: bold;
-            vertical-align: middle;    /* ✅ 수직 정렬 보정 */
-            height: auto;              /* ✅ 높이 강제 고정 방지 */
-        }
-
-
-        .like-section {
-            display: flex; justify-content: flex-end; align-items: center;
-            gap: 5px; padding: 0 15px 10px;
-        }
-        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
-        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
-
-        .add-to-cart-btn, .order-list-btn {
-            background-color: #ffeb3b; color: black;
-            border: none; border-radius: 5px;
-            padding: 12px 20px; cursor: pointer; font-weight: bold;
-            width: 100%; margin-top: 15px;
-        }
-        .order-list-btn { background-color: #FAE100; }
-        .cart-count {
-            background-color: #ff5c5c; color: white; padding: 4px 10px;
-            border-radius: 4px; margin-left: 8px; font-weight: bold; font-size: 1.2em;
+            width: 100%;
+            margin-top: 25px;
         }
     </style>
 </head>
 <body>
-<div layout:fragment="contentorder">
+<div class="container">
 
-    <div class="container"></div>
+    <div class="search-container">
+        <form th:action="@{/fs/list}" method="get">
+            <div class="search-box">
+                <input type="text" name="keyword" th:placeholder="'시설 검색'">
+                <button type="submit">검색</button>
+            </div>
+        </form>
+    </div>
 
+    <div class="tabs">
+        <button type="button" onclick="filterByLikes()" class="btn-custom">
+            ❤️ <span>인기순</span>
+        </button>
+        <div class="tab" onclick="filterByCategory('관광지')">관광지</div>
+        <div class="tab" onclick="filterByCategory('식당')">식당</div>
+        <div class="tab" onclick="filterByCategory('문화')">문화</div>
+        <div class="tab" onclick="filterByCategory('레저')">레저</div>
+        <div class="tab" onclick="filterByCategory('의료')">의료</div>
+    </div>
+    <ul class="food-list card-list">
+        <div class="container my-4">
+            <div class="row row-cols-2 row-cols-md-3 g-3">
+                <!-- 카드 반복 요소 -->
+                <div class="col" >
+                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
+                         style="cursor: pointer;">
+                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
+                        <div class="card-body">
+                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
+                         style="cursor: pointer;">
+                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
+                        <div class="card-body">
+                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
+                         style="cursor: pointer;">
+                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
+                        <div class="card-body">
+                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
+                         style="cursor: pointer;">
+                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
+                        <div class="card-body">
+                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
+                         style="cursor: pointer;">
+                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
+                        <div class="card-body">
+                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
+                        </div>
+                    </div>
+                </div>
+                <!-- end each -->
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="d-flex justify-content-center align-items-center mt-3">
+                <button class="btn btn-outline-secondary btn-sm me-2">&lt;</button>
+                <span class="fw-bold">1 / 5</span>
+                <button class="btn btn-outline-secondary btn-sm ms-2">&gt;</button>
+            </div>
+        </div>
+    </ul>
+
+    <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
 </div>
+
 </body>
 </html>

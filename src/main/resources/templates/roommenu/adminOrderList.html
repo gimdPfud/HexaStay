@@ -13,215 +13,231 @@
             width: 100%;
             table-layout: fixed;
         }
+        /* 체크박스 크기 키우기 */
+        input[type="checkbox"] {
+            transform: scale(1.5); /* 숫자를 키우면 더 커집니다 */
+            margin: 5px;
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <h2 class="fw-bold mb-4 text-center" >관리자 전용 주문 내역 목록</h2>
-    <div class="d-flex justify-content-center mt-4 gap-3">
-        <button type="button" onclick="handleConfirm('ACCEPT')" class="btn btn-warning px-4">주문 접수</button>
-        <button type="button" onclick="handleConfirm('COMPLETE')" class="btn btn-success px-4">주문 완료</button>
-        <button type="button" onclick="handleConfirm('CANCEL')" class="btn btn-danger px-4">주문 취소</button>
-        <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-primary px-3">룸 서비스 목록</button>
-    </div>
 
-    <div class="container mt-4 w-100 bg-light">
+    <div class="container-fluid mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center" >관리자 전용 주문 내역 목록</h2>
 
-        <form id="orderForm">
-            <div class="row mt-4">
-                <div class="col-12">
-                    <table class="table table-bordered text-company mb-0">
-                        <thead class="table-light text-center">
-                        <tr>
-                            <th style="width: 10%;">
-                                <input type="checkbox" id="selectAll"> 선택
-                            </th>
-                            <th style="width: 10%;">주문번호</th>
-                            <th style="width: 20%;">주문자</th>
-                            <th style="width: 10%;">상태</th>
-                            <th style="width: 50%;">주문내용</th>
-                        </tr>
-                        </thead>
 
-                        <tbody>
-                        <tr th:each="order : ${orders}">
-                            <td class="text-center">
-                                <!-- 각 체크박스에는 주문번호를 data-id 속성에 할당 -->
-                                <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
-                            </td>
-                            <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
-                            <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
-                            <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
-                            <td class="text-center" style="vertical-align: middle;">
-                                <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"
-                                        th:each="item, iterStat : ${order.orderItemList}"
-                                        th:if="${iterStat.index == 0}">
-                                        <div class="row text-center text-md-start g-1">
-                                            <div class="col-12 col-md-6">
-                                                <strong th:text="#{orderList.menuName}">메뉴 이름:</strong>
-                                                <span th:text="${item.roomMenuOrderItemName}" class="ms-1"></span>
-                                            </div>
-                                            <div class="col-6 col-md-3">
-                                                <strong th:text="#{orderList.quantity}">수량:</strong>
-                                                <span th:text="${item.roomMenuOrderItemAmount}" class="ms-1"></span>
-                                            </div>
-                                            <div class="col-12">
-                                                <strong>총 주문 금액:</strong>
-                                                ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span>
-                                                <span th:if="${order.discountedPrice != null}">
-                <br>
-                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
-                ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
-            </span>
-                                            </div>
+        <!-- 주문이 없을 경우 -->
+        <div th:if="${#lists.isEmpty(orders)}" class="text-center mt-5">
+            <h6>주문 들어온 내역이 없습니다</h6>
+        </div>
 
-                                            <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
-                                                 class="col-12 text-muted mt-1" style="font-size: 0.9em;">
-                                                <small>
+        <div th:if="${!#lists.isEmpty(orders)}">
+            <div class="d-flex justify-content-center mt-4 gap-3">
+                <button type="button" onclick="handleConfirm('ACCEPT')" class="btn btn-primary px-3">주문 접수</button>
+                <button type="button" onclick="handleConfirm('COMPLETE')" class="btn btn-success px-3">주문 완료</button>
+                <button type="button" onclick="handleConfirm('CANCEL')" class="btn btn-danger px-3">주문 취소</button>
+            </div>
+            <form id="orderForm">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <table class="table table-bordered text-company mb-0">
+                            <thead class="table-light text-center">
+                            <tr>
+                                <th style="width: 10%;"></th>
+                                <th style="width: 10%;">주문번호</th>
+                                <th style="width: 20%;">주문자</th>
+                                <th style="width: 10%;">상태</th>
+                                <th style="width: 50%;">주문내용</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="order : ${orders}">
+                                <td class="text-center">
+                                    <!-- 각 체크박스에는 주문번호를 data-id 속성에 할당 -->
+                                    <input type="checkbox" th:data-id="${order.roomMenuOrderNum}" />
+                                </td>
+                                <td th:text="${order.roomMenuOrderNum}" class="text-center">1001</td>
+                                <td th:text="${order.member.memberName + ' (' + order.member.memberEmail + ')'}" class="text-center">홍길동</td>
+                                <td th:text="${order.roomMenuOrderStatus}" class="text-center">ORDER</td>
+                                <td class="text-start" style="vertical-align: middle;">
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"
+                                                th:each="item, iterStat : ${order.orderItemList}"
+                                                th:if="${iterStat.index == 0}">
+
+                                                <div>
+                                                    <strong th:text="#{orderList.menuName}">메뉴명:</strong>
+                                                    <span th:text="${item.roomMenuOrderItemName}" class="ms-1"></span>
+                                                </div>
+
+                                                <div>
+                                                    <strong th:text="#{orderList.quantity}">수량:</strong>
+                                                    <span th:text="${item.roomMenuOrderItemAmount}" class="ms-1"></span>
+                                                </div>
+
+                                                <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                                                     class="text-muted mt-1" style="font-size: 0.9em;">
                                                     <strong>옵션:</strong>
                                                     <span th:text="${item.roomMenuSelectOptionName}">옵션 요약 정보</span>
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <small>
-                                                요청: <span th:text="${item.roomMenuOrderRequestMessage}"></span>
-                                            </small>
-                                        </div>
-                                        </li>
-                                    </ul>
-
-                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시 -->
-                                    <div class="mt-2" th:if="${order.orderItemList.size() > 1}">
-                                        <small th:text="'외 ' + (${order.orderItemList.size()} - 1) + '건 추가 주문됨'"></small>
-                                        <button type="button" class="btn btn-link" data-bs-toggle="modal"
-                                                th:data-bs-target="'#orderModal-' + ${order.roomMenuOrderNum}">
-                                            상세보기
-                                        </button>
-                                    </div>
-                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시  끝-->
-
-                                    <!-- 주문 상세 모달창 (요청사항 제거, 최종 총 금액 추가) -->
-                                    <div class="modal fade" th:id="'orderModal-' + ${order.roomMenuOrderNum}" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="orderModalLabel">주문 상세 정보</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <ul class="list-group list-group-flush">
-                                                        <!-- 주문 항목 목록 전체 출력 (요청사항은 생략) -->
-                                                        <li class="list-group-item" th:each="item : ${order.orderItemList}">
-                                                            <div class="d-flex align-items-center mb-1">
-                                                                <strong class="me-2" th:text="#{orderList.menuName}">메뉴 이름:</strong>
-                                                                <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
-                                                            </div>
 
-                                                            <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
-                                                                 class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
-                                                                <strong class="me-2">옵션:</strong>
-                                                                <span th:text="${item.roomMenuSelectOptionName}">옵션 요약 정보</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center mb-1">
-                                                                <strong class="me-2" th:text="#{orderList.quantity}">수량:</strong>
-                                                                <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <strong class="me-2" th:text="#{orderList.totalPrice}">총 가격:</strong>
-                                                                <span class="flex-grow-1"></span>
-                                                                <strong>₩<span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 3, 'COMMA')}">아이템 총 금액</span></strong>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
+                                                <div th:if="${item.roomMenuOrderRequestMessage != null and item.roomMenuOrderRequestMessage != ''}" class="mt-1">
+                                                    <strong>요청사항:</strong>
+                                                    <span th:text="${item.roomMenuOrderRequestMessage}"></span>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
-                                                    <div class="me-auto">
-                                                        <strong>총 주문 금액:</strong> ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span><br>
-                                                        <span th:if="${order.discountedPrice != null}">
-                                                        <strong style="color: #f75b5b;">할인 적용 후 금액:</strong>
-                                                        ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
-                                                        </span>
+
+                                                <div class="mt-1">
+                                                    <strong>총 주문 금액:</strong>
+                                                    ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span>
+                                                    <span th:if="${order.discountedPrice != null}">
+                                                <br>
+                                                <strong style="color: #f75b5b;">할인 적용 금액:</strong>
+                                                ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+                                            </span>
+
+                                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시 -->
+                                                    <div class="mt-2" th:if="${order.orderItemList.size() > 1}">
+                                                        <small th:text="'외 ' + (${order.orderItemList.size()} - 1) + '건 추가 주문됨'"></small>
+                                                        <button type="button" class="btn btn-dark btn-sm px-2 py-1 ms-2" style="font-size: 0.8rem; line-height: 1;" data-bs-toggle="modal"
+                                                                th:data-bs-target="'#orderModal-' + ${order.roomMenuOrderNum}">
+                                                            상세보기
+                                                        </button>
                                                     </div>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                                    <!-- 추가 주문 항목이 있을 경우, "외 X건 추가 주문됨"과 상세 버튼 표시  끝-->
+                                                </div>
+                                            </li>
+                                        </ul>
+
+
+                                        <!-- 주문 상세 모달창 (요청사항 제거, 최종 총 금액 추가) -->
+                                        <div class="modal fade" th:id="'orderModal-' + ${order.roomMenuOrderNum}" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" style="margin-top: 100px;">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="orderModalLabel">주문 상세 정보</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <ul class="list-group list-group-flush">
+                                                            <!-- 주문 항목 목록 전체 출력 (요청사항은 생략) -->
+                                                            <li class="list-group-item" th:each="item : ${order.orderItemList}">
+                                                                <div class="d-flex align-items-center mb-1">
+                                                                    <strong class="me-2" th:text="#{orderList.menuName}">메뉴명:</strong>
+                                                                    <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
+                                                                </div>
+
+                                                                <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                                                                     class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
+                                                                    <strong class="me-2">옵션:</strong>
+                                                                    <span th:text="${item.roomMenuSelectOptionName}">옵션 요약 정보</span>
+                                                                </div>
+                                                                <div class="d-flex align-items-center mb-1">
+                                                                    <strong class="me-2" th:text="#{orderList.quantity}">수량:</strong>
+                                                                    <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
+                                                                </div>
+                                                                <div class="d-flex align-items-center mb-1">
+                                                                    <strong class="me-2" th:text="#{orderList.totalPrice}">총 가격:</strong>
+                                                                    <strong>₩<span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 3, 'COMMA')}">아이템 총 금액</span></strong>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+
+                                                        <div class="modal-footer">
+                                                            <!-- 모달 하단에 전체 주문의 총 금액 표시 -->
+                                                            <div class="w-100 text-center" style="font-size: 1.1rem;">
+                                                                <strong>총 주문 금액:</strong> ₩<span th:text="${#numbers.formatInteger(order.originalTotalPrice, 3, 'COMMA')}"></span><br>
+                                                                <span th:if="${order.discountedPrice != null}">
+                                                            <strong style="color: #f75b5b;">할인 적용 후 금액:</strong>
+                                                            ₩<span th:text="${#numbers.formatInteger(order.discountedPrice, 3, 'COMMA')}"></span>
+                                                            </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer justify-content-center">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- 해당 주문의 상세 모달 (각 주문마다 생성) 끝-->
                                     </div>
-                                    <!-- 해당 주문의 상세 모달 (각 주문마다 생성) 끝-->
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </form>
-    </div>
+            </form>
 
-    <!-- 알람 모달 시작 -->
-    <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 주문 알림</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
-                <div class="modal-body" id="orderAlertContent">
-                    <!-- JS로 채워짐 -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="orderAlertConfirmBtn">확인</button>
+            <!-- 알람 모달 시작 -->
+            <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 주문 알림</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                        </div>
+                        <div class="modal-body" id="orderAlertContent">
+                            <!-- JS로 채워짐 -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="orderAlertConfirmBtn">확인</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- 알람 모달 실행 끝 -->
+
+            <!-- 페이지 네비게이션 -->
+            <nav>
+                <ul class="pagination justify-content-center align-items-center mt-4">
+                    <!-- 첫 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roommenu/adminOrderList(page=0)}">
+                            &laquo; 처음
+                        </a>
+                    </li>
+
+                    <!-- 이전 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${prevPage - 1})}">
+                            이전
+                        </a>
+                    </li>
+
+                    <!-- 페이지 번호 -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/roommenu/adminOrderList(page=${i - 1})}"
+                           th:text="${i}">1</a>
+                    </li>
+
+                    <!-- 다음 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${nextPage - 1})}">
+                            다음
+                        </a>
+                    </li>
+
+                    <!-- 마지막 페이지 -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${totalPages - 1})}">
+                            마지막 &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="text-center mt-5">
+            <button type="button" onclick="location.href='/roommenu/list'" class="btn btn-secondary px-3">객실 서비스 목록</button>
         </div>
     </div>
-    <!-- 알람 모달 실행 끝 -->
-
-    <!-- 페이지 네비게이션 -->
-    <nav>
-        <ul class="pagination justify-content-center align-items-center mt-3">
-            <!-- 첫 페이지 -->
-            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=0)}">
-                    &laquo; 처음
-                </a>
-            </li>
-
-            <!-- 이전 페이지 -->
-            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${prevPage - 1})}">
-                    이전
-                </a>
-            </li>
-
-            <!-- 페이지 번호 -->
-            <li class="page-item"
-                th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link"
-                   th:href="@{/roommenu/adminOrderList(page=${i - 1})}"
-                   th:text="${i}">1</a>
-            </li>
-
-            <!-- 다음 페이지 -->
-            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${nextPage - 1})}">
-                    다음
-                </a>
-            </li>
-
-            <!-- 마지막 페이지 -->
-            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{/roommenu/adminOrderList(page=${totalPages - 1})}">
-                    마지막 &raquo;
-                </a>
-            </li>
-        </ul>
-    </nav>
 
     <script>
         // 페이지 로딩 후 전체 선택 체크박스 이벤트 등록
@@ -254,7 +270,7 @@
 
                     // 주문 접수(ACCEPT)인 경우, 상태 셀 업데이트 후 행 유지
                     if (actionType === 'ACCEPT') {
-                        const statusCell = row.querySelector("td:nth-child(3)");
+                        const statusCell = row.querySelector("td:nth-child(4)");
                         if (statusCell) {
                             statusCell.textContent = "ACCEPT";
                         }

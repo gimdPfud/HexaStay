@@ -77,26 +77,6 @@
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
-        /* 탭 메뉴 스타일 */
-        .tabs {
-            display: flex;
-            justify-content: space-around;
-            padding: 3px;
-            background-color: #ffffff;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        .tab {
-            cursor: pointer;
-            padding: 10px;
-            font-size: 14px;
-        }
-        .tabs .tab.active {
-            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
-            background-color: #f0f0f0 !important; /* 배경 색상도 강제로 지정 */
-            color: #333 !important; /* 텍스트 색상 강제로 지정 */
-        }
-
         /* 검색 박스 스타일 */
         .search-box {
             display: flex;
@@ -357,30 +337,19 @@
             transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
         }
 
-        /* 인기순 버튼의 hover 효과 제거 */
-        .tabs .btn-custom:hover {
-            background-color: transparent; /* 배경색 변경 없이 유지 */
-            border: 2px solid #ff6b6b; /* 테두리 유지 */
-            color: #ff6b6b; /* 텍스트 색상 유지 */
+        .tabs {
+            display: flex; overflow-x: auto; white-space: nowrap;
+            gap: 10px; padding: 10px 0; margin-bottom: 10px;
+            height: 55px; text-align: center; align-items: center;
         }
+        .tabs::-webkit-scrollbar { display: none; }
 
-        /* 탭 버튼에 active 클래스 추가 시 글자 굵기 변화 */
-        .tabs .tab.active {
-            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
+        .tab {
+            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
+            font-size: 14px; background-color: transparent; color: black;
+            height:37px; width: 60px;
+            text-align: center;
         }
-
-        /* 기본 상태에서 탭 글자는 normal */
-        .tabs .tab {
-            font-weight: normal; /* 기본 상태에서는 글자 굵기 normal */
-        }
-
-        /* 탭 버튼에 active 클래스 추가 시 글자 굵기 변화 */
-        .tabs .tab.active {
-            font-weight: bold !important; /* 활성화된 탭 글자 굵게 */
-            background-color: #f0f0f0 !important; /* 배경 색상도 강제로 지정 */
-            color: #333 !important; /* 텍스트 색상 강제로 지정 */
-        }
-
         /* 품절관련, 좋아요 관련 CSS 시작*/
         .sold-out {
             opacity: 0.5;

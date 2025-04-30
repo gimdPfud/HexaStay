@@ -47,4 +47,5 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
 
 
 
+
 }
