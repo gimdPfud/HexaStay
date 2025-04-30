@@ -34,6 +34,7 @@ public class CouponServiceImpl implements CouponService {
     private final RoomMenuCartItemRepository roomMenuCartItemRepository;
     private final RoomMenuCartRepository roomMenuCartRepository;
     private final CouponRepository couponRepository;
+    private final CouponMailService couponMailService;
 
 
 
@@ -87,6 +88,20 @@ public class CouponServiceImpl implements CouponService {
                 .build();
 
         log.info("쿠폰 엔티티 생성 확인 직전: {}", coupon); // 엔티티 저장 직전 로그
+
+
+        // === ✨ 쿠폰 메일 발송 ===
+        try {
+            couponMailService.sendCouponEmail(
+                    member.getMemberEmail(),
+                    coupon.getCouponType().name(),                         // 또는 coupon.getCouponCode() 사용
+                    coupon.getDiscountRate(),
+                    coupon.getExpirationDate()
+            );
+            log.info("✅ 쿠폰 메일 발송 성공 - 수신자: {}", member.getMemberEmail());
+        } catch (Exception e) {
+            log.error("❌ 쿠폰 메일 발송 실패 - 수신자: {}, 오류: {}", member.getMemberEmail(), e.getMessage());
+        }
         couponRepository.save(coupon); // 쿠폰 저장
         log.info("쿠폰 발급 완료: {}", coupon); // 발급 완료 로그
         }
