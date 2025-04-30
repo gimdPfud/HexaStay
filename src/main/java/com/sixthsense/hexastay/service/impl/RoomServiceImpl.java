@@ -309,23 +309,7 @@ public class RoomServiceImpl {
         // 1. 호텔룸 번호로 룸 리스트를 가져온다
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
 
-        //1.1 session 정보를 가져 오는 로직
-//        String  email =  Principal.getname = "2@1234.com";
-//
-//      (1)- 해당맴버가 잡고있는 룸 찾기
-//        Room rooms1 = roomRepository.findByMember_MemberEmail(Principal.getname).getFirst();
 
-//      (2) -- 그 찾아온 룸에서   호텔룸넘뽑기
-//      rooms1.getHotel().getHotelNum();
-
-//        List<Room> findByMember_MemberEmail(String email);
-//        List<Room> rooms1 = roomRepository.findByMember_MemberEmail(Principal.getname);
-//      ---- seacrhServcie.asdasd(rooms1.getFirst().getHotelRoom().getHotelRoomNum());
-
-//        Room room1 = rooms1.getFirst();
-//
-//        HotelRoom hotelRoom = room1.getHotelRoom();
-//        hotelRoom.getHotelRoomNum();
 
 
         // 2. 가져온 룸이 없으면 오류를 던진다
