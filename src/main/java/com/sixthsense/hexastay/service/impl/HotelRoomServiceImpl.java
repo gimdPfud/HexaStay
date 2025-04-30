@@ -25,6 +25,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -283,8 +284,11 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     }
 
     //4.수정
+    /*Controller : HotelRoomContrller
+    *html 파일 : "hotelroom/modifyhotelroom"
+    *  링크 주소 : /admin/hotelroom/modify
+    * */
     @Override
-
     public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException {
         log.info("HotelRoom 수정 Service 진입");
 
@@ -323,65 +327,61 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
         // 5. 프로필 이미지 수정
-        if (hotelRoomDTO.getHotelRoomProfile() != null) {
+        MultipartFile newProfileFile = hotelRoomDTO.getHotelRoomProfile();
 
-        if (hotelRoomRepository.findById(hotelRoomNum).get().getHotelRoomProfileMeta() != null){
-            String orifile = hotelRoomRepository.findById(hotelRoomNum).get().getHotelRoomProfileMeta();
-
-            Path deletePath = Paths.get(System.getProperty("user.dir"), orifile.startsWith("/") ? orifile.substring(1) : orifile);
-
-            try {
-                Files.deleteIfExists(deletePath);
-                log.info("기존 파일 삭제 완료: {}", deletePath);
-            } catch (IOException e) {
-                log.warn("기존 파일 삭제 실패: {}", e.getMessage());
+        if (newProfileFile != null && !newProfileFile.isEmpty()) {
+            // ✅ 기존 파일 삭제
+            String existingMeta = hotelRoom.getHotelRoomProfileMeta();
+            if (existingMeta != null) {
+                Path deletePath = Paths.get(System.getProperty("user.dir"),
+                        existingMeta.startsWith("/") ? existingMeta.substring(1) : existingMeta);
+                try {
+                    Files.deleteIfExists(deletePath);
+                    log.info("기존 이미지 파일 삭제 완료: {}", deletePath);
+                } catch (IOException e) {
+                    log.warn("기존 이미지 파일 삭제 실패: {}", e.getMessage());
+                }
             }
-        }
 
-            String ext = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename()
-                    .substring(hotelRoomDTO.getHotelRoomProfile().getOriginalFilename().lastIndexOf("."));
+            // ✅ 새 파일 저장
+            String ext = newProfileFile.getOriginalFilename()
+                    .substring(newProfileFile.getOriginalFilename().lastIndexOf("."));
             String fileName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoomNum + ext;
-
             Path savePath = Paths.get(System.getProperty("user.dir"), "hotelroom", fileName);
 
-
             Files.createDirectories(savePath.getParent());
+            newProfileFile.transferTo(savePath.toFile());
 
-            hotelRoomDTO.getHotelRoomProfile().transferTo(savePath.toFile());
-            hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/" + fileName);
-
-            // 이 부분 추가!!
-            hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
-
-        } else if (hotelRoomDTO.getHotelRoomProfile() == null) {
-            hotelRoomDTO.setHotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta());
+            hotelRoom.setHotelRoomProfileMeta("/hotelroom/" + fileName);
+        } else {
+            // ✅ 새 파일이 없으면 기존 메타 그대로 유지
+            hotelRoom.setHotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta());
         }
 
         // 6. QR코드 삭제 후 재생성
-        if (hotelRoom.getHotelRoomQr() != null) {
-            // 기존 QR 코드 삭제
-            Path qrPath = Paths.get(System.getProperty("user.dir"), "qrfile", hotelRoom.getHotelRoomQr());
+        String oldQrFile = hotelRoom.getHotelRoomQr(); // 💡 기존 QR 경로 미리 저장
+        if (oldQrFile != null) {
+            Path oldQrPath = Paths.get(System.getProperty("user.dir"), oldQrFile.startsWith("/") ? oldQrFile.substring(1) : oldQrFile);
             try {
-                Files.deleteIfExists(qrPath);
+                Files.deleteIfExists(oldQrPath);
+                log.info("기존 QR 코드 삭제 완료: {}", oldQrPath);
             } catch (IOException e) {
                 log.warn("QR 코드 삭제 실패: {}", e.getMessage());
             }
         }
 
-        // QR 코드 생성 및 경로 설정
+        // QR 코드 재생성
         String qrText = "localhost:8090/qr/" + hotelRoomDTO.getHotelRoomNum();
-        String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png"; // QR 파일 이름
-        Path qrPath = Paths.get(System.getProperty("user.dir"), "qrfile", qrFileName); // 파일 경로
-        Files.createDirectories(qrPath.getParent()); // 경로 생성
+        String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png";
+        Path newQrPath = Paths.get(System.getProperty("user.dir"), "qrfile", qrFileName);
+        Files.createDirectories(newQrPath.getParent());
 
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300);
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", qrPath);
+            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", newQrPath);
 
-            // QR 코드 파일 경로를 hotelRoom 객체에 저장 (view에서 사용할 수 있도록)
-            hotelRoom.setHotelRoomQr("/qrfile/" + qrFileName); // 경로를 "/qr/{파일명}" 형식으로 설정
-
+            hotelRoom.setHotelRoomQr("/qrfile/" + qrFileName); // 새 경로 저장
         } catch (Exception e) {
             throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage());
         }
