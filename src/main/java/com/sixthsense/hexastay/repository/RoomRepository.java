@@ -88,6 +88,12 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             LocalDateTime endDate, 
             Pageable pageable);
 
-    // 체크인, 체크아웃에 따라 장바구니 로직에 추가할 것을 감별
+    // memberNum 기준으로 hotelRoomNum을 참고하여, hotelRoomName을 가져오기.
+//    @Query("SELECT r.hotelRoom.hotelRoomName FROM Room r WHERE r.member.memberNum = :memberNum ORDER BY r.id ASC")
+//    List<String> findHotelRoomNamesByMemberNum(@Param("memberNum") Long memberNum, Pageable pageable);
+
     Optional<Room> findByMemberAndCheckOutDateIsNull(Member member);
+
+    Optional<Room> findByMember(Member member);
+
 }

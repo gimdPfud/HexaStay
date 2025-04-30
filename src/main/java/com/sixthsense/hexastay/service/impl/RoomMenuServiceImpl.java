@@ -1,13 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
-import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuOption;
-import com.sixthsense.hexastay.entity.RoomMenuTranslation;
-import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
-import com.sixthsense.hexastay.repository.RoomMenuRepository;
-import com.sixthsense.hexastay.repository.RoomMenuTranslationRepository;
+import com.sixthsense.hexastay.entity.*;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -39,6 +36,8 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
+    private final HotelRoomRepository hotelRoomRepository;
+    private final AdminRepository adminRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomMenuOptionRepository roomMenuOptionRepository;
 
@@ -486,6 +485,65 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             return dto;
         });
         return roomMenuDTOList;
+    }
+
+    /* 호텔 객실 목록 조회 */
+
+    public List<HotelRoomDTO> searchRoomList(String adminEmail) {
+        log.info("관리자 이메일 '{}'로 호텔 객실 목록 조회를 시작합니다.", adminEmail);
+
+        // 1. 이메일 주소로 Admin 엔티티 조회
+        Admin admin = adminRepository.findByAdminEmail(adminEmail); // Repository 메소드 반환 타입 확인 (Optional이 아닐 수 있음)
+        if (admin == null) {
+            log.warn("이메일 '{}'에 해당하는 관리자를 찾을 수 없습니다.", adminEmail);
+            throw new EntityNotFoundException("해당 이메일의 관리자를 찾을 수 없습니다: " + adminEmail);
+        }
+
+        // 2. 조회된 Admin 엔티티에서 연결된 Company(호텔) 정보 가져오기
+        Company managedCompany = admin.getCompany();
+        if (managedCompany == null) {
+            log.warn("관리자 '{}'에게 할당된 호텔(Company) 정보가 없습니다.", adminEmail);
+            return Collections.emptyList(); // 빈 목록 반환
+        }
+        Long companyId = managedCompany.getCompanyNum(); // Company 엔티티의 PK 필드명 확인
+
+        List<HotelRoom> hotelRooms = hotelRoomRepository.findByCompany_CompanyNum(companyId);
+        log.debug("회사 ID '{}'에 속한 HotelRoom {}건을 조회했습니다.", companyId, hotelRooms.size());
+
+        List<HotelRoomDTO> hotelRoomDtos = hotelRooms.stream()
+                .map(this::convertToHotelRoomDto) // 아래 정의된 변환 메소드 사용
+                .collect(Collectors.toList());
+
+        log.info("관리자 이메일 '{}'에 대한 호텔 객실 목록 조회 완료: {} 건", adminEmail, hotelRoomDtos.size());
+        return hotelRoomDtos;
+    }
+
+    private HotelRoomDTO convertToHotelRoomDto(HotelRoom hotelRoom) {
+        if (hotelRoom == null) {
+            return null;
+        }
+
+        HotelRoomDTO.HotelRoomDTOBuilder builder = HotelRoomDTO.builder()
+                .hotelRoomNum(hotelRoom.getHotelRoomNum())
+                .hotelRoomName(hotelRoom.getHotelRoomName())
+                .hotelRoomPhone(hotelRoom.getHotelRoomPhone())
+                .hotelRoomType(hotelRoom.getHotelRoomType())
+                .hotelRoomContent(hotelRoom.getHotelRoomContent())
+                .hotelRoomStatus(hotelRoom.getHotelRoomStatus())
+                .hotelRoomLodgment(hotelRoom.getHotelRoomLodgment())
+                .hotelRoomPrice(hotelRoom.getHotelRoomPrice())
+                .hotelRoomQr(hotelRoom.getHotelRoomQr())
+                // .hotelRoomPassword(hotelRoom.getHotelRoomPassword()) // 비밀번호는 DTO에 포함하지 않는 것이 좋습니다.
+                .hotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta());
+
+        // Company 정보 매핑 (Company 정보가 있는 경우)
+        if (hotelRoom.getCompany() != null) {
+            builder.companyNum(hotelRoom.getCompany().getCompanyNum());
+            builder.companyName(hotelRoom.getCompany().getCompanyName()); // DTO에 companyName 필드가 있다고 가정
+        }
+
+
+        return builder.build();
     }
 }
 

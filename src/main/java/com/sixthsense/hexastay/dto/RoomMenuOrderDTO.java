@@ -1,4 +1,5 @@
 package com.sixthsense.hexastay.dto;
+import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import lombok.Getter;
@@ -47,7 +48,10 @@ public class RoomMenuOrderDTO {
 
     private String originalImageMeta; // 기존 이미지의 경로
 
+    private Long hotelRoom; // 호텔룸을 참조
+
     private List<RoomMenuOrderItemDTO> orderItemList = new ArrayList<>();
+
 
 
 

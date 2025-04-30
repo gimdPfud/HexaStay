@@ -148,7 +148,7 @@ public class RoomMenuOrderController {
 
     @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO,
-                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice) {
+                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable, Long hotelRoomNum) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -160,9 +160,9 @@ public class RoomMenuOrderController {
         String email = principal.getName();
 
         try {
-            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice);
+            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable, hotelRoomNum);
             log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
-            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order);
+            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order, pageable);
             log.info("3️⃣ 알람 전송 완료");
 
 

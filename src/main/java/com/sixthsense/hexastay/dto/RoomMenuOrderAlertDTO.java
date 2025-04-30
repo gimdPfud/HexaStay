@@ -23,4 +23,7 @@ public class RoomMenuOrderAlertDTO {
     private Long orderId;
     private java.time.LocalDateTime orderTimestamp;
 
+    private String hotelRoomName; // 호텔의 이름
+
+
 }

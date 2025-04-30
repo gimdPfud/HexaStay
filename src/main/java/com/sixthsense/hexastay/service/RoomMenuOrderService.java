@@ -13,7 +13,7 @@ public interface RoomMenuOrderService {
     public Long roomMenuOrderInsert(RoomMenuOrderDTO roomMenuOrderDTO, String email);
 
     // 주문 입력 2
-    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage, Long couponNum, Integer discountedTotalPrice);
+    public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage, Long couponNum, Integer discountedTotalPrice, Pageable pageable, Long hotelRoomNum);
 
     // 리스트
     public Page<RoomMenuOrderDTO> getOrderListByEmail(String email, Pageable pageable);
@@ -25,7 +25,7 @@ public interface RoomMenuOrderService {
     public Page<RoomMenuOrderDTO> getAllOrdersForAdmin(Pageable pageable);
 
     // 관리자에게 알람을 띄우기
-    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order);
+    public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order, Pageable pageable);
 
 
 }
