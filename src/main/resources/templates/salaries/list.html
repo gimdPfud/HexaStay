@@ -82,9 +82,9 @@
         /* 날짜 선택 폼 스타일 */
         .date-search-form {
             background-color: #f8f9fa;
-            padding: 15px;
+            padding: 10px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         /* 행 상세 정보 */
@@ -107,7 +107,7 @@
             background-color: #1D6F42;
             color: white;
             border: none;
-            margin-bottom: 15px;
+            height: 40px;
         }
         
         .excel-btn:hover {
@@ -127,14 +127,12 @@
         <!-- 날짜 선택 폼 -->
         <div class="date-search-form">
             <form id="dateSearchForm" th:action="@{/salaries/list}" method="get" class="row g-3 align-items-center">
+
                 <div class="col-auto">
-                    <label for="startMonth" class="col-form-label">시작 월</label>
+                    <input type="month" class="form-control " id="startMonth" name="startMonth" th:value="${param.startMonth}">
                 </div>
                 <div class="col-auto">
-                    <input type="month" class="form-control" id="startMonth" name="startMonth" th:value="${param.startMonth}">
-                </div>
-                <div class="col-auto">
-                    <label for="endMonth" class="col-form-label">종료 월</label>
+                    <label for="endMonth" class="col-form-label ">~</label>
                 </div>
                 <div class="col-auto">
                     <input type="month" class="form-control" id="endMonth" name="endMonth" th:value="${param.endMonth}">
@@ -146,7 +144,7 @@
                     <button type="button" id="resetButton" class="btn btn-secondary">전체 조회</button>
                 </div>
                 <div class="col-auto ms-auto">
-                    <button type="button" id="excelDownloadBtn" class="btn excel-btn">
+                    <button type="button" id="excelDownloadBtn" class="btn excel-btn ">
                         <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
                     </button>
                 </div>
