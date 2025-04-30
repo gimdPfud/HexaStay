@@ -78,4 +78,13 @@ public class FacilitiesController {
             return "redirect:/admin/fs/read";
         }
     }
+
+    @GetMapping("/fs/list")
+    public String fslistClient(){
+        return "facilities/mobile/list";
+    }
+    @GetMapping("/fs/read")
+    public String fsreadClient(){
+        return "facilities/mobile/read";
+    }
 }
