@@ -11,7 +11,9 @@ import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.OrderstoreService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -29,6 +31,10 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class OrderstoreServiceImpl implements OrderstoreService {
+
+//    //영속성 분리를 위해 추가햄
+//    @PersistenceContext
+//    private EntityManager em;
 
     private final OrderstoreRepository orderstoreRepository;
 //    private final MemberRepository memberRepository;
@@ -85,8 +91,9 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         Room room = roomService.readRoomByHotelRoomNum(hotelRoomNum);
         Orderstore order = new Orderstore();
         order.setRoom(room);
-        order.setOrderstoreStatus("unpaid");
+        order.setOrderstoreStatus("paid"); //그냥 여기서 paid하자....... ㅠㅠ
         order.setOrderstoreMessage(orderstoreMessage);
+//        log.info("orderstore1 : "+order);
 
         if(itemIdList==null||itemIdList.isEmpty()){return 3;}
 
@@ -103,27 +110,18 @@ public class OrderstoreServiceImpl implements OrderstoreService {
             orderItem.setOrderstoreitemTotalPrice(  cartItem.getStorecartitemCount()  *  ( cartItem.getStoremenu().getStoremenuPrice() + cartItem.getOptionPrice() )  );
             orderItem.setStoremenuOptions(cartItem.getStoremenuOptions());// 6:면추가:1500
             orderItem.setStoremenuOptionsPrice(cartItem.getOptionPrice());
-            storecartitemRepository.delete(cartItem);
             itemlist.add(orderItem);
+            storecartitemRepository.delete(cartItem);
         }
         order.setOrderstoreitemList(itemlist);
         order.setStore(itemlist.stream().findFirst().orElseThrow().getStoremenu().getStore());
-        orderstoreRepository.save(order);
+//        log.info("orderstore2 : "+order);
+        order = orderstoreRepository.save(order);
+        log.info("insert의 Orderstore : "+order);
         return 1;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)//영속성 끊어주려고 추가함
-    public void paid(Long orderId) {
-        log.info("paid 시작");
-        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-        log.info("orderstore1 : "+orderstore);
-        orderstore.setOrderstoreStatus("paid");
-        log.info("orderstore2 : "+orderstore);
-        orderstore = orderstoreRepository.save(orderstore);
-        log.info("orderstore3 : "+orderstore);
-        orderstoreRepository.flush(); // 즉시 반영
-    }
+
 
     @Override
     public Long getLastOrder(Long hotelRoom) {
@@ -133,18 +131,6 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         }
         Long orderId = list.getLast().getOrderstoreNum();
         return orderId;
-    }
-
-    @Override
-    public void cancel(Long orderId) {
-        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-        orderstore.setOrderstoreStatus("cancel");
-    }
-
-    @Override
-    public void end(Long orderId) {
-        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-        orderstore.setOrderstoreStatus("end");
     }
 
 
@@ -231,5 +217,19 @@ public class OrderstoreServiceImpl implements OrderstoreService {
         }).toList();
         log.info("서비스에서 찾음? "+result.size());
         return result;
+    }
+
+    @Override
+    public void cancel(Long orderId) {
+        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        orderstore.setOrderstoreStatus("cancel");
+        orderstoreRepository.save(orderstore);
+    }
+
+    @Override
+    public void end(Long orderId) {
+        Orderstore orderstore = orderstoreRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        orderstore.setOrderstoreStatus("end");
+        orderstoreRepository.save(orderstore);
     }
 }

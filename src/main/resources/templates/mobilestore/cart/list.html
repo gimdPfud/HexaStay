@@ -124,23 +124,12 @@
                         }
                         return response.text().then(body => alert(body));
                     } else {
-                        fetch("/member/store/order/getlastorder")
-                            .then(response => {
-                                if (!response.ok) {
-                                    return response.text().then(body => alert(body));
-                                } else {
-                                    return response.text();
-                                }
-                            })
-                            .then(orderid => {
-                                if (!orderid) return;
-                                const url = `/storepayment?tossprice=${price}&o=${orderid}`;
-                                const popup = window.open(url, "_blank", "width=600,height=800");
-                                if (!popup) {
-                                    alert("팝업 차단 해제해 주세요.");
-                                }
-                                window.location.href = "/tossloading";
-                            });
+                        const url = `/storepayment?tossprice=${price}`;
+                        const popup = window.open(url, "_blank", "width=600,height=800");
+                        if (!popup) {
+                            alert("팝업 차단 해제해 주세요.");
+                        }
+                        window.location.href = "/tossloading";
                     }
                 });
         }
