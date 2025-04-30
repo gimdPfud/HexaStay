@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import com.sixthsense.hexastay.repository.*;
+import com.sixthsense.hexastay.service.NotificationService;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -38,6 +39,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final RoomMenuCartRepository roomMenuCartRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final CouponRepository couponRepository;
+    private final NotificationService notificationService;
 
 
     /***************************************************
@@ -502,46 +504,68 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             return;
         }
 
+        // --- 주문 ID 가져오기 ---
+        Long orderId = order.getRoomMenuOrderNum(); // RoomMenuOrder 엔티티에 getId() 메소드가 있다고 가정
+        if (orderId == null) {
+            log.warn("알람 전송 실패: 주문 ID를 가져올 수 없음");
+            return;
+        }
+        // --- 주문 ID 가져오기 끝 ---
+
         // 총 금액 계산 (RoomMenuOrder 내부 기준)
         int totalPrice = order.getOrderItems().stream()
                 .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
                 .sum();
 
-
-
-        // RoomMenuOrderItemDTO 리스트 가져오기
+        // RoomMenuOrderItemDTO 리스트 가져오기 및 정보 추출
         List<RoomMenuOrderItemDTO> itemDtoList = orderDto.getOrderItemList();
         log.info(" orderDto 전체 내용: {}", orderDto);
         log.info(" 주문 항목 리스트: {}", orderDto.getOrderItemList());
 
         String requestMessages = "";
         int totalAmount = 0;
+        String memberEmail = order.getMember().getMemberEmail(); // 주문자 이메일
 
         if (itemDtoList != null && !itemDtoList.isEmpty()) {
             requestMessages = itemDtoList.stream()
                     .map(RoomMenuOrderItemDTO::getRoomMenuOrderRequestMessage)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.joining(", ")); // 줄바꿈 원하면 "\n"
+                    .collect(Collectors.joining(", "));
 
             totalAmount = itemDtoList.stream()
                     .mapToInt(RoomMenuOrderItemDTO::getRoomMenuOrderItemAmount)
                     .sum();
         }
 
-        // DTO 생성
-        RoomMenuOrderAlertDTO alertDto = new RoomMenuOrderAlertDTO();
-        alertDto.setMemberEmail(order.getMember().getMemberEmail());
-        alertDto.setTotalPrice(totalPrice);
-        alertDto.setRoomMenuOrderRequestMessage(requestMessages);
-        alertDto.setRoomMenuOrderAmount(totalAmount);
+        // === 수정 시작: 알림 저장 및 전송 DTO 재구성 ===
 
-        log.info("🚀 알람 전송 DTO: {}", alertDto);
+        // 1. 알림 저장에 필요한 정보를 담을 DTO 준비 (기존 DTO 활용)
+        RoomMenuOrderAlertDTO alertInfoForDb = new RoomMenuOrderAlertDTO();
+        alertInfoForDb.setMemberEmail(memberEmail);
+        alertInfoForDb.setTotalPrice(totalPrice);
+        // 필요 시 추가 정보 설정
 
-        // 메시지 전송
-        messagingTemplate.convertAndSend("/topic/new-order", alertDto);
+        // 2. NotificationService를 호출하여 알림을 DB에 저장하고 결과 받기
+        //    (NotificationService가 주입되어 있어야 함)
+        Notification savedNotification = notificationService.createAndSaveNewOrderNotification(orderId, alertInfoForDb);
 
+        // 3. WebSocket으로 전송할 최종 DTO 생성 (Builder 사용 및 추가 정보 설정)
+        //    (RoomMenuOrderAlertDTO에 notificationId, orderId, orderTimestamp 필드가 추가되어 있어야 함)
+        RoomMenuOrderAlertDTO alertDtoForWebSocket = RoomMenuOrderAlertDTO.builder()
+                .memberEmail(memberEmail)
+                .totalPrice(totalPrice)
+                .roomMenuOrderRequestMessage(requestMessages)
+                .roomMenuOrderAmount(totalAmount)
+                .notificationId(savedNotification.getNotificationId()) // 저장된 알림 ID 설정
+                .orderId(orderId)                           // 주문 ID 설정
+                .orderTimestamp(savedNotification.getCreateDate()) // 알림 생성 시간 (BaseEntity 상속)
+                .build();
+
+        log.info("🚀 최종 WebSocket 알람 전송 DTO: {}", alertDtoForWebSocket);
+
+        // 4. 수정된 최종 DTO를 WebSocket으로 전송
+        messagingTemplate.convertAndSend("/topic/new-order", alertDtoForWebSocket);
+
+        // === 수정 끝 ===
     }
-
-
-
 }
