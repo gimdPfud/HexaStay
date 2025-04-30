@@ -23,13 +23,9 @@ public interface OrderstoreService {
 //    int insert(List<Long> itemIdList, String email, String orderstoreMessage);
     int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage);
 
-    /*3. 주문취소*/
-    void cancel(Long orderId);
-    /*3-1. 주문완료*/
-    void end(Long orderId);
-    /*3-2. 결제완료*/
-    void paid(Long orderId);
     Long getLastOrder(Long hotelRoom);
+    void end(Long orderId);
+    void cancel(Long orderId);
 
     /*4. 고객용 주문내역 목록*/
 //    List<OrderstoreViewDTO> getOrderList(String email);

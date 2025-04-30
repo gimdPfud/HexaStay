@@ -55,8 +55,6 @@
                     <p>결제금액: <span th:text="${tossprice}">결제금액</span>원</p>
                     <p>결제일시: <div>히히 아직 안넣었다</div></p>
                 </div>
-        <input hidden id="o" th:value="${o}">
-
 
         <!--        <div class="payment-info">-->
 <!--            <p>주문번호: <span th:text="${payment.orderId}">주문번호</span></p>-->
@@ -70,14 +68,7 @@
 
 
 <script>
-    const o = document.getElementById('o').value;
 
-    document.addEventListener("DOMContentLoaded",function () {
-        fetch(`/admin/store/order/paid/${o}`)
-            .then(response=>{
-                console.log("갔다옴")
-            })
-    })
     function goHome() {
         // 부모 창 이동
         if (window.opener) {

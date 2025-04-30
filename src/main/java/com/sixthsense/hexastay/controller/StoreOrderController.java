@@ -158,21 +158,21 @@ public class StoreOrderController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    @GetMapping("/admin/store/order/paid/{orderNum}")
-    public ResponseEntity paidOrder(@PathVariable(value = "orderNum") Long orderNum){
-        try {
-            log.info("paid로 변환 시작");
-            orderstoreService.paid(orderNum);
-            log.info("됨");
-        } catch (EntityNotFoundException e){
-            log.info("못찾음");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            log.info("왜안됨");
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @GetMapping("/admin/store/order/paid/{orderNum}") 이거 그냥 insert에서 paid 설정하기로 함
+//    public ResponseEntity paidOrder(@PathVariable(value = "orderNum") Long orderNum){
+//        try {
+//            log.info("paid로 변환 시작");
+//            osService.paid(orderNum);
+//            log.info("됨");
+//        } catch (EntityNotFoundException e){
+//            log.info("못찾음");
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            log.info("왜안됨");
+//            throw new RuntimeException(e);
+//        }
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
     @ResponseBody
     @GetMapping("/member/store/order/getlastorder")
     public ResponseEntity getlastorder(Principal principal){
