@@ -338,7 +338,6 @@
         async function initializeNotifications() { // async 추가
             console.log("알림 초기화 시도");
             try {
-                // API 경로 수정: /roommenu/notifications/unread
                 const response = await fetch('/roommenu/notifications/unread');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -355,12 +354,9 @@
 
                 if (data.notifications && data.notifications.length > 0) {
                     data.notifications.forEach(notification => {
-                        // 백엔드 DTO (NotificationDTO) 기준으로 HTML 생성
-                        // NotificationDTO에 createdAt 필드가 추가되었다고 가정
-                        // 만약 createdAt이 없다면 백엔드 DTO 수정 필요
                         const notificationDataForHtml = {
                             ...notification,
-                            orderTimestamp: notification.createdAt // DTO 필드 createdAt을 사용
+                            orderTimestamp: notification.createDate // DTO 필드 createdAt을 사용
                         };
                         const newItemHTML = createNotificationItemHTML(notificationDataForHtml);
                         menu.insertAdjacentHTML('beforeend', newItemHTML); // 아래쪽에 순서대로 추가
@@ -389,7 +385,8 @@
         // 새로운 알림 항목 HTML 생성 함수 (DTO 필드명 일관성 확인 필요)
         function createNotificationItemHTML(notification) {
             // JavaScript는 WebSocket DTO(orderTimestamp)와 API DTO(createdAt)를 모두 처리해야 함
-            const timeValue = notification.createdAt || notification.orderTimestamp; // 둘 중 있는 값 사용
+            const timeValue = notification.createDate || notification.orderTimestamp;
+            console.log('시간 값 (timeValue):', timeValue);
             const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR') : '시간 정보 없음'; // 한국 시간 형식
             const message = `<strong>${notification.memberEmail}</strong>님이 주문 (${notification.totalPrice.toLocaleString('ko-KR')}원)`; // 가격 포맷팅
             const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
