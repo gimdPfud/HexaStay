@@ -43,15 +43,27 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
+
     <div class="container-fluid mt-4 w-100 bg-light">
-        <!-- 타이틀 + 번역 영역 감싸기 -->
         <div class="position-relative mb-4" style="min-height: 40px;">
-            <!-- 가운데 정렬된 타이틀 -->
             <h2 class="fw-bold position-absolute top-50 start-50 translate-middle text-center mb-0"
                 th:text="#{roomServiceListTitle}" >객실 서비스 목록</h2>
 
-            <!-- 오른쪽 상단에 붙은 번역 영역 -->
-            <div class="position-absolute top-0 end-0">
+            <div class="position-absolute top-0 end-0 d-flex align-items-center gap-3">
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm p-1 position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                            0
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
+                    <ul id="notification-dropdown-menu" class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                        <li><p class="dropdown-item text-center text-muted small mb-0">새로운 알림이 없습니다.</p></li>
+                    </ul>
+                </div>
+
                 <form method="get"
                       th:action="@{/roommenu/list}"
                       class="d-flex align-items-center gap-2"
@@ -75,6 +87,7 @@
                         <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
                     </select>
                 </form>
+
             </div>
         </div>
 
@@ -317,6 +330,200 @@
                     console.error("주문 생성 실패:", error);
                 });
         });
+
+
+        /* 알람 페이지 시작 */
+
+        // 페이지 로드 시 실행될 초기화 함수
+        async function initializeNotifications() { // async 추가
+            console.log("알림 초기화 시도");
+            try {
+                // API 경로 수정: /roommenu/notifications/unread
+                const response = await fetch('/roommenu/notifications/unread');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("읽지 않은 알림 데이터:", data);
+
+                // 배지 업데이트
+                updateNotificationBadge(data.count);
+
+                // 목록 업데이트
+                const menu = document.getElementById('notification-dropdown-menu');
+                menu.innerHTML = ''; // 기존 목록 초기화 (플레이스홀더 포함)
+
+                if (data.notifications && data.notifications.length > 0) {
+                    data.notifications.forEach(notification => {
+                        // 백엔드 DTO (NotificationDTO) 기준으로 HTML 생성
+                        // NotificationDTO에 createdAt 필드가 추가되었다고 가정
+                        // 만약 createdAt이 없다면 백엔드 DTO 수정 필요
+                        const notificationDataForHtml = {
+                            ...notification,
+                            orderTimestamp: notification.createdAt // DTO 필드 createdAt을 사용
+                        };
+                        const newItemHTML = createNotificationItemHTML(notificationDataForHtml);
+                        menu.insertAdjacentHTML('beforeend', newItemHTML); // 아래쪽에 순서대로 추가
+                    });
+                    // 읽음/읽지 않음 상태 반영 (초기 로드 시)
+                    menu.querySelectorAll('li').forEach(li => {
+                        const notificationId = li.querySelector('a')?.getAttribute('data-notification-id');
+                        const notification = data.notifications.find(n => n.notificationId == notificationId);
+                        if (notification) {
+                            li.classList.add(notification.isRead ? 'read' : 'unread');
+                        }
+                    });
+
+                } else {
+                    menu.innerHTML = '<li><p class="dropdown-item text-center text-muted small mb-0">새로운 알림이 없습니다.</p></li>';
+                }
+
+            } catch (error) {
+                console.error("읽지 않은 알림 로딩 실패:", error);
+                const menu = document.getElementById('notification-dropdown-menu');
+                menu.innerHTML = '<li><p class="dropdown-item text-center text-danger small mb-0">알림 로딩 실패</p></li>';
+                updateNotificationBadge(0);
+            }
+        }
+
+        // 새로운 알림 항목 HTML 생성 함수 (DTO 필드명 일관성 확인 필요)
+        function createNotificationItemHTML(notification) {
+            // JavaScript는 WebSocket DTO(orderTimestamp)와 API DTO(createdAt)를 모두 처리해야 함
+            const timeValue = notification.createdAt || notification.orderTimestamp; // 둘 중 있는 값 사용
+            const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR') : '시간 정보 없음'; // 한국 시간 형식
+            const message = `<strong>${notification.memberEmail}</strong>님이 주문 (${notification.totalPrice.toLocaleString('ko-KR')}원)`; // 가격 포맷팅
+            const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
+            // isRead 상태 반영을 위해 li 요소에 클래스 추가 준비
+            const itemClass = notification.isRead ? 'read' : 'unread';
+
+            return `
+    <li class="${itemClass}">
+        <a class="dropdown-item notification-item" href="${link}" data-notification-id="${notification.notificationId}">
+            <div class="small text-muted">${timeString}</div>
+            <div>${message}</div>
+        </a>
+    </li>
+    `;
+        }
+
+        // 알림 배지 업데이트 함수 (변경 없음)
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notification-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'block' : 'none';
+            }
+        }
+
+        // 알림 목록 업데이트 함수 (WebSocket 수신 시 호출됨 - DTO 필드명 주의)
+        function addNotificationToList(notification) { // notification은 WebSocket DTO (orderTimestamp) 기준
+            const menu = document.getElementById('notification-dropdown-menu');
+            const placeholder = menu.querySelector('p.text-muted');
+
+            if (placeholder) {
+                placeholder.parentElement.remove();
+            }
+
+            // WebSocket DTO로 HTML 생성 (isRead는 기본 false(unread)로 처리됨)
+            const newItemHTML = createNotificationItemHTML({...notification, isRead: false}); // isRead: false 명시
+            menu.insertAdjacentHTML('afterbegin', newItemHTML); // 맨 위에 추가
+
+            // 새로 추가된 항목에 unread 클래스 확실히 하기 (create 함수에서 이미 처리하지만 중복해도 무방)
+            const addedLi = menu.firstChild;
+            if (addedLi && addedLi.tagName === 'LI') {
+                addedLi.classList.add('unread');
+                addedLi.classList.remove('read');
+            }
+        }
+
+        // --- 읽음 처리 API 호출 함수 추가 ---
+        async function markNotificationsAsReadApiCall(ids) {
+            if (!ids || ids.length === 0) {
+                console.log("읽음 처리할 알림 ID 없음");
+                return false; // 처리할 ID 없으면 실패 처리
+            }
+            console.log("읽음 처리 API 호출 시도:", ids);
+            try {
+                // API 경로 수정: /roommenu/notifications/read
+                const response = await fetch('/roommenu/notifications/read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // CSRF 토큰이 필요하다면 헤더에 추가해야 함
+                        // 'X-CSRF-TOKEN': csrfToken // 예시
+                    },
+                    body: JSON.stringify(ids) // ID 목록을 JSON으로 전송
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text(); // 에러 메시지 확인
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+                }
+
+                const result = await response.json();
+                console.log("알림 읽음 처리 결과:", result);
+                return true; // 성공 시 true 반환
+
+            } catch (error) {
+                console.error("알림 읽음 처리 실패:", error);
+                // 사용자에게 에러 알림 표시 고려
+                // alert('알림 읽음 처리에 실패했습니다.');
+                return false; // 실패 시 false 반환
+            }
+        }
+        // --- 읽음 처리 API 호출 함수 끝 ---
+
+        // DOM 로드 완료 후 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            // 알림 초기화 함수 호출
+            initializeNotifications();
+
+            // 알림 드롭다운 관련 이벤트 리스너
+            const dropdownElement = document.getElementById('notificationDropdown');
+            if (dropdownElement) {
+                dropdownElement.addEventListener('show.bs.dropdown', async function () { // async 추가
+                    console.log("드롭다운 열림");
+
+                    // 현재 목록에서 '읽지 않은(unread)' 상태인 알림 항목들의 ID 수집
+                    const unreadItems = document.querySelectorAll('#notification-dropdown-menu li.unread .notification-item');
+                    const notificationIdsToRead = Array.from(unreadItems)
+                        .map(item => item.getAttribute('data-notification-id'))
+                        .filter(id => id)
+                        .map(id => parseInt(id));
+
+                    if (notificationIdsToRead.length > 0) {
+                        const success = await markNotificationsAsReadApiCall(notificationIdsToRead); // API 호출
+                        if (success) {
+                            updateNotificationBadge(0); // 성공 시 배지 0으로
+                            // UI 업데이트: 읽음 처리된 항목들의 스타일 변경
+                            unreadItems.forEach(item => {
+                                const li = item.closest('li');
+                                if (li) {
+                                    li.classList.remove('unread');
+                                    li.classList.add('read'); // 읽음 클래스 추가
+                                }
+                            });
+                        } else {
+                            // API 호출 실패 시 사용자에게 알림 등 고려
+                        }
+                    } else {
+                        console.log("읽음 처리할 새 알림 없음");
+                        // 읽을 게 없어도 배지는 0으로 만드는 것이 자연스러울 수 있음
+                        updateNotificationBadge(0);
+                    }
+                });
+            }
+
+            // 동적으로 추가된 알림 항목 클릭 이벤트 위임 (현재는 링크 이동만)
+            const dropdownMenu = document.getElementById('notification-dropdown-menu');
+            if (dropdownMenu) {
+                // 클릭 시 기본 동작(링크 이동)만 수행.
+                // 개별 읽음 처리 로직은 현재 구현하지 않음.
+            }
+
+        });
+
+        /* 알람페이지 끝 */
 
 
     </script>

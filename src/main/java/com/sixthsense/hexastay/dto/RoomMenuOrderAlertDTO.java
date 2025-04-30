@@ -16,4 +16,10 @@ public class RoomMenuOrderAlertDTO {
     private String roomMenuOrderRequestMessage; // 추가
     private Integer roomMenuOrderAmount;    // 추가
 
+    /* 새로 추가됨 */
+
+    private Long notificationId;
+    private Long orderId;
+    private java.time.LocalDateTime orderTimestamp;
+
 }
