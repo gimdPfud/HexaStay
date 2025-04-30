@@ -38,26 +38,7 @@ public class FsService {
         Facilities fs = modelMapper.map(dto,Facilities.class);
         fs.setFsAmount(0);
         fs = fsRepository.save(fs);
-
         log.info("1차저장 끝 "+fs);
-        //프로필 이미지 처리
-        if (dto.getFsPicture() != null && !dto.getFsPicture().isEmpty()) {
-            String fileOriginalName = dto.getFsPicture().getOriginalFilename();
-            String fileFirstName = fs.getFacilitiesNum() + "_" + dto.getFsName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            dto.setFsPictureMeta("/company/fs/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/fs/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "company/fs/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-            dto.getFsPicture().transferTo(uploadPath.toFile());
-        }
-        fs.setFsPictureMeta(dto.getFsPictureMeta());
-        fs = fsRepository.save(fs);
-        log.info("2차저장 끝 : "+fs);
         return fs.getCompany().getCompanyNum();
     }
 
@@ -84,28 +65,6 @@ public class FsService {
         entity.setFsContent(dto.getFsContent());
         entity.setFsPrice(dto.getFsPrice());
         entity.setFsStatus(dto.getFsStatus());
-
-        //이미지 수정
-        if(dto.getFsPicture()!=null && !dto.getFsPicture().isEmpty()) {//이미지 새로 넣었고
-            if (entity.getFsPictureMeta()!=null  && !entity.getFsPictureMeta().isEmpty()) {//기존 이미지가 있다면
-                Path filePath = Paths.get(System.getProperty("user.dir"), entity.getFsPictureMeta().substring(1));
-                Files.deleteIfExists(filePath);//삭제
-            }
-            /*이미지 등록 절차...*/
-            String fileOriginalName = dto.getFsPicture().getOriginalFilename();
-            String fileFirstName = entity.getCompany().getCompanyNum() + "_" + dto.getFacilitiesNum() + "_" + dto.getFsName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            dto.setFsPictureMeta("/company/fs/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/fs/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "company/fs/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-            dto.getFsPicture().transferTo(uploadPath.toFile());
-            entity.setFsPictureMeta(dto.getFsPictureMeta());
-        }
         return entity.getCompany().getCompanyNum();
     }
 
