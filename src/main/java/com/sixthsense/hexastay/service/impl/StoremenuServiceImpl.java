@@ -156,6 +156,7 @@ public class StoremenuServiceImpl implements StoremenuService {
                                 StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
                                 return optionDTO;
                             })
+                            .filter(optionDTO->optionDTO.getStoremenuOptionStatus().equals("alive"))
                             .toList());
             return menuDTO;
         }).toList();
@@ -173,6 +174,7 @@ public class StoremenuServiceImpl implements StoremenuService {
                                 StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
                                 return optionDTO;
                             })
+                            .filter(optionDTO->optionDTO.getStoremenuOptionStatus().equals("alive"))
                             .toList());
             return menuDTO;
         }).toList();
@@ -190,6 +192,7 @@ public class StoremenuServiceImpl implements StoremenuService {
                                 StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
                                 return optionDTO;
                             })
+                            .filter(optionDTO->optionDTO.getStoremenuOptionStatus().equals("alive"))
                             .toList());
             return menuDTO;
         }).toList();
