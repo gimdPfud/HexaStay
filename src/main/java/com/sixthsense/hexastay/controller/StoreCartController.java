@@ -43,8 +43,7 @@ public class StoreCartController {
         /*todo DTO 유효성 확인*/
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
         try {
-            Long hotelroomNum = zzService.sessionToHotelroomNum(session);
-            int result = storecartService.addCart(dto, hotelroomNum);
+            int result = storecartService.addCart(dto, (Long) session.getAttribute("roomNum"));
             HttpStatus status = HttpStatus.BAD_REQUEST;
             return switch (result) {
                 case 4 -> new ResponseEntity<>(HttpStatus.OK);
@@ -64,8 +63,7 @@ public class StoreCartController {
     @GetMapping("/list")
     public String cartList(Model model, Principal principal, HttpSession session){
         if(principal == null){return "sample/qrcamera";}
-        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
-        List<StorecartitemViewDTO> list = storecartService.getCartList(hotelroomNum);
+        List<StorecartitemViewDTO> list = storecartService.getCartList((Long) session.getAttribute("roomNum"));
         final Long[] totalPrice = {0L};
 
         //옵션용 map ??
@@ -100,11 +98,10 @@ public class StoreCartController {
     @GetMapping("/modify/{cartItemId}/{count}")
     public ResponseEntity cartModify(@PathVariable("count") int count, @PathVariable("cartItemId") Long cartItemId, Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
         if(count<=0){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!storecartService.validCartItemOwner(cartItemId,hotelroomNum)){
+        if(!storecartService.validCartItemOwner(cartItemId,(Long) session.getAttribute("roomNum"))){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         count = storecartService.updateCount(cartItemId,count);
@@ -114,8 +111,7 @@ public class StoreCartController {
     @GetMapping("/delete/{cartItemId}")
     public ResponseEntity cartDelete(@PathVariable("cartItemId") Long cartItemId, Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
-        if(!storecartService.validCartItemOwner(cartItemId,hotelroomNum)){
+        if(!storecartService.validCartItemOwner(cartItemId,(Long) session.getAttribute("roomNum"))){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         storecartService.deleteCartItem(cartItemId);
@@ -125,9 +121,8 @@ public class StoreCartController {
     @PostMapping("/clear")
     public ResponseEntity cartClear(StorecartitemDTO dto, Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
         try {
-            storecartService.clearCartItems(hotelroomNum);
+            storecartService.clearCartItems((Long) session.getAttribute("roomNum"));
             cartInsert(dto, principal, session);//저 위에 있는 등록 맞음 ^_^ ;;
             return new ResponseEntity<>(HttpStatus.OK);
         }catch (Exception e){
