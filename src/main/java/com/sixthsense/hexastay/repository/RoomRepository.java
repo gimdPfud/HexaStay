@@ -92,7 +92,6 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             LocalDateTime endDate,
             Pageable pageable);
 
-    Optional<Room> findByMemberAndCheckOutDateIsNull(Member member);
 
     //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
     @Query("SELECT r FROM Room r " +
@@ -102,7 +101,10 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     Optional<Room> findActiveRoomForMemberAtTime(@Param("member") Member member, @Param("currentTime") LocalDateTime currentTime);
 
 
-
+    // 내림 차순으로 정렬.
+    @Query("SELECT r FROM Room r WHERE r.member = :member AND :now BETWEEN r.checkInTime AND r.checkOutTime " +
+            "ORDER BY r.roomNum DESC, r.hotelRoom.hotelRoomNum DESC")
+    List<Room> findActiveRoomsOrdered(@Param("member") Member member, @Param("now") LocalDateTime now);
 
 
 
