@@ -137,19 +137,16 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
         log.debug(">>> 현재 시간 [{}] 기준으로 활성 Room 정보 조회 시도: MemberNum {}", now, member.getMemberNum());
 
+
         // 새로 만든 Repository 메소드 호출
         Room currentActiveRoom = roomRepository.findActiveRoomsOrdered(member, now)
                 .stream()
                 .filter(r -> r.getRoomPassword() != null && r.getRoomPassword().equals(password))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 아니거나, 현재 체크인 된 상태가 아니거나, 체크만료된 객실입니다.."));
 
 
-//                .orElseThrow(() -> { // 현재 시간에 활성 상태인 방이 없으면 예외 발생
-//                    log.error("!!! 현재 시간 [{}]에 해당 사용자가 체크인 상태인 객실 정보를 찾을 수 없습니다. MemberNum: {}", now, member.getMemberNum());
-//                    // 사용자에게 보여줄 메시지도 구체적으로 변경
-//                    return new IllegalStateException("현재 체크인 상태인 객실이 없어 룸서비스 주문을 진행할 수 없습니다.");
-//                });
+
         // --- 조회 로직 끝 ---
 
         HotelRoom associatedHotelRoom = currentActiveRoom.getHotelRoom();
