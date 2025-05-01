@@ -92,12 +92,18 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             LocalDateTime endDate,
             Pageable pageable);
 
-    // memberNum 기준으로 hotelRoomNum을 참고하여, hotelRoomName을 가져오기.
-//    @Query("SELECT r.hotelRoom.hotelRoomName FROM Room r WHERE r.member.memberNum = :memberNum ORDER BY r.id ASC")
-//    List<String> findHotelRoomNamesByMemberNum(@Param("memberNum") Long memberNum, Pageable pageable);
-
     Optional<Room> findByMemberAndCheckOutDateIsNull(Member member);
 
-    Optional<Room> findByMember(Member member);
+    //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
+    @Query("SELECT r FROM Room r " +
+            "WHERE r.member = :member " +
+            "AND r.checkInDate IS NOT NULL AND r.checkInDate <= :currentTime " +
+            "AND r.checkOutDate IS NOT NULL AND r.checkOutDate > :currentTime")
+    Optional<Room> findActiveRoomForMemberAtTime(@Param("member") Member member, @Param("currentTime") LocalDateTime currentTime);
+
+
+
+
+
 
 }

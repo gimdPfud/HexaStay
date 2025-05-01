@@ -29,6 +29,7 @@ public class Room extends BaseEntity {
     private LocalDateTime checkOutDate;
 
 
+
     //*****참조 테이블****//
     //1.Member
     @ManyToOne(fetch = FetchType.LAZY)
