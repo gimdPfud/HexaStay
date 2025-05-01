@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.service.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -48,9 +49,10 @@ public class StoreOrderController {
     @ResponseBody
     @PostMapping("/member/store/order/insert")
     public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList,
-                                      @RequestParam("orderstoreMessage") String orderstoreMessage, Principal principal){
+                                      @RequestParam("orderstoreMessage") String orderstoreMessage,
+                                      Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
@@ -75,10 +77,10 @@ public class StoreOrderController {
     }
     /*2. 내역보기 (목록)*/
     @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
-    public String clientOrderList(Model model,
+    public String clientOrderList(Model model, HttpSession session,
                                   @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable, Principal principal){
         if(principal == null){return "sample/qrcamera";}
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
         Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
         model.addAttribute("list",list);
 

@@ -55,12 +55,12 @@ public class StoreClientController {
     @GetMapping("/list")
     public String typelist(@RequestParam(required = false) String type,
                            @RequestParam(required = false) String keyword,
-                           Model model, Pageable pageable, Principal principal){
+                           Model model, Pageable pageable, Principal principal, HttpSession session){
         log.info("type : "+type);
         log.info("keyword : "+keyword);
         if(principal==null){return "sample/qrcamera";}
 
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
+        Long hotelroomNum = zzService.sessionToHotelroomNum(session);
 
         Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
 
@@ -109,8 +109,7 @@ public class StoreClientController {
                                      HttpSession session){
         if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
-            Long hotelroomNum = zzService.principalToHotelroomNum(principal);
-            Member member = zzService.hotelroomNumToMember(hotelroomNum);
+            Member member = zzService.sessionToMember(session);
             storeService.storeLiketoggle(storeNum, member);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
@@ -126,10 +125,8 @@ public class StoreClientController {
         try {
             log.info("세션에 저장된 roomNum : " + session.getAttribute("roomNum"));
 
-            Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Long likes = storeService.getStoreLikeCount(storeNum);
-            Member member = zzService.hotelroomNumToMember(hotelroomNum);
-            boolean check = storeService.isLiked(storeNum, member);
+            boolean check = storeService.isLiked(storeNum, zzService.sessionToMember(session));
             Map<String,Object> datas = new HashMap<>();
             datas.put("likes",likes);
             datas.put("check",check);
