@@ -136,7 +136,7 @@
         .like-count {
             font-size: 1rem;
             font-weight: bold;
-            color: #80b3ff;
+            color: #ff6b6b;
         }
         div.menu-image-container img.store-image {
             width: 100px !important;
@@ -169,7 +169,6 @@
                 </div>
             </form>
         </div>
-        <!-- 카테고리 탭 -->
         <div class="tabs">
             <button type="button" onclick="filterByLikes()" class="btn-custom">
                 ❤️ <span class="like-count" style="margin-left: 4px;">인기순</span>
@@ -183,7 +182,6 @@
             <div class="tab" onclick="filterByCategory('패스트푸드')">패스트푸드</div>
             <div class="tab" onclick="filterByCategory('카페')">카페</div>
         </div>
-        <!-- 매장 리스트 -->
         <ul class="store-list card-list">
             <li th:each="store : ${list}" class="store-item" th:attr="data-category=${store.storeCategory}">
                 <div class="div-card">
