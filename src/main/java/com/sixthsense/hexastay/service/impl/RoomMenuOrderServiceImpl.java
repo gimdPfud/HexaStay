@@ -130,30 +130,27 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
-        log.debug(">>> 1. 회원 정보 조회 시작...");
         Member member = memberRepository.findByMemberEmail(email);
-        if (member == null) {
-            log.error("!!! 회원 정보를 찾을 수 없습니다: {}", email);
-            throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
-        }
-        log.debug(">>> 1. 회원 정보 조회 완료: MemberNum {}", member.getMemberNum());
+        if (member == null) { /* ... 예외 처리 ... */ }
+        log.debug("Member found: {}", member.getMemberNum());
 
-        // --- 현재 사용자가 체크인한 방 찾기 ---
-        log.debug(">>> 현재 체크인된 Room 정보 조회 시작...");
-        Room currentCheckedInRoom = roomRepository.findByMemberAndCheckOutDateIsNull(member)
-                .orElseThrow(() -> {
-                    log.error("!!! 현재 체크인된 객실 정보를 찾을 수 없습니다. MemberNum: {}", member.getMemberNum());
-                    return new IllegalStateException("현재 체크인된 객실 정보를 찾을 수 없습니다. 룸서비스 주문을 진행할 수 없습니다.");
+        // --- 현재 시간 기준으로 사용자의 활성 Room 찾기 ---
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
+        log.debug(">>> 현재 시간 [{}] 기준으로 활성 Room 정보 조회 시도: MemberNum {}", now, member.getMemberNum());
+
+        // 새로 만든 Repository 메소드 호출
+        Room currentActiveRoom = roomRepository.findActiveRoomForMemberAtTime(member, now)
+                .orElseThrow(() -> { // 현재 시간에 활성 상태인 방이 없으면 예외 발생
+                    log.error("!!! 현재 시간 [{}]에 해당 사용자가 체크인 상태인 객실 정보를 찾을 수 없습니다. MemberNum: {}", now, member.getMemberNum());
+                    // 사용자에게 보여줄 메시지도 구체적으로 변경
+                    return new IllegalStateException("현재 체크인 상태인 객실이 없어 룸서비스 주문을 진행할 수 없습니다.");
                 });
-        // 찾은 Room과 연결된 HotelRoom 정보 로깅 (null 가능성 있음)
-        HotelRoom associatedHotelRoom = currentCheckedInRoom.getHotelRoom();
-        log.info("주문 사용자({})의 현재 체크인 객실 정보 조회 완료: Room Num {}, HotelRoom Name {}",
-                email,
-                currentCheckedInRoom.getRoomNum(),
-                associatedHotelRoom != null ? associatedHotelRoom.getHotelRoomName() : "연결된 HotelRoom 없음");
         // --- 조회 로직 끝 ---
 
-
+        HotelRoom associatedHotelRoom = currentActiveRoom.getHotelRoom();
+        log.info("현재 활성 객실 정보 조회 완료: Room Num {}, HotelRoom Name {}",
+                currentActiveRoom.getRoomNum(),
+                associatedHotelRoom != null ? associatedHotelRoom.getHotelRoomName() : "연결된 HotelRoom 없음");
 
         // 2. 해당 회원의 장바구니 가져오기
         RoomMenuCart cart = roomMenuCartRepository.findByMember(member)
@@ -163,21 +160,20 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         List<RoomMenuCartItem> cartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
         if (cartItems.isEmpty()) throw new IllegalStateException("장바구니에 아이템이 존재하지 않습니다..");
 
-        // 4. 주문 객체 생성
+        // 4. 주문 객체 생성 및 관계 설정
         RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
         roomMenuOrder.setMember(member);
         roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
-        roomMenuOrder.setRegDate(LocalDateTime.now()); // 주문 등록 시간 설정
-        roomMenuOrder.setRoom(currentCheckedInRoom);
-        log.debug(">>> 주문 객체에 Room 설정: RoomNum {}", currentCheckedInRoom.getRoomNum());
-        roomMenuOrder.setRoom(currentCheckedInRoom);
+        roomMenuOrder.setRegDate(LocalDateTime.now()); // 주문 시간 기록
 
-
-
-        if (currentCheckedInRoom.getHotelRoom() != null) {
-            roomMenuOrder.setHotelRoom(currentCheckedInRoom.getHotelRoom());
+        // --- 조회된 활성 Room 및 관련 HotelRoom 설정 ---
+        roomMenuOrder.setRoom(currentActiveRoom); // 찾은 현재 활성 Room 설정
+        if (associatedHotelRoom != null) {
+            roomMenuOrder.setHotelRoom(associatedHotelRoom); // 현재 방에 연결된 HotelRoom 설정
         } else {
-            log.warn("Warning: Room Num {} 에 연결된 HotelRoom 정보가 없습니다.", currentCheckedInRoom.getRoomNum());
+            // DB 데이터 정합성 문제 가능성
+            log.error("!!! 데이터 문제: Room ID {}에 HotelRoom 정보가 연결되지 않았습니다.", currentActiveRoom.getRoomNum());
+            throw new IllegalStateException("객실 기본 정보(HotelRoom)가 누락되어 주문을 진행할 수 없습니다.");
         }
 
         List<RoomMenuOrderItem> orderItems = new ArrayList<>();
