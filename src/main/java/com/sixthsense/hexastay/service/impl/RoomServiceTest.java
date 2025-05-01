@@ -46,6 +46,8 @@ public class RoomServiceTest {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 없습니다."));
 
+
+
         // 4. 연결된 회원 정보로 권한 설정
         Member member = matchedRoom.getMember();
         String role = (member.getMemberRole() == null || member.getMemberRole().isBlank()) ? "USER" : member.getMemberRole();

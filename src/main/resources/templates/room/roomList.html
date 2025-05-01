@@ -55,11 +55,11 @@
             <span th:text="${error}"></span>
         </div>
 
-        <!-- 검색 폼 -->
+        <!-- 검색 폼 Roomcontroll 에 getmapping-->
         <form action="/roomlist/search" method="get" class="d-flex align-items-end gap-2">
             <div class="flex-grow-1">
                 <input name="keyword" type="text" class="form-control"
-                       placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                       placeholder="회원 이름 또는 이메일로 검색 : [기능완료] 검색버튼을 눌러주세요" th:value="${keyword}">
             </div>
 
             <div class="d-flex gap-2">
@@ -192,33 +192,75 @@
         <nav>
             <ul class="pagination mb-0">
 
-                <!-- 이전 -->
-                <!-- 이전 버튼 -->
+                <!-- ⬅ 이전 버튼 -->
                 <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
+
+                    <!-- 검색 결과일 때 -->
                     <a class="page-link"
-                       th:href="${currentStatus} != null ?
-                @{/roomlist/{status}(status=${currentStatus}, page=${rooms.number - 1})} :
-                @{/roomlist(page=${rooms.number - 1})}">
+                       th:if="${keyword != null}"
+                       th:href="@{/roomlist/search(page=${rooms.number - 1}, keyword=${keyword})}">
+                        이전
+                    </a>
+
+                    <!-- 상태별(checkin/checkout) 목록일 때 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:href="@{/roomlist/{status}(status=${currentStatus}, page=${rooms.number - 1})}">
+                        이전
+                    </a>
+
+                    <!-- 전체 목록일 때 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:href="@{/roomlist(page=${rooms.number - 1})}">
                         이전
                     </a>
                 </li>
 
-                <!-- 번호 버튼 -->
+                <!-- 🔢 페이지 번호 버튼 -->
                 <li th:each="i : ${#numbers.sequence(0, rooms.totalPages - 1)}"
                     class="page-item" th:classappend="${rooms.number == i} ? 'active'">
+
+                    <!-- 검색 결과 -->
                     <a class="page-link"
-                       th:href="${currentStatus} != null ?
-                @{/roomlist/{status}(status=${currentStatus}, page=${i})} :
-                @{/roomlist(page=${i})}"
+                       th:if="${keyword != null}"
+                       th:href="@{/roomlist/search(page=${i}, keyword=${keyword})}"
+                       th:text="${i + 1}"></a>
+
+                    <!-- 상태 목록 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:href="@{/roomlist/{status}(status=${currentStatus}, page=${i})}"
+                       th:text="${i + 1}"></a>
+
+                    <!-- 전체 목록 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:href="@{/roomlist(page=${i})}"
                        th:text="${i + 1}"></a>
                 </li>
 
-                <!-- 다음 버튼 -->
+                <!-- ➡ 다음 버튼 -->
                 <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
+
+                    <!-- 검색 결과일 때 -->
                     <a class="page-link"
-                       th:href="${currentStatus} != null ?
-                @{/roomlist/{status}(status=${currentStatus}, page=${rooms.number + 1})} :
-                @{/roomlist(page=${rooms.number + 1})}">
+                       th:if="${keyword != null}"
+                       th:href="@{/roomlist/search(page=${rooms.number + 1}, keyword=${keyword})}">
+                        다음
+                    </a>
+
+                    <!-- 상태별 목록일 때 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:href="@{/roomlist/{status}(status=${currentStatus}, page=${rooms.number + 1})}">
+                        다음
+                    </a>
+
+                    <!-- 전체 목록일 때 -->
+                    <a class="page-link"
+                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:href="@{/roomlist(page=${rooms.number + 1})}">
                         다음
                     </a>
                 </li>
