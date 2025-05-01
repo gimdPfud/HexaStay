@@ -11,214 +11,215 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-        <div class="d-flex gap-5 align-items-stretch">
-            <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 500px;">
-                <h2 class="fw-bold mb-4 text-center">요식업체 상세보기</h2>
+    <div class="d-flex gap-5 align-items-stretch">
+        <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 500px;">
+            <h2 class="fw-bold mb-4 text-center">요식업체 상세보기</h2>
 
-                <div class="d-flex w-100" style="justify-content: center;">
-                    <img th:if="${data.storeProfileMeta != null}"
-                         th:src="@{${data.storeProfileMeta}}"
-                         class="rounded" style="width: 133px; height: 133px;">
+            <div class="d-flex w-100" style="justify-content: center;">
+                <img th:if="${data.storeProfileMeta != null}"
+                     th:src="@{${data.storeProfileMeta}}"
+                     class="rounded" style="width: 133px; height: 133px;">
 
-                    <img th:unless="${data.storeProfileMeta != null}"
-                         th:src="@{/store/default.png}"
-                         class="rounded" style="width: 133px; height: 133px;">
+                <img th:unless="${data.storeProfileMeta != null}"
+                     th:src="@{/store/default.png}"
+                     class="rounded" style="width: 133px; height: 133px;">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">상호명</label>
+                <input type="text" class="form-control" th:value="${data.storeName}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">대표 번호</label>
+                <input type="text" class="form-control" th:value="${data.storePhone}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">대표자명</label>
+                <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">사업장 주소</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="modal" data-bs-target="#mapmodal"
+                            onclick="showMapBox()">지도 보기</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">상호명</label>
-                    <input type="text" class="form-control" th:value="${data.storeName}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">대표 번호</label>
-                    <input type="text" class="form-control" th:value="${data.storePhone}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">대표자명</label>
-                    <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">사업장 주소</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                data-bs-toggle="modal" data-bs-target="#mapmodal"
-                                onclick="showMapBox()">지도 보기</button>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">등록일자</label>
-                    <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">수정일자</label>
-                    <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-                </div>
-                <div class="text-center">
-                    <a th:href="@{'/admin/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
-                </div>
-                <input type="hidden" id="storeLatitude"  name="storeLatitude" th:value="${data.storeLatitude}" readonly>
-                <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
-            </div><!--외부업체 정보-->
+            </div>
+            <div class="mb-3">
+                <label class="form-label">등록일자</label>
+                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">수정일자</label>
+                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+            </div>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/admin/store/list" class="btn btn-secondary">목록</a>
+                <a th:href="@{'/admin/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
+            </div>
+            <input type="hidden" id="storeLatitude"  name="storeLatitude" th:value="${data.storeLatitude}" readonly>
+            <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
+        </div><!--외부업체 정보-->
 
-            <!--외부업체가 제공하는 서비스 목록들-->
-            <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 700px;">
-                <div class="mb-2">
-                    <h2 class="fw-bold mb-4 text-center">제공 서비스 목록</h2>
-                </div><!--제목끝-->
-                <div class="text-end mb-2">
-                    <a th:href="@{'/admin/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
-                </div>
-                <div class="storemenulist mt-3"></div>
+        <!--외부업체가 제공하는 서비스 목록들-->
+        <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 700px;">
+            <div class="mb-2">
+                <h2 class="fw-bold mb-4 text-center">제공 서비스 목록</h2>
+            </div><!--제목끝-->
+            <div class="text-end mb-2">
+                <a th:href="@{'/admin/store/menu/insert/'+${data.storeNum}}" class="btn btn-primary">추가하기</a>
+            </div>
+            <div class="storemenulist mt-3"></div>
 
-                <div class="mt-4 d-grid">
-                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#soldoutlist" aria-expanded="false" aria-controls="soldoutlist">
-                        품절된 항목
-                    </button>
-                </div>
-                <div class="collapse mt-3" id="soldoutlist">
-                    <div class="card card-body">
-                        <div class="soldoutmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
-                    </div>
-                </div>
-
-                <div class="mt-4 d-grid">
-                    <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
-                        삭제된 항목
-                    </button>
-                </div>
-                <div class="collapse mt-3" id="deletedlist">
-                    <div class="card card-body">
-                        <div class="deletedmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
-                    </div>
-                </div>
-
-            </div><!--리스트가 비어있지 않다면 끝-->
-
-            <!--모달창-->
-            <div class="modal" id="mapmodal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">지도 보기</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="map" style="width: 100%; height: 300px;"></div>
-                        </div>
-                    </div>
+            <div class="mt-4 d-grid">
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#soldoutlist" aria-expanded="false" aria-controls="soldoutlist">
+                    품절된 항목
+                </button>
+            </div>
+            <div class="collapse mt-3" id="soldoutlist">
+                <div class="card card-body">
+                    <div class="soldoutmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
                 </div>
             </div>
 
+            <div class="mt-4 d-grid">
+                <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
+                    삭제된 항목
+                </button>
+            </div>
+            <div class="collapse mt-3" id="deletedlist">
+                <div class="card card-body">
+                    <div class="deletedmenulist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                </div>
+            </div>
+
+        </div><!--리스트가 비어있지 않다면 끝-->
+
+        <!--모달창-->
+        <div class="modal" id="mapmodal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">지도 보기</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="map" style="width: 100%; height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
-        <script th:inline="javascript">
-            let storemenulist = document.querySelector(".storemenulist");
-            let deletedmenulist = document.querySelector(".deletedmenulist");
-            let soldoutmenulist = document.querySelector(".soldoutmenulist");
-            let storenum = [[${data.storeNum}]]
-            document.addEventListener("DOMContentLoaded", function () {
-                console.log("페이지 로드 됨")
+    </div>
 
-                fetch(`/admin/store/menu/list/${storenum}`)
-                    .then(response => {
-                        if(!response.ok){
-                            if(response.status===404){
-                                return response.text()
-                                    .then(errmsg=> {
-                                        let error = new Error(errmsg)
-                                        error.status = 404;
-                                        throw error;
-                                    })
-                            }
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
+    <script th:inline="javascript">
+        let storemenulist = document.querySelector(".storemenulist");
+        let deletedmenulist = document.querySelector(".deletedmenulist");
+        let soldoutmenulist = document.querySelector(".soldoutmenulist");
+        let storenum = [[${data.storeNum}]]
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("페이지 로드 됨")
+
+            fetch(`/admin/store/menu/list/${storenum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        showstoremenu(data)
-                    })
-                    .catch(error => {
-                        if(error.status===404){
-                            showemptymenu(error.message);
-                        }
-                        console.log(error)
-                    });
-
-                fetch(`/admin/store/menu/list/deleted/${storenum}`)
-                    .then(response => {
-                        if(!response.ok){
-                            if(response.status===404){
-                                return response.text()
-                                    .then(errmsg=> {
-                                        let error = new Error(errmsg)
-                                        error.status = 404;
-                                        throw error;
-                                    })
-                            }
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        showdeletedmenu(data)
-                    })
-                    .catch(error => {
-                        if(error.status===404){
-                            showemptydeletedmenu(error.message);
-                        }
-                        console.log(error)
-                    });
-
-                fetch(`/admin/store/menu/list/soldout/${storenum}`)
-                    .then(response => {
-                        if(!response.ok){
-                            if(response.status===404){
-                                return response.text()
-                                    .then(errmsg=> {
-                                        let error = new Error(errmsg)
-                                        error.status = 404;
-                                        throw error;
-                                    })
-                            }
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        showsoldoutmenu(data)
-                    })
-                    .catch(error => {
-                        if(error.status===404){
-                            showemptysoldoutmenu(error.message);
-                        }
-                        console.log(error)
-                    });
-
-            })
-
-
-
-            function showMapBox() {
-                let yy = document.getElementById("storeLatitude").value
-                let xx = document.getElementById("storeLongitude").value
-                var container = document.getElementById('map');
-                var options = {
-                    center: new kakao.maps.LatLng(yy, xx),
-                    level: 2
-                };
-                var map = new kakao.maps.Map(container, options);
-                var marker = new kakao.maps.Marker({
-                    position: new kakao.maps.LatLng(yy, xx)
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showstoremenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404){
+                        showemptymenu(error.message);
+                    }
+                    console.log(error)
                 });
-                marker.setMap(map);
-            }
 
-            /*
-             * 메소드명 : showstoremenu
-             * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
-             * 리턴 값 :
-             * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
-             * */
-            function showstoremenu(list) {
-                let tagsstart = `<table class="table table-bordered text-center align-middle">
+            fetch(`/admin/store/menu/list/deleted/${storenum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showdeletedmenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404){
+                        showemptydeletedmenu(error.message);
+                    }
+                    console.log(error)
+                });
+
+            fetch(`/admin/store/menu/list/soldout/${storenum}`)
+                .then(response => {
+                    if(!response.ok){
+                        if(response.status===404){
+                            return response.text()
+                                .then(errmsg=> {
+                                    let error = new Error(errmsg)
+                                    error.status = 404;
+                                    throw error;
+                                })
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showsoldoutmenu(data)
+                })
+                .catch(error => {
+                    if(error.status===404){
+                        showemptysoldoutmenu(error.message);
+                    }
+                    console.log(error)
+                });
+
+        })
+
+
+
+        function showMapBox() {
+            let yy = document.getElementById("storeLatitude").value
+            let xx = document.getElementById("storeLongitude").value
+            var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(yy, xx),
+                level: 2
+            };
+            var map = new kakao.maps.Map(container, options);
+            var marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(yy, xx)
+            });
+            marker.setMap(map);
+        }
+
+        /*
+         * 메소드명 : showstoremenu
+         * 인수 값 : list(Page<StoremenuDTO>를 넣을것)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 Page<DTO>들을 불러와서 table로 추가해준다.
+         * */
+        function showstoremenu(list) {
+            let tagsstart = `<table class="table table-bordered text-center align-middle">
                 <thead class="table-light">
                 <tr>
                     <th style="width: 10%;">이미지</th>
@@ -230,18 +231,18 @@
                 </tr>
                 </thead>
                 <tbody>`;
-                let tagscontent = "";
-                let tagsend = `</tbody>
+            let tagscontent = "";
+            let tagsend = `</tbody>
             </table>`;
-                let imageTag = "";
-                for (let i=0; i<list.length;i++){
-                    if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
-                        imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
-                    } else {
-                        imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
-                    }
-                    let categ = list[i].storemenuCategory;
-                    tagscontent += `<tr>
+            let imageTag = "";
+            for (let i=0; i<list.length;i++){
+                if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                    imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
+                } else {
+                    imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
+                }
+                let categ = list[i].storemenuCategory;
+                tagscontent += `<tr>
                     <td style="text-align: center;">${imageTag}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td><a href="/admin/store/menu/read/${list[i].storemenuNum}" style="color: black">${list[i].storemenuName}</a></td>
@@ -254,16 +255,16 @@
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>
                 </tr>`
-                }
-                let totaltags = tagsstart + tagscontent + tagsend;
-
-                storemenulist.innerHTML=totaltags;
-
             }
+            let totaltags = tagsstart + tagscontent + tagsend;
+
+            storemenulist.innerHTML=totaltags;
+
+        }
 
 
-            function showdeletedmenu(list) {
-                let tagsstart = `<table class="table table-bordered text-center align-middle">
+        function showdeletedmenu(list) {
+            let tagsstart = `<table class="table table-bordered text-center align-middle">
                 <thead class="table-light">
                 <tr>
                     <th style="width: 10%;">이미지</th>
@@ -275,18 +276,18 @@
                 </tr>
                 </thead>
                 <tbody>`;
-                let tagscontent = "";
-                let tagsend = `</tbody>
+            let tagscontent = "";
+            let tagsend = `</tbody>
             </table>`;
-                let imageTag = "";
-                for (let i=0; i<list.length;i++){
-                    if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
-                        imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
-                    } else {
-                        imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
-                    }
-                    let categ = list[i].storemenuCategory;
-                    tagscontent += `<tr>
+            let imageTag = "";
+            for (let i=0; i<list.length;i++){
+                if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                    imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
+                } else {
+                    imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
+                }
+                let categ = list[i].storemenuCategory;
+                tagscontent += `<tr>
                     <td style="text-align: center;">${imageTag}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>${list[i].storemenuName}</td>
@@ -296,15 +297,15 @@
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>
                 </tr>`
-                }
-                let totaltags = tagsstart + tagscontent + tagsend;
-
-                deletedmenulist.innerHTML=totaltags;
-
             }
+            let totaltags = tagsstart + tagscontent + tagsend;
 
-            function showsoldoutmenu(list) {
-                let tagsstart = `<table class="table table-bordered text-center align-middle">
+            deletedmenulist.innerHTML=totaltags;
+
+        }
+
+        function showsoldoutmenu(list) {
+            let tagsstart = `<table class="table table-bordered text-center align-middle">
                 <thead class="table-light">
                 <tr>
                     <th style="width: 10%;">이미지</th>
@@ -316,18 +317,18 @@
                 </tr>
                 </thead>
                 <tbody>`;
-                let tagscontent = "";
-                let tagsend = `</tbody>
+            let tagscontent = "";
+            let tagsend = `</tbody>
             </table>`;
-                let imageTag = "";
-                for (let i=0; i<list.length;i++){
-                    if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
-                        imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
-                    } else {
-                        imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
-                    }
-                    let categ = list[i].storemenuCategory;
-                    tagscontent += `<tr>
+            let imageTag = "";
+            for (let i=0; i<list.length;i++){
+                if (list[i].storemenuImgMeta != null && list[i].storemenuImgMeta !== "") {
+                    imageTag = `<img src="${list[i].storemenuImgMeta}" style="width: 90px; height: 80px;">`;
+                } else {
+                    imageTag = `<img src="/store/menu/default.png" style="width: 90px; height: 80px;">`;
+                }
+                let categ = list[i].storemenuCategory;
+                tagscontent += `<tr>
                     <td style="text-align: center;">${imageTag}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>${list[i].storemenuName}</td>
@@ -337,44 +338,44 @@
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>
                 </tr>`
-                }
-                let totaltags = tagsstart + tagscontent + tagsend;
-
-                soldoutmenulist.innerHTML=totaltags;
-
             }
+            let totaltags = tagsstart + tagscontent + tagsend;
+
+            soldoutmenulist.innerHTML=totaltags;
+
+        }
 
 
 
 
-            /*
-             * 메소드명 : showemptymenu
-             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
-             * 리턴 값 :
-             * 기  능 : 선언될 때 storemenulist에 메시지를 h6태그로 추가함.
-             * */
-            function showemptymenu(msg) {
-                let tagscontent = `<h5 class="text-center text-secondary">${msg}</h5>`;
-                storemenulist.innerHTML=tagscontent;
-            }
-            /*
-             * 메소드명 : showemptydeletedmenu
-             * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
-             * 리턴 값 :
-             * 기  능 : 선언될 때 storemenulist에 메시지를 h6태그로 추가함.
-             * */
-            function showemptydeletedmenu(msg) {
-                let tagscontent = `<h6 class="text-center text-secondary">${msg}</h6>`;
-                deletedmenulist.innerHTML=tagscontent;
-            }
+        /*
+         * 메소드명 : showemptymenu
+         * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 storemenulist에 메시지를 h6태그로 추가함.
+         * */
+        function showemptymenu(msg) {
+            let tagscontent = `<h5 class="text-center text-secondary">${msg}</h5>`;
+            storemenulist.innerHTML=tagscontent;
+        }
+        /*
+         * 메소드명 : showemptydeletedmenu
+         * 인수 값 : msg (컨트롤러에서부터 넘겨진 404메시지 문자열)
+         * 리턴 값 :
+         * 기  능 : 선언될 때 storemenulist에 메시지를 h6태그로 추가함.
+         * */
+        function showemptydeletedmenu(msg) {
+            let tagscontent = `<h6 class="text-center text-secondary">${msg}</h6>`;
+            deletedmenulist.innerHTML=tagscontent;
+        }
 
-            function showemptysoldoutmenu(msg) {
-                let tagscontent = `<h6 class="text-center text-secondary">${msg}</h6>`;
-                soldoutmenulist.innerHTML=tagscontent;
-            }
-        </script>
+        function showemptysoldoutmenu(msg) {
+            let tagscontent = `<h6 class="text-center text-secondary">${msg}</h6>`;
+            soldoutmenulist.innerHTML=tagscontent;
+        }
+    </script>
 
-    </div><!--레이아웃 content 끝-->
+</div><!--레이아웃 content 끝-->
 
 
 
