@@ -11,18 +11,14 @@ import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.OrderstoreService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,9 +82,10 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     /*이거 사용함
     * hotelRoomNum*/
     @Override
-    public int insert(List<Long> itemIdList, Long hotelRoomNum, String orderstoreMessage) {
+    public int insert(List<Long> itemIdList, Long roomNum, String orderstoreMessage) {
         //추가 : room레포지토리에서 방번호로 가장 최근의 room(예약정보)을 찾아 setRoom() 때린다.
-        Room room = roomService.readRoomByHotelRoomNum(hotelRoomNum);
+        Room room = roomRepository.findById(roomNum).orElse(null);
+        if(room==null){return 0;}
         Orderstore order = new Orderstore();
         order.setRoom(room);
         order.setOrderstoreStatus("paid"); //그냥 여기서 paid하자....... ㅠㅠ
@@ -124,8 +121,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
 
 
     @Override
-    public Long getLastOrder(Long hotelRoom) {
-        List<Orderstore> list = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoom);
+    public Long getLastOrder(Long roomNum) {
+        List<Orderstore> list = orderstoreRepository.findByRoom_RoomNum(roomNum);
         if(list.isEmpty()){
             return null;
         }
@@ -152,8 +149,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
 //    }
 
     @Override
-    public List<OrderstoreViewDTO> getOrderList(Long hotelRoomNum) {
-        List<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum);
+    public List<OrderstoreViewDTO> getOrderList(Long roomNum) {
+        List<Orderstore> orderlist = orderstoreRepository.findByRoom_RoomNum(roomNum);
         List<OrderstoreViewDTO> viewOrderList = new ArrayList<>();
         for (Orderstore orderstore : orderlist){
             OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
@@ -169,8 +166,8 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     }
 
     @Override
-    public Page<OrderstoreViewDTO> getOrderList(Long hotelRoomNum, Pageable pageable) {
-        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_HotelRoom_HotelRoomNum(hotelRoomNum, pageable);
+    public Page<OrderstoreViewDTO> getOrderList(Long roomNum, Pageable pageable) {
+        Page<Orderstore> orderlist = orderstoreRepository.findByRoom_RoomNum(roomNum, pageable);
         Page<OrderstoreViewDTO> viewOrderPage = orderlist.map(orderstore->{
             OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);
             List<Orderstoreitem> itemlist = orderstore.getOrderstoreitemList();

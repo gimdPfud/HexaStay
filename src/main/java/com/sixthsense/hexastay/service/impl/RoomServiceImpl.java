@@ -368,37 +368,45 @@ public class RoomServiceImpl {
         return room;
     }
 
-//    public Room authenticateRoomByHotelRoomNumAndPassword(Long hotelRoomNum, String inputPassword) {
-//        // 1. 해당 호텔룸에 연결된 '체크인' 상태의 Room 리스트 가져오기
-//        List<Room> rooms = roomRepository.findCheckinRoomsByHotelRoomNum(hotelRoomNum);
-//
-//        if (rooms.isEmpty()) {
-//            throw new EntityNotFoundException("체크인 상태의 룸이 없습니다.");
-//        }
-//
-//        // 2. 입력한 패스워드가 일치하는 Room 찾기
-//        Room matchedRoom = rooms.stream()
-//                .filter(room -> room.getRoomPassword().equals(inputPassword))
-//                .findFirst()
-//                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하지 않습니다."));
-//
-//        // 3. 로그인 처리
-//        Member member = matchedRoom.getMember();
-//        String role = member.getMemberRole() == null ? "USER" : member.getMemberRole();
-//        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-//        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
-//
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(customMemberDetails, member.getMemberPassword(), authorities);
-//        SecurityContext context = SecurityContextHolder.createEmptyContext();
-//        context.setAuthentication(authentication);
-//        SecurityContextHolder.setContext(context);
-//
-//        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
-//        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
-//
-//        log.info("인증 성공: {} (roomNum: {})", member.getMemberEmail(), matchedRoom.getRoomNum());
-//        return matchedRoom;
-//    }
+    //roomlist 검색용 서비스 조건 : member 의 이름과 이메일 기준
+    public Page<RoomDTO> searchRoomsByMemberKeywordPaged(String keyword, Pageable pageable) {
+        Page<Room> rooms = roomRepository.searchRoomsByMemberNameOrEmailPaged(keyword, pageable);
+        return rooms.map(room -> modelMapper.map(room, RoomDTO.class));
+    }
+
+
+
+    public Room authenticateRoomByHotelRoomNumAndPassword(Long hotelRoomNum, String inputPassword) {
+        // 1. 해당 호텔룸에 연결된 '체크인' 상태의 Room 리스트 가져오기
+        List<Room> rooms = roomRepository.findCheckinRoomsByHotelRoomNum(hotelRoomNum);
+
+        if (rooms.isEmpty()) {
+            throw new EntityNotFoundException("체크인 상태의 룸이 없습니다.");
+        }
+
+        // 2. 입력한 패스워드가 일치하는 Room 찾기
+        Room matchedRoom = rooms.stream()
+                .filter(room -> room.getRoomPassword().equals(inputPassword))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하지 않습니다."));
+
+        // 3. 로그인 처리
+        Member member = matchedRoom.getMember();
+        String role = member.getMemberRole() == null ? "USER" : member.getMemberRole();
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(customMemberDetails, member.getMemberPassword(), authorities);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+
+        log.info("인증 성공: {} (roomNum: {})", member.getMemberEmail(), matchedRoom.getRoomNum());
+        return matchedRoom;
+    }
 
 
 

@@ -49,6 +49,7 @@ public class RoomController {
     public String getRoomListByStatus(@PathVariable("status") String status,
                                       @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
                                       Model model) {
+
         if (!status.equals("checkin") && !status.equals("checkout")) {
             throw new IllegalArgumentException("잘못된 상태입니다.");
         }
@@ -70,6 +71,27 @@ public class RoomController {
         model.addAttribute("currentPage", page);
         return "room/roomList";
     }
+    //검색 조건으로 받는 controller todo:http://localhost:8090/roomlist
+    //조건 멤버의 이름과 이메일로 검색
+    @GetMapping("/roomlist/search")
+    public String getRoomList(@RequestParam(value = "keyword", required = false) String keyword,
+                              @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
+                              Model model) {
+
+        Page<RoomDTO> rooms;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            rooms = roomServiceimpl.searchRoomsByMemberKeywordPaged(keyword, pageable);
+            model.addAttribute("currentStatus", "search");
+        } else {
+            rooms = roomServiceimpl.getRooms(pageable);
+        }
+
+        model.addAttribute("rooms", rooms);
+        model.addAttribute("keyword", keyword); // 검색창에 유지되도록
+        return "room/roomlist";
+    }
+
 
 
     /*키워드로 받는 멤버 검색용 메소드 */

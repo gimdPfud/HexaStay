@@ -56,19 +56,17 @@
         </div>
 
         <!-- 검색 폼 -->
-        <form action="/roomlist" method="get" class="d-flex align-items-end gap-2">
-
+        <form action="/roomlist/search" method="get" class="d-flex align-items-end gap-2">
             <div class="flex-grow-1">
                 <input name="keyword" type="text" class="form-control"
                        placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" id="searchBtn" class="btn btn-primary">검색</button>
+                <button type="submit" id="searchBtn" class="btn btn-primary">검색</button> <!-- ✅ 여기에 연동됨 -->
                 <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
                 <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
             </div>
-
         </form>
 
         <div class="d-flex justify-content-center mt-4 gap-3">

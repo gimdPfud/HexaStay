@@ -14,6 +14,7 @@ import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
 import com.sixthsense.hexastay.service.ZzService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -135,13 +136,13 @@ public class FacilitiesController {
     }
 
     @GetMapping("/fs/list")
-    public String fslistClient(Principal principal, Pageable pageable, Model model){
+    public String fslistClient(Principal principal, Pageable pageable, Model model, HttpSession session){
 //        log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
         if(principal==null){
             return "redirect:/cart/qr";}
         Long companyNum = 0L;
         try {
-            companyNum = zzService.hotelroomNumToCompany(zzService.principalToHotelroomNum(principal)).getCompanyNum();
+            companyNum = zzService.sessionToCompany(session).getCompanyNum();
             log.info("컴퍼니넘 : "+companyNum);
         } catch (Exception e){
             log.info("오류발생");

@@ -13,6 +13,7 @@ import com.sixthsense.hexastay.dto.OrderstoreViewDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.service.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -48,22 +49,26 @@ public class StoreOrderController {
     @ResponseBody
     @PostMapping("/member/store/order/insert")
     public ResponseEntity orderInsert(@RequestParam("items") List<Long> cartitemidList,
-                                      @RequestParam("orderstoreMessage") String orderstoreMessage, Principal principal){
-        if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
+                                      @RequestParam("orderstoreMessage") String orderstoreMessage,
+                                      Principal principal, HttpSession session){
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Long roomNum = (Long) session.getAttribute("roomNum");
+
         if(cartitemidList==null||cartitemidList.isEmpty()){
             return ResponseEntity.badRequest().body("장바구니가 비었습니다.");
         }
         for (Long itemid : cartitemidList) {
-            if(!storecartService.validCartItemOwner(itemid,hotelroomNum)){
+            if(!storecartService.validCartItemOwner(itemid,roomNum)){
                 return new ResponseEntity<>("잘못된 접근입니다.",HttpStatus.FORBIDDEN);
             }
         }
-        /*hotelroomNum이 있다고 가정.... 왜? QR찍을때 받으니까!!...*/
-        int result = orderstoreService.insert(cartitemidList, hotelroomNum, orderstoreMessage);
-        if(result==1){
+        int result = orderstoreService.insert(cartitemidList, roomNum, orderstoreMessage);
+        if (result==1) {
             log.info("정상주문되었습니다.");
-            storecartService.clearCartItems(hotelroomNum);
+            storecartService.clearCartItems(roomNum);
             return new ResponseEntity<>(HttpStatus.OK);
         } else if (result ==2) {
             return ResponseEntity.badRequest().body("숙박 정보를 찾을 수 없습니다.");
@@ -75,11 +80,15 @@ public class StoreOrderController {
     }
     /*2. 내역보기 (목록)*/
     @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
-    public String clientOrderList(Model model,
+    public String clientOrderList(Model model, HttpSession session,
                                   @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable, Principal principal){
-        if(principal == null){return "sample/qrcamera";}
-        Long hotelroomNum = zzService.principalToHotelroomNum(principal);
-        Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(hotelroomNum, pageable);
+        if (principal == null) {
+            return "sample/qrcamera";
+        }
+
+        Long roomNum = (Long) session.getAttribute("roomNum");
+
+        Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(roomNum, pageable);
         model.addAttribute("list",list);
 
         //옵션용 Map 이름가격 > 하나의메뉴
