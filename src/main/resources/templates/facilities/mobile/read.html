@@ -111,26 +111,29 @@
     <div class="item-image">
         <div id="facilityCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
-                <!-- 첫 이미지 (기본 active) -->
+
+                <!--이미지 1 장 밖에 없으므로 캐러샐 대신 그냥 이미지로 ... -->
+<!--                &lt;!&ndash; 첫 이미지 (기본 active) &ndash;&gt;-->
                 <div class="carousel-item active">
-                    <img src="/images/초단.png" class="d-block w-100 item-img" alt="슬라이드 이미지 1">
+                    <img src="${data.fsPictureMeta}" class="d-block w-100 item-img" alt="슬라이드 이미지 1">
                 </div>
-                <!-- 두 번째 이미지 -->
-                <div class="carousel-item">
-                    <img src="/images/시바견.png" class="d-block w-100 item-img" alt="슬라이드 이미지 2">
-                </div>
-                <!-- 세 번째 이미지 -->
-                <div class="carousel-item">
-                    <img src="/images/개구리.png" class="d-block w-100 item-img" alt="슬라이드 이미지 3">
-                </div>
+<!--                &lt;!&ndash; 두 번째 이미지 &ndash;&gt;-->
+<!--                <div class="carousel-item">-->
+<!--                    <img src="/images/시바견.png" class="d-block w-100 item-img" alt="슬라이드 이미지 2">-->
+<!--                </div>-->
+<!--                &lt;!&ndash; 세 번째 이미지 &ndash;&gt;-->
+<!--                <div class="carousel-item">-->
+<!--                    <img src="/images/개구리.png" class="d-block w-100 item-img" alt="슬라이드 이미지 3">-->
+<!--                </div>-->
+
             </div>
-            <!-- 좌우 화살표 -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#facilityCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#facilityCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
+<!--            &lt;!&ndash; 좌우 화살표 &ndash;&gt;-->
+<!--            <button class="carousel-control-prev" type="button" data-bs-target="#facilityCarousel" data-bs-slide="prev">-->
+<!--                <span class="carousel-control-prev-icon"></span>-->
+<!--            </button>-->
+<!--            <button class="carousel-control-next" type="button" data-bs-target="#facilityCarousel" data-bs-slide="next">-->
+<!--                <span class="carousel-control-next-icon"></span>-->
+<!--            </button>-->
         </div>
     </div>
 
@@ -164,23 +167,6 @@
 
     <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
     <script>
-        // 카테고리 탭 클릭 시 부드러운 스크롤 이동
-        document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('#categoryTabs a').forEach(link => {
-        link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1);
-        const target = document.getElementById(targetId);
-        if (target) {
-        window.scrollTo({
-        top: target.offsetTop - 70,
-        behavior: 'smooth'
-        });
-        }
-        });
-        });
-        });
-
         function showMapBox() {
         let yy = document.getElementById("storeLatitude").value;
         let xx = document.getElementById("storeLongitude").value;
