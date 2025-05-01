@@ -28,14 +28,12 @@ public class NotificationService {
 
     public Notification createAndSaveNewOrderNotification(Long orderId, RoomMenuOrderAlertDTO alertInfo) {
         log.info("새로운 주문 알림 생성 시도. Order ID: {}", orderId);
-        // 필요 시 중복 알림 생성 방지 로직 추가 (예: existsByOrderId)
 
         Notification notification = Notification.builder()
                 .orderId(orderId)
                 .memberEmail(alertInfo.getMemberEmail())
                 .totalPrice(alertInfo.getTotalPrice())
                 .isRead(false) // 기본값 false 명시
-                // .message(...) // 필요 시 메시지 생성
                 .build();
 
         Notification savedNotification = notificationRepository.save(notification);
@@ -83,14 +81,14 @@ public class NotificationService {
     }
 
 
-    public long getUnreadNotificationCount() {
+   /* public long getUnreadNotificationCount()  todo : 이제 쓸 일 없음. {
         return notificationRepository.countByIsReadFalse();
     }
 
 
     public List<Notification> getUnreadNotifications() {
         return notificationRepository.findByIsReadFalseOrderByCreateDateDesc();
-    }
+    }*/
 
 
     public int markNotificationsAsRead(List<Long> notificationIds) {

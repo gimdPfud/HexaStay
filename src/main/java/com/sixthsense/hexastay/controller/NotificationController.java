@@ -41,7 +41,6 @@ public class NotificationController {
     public ResponseEntity<Map<String, Object>> getUnreadNotifications() {
         log.info("읽지 않은 알림 조회 API 호출됨 (/unread)");
 
-        // <<<--- 서비스 호출 변경: 상세 정보 포함 DTO 리스트를 가져옴 ---<<<
         List<NotificationDTO> notificationDtos = notificationService.getUnreadNotificationsWithDetails();
         long unreadCount = notificationDtos.size(); // DTO 리스트 크기로 카운트
 

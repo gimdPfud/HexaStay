@@ -50,6 +50,8 @@ public class RoomMenuOrderDTO {
 
     private Long hotelRoom; // 호텔룸을 참조
 
+    private String hotelRoomName; // 호텔의 이름.
+
     private List<RoomMenuOrderItemDTO> orderItemList = new ArrayList<>();
 
 
