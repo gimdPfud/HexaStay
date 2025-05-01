@@ -15,7 +15,7 @@ public interface RoomMenuOrderService {
     // 주문 입력 2
     public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage,
                                                      Long couponNum, Integer discountedTotalPrice,
-                                                     Pageable pageable);
+                                                     Pageable pageable, String password);
 
     // 리스트
     public Page<RoomMenuOrderDTO> getOrderListByEmail(String email, Pageable pageable);
