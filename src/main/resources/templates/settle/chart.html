@@ -60,12 +60,12 @@
             margin-left: 8px;
         }
 
-        /* 엑셀 다운로드 버튼 스타일 */
         .excel-btn {
             background-color: #1D6F42;
             color: white;
             border: none;
             height: 40px;
+            margin-left: 8px;
         }
 
         .excel-btn:hover {
@@ -81,47 +81,45 @@
         <h2 class="fw-bold mb-4 text-center">재무 정산 차트</h2>
 
         <!-- 🔽 선택 필터 + 다운로드 버튼 -->
+        <!-- 🔽 선택 필터 + 다운로드 버튼 -->
         <div class="row align-items-center mb-4 gx-3 gy-2">
-            <!-- 필터들 -->
-            <div class=" d-flex flex-wrap align-items-center gap-2">
-                <select class="form-select" id="hqSelect" style="width: 200px";>
-                    <option selected>본사 선택</option>
-                    <option>서울본사</option>
-                    <option>부산본사</option>
-                </select>
-                <select class="form-select" id="branchSelect" style="width: 200px";>
-                    <option selected>지사 선택</option>
-                    <option>중부지사</option>
-                    <option>남부지사</option>
-                </select>
-                <select class="form-select" id="officeSelect" style="width: 200px";>
-                    <option selected>지점 선택</option>
-                    <option>강남지점</option>
-                    <option>대구지점</option>
-                </select>
-                <select class="form-select" id="storeSelect" style="width: 200px";>
-                    <option selected>스토어 선택</option>
-                    <option>스토어 A</option>
-                    <option>스토어 B</option>
-                </select>
-                <!-- 다운로드 버튼 -->
-                <div class="col d-flex justify-content-center">
-                    <button type="button" id="excelDownloadBtn" class="btn excel-btn ">
+            <div class="col-12">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <select class="form-select" id="hqSelect" style="width: 200px;">
+                        <option selected>본사 선택</option>
+                        <option>서울본사</option>
+                        <option>부산본사</option>
+                    </select>
+                    <select class="form-select" id="branchSelect" style="width: 200px;">
+                        <option selected>지사 선택</option>
+                        <option>중부지사</option>
+                        <option>남부지사</option>
+                    </select>
+                    <select class="form-select" id="officeSelect" style="width: 200px;">
+                        <option selected>지점 선택</option>
+                        <option>강남지점</option>
+                        <option>대구지점</option>
+                    </select>
+                    <select class="form-select" id="storeSelect" style="width: 200px;">
+                        <option selected>스토어 선택</option>
+                        <option>스토어 A</option>
+                        <option>스토어 B</option>
+                    </select>
+                    <button type="button" id="excelDownloadBtn" class="btn excel-btn px-4" style="margin-left: 8px;">
                         <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
                     </button>
                 </div>
 
-                <!-- 날짜 선택 폼 추가 -->
-                <div class="date-range-form">
-                    <input type="date" id="startDate" name="startDate" class="form-control">
-                    <span style="margin: 0 8px;">~</span>
-                    <input type="date" id="endDate" name="endDate" class="form-control">
+                <div class="d-flex flex-wrap align-items-center gap-3 ms-2 mt-3">
+                    <input type="date" id="startDate" class="form-control" style="width: 160px;">
+                    <span>~</span>
+                    <input type="date" id="endDate" class="form-control" style="width: 160px;">
                     <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
                     <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
                 </div>
             </div>
-
         </div>
+
 
         <!-- 📊 테이블 & 차트 -->
         <div class="chart-section">

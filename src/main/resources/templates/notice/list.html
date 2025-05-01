@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
-
 <head>
   <meta charset="UTF-8">
   <title>공지사항 목록</title>
@@ -11,6 +9,10 @@
   <style>
     .table td {
       vertical-align: middle;
+    }
+
+    .small-text {
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -56,8 +58,8 @@
           <thead class="table-light text-center">
           <tr>
             <th style="width: 10%" class="text-center">번호</th>
-            <th style="width: 75%">제목</th>
-            <th style="width: 15%" class="text-center">등록일</th>
+            <th style="width: 77%">제목</th>
+            <th style="width: 13%" class="text-center">등록일</th>
           </tr>
           </thead>
           <tbody>
@@ -66,7 +68,7 @@
             <td>
               <a th:href="@{/notice/read/{noticeNum}(noticeNum=${data.noticeNum})}" th:text="${data.noticeTitle}"></a>
             </td>
-            <td class="text-center" th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd')}"></td>
+            <td class="text-center small-text" th:text="${#temporals.format(data.modifyDate,'yyyy-MM-dd HH:mm')}"></td>
           </tr>
           </tbody>
         </table>
