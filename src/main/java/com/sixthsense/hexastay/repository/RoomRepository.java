@@ -102,7 +102,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
 
     // 내림 차순으로 정렬.
-    @Query("SELECT r FROM Room r WHERE r.member = :member AND :now BETWEEN r.checkInTime AND r.checkOutTime " +
+    @Query("SELECT r FROM Room r WHERE r.member = :member AND :now BETWEEN r.checkInDate AND r.checkOutDate " +
             "ORDER BY r.roomNum DESC, r.hotelRoom.hotelRoomNum DESC")
     List<Room> findActiveRoomsOrdered(@Param("member") Member member, @Param("now") LocalDateTime now);
 
