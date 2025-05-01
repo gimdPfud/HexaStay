@@ -473,7 +473,9 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // Page.map() 메서드를 이용해 DTO로 변환
         Page<RoomMenuOrderDTO> dtoPage = orderPage.map(order -> {
+
             RoomMenuOrderDTO dto = new RoomMenuOrderDTO();
+
             dto.setRoomMenuOrderNum(order.getRoomMenuOrderNum());
             dto.setRoomMenuOrderStatus(order.getRoomMenuOrderStatus());
             dto.setRegDate(order.getRegDate());
@@ -484,6 +486,14 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                     .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
                     .sum();
             dto.setOriginalTotalPrice(originalTotal);
+            dto.setMember(order.getMember());
+
+            if (order.getHotelRoom() != null) {
+                dto.setHotelRoomName(order.getHotelRoom().getHotelRoomName());
+            } else {
+                dto.setHotelRoomName("정보 없음"); // HotelRoom 정보가 없는 경우
+            }
+
             // DTO의 totalPrice도 설정 (관리자 페이지에서 사용한다면)
             int totalPrice = originalTotal;
             if (order.getDiscountedPrice() != null) {
@@ -501,6 +511,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 // >>> **추가: 옵션 필드 값을 DTO에 복사** <<<
                 itemDTO.setRoomMenuSelectOptionName(item.getRoomMenuSelectOptionName());
                 itemDTO.setRoomMenuSelectOptionPrice(item.getRoomMenuSelectOptionPrice());
+                itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName()); /* 룸의 이름 표시 */
                 // >>> **추가 완료** <<<
                 return itemDTO;
             }).collect(Collectors.toList());

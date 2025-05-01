@@ -49,7 +49,7 @@ public class RoomMenuOrder extends BaseEntity {
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY) // FetchType은 상황에 맞게
-    @JoinColumn(name = "hotelRoom") // DB의 외래 키 컬럼 이름
+    @JoinColumn(name = "hotel_room_num") // DB의 외래 키 컬럼 이름
     private HotelRoom hotelRoom;
 
     // 연관관계 편의 메소드 (양방향 시 필요할 수 있음)

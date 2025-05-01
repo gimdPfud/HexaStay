@@ -4,6 +4,7 @@ import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
@@ -24,19 +25,16 @@ import java.util.Optional;
 
 public interface RoomMenuOrderRepository extends JpaRepository<RoomMenuOrder, Long>{
 
-    // 멤버를 참조하여 이메일을 찾는다.
-    public Page<RoomMenuOrder> findByMember_MemberEmail(String email, Pageable pageable);
-
-    List<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member);
-
-    // 오더된 정보만 빼오기.
-    List<RoomMenuOrder> findAllByRoomMenuOrderStatusInOrderByRegDateDesc(Collection<RoomMenuOrderStatus> statuses);
-
     // 페이징을 위한 메서드: Pageable 인자를 추가하면 Page<RoomMenuOrder> 반환
+    // FetchType.EAGER 처럼 필요한 연관 엔티티를 함께 조회하도록 설정
+    @EntityGraph(attributePaths = {"member", "hotelRoom", "orderItems", "orderItems.roomMenu"})
     Page<RoomMenuOrder> findAllByRoomMenuOrderStatusInOrderByRegDateDesc(Collection<RoomMenuOrderStatus> statuses, Pageable pageable);
+
 
     // 기존 메서드: List<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member);
     // 페이징을 위해 Pageable 인자를 추가하여 Page를 반환하도록 수정
     Page<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member, Pageable pageable);
+
+
 }
 
