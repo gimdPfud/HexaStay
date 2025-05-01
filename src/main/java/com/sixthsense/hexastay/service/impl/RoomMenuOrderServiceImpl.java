@@ -145,8 +145,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 아니거나, 현재 체크인 된 상태가 아니거나, 체크만료된 객실입니다.."));
 
-
-
         // --- 조회 로직 끝 ---
 
         HotelRoom associatedHotelRoom = currentActiveRoom.getHotelRoom();
