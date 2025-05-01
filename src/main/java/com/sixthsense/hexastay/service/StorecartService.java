@@ -16,14 +16,14 @@ import java.util.List;
 public interface StorecartService {
 
     /*1. 등록*/
-    int addCart(StorecartitemDTO dto, Long hotelroomNum);
+    int addCart(StorecartitemDTO dto, Long roomNum);
 
     /*2. 목록*/
-    List<StorecartitemViewDTO> getCartList(Long hotelroomNum);
-    Long getItemCount(Long hotelroomNum);
+    List<StorecartitemViewDTO> getCartList(Long roomNum);
+    Long getItemCount(Long roomNum);
 
     /*3. 카트 주인 찾기*/
-    boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum);
+    boolean validCartItemOwner(Long storeCartItemId, Long roomNum);
 
     /*4. 수정 (카트 수량 변경)*/
     Integer updateCount(Long storeCartItemId, Integer count);
@@ -32,5 +32,5 @@ public interface StorecartService {
     void deleteCartItem(Long storeCartItemId);
 
     /*6. 카트 비우기*/
-    void clearCartItems(Long hotelroomNum);
+    void clearCartItems(Long roomNum);
 }

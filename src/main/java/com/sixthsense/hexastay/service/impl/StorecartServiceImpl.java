@@ -37,7 +37,7 @@ public class StorecartServiceImpl implements StorecartService {
     private final RoomRepository roomRepository;
 
         @Override
-    public int addCart(StorecartitemDTO dto, Long hotelroomNum) {
+    public int addCart(StorecartitemDTO dto, Long roomNum) {
         log.info(dto.toString());
         log.info(dto.getOptionPrice());
 //        log.info(dto.getStorecartitemCount());
@@ -45,12 +45,11 @@ public class StorecartServiceImpl implements StorecartService {
         //1. 메뉴 조회
         Storemenu storemenu = storemenuRepository.findById(dto.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
         //2. room 조회. (왜냐면?? room과 일대일 관계를 맺도록 바꿈. > room은 1번의 숙박/고객/예약 이니까...)
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        Room room = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
+        Room room = roomRepository.findById(roomNum).orElse(null);
         if(room==null){return 1;}
 
         //3. 장바구니 조회
-        Storecart storecart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
+        Storecart storecart = storecartRepository.findByRoom_RoomNum(roomNum);
 //        log.info("메뉴, 룸(중간), 카트 찾음.");
 //        log.info(storemenu);
 //        log.info(room);
@@ -108,20 +107,19 @@ public class StorecartServiceImpl implements StorecartService {
     }
 
         @Override
-    public List<StorecartitemViewDTO> getCartList(Long hotelRoomNum) {
-        List<StorecartitemViewDTO> list = storecartitemRepository.storeCartViewList(hotelRoomNum);
+    public List<StorecartitemViewDTO> getCartList(Long roomNum) {
+        List<StorecartitemViewDTO> list = storecartitemRepository.storeCartViewList(roomNum);
         return list;
     }
 
     @Override
-    public Long getItemCount(Long hotelroomNum) {
-        return storecartitemRepository.countByStorecart_Room_HotelRoom(hotelroomNum);
+    public Long getItemCount(Long roomNum) {
+        return storecartitemRepository.countByStorecart_Room(roomNum);
     }
 
     @Override
-    public boolean validCartItemOwner(Long storeCartItemId, Long hotelroomNum) {
-        Pageable pageable = PageRequest.of(0,1, Sort.by(Sort.Direction.DESC,"roomNum"));
-        Room inputRoom = roomRepository.findByHotelRoom_HotelRoomNum(hotelroomNum,pageable).stream().findFirst().orElse(null);
+    public boolean validCartItemOwner(Long storeCartItemId, Long roomNum) {
+        Room inputRoom = roomRepository.findById(roomNum).orElse(null);
         Storecartitem itemEntity = storecartitemRepository.findById(storeCartItemId).orElseThrow(EntityNotFoundException::new);
         Room cartRoom = itemEntity.getStorecart().getRoom();
         return inputRoom == cartRoom;
@@ -140,8 +138,8 @@ public class StorecartServiceImpl implements StorecartService {
     }
 
         @Override
-    public void clearCartItems(Long hotelroomNum) {
-        Storecart cart = storecartRepository.findByRoom_HotelRoom_HotelRoomNum(hotelroomNum);
+    public void clearCartItems(Long roomNum) {
+        Storecart cart = storecartRepository.findByRoom_RoomNum(roomNum);
         List<Storecartitem> list = storecartitemRepository.findByStorecart_StorecartNum(cart.getStorecartNum());
         storecartitemRepository.deleteAll(list);
     }
