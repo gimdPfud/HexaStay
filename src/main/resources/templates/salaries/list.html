@@ -325,6 +325,13 @@
                         span.classList.add('clicked-text');
                     }
 
+                    // 공제 상세내역을 열 때만 해당 공제 모달이 열리도록 처리
+                    const existingIncentiveRow = document.querySelector('.detail-row');
+                    if (existingIncentiveRow) {
+                        existingIncentiveRow.remove(); // 인센티브 모달이 열려 있다면 닫기
+                    }
+
+                    // 공제 상세내역을 표시
                     showDetailBoxUnderRow('공제 상세내역', this.dataset.details, this);
                 });
             });
@@ -345,10 +352,18 @@
                         span.classList.add('clicked-text');
                     }
 
+                    // 공제 모달이 열려 있을 경우, 이를 닫고 인센티브 모달만 열기
+                    const existingDeductionRow = document.querySelector('.detail-row');
+                    if (existingDeductionRow) {
+                        existingDeductionRow.remove(); // 공제 모달이 열려 있다면 닫기
+                    }
+
+                    // 인센티브 모달만 열기
                     showDetailBoxUnderRow('인센티브 상세내역', this.dataset.details, this);
                 });
             });
-            
+
+
             // 엑셀 다운로드 기능
             document.getElementById('excelDownloadBtn').addEventListener('click', function() {
                 exportToExcel();

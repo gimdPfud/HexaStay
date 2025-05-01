@@ -1,51 +1,43 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>공지사항 보기</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>공지사항 상세보기</title>
+    <style>
+        .card {
+            width: 100%;
+        }
+        .card-header, .card-footer {
+            text-align: center;
+        }
+        .small-text {
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <div class="container">
-        <div class="row mt-3">
-            <div class="col-1"></div>
-                <div class="col-10">
-                    <!--카드형식으로 폼-->
-                    <div class="card mb-3">
-                        <div class="card-header text-center"><b>게시글 읽기</b></div>
-                        <div class="card-body">
-                            <div class="mb-3 mt-3">
-                                <p>번호: <span th:text="${noticedata.noticeNum}"></span></p>
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <p>제목: <span th:text="${noticedata.noticeTitle}"></span></p>
-                            </div>
-        <!--                    <div class="mb-3 mt-3">-->
-        <!--                        <p>작성자: <span th:text="${noticedata.noticeWriter}"></span></p>-->
-        <!--                    </div>-->
-                            <div class="mb-3 mt-3">
-                                <p>내용: <span th:text="${noticedata.noticeContent}"></span></p>
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <p>날짜: <span th:text="${#temporals.format(noticedata.modifyDate,'yyyy-MM-dd')}"></span></p>
-                            </div>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between">
-                            <button type="button" th:onclick="|location.href='@{/notice/list}'|" class="btn btn-outline-secondary px-2 py-1">
-                                <i class="bi-caret-left"></i>
-                            </button>
-                            <div>
-                                <a th:href="@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-outline-success px-2 py-1">수정</a>
-                                <a th:href="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" class="btn btn-outline-danger px-2 py-1">삭제</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <div class="col-1"></div>
+
+    <div class="container mt-4 bg-light">
+        <h2 class="fw-bold mb-4 text-center">공지사항</h2>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title fw-bold" th:text="${noticedata.noticeTitle}">공지 제목</h5>
+                <p class="text-muted text-end small-text" th:text="${#temporals.format(noticedata.modifyDate, 'yyyy-MM-dd HH:mm')}">2025-05-01</p>
+                <hr>
+                <div class="mb-5" th:utext="${noticedata.noticeContent}">공지 내용</div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-center gap-3">
+                <button type="button" onclick="location.href='/notice/list'" class="btn btn-outline-secondary px-4">목록</button>
+                <button type="button" th:onclick="|location.href='@{/notice/modify/{noticeNum}(noticeNum=${noticedata.noticeNum})}'|" class="btn btn-primary px-4">수정</button>
+                <form th:action="@{/notice/delete/{noticeNum}(noticeNum=${noticedata.noticeNum})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?')" style="display:inline;">
+                    <button type="submit" class="btn btn-danger px-4">삭제</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

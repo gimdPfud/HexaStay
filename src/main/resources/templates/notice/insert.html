@@ -4,18 +4,20 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>공지사항</title>
+    <title>공지사항 등록</title>
     <style>
         .content {
             margin: auto;
         }
+
         .card {
             width: 100%;
-
         }
+
         .card-header{
             text-align: center;
         }
+
         .card-footer {
             text-align: center;
             padding: 10px;
@@ -24,8 +26,10 @@
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <div class="container mt-4 bg-light" style="max-width: 700px;">
+
+    <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">게시글 등록</h2>
+
         <form action="/notice/insert" method="post">
             <input type="hidden" name="memberNum" th:value="${memberNum}">
 
@@ -41,8 +45,8 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-center gap-3">
-                    <button type="button" onclick="location.href='/notice/list'" class="btn btn-secondary px-2 py-1">목록</button>
-                    <button type="submit" class="btn btn-primary px-2 py-1">등록</button>
+                    <button type="button" onclick="location.href='/notice/list'" class="btn btn-secondary px-4">목록</button>
+                    <button type="submit" class="btn btn-primary px-4">등록</button>
                 </div>
             </div>
         </form>
