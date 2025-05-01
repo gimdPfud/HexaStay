@@ -9,7 +9,10 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
+import com.sixthsense.hexastay.dto.FsViewDTO;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Facilities;
+import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.FacilitiesRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ import java.util.List;
 public class FsService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final FacilitiesRepository fsRepository;
+    private final CompanyRepository companyRepository;
 
     //등록 반환 fsNum
     public Long fsInsert(FacilitiesDTO dto) throws IOException {
@@ -55,6 +59,26 @@ public class FsService {
     public FacilitiesDTO read (Long fsNum){
         Facilities a = fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new);
         return modelMapper.map(a,FacilitiesDTO.class).setCompanyDTO(modelMapper.map(a.getCompany(),CompanyDTO.class));
+    }
+    public FsViewDTO readMobile (Long num){
+        // 시설(company)찾음
+        Company facility = companyRepository.findById(num).orElseThrow(EntityNotFoundException::new);
+        CompanyDTO cdto = modelMapper.map(facility,CompanyDTO.class);
+
+        // 반환할거에 시설(company)정보 세팅
+        FsViewDTO result = new FsViewDTO(cdto);
+
+        // 반환할거에 시설(fs) 찾아서 넣어야됨.
+        List<Facilities> fsslist = fsRepository.findByCompany_CompanyNum(num);
+        fsslist.forEach(fss->{
+            FacilitiesDTO fssDTO = modelMapper.map(fss,FacilitiesDTO.class);
+            fssDTO.setCompanyDTO(cdto);
+            result.addFssList(fssDTO);
+        });
+
+//        log.info(result.toString());
+
+        return result;
     }
 
     //수정 반환 companyNum

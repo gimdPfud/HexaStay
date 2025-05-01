@@ -148,13 +148,17 @@ public class FacilitiesController {
             log.info("오류발생");
             return "redirect:/main";
         }
-        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null,companyNum,pageable);
+        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null, companyNum ,pageable);
         model.addAttribute("list",list);
         return "facilities/mobile/list";
     }
     @GetMapping("/fs/read/{num}")
     public String fsreadClient(@PathVariable Long num, Model model){
-//        model.addAttribute("data",)
+        try {
+            model.addAttribute("data", fsService.readMobile(num));
+        }catch (Exception e){
+            return "redirect:/fs/list";
+        }
         return "facilities/mobile/read";
     }
 }

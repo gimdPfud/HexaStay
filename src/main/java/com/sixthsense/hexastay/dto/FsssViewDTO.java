@@ -26,14 +26,14 @@ public class FsssViewDTO {
     private String fsssStatus;    //서비스 상태(이용가능 불가능 삭제됨)
     private Long fsNum;
 
-    public FsssViewDTO(FacilitiesDTO dto) {
-        this.fsssNum = dto.getFacilitiesNum();
-        this.fsssName = dto.getFsName();
-        this.fsssContent = dto.getFsContent();
-        this.fsssPrice = dto.getFsPrice();
-        this.fsssAmountMax = dto.getFsAmountMax();
-        this.fsssAmount = dto.getFsAmount();
-        this.fsssStatus = dto.getFsStatus();
-        this.fsNum = dto.getCompanyDTO().getCompanyNum();
+    public FsssViewDTO(FacilitiesDTO fdto) {
+        this.fsssNum = fdto.getFacilitiesNum();
+        this.fsssName = fdto.getFsName();
+        this.fsssContent = fdto.getFsContent();
+        this.fsssPrice = fdto.getFsPrice();
+        this.fsssAmountMax = fdto.getFsAmountMax();
+        this.fsssAmount = fdto.getFsAmount();
+        this.fsssStatus = fdto.getFsStatus();
+        this.fsNum = fdto.getCompanyDTO().getCompanyNum();
     }
 }

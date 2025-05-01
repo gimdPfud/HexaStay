@@ -148,21 +148,51 @@ public class StoremenuServiceImpl implements StoremenuService {
     @Override
     public List<StoremenuDTO> list(Long storeNum, String status) {
         List<Storemenu> storemenuList= storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum,status);
-        List<StoremenuDTO> list = storemenuList.stream().map(data -> modelMapper.map(data, StoremenuDTO.class)).toList();
+        List<StoremenuDTO> list = storemenuList.stream().map(data-> {
+            StoremenuDTO menuDTO = modelMapper.map(data, StoremenuDTO.class);
+            menuDTO.setStoremenuOptionDTOList(
+                    data.getStoremenuOptionList().stream()
+                            .map(option->{
+                                StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
+                                return optionDTO;
+                            })
+                            .toList());
+            return menuDTO;
+        }).toList();
         return list;
     }
 
     @Override
     public List<StoremenuDTO> list(Long storeNum) {
         List<Storemenu> storemenuList = storemenuRepository.findAll(storeNum);
-        List<StoremenuDTO> list = storemenuList.stream().map(data->modelMapper.map(data,StoremenuDTO.class)).toList();
+        List<StoremenuDTO> list = storemenuList.stream().map(data-> {
+            StoremenuDTO menuDTO = modelMapper.map(data, StoremenuDTO.class);
+            menuDTO.setStoremenuOptionDTOList(
+                    data.getStoremenuOptionList().stream()
+                            .map(option->{
+                                StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
+                                return optionDTO;
+                            })
+                            .toList());
+            return menuDTO;
+        }).toList();
         return list;
     }
 
     @Override
     public List<StoremenuDTO> list(Long storeNum, String category, String status) {
         List<Storemenu> storemenuList= storemenuRepository.findCateg(storeNum, category, status);
-        List<StoremenuDTO> list = storemenuList.stream().map(data -> modelMapper.map(data, StoremenuDTO.class)).toList();
+        List<StoremenuDTO> list = storemenuList.stream().map(data-> {
+            StoremenuDTO menuDTO = modelMapper.map(data, StoremenuDTO.class);
+            menuDTO.setStoremenuOptionDTOList(
+                    data.getStoremenuOptionList().stream()
+                            .map(option->{
+                                StoremenuOptionDTO optionDTO = new StoremenuOptionDTO(option);
+                                return optionDTO;
+                            })
+                            .toList());
+            return menuDTO;
+        }).toList();
         return list;
     }
 
