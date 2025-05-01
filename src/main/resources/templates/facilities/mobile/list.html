@@ -57,6 +57,17 @@
         .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
         .d-flex { display: flex; gap: 15px; }
 
+        .facility-card {
+            height: 160px;
+        }
+
+        @media (min-width: 768px) {
+            .facility-card {
+                height: 100px;
+            }
+        }
+
+
 
 
         .back-to-list-btn {
@@ -94,66 +105,39 @@
         <div class="tab" onclick="filterByCategory('레저')">레저</div>
         <div class="tab" onclick="filterByCategory('의료')">의료</div>
     </div>
-    <ul class="food-list card-list">
-        <div class="container my-4">
-            <div class="row row-cols-2 row-cols-md-3 g-3">
-                <!-- 카드 반복 요소 -->
-                <div class="col" >
-                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
-                         style="cursor: pointer;">
-                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
-                        <div class="card-body">
-                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col" >
-                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
-                         style="cursor: pointer;">
-                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
-                        <div class="card-body">
-                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col" >
-                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
-                         style="cursor: pointer;">
-                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
-                        <div class="card-body">
-                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col" >
-                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
-                         style="cursor: pointer;">
-                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
-                        <div class="card-body">
-                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col" >
-                    <div class="card h-100 shadow-sm" onclick="location.href='/fs/read';"
-                         style="cursor: pointer;">
-                        <img th:src="@{/images/초단.png}" class="card-img-top" alt="시설 이미지">
-                        <div class="card-body">
-                            <h6 class="card-title" >강릉 세인트존스호텔</h6>
-                        </div>
-                    </div>
-                </div>
-                <!-- end each -->
-            </div>
 
-            <!-- 페이지네이션 -->
-            <div class="d-flex justify-content-center align-items-center mt-3">
-                <button class="btn btn-outline-secondary btn-sm me-2">&lt;</button>
-                <span class="fw-bold">1 / 5</span>
-                <button class="btn btn-outline-secondary btn-sm ms-2">&gt;</button>
+    <div class="container my-4">
+        <div class="row row-cols-3 row-cols-md-4 g-3">
+            <!-- 카드 반복 요소 -->
+            <div class="col" th:each="fs:${list}">
+                <a th:href="@{'/fs/read/'+${fs.companyNum}}" style="text-decoration: none">
+                    <div class="card shadow-sm facility-card">
+                        <img class="cart-img-top" style="height: 80%; object-fit: cover;" th:src="@{${fs.companyPictureMeta}}" alt="시설 이미지">
+                        <div class="card-body" style="width: 100%; height: 20%">
+                            <h6 class="card-title text-truncate"
+                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px"
+                                th:text="${fs.companyName}">시설명</h6>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
-    </ul>
+
+        <!-- 페이지네이션 -->
+        <div class="d-flex justify-content-center align-items-center mt-3">
+            <a class="btn btn-outline-secondary btn-sm me-2"
+               th:classappend="${!list.hasPrevious()} ? 'disabled'"
+               th:href="@{/fs/list?page={prev}(prev=${list.number - 1})}">&lt;</a>
+            <span class="fw-bold">
+                <span th:text="${list.number+1}">1</span>
+                <span> / </span>
+                <span th:text="${list.totalPages}">5</span>
+            </span>
+            <a class="btn btn-outline-secondary btn-sm ms-2"
+               th:classappend="${!list.hasNext()} ? 'disabled'"
+               th:href="@{/fs/list?page={last}(last=${list.totalPages-1})}">&gt;</a>
+        </div>
+    </div>
 
     <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
 </div>

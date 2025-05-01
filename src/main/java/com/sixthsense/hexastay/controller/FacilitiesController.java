@@ -8,12 +8,16 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
+import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
+import com.sixthsense.hexastay.service.ZzService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +26,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Controller
 @Log4j2
 @RequiredArgsConstructor
 public class FacilitiesController {
     private final FsService fsService;
+    private final ZzService zzService;
     private final CompanyService companyService;
     /*
      * 메소드명 :
@@ -129,11 +135,25 @@ public class FacilitiesController {
     }
 
     @GetMapping("/fs/list")
-    public String fslistClient(){
+    public String fslistClient(Principal principal, Pageable pageable, Model model){
+//        log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
+        if(principal==null){
+            return "redirect:/cart/qr";}
+        Long companyNum = 0L;
+        try {
+            companyNum = zzService.hotelroomNumToCompany(zzService.principalToHotelroomNum(principal)).getCompanyNum();
+            log.info("컴퍼니넘 : "+companyNum);
+        } catch (Exception e){
+            log.info("오류발생");
+            return "redirect:/main";
+        }
+        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null,companyNum,pageable);
+        model.addAttribute("list",list);
         return "facilities/mobile/list";
     }
-    @GetMapping("/fs/read")
-    public String fsreadClient(){
+    @GetMapping("/fs/read/{num}")
+    public String fsreadClient(@PathVariable Long num, Model model){
+//        model.addAttribute("data",)
         return "facilities/mobile/read";
     }
 }
