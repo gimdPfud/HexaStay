@@ -44,7 +44,7 @@ public class MemberSecurityConfig {
             .securityMatcher("/main/**", "/member/**", "/branch/**", "/center/**",
                     "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                     "/notice/**", "/review/**", "/room/**", "/roommenu/**",
-                    "/roomMenu/**","/qr/**,",
+                    "/roomMenu/**","/qr/**,","/fs/**",
                     "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**,",
                     "/ws-order-alert/**", "/cart/**", "/roomcare/**")
             .authenticationManager(authManager)

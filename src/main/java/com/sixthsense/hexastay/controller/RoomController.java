@@ -10,6 +10,7 @@ import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import com.sixthsense.hexastay.service.impl.RoomServiceTest;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -258,13 +259,14 @@ public class RoomController {
     @PostMapping("/qr/{hotelRoomNum}")
     public String checkPassword(@RequestParam("roomPassword") String roomPassword,
                                 @PathVariable("hotelRoomNum") Long hotelRoomNum,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes,
+                                HttpSession session
+                                ) {
+        // 변수 선언 (빨간줄 방지용!!)
+        Room room;
         try {
             // ✅ 서비스에서 패스워드까지 검증해서 반환
-            Room room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
-
-            // ✅ 성공 → 메인으로 이동
-            return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
+            room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
 
         } catch (IllegalArgumentException e) {
             // ❌ 비밀번호 불일치
@@ -276,6 +278,10 @@ public class RoomController {
             redirectAttributes.addFlashAttribute("error", "호텔룸 정보를 찾을 수 없습니다.");
             return "redirect:/roomlist";
         }
+
+        // ✅ 성공 → 세션에 roomNum 저장 후 메인으로 이동
+        session.setAttribute("roomNum", room.getRoomNum());
+        return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
     }
 
 

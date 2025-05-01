@@ -105,7 +105,8 @@ public class StoreClientController {
     /*5. 스토어 좋아요~ 또는 싫어요~?*/
     @ResponseBody
     @GetMapping("/like/{storeNum}")
-    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal){
+    public ResponseEntity liketoggle(@PathVariable Long storeNum, Principal principal,
+                                     HttpSession session){
         if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
             Long hotelroomNum = zzService.principalToHotelroomNum(principal);
@@ -119,9 +120,12 @@ public class StoreClientController {
 
     @ResponseBody
     @GetMapping("/like/list/{storeNum}")
-    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal){
+    public ResponseEntity likeList(@PathVariable Long storeNum, Principal principal,
+                                   HttpSession session){
         if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
+            log.info("세션에 저장된 roomNum : " + session.getAttribute("roomNum"));
+
             Long hotelroomNum = zzService.principalToHotelroomNum(principal);
             Long likes = storeService.getStoreLikeCount(storeNum);
             Member member = zzService.hotelroomNumToMember(hotelroomNum);
