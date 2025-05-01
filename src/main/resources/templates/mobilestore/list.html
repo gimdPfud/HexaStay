@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile.html}">
+      layout:decorate="~{layouts/layoutmobile}" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +10,13 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
-        .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
-
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+        }
         .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
         .search-box {
             display: flex; align-items: center; gap: 0.5rem;
@@ -26,7 +32,6 @@
             border-radius: 6px; background-color: #d0e8ff;
             border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
         }
-
         .tabs {
             display: flex; overflow-x: auto; white-space: nowrap;
             gap: 10px; padding: 10px 0; margin-bottom: 10px;
@@ -37,7 +42,7 @@
         .tab {
             flex-shrink: 0; cursor: pointer; padding: 8px 14px;
             font-size: 14px; background-color: transparent; color: black;
-            height: 65px; width: 60px; text-align: center;
+            height: 37px; width: 60px; text-align: center;
         }
         .tab.active {
             font-weight: bold;
@@ -46,70 +51,117 @@
             color: #00796b;
         }
         .btn-custom {
-            background-color: transparent; color: #ff6b6b;
-            border: 2px solid #ff6b6b; border-radius: 12px;
-            padding: 8px 16px; font-size: 12px; font-weight: normal;
-            cursor: pointer; white-space: nowrap;
+            background-color: transparent; /* 배경색 제거 */
+            color: #ff6b6b; /* 텍스트 색상 */
+            border: 2px solid #ff6b6b; /* 빨간색 테두리 */
+            border-radius: 12px; /* 둥근 모서리 */
+            padding: 8px 16px; /* 여백을 조금 더 줄임 */
+            font-size: 12px; /* 폰트 크기 약간 증가 */
+            font-weight: normal; /* 폰트 굵기 조정 */
+            box-shadow: none; /* 그림자 제거 */
+            cursor: pointer; /* 클릭 가능한 포인터 */
+            transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
         }
-
-        .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
+        .card-list {
+            list-style: none;
+            padding: 0;
+            display: grid; /* 그리드 레이아웃 사용 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
+            gap: 20px; /* 카드 사이 간격 */
+        }
         .div-card {
-            background: white; border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* 카드 높이 유동적으로 */
         }
-        .inner-wrapper { padding: 15px; }
-        .d-flex { display: flex; gap: 15px; }
+        .inner-wrapper {
+            padding: 15px;
+        }
+        .d-flex {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 0;
+        }
         .menu-image-container {
-            width: 100px; height: 100px; flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .store-image {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
         }
         .text-info { flex: 1; }
         .store-name {
-            font-size: 1.2rem; font-weight: bold; color: black; margin-bottom: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 5px;
         }
-        .store-content { font-size: 0.9rem; color: black; }
+        .store-content {
+            font-size: 0.9rem;
+            color: black;
+        }
         .menu-badge {
             display: inline-block;
-            font-size: 0.75rem;
-            padding: 1px 6px;          /* ✅ padding 축소 */
-            line-height: 1;            /* ✅ 줄 간격 고정 */
-            border-radius: 8px;
             background-color: #e0f7fa;
             color: #00796b;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-bottom: 4px;
             font-weight: bold;
-            vertical-align: middle;    /* ✅ 수직 정렬 보정 */
-            height: auto;              /* ✅ 높이 강제 고정 방지 */
         }
-
-
         .like-section {
-            display: flex; justify-content: flex-end; align-items: center;
-            gap: 5px; padding: 0 15px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            gap: 5px;
         }
-        .like-icon { font-size: 1.5rem; cursor: pointer; color: gray; }
-        .like-count { font-size: 1rem; font-weight: bold; color: #80b3ff; }
+        .like-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: gray;
+        }
+        .like-count {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #80b3ff;
+        }
+        div.menu-image-container img.store-image {
+            width: 100px !important;
+            height: 100px !important;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        a {
+            color: #333; /* 진회색 - 검정에 가까움 */
+            text-decoration: none; /* 밑줄 제거 */
+        }
+        .store-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: black;
+        }
 
-        .add-to-cart-btn, .order-list-btn {
-            background-color: #ffeb3b; color: black;
-            border: none; border-radius: 5px;
-            padding: 12px 20px; cursor: pointer; font-weight: bold;
-            width: 100%; margin-top: 15px;
-        }
-        .order-list-btn { background-color: #FAE100; }
-        .cart-count {
-            background-color: #ff5c5c; color: white; padding: 4px 10px;
-            border-radius: 4px; margin-left: 8px; font-weight: bold; font-size: 1.2em;
-        }
+
     </style>
 </head>
 <body>
 <div layout:fragment="contentorder">
     <div class="container">
-
-        <!-- 검색창 -->
-        <div class="search-container">
+        <div id="search-container" class="search-container">
             <form th:action="@{/member/store/list}" method="get">
                 <div class="search-box">
                     <input type="text" name="keyword" th:placeholder="'매장명 검색'">
@@ -117,11 +169,10 @@
                 </div>
             </form>
         </div>
-
         <!-- 카테고리 탭 -->
         <div class="tabs">
             <button type="button" onclick="filterByLikes()" class="btn-custom">
-                ❤️ <span>인기순</span>
+                ❤️ <span class="like-count" style="margin-left: 4px;">인기순</span>
             </button>
             <div class="tab" onclick="filterByCategory('전체')">전체</div>
             <div class="tab" onclick="filterByCategory('한식')">한식</div>
@@ -132,7 +183,6 @@
             <div class="tab" onclick="filterByCategory('패스트푸드')">패스트푸드</div>
             <div class="tab" onclick="filterByCategory('카페')">카페</div>
         </div>
-
         <!-- 매장 리스트 -->
         <ul class="store-list card-list">
             <li th:each="store : ${list}" class="store-item" th:attr="data-category=${store.storeCategory}">

@@ -6,12 +6,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/roommenu.css"><!-- 국기 아이콘 가져오기 -->
     <title>모바일 주문 페이지</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
-
         .container {
             width: 100%;
             max-width: 400px;
@@ -19,311 +17,39 @@
             background: white;
             padding: 10px;
         }
-
-        /* 검색창 */
-        .search-container {
-            padding: 0.2rem;
-            background-color: white;
-            margin-bottom: 0;
-        }
-
+        .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
         .search-box {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: nowrap;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 0.3rem;
-            margin-bottom: 0;
+            display: flex; align-items: center; gap: 0.5rem;
+            background-color: white; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 0.3rem;
         }
-
-        .search-box select,
-        .search-box input[type="text"],
-        .search-box button {
-            height: 40px;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-        }
-
-        .search-box select {
-            width: 120px;
-            padding: 0 0.5rem;
-        }
-
         .search-box input[type="text"] {
-            width: 120px;
-            flex: 1;
-            padding: 0 0.75rem;
+            flex: 1; height: 40px; font-size: 1rem;
+            border-radius: 6px; border: 1px solid #ced4da; padding: 0 0.75rem;
         }
-
         .search-box button {
-            padding: 0 1rem;
-            background-color: #d0e8ff;
-            border: 1px solid #90c6f7;
-            color: #0d6efd;
-            font-weight: 500;
-            white-space: nowrap;
+            height: 40px; padding: 0 1rem; font-size: 1rem;
+            border-radius: 6px; background-color: #d0e8ff;
+            border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
         }
-
-        /* 버튼, 입력창 외곽선 스타일 변경 */
-        .search-box select:focus,
-        .search-box input[type="text"]:focus,
-        .search-box button:focus {
-            border-color: #80b3ff;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        .tabs {
+            display: flex; overflow-x: auto; white-space: nowrap;
+            gap: 10px; padding: 10px 0; margin-bottom: 10px;
+            height: 55px; text-align: center; align-items: center;
         }
+        .tabs::-webkit-scrollbar { display: none; }
 
-        /* 검색 박스 스타일 */
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+        .tab {
+            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
+            font-size: 14px; background-color: transparent; color: black;
+            height: 37px; width: 60px; text-align: center;
         }
-
-        .form-select {
-            width: 100%;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #ffffff;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-select:focus {
-            border-color: #4CAF50; /* 초록색 테두리 */
-            outline: none;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-        }
-
-        .form-select option {
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        /* select 요소 화살표 커스터마이징 */
-        .form-select::-ms-expand {
-            display: none; /* Internet Explorer에서 기본 화살표 숨기기 */
-        }
-
-        .form-select {
-            width: 115px;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #f9f9f9;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"%3E%3Cpolygon points="0,0 5,5 10,0" fill="%23666"/%3E%3C/svg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 10px;
-        }
-
-        #search-container {
-            display: block; /* 항상 보이게 설정 */
-        }
-
-        /* 카테고리 텍스트를 꾸미는 스타일 */
-        .category-label {
-            display: inline-block;
-            background-color: white;
-            color: #333;
+        .tab.active {
             font-weight: bold;
-            padding: 3px 8px; /* 패딩 줄이기 */
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            font-size: clamp(10px, 1.1vw, 16px); /* 글자 크기 줄이기 */
-            margin: 0;
-            transition: background-color 0.3s ease;
-        }
-
-        /* 공통 스타일 */
-        .card-list {
-            list-style: none;
-            padding: 0;
-            display: grid; /* 그리드 레이아웃 사용 */
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
-            gap: 20px; /* 카드 사이 간격 */
-        }
-
-        .div-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* 카드 높이 유동적으로 */
-        }
-
-        .food-item {
-            padding: 0; /* food-item의 기본 패딩 제거 */
-            border-bottom: none; /* food-item의 하단 테두리 제거 */
-            margin-bottom: 0; /* food-item의 하단 마진 제거 */
-        }
-
-        .category-wrapper {
-            background-color: white;
-            padding: 2px;
-            text-align: left;
-            font-size: 0.8rem;
-        }
-
-        .inner-wrapper {
-            padding: 4px;
-        }
-
-        .d-flex {
-            display: flex;
-            justify-content: flex-end;
-            gap: 5px;
-            margin-top: 0;
-        }
-
-        .text-info-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            margin-left: 15px;
-        }
-
-        .text-info {
-            width: 60%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding-left: 10px;
-            margin-top: 15px;
-        }
-
-        .text-info .menu-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin: 5px 0;
-            color: black;
-        }
-
-        .menu-content {
-            color: black;
-            font-size: 0.8rem;
-        }
-
-        .price-box{
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin: 5px 0;
-            color: black;
-        }
-
-        .image-like-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* 이미지 세로 중앙 배치 */
-        .menu-image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* height: 100%; 삭제 */
-
-        }
-        div.menu-image-container img.menu-image {
-            width: 100px !important;
-            height: 100px !important;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .menu-badge {
-            display: inline-block;
-            background-color: #e0f7fa;
+            background-color: #e0f7fa;  /* 선택된 탭 배경 */
+            border-bottom: 3px solid #00796b;  /* 탭 하단 표시선 */
             color: #00796b;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 12px;
-            margin-bottom: 4px;
-            font-weight: bold;
         }
-
-        .like-section {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* 오른쪽 정렬 */
-            gap: 5px;
-        }
-
-        .like-icon {
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: gray;
-        }
-
-        .like-count {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #80b3ff;
-        }
-
-        .cart-count {
-            background-color: #D57483;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 2px;
-            margin-left: 8px;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        a {
-            color: #333; /* 진회색 - 검정에 가까움 */
-            text-decoration: none; /* 밑줄 제거 */
-        }
-
-        /* 다국어 */
-        .lang-en .tab {
-            font-size: 13px;
-            padding: 8px 10px;
-            letter-spacing: -0.5px;
-        }
-
-        /* 영어 */
-        .lang-en .tab {
-            font-size: 12px;
-            padding: 8px 10px;
-            letter-spacing: -0.5px;
-        }
-
-        /* 일본어 */
-        .lang-ja .tab {
-            font-size: 13px;
-            padding: 8px 10px;
-            letter-spacing: 0px; /* 일본어는 자간을 좁히지 않는 게 가독성에 좋음 */
-            font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
-        }
-
-        /* 중국어 */
-        .lang-cn .tab {
-            font-size: 13px;
-            padding: 8px 10px;
-            letter-spacing: 0px; /* 중국어도 자간 유지 */
-            font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
-        }
-
         .btn-custom {
             background-color: transparent; /* 배경색 제거 */
             color: #ff6b6b; /* 텍스트 색상 */
@@ -336,26 +62,143 @@
             cursor: pointer; /* 클릭 가능한 포인터 */
             transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
         }
-
-        .tabs {
-            display: flex; overflow-x: auto; white-space: nowrap;
-            gap: 10px; padding: 10px 0; margin-bottom: 10px;
-            height: 55px; text-align: center; align-items: center;
+        .card-list {
+            list-style: none;
+            padding: 0;
+            display: grid; /* 그리드 레이아웃 사용 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
+            gap: 20px; /* 카드 사이 간격 */
         }
-        .tabs::-webkit-scrollbar { display: none; }
-
-        .tab {
-            flex-shrink: 0; cursor: pointer; padding: 8px 14px;
-            font-size: 14px; background-color: transparent; color: black;
-            height:37px; width: 60px;
-            text-align: center;
+        .div-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* 카드 높이 유동적으로 */
         }
-        /* 품절관련, 좋아요 관련 CSS 시작*/
+        .inner-wrapper {
+            padding: 15px;
+        }
+        .d-flex {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 0;
+        }
+        .menu-image-container {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .menu-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .text-info { flex: 1; }
+        .menu-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 5px;
+        }
+        .menu-content {
+            font-size: 0.9rem;
+            color: black;
+        }
+        .menu-badge {
+            display: inline-block;
+            background-color: #e0f7fa;
+            color: #00796b;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .like-section {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            gap: 5px;
+        }
+        .like-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: gray;
+        }
+        .like-count {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #80b3ff;
+        }
+        div.menu-image-container img.menu-image {
+            width: 100px !important;
+            height: 100px !important;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        a {
+            color: #333; /* 진회색 - 검정에 가까움 */
+            text-decoration: none; /* 밑줄 제거 */
+        }
+        .text-info {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-left: 10px;
+            margin-top: 15px;
+        }
+        .text-info .menu-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: black;
+        }
+        .price-box{
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: black;
+        }
+        /* 다국어 */
+        .lang-en .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: -0.5px;
+        }
+        /* 영어 */
+        .lang-en .tab {
+            font-size: 12px;
+            padding: 8px 10px;
+            letter-spacing: -0.5px;
+        }
+        /* 일본어 */
+        .lang-ja .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: 0px; /* 일본어는 자간을 좁히지 않는 게 가독성에 좋음 */
+            font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
+        }
+        /* 중국어 */
+        .lang-cn .tab {
+            font-size: 13px;
+            padding: 8px 10px;
+            letter-spacing: 0px; /* 중국어도 자간 유지 */
+            font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        }
+        /* 품절관련, 좋아요 관련 CSS 시작 */
         .sold-out {
             opacity: 0.5;
             position: relative;
         }
-
         .sold-out::after {
             content: "품절";
             color: white;
@@ -368,25 +211,19 @@
             right: 10px;
             border-radius: 4px;
         }
-
         .sold-out-item {
             opacity: 0.5;
             pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
             position: relative;
         }
-
         .sold-out-item .enable-click {
             pointer-events: auto; /* 좋아요 버튼만 클릭 허용 */
         }
-        /* 품절관련, 좋아요 관련 CSS 끝*/
-
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
 <div layout:fragment="contentorder">
-
     <div class="container">
-        <!-- 검색창 (항상 표시되도록 설정) -->
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
                 <div class="search-box">
@@ -396,12 +233,10 @@
                 </div>
             </form>
         </div>
-
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <button type="button"
-                    onclick="window.location.href='/roommenu/orderpage?type=L'"
-                    class="btn btn-custom">
+            <button type="button" onclick="window.location.href=
+                '/roommenu/orderpage?type=L'" class="btn btn-custom">
                 ❤️ <span th:text="#{category.popular}">인기순</span>
                 <span class="like-count" style="margin-left: 4px;" th:text="${roomMenuLikes}"></span>
             </button>
