@@ -31,14 +31,22 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
 
     // hotelRoomNum 기준으로 연결된 member 리스트로 가져오는 repository  가져오기
+    //todo : 사용중
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
     List<Room> findByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+    //todo : 검색용 roomlist.html
+    //member 의 이름관 email로 찾아 오는 조건
+    @Query("SELECT r FROM Room r WHERE " +
+            "LOWER(r.member.memberName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(r.member.memberEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Room> searchRoomsByMemberNameOrEmailPaged(@Param("keyword") String keyword, Pageable pageable);
 
     //최신순으로 정렬 하는 repository리 로직
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
     List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
 
-
+    //todo:나중에 필요해서 만들었던 로직 이구 지금은 사용 안함
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
