@@ -282,27 +282,25 @@ public class RoomController {
     public String checkPassword(@RequestParam("roomPassword") String roomPassword,
                                 @PathVariable("hotelRoomNum") Long hotelRoomNum,
                                 RedirectAttributes redirectAttributes,
-                                HttpSession session
-                                ) {
-        // 변수 선언 (빨간줄 방지용!!)
+                                HttpSession session) {
+
         Room room;
         try {
             // ✅ 서비스에서 패스워드까지 검증해서 반환
             room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
 
         } catch (IllegalArgumentException e) {
-            // ❌ 비밀번호 불일치
             redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
             return "redirect:/qr/" + hotelRoomNum;
 
         } catch (EntityNotFoundException e) {
-            // ❌ 해당 호텔룸 없음
             redirectAttributes.addFlashAttribute("error", "호텔룸 정보를 찾을 수 없습니다.");
             return "redirect:/roomlist";
         }
 
-        // ✅ 성공 → 세션에 roomNum 저장 후 메인으로 이동
+        // ✅ 성공 시 roomNum과 함께 roomPassword도 세션에 저장
         session.setAttribute("roomNum", room.getRoomNum());
+        session.setAttribute("roomPassword", room.getRoomPassword()); // ✅ 추가된 라인
         return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
     }
 
