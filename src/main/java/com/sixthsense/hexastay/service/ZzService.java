@@ -50,6 +50,9 @@ public class ZzService {
         return hotelRoomDTO.getHotelRoomNum();
     }
 
+    //roomNum으로 이것저것 다 하기
+
+
     //hotelroomNum으로 Member찾기
     public Member hotelroomNumToMember(Long hotelroomNum){
         Room room = roomService.readRoomByHotelRoomNum(hotelroomNum);
