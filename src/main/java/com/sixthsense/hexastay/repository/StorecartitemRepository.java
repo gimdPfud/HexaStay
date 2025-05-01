@@ -34,10 +34,10 @@ public interface StorecartitemRepository extends JpaRepository<Storecartitem, Lo
             "sci.storemenu.storemenuImgMeta, " +
             "sci.storemenuOptions, " +
             "sci.optionPrice " +
-            ") from Storecartitem sci where sci.storecart.room.hotelRoom.hotelRoomNum=:hotelRoomNum")
-    List<StorecartitemViewDTO> storeCartViewList(Long hotelRoomNum);
+            ") from Storecartitem sci where sci.storecart.room.roomNum=:roomNum")
+    List<StorecartitemViewDTO> storeCartViewList(Long roomNum);
 
-    @Query("select sum(s.storecartitemCount) from Storecartitem s where s.storecart.room.hotelRoom.hotelRoomNum = ?1")
-    Long countByStorecart_Room_HotelRoom(Long hotelroomNum);
+    @Query("select sum(s.storecartitemCount) from Storecartitem s where s.storecart.room.roomNum = ?1")
+    Long countByStorecart_Room(Long roomNum);
 
 }

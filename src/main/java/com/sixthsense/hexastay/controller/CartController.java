@@ -12,6 +12,7 @@ import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.ZzService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,17 +68,24 @@ public class CartController {
 
     @ResponseBody
     @GetMapping("/getlength")
-    public ResponseEntity getlength(HttpServletRequest request, Principal principal){
-        String referer = request.getHeader("Referer");
-//        System.out.println("이전 페이지: " + referer);
+    public ResponseEntity getlength(HttpServletRequest request, Principal principal, HttpSession session){
+
         if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
+
+        String referer = request.getHeader("Referer");
         String email = principal.getName();
+        Long roomNum = (Long) session.getAttribute("roomNum");
+
         if (referer != null) {
+
             if (referer.contains("/roommenu")) {
+                // 객실서비스 장바구니 개수 구하기
                 Integer totalCartItemCount = roomMenuCartService.getTotalCartItemCount(email);
                 return new ResponseEntity<>(totalCartItemCount, HttpStatus.OK);
+
             } else if (referer.contains("/member/store")) {
-                return new ResponseEntity<>(storecartService.getItemCount(zzService.principalToHotelroomNum(principal)),HttpStatus.OK);
+                // 스토어 장바구니 개수 구하기
+                return new ResponseEntity<>(storecartService.getItemCount(roomNum),HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
