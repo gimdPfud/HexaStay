@@ -125,7 +125,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     @Override
     public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage,
                                                      Long couponNum, Integer discountedTotalPrice,
-                                                     Pageable pageable) {
+                                                     Pageable pageable, String password) {
         log.info("장바구니 기반 주문 생성 시작 - email: {}", email);
 
         // 1. 로그인한 회원 조회
@@ -138,12 +138,18 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         log.debug(">>> 현재 시간 [{}] 기준으로 활성 Room 정보 조회 시도: MemberNum {}", now, member.getMemberNum());
 
         // 새로 만든 Repository 메소드 호출
-        Room currentActiveRoom = roomRepository.findActiveRoomForMemberAtTime(member, now)
-                .orElseThrow(() -> { // 현재 시간에 활성 상태인 방이 없으면 예외 발생
-                    log.error("!!! 현재 시간 [{}]에 해당 사용자가 체크인 상태인 객실 정보를 찾을 수 없습니다. MemberNum: {}", now, member.getMemberNum());
-                    // 사용자에게 보여줄 메시지도 구체적으로 변경
-                    return new IllegalStateException("현재 체크인 상태인 객실이 없어 룸서비스 주문을 진행할 수 없습니다.");
-                });
+        Room currentActiveRoom = roomRepository.findActiveRoomsOrdered(member, now)
+                .stream()
+                .filter(r -> r.getRoomPassword() != null && r.getRoomPassword().equals(password))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 없습니다."));
+
+
+//                .orElseThrow(() -> { // 현재 시간에 활성 상태인 방이 없으면 예외 발생
+//                    log.error("!!! 현재 시간 [{}]에 해당 사용자가 체크인 상태인 객실 정보를 찾을 수 없습니다. MemberNum: {}", now, member.getMemberNum());
+//                    // 사용자에게 보여줄 메시지도 구체적으로 변경
+//                    return new IllegalStateException("현재 체크인 상태인 객실이 없어 룸서비스 주문을 진행할 수 없습니다.");
+//                });
         // --- 조회 로직 끝 ---
 
         HotelRoom associatedHotelRoom = currentActiveRoom.getHotelRoom();

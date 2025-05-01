@@ -21,6 +21,7 @@ import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -148,7 +149,7 @@ public class RoomMenuOrderController {
 
     @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO,
-                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable) {
+                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable, HttpSession session) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -158,10 +159,11 @@ public class RoomMenuOrderController {
         }
 
         String email = principal.getName();
+        String password = (String) session.getAttribute("roomPassword");
 
         try {
             // 서비스 호출 시 hotelRoomNum 인자 제거됨
-            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable);
+            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable, password);
             log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
 
             roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order, pageable); // orderDto가 어떻게 채워지는지 확인 필요
