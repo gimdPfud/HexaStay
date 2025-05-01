@@ -23,7 +23,8 @@ public class NotificationDTO {
 
     private boolean isRead = false; // 기본값 false
 
-    private String HotelRoomName;
+
+    private String hotelRoomName;
 
 
 

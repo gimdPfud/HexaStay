@@ -148,7 +148,7 @@ public class RoomMenuOrderController {
 
     @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO,
-                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable, Long hotelRoomNum) {
+                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
@@ -160,18 +160,22 @@ public class RoomMenuOrderController {
         String email = principal.getName();
 
         try {
-            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable, hotelRoomNum);
+            // 서비스 호출 시 hotelRoomNum 인자 제거됨
+            RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable);
             log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
-            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order, pageable);
+
+            roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order, pageable); // orderDto가 어떻게 채워지는지 확인 필요
             log.info("3️⃣ 알람 전송 완료");
 
 
             return ResponseEntity.ok(order.getRoomMenuOrderNum());
+
         } catch (IllegalStateException | EntityNotFoundException e) {
             log.error("주문 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            log.error("서버 에러: {}", e.getMessage());
+            // 전체 스택 트레이스를 로깅하는 것이 디버깅에 더 좋습니다.
+            log.error("서버 에러 발생", e); // e.getMessage() 대신 전체 예외 로깅
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 처리 중 오류 발생");
         }
     }

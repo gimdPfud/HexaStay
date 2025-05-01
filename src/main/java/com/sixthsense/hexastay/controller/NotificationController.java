@@ -31,6 +31,7 @@ public class NotificationController {
                 .memberEmail(notification.getMemberEmail())
                 .totalPrice(notification.getTotalPrice())
                 .isRead(notification.isRead())
+                .hotelRoomName(notification.getHotelRoomName())
                 .build();
     }
 
