@@ -4,6 +4,8 @@ import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @ToString
@@ -25,6 +27,8 @@ public class NotificationDTO {
 
 
     private String hotelRoomName;
+
+    private LocalDateTime createDate; // 시간정보 추가
 
 
 

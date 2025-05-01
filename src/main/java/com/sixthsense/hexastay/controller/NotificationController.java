@@ -39,28 +39,20 @@ public class NotificationController {
 
     @GetMapping("/unread")
     public ResponseEntity<Map<String, Object>> getUnreadNotifications() {
-        log.info("읽지 않은 알림 조회 API 호출됨");
-        long unreadCount = notificationService.getUnreadNotificationCount();
-        List<Notification> unreadNotifications = notificationService.getUnreadNotifications();
+        log.info("읽지 않은 알림 조회 API 호출됨 (/unread)");
 
-        // 엔티티 리스트를 DTO 리스트로 변환
-        List<NotificationDTO> notificationDtos = unreadNotifications.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        // <<<--- 서비스 호출 변경: 상세 정보 포함 DTO 리스트를 가져옴 ---<<<
+        List<NotificationDTO> notificationDtos = notificationService.getUnreadNotificationsWithDetails();
+        long unreadCount = notificationDtos.size(); // DTO 리스트 크기로 카운트
 
         Map<String, Object> response = new HashMap<>();
         response.put("count", unreadCount);
-        response.put("notifications", notificationDtos); // DTO 리스트 반환
+        response.put("notifications", notificationDtos); // <<<--- 변환 과정 없이 바로 DTO 리스트 반환 ---<<<
 
-        log.info("읽지 않은 알림 {}건 조회 완료", unreadCount);
+        log.info("읽지 않은 알림 {}건 상세 정보 조회 완료", unreadCount);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 알림 목록을 읽음 상태로 변경
-     * @param notificationIds 읽음 처리할 알림 ID 목록 (Request Body로 받음)
-     * @return 성공 여부 및 처리된 개수
-     */
     @PostMapping("/read")
     public ResponseEntity<Map<String, Object>> markNotificationsAsRead(@RequestBody List<Long> notificationIds) {
         if (notificationIds == null || notificationIds.isEmpty()) {
