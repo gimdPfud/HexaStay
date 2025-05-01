@@ -83,8 +83,8 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
     <script>
+        //주소 입력
         var geocoder = new daum.maps.services.Geocoder();
-
         function showMapBox() {
             new daum.Postcode({
                 oncomplete: function(data) {

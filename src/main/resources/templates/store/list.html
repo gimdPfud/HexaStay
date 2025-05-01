@@ -5,24 +5,56 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>요식업체 관리</title>
+    <title>요식업체 목록</title>
+    <style>
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .badge-outline-danger {
+            color: #dc3545;
+            background-color: transparent;
+            border: 1px solid #dc3545;
+            padding: 0.35em 0.6em;
+            font-size: 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .badge-outline-success {
+            color: #198754;
+            background-color: transparent;
+            border: 1px solid #198754;
+        }
+
+        .badge-outline-secondary {
+            color: #6c757d;
+            background-color: transparent;
+            border: 1px solid #6c757d;
+        }
+    </style>
 </head>
-<style>
-    .table td {
-        vertical-align: middle;
-    }
-</style>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">요식업체 관리</h2>
+        <h2 class="fw-bold mb-4 text-center">요식업체 목록</h2>
 
         <!-- 검색 조건 및 등록 버튼 -->
         <form class="row g-3 align-items-end" action="/admin/store/list" method="post">
-
-            <div class="col-md-3" style=" width:20%;">
-                <select class="form-select" name="chosenCompany" style="height: 40px; font-size: 0.9rem;">
+            <div class="col-md-3">
+                <select class="form-select" name="chosenCompany">
                     <option th:each="data : ${companyMap}"
                             th:value="${data.key}"
                             th:text="${data.value}"
@@ -30,40 +62,38 @@
                 </select>
             </div>
 
-            <div class="col-md-3" style=" width:20%;">
-                <select class="form-select" name="searchType" style="height: 40px; font-size: 0.9rem;">
+            <div class="col-md-3">
+                <select class="form-select" name="searchType">
                     <option th:selected="${searchType}=='storeName'" value="storeName">상호명</option>
                     <option th:selected="${searchType}=='storeAddress'" value="storeAddress">주소</option>
                     <option th:selected="${searchType}=='storeCeoName'" value="storeCeoName">대표자명</option>
                 </select>
             </div>
 
-            <div class="col-md-4" style=" width:40%;">
-                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력" style="height: 40px; font-size: 0.9rem;">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="검색어 입력">
             </div>
 
-            <div class="col-md-2 d-flex gap-2" style=" width:20%; height: 40px; font-size: 0.9rem;" >
+            <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-50">조회</button>
-                <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">
-                    등록
-                </button>
+                <button type="button" class="btn btn-success w-50" data-bs-toggle="modal" data-bs-target="#insertModal">등록</button>
             </div>
-
         </form>
+
 
         <!-- 테이블 -->
         <div class="row mt-4">
             <div class="col-12">
-                <table class="table table-bordered text-company mb-0">
+                <table class="table table-bordered text-company mb-0" style="table-layout: fixed; width: 100%;">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="text-align: center; vertical-align: middle;">제공호텔</th>
-                        <th style="text-align: center; vertical-align: middle;">이미지</th>
-                        <th style="text-align: center; vertical-align: middle;">업체명</th>
-                        <th style="text-align: center; vertical-align: middle;">주소</th>
-                        <th style="text-align: center; vertical-align: middle;">대표자</th>
-                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
-                        <th style="text-align: center; vertical-align: middle;">상세보기</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">제공사</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">이미지</th>
+                        <th style="width: 15%; text-align: center; vertical-align: middle;">업체명</th>
+                        <th style="width: 30%; text-align: center; vertical-align: middle;">주소</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="width: 15%; text-align: center; vertical-align: middle;">전화번호</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -79,20 +109,22 @@
                                  style="width: 80px; height: 80px;">
                         </td>
 
-                        <td style="text-align: center; vertical-align: middle;">
-                            <a th:href="@{/admin/store/read(idid=${data.storeNum})}" style="color: black;" th:text="${data.storeName}"></a>
-                        </td>
+                        <td th:text="${data.storeName}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storeAddress}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                         <td style="text-align: center; vertical-align: middle;">
-                            <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger btn-sm">삭제</a>
+                            <a th:href="@{/admin/store/read(idid=${data.storeNum})}"
+                               class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
+                                상세보기
+                            </a><br>
+                            <a th:href="@{'/admin/store/delete/'+${data.storeNum}}" class="btn btn-danger px-2 py-1" style="font-size: 0.8rem; line-height: 1;">삭제하기</a><br>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'DELETED'}"
-                                  class="badge bg-danger">비활성화</span>
+                                  class="badge badge-outline-danger">비활성화</span>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'ALIVE'}"
-                                  class="badge bg-success">영업중</span>
+                                  class="badge badge-outline-success">영업중</span>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'CLOSED'}"
-                                  class="badge bg-secondary">영업종료</span>
+                                  class="badge badge-outline-secondary">영업종료</span>
                         </td>
                     </tr>
                     </tbody>
@@ -127,18 +159,20 @@
             </ul>
         </div>
 
+        <hr class="my-4" style="border-top: 2px solid #ccc;">
+
         <div class="row mt-4">
             <div class="col-12">
-                <table class="table table-bordered text-company mb-0">
+                <table class="table table-bordered text-company mb-0" style="table-layout: fixed; width: 100%;">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="text-align: center; vertical-align: middle;">제공호텔</th>
-                        <th style="text-align: center; vertical-align: middle;">이미지</th>
-                        <th style="text-align: center; vertical-align: middle;">업체명</th>
-                        <th style="text-align: center; vertical-align: middle;">주소</th>
-                        <th style="text-align: center; vertical-align: middle;">대표자</th>
-                        <th style="text-align: center; vertical-align: middle;">전화번호</th>
-                        <th style="text-align: center; vertical-align: middle;">상세보기</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">제공사</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">이미지</th>
+                        <th style="width: 15%; text-align: center; vertical-align: middle;">업체명</th>
+                        <th style="width: 30%; text-align: center; vertical-align: middle;">주소</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;">대표자</th>
+                        <th style="width: 15%; text-align: center; vertical-align: middle;">전화번호</th>
+                        <th style="width: 10%; text-align: center; vertical-align: middle;"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -159,13 +193,13 @@
                         <td th:text="${data.storeCeoName}" style="text-align: center; vertical-align: middle;"></td>
                         <td th:text="${data.storePhone}" style="text-align: center; vertical-align: middle;"></td>
                         <td style="text-align: center; vertical-align: middle;">
-                            <a th:href="@{'/admin/store/restore/'+${data.storeNum}}" class="btn btn-success btn-sm">복원</a>
+                            <a th:href="@{'/admin/store/restore/'+${data.storeNum}}" class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">복원하기</a><br>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'DELETED'}"
-                                  class="badge bg-danger">비활성화</span>
+                                  class="badge badge-outline-danger">비활성화</span>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'ALIVE'}"
-                                  class="badge bg-success">영업중</span>
+                                  class="badge badge-outline-success">영업중</span>
                             <span th:if="${data.storeStatus != null and data.storeStatus.toUpperCase() == 'CLOSED'}"
-                                  class="badge bg-secondary">영업종료</span>
+                                  class="badge badge-outline-secondary">영업종료</span>
                         </td>
                     </tr>
                     </tbody>
@@ -173,7 +207,7 @@
             </div>
 
             <div class="text-center mt-5" th:if="${deletedList == null or deletedList.empty}">
-                <h2 class="text-secondary">목록이 없습니다.</h2>
+                <h5 class="text-secondary">목록이 없습니다.</h5>
             </div>
         </div>
 
