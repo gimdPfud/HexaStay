@@ -37,64 +37,58 @@ public class StoremenuController {
     private final StoreService storeService;
     private final AdminService adminService;
 
-    /*storeNum없이 바로 메뉴 등록하려고 할 때
-    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
-    @GetMapping("/insert")
-    public String insertPrevGet(HttpSession session,Principal principal, Model model){
-        if(principal==null){
-            return "redirect:/admin/login";
-        }
-        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-        if(adminDTO==null){
-            return "redirect:/admin/logout";
-        }
-        if(adminDTO.getStoreNum()!=null){
-            return "redirect:/admin/store/menu/insert/"+adminDTO.getStoreNum();
-        }
-        session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
-        List<StoreDTO> list = storeService.getAllList();
-        model.addAttribute("valid","서비스 등록");
-        model.addAttribute("list",list);
-        return "storemenu/selectstorenum";
-    }
-    @GetMapping("/list")
-    public String listPrevGet(HttpSession session, Principal principal, Model model){
-        if(principal==null){
-            return "redirect:/admin/login";
-        }
-        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-        if(adminDTO==null){
-            return "redirect:/admin/logout";
-        }
-        if(adminDTO.getStoreNum()!=null){
-            return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
-        }
-        session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
-        List<StoreDTO> list = storeService.getAllList();
-        model.addAttribute("valid","서비스 목록");
-        model.addAttribute("list",list);
-        return "storemenu/selectstorenum";
-    }
-    @GetMapping("/selected")
-    public String insertPrevSelected(HttpSession session, Principal principal, Long storeNum, Model model){
-        log.info(storeNum);
-        int prevpage = (int) session.getAttribute("prevpage");
-        if(prevpage==1){
-            return "redirect:/admin/store/menu/insert/"+storeNum;
-        } else if(prevpage==2){
-            return "redirect:/admin/store/read?idid="+storeNum;
-        }
-        else {
-            log.info("뭔진모르겟는데 오류");
-            return null;
-        }
-    }
-
-
-
-
-
-
+//    /*storeNum없이 바로 메뉴 등록하려고 할 때
+//    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
+//    @GetMapping("/insert")
+//    public String insertPrevGet(HttpSession session,Principal principal, Model model){
+//        if(principal==null){
+//            return "redirect:/admin/login";
+//        }
+//        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+//        if(adminDTO==null){
+//            return "redirect:/admin/logout";
+//        }
+//        if(adminDTO.getStoreNum()!=null){
+//            return "redirect:/admin/store/menu/insert/"+adminDTO.getStoreNum();
+//        }
+//        session.setAttribute("prevpage", 1);        //이전페이지가 /store/menu/insert 이면 1
+//        List<StoreDTO> list = storeService.getAllList();
+//        model.addAttribute("valid","서비스 등록");
+//        model.addAttribute("list",list);
+//        return "storemenu/selectstorenum";
+//    }
+//    @GetMapping("/list")
+//    public String listPrevGet(HttpSession session, Principal principal, Model model){
+//        if(principal==null){
+//            return "redirect:/admin/login";
+//        }
+//        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+//        if(adminDTO==null){
+//            return "redirect:/admin/logout";
+//        }
+//        if(adminDTO.getStoreNum()!=null){
+//            return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
+//        }
+//        session.setAttribute("prevpage", 2);        //이전페이지가 /store/menu/list 이면 2
+//        List<StoreDTO> list = storeService.getAllList();
+//        model.addAttribute("valid","서비스 목록");
+//        model.addAttribute("list",list);
+//        return "storemenu/selectstorenum";
+//    }
+//    @GetMapping("/selected")
+//    public String insertPrevSelected(HttpSession session, Principal principal, Long storeNum, Model model){
+//        log.info(storeNum);
+//        int prevpage = (int) session.getAttribute("prevpage");
+//        if(prevpage==1){
+//            return "redirect:/admin/store/menu/insert/"+storeNum;
+//        } else if(prevpage==2){
+//            return "redirect:/admin/store/read?idid="+storeNum;
+//        }
+//        else {
+//            log.info("뭔진모르겟는데 오류");
+//            return null;
+//        }
+//    }
     /*
      * 메소드명 :
      * 인수 값 :
