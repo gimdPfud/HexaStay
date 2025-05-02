@@ -40,32 +40,6 @@
                     <input type="text" class="form-control" name="storeName" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">전화번호</label>
-                    <input type="text" class="form-control" name="storePhone" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="storeAddress">주소</label>
-                    <div class="input-group">
-                        <input style="background-color: #f1f1f1;" readonly
-                               type="text" id="storeAddress" class="form-control" name="storeAddress" required>
-                        <button class="btn btn-secondary"
-                                type="button" onclick="insertAddress()">주소 검색</button>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">대표자명</label>
-                    <input type="text" class="form-control" name="storeCeoName" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">패스워드</label>
-                    <input type="password" class="form-control" name="storePassword" required>
-                </div>
-                <input type="hidden" name="storeStatus" value="alive" readonly>
-                <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
-                <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
-                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
-                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
-                <div class="mb-3">
                     <label class="form-label d-block">카테고리</label>
                     <div class="text-center">
                         <div class="form-check form-check-inline">
@@ -98,6 +72,32 @@
                         </div>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="text" class="form-control" name="storePhone" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="storeAddress">주소</label>
+                    <div class="input-group">
+                        <input style="background-color: #f1f1f1;" readonly
+                               type="text" id="storeAddress" class="form-control" name="storeAddress" required>
+                        <button class="btn btn-secondary"
+                                type="button" onclick="insertAddress()">주소 검색</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">대표자명</label>
+                    <input type="text" class="form-control" name="storeCeoName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">패스워드</label>
+                    <input type="password" class="form-control" name="storePassword" required>
+                </div>
+                <input type="hidden" name="storeStatus" value="alive" readonly>
+                <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
+                <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
+                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
                 <div class="d-flex justify-content-center gap-3 mt-4">
                     <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">등록</button>
                     <a href="/admin/store/list" class="btn btn-danger">취소</a>

@@ -62,7 +62,7 @@
                         <div class="card p-3 bg-white border" th:each="option : ${data.storemenuOptionDTOList}" style="width: 100%;">
                             <div class="row align-items-center g-2">
                                 <div class="col-md-5">
-                                    <label class="form-label mb-1">옵션 이름</label>
+                                    <label class="form-label mb-1">옵션명</label>
                                     <input type="text" class="form-control" th:value="${option.storemenuOptionName}" name="existingOptionNames" readonly>
                                 </div>
                                 <div class="col-md-5">
@@ -77,15 +77,9 @@
                     </div>
                 </div>
 
-
-
-
-
-
-
                 <!-- 동적 옵션 추가 -->
                 <div class="mb-3 d-grid">
-                    <button type="button" class="btn btn-outline-primary" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
+                    <button type="button" class="btn btn-outline-success" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
                 </div>
                 <div class="mb-3" id="storemenuOptionInputs"></div>
 
@@ -104,7 +98,7 @@
 
         function addStoreMenuOptionInputs() {
             const template = `
-                <div class="storemenuOption${indexNum} option-inputs">
+                <div class="storemenuOption${indexNum} option-inputs position-relative border rounded p-3 mb-3" style="padding-bottom: 50px;">
                     <div class="mb-3 input-group">
                         <span class="input-group-text">옵션명</span>
                         <input type="text" class="form-control" name="storemenuOptionDTOList[${indexNum}].storemenuOptionName">
@@ -118,7 +112,7 @@
                           <button type="button" class="btn btn-danger btn-sm" onclick="deleteMenuOptions(${indexNum})">
                             <i class="fas fa-trash-alt"></i> 지우기
                           </button>
-                        </div>
+                    </div>
                 </div>`;
             document.getElementById("storemenuOptionInputs").insertAdjacentHTML('beforeend', template);
             indexNum++;
