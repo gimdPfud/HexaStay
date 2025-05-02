@@ -239,21 +239,30 @@
         <div class="text-white small text">
             <div class="d-flex mb-1">
                 <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>
+            <span th:text="${#strings.length(#authentication.principal.admin.adminName) > 8
+                            ? #strings.substring(#authentication.principal.admin.adminName, 0, 8) + '…'
+                            : #authentication.principal.admin.adminName}">이름</span>
                 </div>
                 <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
+            <span th:text="${#strings.length(#authentication.principal.admin.adminPosition) > 8
+                            ? #strings.substring(#authentication.principal.admin.adminPosition, 0, 8) + '…'
+                            : #authentication.principal.admin.adminPosition}">직책</span>
                 </div>
             </div>
             <div class="d-flex">
                 <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>
+            <span th:text="${#strings.length(#authentication.principal.admin.adminRole) > 8
+                            ? #strings.substring(#authentication.principal.admin.adminRole, 0, 8) + '…'
+                            : #authentication.principal.admin.adminRole}">직급</span>
                 </div>
                 <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
+            <span th:text="${#strings.length(#authentication.principal.admin.adminEmail) > 8
+                            ? #strings.substring(#authentication.principal.admin.adminEmail, 0, 8) + '…'
+                            : #authentication.principal.admin.adminEmail}">이메일</span>
                 </div>
             </div>
         </div>
+
     </div>
 </nav>
 

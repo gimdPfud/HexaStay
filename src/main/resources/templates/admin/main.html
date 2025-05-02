@@ -12,7 +12,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f1f1f1; /* 배경색 밝게 */
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
         }
 
         h5 {
@@ -20,29 +22,32 @@
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 10px;
-            text-align: center; /* 텍스트를 가운데 정렬 */
+            text-align: center;
         }
 
         p {
             font-size: 14px;
             color: #555;
+            word-break: break-word;
         }
 
         .container {
-            width: 400px;
-            margin: 1rem;
-            background-color: #fff; /* 카드 배경색 */
+            max-width: 400px;
+            width: 90%;
+            margin: 1rem auto;
+            background-color: #fff;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
-        .container .round {
+        .container img.round {
             width: 130px;
             height: 130px;
             border-radius: 50%;
-            border: 2px solid #ddd; /* 이미지를 좀 더 부드럽게 */
+            border: 2px solid #ddd;
+            object-fit: cover;
             margin-bottom: 15px;
         }
 
@@ -50,7 +55,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px; /* 요소 간 간격을 넓히기 */
+            gap: 15px;
         }
 
         .card h5, .card h6, .card p {
@@ -60,9 +65,9 @@
 
         .card .email {
             font-size: 14px;
-            color: #007bff; /* 이메일 색상 */
+            color: #007bff;
+            word-break: break-all;
         }
-
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -70,21 +75,19 @@
 
     <h5>오늘도 좋은 하루 보내세요!</h5>
 
-    <div class="container mt-4 w-100 bg-light">
-
+    <div class="container mt-4">
         <div class="mt-3">
             <img th:if="${#authentication.principal.adminProfileMeta != null}"
                  th:src="@{${#authentication.principal.adminProfileMeta}}"
-                 style="width: 140px; height: 140px; border-radius: 50%;" alt="관리자 프로필 이미지">
+                 class="round" alt="관리자 프로필 이미지">
             <img th:unless="${#authentication.principal.adminProfileMeta != null}"
                  th:src="@{/profile/default.png}"
-                 style="width: 140px; height: 140px; border-radius: 50%;" alt="기본 프로필 이미지">
+                 class="round" alt="기본 프로필 이미지">
         </div>
         <h5 th:text="${#authentication.principal.admin.adminName}">이름</h5>
         <h6 th:text="${#authentication.principal.admin.adminPosition}">직책</h6>
         <p th:text="${#authentication.principal.admin.adminRole}">직급</p>
         <p class="email">E: <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span></p>
-
     </div>
 </div>
 </body>
