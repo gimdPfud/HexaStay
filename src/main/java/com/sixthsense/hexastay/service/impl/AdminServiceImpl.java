@@ -218,30 +218,44 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public void adminUpdate(AdminDTO adminDTO) throws IOException {
-        Admin admin = adminRepository.findById(adminDTO.getAdminNum()).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
+        Admin admin = adminRepository.findById(adminDTO.getAdminNum())
+                .orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
-        if (!adminDTO.getAdminProfileMeta().isEmpty()) {
+        // 기존 사진이 있고 새로운 사진이 있으면 기존 사진 삭제
+        if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty() 
+            && adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
             Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
             Files.deleteIfExists(filePath);
-
-            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
-            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            adminDTO.setAdminProfileMeta("/profile/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
-        } else if (adminDTO.getAdminProfileMeta().isEmpty() && !admin.getAdminProfileMeta().isEmpty()) {
-            adminDTO.setAdminProfileMeta(admin.getAdminProfileMeta());
         }
 
-        adminRepository.save(modelMapper.map(adminDTO, Admin.class));
+        // 새로운 사진이 있으면 저장
+        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
+            String fileName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+            String newFileName = "admin_" + adminDTO.getAdminNum() + fileExtension;
+            
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "uploads", "admin");
+            Files.createDirectories(uploadPath);
+            
+            Path filePath = uploadPath.resolve(newFileName);
+            adminDTO.getAdminProfile().transferTo(filePath);
+            
+            admin.setAdminProfileMeta("/uploads/admin/" + newFileName);
+        }
+        // 새로운 사진이 없고 기존 사진이 있으면 기존 사진 유지
+        else if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
+            admin.setAdminProfileMeta(admin.getAdminProfileMeta());
+        }
+
+        // 나머지 필드 업데이트 (사번과 주민번호는 변경하지 않음)
+        admin.setAdminName(adminDTO.getAdminName());
+        admin.setAdminAddress(adminDTO.getAdminAddress());
+        admin.setAdminPhone(adminDTO.getAdminPhone());
+        admin.setAdminPosition(adminDTO.getAdminPosition());
+
+        adminRepository.save(admin);
     }
 
     // 회원 삭제
