@@ -19,12 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class FacilitiesDTO {
 
     private Long facilitiesNum;
-    private String fsName;      //서비스 이름
-    private String fsContent;   //서비스 설명
-    private Integer fsPrice;    //서비스 가격
-    private Integer fsAmountMax;   //서비스 수량(수용인원으로 응용??)
-    private Integer fsAmount;   //서비스 수량(수용인원으로 응용??)
-    private String fsStatus;    //서비스 상태(이용가능 불가능 삭제됨)
+    private String facTitle;      //서비스 이름
+    private String facContent;   //서비스 설명
     private CompanyDTO companyDTO;
 
     public FacilitiesDTO setCompanyDTO(CompanyDTO companyDTO) {
