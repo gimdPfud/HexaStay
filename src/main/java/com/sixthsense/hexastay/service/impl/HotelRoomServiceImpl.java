@@ -289,7 +289,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     *  링크 주소 : /admin/hotelroom/modify
     * */
     @Override
-    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException {
+    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
         log.info("HotelRoom 수정 Service 진입");
 
         // 1. 기존 HotelRoom 조회
@@ -321,7 +321,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         }
 
         // 4. Company 연관관계 유지
-        Company company = companyRepository.findById(hotelRoom.getCompany().getCompanyNum())
+        Company company = companyRepository.findById(companyNum)
                 .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다."));
         hotelRoom.setCompany(company);
 
