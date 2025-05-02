@@ -79,7 +79,7 @@
                     <label class="form-label">연락처</label>
                     <div class="row g-2">
                         <div class="col">
-                            <select class="form-select" id="adminPhonePartOne">
+                            <select class="form-select" id="adminPhonePartOne" th:value="${#strings.substring(adminDTO.adminPhone, 0, 3)}">
                                 <option>010</option>
                                 <option>011</option>
                                 <option>017</option>
@@ -87,11 +87,11 @@
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminPhonePartTwo" class="form-control numberOnly text-center" maxlength="4">
+                            <input type="text" id="adminPhonePartTwo" class="form-control numberOnly text-center" maxlength="4" th:value="${#strings.substring(adminDTO.adminPhone, 4, 8)}">
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminPhonePartThree" class="form-control numberOnly text-center" maxlength="4">
+                            <input type="text" id="adminPhonePartThree" class="form-control numberOnly text-center" maxlength="4" th:value="${#strings.substring(adminDTO.adminPhone, 9)}">
                         </div>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                 </div>
             </div>
             <input hidden type="text" name="adminPassword" class="form-control">
-            <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%" th:value="${adminDTO.adminPhone}">
+            <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             <input hidden name="adminResidentNum" id="adminResidentNum" th:value="${adminDTO.adminResidentNum}">
             <input hidden name="adminRole" id="adminRole" th:value="${adminDTO.adminRole}">
             <input hidden name="adminNum" th:value="${adminDTO.adminNum}">
@@ -182,23 +182,6 @@
                     document.getElementById('adminAddressTwo').value = parts[1];
                     document.getElementById('adminAddressThree').value = parts[2];
                 }
-            }
-
-            // 전화번호 분리
-            const fullPhone = document.getElementById('adminPhone').value;
-            console.log('전체 전화번호:', fullPhone);
-            
-            if (fullPhone) {
-                const phoneParts = fullPhone.split('-');
-                console.log('전화번호 분리:', phoneParts);
-                
-                if (phoneParts.length === 3) {
-                    document.getElementById('adminPhonePartOne').value = phoneParts[0];
-                    document.getElementById('adminPhonePartTwo').value = phoneParts[1];
-                    document.getElementById('adminPhonePartThree').value = phoneParts[2];
-                }
-            } else {
-                console.log('전화번호가 없습니다.');
             }
         });
 
