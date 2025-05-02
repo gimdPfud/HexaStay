@@ -1,175 +1,121 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="http://www.w3.org/1999/html">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>시설 상세</title>
-    <!-- CSS 연결 -->
+
+    <!-- 폰트 및 스타일 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/custom.css">
-    <!-- 부트스트랩 아이콘 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- JS 연결 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f9f9f9; }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Spoqa Han Sans Neo', sans-serif;
+        }
 
         .container {
-            width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             margin: 0 auto;
-            background: white;
             padding: 20px;
+            background-color: #ffffff;
         }
 
-        .item-image {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* 실제 이미지 크기 조정 */
         .item-img {
             width: 100%;
-            max-width: 100%;
-            height: auto;
+            height: 200px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
         }
 
-
-
-        input[type="number"] {
-            text-align: center;
-        }
-
-        .quantity-input input {
-            width: 60px;
-            height: 35px;
-            text-align: center;
-            font-size: 16px;
-            margin: 0 5px;
-            background-color: #fff;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .quantity-input button {
-            width: 30px;
-            height: 30px;
+        .fs-name {
             font-size: 20px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            color: #77b1fb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #212529;
         }
+
+        .fs-address {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #495057;
+        }
+
+        .fs-text, .fs-content, .fsservice p {
+            font-size: 14px;
+            color: #343a40;
+            margin-bottom: 8px;
+        }
+
         .back-to-list-btn {
-            background-color: #ddd;
-            color: black;
+            background-color: #77b1fb;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px;
             border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: bold;
+            border-radius: 10px;
             width: 100%;
-            margin-top: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         .modal-content {
             background: white;
             padding: 20px;
             border-radius: 10px;
-            width: 80%;
             max-width: 300px;
             text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="item-image">
-        <div id="facilityCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
+    <img th:src="@{${data.facPictureMeta != null ? data.facPictureMeta : '/profile/default.png'}}" alt="시설 이미지" class="item-img">
 
-                <!--이미지 1 장 밖에 없으므로 캐러샐 대신 그냥 이미지로 ... -->
-<!--                &lt;!&ndash; 첫 이미지 (기본 active) &ndash;&gt;-->
-                <div class="carousel-item active">
-                    <img th:if="${data.facPictureMeta==null}"
-                         th:src="@{/profile/default.png}"
-                         class="d-block w-100 item-img" alt="슬라이드 이미지 1">
-                    <img th:if="${data.facPictureMeta!=null}"
-                         th:src="@{${data.facPictureMeta}}"
-                         class="d-block w-100 item-img" alt="슬라이드 이미지 1">
-                </div>
-<!--                &lt;!&ndash; 두 번째 이미지 &ndash;&gt;-->
-<!--                <div class="carousel-item">-->
-<!--                    <img src="/images/시바견.png" class="d-block w-100 item-img" alt="슬라이드 이미지 2">-->
-<!--                </div>-->
-<!--                &lt;!&ndash; 세 번째 이미지 &ndash;&gt;-->
-<!--                <div class="carousel-item">-->
-<!--                    <img src="/images/개구리.png" class="d-block w-100 item-img" alt="슬라이드 이미지 3">-->
-<!--                </div>-->
+    <p class="fs-name" th:text="${data.facName}">시설 이름</p>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <p class="fs-address mb-0" th:text="${data.facAddress}">시설 주소</p>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mapmodal" onclick="showMapBox()">지도보기</button>
+    </div>
 
-            </div>
-<!--            &lt;!&ndash; 좌우 화살표 &ndash;&gt;-->
-<!--            <button class="carousel-control-prev" type="button" data-bs-target="#facilityCarousel" data-bs-slide="prev">-->
-<!--                <span class="carousel-control-prev-icon"></span>-->
-<!--            </button>-->
-<!--            <button class="carousel-control-next" type="button" data-bs-target="#facilityCarousel" data-bs-slide="next">-->
-<!--                <span class="carousel-control-next-icon"></span>-->
-<!--            </button>-->
+    <div class="card">
+        <h2>부대시설</h2>
+        <div class="fsservice" th:each="fss:${data.fssList}">
+            <p th:text="${fss.fsssTitle}"></p>
         </div>
     </div>
 
-    <div class="content">
-        <p class="fs-name mb-0"
-           th:text="${data.facName}">시설 이름</p>
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <p class="fs-name mb-0"
-               th:text="${data.facAddress}">시설 주소</p>
-            <button type="button" class="btn btn-sm btn-outline-secondary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#mapmodal"
-                    onclick="showMapBox()">
-                지도보기
-            </button>
-        </div>
-
-        <p class="fs-content">시설 정보</p>
-
-
-        <div class="fsservice card" th:each="fss:${data.fssList}">
-            <p th:text="${fss.fsssTitle}"></p>
-        </div>
-
-        <p class="fs-text">내용</p>
-
-        <div class="fsservice card" th:each="fss:${data.fssList}">
+    <div class="card">
+        <h2>숙소 이용 정보</h2>
+        <div class="fsservice" th:each="fss:${data.fssList}">
             <p th:text="${fss.fsssContent}"></p>
         </div>
     </div>
 
+    <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
+
+    <!-- 지도 모달 -->
     <div class="modal" id="mapmodal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -183,10 +129,12 @@
             </div>
         </div>
     </div>
+</div>
 
-    <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
-    <script th:inline="javascript">
-        function showMapBox() {
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
+<script th:inline="javascript">
+    function showMapBox() {
         let yy = [[${data.facLatitude}]];
         let xx = [[${data.facLongitude}]];
         var container = document.getElementById('map');
@@ -194,11 +142,7 @@
         var map = new kakao.maps.Map(container, options);
         var marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(yy, xx) });
         marker.setMap(map);
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b"></script>
-</div>
+    }
+</script>
 </body>
 </html>
