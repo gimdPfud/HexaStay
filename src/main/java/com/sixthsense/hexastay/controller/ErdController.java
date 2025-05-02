@@ -13,11 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -49,8 +45,6 @@ public class ErdController {
     public String insertPost(ErdDTO erdDTO, Principal principal) throws IOException {
         String email = principal.getName();
         AdminDTO adminDTO = adminService.adminFindEmail(email);
-        log.info("로그인 이메일은?"+ adminDTO.getAdminEmail());
-        log.info("로그인 컴퍼니넘은?"+ adminDTO.getCompanyNum());
 
         if (adminDTO.getCompanyNum() != null) {
             erdDTO.setCompanyNum(adminDTO.getCompanyNum());
@@ -62,16 +56,16 @@ public class ErdController {
         return "redirect:/erd/list";
     }
 
-    @GetMapping("/update")
-    public String updateForm(@RequestParam Long id, Model model) {
-        ErdDTO erdDto = new ErdDTO();
-        model.addAttribute("erdDto", erdDto);
+    @GetMapping("/update/{erdNum}")
+    public String updateForm(@PathVariable("erdNum")Long erdNum, Model model) {
+        model.addAttribute("erd", erdService.getErd(erdNum));
         return "/erd/update";
     }
 
 
-    @PostMapping("/update")
-    public String updatePost(ErdDTO erdDto, BindingResult bindingResult, Model model) {
+    @PostMapping("/update/{erdNum}")
+    public String updatePost(ErdDTO erdDto) throws IOException {
+        erdService.insert(erdDto);
             return "/erd/update";
     }
 
