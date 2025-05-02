@@ -319,8 +319,11 @@ public class AdminController {
     }
 
 
-
-
-
+    @GetMapping("/update/{adminNum}")
+    public String adminUpdate(@PathVariable Long adminNum, Model model) throws IOException {
+        AdminDTO adminDTO = adminService.adminRead(adminNum);
+        model.addAttribute("adminDTO", adminDTO);
+        return "admin/mypage";
+    }
 
 }
