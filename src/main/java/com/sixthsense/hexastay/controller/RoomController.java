@@ -129,6 +129,15 @@ public class RoomController {
         return "redirect:/register-hotelroom";
     }
 
+    //RoomPassword 검색용 Controller
+    /*@GetMapping("/room/check-password")
+    @ResponseBody
+    public ResponseEntity<?> checkPassword(@RequestParam("value") String roomPassword) {
+        boolean isInUse = roomServiceimpl.RoomPasswordUniqueness(roomPassword);
+        return ResponseEntity.ok(!isInUse); // true = 사용 가능
+    }*/
+
+
     /**
      * 회원이 특정 호텔룸에 배정되는 등록 페이지 이동
      */
@@ -287,7 +296,7 @@ public class RoomController {
         Room room;
         try {
             // ✅ 서비스에서 패스워드까지 검증해서 반환
-            room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
+            room = roomServiceimpl.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
