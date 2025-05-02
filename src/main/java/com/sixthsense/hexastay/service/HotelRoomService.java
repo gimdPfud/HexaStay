@@ -35,7 +35,7 @@ public interface HotelRoomService {
 
     //***************단일 호텔룸 CRRUD **************//
     //호텔룸만 등록
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException;
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException;
 
     //2-2.리스트(pageable) todo: member의 참조 값을 가지고 있는 메서드
     public Page<HotelRoomDTO> hotelroomList(Pageable page);

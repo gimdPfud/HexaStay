@@ -107,8 +107,13 @@ public class HotelRoomController {
 
     //todo:http://localhost:8090/admin/hotelroom/input
     @PostMapping("/input")
-    public String inputHotelRoomPost(HotelRoomDTO hotelRoomDTO, RedirectAttributes redirectAttributes) {
+    public String inputHotelRoomPost(HotelRoomDTO hotelRoomDTO,
+                                     RedirectAttributes redirectAttributes,
+                                     Principal principal)
+    {
         log.info("호텔룸 등록 요청: {}", hotelRoomDTO);
+        String loginEmail = principal.getName();
+        Long companyNum = adminService.adminFindEmail(loginEmail).getCompanyNum();
 
         if (hotelRoomDTO == null) {
             redirectAttributes.addFlashAttribute("error", "잘못된 요청입니다.");
@@ -123,7 +128,7 @@ public class HotelRoomController {
             hotelRoomDTO.setHotelRoomQr(qrContent);  // URL을 hotelRoomQr에 설정
 
             // 호텔룸 저장
-            hotelRoomService.hotelroomInsert(hotelRoomDTO);
+            hotelRoomService.hotelroomInsert(hotelRoomDTO,companyNum);
 
             redirectAttributes.addFlashAttribute("message", "호텔룸이 성공적으로 등록되었습니다.");
             return "redirect:/admin/hotelroom/input";

@@ -19,15 +19,24 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
-    //roomPassword 만 찾아오는 커리 메소드
-    Optional<Room> findRoomByRoomPassword(String roomPassword);
+    //roomPassword 만 찾아와서 유효성 검사
+    //1.
+    @Query("SELECT COUNT(r) > 0 FROM Room r WHERE r.roomPassword = :roomPassword")
+    boolean isRoomPasswordInUse(@Param("roomPassword") String roomPassword);
 
+    //2.
+    boolean existsByRoomPassword(String roomPassword);
+
+
+
+    //todo:@GetMapping("/membersByHotelRoom/{hotelRoomNum}") - RoomController
+    //roomlist 에서 member 클릭시 유저가 예약한 호텔룸 정보
     Page<Room> findByHotelRoom_HotelRoomNum(Long hotelRoomNum, Pageable pageable);
 
+    //todo:@GetMapping("/hotelRoomsByMember/{memberNum}") -- RoomController
+    //roomlist 에서 hotelRoom 클릭시 호텔룸에 예약된 유저의 정보 보기
     Page<Room> findByMember_MemberNum(Long memberNum, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"hotelRoom", "member"})
-    Page<Room> findAll(Pageable pageable);
 
 
     // hotelRoomNum 기준으로 연결된 member 리스트로 가져오는 repository  가져오기
@@ -42,26 +51,15 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             "OR LOWER(r.member.memberEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Room> searchRoomsByMemberNameOrEmailPaged(@Param("keyword") String keyword, Pageable pageable);
 
-    //최신순으로 정렬 하는 repository리 로직
-    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
-    List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
 
-    //todo:나중에 필요해서 만들었던 로직 이구 지금은 사용 안함
+    //todo:나중에 필요해서 만들었던 로직 지금은 사용 안함
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
-
-
-    // hotelRoomNum 기준으로 연결된 member들만 가져오기
-    @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
-    Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
 
     //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
     Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
-
-
-
 
 
     //Room pk 을 찾아와서 member fk 만 변경 하는 메소드
@@ -77,17 +75,26 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("UPDATE Room r SET r.hotelRoom.hotelRoomNum = :hotelRoomNum WHERE r.roomNum = :roomNum")
     void updateHotelRoomFk(@Param("roomNum") Long roomNum, @Param("newHotelRoomNum") Long hotelRoomNum);
 
+    /****추후에 쓸 메소드****/
+    //최신순으로 정렬 하는 repository리 로직
+    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
+    List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
+
+    // hotelRoomNum 기준으로 연결된 member들만 가져오기
+    @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
+    Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
+
+    //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
+    @Query("SELECT r FROM Room r " +
+            "WHERE r.member = :member " +
+            "AND r.checkInDate IS NOT NULL AND r.checkInDate <= :currentTime " +
+            "AND r.checkOutDate IS NOT NULL AND r.checkOutDate > :currentTime")
+    Optional<Room> findActiveRoomForMemberAtTime(@Param("member") Member member, @Param("currentTime") LocalDateTime currentTime);
+
+    /****추후에 쓸 메소드****/
 
 
-
-    // 특정 Member ID를 가진 HotelRoom 조회 (해당 멤버가 배정된 호텔룸)
-//    List<Room> findByMember_MemberId(Long memberId);
-
-
-
-
-
-
+    /*****매출 정산용 메소드******/
     // 정산용
     @EntityGraph(attributePaths = {"hotelRoom", "member"})
     Page<Room> findByHotelRoom_HotelRoomNumIn(List<Long> hotelRoomNums, Pageable pageable);
@@ -100,15 +107,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             LocalDateTime endDate,
             Pageable pageable);
 
-
-    //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
-    @Query("SELECT r FROM Room r " +
-            "WHERE r.member = :member " +
-            "AND r.checkInDate IS NOT NULL AND r.checkInDate <= :currentTime " +
-            "AND r.checkOutDate IS NOT NULL AND r.checkOutDate > :currentTime")
-    Optional<Room> findActiveRoomForMemberAtTime(@Param("member") Member member, @Param("currentTime") LocalDateTime currentTime);
-
-
+    /***윤겸 RoomMenuOrderServiceImpl **/
     // 내림 차순으로 정렬.
     @Query("SELECT r FROM Room r WHERE r.member = :member AND :now BETWEEN r.checkInDate AND r.checkOutDate " +
             "ORDER BY r.roomNum DESC, r.hotelRoom.hotelRoomNum DESC")
