@@ -170,14 +170,17 @@ public class HotelRoomController {
     @PostMapping("/update")
     public String hotelRoomUpdatePost(@RequestParam Long hotelRoomNum,
                                       HotelRoomDTO hotelRoomDTO,
-        RedirectAttributes redirectAttributes                              )
+        RedirectAttributes redirectAttributes,Principal principal                              )
     {
+        String loginEmail = principal.getName();
+        Long companyNum = adminService.adminFindEmail(loginEmail).getCompanyNum();
+
 
         log.info(hotelRoomNum + "hotelRoomNum Post 페이지에 들어 오기는 했지 ");
         log.info(hotelRoomNum + "hotelRoomNum 키 값이 들어 오니  ");
 
         try {
-            hotelRoomService.hotelroomUpdate(hotelRoomNum,hotelRoomDTO);
+            hotelRoomService.hotelroomUpdate(hotelRoomNum,hotelRoomDTO,companyNum);
             redirectAttributes.addFlashAttribute("successMessage", "호텔룸 정보가 성공적으로 수정되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -218,8 +221,11 @@ public class HotelRoomController {
     public String hotelRoomModifyPost(
             @RequestParam(value = "hotelRoomNum", required = false) Long hotelRoomNum,
             @ModelAttribute HotelRoomDTO hotelRoomDTO,
-            Model model) throws IOException {
-
+            Model model,
+            Principal principal) throws IOException
+    {
+        String loginEmail = principal.getName();
+        Long companyNum = adminService.adminFindEmail(loginEmail).getCompanyNum();
         log.info(hotelRoomNum + "수정 modidyfy 페이지 에는 들어 오기는 했냐 ");
 
 
@@ -230,7 +236,7 @@ public class HotelRoomController {
         }
 
         try {
-            hotelRoomService.hotelroomUpdate(hotelRoomNum, hotelRoomDTO);
+            hotelRoomService.hotelroomUpdate(hotelRoomNum, hotelRoomDTO,companyNum);
 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "호텔룸 수정 중 오류가 발생했습니다: " + e.getMessage());
