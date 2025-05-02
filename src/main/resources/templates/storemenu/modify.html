@@ -25,6 +25,7 @@
                 <small id="fileError" class="text-danger d-none">올바른 파일이 선택되지 않았습니다.</small>
             </div>
 
+            <input type="hidden" name="storemenuStatus" th:value="${data.storemenuStatus}">
             <input type="hidden" name="storemenuNum" th:value="${data.storemenuNum}">
             <input hidden type="number" name="storeNum" th:value="${data.storeNum}" readonly>
 
@@ -38,7 +39,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">메뉴 설명</label>
-                <textarea class="form-control" name="storemenuContent" placeholder="용량 또는 크기를 꼭 기입해주세요." th:text="${data.storemenuContent}"></textarea>
+                <textarea class="form-control" name="storemenuContent" placeholder="용량 또는 크기 등을 꼭 기입해주세요." th:text="${data.storemenuContent}"></textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label">메뉴 카테고리</label>

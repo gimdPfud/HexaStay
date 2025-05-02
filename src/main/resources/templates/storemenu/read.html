@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}"
->
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>외부업체 메뉴 상세보기</title>
+    <title>요식업체 메뉴 상세보기</title>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 400px;">
-        <div class="text-center mb-3">
-            <div class="d-flex w-100" style="justify-content: center;">
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">요식업체 메뉴 상세보기</h2>
+        <div class="container p-4" style="max-width: 700px;">
+
+            <div class="d-flex w-100 justify-content-center">
                 <img th:if="${data.storemenuImgMeta != null}"
                      th:src="@{${data.storemenuImgMeta}}"
                      class="rounded" style="width: 133px; height: 133px;">
@@ -21,62 +22,58 @@
                      th:src="@{/store/menu/default.png}"
                      class="rounded" style="width: 133px; height: 133px;">
             </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">상품명</label>
-            <input type="text" class="form-control" th:value="${data.storemenuName}" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">가격</label>
-            <input type="text" class="form-control" th:value="${data.storemenuPrice}" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">설명</label>
-            <textarea class="form-control" rows="3" th:text="${data.storemenuContent}" readonly></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">카테고리</label>
-            <select class="form-select" disabled>
-                <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
-                <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
-                <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
-                <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">등록일자</label>
-            <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">수정일자</label>
-            <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-        </div>
-        <div class="text-center mt-4">
-            <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-dark">목록</a>
-            <a th:href="@{'/admin/store/menu/modify/'+${data.storemenuNum}}" class="btn btn-success">수정</a>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">카테고리</label>
+                <select class="form-select" disabled>
+                    <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
+                    <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
+                    <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
+                    <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">상품명</label>
+                <input type="text" class="form-control" th:value="${data.storemenuName}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">가격</label>
+                <input type="text" class="form-control" th:value="${data.storemenuPrice}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">설명</label>
+                <textarea class="form-control" rows="3" th:text="${data.storemenuContent}" readonly></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">등록일자</label>
+                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">수정일자</label>
+                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
+            </div>
+            <!--외부업체가 제공하는 서비스 목록들-->
+            <div class="mb-3">
+                <label class="form-label">옵션</label>
+                <div class="optionlist"></div>
+            <div class="mt-4 d-grid">
+                <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
+                    삭제된 항목
+                </button>
+            </div>
+            <div class="collapse mt-3" id="deletedlist">
+                <div class="card card-body">
+                    <h4 class="text-center text-secondary">삭제된 항목 목록</h4>
+                    <div class="deletedoptionlist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                </div>
+            </div>
+            </div><!--제목끝-->
 
-    <!--외부업체가 제공하는 서비스 목록들-->
-    <div class="container rounded shadow-sm w-100 h-100 p-3" style="max-width: 800px;">
-        <div class="mb-3">
-            <h1 class="text-center">옵션
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#insertModal">추가</button>
-            </h1>
-        </div><!--제목끝-->
-        <div class="optionlist mt-5"></div>
-        <div class="mt-4 d-grid">
-            <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
-                삭제된 항목
-            </button>
-        </div>
-        <div class="collapse mt-3" id="deletedlist">
-            <div class="card card-body">
-                <h4 class="text-center text-secondary">삭제된 항목 목록</h4>
-                <div class="deletedoptionlist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+            <div class="text-center mt-4">
+                <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-dark">목록</a>
+                <a th:href="@{'/admin/store/menu/modify/'+${data.storemenuNum}}" class="btn btn-success">수정</a>
             </div>
         </div>
-    </div><!--리스트가 비어있지 않다면 끝-->
+    </div>
 
 
     <!--등록모달-->
@@ -98,8 +95,6 @@
                                 <span class="input-group-text">옵션 가격</span>
                                 <input type="number" class="form-control" name="storemenuOptionPrice">
                             </div>
-                            <input hidden type="hidden" class="form-control" name="storemenuOptionStatus" value="alive" readonly>
-                            <input hidden type="hidden" class="form-control" name="storemenuNum" th:value="${data.storemenuNum}" readonly>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">
@@ -214,7 +209,6 @@
                 <tr>
                     <th>이름</th>
                     <th>가격</th>
-                    <th>버튼</th>
                 </tr>
                 </thead>
                 <tbody>`;
