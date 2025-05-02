@@ -4,7 +4,13 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>시설서비스 등록</title>
+    <title>시설 정보 등록</title>
+
+    <link href="/summernote-0.9.0-dist/summernote-bs5.css" rel="stylesheet">
+    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
+    <!-- language pack -->
+    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
+
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
@@ -12,7 +18,7 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
 
-        <form id="insertForm" action="/facility/insert" method="post" enctype="multipart/form-data">
+        <form id="insertForm" action="/facility/insert" method="post">
             <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-2">
@@ -37,6 +43,27 @@
         </form>
 
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded",function () {
+            $('#facContent, #facTitle').summernote({
+                placeholder: '내용을 입력하세요.',
+                tabsize: 2,
+                height: 300,
+                lang: 'ko-KR', // default: 'en-US'
+
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ]
+            });
+        })
+    </script>
 
 </div>
 </body>
