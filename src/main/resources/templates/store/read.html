@@ -120,7 +120,17 @@
         let storenum = [[${data.storeNum}]]
         document.addEventListener("DOMContentLoaded", function () {
             console.log("페이지 로드 됨")
+            menuList();
+        })
 
+        document.querySelectorAll("a").forEach(a=>{
+            a.addEventListener("click",function () {
+                menuList();
+            })
+        })
+
+
+        function menuList() {
             fetch(`/admin/store/menu/list/${storenum}`)
                 .then(response => {
                     if(!response.ok){
@@ -192,8 +202,7 @@
                     }
                     console.log(error)
                 });
-
-        })
+        }
 
 
 
@@ -249,8 +258,8 @@
                     <td>${list[i].storemenuPrice.toLocaleString()}원</td>
                     <td>
                       <div class="d-flex flex-column align-items-center gap-1">
-                          <a href="..." class="btn btn-secondary btn-sm w-100">품절</a>
-                          <a href="..." class="btn btn-danger btn-sm w-100">삭제</a>
+                          <a href="/admin/store/menu/soldout/${list[i].storemenuNum}" class="btn btn-secondary btn-sm w-100">품절</a>
+                          <a href="/admin/store/menu/delete/${list[i].storemenuNum}" class="btn btn-danger btn-sm w-100">삭제</a>
                        </div>
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>

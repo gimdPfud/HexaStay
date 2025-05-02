@@ -25,19 +25,6 @@
                            accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
                     <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
-
-                <div class="mb-2">
-                    <label class="form-label">메뉴명</label>
-                    <input type="text" class="form-control" name="storemenuName">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">메뉴 가격</label>
-                    <input type="number" class="form-control" name="storemenuPrice">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">메뉴 설명</label>
-                    <textarea class="form-control" maxlength="255" name="storemenuContent" placeholder="용량 또는 크기 등을 꼭 기입해주세요."></textarea>
-                </div>
                 <div class="mb-3">
                     <label class="form-label">메뉴 카테고리</label>
                     <select name="storemenuCategory" class="form-select form-control">
@@ -47,7 +34,19 @@
                         <option value="plus">추가</option>
                     </select>
                 </div>
-                <div class="mb-2 d-grid">
+                <div class="mb-2">
+                    <label class="form-label">메뉴명</label>
+                    <input type="text" class="form-control" name="storemenuName">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">메뉴 가격</label>
+                    <input type="number" class="form-control" name="storemenuPrice">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">메뉴 설명</label>
+                    <textarea class="form-control" maxlength="255" name="storemenuContent" placeholder="용량 또는 크기 등을 꼭 기입해주세요."></textarea>
+                </div>
+                <div class="mb-2 mt-2 d-grid">
                     <button type="button" class="btn btn-outline-success" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
                     <input hidden type="number" class="form-control" name="storeNum" th:value="${storeNum}" readonly>
                 </div>
