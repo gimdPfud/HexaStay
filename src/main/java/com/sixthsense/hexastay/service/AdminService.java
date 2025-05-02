@@ -18,7 +18,11 @@ public interface AdminService {
     Page<AdminDTO> listAdmin(String email, Pageable pageable);
     public Page<AdminDTO> listAdminSearch(String email, String type, String keyword, Pageable pageable);
 
-    //가입대기자 리스트
+    //가입관련
+    //사번값 자동 완성
+    Admin createAdminEmployeeNum(Admin admin);
+
+    // 가입자 대기 리스트
     List<AdminDTO> getWaitAdminList();
 
     //가입승인

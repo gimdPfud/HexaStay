@@ -8,6 +8,7 @@ import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -20,10 +21,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.NoSuchElementException;
@@ -77,10 +80,30 @@ public class AdminController {
 
 
     @GetMapping("/insert")
-    public String adminInsert (Model model) {
-        String companyType = "center";
-        model.addAttribute("companyList", adminService.insertSelectCompany(companyType));
-        return "/admin/insert";
+    public String insert(Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        if (adminDTO == null) {
+            return "redirect:/admin/logout";
+        }
+
+        List<CompanyDTO> companyList;
+        if (adminDTO.getAdminRole().equals("superAdmin")) {
+
+            companyList = companyService.getAllList();
+        } else if (adminDTO.getAdminRole().equals("EXEC") || adminDTO.getAdminRole().equals("HEAD")) {
+
+            companyList = companyService.getCompanyAndSubsidiaries(adminDTO.getCompanyNum());
+        } else {
+            companyList = Collections.singletonList(companyService.companyRead(adminDTO.getCompanyNum()));
+        }
+
+        model.addAttribute("companyList", companyList);
+        model.addAttribute("adminRole", adminDTO.getAdminRole());
+        model.addAttribute("adminDTO", new AdminDTO());
+        return "admin/insert";
     }
 
     @ResponseBody
@@ -99,10 +122,34 @@ public class AdminController {
     }
 
     @PostMapping("/insert")
-    public String insert(AdminDTO adminDTO) throws IOException {
-        adminDTO.setAdminActive("PENDING");
-        adminService.insertAdmin(adminDTO);
-        return "redirect:/admin/list";
+    public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            log.info("유효성 검사 오류 발생");
+            List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
+            model.addAttribute("companyList", companyList);
+            return "admin/insert";
+        }
+
+        // 이메일 중복 체크
+        if (adminRepository.findByAdminEmail(adminDTO.getAdminEmail()) != null) {
+            log.info("이메일 중복 체크 실패");
+            bindingResult.rejectValue("adminEmail", "duplicate", "이미 사용 중인 이메일입니다.");
+            List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
+            model.addAttribute("companyList", companyList);
+            return "admin/insert";
+        }
+
+        try {
+            adminDTO.setAdminActive("INACTIVE");
+            adminService.insertAdmin(adminDTO);
+            return "redirect:/admin/list";
+        } catch (IOException e) {
+            log.error("파일 업로드 중 오류 발생", e);
+            model.addAttribute("error", "파일 업로드 중 오류가 발생했습니다.");
+            List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
+            model.addAttribute("companyList", companyList);
+            return "admin/insert";
+        }
     }
 
 
@@ -176,7 +223,9 @@ public class AdminController {
     //승인
     @GetMapping("/approve")
     public String approve(Model model) {
+        log.info("=== 회원 승인 페이지 접근 ===");
         List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
+        log.info("승인 대기 중인 회원 수: {}", adminDTOList.size());
         model.addAttribute("adminDTOList", adminDTOList);
         return "admin/approve";
     }
