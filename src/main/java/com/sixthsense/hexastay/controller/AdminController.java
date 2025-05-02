@@ -239,9 +239,60 @@ public class AdminController {
 
     //마이페이지
     @GetMapping("/mypage")
-    public String mypage(Model model,Principal principal) {
-        model.addAttribute("centerDTOList", adminService.adminFindEmail(principal.getName()));
-        return "admin/mypage";
+    public String mypage(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        
+        try {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if (adminDTO == null) {
+                log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
+                return "redirect:/admin/logout";
+            }
+            
+            model.addAttribute("adminDTO", adminDTO);
+            return "admin/mypage";
+        } catch (Exception e) {
+            log.error("마이페이지 접근 중 오류 발생: ", e);
+            return "redirect:/admin/logout";
+        }
+    }
+
+    @PostMapping("/mypage")
+    public String mypageUpdate(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+
+        if (bindingResult.hasErrors()) {
+            log.info("유효성 검사 오류 발생");
+            return "admin/mypage";
+        }
+
+        try {
+            // 현재 로그인한 사용자의 정보를 가져옴
+            AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
+            if (currentAdmin == null) {
+                log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
+                return "redirect:/admin/logout";
+            }
+
+            // 수정할 수 없는 필드들은 현재 값으로 유지
+            adminDTO.setAdminNum(currentAdmin.getAdminNum());
+            adminDTO.setAdminEmail(currentAdmin.getAdminEmail());
+            adminDTO.setAdminRole(currentAdmin.getAdminRole());
+            adminDTO.setAdminEmployeeNum(currentAdmin.getAdminEmployeeNum());
+            adminDTO.setAdminResidentNum(currentAdmin.getAdminResidentNum());
+            adminDTO.setCompanyNum(currentAdmin.getCompanyNum());
+
+            adminService.adminUpdate(adminDTO);
+            return "redirect:/admin/mypage";
+        } catch (Exception e) {
+            log.error("마이페이지 수정 중 오류 발생: ", e);
+            model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
+            return "admin/mypage";
+        }
     }
 
     @GetMapping("/read/{adminNum}")
