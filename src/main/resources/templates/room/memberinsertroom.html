@@ -5,6 +5,20 @@
 <head>
     <meta charset="UTF-8">
     <title>객실 배정(비회원)</title>
+
+    <style>
+        .card {
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .card:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        .card:hover .card-title {
+            color: #0d6efd;
+        }
+    </style>
+
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
@@ -23,15 +37,13 @@
         <form action="/member-insertroom" th:object="${memberDTO}" method="post" enctype="multipart/form-data">
             <div class="container p-4" style="max-width: 700px;">
                 <!-- 방 종류 -->
-                <div class="mb-3">
-                    <label for="hotelRoomName" class="form-label">객실명</label>
-                    <select class="form-select" id="hotelRoomName" name="hotelRoomName" onchange="updateHotelRoomPk()" required>
-                        <option value="">객실 선택</option>
-                        <option th:each="room : ${hotelRoomList}"
-                                th:value="${room.hotelRoomName}"
-                                th:text="${room.hotelRoomName}">
-                        </option>
-                    </select>
+
+                <!-- 호텔룸 이미지로 보여주는 레이아웃 메소드 -->
+                <div class="mt-3">
+                    <h5>객실 선택</h5>
+                    <div class="row gx-2 gy-3" id="hotelRoomList"></div>
+                    <!-- ✅ 수정: ID 이름 통일 -->
+                    <div class="d-flex justify-content-center mt-2" id="hotelRoomPagination"></div>
                 </div>
 
                 <!-- 숨겨진 호텔룸 PK 값 전송용 -->
@@ -52,7 +64,7 @@
                     <label class="form-label">전화번호</label>
                     <input type="text" class="form-control"  th:field="*{memberPhone}" placeholder="전화번호 입력" required>
                 </div>
-                <!-- 비밀번호 입력 (보이게 수정됨) -->
+                <!-- 비밀번호 입력 (중복 체크 + 추천 버튼 추가) -->
                 <div class="mb-3">
                     <label class="form-label">객실 이용 비밀번호</label>
                     <div class="input-group">
@@ -60,22 +72,14 @@
                         <input type="text" class="form-control" id="roomPassword" name="roomPassword"
                                th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리 입력"
                                maxlength="4" pattern="\d{4}" inputmode="numeric" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="suggestPassword()">패스워드추천</button>
                     </div>
+                    <!-- 중복 여부 메시지 출력 영역 -->
+                    <div id="passwordCheckMessage" class="form-text mt-1"></div>
                 </div>
 
                 <!-- 비밀번호 확인 (유효성 검사용 그대로 유지) -->
-                <div class="mb-3">
-                    <label class="form-label">비밀번호 확인</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
-                        <input type="text" class="form-control" id="confirmPassword"
-                               maxlength="4" pattern="\d{4}"
-                               placeholder="비밀번호 재입력" required>
-                    </div>
-                    <div class="form-text text-danger" id="passwordMismatch" style="display: none;">
-                        비밀번호가 일치하지 않습니다.
-                    </div>
-                </div>
+
                 <!-- 체크인 -->
                 <div class="mb-3">
                     <label class="form-label">체크인 날짜</label>
@@ -100,33 +104,110 @@
 
 
     <!-- 호텔룸 자동 선택 JS -->
-    <script>
-        /*호텔룸 pk 을 자동으로 가져 와서 pk 값이 자동으로 room 테이블에 입력되는 메소드*/
-        function updateHotelRoomPk() {
-            let selectedName = document.getElementById("hotelRoomName").value;
+    <script th:inline="javascript">
+        // 실시간 중복 체크
+        document.getElementById("roomPassword").addEventListener("input", function () {
+            const pw = this.value;
+            const message = document.getElementById("passwordCheckMessage");
 
-            if (!selectedName) {
-                document.getElementById("hotelRoomNum").value = "";
-                return;
+            if (pw.length === 4) {
+                fetch(`/room/check-password?value=${pw}`) // ✅ 슬래시(/)로 시작해야 컨트롤러로 감
+                    .then(res => res.json())
+                    .then(data => {
+                        message.textContent = data.message;
+                        message.style.color = data.available ? "green" : "red";
+                    });
+            } else {
+                message.textContent = "";
             }
+        });
 
-            fetch(`/admin/hotelroom/latest?hotelRoomName=` + encodeURIComponent(selectedName))
-                .then(response => {
-                    if (!response.ok) throw new Error("해당 이름의 호텔룸이 존재하지 않습니다.");
-                    return response.json();
-                })
+        // 비밀번호 추천 기능
+        function suggestPassword() {
+            const randomPw = String(Math.floor(1000 + Math.random() * 9000));
+            const input = document.getElementById("roomPassword");
+            input.value = randomPw;
+
+            // 자동 중복 체크 트리거
+            input.dispatchEvent(new Event('input'));
+        }
+
+
+        function loadHotelRooms(page = 0) {
+
+            //페이지 갯수 제한 설정
+            const pageSize = 4;
+            fetch(`/admin/hotelroom/listpage?page=${page}&size=${pageSize}`)
+                .then(res => res.json())
                 .then(data => {
-                    if (data && data.hotelRoomNum) {
-                        document.getElementById("hotelRoomNum").value = data.hotelRoomNum;
-                    } else {
-                        throw new Error("유효한 호텔룸 데이터를 받지 못했습니다.");
+                    const listContainer = document.getElementById('hotelRoomList');
+                    listContainer.innerHTML = '';
+
+                    if (data.content.length === 0) {
+                        listContainer.innerHTML = "<p>등록된 객실이 없습니다.</p>";
+                        return;
                     }
+
+                    data.content.forEach(room => {
+                        const isDisabled = room.hotelRoomStatus === 'checkin';
+                        const badgeClass = isDisabled ? 'bg-danger' : 'bg-primary';
+                        const badgeText = isDisabled ? '사용중' : '비어있음';
+                        const formattedPrice = Number(room.hotelRoomPrice).toLocaleString();
+
+                        const card = `
+    <div class="col-md-3 mb-3 d-flex">
+        <div class="card flex-fill ${isDisabled ? 'disabled-room' : ''}"
+             ${isDisabled ? '' : `onclick="selectHotelRoom(${room.hotelRoomNum}, this)"`}
+             style="font-size: 0.85rem;">
+            <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지"
+                 style="height:140px; object-fit:cover;">
+            <div class="card-body py-2">
+                <span class="badge ${badgeClass}">${badgeText}</span>
+                <h6 class="card-title mt-2 text-truncate">${room.hotelRoomName}</h6>
+                <p class="card-text small">
+                    전화: ${room.hotelRoomPhone}<br>
+                    가격: ${formattedPrice}원
+                </p>
+            </div>
+        </div>
+    </div>
+`;
+                        listContainer.insertAdjacentHTML('beforeend', card);
+                    });
+
+                    setupPagination(data);
                 })
-                .catch(error => {
-                    console.error("에러 발생:", error);
-                    alert(error.message);
+                .catch(err => {
+                    console.error("객실 불러오기 오류:", err);
                 });
         }
+
+        function setupPagination(data) {
+            const pagination = document.getElementById('hotelRoomPagination');
+            pagination.innerHTML = '';
+
+            for (let i = 0; i < data.totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm mx-1 ' + (i === data.number ? 'btn-primary' : 'btn-outline-secondary');
+                btn.innerText = i + 1;
+                btn.onclick = () => loadHotelRooms(i);
+                pagination.appendChild(btn);
+            }
+        }
+
+        function selectHotelRoom(hotelRoomNum, element) {
+            document.getElementById('hotelRoomNum').value = hotelRoomNum;
+
+            const allCards = document.querySelectorAll('#hotelRoomList .card');
+            allCards.forEach(card => {
+                card.classList.remove('border-primary', 'selected');
+            });
+
+            element.classList.add('border-primary', 'selected');
+        }
+
+
 
         /*비밀번호 유효성 검사 추가 4 자리로 제안 스크립트*/
         document.addEventListener("DOMContentLoaded", function () {
@@ -160,6 +241,10 @@
             });
         });
 
+        // ✅ 여기에 반드시 포함
+        document.addEventListener("DOMContentLoaded", function () {
+            loadHotelRooms();
+        });
 
 
     </script>

@@ -20,12 +20,13 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
     //roomPassword 만 찾아와서 유효성 검사
-    //1.
+    //1.Boolean 타입
     @Query("SELECT COUNT(r) > 0 FROM Room r WHERE r.roomPassword = :roomPassword")
     boolean isRoomPasswordInUse(@Param("roomPassword") String roomPassword);
 
-    //2.
-    boolean existsByRoomPassword(String roomPassword);
+    //2.Long 타입
+    @Query("SELECT COUNT(r) FROM Room r WHERE r.roomPassword = :roomPassword")
+    long countByRoomPassword(@Param("roomPassword") String roomPassword);
 
 
 

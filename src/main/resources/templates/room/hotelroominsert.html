@@ -95,11 +95,16 @@
                        th:field="*{checkOutDate}" placeholder="체크아웃 날짜" required />
             </div>
             <div class="col-md-4" style="width: 18%;">
-                <input type="text" class="form-control" id="roomPassword" name="roomPassword"
-                       th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리"
-                       pattern="^\d{4}$"
-                       maxlength="4"
-                       inputmode="numeric" required />
+                <div class="input-group">
+                    <input type="text" class="form-control" id="roomPassword" name="roomPassword"
+                           th:field="*{roomPassword}" placeholder="비밀번호 숫자 4자리"
+                           pattern="^\d{4}$"
+                           maxlength="4"
+                           inputmode="numeric" required />
+
+                    <button type="button" class="btn btn-outline-secondary" onclick="suggestPassword()">추천</button>
+                </div>
+                <div id="passwordCheckMessage" class="form-text mt-1"></div>
             </div>
 
             <!--호텔룸 이미지로 보여주는 레이아웃 메소드-->
@@ -167,6 +172,36 @@
 
     <!-- JavaScript 영역 -->
     <script th:inline="javascript">
+
+
+        // 실시간 중복 체크
+        document.getElementById("roomPassword").addEventListener("input", function () {
+            const pw = this.value;
+            const message = document.getElementById("passwordCheckMessage");
+
+            if (pw.length === 4) {
+                fetch(`/room/check-password?value=${pw}`) // ✅ 슬래시(/)로 시작해야 컨트롤러로 감
+                    .then(res => res.json())
+                    .then(data => {
+                        message.textContent = data.message;
+                        message.style.color = data.available ? "green" : "red";
+                    });
+            } else {
+                message.textContent = "";
+            }
+        });
+
+        // 비밀번호 추천 기능
+        function suggestPassword() {
+            const randomPw = String(Math.floor(1000 + Math.random() * 9000));
+            const input = document.getElementById("roomPassword");
+            input.value = randomPw;
+
+            // 자동 중복 체크 트리거
+            input.dispatchEvent(new Event('input'));
+        }
+
+
 
         //roomPassword 패스워드 4자리로 제한적 설정
         document.getElementById('roomPassword').addEventListener('input', function (e) {
