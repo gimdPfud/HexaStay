@@ -302,20 +302,19 @@ public class RoomController {
 
     @PostMapping("/qr/{hotelRoomNum}")
     public String checkPasswordByStatus(@RequestParam("roomPassword") String roomPassword,
+                                        @PathVariable("hotelRoomNum") Long hotelRoomNum,
                                         RedirectAttributes redirectAttributes,
                                         HttpSession session) {
-
-        Room room = roomServiceTest.readRoomByCheckinPassword(roomPassword);
         try {
+            Room room = roomServiceTest.readRoomByCheckinPassword(roomPassword);
 
             session.setAttribute("roomNum", room.getRoomNum());
             session.setAttribute("roomPassword", room.getRoomPassword());
 
             return "redirect:/main?hotelRoomNum=" + room.getHotelRoom().getHotelRoomNum();
         } catch (IllegalArgumentException | EntityNotFoundException e) {
-
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/qr/" + (room.getHotelRoom().getHotelRoomNum());
+            return "redirect:/qr/" + hotelRoomNum;
         }
     }
 
