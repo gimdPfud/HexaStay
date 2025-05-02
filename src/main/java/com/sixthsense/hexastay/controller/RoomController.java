@@ -25,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -130,12 +131,19 @@ public class RoomController {
     }
 
     //RoomPassword 검색용 Controller
-    /*@GetMapping("/room/check-password")
-    @ResponseBody
-    public ResponseEntity<?> checkPassword(@RequestParam("value") String roomPassword) {
-        boolean isInUse = roomServiceimpl.RoomPasswordUniqueness(roomPassword);
-        return ResponseEntity.ok(!isInUse); // true = 사용 가능
-    }*/
+    //memberinsertroom.html / hotelroominsert.html - 패스워드 추천 버튼
+    @GetMapping("/room/check-password")
+    @ResponseBody  // 👈 이걸 붙여야 함
+    public Map<String, Object> checkRoomPassword(@RequestParam("value") String roomPassword) {
+        boolean available = roomServiceimpl.isRoomPasswordAvailable(roomPassword);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("available", available);
+        response.put("message", available ? "사용 가능한 비밀번호입니다." : "이미 사용 중인 비밀번호입니다.");
+
+        return response;
+    }
+
 
 
     /**

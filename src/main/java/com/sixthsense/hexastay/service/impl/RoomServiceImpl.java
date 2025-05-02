@@ -8,6 +8,7 @@ import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.entity.RoomService;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
@@ -205,11 +206,11 @@ public class RoomServiceImpl {
     }
 
     //패스워드 중복 체크
-    public void RoomPasswordUniqueness(String roomPassword) {
-        if (roomRepository.existsByRoomPassword(roomPassword)) {
-            throw new IllegalArgumentException("이미 사용 중인 비밀번호입니다. 다른 비밀번호를 입력해주세요.");
-        }
+    public boolean isRoomPasswordAvailable(String roomPassword) {
+        long count = roomRepository.countByRoomPassword(roomPassword);
+        return count == 0;
     }
+
 
 
 
