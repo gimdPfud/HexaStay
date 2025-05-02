@@ -26,7 +26,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
         .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
-        .menu-image-container { display: flex; justify-content: center; align-items: center; height: 100%; min-height: 150px; margin-bottom: 30px; }
+        .menu-image-container { display: flex; justify-content: center; align-items: center; height: 100%; min-height: 150px; padding-left: 10px }
         .menu-image { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
         .menu-badge {
             display: inline-block;
@@ -40,22 +40,60 @@
             background-color: #e0f7fa;
             color: #00796b;
             font-weight: bold;
+            margin-bottom: 4px;
             max-width: max-content;
         }
-        .menu-badge * {
-            display: inline;
-            font-size: inherit;
+        .text-info { display: flex; flex-direction: column; padding-left: 15px; }
+        .menu-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 5px;
+        }
+        .menu-content {
+            font-size: 0.9rem;
+            color: black;
+            margin-bottom: 5px;
+        }
+        .price-box { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
+
+        .card-list {
+            list-style: none;
             padding: 0;
-            margin: 0;
+            display: grid; /* 그리드 레이아웃 사용 */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
+            gap: 20px; /* 카드 사이 간격 */
+        }
+        .div-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 10px; margin-bottom: 10px; }
+
+        /* 품절관련, 좋아요 관련 CSS 시작 */
+        .sold-out {
+            opacity: 0.5;
+            position: relative;
+        }
+        .sold-out::after {
+            content: "품절";
+            color: white;
+            background-color: red;
+            font-weight: bold;
+            padding: 2px 6px;
+            font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 4px;
+        }
+        .sold-out-item {
+            opacity: 0.5;
+            pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
+            position: relative;
         }
 
-        .text-info { display: flex; flex-direction: column; margin-top: 10PX; padding-left: 10px; }
-        .menu-name { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
-        .menu-content{ font-size: 0.8rem; margin-bottom: 40px; color: black;}
-        .price-box { font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: black; }
-        .div-card { background: white; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 10px; margin-bottom: 10px; }
-        .sold-out { opacity: 0.5; position: relative; pointer-events: none; }
-        .sold-out::after { content: "품절"; color: white; background-color: red; font-weight: bold; padding: 2px 6px; font-size: 12px; position: absolute; top: 10px; right: 10px; border-radius: 4px; }
         html, body {
             margin: 0;
             padding: 0;
@@ -158,33 +196,56 @@
                 const filtered = list.filter(item => item.storemenuCategory === categoryKey);
 
                 if (filtered.length > 0) {
-                    html += `<div id="${categoryValue}" class="mb-4">
+                    html += `<ul class="card-list" id="${categoryValue}">
                                 <h5 class="mt-4 mb-2">${categoryValue}</h5>`;
 
                     filtered.forEach(item => {
-                        const soldOutClass = item.storemenuStatus === 'soldout' ? 'sold-out' : '';
-                        const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
                         // ✅ JS로 직접 카테고리 한글 변환
                         const korCategory = categories[item.storemenuCategory] || '기타';
-                        html += `
-                        <a href="/member/store/menu/read/${item.storemenuNum}" class="text-decoration-none">
-                            <div class="div-card ${soldOutClass}">
-                                <div class="d-flex">
-                                    <div class="menu-image-container">
-                                        <img src="${image}" class="menu-image">
+                        const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
+
+                        if(item.storemenuStatus === 'soldout'){
+                            console.log("솔드아웃!!!")
+                            html += `<li class="sold-out">
+                            <div class="div-card" style="display: block; width: 100%;" class="sold-out-item">
+                                <div class="inner-wrapper">
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div class="menu-image-container">
+                                            <img src="${image}" class="menu-image">
+                                        </div>
+                                        <div class="text-info">
+                                            <span class="menu-badge">품절</span>
+                                            <p class="menu-name">${item.storemenuName}</p>
+                                            <p class="menu-content">${item.storemenuContent}</p>
+                                            <p class="price-box">${item.storemenuPrice} 원</p>
+                                        </div>
                                     </div>
-                                    <div class="text-info">
-                                        <span class="menu-badge">${korCategory}</span>
-                                        <p class="menu-name">${item.storemenuName}</p>
-                                        <p class="menu-content">${item.storemenuContent}</p>
-                                        <div class="price-box">${item.storemenuPrice} 원</div>
+                                </div>
+                            </div></li>`;
+                        } else if (item.storemenuStatus==='alive'){
+                            console.log("솔드아웃 아니지롱")
+                            html += `<li>
+                        <a href="/member/store/menu/read/${item.storemenuNum}" class="text-decoration-none">
+                            <div class="div-card" style="display: block; width: 100%;">
+                                <div class="inner-wrapper">
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div class="menu-image-container">
+                                            <img src="${image}" class="menu-image">
+                                        </div>
+                                        <div class="text-info">
+                                            <span class="menu-badge">${korCategory}</span>
+                                            <p class="menu-name">${item.storemenuName}</p>
+                                            <p class="menu-content">${item.storemenuContent}</p>
+                                            <p class="price-box">${item.storemenuPrice} 원</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </a>`;
+                        </a></li>`;
+                        }
                     });
 
-                    html += `</div>`; // category section 끝
+                    html += `</ul>`; // category section 끝
 
                 }
             });

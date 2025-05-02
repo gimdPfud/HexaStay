@@ -40,6 +40,46 @@
                     <input type="text" class="form-control" name="storeName" required>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="text" class="form-control" name="storePhone" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="storeAddress">주소</label>
+
+                    <!-- 바깥 wrapper에만 둥근 테두리 적용 -->
+                    <div class="border rounded overflow-hidden">
+                        <!-- 윗줄: 우편번호 + 주소 + 버튼 -->
+                        <div class="input-group">
+                            <input style="background-color: #f1f1f1;" readonly type="text"
+                                   id="storeAddressZonecode" class="form-control rounded-0" required/>
+                            <input style="background-color: #f1f1f1; width: 50%;" readonly type="text"
+                                   id="storeAddressQuery" class="form-control rounded-0" required/>
+                            <input readonly type="hidden" id="storeAddress" name="storeAddress" required/>
+                            <button class="btn btn-secondary rounded-0"
+                                    type="button" onclick="insertAddress()">주소 검색
+                            </button>
+                        </div>
+
+                        <!-- 아랫줄: 상세주소 -->
+                        <input type="text" id="storeAddressDetail"
+                               class="form-control rounded-0"
+                               placeholder="상세 주소를 입력하세요." required/>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">대표자명</label>
+                    <input type="text" class="form-control" name="storeCeoName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">패스워드</label>
+                    <input type="password" class="form-control" name="storePassword" required>
+                </div>
+                <input type="hidden" name="storeStatus" value="alive" readonly>
+                <input type="hidden" id="storeLatitude"  name="storeLatitude" readonly>
+                <input type="hidden" id="storeLongitude" name="storeLongitude" readonly>
+                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
+                <div class="mb-3">
                     <label class="form-label d-block">카테고리</label>
                     <div class="text-center">
                         <div class="form-check form-check-inline">
@@ -341,10 +381,10 @@
 
         function insertAddress() {
             new daum.Postcode({
-                oncomplete: function(data) {
-                    var addr = data.address; // 최종 주소 변수
-                    // 주소 정보를 해당 필드에 넣는다.
-                    document.getElementById("storeAddress").value = addr;
+                oncomplete: function (data) {
+                    console.log(data)
+                    document.getElementById("storeAddressQuery").value = data.address;
+                    document.getElementById("storeAddressZonecode").value = data.zonecode;
                 }
             }).open();
         }
