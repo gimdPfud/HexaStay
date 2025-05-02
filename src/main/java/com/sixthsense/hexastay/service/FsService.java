@@ -9,7 +9,7 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
-import com.sixthsense.hexastay.dto.FsViewDTO;
+import com.sixthsense.hexastay.dto.FacViewDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Facilities;
 import com.sixthsense.hexastay.repository.CompanyRepository;
@@ -37,12 +37,10 @@ public class FsService {
     private final CompanyRepository companyRepository;
 
     //등록 반환 fsNum
-    public Long fsInsert(FacilitiesDTO dto) throws IOException {
-        log.info("등록시작 "+dto);
+    public Long fsInsert(FacilitiesDTO dto) {
+//        log.info("등록시작 "+dto);
         Facilities fs = modelMapper.map(dto,Facilities.class);
-        fs.setFsAmount(0);
         fs = fsRepository.save(fs);
-        log.info("1차저장 끝 "+fs);
         return fs.getCompany().getCompanyNum();
     }
 
@@ -60,13 +58,13 @@ public class FsService {
         Facilities a = fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new);
         return modelMapper.map(a,FacilitiesDTO.class).setCompanyDTO(modelMapper.map(a.getCompany(),CompanyDTO.class));
     }
-    public FsViewDTO readMobile (Long num){
+    public FacViewDTO readMobile (Long num){
         // 시설(company)찾음
         Company facility = companyRepository.findById(num).orElseThrow(EntityNotFoundException::new);
         CompanyDTO cdto = modelMapper.map(facility,CompanyDTO.class);
 
         // 반환할거에 시설(company)정보 세팅
-        FsViewDTO result = new FsViewDTO(cdto);
+        FacViewDTO result = new FacViewDTO(cdto);
 
         // 반환할거에 시설(fs) 찾아서 넣어야됨.
         List<Facilities> fsslist = fsRepository.findByCompany_CompanyNum(num);
@@ -76,7 +74,7 @@ public class FsService {
             result.addFssList(fssDTO);
         });
 
-//        log.info(result.toString());
+        log.info(result.toString());
 
         return result;
     }
@@ -84,28 +82,9 @@ public class FsService {
     //수정 반환 companyNum
     public Long modify (FacilitiesDTO dto) throws IOException {
         Facilities entity = fsRepository.findById(dto.getFacilitiesNum()).orElseThrow(EntityNotFoundException::new);
-        entity.setFsAmountMax(dto.getFsAmountMax());
-        entity.setFsName(dto.getFsName());
-        entity.setFsContent(dto.getFsContent());
-        entity.setFsPrice(dto.getFsPrice());
-        entity.setFsStatus(dto.getFsStatus());
+        entity.setFacTitle(dto.getFacTitle());
+        entity.setFacContent(dto.getFacContent());
         return entity.getCompany().getCompanyNum();
-    }
-
-    //상태변경 반환 fsNum
-    public Long fsYes(Long fsNum){
-        fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new).setFsStatus("yes");
-        return fsNum;
-    }
-    public Long fsNo(Long fsNum){
-        fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new).setFsStatus("no");
-        return fsNum;
-    }
-    //수량변경
-    public Long refill(Long fsNum){
-        Facilities a = fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new);
-        a.setFsAmount(0);
-        return a.getCompany().getCompanyNum();
     }
 
     //삭제 반환 fsNum

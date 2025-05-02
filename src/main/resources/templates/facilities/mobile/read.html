@@ -115,7 +115,12 @@
                 <!--이미지 1 장 밖에 없으므로 캐러샐 대신 그냥 이미지로 ... -->
 <!--                &lt;!&ndash; 첫 이미지 (기본 active) &ndash;&gt;-->
                 <div class="carousel-item active">
-                    <img src="${data.fsPictureMeta}" class="d-block w-100 item-img" alt="슬라이드 이미지 1">
+                    <img th:if="${data.facilPictureMeta==null}"
+                         th:src="@{/profile/default.png}"
+                         class="d-block w-100 item-img" alt="슬라이드 이미지 1">
+                    <img th:if="${data.facilPictureMeta!=null}"
+                         th:src="@{${data.facilPictureMeta}}"
+                         class="d-block w-100 item-img" alt="슬라이드 이미지 1">
                 </div>
 <!--                &lt;!&ndash; 두 번째 이미지 &ndash;&gt;-->
 <!--                <div class="carousel-item">-->
@@ -138,8 +143,11 @@
     </div>
 
     <div class="content">
+        <p class="fs-name mb-0"
+           th:text="${data.facilName}">시설 이름</p>
         <div class="d-flex align-items-center justify-content-between mb-2">
-            <p class="fs-name mb-0">시설 이름</p>
+            <p class="fs-name mb-0"
+               th:text="${data.facilAddress}">시설 주소</p>
             <button type="button" class="btn btn-sm btn-outline-secondary"
                     data-bs-toggle="modal"
                     data-bs-target="#mapmodal"
@@ -147,8 +155,19 @@
                 지도보기
             </button>
         </div>
+
         <p class="fs-content">시설 정보</p>
+
+
+        <div class="fsservice card" th:each="fss:${data.fssList}">
+            <p th:text="${fss.fsssName}"></p>
+        </div>
+
         <p class="fs-text">내용</p>
+
+        <div class="fsservice card" th:each="fss:${data.fssList}">
+            <p th:text="${fss.fsssContent}"></p>
+        </div>
     </div>
 
     <div class="modal" id="mapmodal" tabindex="-1">
@@ -166,10 +185,10 @@
     </div>
 
     <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
-    <script>
+    <script th:inline="javascript">
         function showMapBox() {
-        let yy = document.getElementById("storeLatitude").value;
-        let xx = document.getElementById("storeLongitude").value;
+        let yy = [[${data.facilLatitude}]];
+        let xx = [[${data.facilLongitude}]];
         var container = document.getElementById('map');
         var options = { center: new kakao.maps.LatLng(yy, xx), level: 2 };
         var map = new kakao.maps.Map(container, options);

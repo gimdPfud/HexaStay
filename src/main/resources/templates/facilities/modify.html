@@ -30,28 +30,6 @@
                     <textarea class="form-control" name="fsContent" rows="4" th:text="${data.fsContent}"></textarea>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">가격</label>
-                    <input type="number" class="form-control" name="fsPrice" th:value="${data.fsPrice}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">수량</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" th:value="${data.fsAmount}+' 명이 이용중입니다.'" readonly>
-                        <span class="input-group-text">/</span>
-                        <input type="number" min="0" class="form-control" id="fsAmountMax" name="fsAmountMax" th:value="${data.fsAmountMax}">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">상태</label>
-                    <select class="form-control" name="fsStatus">
-                        <option th:value="yes" th:selected="${data.fsStatus == 'yes'}">이용가능</option>
-                        <option th:value="no" th:selected="${data.fsStatus == 'no'}">이용불가</option>
-                    </select>
-                </div>
-
                 <div class="d-flex justify-content-center gap-3">
                     <a th:href="@{/facility/list/{num}(num=${data.companyDTO.companyNum})}" class="btn btn-secondary">취소</a>
                     <a th:href="@{/facility/delete/{num}(num=${data.facilitiesNum})}" class="btn btn-danger">삭제</a>
