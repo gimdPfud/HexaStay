@@ -43,6 +43,9 @@
             flex-shrink: 0; cursor: pointer; padding: 8px 14px;
             font-size: 14px; background-color: transparent; color: black;
             height: 37px; width: 60px; text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .tab.active {
             font-weight: bold;
@@ -173,11 +176,11 @@
             <button type="button" onclick="filterByLikes()" class="btn-custom">
                 ❤️ <span class="like-count" style="margin-left: 4px;">인기순</span>
             </button>
-            <div class="tab" onclick="filterByCategory('전체')">전체</div>
+            <div class="tab" style="text-align: center" onclick="filterByCategory('전체')">전체</div>
             <div class="tab" onclick="filterByCategory('한식')">한식</div>
             <div class="tab" onclick="filterByCategory('일식')">일식</div>
             <div class="tab" onclick="filterByCategory('중식')">중식</div>
-            <div class="tab" onclick="filterByCategory('아시안')">아시안</div>
+            <div class="tab " onclick="filterByCategory('아시안')">아시안</div>
             <div class="tab" onclick="filterByCategory('양식')">양식</div>
             <div class="tab" onclick="filterByCategory('패스트푸드')">패스트푸드</div>
             <div class="tab" onclick="filterByCategory('카페')">카페</div>
