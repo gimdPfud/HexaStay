@@ -25,13 +25,16 @@ public class Store extends BaseEntity {
     private Long storeNum;
 
     //외부 업체 이름
+    @Column(nullable = false, length = 20)
     private String storeName;
 
     //외부업체 매장번호
+    @Column(nullable = false)
     private String storePhone;
 
     //외부 업체주소
     //  문자열 주소
+    @Column(nullable = false)
     private String storeAddress;
     //  경도 x
     private Double storeLongitude;
@@ -50,6 +53,7 @@ public class Store extends BaseEntity {
     private String storeStatus;
 
     //추가 : 카테고리 ( 한식 중식 일식 아시안 양식 패스트푸드 카페  중 1택.)
+    @Column(nullable = false)
     private String storeCategory;
 
     private String storeProfileMeta; //가게 대표 사진

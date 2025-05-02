@@ -23,6 +23,7 @@ public class StoremenuOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long storemenuOptionNum;        //옵션pk
 
+    @Column(nullable = false, length = 20)
     private String storemenuOptionName;     //옵션 이름
     private Integer storemenuOptionPrice;   //옵션 가격
     private String storemenuOptionStatus;   //활성화비활성화
