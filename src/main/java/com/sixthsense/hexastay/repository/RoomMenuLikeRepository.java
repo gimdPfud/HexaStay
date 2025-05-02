@@ -21,7 +21,9 @@ public interface RoomMenuLikeRepository extends JpaRepository<RoomMenuLike, Long
 
     Long countByRoomMenuAndRoomMenuLikedCheck(RoomMenu roomMenu, Boolean likedCheck);
 
+    // 연결된 좋아요 삭제
+    void deleteByRoomMenu_RoomMenuNum(Long roomMenuNum);
 
-
+    // 좋아요 삭제하기
 
 }

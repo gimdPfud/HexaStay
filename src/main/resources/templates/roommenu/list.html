@@ -38,10 +38,15 @@
         }
 
     </style>
+
 </head>
 <!-- fixme : value 값과, name명 수정하지 마세요!! 오류생깁니다. 그리고 th:text 지워버리면 번역 실행 안됩니다.. 예) th:text="#{menu.translationPage}" -->
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <div class="container-fluid mt-4 w-100 bg-light">
         <div class="position-relative mb-4" style="min-height: 40px;">
@@ -204,7 +209,10 @@
                         <td th:text="${roomMenuDTO.roomMenuStatus}"></td>
                         <td>
                             <a th:href="@{/roommenu/modify(num=${roomMenuDTO.roomMenuNum})}" class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">수정</a>
-                            <form action="/roommenu/delete" method="post" style="display:inline;">
+                            <form action="/roommenu/delete"
+                                  method="post"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('정말 삭제하시겠습니까? 좋아요가 삭제되고 옵션도 삭제됩니다. 신중하게 결정하세요.');">
                                 <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
                                 <button type="submit" class="btn btn-danger px-2 py-1" style="font-size: 0.8rem; line-height: 1;">삭제</button>
                             </form>
@@ -267,6 +275,11 @@
     <!-- WebSocket 관련 라이브러리 추가 -->
     <!-- 웹소켓 및 STOMP 라이브러리 -->
     <script>
+
+        /* 옵션이 있으면 삭제 요청하기 */
+
+
+
         /*------ 카테고리 드롭다운 활성화 시작 ------*/
         console.log("JS 로딩됨");
 

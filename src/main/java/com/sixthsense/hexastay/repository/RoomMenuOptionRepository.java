@@ -16,4 +16,7 @@ public interface RoomMenuOptionRepository extends JpaRepository<RoomMenuOption, 
     // 특정 룸메뉴 옵션 ID로 조회
     Optional<RoomMenuOption> findById(Long roomMenuOptionNum);
 
+    // 삭제시 옵션 확인
+    boolean existsByRoomMenu_RoomMenuNum(Long roomMenuNum);
+
 }

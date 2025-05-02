@@ -40,6 +40,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomMenuOptionRepository roomMenuOptionRepository;
+    private final RoomMenuLikeRepository roomMenuLikeRepository;
 
 
     /**************************************************
@@ -382,11 +383,16 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     public void delete(Long num) {
 
         log.info("삭제 서비스 진입" + num);
+
+        roomMenuLikeRepository.deleteByRoomMenu_RoomMenuNum(num);
         roomMenuRepository.deleteById(num);
 
         log.info("삭제완료 db를 확인하세요.");
 
     }
+
+
+
 
     // 번역
     @Override
