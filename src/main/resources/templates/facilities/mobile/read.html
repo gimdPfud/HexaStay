@@ -115,11 +115,11 @@
                 <!--이미지 1 장 밖에 없으므로 캐러샐 대신 그냥 이미지로 ... -->
 <!--                &lt;!&ndash; 첫 이미지 (기본 active) &ndash;&gt;-->
                 <div class="carousel-item active">
-                    <img th:if="${data.facilPictureMeta==null}"
+                    <img th:if="${data.facPictureMeta==null}"
                          th:src="@{/profile/default.png}"
                          class="d-block w-100 item-img" alt="슬라이드 이미지 1">
-                    <img th:if="${data.facilPictureMeta!=null}"
-                         th:src="@{${data.facilPictureMeta}}"
+                    <img th:if="${data.facPictureMeta!=null}"
+                         th:src="@{${data.facPictureMeta}}"
                          class="d-block w-100 item-img" alt="슬라이드 이미지 1">
                 </div>
 <!--                &lt;!&ndash; 두 번째 이미지 &ndash;&gt;-->
@@ -144,10 +144,10 @@
 
     <div class="content">
         <p class="fs-name mb-0"
-           th:text="${data.facilName}">시설 이름</p>
+           th:text="${data.facName}">시설 이름</p>
         <div class="d-flex align-items-center justify-content-between mb-2">
             <p class="fs-name mb-0"
-               th:text="${data.facilAddress}">시설 주소</p>
+               th:text="${data.facAddress}">시설 주소</p>
             <button type="button" class="btn btn-sm btn-outline-secondary"
                     data-bs-toggle="modal"
                     data-bs-target="#mapmodal"
@@ -160,7 +160,7 @@
 
 
         <div class="fsservice card" th:each="fss:${data.fssList}">
-            <p th:text="${fss.fsssName}"></p>
+            <p th:text="${fss.fsssTitle}"></p>
         </div>
 
         <p class="fs-text">내용</p>
@@ -187,8 +187,8 @@
     <button class="back-to-list-btn" onclick="window.location.href='/main'">메인으로</button>
     <script th:inline="javascript">
         function showMapBox() {
-        let yy = [[${data.facilLatitude}]];
-        let xx = [[${data.facilLongitude}]];
+        let yy = [[${data.facLatitude}]];
+        let xx = [[${data.facLongitude}]];
         var container = document.getElementById('map');
         var options = { center: new kakao.maps.LatLng(yy, xx), level: 2 };
         var map = new kakao.maps.Map(container, options);
