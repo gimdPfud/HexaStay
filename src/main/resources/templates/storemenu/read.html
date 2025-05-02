@@ -47,16 +47,16 @@
             <div class="mb-3">
                 <label class="form-label">옵션</label>
                 <div class="optionlist"></div>
-            <div class="mt-4 d-grid">
-                <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
-                    삭제된 항목
-                </button>
-            </div>
-            <div class="collapse mt-3" id="deletedlist">
-                <div class="card card-body">
-                    <div class="deletedoptionlist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                <div class="mt-4 d-grid">
+                    <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#deletedlist" aria-expanded="false" aria-controls="deletedlist">
+                        삭제된 항목
+                    </button>
                 </div>
-            </div>
+                <div class="collapse mt-3" id="deletedlist">
+                    <div class="card card-body">
+                        <div class="deletedoptionlist"></div> <!-- 삭제된 목록을 여기에 표시 -->
+                    </div>
+                </div>
             </div><!--제목끝-->
             <div class="mb-3">
                 <label class="form-label">등록일자</label>
@@ -68,7 +68,7 @@
             </div>
 
             <div class="d-flex justify-content-center gap-3">
-                <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-dark">목록</a>
+                <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-secondary">목록</a>
                 <a th:href="@{'/admin/store/menu/modify/'+${data.storemenuNum}}" class="btn btn-success">수정</a>
                 <a th:href="@{'/admin/store/menu/delete/'+${data.storemenuNum}}" class="btn btn-danger">삭제</a>
             </div>
@@ -219,10 +219,6 @@
                 tagscontent += `<tr>
                     <td>${list[i].storemenuOptionName}</td>
                     <td>${list[i].storemenuOptionPrice}</td>
-                    <td>
-                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modifyModal" data-option-num="${list[i].storemenuOptionNum}">수정</button>
-                        <a href="/admin/store/menu/option/delete/${list[i].storemenuOptionNum}" class="btn btn-danger btn-sm">삭제</a>
-                    </td>
                 </tr>`
             }
             let totaltags = tagsstart + tagscontent + tagsend;
@@ -255,7 +251,7 @@
                 <tr>
                     <th>이름</th>
                     <th>가격</th>
-                    <th>버튼</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>`;

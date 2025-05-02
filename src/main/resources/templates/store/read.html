@@ -235,7 +235,7 @@
                     <th style="width: 20%;">카테고리</th>
                     <th style="width: 25%;">이름</th>
                     <th style="width: 20%;">가격</th>
-                    <th style="width: 15%;">버튼</th>
+                    <th style="width: 15%;"></th>
                     <th style="width: 10%;">옵션</th>
                 </tr>
                 </thead>
@@ -277,10 +277,10 @@
                 <thead class="table-light">
                 <tr>
                     <th style="width: 10%;">이미지</th>
-                    <th style="width: 15%;">카테고리</th>
-                    <th style="width: 35%;">이름</th>
-                    <th style="width: 10%;">가격</th>
-                    <th >버튼</th>
+                    <th style="width: 20%;">카테고리</th>
+                    <th style="width: 25%;">이름</th>
+                    <th style="width: 20%;">가격</th>
+                    <th style="width: 15%;"></th>
                     <th style="width: 10%;">옵션</th>
                 </tr>
                 </thead>
@@ -300,8 +300,7 @@
                     <td style="text-align: center;">${imageTag}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>${list[i].storemenuName}</td>
-                    <td>${list[i].storemenuPrice}</td>
-                    <td>
+                    <td>${list[i].storemenuPrice.toLocaleString()}원</td>                    <td>
                         <a href="/admin/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>
@@ -318,10 +317,10 @@
                 <thead class="table-light">
                 <tr>
                     <th style="width: 10%;">이미지</th>
-                    <th style="width: 15%;">카테고리</th>
-                    <th style="width: 35%;">이름</th>
-                    <th style="width: 10%;">가격</th>
-                    <th >버튼</th>
+                    <th style="width: 20%;">카테고리</th>
+                    <th style="width: 25%;">이름</th>
+                    <th style="width: 20%;">가격</th>
+                    <th style="width: 15%;"></th>
                     <th style="width: 10%;">옵션</th>
                 </tr>
                 </thead>
@@ -341,8 +340,7 @@
                     <td style="text-align: center;">${imageTag}</td>
                     <td>${categ=="main"?"메인":categ=="side"?"사이드":categ=="drink"?"음료":categ=="plus"?"추가":"-"}</td>
                     <td>${list[i].storemenuName}</td>
-                    <td>${list[i].storemenuPrice}</td>
-                    <td>
+                    <td>${list[i].storemenuPrice.toLocaleString()}원</td>                    <td>
                         <a href="/admin/store/menu/restore/${list[i].storemenuNum}" class="btn btn-success btn-sm">복원</a>
                     </td>
                     <td>${list[i].storemenuOptionDTOList ? list[i].storemenuOptionDTOList.length : 0}</td>
