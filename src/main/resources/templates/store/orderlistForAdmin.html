@@ -48,10 +48,10 @@
                         </div>
                         <div>
                             <button type="button" class="btn btn-sm btn-danger me-2"
-                                    th:disabled="${orderDTO.orderstoreStatus.equals('cancel')}"
+                                    th:disabled="${orderDTO.orderstoreStatus.equals('cancel') or orderDTO.orderstoreStatus.equals('end')}"
                                     th:onclick="|ordercancel(${orderDTO.orderstoreNum})|">주문취소</button>
                             <button type="button" class="btn btn-sm btn-success"
-                                    th:disabled="${orderDTO.orderstoreStatus.equals('end')}"
+                                    th:disabled="${orderDTO.orderstoreStatus.equals('cancel') or orderDTO.orderstoreStatus.equals('end')}"
                                     th:onclick="|orderEnd(${orderDTO.orderstoreNum})|">주문완료</button>
                         </div>
                     </div>
@@ -63,6 +63,7 @@
                             <span class="fw-bold" th:text="${item.storemenuDTO.storemenuName}"></span>
                             <span th:text="' x ' + ${item.orderstoreitemAmount}"></span>
                             <span class="text-muted ms-2" th:text="'(' + ${item.orderstoreitemTotalPrice} + '원)'"></span>
+                            <span class="text-muted ms-2" th:each="option : ${optionMap[item.orderstoreitemNum]}" th:text="${option}">메뉴옵션들</span>
                         </div>
 
                         <!-- 요청사항 -->
@@ -83,7 +84,6 @@
             </div>
         </div>
     </div>
-</div>
 
     <!-- JS -->
     <script th:inline="javascript">

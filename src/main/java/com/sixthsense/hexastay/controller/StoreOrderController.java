@@ -149,7 +149,7 @@ public class StoreOrderController {
                     List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
                     options = options.stream().map(option->{//옵션1개
                         List<String> optionInfos = Arrays.stream((option.split(":"))).toList();
-                        option = optionInfos.get(1) + " (" + optionInfos.get(2) + " 원)";
+                        option = optionInfos.get(1) + " (" + optionInfos.get(2) + "원)";
                         return option;
                     }).toList();
                     optionMap.put(dto.getOrderstoreitemNum(),options);
