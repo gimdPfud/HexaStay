@@ -10,6 +10,8 @@ package com.sixthsense.hexastay.dto;
 
 
 import com.sixthsense.hexastay.enums.AdminRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +42,8 @@ public class AdminDTO {
     private String adminResidentNum;;
 
     //어드민 이메일
+    @NotBlank(message = "이메일은 필수 입력값입니다.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String adminEmail;
 
     //어드민 주소

@@ -24,7 +24,8 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
     public Page<Admin> findAll(Pageable pageable);
 
     public Admin findByAdminNum(Long adminNum);
-    public List<Admin> findByAdminActive(String active);
+    @Query("SELECT a FROM Admin a WHERE a.adminActive = :active")
+    public List<Admin> findByAdminActive(@Param("active") String active);
 
     // 리스트
     List<Admin> findByCompany_CompanyNum(Long companyNum);
@@ -68,4 +69,9 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
 
     @Query("SELECT a FROM Admin a WHERE a.store.storeNum = :storeNum AND a.adminRole <> :excludedRole")
     List<Admin> findBySalariesStore(@Param("storeNum") Long storeNum);
+
+
+    // 사번 생성용
+    @Query("SELECT MAX(a.adminEmployeeNum) FROM Admin a WHERE a.adminEmployeeNum LIKE :prefix")
+    String findMaxEmpNumStartingWith(@Param("prefix") String prefix);
 }

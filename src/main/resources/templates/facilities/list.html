@@ -32,18 +32,15 @@
 <div layout:fragment="content">
 
   <div class="container mt-4 w-100 bg-light">
-    <h2 class="fw-bold mb-4 text-center">시설서비스 관리</h2>
+    <h2 class="fw-bold mb-4 text-center">시설정보 관리</h2>
 
     <div class="row mt-4">
       <div class="col-12">
         <table class="table table-bordered text-fs mb-0">
           <thead class="table-light text-center">
             <tr>
-              <th style="width: 11%">사진없습니다</th>
-              <th style="width: 14%;">서비스명</th>
-              <th style="width: 28%;">상세설명</th>
-              <th style="width: 14%;">가격</th>
-              <th style="width: 14%;">사용중 / 전체</th>
+              <th style="width: 14%;">첫번째입력(정보?)</th>
+              <th style="width: 28%;">두번째입력(내용?)</th>
               <th style="width: 14%;"></th>
             </tr>
           </thead>
@@ -51,32 +48,17 @@
           <tbody>
             <tr th:each="item : ${list}" class="text-center">
 
+              <td th:text="${item.facTitle}"></td>
+              <td th:text="${item.facContent}"></td>
               <td>
-              </td>
-              <td th:text="${item.fsName}">서비스명</td>
-              <td th:text="${item.fsContent}">상세설명</td>
-              <td th:text="${item.fsPrice}+' 원'">0 원</td>
-              <td th:text="${item.fsAmount}+' / '+${item.fsAmountMax}">0/0</td>
-              <td>
-                <!-- 비활성화 상태 배지 -->
-                <span th:if="${item.fsStatus != null and item.fsStatus.toUpperCase() == 'YES'}"
-                      class="badge badge-outline-success">이용가능</span>
-                <span th:if="${item.fsStatus != null and item.fsStatus.toUpperCase() == 'NO'}"
-                      class="badge badge-outline-danger">이용불가</span>
                 <a th:href="@{/facility/read/{fsNum}(fsNum=${item.facilitiesNum})}"
                    class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
                   상세보기
                 </a>
-
-                <form th:action="@{/facility/refill/{num}(num=${item.facilitiesNum})}" method="post">
-                  <button type="submit" class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
-                    재입고하기</button>
-                </form>
               </td>
 
             </tr>
           </tbody>
-
         </table>
       </div>
     </div>

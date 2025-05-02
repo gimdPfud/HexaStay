@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -250,6 +251,22 @@ public class CompanyServiceImpl implements CompanyService {
         return list;
     }
 
+    @Override
+    public List<CompanyDTO> getCompanyAndSubsidiaries(Long companyNum) {
+        List<Company> companies = new ArrayList<>();
+        Company mainCompany = companyRepository.findById(companyNum)
+                .orElseThrow(() -> new EntityNotFoundException("회사를 찾을 수 없습니다."));
+        companies.add(mainCompany);
+        
+        // 하위 회사들 조회
+        List<Company> subsidiaries = companyRepository.findByCompanyParent(companyNum);
+        companies.addAll(subsidiaries);
+        
+        return companies.stream()
+                .map(company -> modelMapper.map(company, CompanyDTO.class))
+                .collect(Collectors.toList());
+    }
+
     private CompanyDTO convertToCompanyDTO(Company company) {
         CompanyDTO dto = modelMapper.map(company, CompanyDTO.class);
 
@@ -287,5 +304,12 @@ public class CompanyServiceImpl implements CompanyService {
         return companyDTOS;
     }
 
+    @Override
+    public List<CompanyDTO> getAllList() {
+        List<Company> companies = companyRepository.findAll();
+        return companies.stream()
+                .map(company -> modelMapper.map(company, CompanyDTO.class))
+                .collect(Collectors.toList());
+    }
 
 }

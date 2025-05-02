@@ -178,6 +178,7 @@
 
         function searchCompanys(button) {
             const formData = new FormData(button.form);
+            console.log(formData);
             fetch("/company/list/store",{
                 method: "POST",
                 body: formData
@@ -191,6 +192,7 @@
                     }
                 })
                 .then(data => {
+                    console.log(data)
                     listCompanys(data)
                 })
         }

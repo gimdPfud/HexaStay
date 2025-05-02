@@ -38,4 +38,8 @@ public interface CompanyService {
     List<CompanyDTO> getCompanyList (Long companyNum);
     List<CompanyDTO> getBnFList();
 
+    List<CompanyDTO> getCompanyAndSubsidiaries(Long companyNum);
+
+    List<CompanyDTO> getAllList();
+
 }
