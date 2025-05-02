@@ -57,10 +57,17 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
+    // roomNum + roomPassword 조합으로 단일 Room 조회
+    Optional<Room> findByRoomNumAndRoomPassword(Long roomNum, String roomPassword);
+
 
     //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
     Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
+
+    //qr/{hotelRoomNum}들어 갈때 쓰는 로직
+    @Query("SELECT r FROM Room r WHERE r.roomPassword = :roomPassword AND r.hotelRoom.hotelRoomStatus = 'checkin'")
+    Optional<Room> findCheckinRoomByPassword(@Param("roomPassword") String roomPassword);
 
 
     //Room pk 을 찾아와서 member fk 만 변경 하는 메소드
