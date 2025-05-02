@@ -44,7 +44,7 @@
                     <td th:text="${erd.erdSku}"></td>
                     <td th:text="${erd.erdUnit}"></td>
                     <td th:text="${erd.erdNote}"></td>
-                    <td><button class="btn btn-success px-2 py-1">수정</button></td>
+                    <td><a th:href="@{/erd/update/{id}(id=${erd.erdNum})}" class="btn btn-success px-2 py-1">수정</a></td>
                 </tr>
                 </tbody>
             </table>

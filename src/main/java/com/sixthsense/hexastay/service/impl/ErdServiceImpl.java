@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,7 +58,7 @@ public class ErdServiceImpl implements ErdService {
     }
 
     //소속 리스트
-@Override
+    @Override
     public Page<ErdDTO> getErdList(AdminDTO adminDTO, Pageable pageable) {
         Page<Erd> erdList = null;
         if (adminDTO.getCompanyNum() != null) {
@@ -65,7 +66,50 @@ public class ErdServiceImpl implements ErdService {
         } else if (adminDTO.getStoreNum() != null) {
             erdList = erdRepository.findByStore_StoreNum(adminDTO.getStoreNum(), pageable);
         }
-     return erdList.map(erd -> modelMapper.map(erd, ErdDTO.class));
+        return erdList.map(erd -> modelMapper.map(erd, ErdDTO.class));
+    }
+
+
+    @Override
+    public ErdDTO getErd(Long erdNum) {
+        Erd erd = erdRepository.findById(erdNum).orElseThrow( () ->(new NotFoundException("품목을 찾지 못했습니다.")));
+        return modelMapper.map(erd, ErdDTO.class);
+    }
+
+
+    @Override
+    public void update(ErdDTO erdDTO) throws IOException {
+        Erd existingErd = erdRepository.findById(erdDTO.getErdNum())
+                .orElseThrow(() -> new NotFoundException("품목을 찾지 못했습니다."));
+
+        // 새로운 이미지가 있는 경우
+        if (erdDTO.getErdPicture() != null && !erdDTO.getErdPicture().isEmpty()) {
+            String fileOriginalName = erdDTO.getErdPicture().getOriginalFilename();
+            String fileFirstName = erdDTO.getErdSku() + "_" + erdDTO.getErdName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            erdDTO.setErdPictureMeta("/erd/" + fileName);
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "erd/" + fileName);
+            Path createPath = Paths.get(System.getProperty("user.dir"), "erd/");
+            if (!Files.exists(createPath)) {
+                Files.createDirectory(createPath);
+            }
+            erdDTO.getErdPicture().transferTo(uploadPath.toFile());
+        } else if (existingErd.getErdPictureMeta() != null) {
+            // 새로운 이미지가 없고 기존 이미지가 있는 경우
+            erdDTO.setErdPictureMeta(existingErd.getErdPictureMeta());
+        }
+
+        Erd erd = modelMapper.map(erdDTO, Erd.class);
+
+        if (erdDTO.getCompanyNum() != null) {
+            erd.getCompany().setCompanyNum(erdDTO.getCompanyNum());
+        } else if (erdDTO.getStoreNum() != null) {
+            erd.getStore().setStoreNum(erdDTO.getStoreNum());
+        }
+
+        erdRepository.save(erd);
     }
 
 

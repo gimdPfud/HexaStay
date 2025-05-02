@@ -8,6 +8,7 @@
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">회원 등록</h2>
@@ -56,11 +57,28 @@
                     </div>
                 </div>
 
+
+
                 <div class="mb-3">
-                    <label class="form-label">주소</label>
-                    <input type="text" th:field="*{adminAddress}" class="form-control" th:classappend="${#fields.hasErrors('adminAddress')} ? 'is-invalid'">
+                    <label class="form-label">가게 주소</label>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <input type="text" id="adminAddressOne" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="adminAddressTwo" class="form-control" style="background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary" onclick="showMapBox()">주소 검색</button>
+                        </div>
+                    </div>
+                    <input type="text" id="adminAddressThree" class="form-control mt-2">
+                    <input hidden type="text" id="adminAddress" class="form-control"
+                           th:field="*{adminAddress}" th:classappend="${#fields.hasErrors('adminAddress')} ? 'is-invalid'">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminAddress')}" th:errors="*{adminAddress}"></div>
                 </div>
+
+
 
                 <div class="mb-3">
                     <label class="form-label">연락처</label>
@@ -145,7 +163,6 @@
                     <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
-
             <input hidden type="text" name="adminPassword" class="form-control">
             <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             <input hidden name="companyNum" id="companyNum">
@@ -389,6 +406,11 @@
             document.getElementById('adminResidentNum').value =
                 document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
 
+            // 주소 결합
+            document.getElementById('adminAddress').value =
+            document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
+            + "\u00A0" + document.getElementById('adminAddressThree').value;
+
             // 폼 제출
             event.target.form.submit();
         }
@@ -491,6 +513,20 @@
             document.getElementById('employeeNum').value = empNum;
         });
 
+
+        //주소 입력
+        var geocoder = new daum.maps.services.Geocoder();
+        function showMapBox() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    console.log(data);
+                    var zonecode = data.zonecode;
+                    var addr = data.address;
+                    document.getElementById("adminAddressOne").value = zonecode;
+                    document.getElementById("adminAddressTwo").value = addr;
+                }
+            }).open();
+        }
     </script>
 
 </div>
