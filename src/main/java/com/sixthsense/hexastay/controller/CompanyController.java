@@ -87,9 +87,6 @@ public class CompanyController {
     public String readCompany(@PathVariable(name = "companyNum") Long companyNum, Model model) {
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
-        log.info("read Controller 진입 헤헤헤헤헤");
-        log.info("companyNum 갖고 옴?: " + companyNum);
-
         if (companyDTO == null) {
             log.info("companyDTO가 null인 pk : " + companyNum);
             return "redirect:/company/list";
