@@ -131,14 +131,6 @@
             cursor: pointer;
         }
 
-        .profile-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-        }
-
         .dropdown-menu {
             font-size: 14px; /* 텍스트 크기 */
             padding: 10px 10px; /* 상하 여백 */
@@ -199,6 +191,16 @@
                 padding-top: 100px;
             }
         }
+        .profile-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block; /* 중요! */
+            cursor: pointer;
+            pointer-events: none; /* 이미지 자체에 클릭 효과 차단 */
+        }
+
 
 
 
@@ -220,6 +222,7 @@
         <!-- 프로필 이미지 드롭다운 -->
         <!-- 프로필 드롭다운 + 관리자 정보 블록 -->
         <div class="dropdown text-end">
+
             <button class="btn p-0" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <img class="profile-img"
                      th:src="${#authentication.principal.adminProfileMeta != null ? #authentication.principal.adminProfileMeta : '/profile/default.png'}"
