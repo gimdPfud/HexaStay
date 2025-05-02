@@ -4,104 +4,123 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>외부업체 메뉴 수정</title>
+    <title>요식업체 메뉴 수정</title>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <h2 class="text-center">외부업체 메뉴 수정</h2>
-    <div class="card p-4">
+
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">요식업체 메뉴 수정</h2>
+
         <form action="/admin/store/menu/modify" method="post" enctype="multipart/form-data">
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
-                </div>
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
-                    <img th:if="${data.storemenuImgMeta != null}" th:src="@{${data.storemenuImgMeta}}" style="width: 100%; height: 100%; object-fit: contain;">
-                    <img th:unless="${data.storemenuImgMeta != null}" th:src="@{/store/menu/default.png}" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <p class="file-name">변경할 이미지를 선택하세요.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storemenuImg" class="btn btn-light form-control rounded-pill" accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;" th:value="${data.storemenuImg}">
-                <small id="fileError" class="text-danger d-none">올바른 파일이 선택되지 않았습니다.</small>
-            </div>
+            <div class="container p-4" style="max-width: 700px;">
 
-            <input type="hidden" name="storemenuStatus" th:value="${data.storemenuStatus}">
-            <input type="hidden" name="storemenuNum" th:value="${data.storemenuNum}">
-            <input hidden type="number" name="storeNum" th:value="${data.storeNum}" readonly>
-
-            <div class="mb-3">
-                <label class="form-label">메뉴 이름</label>
-                <input type="text" class="form-control" name="storemenuName" th:value="${data.storemenuName}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 가격</label>
-                <input type="number" class="form-control" name="storemenuPrice" th:value="${data.storemenuPrice}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 설명</label>
-                <textarea class="form-control" name="storemenuContent" placeholder="용량 또는 크기 등을 꼭 기입해주세요." th:text="${data.storemenuContent}"></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">메뉴 카테고리</label>
-                <select name="storemenuCategory" class="form-select form-control">
-                    <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
-                    <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
-                    <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
-                    <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
-                </select>
-            </div>
-            <!--기존 옵션 리스트-->
-            <div class="mb-3">
-                <label class="form-label">메뉴 옵션 리스트</label>
-                <div th:each="option:${data.storemenuOptionDTOList}">
-                    <div class="mb-3">
-                        <label class="form-label">옵션 이름</label>
-                        <input type="text" class="form-control" th:value="${option.storemenuOptionName}">
+                <!-- 이미지 업로드 -->
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2 d-flex align-items-center justify-content-center" style="width: 103px; height: 132px; margin: auto;">
+                        <img th:if="${data.storemenuImgMeta != null}" th:src="@{${data.storemenuImgMeta}}" style="width: 100%; height: 100%; object-fit: contain;" id="pictureTemp">
+                        <img th:unless="${data.storemenuImgMeta != null}" th:src="@{/store/menu/default.png}" style="width: 100%; height: 100%; object-fit: contain;" id="pictureTemp">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">옵션 가격</label>
-                        <input type="text" class="form-control" th:value="${option.storemenuOptionPrice}">
-                    </div>
-                    <div class="mb-3">
-                        <button>삭제</button>
+                    <p class="file-name">변경할 이미지를 선택하세요.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
+                    <input type="file" id="adminProfile" name="storemenuImg" class="d-none" accept=".webp, .png, .jpeg, .jpg, .gif">
+                    <small id="fileError" class="text-danger d-none">올바른 파일이 선택되지 않았습니다.</small>
+                </div>
+
+                <!-- hidden fields -->
+                <input type="hidden" name="storemenuStatus" th:value="${data.storemenuStatus}">
+                <input type="hidden" name="storemenuNum" th:value="${data.storemenuNum}">
+                <input type="hidden" name="storeNum" th:value="${data.storeNum}">
+
+                <!-- 메뉴 정보 -->
+                <div class="mb-3">
+                    <label class="form-label">메뉴 카테고리</label>
+                    <select name="storemenuCategory" class="form-select">
+                        <option value="main" th:selected="${data.storemenuCategory == 'main'}">메인</option>
+                        <option value="side" th:selected="${data.storemenuCategory == 'side'}">사이드</option>
+                        <option value="drink" th:selected="${data.storemenuCategory == 'drink'}">음료</option>
+                        <option value="plus" th:selected="${data.storemenuCategory == 'plus'}">추가</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 이름</label>
+                    <input type="text" class="form-control" name="storemenuName" th:value="${data.storemenuName}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 가격</label>
+                    <input type="number" class="form-control" name="storemenuPrice" th:value="${data.storemenuPrice}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">메뉴 설명</label>
+                    <textarea class="form-control" name="storemenuContent" placeholder="용량 또는 크기 등을 꼭 기입해주세요." th:text="${data.storemenuContent}"></textarea>
+                </div>
+
+                <!-- 기존 옵션 리스트 -->
+                <div class="mb-3">
+                    <label class="form-label">메뉴 옵션 리스트</label>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="card p-3 bg-white border" th:each="option : ${data.storemenuOptionDTOList}" style="width: 100%;">
+                            <div class="row align-items-center g-2">
+                                <div class="col-md-5">
+                                    <label class="form-label mb-1">옵션 이름</label>
+                                    <input type="text" class="form-control" th:value="${option.storemenuOptionName}" name="existingOptionNames" readonly>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label mb-1">옵션 가격</label>
+                                    <input type="number" class="form-control" th:value="${option.storemenuOptionPrice}" name="existingOptionPrices" readonly>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-danger btn-sm ms-4">삭제</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="mb-3 d-grid">
-                <button type="button" class="btn btn-outline-primary" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
-            </div>
-            <div class="mb-3" id="storemenuOptionInputs"></div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">저장</button>
-                <a th:href="@{'/admin/store/menu/read/'+${data.storemenuNum}}" class="btn btn-dark">취소</a>
-            </div>
-            <div class="text-end mt-4">
-                <a th:href="@{'/admin/store/menu/delete/'+${data.storemenuNum}}" class="btn btn-danger">삭제</a>
+
+
+
+
+
+                <!-- 동적 옵션 추가 -->
+                <div class="mb-3 d-grid">
+                    <button type="button" class="btn btn-outline-primary" onclick="addStoreMenuOptionInputs()">메뉴 옵션 추가하기</button>
+                </div>
+                <div class="mb-3" id="storemenuOptionInputs"></div>
+
+                <!-- 버튼 -->
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    <a th:href="@{'/admin/store/menu/read/' + ${data.storemenuNum}}" class="btn btn-dark">취소</a>
+                </div>
             </div>
         </form>
     </div>
 
+    <!-- SCRIPT -->
     <script th:inline="javascript">
         let indexNum = [[${#lists.size(data.storemenuOptionDTOList)}]];
 
         function addStoreMenuOptionInputs() {
-            let strs = `<div class="storemenuOption${indexNum} option-inputs">
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 이름</span>
-                                <input type="text" class="form-control" name="storemenuOptionDTOList[${indexNum}].storemenuOptionName">
-                            </div>
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 가격</span>
-                                <input type="number" class="form-control" name="storemenuOptionDTOList[${indexNum}].storemenuOptionPrice">
-                            </div>
-                            <input hidden type="hidden" name="storemenuOptionDTOList[${indexNum}].storemenuOptionStatus" value="alive">
-                            <div class="mb-3 input-group">
-                                <button type="button" onclick="deleteMenuOptions(${indexNum})" class="btn btn-danger">지우기</button>
-                            </div>
-                        </div>`;
-            document.getElementById("storemenuOptionInputs").insertAdjacentHTML('beforeend', strs);
+            const template = `
+                <div class="storemenuOption${indexNum} option-inputs">
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text">옵션명</span>
+                        <input type="text" class="form-control" name="storemenuOptionDTOList[${indexNum}].storemenuOptionName">
+                    </div>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text">옵션 가격</span>
+                        <input type="number" class="form-control" name="storemenuOptionDTOList[${indexNum}].storemenuOptionPrice">
+                    </div>
+                    <input type="hidden" name="storemenuOptionDTOList[${indexNum}].storemenuOptionStatus" value="alive">
+                    <div class="text-end">
+                          <button type="button" class="btn btn-danger btn-sm" onclick="deleteMenuOptions(${indexNum})">
+                            <i class="fas fa-trash-alt"></i> 지우기
+                          </button>
+                        </div>
+                </div>`;
+            document.getElementById("storemenuOptionInputs").insertAdjacentHTML('beforeend', template);
             indexNum++;
         }
 
@@ -117,54 +136,49 @@
             const optionBlocks = document.querySelectorAll('#storemenuOptionInputs .option-inputs');
             optionBlocks.forEach((block, index) => {
                 block.className = `storemenuOption${index} option-inputs`;
-
-                const nameInput = block.querySelector('[name$=".storemenuOptionName"]');
-                const priceInput = block.querySelector('[name$=".storemenuOptionPrice"]');
-                const statusInput = block.querySelector('[name$=".storemenuOptionStatus"]');
-                const deleteButton = block.querySelector('button');
-
-                if (nameInput) nameInput.name = `storemenuOptionDTOList[${index}].storemenuOptionName`;
-                if (priceInput) priceInput.name = `storemenuOptionDTOList[${index}].storemenuOptionPrice`;
-                if (statusInput) statusInput.name = `storemenuOptionDTOList[${index}].storemenuOptionStatus`;
-                if (deleteButton) deleteButton.setAttribute("onclick", `deleteMenuOptions(${index})`);
+                block.querySelectorAll('input').forEach(input => {
+                    if (input.name.includes("storemenuOptionName")) {
+                        input.name = `storemenuOptionDTOList[${index}].storemenuOptionName`;
+                    } else if (input.name.includes("storemenuOptionPrice")) {
+                        input.name = `storemenuOptionDTOList[${index}].storemenuOptionPrice`;
+                    } else if (input.name.includes("storemenuOptionStatus")) {
+                        input.name = `storemenuOptionDTOList[${index}].storemenuOptionStatus`;
+                    }
+                });
+                const deleteBtn = block.querySelector('button');
+                if (deleteBtn) deleteBtn.setAttribute('onclick', `deleteMenuOptions(${index})`);
             });
-
             indexNum = optionBlocks.length;
         }
 
-        // 프로필 사진
-        document.getElementById('adminProfile').addEventListener('change', function () {
-            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-            const filePath = this.value;
-            const errorMessage = document.getElementById('fileError');
-            const previewImage = document.getElementById('pictureTemp');
-            const file = this.files[0];
+        // 이미지 업로드
+        const fileInput = document.getElementById('adminProfile');
+        const fileNameDisplay = document.querySelector('.file-name');
+        const fileError = document.getElementById('fileError');
+        const preview = document.getElementById('pictureTemp');
 
-            if (!allowedExtensions.exec(filePath)) {
-                this.value = '';
-                errorMessage.classList.remove('d-none');
-                previewImage.classList.add('d-none');
-            } else {
-                errorMessage.classList.add('d-none');
+        document.getElementById('PictureBtn').addEventListener('click', () => fileInput.click());
 
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.remove('d-none');
-                    };
-                    reader.readAsDataURL(file);
-                }
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            const allowedExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
+
+            if (!file || !allowedExtensions.test(file.name)) {
+                fileInput.value = '';
+                fileError.classList.remove('d-none');
+                preview.classList.add('d-none');
+                fileNameDisplay.textContent = "사진이 선택되지 않았습니다.";
+                return;
             }
-        });
 
-        document.getElementById('PictureBtn').addEventListener('click', function () {
-            document.getElementById('adminProfile').click();
-        });
-
-        document.getElementById('adminProfile').addEventListener('change', function () {
-            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-            document.querySelector('.file-name').textContent = fileName;
+            fileError.classList.add('d-none');
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+            fileNameDisplay.textContent = file.name;
         });
     </script>
 </div>

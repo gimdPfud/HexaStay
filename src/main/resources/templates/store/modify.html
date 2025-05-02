@@ -1,81 +1,84 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>외부업체 정보수정</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>요식업체 정보수정</title>
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
-        <h2 class="text-center mb-4">외부업체 수정</h2>
+
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">요식업체 수정</h2>
+
         <form action="/admin/store/modify" method="post" enctype="multipart/form-data">
+            <div class="container p-4" style="max-width: 700px;">
+                <input type="hidden" name="storeNum" th:value="${data.storeNum}">
+                <input type="hidden" name="storeStatus" value="alive">
+                <input type="hidden" id="storeLatitude" name="storeLatitude" th:value="${data.storeLatitude}">
+                <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}">
+                <input type="hidden" id="originalAddress" th:value="${data.storeAddress}">
+                <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
+                <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
 
-            <input type="hidden" name="storeNum" th:value="${data.storeNum}">
-            <input type="hidden" name="storeStatus" value="alive">
-            <input type="hidden" id="storeLatitude" name="storeLatitude" th:value="${data.storeLatitude}">
-            <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}">
-            <input type="hidden" id="originalAddress" th:value="${data.storeAddress}">
-            <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
-            <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
-
-            <div class="mb-3 user-box text-center">
-                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
-                    <img id="pictureTemp" th:if="${data.storeProfileMeta != null}" th:src="@{${data.storeProfileMeta}}"
-                         style="width: 100%; height: 100%; object-fit: contain;" />
-                    <img id="pictureTemp" th:unless="${data.storeProfileMeta != null}" th:src="@{'/store/default.png'}"
-                         style="width: 100%; height: 100%; object-fit: contain;" />
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" th:if="${data.storeProfileMeta != null}" th:src="@{${data.storeProfileMeta}}"
+                             style="width: 100%; height: 100%; object-fit: contain;" />
+                        <img id="pictureTemp" th:unless="${data.storeProfileMeta != null}" th:src="@{'/store/default.png'}"
+                             style="width: 100%; height: 100%; object-fit: contain;" />
+                    </div>
+                    <p class="file-name">이미지가 선택되지 않았습니다.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="storeProfile"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" th:value="${data.storeProfile}">
+                    <small id="fileError" class="text-danger d-none">
+                        <br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.
+                    </small>
                 </div>
-                <p class="file-name">사진이 선택되지 않았습니다.</p>
-                <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
-                <input hidden type="file" id="adminProfile" name="storeProfile"
-                       accept=".webp, .png, .jpeg, .jpg, .gif" th:value="${data.storeProfile}">
-                <small id="fileError" class="text-danger d-none">
-                    <br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.
-                </small>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">가게 이름</label>
-                <input type="text" class="form-control" name="storeName" th:value="${data.storeName}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">가게 전화 번호</label>
-                <input type="text" class="form-control" name="storePhone" th:value="${data.storePhone}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">가게 주소</label>
-                <div class="input-group">
-                    <input style="background-color: #ced4da;" readonly
-                           type="text" id="storeAddress" class="form-control" name="storeAddress"
-                           th:value="${data.storeAddress}" required>
-                    <button class="btn btn-outline-secondary" type="button" onclick="showMapBox()">주소 검색</button>
+                <div class="mb-3">
+                    <label class="form-label">가게명</label>
+                    <input type="text" class="form-control" name="storeName" th:value="${data.storeName}" required>
                 </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">가게 대표자명</label>
-                <input type="text" class="form-control" name="storeCeoName" th:value="${data.storeCeoName}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">가게 패스워드</label>
-                <input type="text" class="form-control" name="storePassword" th:value="${data.storePassword}" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label d-block">카테고리</label>
-                <div th:each="cat : ${storeCategoryList}" class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="storeCategory"
-                           th:id="${cat}" th:value="${cat}" th:checked="${data.storeCategory == cat}">
-                    <label class="form-check-label" th:for="${cat}" th:text="${cat}"></label>
+                <div class="mb-3">
+                    <label class="form-label">가게 전화 번호</label>
+                    <input type="text" class="form-control" name="storePhone" th:value="${data.storePhone}" required>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">가게 주소</label>
+                    <div class="input-group">
+                        <input style="background-color: #ced4da;" readonly
+                               type="text" id="storeAddress" class="form-control" name="storeAddress"
+                               th:value="${data.storeAddress}" required>
+                        <button class="btn btn-outline-secondary" type="button" onclick="showMapBox()">주소 검색</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">가게 대표자명</label>
+                    <input type="text" class="form-control" name="storeCeoName" th:value="${data.storeCeoName}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">가게 패스워드</label>
+                    <input type="text" class="form-control" name="storePassword" th:value="${data.storePassword}" required>
+                </div>
 
-            <div class="d-flex justify-content-center gap-3">
-                <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">저장</button>
-                <a th:href="@{'/admin/store/read/' + ${data.storeNum}}" class="btn btn-danger">취소</a>
+                <div class="mb-3">
+                    <label class="form-label d-block">카테고리</label>
+                    <div class="text-center">
+                        <div th:each="cat : ${storeCategoryList}" class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="storeCategory"
+                                   th:id="${cat}" th:value="${cat}" th:checked="${data.storeCategory == cat}">
+                            <label class="form-check-label" th:for="${cat}" th:text="${cat}"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">저장</button>
+                    <a th:href="@{'/admin/store/read?idid=' + ${data.storeNum}}" class="btn btn-danger">취소</a>
+                </div>
             </div>
         </form>
     </div>
