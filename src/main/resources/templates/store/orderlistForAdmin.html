@@ -44,7 +44,9 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center">
                             <strong class="me-1">주문 상태</strong>
-                            <span class="badge bg-primary" th:text="${orderDTO.orderstoreStatus}" style="font-weight: normal;"></span>
+                            <span class="badge"
+                                  th:classappend="${orderDTO.orderstoreStatus.equals('paid') ? ' bg-primary' : orderDTO.orderstoreStatus.equals('end') ? ' bg-success' : orderDTO.orderstoreStatus.equals('cancel') ? ' bg-secondary' : ' bg-danger'}"
+                                  th:text="${orderDTO.orderstoreStatus}" style="font-weight: normal;"></span>
                         </div>
                         <div>
                             <button type="button" class="btn btn-sm btn-danger me-2"
