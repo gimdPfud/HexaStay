@@ -297,7 +297,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
             }
             option.setRoomMenuOptionName(dto.getRoomMenuOptionName());
             option.setRoomMenuOptionPrice(dto.getRoomMenuOptionPrice());
-            option.setRoomMenuOptionStock(dto.getRoomMenuOptionStock()); //
+            option.setRoomMenuOptionAmount(dto.getRoomMenuOptionAmount()); //
             roomMenuOptionRepository.save(option);
         }
 

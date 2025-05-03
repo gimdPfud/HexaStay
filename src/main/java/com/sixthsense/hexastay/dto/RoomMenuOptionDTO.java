@@ -19,7 +19,7 @@ public class RoomMenuOptionDTO {
 
     private int roomMenuOptionPrice;
 
-    private int roomMenuOptionStock;
+    private int roomMenuOptionAmount;
 
     private Long roomMenuNum; // 룸메뉴의 관계키
 
@@ -32,13 +32,13 @@ public class RoomMenuOptionDTO {
         if (o == null || getClass() != o.getClass()) return false;
         RoomMenuOptionDTO that = (RoomMenuOptionDTO) o;
         return roomMenuOptionPrice == that.roomMenuOptionPrice &&
-                roomMenuOptionStock == that.roomMenuOptionStock &&
+                getRoomMenuOptionAmount() == that.getRoomMenuOptionAmount() &&
                 Objects.equals(roomMenuOptionName, that.roomMenuOptionName);
     }
 
     // === hashCode() 재정의 ===
     @Override
     public int hashCode() {
-        return Objects.hash(roomMenuOptionName, roomMenuOptionPrice, roomMenuOptionStock);
+        return Objects.hash(roomMenuOptionName, roomMenuOptionPrice, roomMenuOptionAmount);
     }
 }
