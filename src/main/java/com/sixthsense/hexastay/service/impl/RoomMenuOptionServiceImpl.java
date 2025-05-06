@@ -63,7 +63,7 @@ public class RoomMenuOptionServiceImpl implements RoomMenuOptionService {
 
         option.setRoomMenuOptionName(roomMenuOptionDTO.getRoomMenuOptionName());
         option.setRoomMenuOptionPrice(roomMenuOptionDTO.getRoomMenuOptionPrice());
-        option.setRoomMenuOptionStock(roomMenuOptionDTO.getRoomMenuOptionStock()); // 추가
+        option.setRoomMenuOptionAmount(roomMenuOptionDTO.getRoomMenuOptionAmount()); // 추가
         optionRepository.save(option);
         return modelMapper.map(option, RoomMenuOptionDTO.class);
     }
@@ -77,4 +77,11 @@ public class RoomMenuOptionServiceImpl implements RoomMenuOptionService {
         optionRepository.delete(option);
 
     }
-}
+
+    // admin/list에서 삭제 시 옵션 확인하기.
+    @Override
+    public boolean hasOption(Long roomMenuNum) {
+            return optionRepository.existsByRoomMenu_RoomMenuNum(roomMenuNum);
+        }
+    }
+
