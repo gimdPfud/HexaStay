@@ -4,14 +4,20 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>마이페이지</title>
+    <title>회원 수정</title>
+    <style>
+        .readonly-style {
+            background-color: #e9ecef !important;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">마이페이지</h2>
+        <h2 class="fw-bold mb-4 text-center">회원 수정</h2>
 
         <form th:action="@{/admin/mypage}" method="post" enctype="multipart/form-data" th:object="${adminDTO}">
             <div class="container p-4" style="max-width: 700px;">
@@ -29,17 +35,17 @@
 
                 <div class="mb-3">
                     <label class="form-label">사번</label>
-                    <input type="text" th:field="*{adminEmployeeNum}" class="form-control" readonly>
+                    <input type="text" th:field="*{adminEmployeeNum}" class="form-control readonly-style" readonly>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
-                    <input type="email" th:field="*{adminEmail}" class="form-control" readonly th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                    <input type="email" th:field="*{adminEmail}" class="form-control readonly-style" readonly th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이름</label>
-                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                    <input type="text" th:field="*{adminName}" class="form-control readonly-style" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
                 </div>
 
@@ -47,23 +53,23 @@
                     <label class="form-label">주민등록번호</label>
                     <div class="row g-2">
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly text-center" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly readonly-style" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN' && adminDTO.adminRole != 'EXEC' && adminDTO.adminRole != 'HEAD'}">
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly text-center" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly readonly-style" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN' && adminDTO.adminRole != 'EXEC' && adminDTO.adminRole != 'HEAD'}">
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">가게 주소</label>
+                    <label class="form-label">주소</label>
                     <div class="row g-2">
                         <div class="col-auto">
-                            <input type="text" id="adminAddressOne" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                            <input type="text" id="adminAddressOne" class="form-control readonly-style" style="width: 120px;" readonly required>
                         </div>
                         <div class="col">
-                            <input type="text" id="adminAddressTwo" class="form-control" style="background-color: #ced4da;" readonly required>
+                            <input type="text" id="adminAddressTwo" class="form-control readonly-style" readonly required>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-outline-secondary" onclick="showMapBox()">주소 검색</button>
@@ -96,11 +102,41 @@
                     </div>
                 </div>
 
+
+                <div class="mb-3" th:if="${adminDTO.adminRole == 'EXEC' or adminDTO.adminRole == 'SUPERADMIN' or
+                adminDTO.adminRole == 'HEAD' or adminDTO.adminRole == 'GM' or adminDTO.adminRole == 'MGR'}">
+                    <label class="form-label">직급</label>
+
+                    <select class="form-select" id="adminCenterRank"
+                            th:if="${adminDTO.adminRole == 'EXEC' or adminDTO.adminRole == 'HEAD' or adminDTO.adminRole == 'SUPERADMIN'}">
+                        <option value="EXEC" th:selected="${adminDTO.adminRole == 'EXEC'}">임원진</option>
+                        <option value="HEAD" th:selected="${adminDTO.adminRole == 'HEAD'}">팀장</option>
+                        <option value="CREW" th:selected="${adminDTO.adminRole == 'CREW'}">사원</option>
+                    </select>
+
+                    <select class="form-select" id="adminBranchRank"
+                            th:if="${adminDTO.adminRole == 'GM' or adminDTO.adminRole == 'SUPERADMIN'}">
+                        <option value="GM" th:selected="${adminDTO.adminRole == 'GM'}">총괄 책임자</option>
+                        <option value="SV" th:selected="${adminDTO.adminRole == 'SV'}">관리자</option>
+                        <option value="AGENT" th:selected="${adminDTO.adminRole == 'AGENT'}">사원</option>
+                        <option value="PARTNER" th:selected="${adminDTO.adminRole == 'PARTNER'}">협력 업체</option>
+                    </select>
+
+                    <select class="form-select" id="adminStoreRank"
+                            th:if="${adminDTO.adminRole == 'MGR' or adminDTO.adminRole == 'SUPERADMIN'}">
+                        <option value="MGR" th:selected="${adminDTO.adminRole == 'MGR'}">매니저</option>
+                        <option value="SUBMGR" th:selected="${adminDTO.adminRole == 'SUBMGR'}">부매니저</option>
+                        <option value="STAFF" th:selected="${adminDTO.adminRole == 'STAFF'}">매장 직원</option>
+                    </select>
+                </div>
+
+
                 <div class="mb-3">
                     <label class="form-label">직책</label>
                     <input type="text" th:field="*{adminPosition}" class="form-control" th:classappend="${#fields.hasErrors('adminPosition')} ? 'is-invalid'">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminPosition')}" th:errors="*{adminPosition}"></div>
                 </div>
+
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
                     <button type="submit" onclick="submitForm(event)" class="btn btn-success">수정</button>
@@ -110,7 +146,7 @@
             <input hidden type="text" name="adminPassword" class="form-control">
             <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%" th:value="${adminDTO.adminPhone}">
             <input hidden name="adminResidentNum" id="adminResidentNum" th:value="${adminDTO.adminResidentNum}">
-            <input hidden name="adminRole" id="adminRole" th:value="${adminDTO.adminRole}">
+            <input hidden name="adminRole" id="adminRole">
             <input hidden name="adminNum" th:value="${adminDTO.adminNum}">
             <input hidden name="adminProfileMeta" th:value="${adminDTO.adminProfileMeta}">
             <input hidden name="adminEmployeeNum" th:value="${adminDTO.adminEmployeeNum}">
@@ -204,6 +240,7 @@
             }
         });
 
+
         function submitForm(event) {
             event.preventDefault();
 
@@ -246,6 +283,15 @@
             document.getElementById('adminResidentNum').value =
                 document.getElementById('adminResidentNumPartOne').value +
                 document.getElementById('adminResidentNumPartTwo').value;
+
+            // 직급
+            if (document.getElementById('adminCenterRank').value != null) {
+                document.getElementById('adminRole').value = document.getElementById('adminCenterRank').value;
+            } else if (document.getElementById('adminBranchRank').value != null) {
+                document.getElementById('adminRole').value = document.getElementById('adminBranchRank').value;
+            } else if (document.getElementById('adminStoreRank').value != null) {
+                document.getElementById('adminRole').value = document.getElementById('adminStoreRank').value;
+            }
 
             // 폼 제출
             if (isValid) {
