@@ -24,7 +24,7 @@ import lombok.ToString;
 public class RoomMenuOrderItemDTO {
 
     //주문아이템
-    private String roomMenuOrderItemNum;
+    private Long roomMenuOrderItemNum;
 
     private Integer roomMenuOrderItemAmount; //주문수량
 
@@ -40,5 +40,6 @@ public class RoomMenuOrderItemDTO {
 
     // 새로 추가한 이미지 필드
     private String roomMenuImageMeta;
+
 
 }

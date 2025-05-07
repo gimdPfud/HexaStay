@@ -60,32 +60,48 @@ public class RoomMenuLikeController {
 
     @GetMapping("/roommenu/orderpage/status/{roomMenuNum}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getRoomMenuLikeStatus(@PathVariable Long roomMenuNum,
-                                                                     @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
-        log.info("룸메뉴 좋아요 조회 컨트롤러 진입");
-        log.info("로그인한 사용자" + customMemberDetails.getMember().getMemberEmail());
+    public ResponseEntity<Map<String, Object>> getRoomMenuLikeStatus(
+            @PathVariable Long roomMenuNum,
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
-        String email = customMemberDetails.getName();
-        RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
+        log.info("룸메뉴 좋아요 조회 컨트롤러 진입 - roomMenuNum: {}", roomMenuNum);
 
-        Optional<RoomMenuLike> optional = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(email, menu);
-
-        boolean liked = false;
-        boolean disliked = false;
-        if (optional.isPresent()) {
-            liked = Boolean.TRUE.equals(optional.get().getRoomMenuLikedCheck());
-            disliked = Boolean.FALSE.equals(optional.get().getRoomMenuLikedCheck());
+        String email = null;
+        if (customMemberDetails != null && customMemberDetails.getMember() != null) {
+            email = customMemberDetails.getMember().getMemberEmail();
+            log.info("로그인한 사용자: {}", email);
+        } else {
+            log.info("비로그인 사용자 또는 사용자 정보를 가져올 수 없음.");
         }
 
-        // 좋아요/싫어요 총 개수
+        // RoomMenu 존재 여부 확인
+        Optional<RoomMenu> optionalMenu = roomMenuRepository.findById(roomMenuNum);
+        if (optionalMenu.isEmpty()) {
+            log.warn("요청된 RoomMenu ID {}를 찾을 수 없습니다.", roomMenuNum);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "메뉴를 찾을 수 없습니다.", "roomMenuNum", roomMenuNum));
+        }
+        RoomMenu menu = optionalMenu.get();
+
+        boolean liked = false;
+
+        // 로그인한 사용자만 개인의 '좋아요' 상태를 조회
+        if (email != null) {
+            Optional<RoomMenuLike> optionalLike = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(email, menu);
+            if (optionalLike.isPresent()) {
+                RoomMenuLike likeInfo = optionalLike.get();
+                // RoomMenuLike 엔티티의 roomMenuLikedCheck 필드가 Boolean 타입이라고 가정
+                liked = Boolean.TRUE.equals(likeInfo.getRoomMenuLikedCheck());
+
+            }
+        }
+
+        // 메뉴의 총 좋아요/싫어요 개수 (이 부분은 로그인 여부와 관계없이 계산)
         Long likeCount = roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, true);
-        Long dislikeCount = roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, false);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("liked", liked);
-        response.put("disliked", disliked);
+        response.put("liked", liked); // 비로그인 시에는 false
         response.put("likeCount", likeCount);
-        response.put("dislikeCount", dislikeCount);
 
         return ResponseEntity.ok(response);
     }
