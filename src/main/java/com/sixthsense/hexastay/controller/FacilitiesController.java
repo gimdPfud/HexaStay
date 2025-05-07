@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
 import com.sixthsense.hexastay.service.ZzService;
@@ -36,6 +37,7 @@ public class FacilitiesController {
     private final FsService fsService;
     private final ZzService zzService;
     private final CompanyService companyService;
+    private final AdminService adminService;
     /*
      * 메소드명 :
      * 인수 값 :
@@ -113,6 +115,7 @@ public class FacilitiesController {
         if(principal==null){
             return "redirect:/cart/qr";}
         Long companyNum = 0L;
+        Long adminNum = adminService.adminFindEmail(principal.getName()).getAdminNum();
         try {
             companyNum = zzService.sessionToCompany(session).getCompanyNum();
             log.info("컴퍼니넘 : "+companyNum);
@@ -120,7 +123,7 @@ public class FacilitiesController {
             log.info("오류발생");
             return "redirect:/main";
         }
-        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null, companyNum ,pageable);
+        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null, companyNum, adminNum, pageable);
         model.addAttribute("list",list);
         return "facilities/mobile/list";
     }

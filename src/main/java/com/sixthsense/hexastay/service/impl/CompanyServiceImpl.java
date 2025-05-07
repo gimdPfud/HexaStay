@@ -132,22 +132,39 @@ public class CompanyServiceImpl implements CompanyService {
 
     // 검색용
     @Override
-    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable) {
-        // 소속만 선택하고 검색 조건/키워드가 없을 때
-        if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
-            if (choice == null || choice.isEmpty()) {
-                // 전체 선택 시
-                return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, null, pageable)
-                        .map(this::convertToCompanyDTO);
-            } else {
-                // 특정 타입 선택 시
-                return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
-                        .map(this::convertToCompanyDTO);
-            }
-        }
+    public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Long adminNum, Pageable pageable) {
 
-        // 검색 조건 + 키워드가 있을 때
-        Page<Company> companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
+        Page<Company> companyPage = null;
+
+        if (adminRepository.findByAdminNum(adminNum).getAdminRole().equals("SUPERADMIN")) {
+            if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
+                if (choice == null || choice.isEmpty()) {
+                    return companyRepository.findAllIgnoringCompanyNum(null, pageable)
+                            .map(this::convertToCompanyDTO);
+                } else {
+                    return companyRepository.findAllIgnoringCompanyNum(choice, pageable)
+                            .map(this::convertToCompanyDTO);
+                }
+            }
+            companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
+        } else {
+
+            // 소속만 선택하고 검색 조건/키워드가 없을 때
+            if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
+                if (choice == null || choice.isEmpty()) {
+                    // 전체 선택 시
+                    return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, null, pageable)
+                            .map(this::convertToCompanyDTO);
+                } else {
+                    // 특정 타입 선택 시
+                    return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
+                            .map(this::convertToCompanyDTO);
+                }
+            }
+
+            // 검색 조건 + 키워드가 있을 때
+            companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
+        }
         return companyPage.map(this::convertToCompanyDTO);
     }
 

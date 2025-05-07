@@ -105,7 +105,7 @@
 
                     <div class="modal-body">
 
-                        <ul class="list-group" th:if="${adminDTOList != null and not #lists.isEmpty(adminDTOList)}" th:each="admin : ${adminDTOList}">
+                        <ul class="list-group" th:if="${adminDTOList != null and not #lists.isEmpty(adminDTOList)}">
                             <li class="list-group-item"
                                 th:each="admin : ${adminDTOList}"
                                 th:attr="data-name=${admin.adminName},
@@ -130,6 +130,8 @@
                         <div th:if="${adminDTOList == null or #lists.isEmpty(adminDTOList)}" class="text-center">
                             등록된 직원이 없습니다.
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -191,9 +193,7 @@
                 list.appendChild(li);
             });
         }
-    </script>
 
-<script>
     document.addEventListener('DOMContentLoaded', function () {
         const modalElement = document.getElementById('employeeModal');
         const listGroup = modalElement.querySelector('.list-group');
