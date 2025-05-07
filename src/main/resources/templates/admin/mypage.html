@@ -4,14 +4,20 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>마이페이지</title>
+    <title>회원 수정</title>
+    <style>
+        .readonly-style {
+            background-color: #e9ecef !important;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">마이페이지</h2>
+        <h2 class="fw-bold mb-4 text-center">회원 수정</h2>
 
         <form th:action="@{/admin/mypage}" method="post" enctype="multipart/form-data" th:object="${adminDTO}">
             <div class="container p-4" style="max-width: 700px;">
@@ -29,17 +35,17 @@
 
                 <div class="mb-3">
                     <label class="form-label">사번</label>
-                    <input type="text" th:field="*{adminEmployeeNum}" class="form-control" readonly>
+                    <input type="text" th:field="*{adminEmployeeNum}" class="form-control readonly-style" readonly>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
-                    <input type="email" th:field="*{adminEmail}" class="form-control" readonly th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                    <input type="email" th:field="*{adminEmail}" class="form-control readonly-style" readonly th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이름</label>
-                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                    <input type="text" th:field="*{adminName}" class="form-control readonly-style" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
                 </div>
 
@@ -47,23 +53,23 @@
                     <label class="form-label">주민등록번호</label>
                     <div class="row g-2">
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly text-center" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartOne" class="form-control readonly-style" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly text-center" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartTwo" class="form-control readonly-style" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">가게 주소</label>
+                    <label class="form-label">주소</label>
                     <div class="row g-2">
                         <div class="col-auto">
-                            <input type="text" id="adminAddressOne" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                            <input type="text" id="adminAddressOne" class="form-control readonly-style" style="width: 120px;" readonly required>
                         </div>
                         <div class="col">
-                            <input type="text" id="adminAddressTwo" class="form-control" style="background-color: #ced4da;" readonly required>
+                            <input type="text" id="adminAddressTwo" class="form-control readonly-style" readonly required>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-outline-secondary" onclick="showMapBox()">주소 검색</button>
