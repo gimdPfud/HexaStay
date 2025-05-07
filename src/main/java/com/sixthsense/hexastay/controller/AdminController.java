@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,6 +42,9 @@ public class AdminController {
     private final AdminService adminService;
     private final CompanyService companyService;
     private final AdminRepository adminRepository;
+    private final CompanyRepository companyRepository;
+    private final StoreRepository storeRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     // 시큐리티 체크
@@ -123,8 +128,13 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
+        log.info("컴퍼니 들어왓나?" + adminDTO.getCompanyNum());
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> {
+                log.error("유효성 검사 오류: {}", error.getDefaultMessage());
+            });
+
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
             model.addAttribute("companyList", companyList);
             return "admin/insert";
@@ -141,11 +151,14 @@ public class AdminController {
 
         try {
             adminDTO.setAdminActive("INACTIVE");
+            adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
             adminService.insertAdmin(adminDTO);
             return "redirect:/admin/list";
+
         } catch (IOException e) {
-            log.error("파일 업로드 중 오류 발생", e);
-            model.addAttribute("error", "파일 업로드 중 오류가 발생했습니다.");
+
+            log.error("회원 가입 중, 오류 발생", e);
+            model.addAttribute("error", "회원 가입 중, 오류가 발생했습니다.");
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
             model.addAttribute("companyList", companyList);
             return "admin/insert";

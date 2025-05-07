@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum AdminRole {
+    SUPERADMIN("슈퍼어드민"),
     //본사
     EXEC("임원진"),
     HEAD("매니저"),
