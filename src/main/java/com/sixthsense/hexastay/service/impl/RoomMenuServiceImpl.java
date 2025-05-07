@@ -41,6 +41,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomMenuOptionRepository roomMenuOptionRepository;
     private final RoomMenuLikeRepository roomMenuLikeRepository;
+    private final RoomMenuOrderItemRepository roomMenuOrderItemRepository;
 
 
     /**************************************************
