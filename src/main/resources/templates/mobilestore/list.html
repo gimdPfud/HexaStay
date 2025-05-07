@@ -104,7 +104,10 @@
             object-fit: cover;
             border-radius: 10px;
         }
-        .text-info { flex: 1; }
+        .text-info {
+            flex: 1;
+            padding-left: 10px;
+        }
         .store-name {
             font-size: 1.2rem;
             font-weight: bold;
@@ -187,27 +190,30 @@
         </div>
         <ul class="store-list card-list">
             <li th:each="store : ${list}" class="store-item" th:attr="data-category=${store.storeCategory}">
-                <div class="div-card">
-                    <a th:href="@{'/member/store/read/'+${store.storeNum}}" style="text-decoration: none; color: inherit;">
+                <a th:href="@{'/member/store/read/'+${store.storeNum}}" style="text-decoration: none; color: inherit;">
+                    <div class="div-card" style="display: block; width: 100%;">
                         <div class="inner-wrapper">
-                            <div class="d-flex">
+                            <div class="d-flex justify-content-center align-items-center">
                                 <div class="menu-image-container" >
                                     <img th:if="${store.storeProfileMeta != null}" th:src="@{${store.storeProfileMeta}}" class="store-image">
                                     <img th:unless="${store.storeProfileMeta != null}" th:src="@{/store/default.png}" class="store-image">
                                 </div>
+
                                 <div class="text-info">
                                     <span class="menu-badge" th:text="${store.storeCategory}"></span>
                                     <p class="store-name" th:text="${store.storeName}"></p>
                                     <p class="store-content" th:text="${store.storeAddress}"></p>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="like-section">
+                                            <span th:id="'likeIcon-' + ${store.storeNum}" th:attr="onclick='toggleLike(' + ${store.storeNum} + ', event)'" class="like-icon">🤍</span>
+                                            <span th:id="${store.storeNum}" class="like-count">0</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </a>
-                    <div class="like-section">
-                        <span th:id="'likeIcon-' + ${store.storeNum}" th:attr="onclick='toggleLike(' + ${store.storeNum} + ', event)'" class="like-icon">🤍</span>
-                        <span th:id="${store.storeNum}" class="like-count">0</span>
                     </div>
-                </div>
+                </a>
             </li>
         </ul>
     </div>
