@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
@@ -28,10 +27,10 @@
                     <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
 
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">사번</label>-->
-<!--                    <input readonly type="text" inputmode="numeric" name="adminEmployeeNum" class="form-control numberOnly" maxlength="8">-->
-<!--                </div>-->
+                <!--                <div class="mb-3">-->
+                <!--                    <label class="form-label">사번</label>-->
+                <!--                    <input readonly type="text" inputmode="numeric" name="adminEmployeeNum" class="form-control numberOnly" maxlength="8">-->
+                <!--                </div>-->
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
@@ -164,7 +163,6 @@
                     <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
-            <input hidden type="text" name="adminPassword" class="form-control">
             <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             <input hidden name="companyNum" id="companyNum">
             <input hidden name="storeNum" id="storeNum">
@@ -312,14 +310,14 @@
 
         function submitForm(event) {
             event.preventDefault();
-            
+
             // 필수 입력 필드 검사
             const requiredFields = {
                 'adminEmail': '이메일',
                 'adminName': '이름',
                 'adminResidentNumPartOne': '주민등록번호 앞자리',
                 'adminResidentNumPartTwo': '주민등록번호 뒷자리',
-                'adminAddress': '주소',
+                'adminAddressOne': '주소',
                 'adminPhonePartOne': '연락처 앞자리',
                 'adminPhonePartTwo': '연락처 중간자리',
                 'adminPhonePartThree': '연락처 뒷자리',
@@ -374,23 +372,24 @@
             switch (adminChoice) {
                 case "본사":
                     document.getElementById("adminRole").value = adminCenterRank.value;
-                    companyNum.value = adminCenter.value;
+                    companyNum.value = adminCenter;
                     storeNum.value = "";
                     break;
                 case "지점":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
+                    companyNum.value = adminBranchFacility;
                     storeNum.value = "";
                     break;
                 case "외부시설":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
+                    companyNum.value = adminBranchFacility;
                     storeNum.value = "";
                     break;
                 case "스토어":
                     document.getElementById("adminRole").value = adminStoreRank.value;
                     companyNum.value = "";
-                    storeNum.value = adminStore.value;
+                    storeNum.value = adminStore;
+
                     break;
             }
 
@@ -409,8 +408,8 @@
 
             // 주소 결합
             document.getElementById('adminAddress').value =
-            document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
-            + "\u00A0" + document.getElementById('adminAddressThree').value;
+                document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
+                + "\u00A0" + document.getElementById('adminAddressThree').value;
 
             // 폼 제출
             event.target.form.submit();

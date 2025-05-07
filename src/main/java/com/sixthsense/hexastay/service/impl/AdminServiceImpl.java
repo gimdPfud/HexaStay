@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.AdminService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +40,24 @@ public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
     private final StoreRepository storeRepository;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final CompanyRepository companyRepository;
+
+    @PostConstruct
+    public void init() {
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT)
+                .setPropertyCondition(context -> context.getSource() != null);
+        
+        // Company와 Store 객체가 null이 아닌 경우에만 매핑
+        modelMapper.createTypeMap(AdminDTO.class, Admin.class)
+                .addMappings(mapper -> {
+                    mapper.skip(Admin::setCompany);
+                    mapper.skip(Admin::setStore);
+                });
+
+    }
 
     // 리스트 페이지용
 
@@ -57,6 +73,7 @@ public class AdminServiceImpl implements AdminService {
             Long storeNum = admin.getStore().getStoreNum();
             adminList = adminRepository.findByStore_StoreNum(storeNum, pageable);
         }
+
         return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
     }
 
@@ -90,41 +107,54 @@ public class AdminServiceImpl implements AdminService {
     // 가입
     @Override
     public void insertAdmin(AdminDTO adminDTO) throws IOException {
-        adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
-
-        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
-            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
-            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            adminDTO.setAdminProfileMeta("/profile/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
-        }
 
         //사번 자동증분
         String yearPrefix = String.valueOf(Year.now().getValue()).substring(2);
         String maxEmpNum = adminRepository.findMaxEmpNumStartingWith(yearPrefix + "%");
         int nextSeq = 1;
+        if (maxEmpNum != null) {
             int lastSeq = Integer.parseInt(maxEmpNum.substring(2)); // 뒤 6자리
             nextSeq = lastSeq + 1;
-            String employeeNum = yearPrefix + String.format("%06d", nextSeq);
+        }
+        String employeeNum = yearPrefix + String.format("%06d", nextSeq);
         adminDTO.setAdminEmployeeNum(employeeNum);
 
+        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
+            log.info("프로필 사진 업로드 시작");
+            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
 
-        // 이제 저변환하고 저장
-        Admin admin = modelMapper.map(adminDTO, Admin.class);
-        if (adminDTO.getCompanyNum() != null) {
-            admin.getCompany().setCompanyNum(adminDTO.getCompanyNum());
-        } else if (adminDTO.getStoreNum() != null) {
-            admin.getStore().setStoreNum(adminDTO.getStoreNum());
+
+            // 프로필 메타 경로 설정
+            String profileMetaPath = "/profile/" + fileName;
+            log.info("설정된 프로필 메타 경로: {}", profileMetaPath);
+
+            // 파일 저장
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            Path filePath = uploadPath.resolve(fileName);
+            log.info("프로필 사진 저장 경로: {}", filePath);
+            adminDTO.getAdminProfile().transferTo(filePath.toFile());
+
+            // Admin 엔티티 생성 전에 메타 경로 설정
+            adminDTO.setAdminProfileMeta(profileMetaPath);
+            log.info("프로필 사진 업로드 완료");
         }
 
+
+        // 이제 변환하고 저장
+        Admin admin = modelMapper.map(adminDTO, Admin.class);
+        if (adminDTO.getCompanyNum() != null) {
+            admin.setCompany(companyRepository.findById(adminDTO.getCompanyNum()).orElseThrow(() -> new EntityNotFoundException("Company 존재하지 않음 : " + adminDTO.getCompanyNum())));
+        } else if (adminDTO.getStoreNum() != null) {
+            admin.setStore(storeRepository.findById(adminDTO.getStoreNum()).orElseThrow(() -> new EntityNotFoundException("Store 존재하지 않음 : " + adminDTO.getStoreNum())));
+        }
+
+        // 프로필 메타 경로가 제대로 설정되었는지 확인
         adminRepository.save(admin);
     }
 
@@ -136,7 +166,7 @@ public class AdminServiceImpl implements AdminService {
         log.info("INACTIVE 상태의 회원 수: {}", adminList.size());
         
         if (adminList.isEmpty()) {
-            log.warn("INACTIVE 상태의 회원이 없습니다. 데이터베이스 쿼리 결과를 확인해주세요.");
+            log.warn("INACTIVE 상태의 회원이 없습니다.");
             return new ArrayList<>();
         }
         
@@ -160,6 +190,7 @@ public class AdminServiceImpl implements AdminService {
         // 계층별 조회 권한 설정
         List<String> allowedRoles = new ArrayList<>();
         switch (role) {
+            case "SUPERADMIN":
             case "EXEC":
             case "GM":
             case "MGR":
@@ -321,7 +352,6 @@ public class AdminServiceImpl implements AdminService {
         if (maxEmpNum != null) {
             int lastSeq = Integer.parseInt(maxEmpNum.substring(2)); // 뒤 6자리
             nextSeq = lastSeq + 1;
-            String employeeNum = yearPrefix + String.format("%06d", nextSeq);
         }
         return yearPrefix + String.format("%06d", nextSeq);
     }
