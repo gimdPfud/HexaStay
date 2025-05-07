@@ -219,8 +219,14 @@
             });
         });
 
+        // adminOrderList.html의 <script> 태그 내에 이 함수를 배치하거나 수정합니다.
+
         function handleConfirm(actionType) {
+            console.log("handleConfirm 함수 시작. actionType:", actionType);
+
             const checkedOrders = [];
+            // 성공 시 UI 업데이트를 위해 필요한 정보를 담을 배열
+            const itemsToUpdateOnSuccess = [];
 
             // tbody의 모든 체크박스를 순회
             document.querySelectorAll('tbody input[type="checkbox"]').forEach(checkbox => {
@@ -230,51 +236,126 @@
                     const orderId = parseInt(orderIdStr, 10);
 
                     if (isNaN(orderId)) {
-                        console.error("유효하지 않은 주문번호입니다: " + orderIdStr);
+                        console.error("유효하지 않은 주문번호입니다:", orderIdStr);
                     } else {
                         checkedOrders.push(orderId);
-                    }
-
-                    // 주문 접수(ACCEPT)인 경우, 상태 셀 업데이트 후 행 유지
-                    if (actionType === 'ACCEPT') {
-                        const statusCell = row.querySelector("td:nth-child(3)");
-                        if (statusCell) {
-                            statusCell.textContent = "ACCEPT";
-                        }
-                    } else {
-                        // COMPLETE나 CANCEL인 경우엔 행 제거
-                        row.remove();
+                        // UI 업데이트를 위해 행, 액션, 체크박스 정보 저장
+                        itemsToUpdateOnSuccess.push({ row: row, action: actionType, checkbox: checkbox });
                     }
                 }
             });
 
+            console.log("선택된 주문 ID 목록 (checkedOrders):", checkedOrders);
+
             if (checkedOrders.length === 0) {
                 alert("선택된 주문이 없습니다.");
+                console.log("선택된 주문이 없어 함수 종료.");
                 return;
             }
 
             let url = "";
             switch (actionType) {
-                case 'COMPLETE': url = '/roommenu/complete-orders'; break;
-                case 'CANCEL': url = '/roommenu/cancel-orders'; break;
-                case 'ACCEPT': url = '/roommenu/accept-orders'; break;
+                case 'COMPLETE': url = '/roommenu/admin/orderalert/complete-orders'; break;
+                case 'CANCEL': url = '/roommenu/admin/orderalert/cancel-orders'; break;
+                case 'ACCEPT': url = '/roommenu/admin/orderalert/accept-orders'; break;
+                default:
+                    alert("알 수 없는 작업 유형입니다: " + actionType);
+                    console.error("알 수 없는 작업 유형:", actionType);
+                    return;
             }
+
+            console.log("최종 요청 URL:", url);
+            console.log("요청 Body (JSON으로 변환 전):", checkedOrders);
+
+            console.log("이제 fetch를 호출합니다...");
 
             fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Spring Security CSRF 토큰이 필요하다면 여기에 헤더 추가
+                    // 예: 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
                 body: JSON.stringify(checkedOrders)
-            }).then(res => {
-                if (res.ok) {
-                    alert("처리되었습니다.");
-                } else {
-                    alert("처리 중 오류 발생");
-                }
-            }).catch(error => {
-                console.error(error);
-                alert("요청 실패: " + error);
-            });
+            })
+                .then(response => {
+                    console.log("1. fetch().then() - 응답 객체 수신:", response);
+                    if (!response.ok) {
+                        // 서버 에러 응답 처리 (4xx, 5xx)
+                        return response.json().then(errData => { // 에러 응답도 JSON일 수 있음 (Controller에서 Map으로 반환 시)
+                            const message = (errData && errData.message) ? errData.message : `HTTP error! status: ${response.status}`;
+                            const error = new Error(message);
+                            error.response = response;
+                            error.data = errData;
+                            throw error;
+                        }).catch(() => { // 에러 응답이 JSON이 아닐 경우 (예: 일반 텍스트나 HTML 에러 페이지)
+                            const error = new Error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
+                            error.response = response;
+                            throw error;
+                        });
+                    }
+                    console.log("1.1. 응답 상태 OK, response.json() 호출 시도");
+                    return response.json(); // RoomMenuAdminOrderActionController는 JSON을 반환
+                })
+                .then(data => {
+                    console.log("2. response.json().then() - JSON 데이터 수신:", data);
+                    alert(data.message || "처리가 완료되었습니다."); // Controller에서 보낸 message 사용
+
+                    // ✅ 서버 처리 성공 후 UI 업데이트
+                    itemsToUpdateOnSuccess.forEach(item => {
+                        const statusCell = item.row.querySelector("td:nth-child(4)"); // 상태 셀 (4번째)
+
+                        if (statusCell) { // statusCell이 실제로 존재하는지 확인
+                            if (item.action === 'ACCEPT') {
+                                statusCell.textContent = RoomMenuOrderStatus.ACCEPT;
+                            } else if (item.action === 'COMPLETE') {
+                                statusCell.textContent = RoomMenuOrderStatus.COMPLETE;
+                            } else if (item.action === 'CANCEL') {
+                                statusCell.textContent = RoomMenuOrderStatus.CANCEL;
+                            }
+                        }
+
+                        if (item.checkbox) {
+                            item.checkbox.checked = false; // 처리 후 체크박스 해제
+                        }
+
+                        // "완료" 또는 "취소" 시 행을 제거하는 로직
+                        // (만약 상태만 변경하고 행을 유지하고 싶다면 이 if문을 주석 처리하거나 삭제)
+                        if (item.action === 'COMPLETE' || item.action === 'CANCEL') {
+                            console.log(item.action + " 처리로 행을 제거합니다:", item.row);
+                            item.row.remove();
+                        }
+                    });
+
+                    // 전체 선택 체크박스도 해제 (선택 사항)
+                    const selectAllCheckbox = document.getElementById('selectAll');
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("3. .catch() - Fetch 요청 또는 처리 중 오류 발생:", error);
+                    let errorMessage = "처리 중 오류가 발생했습니다. 콘솔을 확인해주세요.";
+                    // error 객체에 서버가 보낸 message가 있을 경우 그것을 사용
+                    if (error.data && error.data.message) {
+                        errorMessage = error.data.message;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+                    alert(errorMessage);
+                });
+
+            console.log("fetch 호출이 시작되었습니다 (비동기).");
         }
+
+        // ✅ JavaScript에서 Enum 값을 사용하기 위한 간단한 객체 (선택 사항이지만, 일관성 유지에 도움)
+        const RoomMenuOrderStatus = {
+            ORDER: 'ORDER',
+            ACCEPT: 'ACCEPT',
+            COMPLETE: 'COMPLETE',
+            CANCEL: 'CANCEL'
+        };
+
     </script>
 </div>
 </body>

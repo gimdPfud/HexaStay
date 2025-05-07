@@ -15,21 +15,21 @@ import java.net.http.WebSocket;
 
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-        @Override
-        public void registerStompEndpoints(StompEndpointRegistry registry) {
-            // 클라이언트가 연결할 WebSocket 엔드포인트
-            registry.addEndpoint("/ws-order-alert")
-                    .setAllowedOriginPatterns("*") // CORS 허용: 운영 시 도메인 제한해도 됨
-                    .withSockJS(); // SockJS fallback 지원
-        }
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // 클라이언트가 연결할 WebSocket 엔드포인트
+        registry.addEndpoint("/ws-order-alert") // 클라이언트 JavaScript에서 이 엔드포인트로 연결합니다.
+                .setAllowedOriginPatterns("*") // 개발 중에는 모든 출처를 허용하지만, 프로덕션에서는 특정 도메인으로 제한하는 것이 좋습니다.
+                .withSockJS(); // SockJS는 WebSocket을 지원하지 않는 브라우저에 대한 fallback 옵션을 제공합니다.
+    }
 
-        @Override
-        public void configureMessageBroker(MessageBrokerRegistry config) {
-            // 관리자 브라우저가 구독할 prefix (서버 → 브라우저 알림 전송)
-            config.enableSimpleBroker("/topic");
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue"); // ✅ "/queue" 추가
 
-            // 클라이언트가 메시지를 서버로 보낼 때 사용할 prefix
-            config.setApplicationDestinationPrefixes("/app");
-        }
+        config.setApplicationDestinationPrefixes("/app");
+
+        config.setUserDestinationPrefix("/user"); // ✅ 사용자 목적지 접두사 추가
+    }
 
 }

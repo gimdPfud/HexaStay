@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile}" xmlns="http://www.w3.org/1999/html">
+      layout:decorate="~{layouts/layoutmobileA.html}" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -221,7 +221,7 @@
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
-<div layout:fragment="contentorder">
+<div layout:fragment="contentorderA">
     <div class="container">
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">

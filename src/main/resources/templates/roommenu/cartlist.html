@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutmobile}">
+      layout:decorate="~{layouts/layoutmobileA}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -213,7 +213,7 @@
 * 수정일    : 2025-04-13
 *
 -------------------------------------------------------------->
-<div layout:fragment="contentorder">
+<div layout:fragment="contentorderA">
     <div class="container ">
 
         <!-- 장바구니가 비어있는 경우 -->
@@ -401,41 +401,6 @@
                     .catch(error => {
                         console.error('에러 발생:', error);
                         alert('❌ 수량 변경 중 오류가 발생했습니다.');
-                    });
-            }
-
-            // 결제 처리를 시작합니다.
-            function processPayment() {
-                const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
-
-                const selectedCoupon = document.getElementById('couponSelect').value;
-                const discountedTotal = couponFinalTotal; // 전역 변수에서 가져옴
-
-                const formData = new URLSearchParams();
-                formData.append('requestMessage', roomMenuOrderRequestMessage);
-
-                if (selectedCoupon) {
-                    formData.append('couponNum', selectedCoupon);
-                }
-
-                if (discountedTotal !== null) {
-                    formData.append('discountedTotalPrice', discountedTotal);
-                }
-
-                fetch('/roommenu/cart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: formData
-                })
-                    .then(res => res.text())
-                    .then(result => {
-                        alert("결제가 완료되었습니다.");
-                        window.location.href = '/roommenu/orderList';
-                    })
-                    .catch(error => {
-                        alert("결제 중 오류 발생: " + error);
                     });
             }
 

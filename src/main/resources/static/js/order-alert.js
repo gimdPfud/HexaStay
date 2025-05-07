@@ -1,16 +1,7 @@
-/**
- * 공통 실시간 주문 알림 및 조건부 알림 UI 처리 스크립트
- * - 모든 관련 관리자 페이지에 이 파일 하나만 포함합니다.
- * - 모달 알림은 모달 HTML 요소가 있다면 항상 표시됩니다.
- * - 드롭다운 목록/배지 관련 기능(초기화, 업데이트, 읽음 처리)은
- * 해당 HTML 요소가 페이지에 존재할 때만(주로 /roommenu/list 페이지) 동작합니다.
- */
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log("공통 알림 스크립트 v2 초기화 시작");
 
-    // --- 알림 UI 관련 함수들 ---
-    // 이 함수들은 호출될 때 내부적으로 관련 요소 존재 여부를 확인하거나,
-    // 호출하는 쪽에서 요소 존재 여부를 확인 후 호출합니다.
 
     function updateNotificationBadge(count) {
         const badge = document.getElementById('notification-badge');

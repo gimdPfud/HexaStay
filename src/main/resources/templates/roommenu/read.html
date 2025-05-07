@@ -45,7 +45,7 @@
                     <tr th:each="option : ${roomMenuDTO.options}" class="text-center">
                         <td th:text="${option.roomMenuOptionName}"></td>
                         <td th:text="${option.roomMenuOptionPrice}"></td>
-                        <td th:text="${option.roomMenuOptionStock}"></td>
+                        <td th:text="${option.roomMenuOptionAmount}"></td>
                     </tr>
                     <tr th:if="${roomMenuDTO.options == null or roomMenuDTO.options.size() == 0}" class="text-center">
                         <td colspan="3">옵션이 없습니다.</td>
