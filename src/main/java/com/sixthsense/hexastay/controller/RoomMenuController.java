@@ -17,12 +17,12 @@ import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
 import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuOption;
+import com.sixthsense.hexastay.entity.RoomMenuOrderItem;
 import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
+import com.sixthsense.hexastay.repository.RoomMenuOrderItemRepository;
+import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
-import com.sixthsense.hexastay.service.HotelRoomService;
-import com.sixthsense.hexastay.service.RoomMenuCartService;
-import com.sixthsense.hexastay.service.RoomMenuOptionService;
-import com.sixthsense.hexastay.service.RoomMenuService;
+import com.sixthsense.hexastay.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +56,7 @@ public class RoomMenuController {
     private final RoomMenuCartService roomMenuCartService;
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuOptionService roomMenuOptionService;
+    private final RoomMenuOrderItemRepository roomMenuOrderItemRepository;
 
     /**************************************************
      * 메인 페이지
@@ -303,6 +304,13 @@ public class RoomMenuController {
         // 옵션 존재 여부 확인
         if (roomMenuOptionService.hasOption(num)) {
             redirectAttributes.addFlashAttribute("errorMessage", "옵션이 존재합니다. 옵션을 먼저 삭제해주세요.");
+            return "redirect:/roommenu/list";
+        }
+
+        // 2. 주문 이력 존재 여부 확인
+        boolean isOrdered = roomMenuOrderItemRepository.existsByRoomMenuRoomMenuNum(num);
+        if (isOrdered) {
+            redirectAttributes.addFlashAttribute("errorMessage", "해당 메뉴는 이미 주문된 이력이 있어 삭제할 수 없습니다.");
             return "redirect:/roommenu/list";
         }
 
