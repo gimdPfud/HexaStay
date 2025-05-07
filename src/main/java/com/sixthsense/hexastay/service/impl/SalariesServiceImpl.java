@@ -67,15 +67,15 @@ public class SalariesServiceImpl implements SalariesService {
         List<Salaries> oriSalariesList = new ArrayList<>();
 
         // 본사 계열
-        if (role.equals("exec") || role.equals("head") || role.equals("crew")) {
+        if (role.equals("EXEC") || role.equals("HEAD") || role.equals("CREW")) {
             oriSalariesList = salariesRepository.findHeadOfficeSalaries(email, role, companyNum);
         }
         // 지사/지점 계열
-        else if (role.equals("gm") || role.equals("sv") || role.equals("agent") || role.equals("partner")) {
+        else if (role.equals("GM") || role.equals("SV") || role.equals("AGENT") || role.equals("PARTNER")) {
             oriSalariesList = salariesRepository.findBranchSalaries(email, role, companyNum);
         }
         // 스토어 계열
-        else if (role.equals("mgr") || role.equals("submgr") || role.equals("staff")) {
+        else if (role.equals("MGR") || role.equals("SUBMGR") || role.equals("STAFF")) {
             oriSalariesList = salariesRepository.findStoreSalaries(email, role, storeNum);
         }
 

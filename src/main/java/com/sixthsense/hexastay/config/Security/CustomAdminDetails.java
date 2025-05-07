@@ -72,11 +72,10 @@ public class CustomAdminDetails implements UserDetails, Principal {
                 .orElse(null);
     }
 
-
     public String getAdminProfileMeta() {
         return Optional.ofNullable(admin)
                 .map(Admin::getAdminProfileMeta)
-                .orElse(null);
+                .orElse("/profile/default.png");
     }
 
     @Override

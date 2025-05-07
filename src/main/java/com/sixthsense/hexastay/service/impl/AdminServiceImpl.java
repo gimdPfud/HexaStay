@@ -49,13 +49,17 @@ public class AdminServiceImpl implements AdminService {
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setPropertyCondition(context -> context.getSource() != null);
-        
-        // Company와 Store 객체가 null이 아닌 경우에만 매핑
+
         modelMapper.createTypeMap(AdminDTO.class, Admin.class)
                 .addMappings(mapper -> {
                     mapper.skip(Admin::setCompany);
                     mapper.skip(Admin::setStore);
                 });
+
+        modelMapper.typeMap(Admin.class, AdminDTO.class).addMappings(mapper -> {
+            mapper.map(src -> src.getCompany().getCompanyNum(), AdminDTO::setCompanyNum);
+            mapper.map(src -> src.getCompany().getCompanyName(), AdminDTO::setCompanyName);
+        });
 
     }
 
@@ -74,7 +78,16 @@ public class AdminServiceImpl implements AdminService {
             adminList = adminRepository.findByStore_StoreNum(storeNum, pageable);
         }
 
-        return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
+        return adminList.map(adminOne -> {
+            AdminDTO dto = modelMapper.map(adminOne, AdminDTO.class);
+            if (adminOne.getCompany() != null) {
+                dto.setCompanyName(adminOne.getCompany().getCompanyName());
+            }
+            if (adminOne.getStore() != null) {
+                dto.setStoreName(adminOne.getStore().getStoreName());
+            }
+            return dto;
+        });
     }
 
     @Override
@@ -263,31 +276,36 @@ public class AdminServiceImpl implements AdminService {
 
         // 새로운 사진이 있으면 저장
         if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
-            String fileName = adminDTO.getAdminProfile().getOriginalFilename();
-            String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-            String newFileName = "admin_" + adminDTO.getAdminNum() + fileExtension;
+            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
+            String fileName = fileFirstName + fileSubName;
+
+            // 프로필 메타 경로 설정
+            String profileMetaPath = "/profile/" + fileName;
             
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "uploads", "admin");
-            Files.createDirectories(uploadPath);
-            
-            Path filePath = uploadPath.resolve(newFileName);
-            adminDTO.getAdminProfile().transferTo(filePath);
-            
-            admin.setAdminProfileMeta("/uploads/admin/" + newFileName);
-        }
-        // 새로운 사진이 없고 기존 사진이 있으면 기존 사진 유지
-        else if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
-            admin.setAdminProfileMeta(admin.getAdminProfileMeta());
+            // 파일 저장
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            Path filePath = uploadPath.resolve(fileName);
+            adminDTO.getAdminProfile().transferTo(filePath.toFile());
+
+            // Admin 엔티티에 메타 경로 설정
+            admin.setAdminProfileMeta(profileMetaPath);
         }
 
-        // 나머지 필드 업데이트 (사번과 주민번호는 변경하지 않음)
+        // 나머지 필드 업데이트
         admin.setAdminName(adminDTO.getAdminName());
         admin.setAdminAddress(adminDTO.getAdminAddress());
         admin.setAdminPhone(adminDTO.getAdminPhone());
         admin.setAdminPosition(adminDTO.getAdminPosition());
+        admin.setAdminRole(adminDTO.getAdminRole());
 
         adminRepository.save(admin);
     }
+
 
     // 회원 삭제
     @Override
