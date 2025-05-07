@@ -367,7 +367,7 @@ public class RoomMenuOrderController {
      *
      ****************************************************/
 
-    // 임시임.. 체크여부에 따라서 삭제 기능
+    /*// 임시임.. 체크여부에 따라서 삭제 기능
     @PostMapping("/roommenu/complete-orders")
     public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
         log.info("관리자용 오더 컨트롤러 주문완료 컨트롤러 진입");
@@ -441,5 +441,5 @@ public class RoomMenuOrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("에러: " + e.getMessage());
         }
-    }
+    }*/
 }

@@ -102,8 +102,8 @@
                             </td>
                             <td>
                                 <input type="number" class="form-control"
-                                       th:name="'options[' + ${iterStat.index} + '].roomMenuOptionStock'"
-                                       th:value="${option.roomMenuOptionStock}" /> <!-- 재고 추가 -->
+                                       th:name="'options[' + ${iterStat.index} + '].roomMenuOptionAmount'"
+                                       th:value="${option.roomMenuOptionAmount}" /> <!-- 재고 추가 -->
                             </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="removeOptionRow(this)">삭제</button>
@@ -198,7 +198,7 @@
             <input type="hidden" name="options[${index}].roomMenuOptionNum" value="0"/>
             <td><input type="text" class="form-control" name="options[${index}].roomMenuOptionName" /></td>
             <td><input type="text" class="form-control" name="options[${index}].roomMenuOptionPrice" /></td>
-            <td><input type="number" class="form-control" name="options[${index}].roomMenuOptionStock" value="0" /></td> <!-- 재고 input 추가 -->
+            <td><input type="number" class="form-control" name="options[${index}].roomMenuOptionAmount" value="0" /></td> <!-- 재고 input 추가 -->
             <td><button type="button" class="btn btn-danger btn-sm" onclick="removeOptionRow(this)">삭제</button></td>
             `;
         }
