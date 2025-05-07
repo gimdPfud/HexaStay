@@ -152,8 +152,8 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                 log.info("새 아이템에 대한 RoomMenuCartItemOption {}개를 저장합니다.", optionDTOList.size());
                 for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
                     // RoomMenuOption을 다시 조회하여 이름/가격 일관성 확보 (또는 DTO 정보 사용)
-                    RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRooMenuCartItemOptionNum())
-                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRooMenuCartItemOptionNum()));
+                    RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRoomMenuCartItemOptionNum())
+                            .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRoomMenuCartItemOptionNum()));
 
                     RoomMenuCartItemOption option = new RoomMenuCartItemOption();
                     option.setRoomMenuCartItem(savedCartItem); // 저장된 CartItem 참조 설정

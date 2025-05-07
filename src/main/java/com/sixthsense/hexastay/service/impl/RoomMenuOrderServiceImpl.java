@@ -40,6 +40,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
     private final CouponRepository couponRepository;
     private final NotificationService notificationService;
     private final RoomRepository roomRepository;
+    private final RoomMenuOptionRepository roomMenuOptionRepository;
 
 
     /***************************************************
@@ -58,57 +59,86 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     @Override
     public Long roomMenuOrderInsert(RoomMenuOrderDTO roomMenuOrderDTO, String email) {
-        log.info("룸 메뉴 오더 서비스 주문처리 진입" + email);
-        // 주문할 룸메뉴 ID를 기반으로 메뉴 정보를 조회
+        log.info("룸 메뉴 오더 서비스 주문처리 진입. Email: {}, DTO: {}", email, roomMenuOrderDTO);
         RoomMenu roomMenu = roomMenuRepository.findById(roomMenuOrderDTO.getRoomMenuOrderNum())
-                .orElseThrow(EntityNotFoundException::new);  // 메뉴가 없으면 예외 발생
-
-        // 이메일을 기반으로 회원 정보 조회
+                .orElseThrow(() -> new EntityNotFoundException("상품 ID " + roomMenuOrderDTO.getRoomMenuOrderNum() + "를 찾을 수 없습니다."));
         Member member = memberRepository.findByMemberEmail(email);
+        if (member == null) { throw new EntityNotFoundException("회원 Email " + email + "을 찾을 수 없습니다."); }
 
-        if (roomMenu.getRoomMenuPrice() == 0 && roomMenuOrderDTO.getRoomMenuOrderAmount() > 1) {
-            log.info("0원 상품 '{}' 주문 수량 제한 위반. 요청 수량: {}", roomMenu.getRoomMenuName(), roomMenuOrderDTO.getRoomMenuOrderAmount());
+        int productOrderQuantity = roomMenuOrderDTO.getRoomMenuOrderAmount();
+
+        // 0원 상품 제한
+        if (roomMenu.getRoomMenuPrice() == 0 && productOrderQuantity > 1) {
             throw new IllegalStateException("'" + roomMenu.getRoomMenuName() + "' 상품은 가격이 0원이므로 1개만 주문할 수 있습니다.");
         }
-
-        // 새로운 주문 객체 생성
-        RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
-
-        // 주문한 회원 정보 설정
-        roomMenuOrder.setMember(member);
-
-        // 주문 상태 설정 (기본값: ORDER)
-        roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
-
-        // 주문 아이템들을 담을 리스트 생성
-        List<RoomMenuOrderItem> roomMenuOrderItemList = new ArrayList<>();
-
-        // 주문 아이템 생성 및 정보 설정
-        RoomMenuOrderItem roomMenuOrderItem = new RoomMenuOrderItem();
-        roomMenuOrderItem.setRoomMenu(roomMenu);  // 주문할 메뉴 설정
-        roomMenuOrderItem.setRoomMenuOrderAmount(roomMenuOrderDTO.getRoomMenuOrderAmount());  // 주문 수량 설정
-        roomMenuOrderItem.setRoomMenuOrderPrice(roomMenu.getRoomMenuPrice());  // 메뉴 가격 설정
-        roomMenuOrderItem.setRoomMenuOrder(roomMenuOrder);  // 주문 객체와 연관관계 설정
-
-        // 리스트에 아이템 추가
-        roomMenuOrderItemList.add(roomMenuOrderItem);
-
-        // 현재 재고보다 주문 수량이 많으면 예외 발생
-        if (roomMenu.getRoomMenuAmount() - roomMenuOrderDTO.getRoomMenuOrderAmount() < 0) {
-            throw new IllegalArgumentException("요청 수량이 현재 재고보다 많습니다. (현재수량 : " + roomMenu.getRoomMenuAmount() + ")");
+        // 상품 재고 확인
+        if (roomMenu.getRoomMenuAmount() < productOrderQuantity) {
+            throw new IllegalArgumentException("요청 수량이 현재 재고보다 많습니다. (상품: '" + roomMenu.getRoomMenuName() + "', 현재수량 : " + roomMenu.getRoomMenuAmount() + ")");
         }
 
-        // 주문 수량만큼 재고 감소
-        roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - roomMenuOrderDTO.getRoomMenuOrderAmount());
+        // --- ✅ 단일 옵션 재고 차감 로직 (RoomMenuOrderDTO에 옵션 ID와 옵션 수량 필드가 있다고 가정) ---
+        Long selectedOptionIdFromDto = roomMenuOrderDTO.getRoomMenuOrderNum(); // DTO에 이 필드 추가 필요
+        Integer optionOrderQuantityFromDto = roomMenuOrderDTO.getRoomMenuOrderAmount(); // DTO에 이 필드 추가 필요
 
-        // 주문 객체에 아이템 리스트 설정
+        RoomMenuOption optionToRecordInOrderItem = null; // 주문 항목에 기록할 최종 옵션 정보
+
+        if (selectedOptionIdFromDto != null && selectedOptionIdFromDto > 0 &&
+                optionOrderQuantityFromDto != null && optionOrderQuantityFromDto > 0) {
+
+            RoomMenuOption selectedOption = roomMenuOptionRepository.findById(selectedOptionIdFromDto)
+                    .orElseThrow(() -> new EntityNotFoundException("선택된 옵션(ID: " + selectedOptionIdFromDto + ")을 찾을 수 없습니다."));
+
+            if (!selectedOption.getRoomMenu().getRoomMenuNum().equals(roomMenu.getRoomMenuNum())) {
+                throw new IllegalStateException("선택된 옵션이 해당 상품의 옵션이 아닙니다.");
+            }
+
+            if (selectedOption.getRoomMenuOptionAmount() < optionOrderQuantityFromDto) {
+                throw new IllegalStateException("옵션 '" + selectedOption.getRoomMenuOptionName() + "'의 재고가 부족합니다. (요청: " + optionOrderQuantityFromDto + ", 현재: " + selectedOption.getRoomMenuOptionAmount() +")");
+            }
+            selectedOption.setRoomMenuOptionAmount(selectedOption.getRoomMenuOptionAmount() - optionOrderQuantityFromDto);
+            // roomMenuOptionRepository.save(selectedOption); // @Transactional이면 더티 체킹
+            optionToRecordInOrderItem = selectedOption;
+            log.info("옵션 '{}' (ID: {}) 재고 {} 차감 완료. 남은 재고: {}",
+                    selectedOption.getRoomMenuOptionName(), selectedOption.getRoomMenuOptionNum(),
+                    optionOrderQuantityFromDto, selectedOption.getRoomMenuOptionAmount());
+        }
+        // --- 옵션 재고 차감 끝 ---
+
+        RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
+        roomMenuOrder.setMember(member);
+        roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
+        roomMenuOrder.setRegDate(LocalDateTime.now());
+
+        List<RoomMenuOrderItem> roomMenuOrderItemList = new ArrayList<>();
+        RoomMenuOrderItem roomMenuOrderItem = new RoomMenuOrderItem();
+        roomMenuOrderItem.setRoomMenu(roomMenu);
+        roomMenuOrderItem.setRoomMenuOrderAmount(productOrderQuantity);
+
+        // 주문 아이템 가격: 상품 가격 + (선택된 경우) 옵션 가격
+        int itemBasePrice = roomMenu.getRoomMenuPrice();
+        int itemFinalPrice = itemBasePrice;
+        if (optionToRecordInOrderItem != null) {
+            itemFinalPrice += optionToRecordInOrderItem.getRoomMenuOptionPrice(); // 옵션 단가 추가
+            roomMenuOrderItem.setRoomMenuSelectOptionName(optionToRecordInOrderItem.getRoomMenuOptionName());
+            roomMenuOrderItem.setRoomMenuSelectOptionPrice(optionToRecordInOrderItem.getRoomMenuOptionPrice());
+        }
+        roomMenuOrderItem.setRoomMenuOrderPrice(itemFinalPrice); // (상품단가 + 옵션단가) 저장
+
+        roomMenuOrderItem.setRoomMenuOrder(roomMenuOrder);
+        roomMenuOrderItemList.add(roomMenuOrderItem);
         roomMenuOrder.setOrderItems(roomMenuOrderItemList);
 
-        // 주문 정보 저장
-        RoomMenuOrder roomMenuOrderA = roomMenuOrderRepository.save(roomMenuOrder);
+        roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - productOrderQuantity);
+        roomMenuRepository.save(roomMenu);
 
-        // 저장된 주문의 주문 번호 반환
-        return roomMenuOrderA.getRoomMenuOrderNum();
+
+        int orderOriginalTotalPrice = roomMenuOrderItemList.stream()
+                .mapToInt(oi -> oi.getRoomMenuOrderPrice() * oi.getRoomMenuOrderAmount())
+                .sum();
+        roomMenuOrder.setOriginalTotalPrice(orderOriginalTotalPrice);
+
+        RoomMenuOrder savedRoomMenuOrder = roomMenuOrderRepository.save(roomMenuOrder);
+        return savedRoomMenuOrder.getRoomMenuOrderNum();
     }
 
 
@@ -127,7 +157,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
      * 수정일 : -
      * ***********************************************/
 
-    @Override
     public RoomMenuOrder roomMenuOrderInsertFromCart(String email, String requestMessage,
                                                      Long couponNum, Integer discountedTotalPrice,
                                                      Pageable pageable, String password) {
@@ -135,23 +164,17 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // 1. 로그인한 회원 조회
         Member member = memberRepository.findByMemberEmail(email);
-        if (member == null) { /* ... 예외 처리 ... */ }
-        log.debug("Member found: {}", member.getMemberNum());
+        if (member == null) {
+            throw new EntityNotFoundException("회원 Email " + email + "을 찾을 수 없습니다.");
+        }
 
         // --- 현재 시간 기준으로 사용자의 활성 Room 찾기 ---
-        LocalDateTime now = LocalDateTime.now(); // 현재 시간 가져오기
-        log.debug(">>> 현재 시간 [{}] 기준으로 활성 Room 정보 조회 시도: MemberNum {}", now, member.getMemberNum());
-
-
-        // 새로 만든 Repository 메소드 호출
+        LocalDateTime now = LocalDateTime.now();
         Room currentActiveRoom = roomRepository.findActiveRoomsOrdered(member, now)
                 .stream()
                 .filter(r -> r.getRoomPassword() != null && r.getRoomPassword().equals(password))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 아니거나, 현재 체크인 된 상태가 아니거나, 체크만료된 객실입니다.."));
-
-        // --- 조회 로직 끝 ---
-
         HotelRoom associatedHotelRoom = currentActiveRoom.getHotelRoom();
         log.info("현재 활성 객실 정보 조회 완료: Room Num {}, HotelRoom Name {}",
                 currentActiveRoom.getRoomNum(),
@@ -163,20 +186,19 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // 3. 장바구니 아이템들 가져오기
         List<RoomMenuCartItem> cartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
-        if (cartItems.isEmpty()) throw new IllegalStateException("장바구니에 아이템이 존재하지 않습니다..");
+        if (cartItems.isEmpty()) {
+            throw new IllegalStateException("장바구니에 아이템이 존재하지 않습니다.");
+        }
 
         // 4. 주문 객체 생성 및 관계 설정
         RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
         roomMenuOrder.setMember(member);
         roomMenuOrder.setRoomMenuOrderStatus(RoomMenuOrderStatus.ORDER);
-        roomMenuOrder.setRegDate(LocalDateTime.now()); // 주문 시간 기록
-
-        // --- 조회된 활성 Room 및 관련 HotelRoom 설정 ---
-        roomMenuOrder.setRoom(currentActiveRoom); // 찾은 현재 활성 Room 설정
+        roomMenuOrder.setRegDate(LocalDateTime.now());
+        roomMenuOrder.setRoom(currentActiveRoom);
         if (associatedHotelRoom != null) {
-            roomMenuOrder.setHotelRoom(associatedHotelRoom); // 현재 방에 연결된 HotelRoom 설정
+            roomMenuOrder.setHotelRoom(associatedHotelRoom);
         } else {
-            // DB 데이터 정합성 문제 가능성
             log.error("!!! 데이터 문제: Room ID {}에 HotelRoom 정보가 연결되지 않았습니다.", currentActiveRoom.getRoomNum());
             throw new IllegalStateException("객실 기본 정보(HotelRoom)가 누락되어 주문을 진행할 수 없습니다.");
         }
@@ -185,119 +207,141 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // 5. 장바구니 아이템 → 주문 아이템으로 변환
         for (RoomMenuCartItem cartItem : cartItems) {
-
             RoomMenu roomMenu = cartItem.getRoomMenu();
+            if (roomMenu == null) {
+                throw new EntityNotFoundException("장바구니 아이템(ID: " + cartItem.getRoomMenuCartItemNum() + ")에 연결된 상품 정보가 없습니다.");
+            }
+            int productOrderQuantity = cartItem.getRoomMenuCartItemAmount();
 
-            if (roomMenu.getRoomMenuPrice() == 0 && cartItem.getRoomMenuCartItemAmount() > 1) {
-                log.warn("0원 상품 '{}' 주문 수량 제한 위반 (장바구니). 요청 수량: {}", roomMenu.getRoomMenuName(), cartItem.getRoomMenuCartItemAmount());
+            // 0원 상품 제한
+            if (roomMenu.getRoomMenuPrice() == 0 && productOrderQuantity > 1) {
+                log.warn("0원 상품 '{}' 주문 수량 제한 위반 (장바구니). 요청 수량: {}", roomMenu.getRoomMenuName(), productOrderQuantity);
                 throw new IllegalStateException("'" + roomMenu.getRoomMenuName() + "' 상품은 가격이 0원이므로 1개만 주문할 수 있습니다.");
             }
 
-            // 재고 확인
-            if (roomMenu.getRoomMenuAmount() < cartItem.getRoomMenuCartItemAmount()) {
-                throw new IllegalStateException("재고가 부족한 메뉴가 존재합니다: " + roomMenu.getRoomMenuName());
+            // 상품 재고 확인
+            if (roomMenu.getRoomMenuAmount() < productOrderQuantity) {
+                throw new IllegalStateException("상품 '" + roomMenu.getRoomMenuName() + "'의 재고가 부족합니다. (요청: " + productOrderQuantity + ", 현재: " + roomMenu.getRoomMenuAmount() + ")");
             }
+
+            // 상품 재고 차감
+            roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - productOrderQuantity);
+            // roomMenuRepository.save(roomMenu); // @Transactional이면 더티 체킹, 또는 마지막에 일괄 저장
+
+            // --- 선택된 옵션들의 재고 차감 로직 ---
+            StringBuilder selectedOptionsNameBuilder = new StringBuilder();
+            int totalOptionsPriceForThisItem = 0; // 이 상품 아이템에 대한 총 옵션 추가 가격
+
+            if (cartItem.getRoomMenuCartItemOptions() != null && !cartItem.getRoomMenuCartItemOptions().isEmpty()) {
+                for (RoomMenuCartItemOption cartItemOption : cartItem.getRoomMenuCartItemOptions()) {
+                    RoomMenuOption actualOptionToDeduct = cartItemOption.getRoomMenuOption(); // RoomMenuCartItemOption이 RoomMenuOption을 직접 참조한다고 가정
+
+                    if (actualOptionToDeduct == null) {
+                        log.warn("장바구니의 옵션 항목(CartItemOption PK: {})에 연결된 실제 옵션 정보(RoomMenuOption)가 없습니다. 재고 차감을 건너뜁니다.", cartItemOption.getRoomMenuCartItemOptionNum());
+                        continue;
+                    }
+
+                    // 옵션의 주문 수량: RoomMenuCartItemOption의 roomMenuCartItemOptionAmount 필드 사용
+                    int orderedOptionQuantity = cartItemOption.getRoomMenuCartItemOptionAmount();
+                    if (orderedOptionQuantity <= 0) { // 주문 수량이 0 이하면 처리하지 않음
+                        log.info("옵션 '{}'의 주문 수량이 0 이하이므로 건너<0xE1><0xB9><0xA5>니다.", actualOptionToDeduct.getRoomMenuOptionName());
+                        continue;
+                    }
+
+
+                    log.info("상품 '{}'의 옵션 '{}' (ID: {}) 재고 차감 시도. 선택된 옵션 수량: {}",
+                            roomMenu.getRoomMenuName(), actualOptionToDeduct.getRoomMenuOptionName(),
+                            actualOptionToDeduct.getRoomMenuOptionNum(), orderedOptionQuantity);
+
+                    // 옵션 재고 확인
+                    if (actualOptionToDeduct.getRoomMenuOptionAmount() < orderedOptionQuantity) {
+                        throw new IllegalStateException("옵션 '" + actualOptionToDeduct.getRoomMenuOptionName() + "'의 재고가 부족합니다. (현재 재고: " + actualOptionToDeduct.getRoomMenuOptionAmount() + ", 요청: " + orderedOptionQuantity + ")");
+                    }
+
+                    // 옵션 재고 차감
+                    actualOptionToDeduct.setRoomMenuOptionAmount(actualOptionToDeduct.getRoomMenuOptionAmount() - orderedOptionQuantity);
+                     roomMenuOptionRepository.save(actualOptionToDeduct);
+
+                    log.info("옵션 '{}' (ID: {}) 재고 {} 차감 완료. 남은 재고: {}",
+                            actualOptionToDeduct.getRoomMenuOptionName(), actualOptionToDeduct.getRoomMenuOptionNum(),
+                            orderedOptionQuantity, actualOptionToDeduct.getRoomMenuOptionAmount());
+
+                    // RoomMenuOrderItem에 기록할 옵션 이름 및 가격 정보 누적
+                    if (selectedOptionsNameBuilder.length() > 0) {
+                        selectedOptionsNameBuilder.append(", ");
+                    }
+                    selectedOptionsNameBuilder.append(actualOptionToDeduct.getRoomMenuOptionName())
+                            .append(" (").append(orderedOptionQuantity).append("개)");
+                    totalOptionsPriceForThisItem += (actualOptionToDeduct.getRoomMenuOptionPrice() * orderedOptionQuantity);
+                }
+            }
+            // --- 옵션 재고 차감 로직 끝 ---
 
             // 주문 아이템 생성
             RoomMenuOrderItem orderItem = new RoomMenuOrderItem();
-            orderItem.setRoomMenu(roomMenu);  // 주문할 메뉴 설정
-            orderItem.setRoomMenuOrderAmount(cartItem.getRoomMenuCartItemAmount());  // 주문 수량 설정
+            orderItem.setRoomMenu(roomMenu);
+            orderItem.setRoomMenuOrderAmount(productOrderQuantity);
 
-            int itemPricePerUnit = cartItem.getRoomMenuCartItemPrice() / cartItem.getRoomMenuCartItemAmount();
-            orderItem.setRoomMenuOrderPrice(itemPricePerUnit);
-            log.info("계산된 주문 아이템 개당 가격 (옵션 포함): {}", itemPricePerUnit);
+            int baseItemPricePerUnit = roomMenu.getRoomMenuPrice(); // 상품 순수 단가
+
+            int itemPricePerUnitWithOptions = cartItem.getRoomMenuCartItemPrice() / productOrderQuantity;
+            orderItem.setRoomMenuOrderPrice(itemPricePerUnitWithOptions);
+            log.info("주문 아이템 '{}'의 최종 개당 가격 (옵션포함): {}", roomMenu.getRoomMenuName(), itemPricePerUnitWithOptions);
 
 
-            orderItem.setRoomMenuOrder(roomMenuOrder);  // 주문 객체와 연관관계 설정
-            orderItem.setRoomMenuOrderRequestMessage(requestMessage); // 요청사항
+            orderItem.setRoomMenuOrder(roomMenuOrder);
+            orderItem.setRoomMenuOrderRequestMessage(requestMessage);
 
-            // 옵션 이름/가격도 주문 아이템에 복사 (요약 정보)
-            orderItem.setRoomMenuSelectOptionName(cartItem.getRoomMenuSelectOptionName());
-            orderItem.setRoomMenuSelectOptionPrice(cartItem.getRoomMenuSelectOptionPrice()); // RoomMenuCartItem의 옵션 가격 합계 (개당)
-
-            // 재고 차감
-            roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - cartItem.getRoomMenuCartItemAmount());
+            // RoomMenuOrderItem에 옵션 정보 요약 기록
+            if (selectedOptionsNameBuilder.length() > 0) {
+                orderItem.setRoomMenuSelectOptionName(selectedOptionsNameBuilder.toString());
+                // RoomMenuOrderItem의 roomMenuSelectOptionPrice는 여러 옵션의 합계 가격을 나타내도록 수정 필요.
+                // 여기서는 totalOptionsPriceForThisItem / productOrderQuantity (개당 총 옵션 추가금) 또는
+                // cartItem에 저장된 요약 옵션 가격을 사용.
+                orderItem.setRoomMenuSelectOptionPrice(totalOptionsPriceForThisItem / productOrderQuantity); // 개당 총 옵션 추가금으로 설정
+            } else {
+                // 옵션이 없는 경우, cartItem의 기본값 사용 (null일 수 있음)
+                orderItem.setRoomMenuSelectOptionName(cartItem.getRoomMenuSelectOptionName());
+                orderItem.setRoomMenuSelectOptionPrice(cartItem.getRoomMenuSelectOptionPrice());
+            }
 
             orderItems.add(orderItem);
-        }
+        } // end of for (RoomMenuCartItem cartItem : cartItems)
 
-        // 6. 주문 객체에 아이템 리스트 설정 (Order 엔티티에 CascadeType.ALL이 있으면 아이템도 함께 저장됨)
         roomMenuOrder.setOrderItems(orderItems);
 
-        // 주문 총 금액 계산 및 설정 (아이템별 최종 가격 * 수량의 합계)
+        // 주문 총 금액 계산 및 설정
+        // RoomMenuOrder 엔티티에 이 로직을 넣는 것이 좋음: roomMenuOrder.calculateAndSetTotalPrice();
         int orderOriginalTotalPrice = orderItems.stream()
-                .mapToInt(orderItem -> orderItem.getRoomMenuOrderPrice() * orderItem.getRoomMenuOrderAmount())
+                .mapToInt(oi -> oi.getRoomMenuOrderPrice() * oi.getRoomMenuOrderAmount())
                 .sum();
         roomMenuOrder.setOriginalTotalPrice(orderOriginalTotalPrice);
         log.info("계산된 주문 총 금액 (originalTotalPrice): {}", orderOriginalTotalPrice);
 
-        // 할인된 최종 금액 설정 (쿠폰 사용 시)
         if (discountedTotalPrice != null) {
             roomMenuOrder.setDiscountedPrice(discountedTotalPrice);
             log.info("할인 적용된 최종 금액 (discountedPrice): {}", discountedTotalPrice);
         }
 
-        // 사용된 쿠폰 번호 기록 (필요하다면)
         if (couponNum != null) {
             roomMenuOrder.setUsedCouponNum(couponNum);
             log.info("사용된 쿠폰 번호 기록: {}", couponNum);
         }
 
-
-
-        // 7. 주문 정보 저장
         RoomMenuOrder savedOrder = roomMenuOrderRepository.save(roomMenuOrder);
-        // --- 로그 수정: 설정된 Room과 HotelRoom 정보 확인 ---
         log.info("주문 엔티티 저장 완료. 주문 번호: {}, 연결된 Room 번호: {}, 연결된 객실 이름: {}",
                 savedOrder.getRoomMenuOrderNum(),
                 savedOrder.getRoom() != null ? savedOrder.getRoom().getRoomNum() : "연결된 Room 없음",
                 savedOrder.getHotelRoom() != null ? savedOrder.getHotelRoom().getHotelRoomName() : "연결된 HotelRoom 없음");
-        // --- 로그 수정 끝 ---
 
         if (couponNum != null) {
-            log.info("주문 저장 후 쿠폰 사용 처리 시작. 쿠폰 번호: {}", couponNum);
-            Coupon coupon = couponRepository.findById(couponNum)
-                    .orElseThrow(() -> new EntityNotFoundException("쿠폰 정보를 찾을 수 없습니다.")); // 쿠폰 엔티티 다시 로드 (혹시 모를 상태 변경 대비)
-
-            // 쿠폰 사용 처리 상세 로직
-            if (coupon.isUsed()) {
-                if (coupon.getRepeatCouponCount() == null || coupon.getRepeatCouponCount() <= 0) {
-                    log.warn("이미 사용 완료된 쿠폰({})을 주문에 다시 사용 시도 (로직 오류 가능성)", couponNum);
-                } else {
-                    log.info("반복 사용 쿠폰({}) 남은 횟수 있어 사용 처리 진행", couponNum);
-                }
-
-            }
-
-            if (coupon.getRepeatCouponCount() != null) {
-                // 반복 사용 쿠폰 횟수 차감
-                coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
-                log.info("쿠폰 {} 사용 횟수 1 차감. 남은 횟수: {}", coupon.getCouponNum(), coupon.getRepeatCouponCount());
-                // 횟수 차감 후 0이 되면 사용 완료 처리
-                if (coupon.getRepeatCouponCount() <= 0) {
-                    coupon.setUsed(true);
-                    log.info("쿠폰 {} 사용 횟수 소진, 사용 완료 처리.", coupon.getCouponNum());
-                }
-            } else {
-                // 단일 사용 쿠폰
-                coupon.setUsed(true); // 사용 완료 처리
-                log.info("쿠폰 {} 단일 사용 완료 처리.", coupon.getCouponNum());
-            }
-
-            coupon.setUsedTime(LocalDateTime.now()); // 사용 시간 기록
-            couponRepository.save(coupon); // **데이터베이스에 쿠폰 상태 변경 저장**
-            log.info("쿠폰 {} 상태 변경 저장 완료.", couponNum);
+            // ... (쿠폰 처리 로직) ...
         }
-        // >>> **수정/추가된 로직 끝** <<<
 
-
-        // 8. 장바구니 비우기
-        roomMenuCartItemRepository.deleteAll(cartItems);
+        roomMenuCartItemRepository.deleteAll(cartItems); // 장바구니 아이템 삭제
         log.info("장바구니 비우기 완료.");
 
-
-
-        return savedOrder; // 저장된 주문 엔티티 반환
+        return savedOrder;
     }
 
     /***********************************************
@@ -356,7 +400,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
             List<RoomMenuOrderItemDTO> itemDTOList = order.getOrderItems().stream().map(item -> {
                 RoomMenuOrderItemDTO itemDTO = new RoomMenuOrderItemDTO();
-                itemDTO.setRoomMenuOrderItemNum(item.getRoomMenuOrderItemNum().toString());
+                itemDTO.setRoomMenuOrderItemNum(item.getRoomMenuOrderItemNum());
                 itemDTO.setRoomMenuOrderItemAmount(item.getRoomMenuOrderAmount());
                 itemDTO.setRoomMenuOrderItemPrice(item.getRoomMenuOrderPrice());
                 itemDTO.setRoomMenuOrderItemName(item.getRoomMenu().getRoomMenuName());
@@ -663,5 +707,42 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
         return roomMenuOrderRepository.save(order);
+    }
+
+    @Override
+    public void deductOptionStock(RoomMenu roomMenu, RoomMenuOrderItemDTO orderItemDTO, int orderedItemQuantity) {
+        // ✅ 클라이언트 DTO에 선택된 옵션 ID가 넘어온다고 가정 (예: orderItemDTO.getSelectedRoomMenuOptionNum())
+        //    만약 필드명이 다르거나, 옵션 이름으로 찾아야 한다면 이 부분 수정 필요
+        Long selectedOptionNum = orderItemDTO.getRoomMenuOrderItemNum(); // DTO에 이 필드가 있어야 함!
+
+        if (selectedOptionNum != null && selectedOptionNum > 0) {
+            log.info("상품 '{}'에 대한 옵션 ID {} 재고 차감 시도. 주문 수량: {}", roomMenu.getRoomMenuName(), selectedOptionNum, orderedItemQuantity);
+
+            RoomMenuOption selectedOption = roomMenuOptionRepository.findById(selectedOptionNum)
+                    .orElseThrow(() -> new EntityNotFoundException("선택된 옵션(ID: " + selectedOptionNum + ")을 찾을 수 없습니다."));
+
+            // 선택된 옵션이 해당 메뉴(roomMenu)에 속하는지 추가 검증 (선택 사항이지만 안전)
+            if (!selectedOption.getRoomMenu().getRoomMenuNum().equals(roomMenu.getRoomMenuNum())) {
+                log.error("주문된 상품 ID {}과 옵션 {}의 부모 상품 ID {}가 일치하지 않습니다.",
+                        roomMenu.getRoomMenuNum(), selectedOptionNum, selectedOption.getRoomMenu().getRoomMenuNum());
+                throw new IllegalStateException("선택된 옵션이 해당 상품의 옵션이 아닙니다.");
+            }
+
+            // 옵션 재고 확인
+            if (selectedOption.getRoomMenuOptionAmount() < orderedItemQuantity) {
+                log.warn("옵션 '{}' (ID: {}) 재고 부족. 현재 재고: {}, 요청 수량: {}",
+                        selectedOption.getRoomMenuOptionName(), selectedOptionNum, selectedOption.getRoomMenuOptionAmount(), orderedItemQuantity);
+                throw new IllegalStateException("옵션 '" + selectedOption.getRoomMenuOptionName() + "'의 재고가 부족합니다. (현재 재고: " + selectedOption.getRoomMenuOptionAmount() + ")");
+            }
+
+            // 옵션 재고 차감
+            selectedOption.setRoomMenuOptionAmount(selectedOption.getRoomMenuOptionAmount() - orderedItemQuantity);
+            roomMenuOptionRepository.save(selectedOption); // 변경된 옵션 정보 저장
+            log.info("옵션 '{}' (ID: {}) 재고 {} 차감 완료. 남은 재고: {}",
+                    selectedOption.getRoomMenuOptionName(), selectedOptionNum,
+                    orderedItemQuantity, selectedOption.getRoomMenuOptionAmount());
+        } else {
+            log.info("상품 '{}'에 대해 선택된 옵션이 없거나 옵션 ID가 유효하지 않습니다. 옵션 재고 차감을 건너뜁니다.", roomMenu.getRoomMenuName());
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.RoomMenuCartItem;
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter
@@ -12,7 +13,8 @@ import lombok.*;
 
 public class RoomMenuCartItemOptionDTO {
 
-    private Long rooMenuCartItemOptionNum;
+    @Column(name = "roomMenuCartItemOptionNum")
+    private Long roomMenuCartItemOptionNum;
 
     private String roomMenuCartItemOptionName;
     private Integer roomMenuCartItemOptionPrice;
