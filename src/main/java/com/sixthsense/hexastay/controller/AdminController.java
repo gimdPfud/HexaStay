@@ -89,17 +89,17 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
+
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
 
         List<CompanyDTO> companyList;
-        if (adminDTO.getAdminRole().equals("superAdmin")) {
-
+        if (adminDTO.getAdminRole().equals("SUPERADMIN")) {
             companyList = companyService.getAllList();
         } else if (adminDTO.getAdminRole().equals("EXEC") || adminDTO.getAdminRole().equals("HEAD")) {
-
             companyList = companyService.getCompanyAndSubsidiaries(adminDTO.getCompanyNum());
         } else {
             companyList = Collections.singletonList(companyService.companyRead(adminDTO.getCompanyNum()));
@@ -128,7 +128,7 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
-        log.info("컴퍼니 들어왓나?" + adminDTO.getCompanyNum());
+        log.info("요쓰" + adminDTO.getAdminRole());
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
             bindingResult.getAllErrors().forEach(error -> {
@@ -173,7 +173,7 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
@@ -198,7 +198,7 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
@@ -256,14 +256,14 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
                 log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
                 return "redirect:/admin/logout";
             }
-            
+
             model.addAttribute("adminDTO", adminDTO);
             return "admin/mypage";
         } catch (Exception e) {
@@ -284,27 +284,18 @@ public class AdminController {
         }
 
         try {
-            // 현재 로그인한 사용자의 정보를 가져옴
             AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
             if (currentAdmin == null) {
                 log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
                 return "redirect:/admin/logout";
             }
 
-            // 수정할 수 없는 필드들은 현재 값으로 유지
-            adminDTO.setAdminNum(currentAdmin.getAdminNum());
-            adminDTO.setAdminEmail(currentAdmin.getAdminEmail());
-            adminDTO.setAdminRole(currentAdmin.getAdminRole());
-            adminDTO.setAdminEmployeeNum(currentAdmin.getAdminEmployeeNum());
-            adminDTO.setAdminResidentNum(currentAdmin.getAdminResidentNum());
-            adminDTO.setCompanyNum(currentAdmin.getCompanyNum());
-
             adminService.adminUpdate(adminDTO);
-            return "redirect:/admin/mypage";
+            return "redirect:/admin/list";
         } catch (Exception e) {
             log.error("마이페이지 수정 중 오류 발생: ", e);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
-            return "admin/mypage";
+            return "admin/list";
         }
     }
 
@@ -333,7 +324,7 @@ public class AdminController {
 
 
     @GetMapping("/update/{adminNum}")
-    public String adminUpdate(@PathVariable Long adminNum, Model model) throws IOException {
+    public String adminUpdate(@PathVariable Long adminNum, Model model) {
         AdminDTO adminDTO = adminService.adminRead(adminNum);
         model.addAttribute("adminDTO", adminDTO);
         return "admin/mypage";
