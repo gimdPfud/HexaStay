@@ -69,22 +69,45 @@
             </div>
         </form>
 
+        <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
+            <!-- 체크인 목록 -->
             <a th:href="@{/roomlist/checkin}"
                class="text-decoration-none text-primary"
-               th:classappend="${currentStatus} == 'checkin' ? 'border-bottom border-primary' : ''">
+               th:classappend="${currentStatus} == 'checkin' ? 'border-bottom border-primary fw-bold' : ''">
                 체크인 목록
             </a>
             <span>|</span>
+
+            <!-- 체크아웃 목록 -->
             <a th:href="@{/roomlist/checkout}"
                class="text-decoration-none text-danger"
-               th:classappend="${currentStatus} == 'checkout' ? 'border-bottom border-danger' : ''">
+               th:classappend="${currentStatus} == 'checkout' ? 'border-bottom border-danger fw-bold' : ''">
                 체크아웃 목록
             </a>
             <span>|</span>
+
+            <!-- 전체 목록 -->
             <a th:href="@{/roomlist}"
-               class="text-decoration-none text-dark">
+               class="text-decoration-none text-dark"
+               th:classappend="${currentStatus} == null ? 'border-bottom border-dark fw-bold' : ''">
                 전체 목록
+            </a>
+            <span>|</span>
+
+            <!-- 표시된 객실 -->
+            <a th:href="@{/roomlist/display/VISIBLE}"
+               class="text-decoration-none text-success"
+               th:classappend="${currentStatus} == 'VISIBLE' ? 'border-bottom border-success fw-bold' : ''">
+                표시된 객실
+            </a>
+            <span>|</span>
+
+            <!-- 숨김 객실 -->
+            <a th:href="@{/roomlist/display/HIDDEN}"
+               class="text-decoration-none text-secondary"
+               th:classappend="${currentStatus} == 'HIDDEN' ? 'border-bottom border-secondary fw-bold' : ''">
+                숨김 객실
             </a>
         </div>
 
@@ -95,16 +118,17 @@
                     <thead class="table-light text-center">
                     <tr>
                         <th style="width: 5%;">번호</th>
-                        <th style="width: 13%;">객실명</th>
+                        <th style="width: 10%;">객실명</th>
                         <th style="width: 9%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 8%;">메일 재발송</th>
-                        <th style="width: 12%;">객실 연락처</th>
+                        <th style="width: 8%;">메일</th>
+                        <th style="width: 10%;">객실 연락처</th>
                         <th style="width: 8%;">체크인</th>
                         <th style="width: 8%;">체크아웃</th>
                         <th style="width: 8%;">비밀번호</th>
                         <th style="width: 9%;">현재 상태</th>
                         <th style="width: 9%;">상태 변경</th>
+                        <th style="width: 10%;">표시 상태</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -126,7 +150,8 @@
                         </td>
                         <td class="text-center text-truncate" th:text="${room.memberEmail}"></td>
                         <td class="text-center">
-                            <form method="post" th:action="@{'/room/resend-mail/' + ${room.roomNum}}" style="display:inline;">
+                            <form method="post" th:action="@{'/room/resend-mail/' + ${room.roomNum}}"
+                                  style="display:inline;">
                                 <button type="button"
                                         class="btn btn-sm btn-outline-success"
                                         onclick="confirmResendMail(this)"
@@ -176,6 +201,24 @@
                                         onclick="roomStatusUpdate(this)">
                                 </button>
                             </div>
+                        </td>
+
+                        <td class="text-center">
+                            <!-- null, 빈 문자열, VISIBLE 상태일 때 -->
+                            <button th:if="${#strings.isEmpty(room.roomDisplayStatus) or room.roomDisplayStatus.equals('VISIBLE')}"
+                                    class="btn btn-sm btn-secondary"
+                                    th:attr="data-roomNum=${room.roomNum}, data-status='HIDDEN'"
+                                    onclick="toggleDisplayStatus(this)">
+                                숨기기
+                            </button>
+
+                            <!-- HIDDEN 상태일 때 -->
+                            <button th:if="${room.roomDisplayStatus != null and room.roomDisplayStatus.equals('HIDDEN')}"
+                                    class="btn btn-sm btn-warning"
+                                    th:attr="data-roomNum=${room.roomNum}, data-status='VISIBLE'"
+                                    onclick="toggleDisplayStatus(this)">
+                                표시
+                            </button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">
@@ -271,6 +314,33 @@
 
     <script th:inline="javascript">
 
+        /*room 상태 변환 버튼 쌓이는 테이블 view 버튼으로 안보여 지게 하기 */
+        function toggleDisplayStatus(element) {
+            const roomNum = element.getAttribute("data-roomNum");
+            const status = element.getAttribute("data-status");
+
+            if (!confirm(`해당 객실을 ${status === 'VISIBLE' ? '표시' : '숨기기'} 처리하시겠습니까?`)) return;
+
+            fetch(`/admin/room/display/${roomNum}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("서버 오류 발생");
+                    alert(`객실이 ${status === 'VISIBLE' ? '표시' : '숨기기'} 처리되었습니다.`);
+                    location.reload();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("상태 변경 중 오류가 발생했습니다.");
+                });
+        }
+
+
+        /*체크인 체크아웃 변경 버튼*/
         function roomStatusUpdate(element) {
             const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
             const status = element.getAttribute("data-status");

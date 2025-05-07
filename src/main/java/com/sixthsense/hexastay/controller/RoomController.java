@@ -50,7 +50,7 @@ public class RoomController {
     private final RoomRepository roomRepository;
 
     //todo:0425 카테고리 분류별 페이지 리스트 localhost:8090/roomList
-    //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지
+    //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지 - 방 배정 리스트
     @GetMapping("/roomlist/{status}")
     public String getRoomListByStatus(@PathVariable("status") String status,
                                       @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
@@ -63,13 +63,15 @@ public class RoomController {
         Page<RoomDTO> rooms = roomServiceimpl.findRoomsByHotelRoomStatus(status, pageable);
         model.addAttribute("rooms", rooms);  // ✅ Page 객체 전달
         model.addAttribute("currentStatus", status);
-        return "room/roomlist"; // ✅ 파일명은 소문자 유지
+        return "room/roomList"; // ✅ 파일명은 소문자 유지
     }
 
     //전체 페이지 보여 주는 로직
     //todo:http://localhost:8090/roomlist
     @GetMapping("/roomlist")
-    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model) {
+    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model)
+
+    {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("roomNum").descending());
         Page<RoomDTO> rooms = roomServiceimpl.getRooms(pageable);
 
@@ -77,6 +79,8 @@ public class RoomController {
         model.addAttribute("currentPage", page);
         return "room/roomList";
     }
+
+
     //검색 조건으로 받는 controller todo:http://localhost:8090/roomlist
     //조건 멤버의 이름과 이메일로 검색
     @GetMapping("/roomlist/search")
@@ -95,7 +99,7 @@ public class RoomController {
 
         model.addAttribute("rooms", rooms);
         model.addAttribute("keyword", keyword); // 검색창에 유지되도록
-        return "room/roomlist";
+        return "room/roomList";
     }
 
 
@@ -211,7 +215,7 @@ public class RoomController {
 
     /******** Room Pk 찾아와서 : Member FK 만수정 하는 로직 ************/
 
-    //todo:memberByhotelRoom.html 에서 쓰이는 메소드
+    //todo:memberByhotelRoom.html 에서 쓰이는 메소드 - room 에서 meber fk 만 수정 하는 로직
     @PostMapping("/admin/room/update-member")
     @ResponseBody
     public String updateRoomMember(@RequestParam("roomNum") Long roomNum,
@@ -341,6 +345,26 @@ public class RoomController {
 
         // 비밀번호 불일치
         return Map.of("valid", false, "reason", "no_match");
+    }
+
+    //room 중간 테이블 쌓이는거 방지
+    @GetMapping("/roomlist/display/{status:VISIBLE|HIDDEN}")
+    public String getRoomsByDisplayStatus(@PathVariable String status,
+                                          @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
+                                          Model model) {
+        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByDisplayStatus(status, pageable);
+        model.addAttribute("rooms", rooms);
+        model.addAttribute("currentStatus", status);
+        return "room/roomList";
+    }
+
+    // display 상태 변경 (VISIBLE / HIDDEN)
+    @PostMapping("/admin/room/display/{roomNum}")
+    public ResponseEntity<?> updateRoomDisplayStatus(@PathVariable Long roomNum,
+                                                     @RequestBody Map<String, String> payload) {
+        String status = payload.get("status");
+        roomServiceimpl.updateRoomDisplayStatus(roomNum, status);
+        return ResponseEntity.ok().build();
     }
 
 
