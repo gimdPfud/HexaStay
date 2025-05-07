@@ -27,7 +27,6 @@
         .pricing-section { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; text-align: center; }
         .pricing-section div { font-size: 16px; }
         .pricing-section .final-total { font-weight: bold; color: red; font-size: 20px; }
-        .btn { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
         .add-to-cart-btn { background-color: #77b1fb; color: black; }
         .back-btn { background-color: #ddd; color: black; }
         .button-container { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; margin-top: 10px; margin-left: -4px; }
@@ -85,8 +84,10 @@
             <div class="pricing-section">
                 <div class="final-total">최종 주문 금액 : <span class="text-danger fs-5" th:text="${#numbers.formatInteger(totalPrice, 3, 'COMMA') + ' 원'}"></span></div>
             </div>
-            <button type="button" class="btn add-to-cart-btn" th:data-price="${totalPrice}" onclick="processPayment(this)">결제하기</button>
-            <button type="button" class="btn back-btn" onclick="window.location.href='/roommenu/orderpage'">목록으로</button>
+            <button type="button" class="btn add-to-cart-btn" th:data-price="${totalPrice}" onclick="processPayment(this)"
+            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">결제하기</button>
+            <button type="button" class="btn back-btn" onclick="window.location.href='/roommenu/orderpage'"
+            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">목록으로</button>
         </div>
     </form>
     <script th:inline="javascript">
