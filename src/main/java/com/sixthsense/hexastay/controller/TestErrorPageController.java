@@ -31,4 +31,14 @@ public class TestErrorPageController {
     public String trigger500Error() {
         throw new RuntimeException("테스트용 500 Internal Server Error 입니다!");
     }
+
+    @GetMapping("/test/trigger-502")
+    public void trigger502Error(HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.BAD_GATEWAY.value(), "테스트용 502 Bad Gateway 오류입니다.");
+    }
+
+    @GetMapping("/test/trigger-503")
+    public void trigger503Error(HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), "테스트용 503 Service Unavailable 오류입니다.");
+    }
 }
