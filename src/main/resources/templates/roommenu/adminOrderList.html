@@ -303,23 +303,16 @@
 
                     // ✅ 서버 처리 성공 후 UI 업데이트
                     itemsToUpdateOnSuccess.forEach(item => {
-                        const statusCell = item.row.querySelector("td:nth-child(4)"); // ✅ 수정: 4번째 TD (상태) 선택
+                        const statusCell = item.row.querySelector("td:nth-child(4)"); // 상태 셀 (4번째)
 
-                        if (item.action === 'ACCEPT') {
-                            if (statusCell) {
-                                // 서버에서 실제 변경된 상태를 보내준다면 data.status 등으로 설정 가능
-                                statusCell.textContent = RoomMenuOrderStatus.ACCEPT.name(); // Enum 이름을 직접 사용하거나, 서버 응답 활용
+                        if (statusCell) { // statusCell이 실제로 존재하는지 확인
+                            if (item.action === 'ACCEPT') {
+                                statusCell.textContent = RoomMenuOrderStatus.ACCEPT;
+                            } else if (item.action === 'COMPLETE') {
+                                statusCell.textContent = RoomMenuOrderStatus.COMPLETE;
+                            } else if (item.action === 'CANCEL') {
+                                statusCell.textContent = RoomMenuOrderStatus.CANCEL;
                             }
-                        } else if (item.action === 'COMPLETE') {
-                            if (statusCell) {
-                                statusCell.textContent = RoomMenuOrderStatus.COMPLETE.name();
-                            }
-                            // "완료" 시 행을 제거할지, 상태만 변경할지 결정 (현재는 아래 로직에서 제거됨)
-                        } else if (item.action === 'CANCEL') {
-                            if (statusCell) {
-                                statusCell.textContent = RoomMenuOrderStatus.CANCEL.name();
-                            }
-                            // "취소" 시 행을 제거할지, 상태만 변경할지 결정 (현재는 아래 로직에서 제거됨)
                         }
 
                         if (item.checkbox) {
