@@ -198,11 +198,8 @@
             object-fit: cover;
             display: block; /* 중요! */
             cursor: pointer;
-            pointer-events: none; /* 이미지 자체에 클릭 효과 차단 */
+            pointer-events: none;
         }
-
-
-
 
     </style>
 </head>
@@ -223,12 +220,13 @@
         <!-- 프로필 드롭다운 + 관리자 정보 블록 -->
         <div class="dropdown text-end">
 
-            <button class="btn p-0" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn p-0 d-flex align-items-center gap-1" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <img class="profile-img"
                      th:src="${#authentication.principal.adminProfileMeta != null ? #authentication.principal.adminProfileMeta : '/profile/default.png'}"
                      alt="프로필" />
+                <i class="bi bi-caret-down-fill text-white" style="font-size: 0.9rem;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <ul class="dropdown-menu dropdown-menu-end text-center" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>
                 <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
             </ul>

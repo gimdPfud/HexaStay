@@ -61,7 +61,7 @@ public class CompanyServiceImpl implements CompanyService {
             companyDTO.getCompanyPicture().transferTo(uploadPath.toFile());
         }
 
-        // 2. 지사/지점일 경우 → 소속 본사로부터 브랜드명 세팅
+        // 2. 지점/외부시설일 경우 → 소속 본사로부터 브랜드명 세팅
         if ("branch".equals(companyDTO.getCompanyType()) || "facility".equals(companyDTO.getCompanyType())) {
             Optional<Company> parentCompanyOpt = companyRepository.findById(companyDTO.getCompanyParent());
 
@@ -71,6 +71,8 @@ public class CompanyServiceImpl implements CompanyService {
                 throw new IllegalArgumentException("소속 본사를 찾을 수 없습니다. [id=" + companyDTO.getCompanyParent() + "]");
             }
         }
+
+        companyDTO.setCompanyStatus("ACTIVE");
 
         //DTO를 Entity로 변환
         Company company = modelMapper.map(companyDTO, Company.class);
@@ -102,7 +104,7 @@ public class CompanyServiceImpl implements CompanyService {
                 dto.setCompanyParentName(company.getCompanyName());
 
             } else if ("branch".equals(type)) {
-                // 지사일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 지사명
+                // 지점일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 지점명
                 dto.setBranchName(company.getCompanyName());
 
                 if (company.getCompanyParent() != null) {
@@ -112,7 +114,7 @@ public class CompanyServiceImpl implements CompanyService {
                 }
 
             } else if ("facility".equals(type)) {
-                // 지점일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 지점명
+                // 외부시설일 경우: 부모 본사 이름을 찾아서 본사명에, 자기 이름은 외부시설명
                 dto.setFacilityName(company.getCompanyName());
 
                 if (company.getCompanyParent() != null) {
