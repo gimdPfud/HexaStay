@@ -53,11 +53,11 @@
                     <label class="form-label">주민등록번호</label>
                     <div class="row g-2">
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartOne" class="form-control readonly-style" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly readonly-style" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN' && adminDTO.adminRole != 'EXEC' && adminDTO.adminRole != 'HEAD'}">
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartTwo" class="form-control readonly-style" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN'}">
+                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly readonly-style" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" th:readonly="${adminDTO.adminRole != 'SUPERADMIN' && adminDTO.adminRole != 'EXEC' && adminDTO.adminRole != 'HEAD'}">
                         </div>
                     </div>
                 </div>

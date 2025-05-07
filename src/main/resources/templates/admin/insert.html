@@ -489,31 +489,6 @@
         });
 
 
-        // 사번 자동입력
-        function generateEmployeeNumber() {
-            const now = new Date();
-            const yearPrefix = String(now.getFullYear()).slice(2, 4); // "25"
-            const storageKey = `empNum_${yearPrefix}`;
-
-            let currentNum = localStorage.getItem(storageKey);
-            if (!currentNum) {
-                currentNum = 1;
-            } else {
-                currentNum = parseInt(currentNum) + 1;
-            }
-
-            localStorage.setItem(storageKey, currentNum);
-
-            const paddedNum = String(currentNum).padStart(6, '0');
-            return yearPrefix + paddedNum;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const empNum = generateEmployeeNumber();
-            document.getElementById('employeeNum').value = empNum;
-        });
-
-
         //주소 입력
         var geocoder = new daum.maps.services.Geocoder();
         function showMapBox() {
