@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>서버 내부 오류 (500)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; color: #333; }
+        .container { max-width: 800px; margin: 40px auto; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        h1 { color: #d9534f; }
+        h2 { margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        p { line-height: 1.6; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .error-details { background-color: #f5f5f5; border: 1px solid #e3e3e3; padding: 15px; border-radius: 4px; margin-top: 20px; font-size: 0.9em; }
+        .stack-trace { white-space: pre-wrap; word-wrap: break-word; max-height: 300px; overflow-y: auto; background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>⚙️ 서버 내부 오류 (500)</h1>
+    <p>요청을 처리하는 중에 예상치 못한 문제가 발생했습니다.</p>
+    <p>잠시 후 다시 시도해주시거나, 문제가 지속되면 관리자에게 문의해주세요.</p>
+    <p><a th:href="@{/}">홈으로 돌아가기</a></p>
+
+    <div class="error-details"
+         th:if="${timestamp != null or status != null or error != null or message != null or exception != null or path != null or trace != null}">
+        <h2>오류 상세 정보 (개발용)</h2>
+
+        <p th:if="${timestamp != null}">
+            <b>발생 시간:</b>
+            <span th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        </p>
+        <p th:if="${status != null}">
+            <b>상태 코드:</b>
+            <span th:text="${status}"></span>
+        </p>
+        <p th:if="${error != null}">
+            <b>에러 유형:</b>
+            <span th:text="${error}"></span>
+        </p>
+        <p th:if="${path != null}">
+            <b>요청 경로:</b>
+            <span th:text="${path}"></span>
+        </p>
+        <p th:if="${message != null}">
+            <b>오류 메시지:</b>
+            <span th:text="${message}"></span>
+        </p>
+        <p th:if="${exception != null}">
+            <b>예외 클래스:</b>
+            <span th:text="${exception}"></span>
+        </p>
+
+        <div th:if="${trace != null}" class="stack-trace-container">
+            <h3>스택 트레이스 (개발자 참고용):</h3>
+            <pre class="stack-trace" th:text="${trace}"></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>
