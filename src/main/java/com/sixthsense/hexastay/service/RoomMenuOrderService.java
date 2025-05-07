@@ -29,5 +29,13 @@ public interface RoomMenuOrderService {
     // 관리자에게 알람을 띄우기
     public void RoomMenuSendOrderAlert(RoomMenuOrderDTO orderDto, RoomMenuOrder order, Pageable pageable);
 
+    // 오더를 받았을 때의 알람 추가
+    public RoomMenuOrder acceptOrder(Long orderId);
+
+    // 주문을 완료하였을 때의 알람 추가
+    public RoomMenuOrder completeOrder(Long orderId);
+
+    // 주문을 취소하였을 때의 알람 추가.
+    public RoomMenuOrder cancelOrderAsAdmin(Long orderId);
 
 }

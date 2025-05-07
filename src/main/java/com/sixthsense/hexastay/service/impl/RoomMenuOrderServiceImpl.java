@@ -614,4 +614,44 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
         // === 수정 끝 ===
     }
+
+    // 주문 접수시 알람 추가
+    @Override
+    public RoomMenuOrder acceptOrder(Long orderId) {
+        log.info("주문 접수 서비스 알람 - orderId: {}", orderId);
+        RoomMenuOrder order = roomMenuOrderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문 ID " + orderId + "에 해당하는 주문을 찾을 수 없습니다."));
+
+        order.setRoomMenuOrderStatus(RoomMenuOrderStatus.ACCEPT);
+        return roomMenuOrderRepository.save(order);
+    }
+
+    // 주문 완료시 알람 추가
+    @Override
+    public RoomMenuOrder completeOrder(Long orderId) {
+        log.info("주문 완료 서비스 알람 - orderId: {}", orderId);
+
+        RoomMenuOrder order = roomMenuOrderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문 ID " + orderId + "에 해당하는 주문을 찾을 수 없습니다."));
+
+        order.setRoomMenuOrderStatus(RoomMenuOrderStatus.COMPLETE);
+        return roomMenuOrderRepository.save(order);
+    }
+
+
+    // 주문 취소시 알람 추가
+    @Override
+    public RoomMenuOrder cancelOrderAsAdmin(Long orderId) {
+        log.info("관리자 주문 취소 서비스 알람 - orderId: {}", orderId);
+        RoomMenuOrder order = roomMenuOrderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문 ID " + orderId + "에 해당하는 주문을 찾을 수 없습니다."));
+
+        for (RoomMenuOrderItem item : order.getOrderItems()) {
+            RoomMenu menu = item.getRoomMenu();
+            log.info("재고 복원 시도: 메뉴 ID {}, 수량 {}", menu.getRoomMenuNum(), item.getRoomMenuOrderAmount());
+        }
+
+        order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
+        return roomMenuOrderRepository.save(order);
+    }
 }
