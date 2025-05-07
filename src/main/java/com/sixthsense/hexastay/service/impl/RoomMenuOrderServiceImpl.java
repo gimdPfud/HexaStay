@@ -66,6 +66,11 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         // 이메일을 기반으로 회원 정보 조회
         Member member = memberRepository.findByMemberEmail(email);
 
+        if (roomMenu.getRoomMenuPrice() == 0 && roomMenuOrderDTO.getRoomMenuOrderAmount() > 1) {
+            log.info("0원 상품 '{}' 주문 수량 제한 위반. 요청 수량: {}", roomMenu.getRoomMenuName(), roomMenuOrderDTO.getRoomMenuOrderAmount());
+            throw new IllegalStateException("'" + roomMenu.getRoomMenuName() + "' 상품은 가격이 0원이므로 1개만 주문할 수 있습니다.");
+        }
+
         // 새로운 주문 객체 생성
         RoomMenuOrder roomMenuOrder = new RoomMenuOrder();
 
@@ -182,6 +187,11 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
         for (RoomMenuCartItem cartItem : cartItems) {
 
             RoomMenu roomMenu = cartItem.getRoomMenu();
+
+            if (roomMenu.getRoomMenuPrice() == 0 && cartItem.getRoomMenuCartItemAmount() > 1) {
+                log.warn("0원 상품 '{}' 주문 수량 제한 위반 (장바구니). 요청 수량: {}", roomMenu.getRoomMenuName(), cartItem.getRoomMenuCartItemAmount());
+                throw new IllegalStateException("'" + roomMenu.getRoomMenuName() + "' 상품은 가격이 0원이므로 1개만 주문할 수 있습니다.");
+            }
 
             // 재고 확인
             if (roomMenu.getRoomMenuAmount() < cartItem.getRoomMenuCartItemAmount()) {

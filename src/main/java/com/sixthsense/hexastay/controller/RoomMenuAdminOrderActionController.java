@@ -106,7 +106,7 @@ public class RoomMenuAdminOrderActionController {
                             .notificationId(System.currentTimeMillis())
                             .orderId(updatedOrderEntity.getRoomMenuOrderNum())
                             .title("주문 완료")
-                            .message("고객님의 주문(번호: " + updatedOrderEntity.getRoomMenuOrderNum() + ")이 완료되었습니다. 맛있게 드세요!")
+                            .message("고객님의 주문(번호: " + updatedOrderEntity.getRoomMenuOrderNum() + ")이 완료되었습니다. 좋은 하루 되세요!")
                             .status(RoomMenuOrderStatus.COMPLETE.name())
                             .createDate(LocalDateTime.now().toString())
                             .isRead(false)
