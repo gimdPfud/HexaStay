@@ -4,13 +4,13 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>ERD 목록</title>
+    <title>물품 목록</title>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">ERD 목록</h2>
+        <h2 class="fw-bold mb-4 text-center">물품 목록</h2>
 
         <div class="mb-3 text-end" >
             <a href="/erd/insert" class="btn btn-success px-2 py-1">물품 추가</a>
@@ -34,17 +34,18 @@
                     <td>
                         <img th:if="${erd.erdPictureMeta != null}"
                              th:src="@{${erd.erdPictureMeta}}"
-                             style="width: 80px; height: 80px;">
+                             style="width: 80px; height: 80px; object-fit: contain; background-color: #fff; border: 1px solid #ccc;">
+
                         <img th:unless="${erd.erdPictureMeta != null}"
                              th:src="@{/profile/default.png}"
-                             style="width: 80px; height: 80px;">
+                             style="width: 80px; height: 80px; object-fit: contain; background-color: #fff; border: 1px solid #ccc;">
                     </td>
                     <td th:text="${erd.erdType}"></td>
                     <td th:text="${erd.erdName}"></td>
                     <td th:text="${erd.erdSku}"></td>
                     <td th:text="${erd.erdUnit}"></td>
                     <td th:text="${erd.erdNote}"></td>
-                    <td><button class="btn btn-success px-2 py-1">수정</button></td>
+                    <td><a th:href="@{/erd/update/{id}(id=${erd.erdNum})}" class="btn btn-success px-2 py-1">수정</a></td>
                 </tr>
                 </tbody>
             </table>

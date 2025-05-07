@@ -13,4 +13,6 @@ public interface ErdService {
     void insert(ErdDTO erdDTO) throws IOException;
 
     Page<ErdDTO> getErdList(AdminDTO adminDTO, Pageable pageable);
+    ErdDTO getErd(Long erdNum);
+    void update(ErdDTO erdDTO) throws IOException;
 }

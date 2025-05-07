@@ -8,6 +8,7 @@ import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.entity.RoomService;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
@@ -204,6 +205,13 @@ public class RoomServiceImpl {
         log.info("Room 엔티티 저장 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
     }
 
+    //패스워드 중복 체크
+    public boolean isRoomPasswordAvailable(String roomPassword) {
+        long count = roomRepository.countByRoomPassword(roomPassword);
+        return count == 0;
+    }
+
+
 
 
     //Room 페이지에 있는 정보를 가져 List 메서드
@@ -266,11 +274,6 @@ public class RoomServiceImpl {
         });
     }
 
-    //todo:main 페이지 가기 전에 중간 페이지 - 필수 페이지 입니다.
-    //roompassword 을 찾아와서 패스워드를 인증 하는 메소드
-    public boolean RoomPassword(String roomPassword) {
-        return roomRepository.findRoomByRoomPassword(roomPassword).isPresent();
-    }
 
     //Room pk 을 찾아와서 Member FK 만 수정 하는 로직
     //todo:memberByhotelRoom.html 에서 쓰이는 메소드
@@ -304,24 +307,24 @@ public class RoomServiceImpl {
     //todo: http://localhost:8090/qr/${hotelRoomNum}
     //Room DB 에서 HotelRoomNum fk 을 찾아 와서 그 기준으로 member fk을 찾아 오는 로직
 // 호텔룸 번호를 받아서 룸을 찾고, 로그인 인증까지 해주는 메소드
-    public Room readRoomByHotelRoomNum(Long hotelRoomNum) {
+    public Room readRoomByHotelRoomNum(Long hotelRoomNum,String roomPassword) {
 
-        // 1. 호텔룸 번호로 룸 리스트를 가져온다
+        // 1. 호텔룸 번호로 연결된 룸 리스트 조회
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
 
-
-
-
-        // 2. 가져온 룸이 없으면 오류를 던진다
+        // 2. 연결된 룸이 없으면 예외
         if (rooms.isEmpty()) {
             throw new EntityNotFoundException("해당 호텔룸에 연결된 룸 정보가 없습니다.");
         }
 
-        // 3. 여러 룸 중에서 첫 번째 룸을 선택한다
-        Room room = rooms.getFirst();
+        // 3. 비밀번호가 일치하는 Room 찾기
+        Room matchedRoom = rooms.stream()
+                .filter(r -> r.getRoomPassword() != null && r.getRoomPassword().equals(roomPassword))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하는 룸이 없습니다."));
 
         // 4. 선택한 룸에 연결된 회원(Member) 정보를 가져온다
-        Member member = room.getMember();
+        Member member = matchedRoom.getMember();
 
         // 5. 회원의 역할(Role)을 가져온다 (예: USER, ADMIN)
         String role = member.getMemberRole();
@@ -363,12 +366,14 @@ public class RoomServiceImpl {
         session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
         log.info("인증 정보 설정 완료: {}", authentication);
+        log.info("✅ 로그인 완료 - 이메일: {}, 룸 번호: {}", member.getMemberEmail(), matchedRoom.getRoomNum());
 
         // 14. 최종적으로 찾은 룸을 반환한다
-        return room;
+        return matchedRoom;
     }
 
     //roomlist 검색용 서비스 조건 : member 의 이름과 이메일 기준
+    //todo: room/roomlist.html - 검색 의 적용
     public Page<RoomDTO> searchRoomsByMemberKeywordPaged(String keyword, Pageable pageable) {
         Page<Room> rooms = roomRepository.searchRoomsByMemberNameOrEmailPaged(keyword, pageable);
         return rooms.map(room -> modelMapper.map(room, RoomDTO.class));

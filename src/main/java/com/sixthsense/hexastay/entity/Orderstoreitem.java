@@ -29,8 +29,10 @@ public class Orderstoreitem {
     private Storemenu storemenu;        //메뉴랑 연결
 
     //주문한 메뉴 양
+    @Column(nullable = false)
     private Integer orderstoreitemAmount;
     //주문한 메뉴 가격
+    @Column(nullable = false)
     private Integer orderstoreitemPrice;
     //주문한 메뉴들의 총가격
     private Integer orderstoreitemTotalPrice;

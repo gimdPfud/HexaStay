@@ -49,7 +49,6 @@ public class StoreController {
             return "redirect:/admin/logout";
         }
 //        log.info(adminDTO);
-
 //        // 소속된 회사 없음
 //        if (adminDTO.getCompanyNum() == null) {
 //            if (adminDTO.getStoreNum() != null) {
@@ -70,6 +69,7 @@ public class StoreController {
     @PostMapping("/insert")
     public String insert(StoreDTO storeDTO) throws IOException {
 //        log.info("등록post : "+storeDTO);
+        //todo <option selected>검색 조건</option> -> <option value="전체" selected>검색 조건</option>
         storeService.insert(storeDTO);
         return "redirect:/admin/store/list";
     }

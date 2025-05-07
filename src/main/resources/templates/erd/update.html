@@ -4,53 +4,124 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>ERD 항목 수정</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], select { width: 300px; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        input[type="checkbox"] { margin-bottom: 15px; margin-left: 5px; }
-        input[type="hidden"] { display: none; }
-        .form-group { margin-bottom: 15px; }
-        button, a { padding: 10px 15px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px; }
-        button[type="submit"] { background-color: #4CAF50; color: white; }
-        button[type="submit"]:hover { background-color: #45a049; }
-        a { background-color: #f8f8f8; color: #333; border: 1px solid #ccc; }
-        a:hover { background-color: #eee; }
-        .error { color: red; font-size: 0.9em; }
-    </style>
+    <title>물품 수정</title>
 </head>
-<body>
-    <h2>ERD 항목 수정</h2>
-    <!-- th:object를 사용하여 DTO와 폼 바인딩 -->
-    <form th:action="@{/erd/update}" th:object="${erdDto}" method="post">
-        <!-- ID는 hidden 필드로 전송 -->
-        <input type="hidden" th:field="*{id}" />
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
-        <div class="form-group">
-            <label for="tableName">테이블명:</label>
-            <input type="text" th:field="*{tableName}" required />
-            <span class="error" th:if="${#fields.hasErrors('tableName')}" th:errors="*{tableName}">Table Name Error</span>
-        </div>
-        <div class="form-group">
-            <label for="columnName">컬럼명:</label>
-            <input type="text" th:field="*{columnName}" required />
-             <span class="error" th:if="${#fields.hasErrors('columnName')}" th:errors="*{columnName}">Column Name Error</span>
-        </div>
-        <div class="form-group">
-            <label for="dataType">데이터 타입:</label>
-            <input type="text" th:field="*{dataType}" placeholder="예: VARCHAR(255), INT, BOOLEAN" required />
-             <span class="error" th:if="${#fields.hasErrors('dataType')}" th:errors="*{dataType}">Data Type Error</span>
-        </div>
-        <div class="form-group">
-            <label for="isNullable">NULL 허용:</label>
-            <input type="checkbox" th:field="*{isNullable}" />
-            <!-- th:field 사용 시 value 불필요, boolean 타입 자동 처리 -->
-        </div>
-        <!-- 필요한 다른 ERD 관련 필드들 추가 -->
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">물품 수정</h2>
 
-        <button type="submit">저장</button>
-        <a th:href="@{/erd/list}">취소</a>
-    </form>
+        <form action="/erd/insert" method="post" enctype="multipart/form-data">
+            <div class="container p-4" style="max-width: 700px;">
+
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
+                        <th:block th:if="${erd.erdPictureMeta != null}">
+                            <img id="pictureTemp"
+                                 th:src="@{${erd.erdPictureMeta}}"
+                                 style="width: 100%; height: 100%; object-fit: contain;"
+                                 alt="이미지 미리보기">
+                        </th:block>
+                        <th:block th:if="${erd.erdPictureMeta == null}">
+                            <span class="text-muted">이미지가 없습니다</span>
+                        </th:block>
+                    </div>
+                    <p class="file-name">수정할 이미지를 선택해 주세요.</p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="erdPicture" name="erdPicture" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="erdType" class="form-label">분류 선택</label>
+                    <select type="text" class="form-control" id="erdType" name="erdType" required>
+                        <option>호텔용품</option>
+                        <option>설비</option>
+                        <option>시설관리자재</option>
+                        <option>사무/소모품</option>
+                        <option>식음료</option>
+                        <option>청소/위생용품</option>
+                        <option>유니폼/의류</option>
+                        <option>기타</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="erdName" class="form-label">물품명</label>
+                    <input type="text" class="form-control" id="erdName" name="erdName" required
+                           th:value="${erd.erdName}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="erdSku" class="form-label">SKU번호</label>
+                    <input type="text" class="form-control" id="erdSku" name="erdSku" required
+                           th:value="${erd.erdSku}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="erdUnit" class="form-label">수량</label>
+                    <input type="text" class="form-control" id="erdUnit" name="erdUnit" required
+                           th:value="${erd.erdUnit}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="erdNote" class="form-label">비고</label>
+                    <input type="text" class="form-control" id="erdNote" name="erdNote" required
+                           th:value="${erd.erdNote}">
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="submit" class="btn btn-success">수정</button>
+                    <a th:href="@{/erd/list}" class="btn btn-danger">취소</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <input hidden name="$erdNum" value="${erd.erdNum}">
+
+    <script>
+        // 프로필 사진
+
+        document.getElementById('erdPicture').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
+
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('erdPicture').click();
+        });
+
+
+        document.getElementById('erdPicture').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+    </script>
+
+</div>
 </body>
-</html> 
+</html>

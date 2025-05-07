@@ -26,22 +26,22 @@ public class Storemenu extends BaseEntity {
     private Long storemenuNum;
 
     //룸서비스외부 업체 상품이름
+    @Column(nullable = false, length = 20)
     private String storemenuName;
 
     //룸서비스외부 업체상품 가격
+    @Column(nullable = false)
     private Integer storemenuPrice;
 
     //룸서비스외부 업체상품 설명
     private String storemenuContent;
 
     //룸서비스외부 업체상품 카테고리
+    @Column(nullable = false)
     private String storemenuCategory;
 
     //룸서비스외부 업체상품 서비스 활성화 여부
     private String storemenuStatus;
-
-    //룸서비스외부
-    private String storemenuOut;
 
     //참조 테이블 - Store 테이블 Pk 참조
     @ManyToOne(fetch = FetchType.LAZY)

@@ -45,8 +45,8 @@
                 <button type="submit" class="btn btn-primary w-50">
                     검색
                 </button>
-                <a href="/admin/list" class="btn btn-success w-50">
-                    전체
+                <a href="/admin/insert" class="btn btn-success w-50">
+                    등록
                 </a>
             </div>
         </form>
@@ -86,7 +86,7 @@
                         <td th:text="${#strings.isEmpty(adminDTO.companyName) ? (!#strings.isEmpty(adminDTO.storeName) ? adminDTO.storeName : '') : adminDTO.companyName}">소속</td>
                         <td th:text="${adminDTO.adminJoinDate}">입사일</td>
                         <td>
-                            <a th:href="@{|/admin/edit/${adminDTO.adminNum}|}"
+                            <a th:href="@{|/admin/update/${adminDTO.adminNum}|}"
                                class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
                                 수정
                             </a>

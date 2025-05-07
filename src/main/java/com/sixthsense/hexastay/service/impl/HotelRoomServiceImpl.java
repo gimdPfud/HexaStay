@@ -150,14 +150,14 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //************단일 호텔룸 CRRUD 메소드*************//
     // 1. 호텔방 등록 (이미지 + QR 코드까지 함께 등록하는 메서드)
     @Override
-    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO) throws IOException {
+    public void hotelroomInsert(HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
         log.info("HotelRoom Service 진입 했습니다."); // 이 메서드가 실행되었다는 로그 출력
 
         // DTO → Entity로 바꿔주는 코드 (HotelRoomDTO → HotelRoom)
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
 
         // DTO에 있는 회사 번호(companyNum)를 꺼내서, DB에서 실제 회사 정보를 찾아오기
-        Long companyNum = hotelRoom.getCompany().getCompanyNum();
+
         Company company = companyRepository.findById(companyNum)
                 .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다.")); // 회사 없으면 오류
         hotelRoom.setCompany(company); // 찾은 회사 정보를 호텔방에 다시 넣어줌
@@ -289,7 +289,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     *  링크 주소 : /admin/hotelroom/modify
     * */
     @Override
-    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO) throws IOException {
+    public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
         log.info("HotelRoom 수정 Service 진입");
 
         // 1. 기존 HotelRoom 조회
@@ -321,7 +321,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         }
 
         // 4. Company 연관관계 유지
-        Company company = companyRepository.findById(hotelRoom.getCompany().getCompanyNum())
+        Company company = companyRepository.findById(companyNum)
                 .orElseThrow(() -> new EntityNotFoundException("회사 정보가 없습니다."));
         hotelRoom.setCompany(company);
 

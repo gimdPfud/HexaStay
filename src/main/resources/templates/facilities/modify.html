@@ -5,11 +5,16 @@
 <head>
     <meta charset="UTF-8">
     <title>수정하기</title>
+
+    <link href="/summernote-0.9.0-dist/summernote-bs5.css" rel="stylesheet">
+    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
+    <!-- language pack -->
+    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">조직 수정</h2>
+        <h2 class="fw-bold mb-4 text-center">시설 정보 수정</h2>
 
         <form id="modifyForm" action="/facility/modify" method="post" enctype="multipart/form-data">
             <div class="container p-4" style="max-width: 500px;">
@@ -21,35 +26,13 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">서비스명</label>
-                    <input type="text" class="form-control" name="fsName" th:value="${data.fsName}">
+                    <label class="form-label">시설 정보 입력 칸 1</label>
+                    <textarea class="form-control" id="facTitle" name="facTitle" th:text="${data.facTitle}"></textarea>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">상세설명</label>
-                    <textarea class="form-control" name="fsContent" rows="4" th:text="${data.fsContent}"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">가격</label>
-                    <input type="number" class="form-control" name="fsPrice" th:value="${data.fsPrice}">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">수량</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" th:value="${data.fsAmount}+' 명이 이용중입니다.'" readonly>
-                        <span class="input-group-text">/</span>
-                        <input type="number" min="0" class="form-control" id="fsAmountMax" name="fsAmountMax" th:value="${data.fsAmountMax}">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">상태</label>
-                    <select class="form-control" name="fsStatus">
-                        <option th:value="yes" th:selected="${data.fsStatus == 'yes'}">이용가능</option>
-                        <option th:value="no" th:selected="${data.fsStatus == 'no'}">이용불가</option>
-                    </select>
+                    <label class="form-label">시설 정보 입력 칸 2</label>
+                    <textarea class="form-control" name="facContent" id="facContent" rows="4" th:text="${data.facContent}"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-center gap-3">
@@ -61,6 +44,27 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded",function () {
+            $('#facContent, #facTitle').summernote({
+                placeholder: '내용을 입력하세요.',
+                tabsize: 2,
+                height: 300,
+                lang: 'ko-KR', // default: 'en-US'
+
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ]
+            });
+        })
+    </script>
 
 </div>
 </body>

@@ -20,7 +20,7 @@ public interface StoremenuRepository extends JpaRepository<Storemenu, Long> {
     public Page<Storemenu> findAll(Pageable pageable);
 
     /*storenum(fk)가 해당하는 menu들을 (활성화된것만) 전부 가져오기.*/
-    @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus in ('alive', 'soldout')")
+    @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus in ('alive')")
     public List<Storemenu> findAll(Long storeNum);
 
     @Query("select s from Storemenu s where s.store.storeNum=:storeNum and s.storemenuStatus=:status and s.storemenuCategory=:category")

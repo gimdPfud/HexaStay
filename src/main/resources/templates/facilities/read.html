@@ -20,33 +20,12 @@
     <div class="container p-4" style="max-width: 700px;">
       <!-- 상세 -->
       <div class="mb-2"><label class="form-label">시설명</label><p class="form-control" th:text="${data.companyDTO.companyName}"></p></div>
-      <div class="mb-2"><label class="form-label">서비스명</label><p class="form-control" th:text="${data.fsName}"></p></div>
-      <div class="mb-2"><label class="form-label">상세설명</label><p class="form-control" th:text="${data.fsContent}"></p></div>
-      <div class="mb-2"><label class="form-label">가격</label><p class="form-control" th:text="${data.fsPrice}"></p></div>
-      <div class="mb-2"><label class="form-label">수량(수용인원)</label>
-        <div class="input-group">
-          <span class="form-control" th:text="${data.fsAmount}+' 명이 이용중입니다.'"></span>
-          <span class="input-group-text" > / </span>
-          <span class="form-control" th:text="${data.fsAmountMax}"></span>
-        </div>
-      </div>
-      <div class="mb-2"><label class="form-label">상태</label><p class="form-control" th:text="${data.fsStatus=='yes'?'이용가능':'이용불가'}"></p></div>
+      <div class="mb-2"><label class="form-label">정보 글 1</label><p class="form-control" th:text="${data.facTitle}"></p></div>
+      <div class="mb-2"><label class="form-label">정보 글 2</label><p class="form-control" th:text="${data.facContent}"></p></div>
 
       <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/facility/list/{num}(num=${data.companyDTO.companyNum})}" class="btn btn-secondary">목록</a>
         <a th:href="@{/facility/modify/{num}(num=${data.facilitiesNum})}" class="btn btn-success">수정</a>
-
-        <!-- 비활성화 상태일 경우 '활성화하기' 버튼 표시 -->
-        <form th:if="${data.fsStatus != null and data.fsStatus.toUpperCase() == 'NO'}"
-              th:action="@{/facility/activate/{num}(num=${data.facilitiesNum})}" method="post">
-          <button type="submit" class="btn btn-outline-danger w-auto">활성화하기</button>
-        </form>
-
-        <!-- 비활성화 버튼 (fsStatus가 null이거나 INACTIVE가 아닐 때만 표시) -->
-        <form th:if="${data.fsStatus == null or data.fsStatus.toUpperCase() != 'NO'}"
-              th:action="@{/facility/deactivate/{num}(num=${data.facilitiesNum})}" method="post">
-          <button type="submit" class="btn btn-outline-danger w-auto">비활성화하기</button>
-        </form>
       </div>
     </div>
   </div>

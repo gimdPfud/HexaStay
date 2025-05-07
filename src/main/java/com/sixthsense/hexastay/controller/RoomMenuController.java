@@ -21,6 +21,7 @@ import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
+import com.sixthsense.hexastay.service.RoomMenuOptionService;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
@@ -54,6 +55,7 @@ public class RoomMenuController {
     private final RoomMenuService roomMenuService;
     private final RoomMenuCartService roomMenuCartService;
     private final RoomMenuRepository roomMenuRepository;
+    private final RoomMenuOptionService roomMenuOptionService;
 
     /**************************************************
      * 메인 페이지
@@ -295,8 +297,14 @@ public class RoomMenuController {
      **************************************************/
 
     @PostMapping("/roommenu/delete")
-    public String roomMenuDelete(Long num, Principal principal){
+    public String roomMenuDelete(Long num, Principal principal, RedirectAttributes redirectAttributes){
         log.info("삭제 컨트롤러 진입" + num);
+
+        // 옵션 존재 여부 확인
+        if (roomMenuOptionService.hasOption(num)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "옵션이 존재합니다. 옵션을 먼저 삭제해주세요.");
+            return "redirect:/roommenu/list";
+        }
 
         String memberName = principal.getName();  // 로그인한 사용자의 이름 (또는 ID)
         log.info("로그인한 사용자: " + memberName);

@@ -35,6 +35,7 @@ public class Storecartitem {
     @JoinColumn(name = "storemenu_num")
     private Storemenu storemenu;
 
+    @Column(nullable = false)
     private Integer storecartitemCount;          //장바구니에 담은 수량
 
     private String storemenuOptions;  //주문한 상품의 옵션들??

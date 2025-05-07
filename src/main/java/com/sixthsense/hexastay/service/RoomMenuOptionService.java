@@ -18,6 +18,9 @@ public interface RoomMenuOptionService {
     // 옵션을 삭제
     public void roomMenuOptionDelete(Long roomMenuOptionNum);
 
+    // 옵션 삭제 시 컨트롤러에서 확인
+    public boolean hasOption(Long roomMenuNum);
+
 
 
 

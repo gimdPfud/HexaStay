@@ -1,269 +1,251 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>직원 정보 입력</title>
+    <title>마이페이지</title>
 </head>
-<body class="w-100 vh-100 bg-light">
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    <form method="post" action="/insert" enctype="multipart/form-data">
-        <div class="container p-4 rounded shadow-sm w-100 h-100" style="max-width: 400px;">
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">마이페이지</h2>
 
-            <div class="d-flex w-100" style="justify-content: center;">
-                <img src="https://via.placeholder.com/103x133" class="rounded" style="width: 103px; height: 133px;">
-            </div>
-            <div class="d-flex w-100 ms-5 mt-3" style="justify-content: center;">
-                <input type="file" name="file" id="file">
-            </div>
+        <form th:action="@{/admin/mypage}" method="post" enctype="multipart/form-data" th:object="${adminDTO}">
+            <div class="container p-4" style="max-width: 700px;">
 
-            <div class="mb-2">
-                <label class="form-label">사번</label>
-                <input th:value="${centerDTOList.adminEmployeeNum}" type="text" name="adminEmployeeNum" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">이메일 (ID)</label>
-                <input th:value="${centerDTOList.adminEmail}" type="text" name="adminEmail" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">이름</label>
-                <input th:value="${centerDTOList.adminName}" type="text" name="adminName" class="form-control">
-            </div>
-            <div class="mb-2">
-                <label class="form-label">주민등록번호</label>
-                <div class="row">
-                    <input type="text" id="adminResidentNumPartOne" class="form-control" style="margin-left: 3.5%; width:46%"> -
-                    <input type="text" id="adminResidentNumPartTwo" class="form-control" style="width:46%">
+                <div class="mb-3 user-box text-center">
+                    <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" th:src="${adminDTO.adminProfileMeta != null} ? ${adminDTO.adminProfileMeta} : '#'" th:classappend="${adminDTO.adminProfileMeta == null} ? 'd-none' : ''">
+                    </div>
+                    <p class="file-name" th:text="${adminDTO.adminProfileMeta != null} ? '기존 프로필 사진' : '프로필 사진이 선택되지 않았습니다.'"></p>
+                    <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
+                    <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
+                           accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
+                    <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">사번</label>
+                    <input type="text" th:field="*{adminEmployeeNum}" class="form-control" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">이메일 (ID)</label>
+                    <input type="email" th:field="*{adminEmail}" class="form-control" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">이름</label>
+                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">주민등록번호</label>
+                    <div class="row g-2">
+                        <div class="col">
+                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly text-center" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" readonly>
+                        </div>
+                        <div class="col-auto d-flex align-items-center">-</div>
+                        <div class="col">
+                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly text-center" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6) : ''}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">가게 주소</label>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <input type="text" id="adminAddressOne" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="adminAddressTwo" class="form-control" style="background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary" onclick="showMapBox()">주소 검색</button>
+                        </div>
+                    </div>
+                    <input type="text" id="adminAddressThree" class="form-control mt-2">
+                    <input hidden type="text" id="adminAddress" name="adminAddress" class="form-control"
+                           th:value="${adminDTO.adminAddress}" th:classappend="${#fields.hasErrors('adminAddress')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('adminAddress')}" th:errors="*{adminAddress}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">연락처</label>
+                    <div class="row g-2">
+                        <div class="col">
+                            <select class="form-select" id="adminPhonePartOne">
+                                <option>010</option>
+                                <option>011</option>
+                                <option>017</option>
+                            </select>
+                        </div>
+                        <div class="col-auto d-flex align-items-center">-</div>
+                        <div class="col">
+                            <input type="text" id="adminPhonePartTwo" class="form-control numberOnly text-center" maxlength="4">
+                        </div>
+                        <div class="col-auto d-flex align-items-center">-</div>
+                        <div class="col">
+                            <input type="text" id="adminPhonePartThree" class="form-control numberOnly text-center" maxlength="4">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">직책</label>
+                    <input type="text" th:field="*{adminPosition}" class="form-control" th:classappend="${#fields.hasErrors('adminPosition')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('adminPosition')}" th:errors="*{adminPosition}"></div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="submit" onclick="submitForm(event)" class="btn btn-success">수정</button>
+                    <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
-            <input th:value="${centerDTOList.adminResidentNum}" hidden name="adminResidentNum" id="adminResidentNum" value="">
-
-            <div class="mb-2">
-                <label class="form-label">주소</label>
-                <input type="text" name="adminAddress" class="form-control">
-            </div>
-            <div class="mb-2 row">
-                <label class="form-label">연락처</label>
-                <select class="form-select" id="adminPhonePartOne" style="margin-left : 3.5%; width:30%">
-                    <option>010</option>
-                    <option>011</option>
-                    <option>017</option>
-                </select> -
-                <input type="text" id="adminPhonePartTwo" class="form-control" style="width:30%"> -
-                <input type="text" id="adminPhonePartThree" class="form-control" style="width:30%">
-
-                <input th:value = "${centerDTOList.adminPhone}" hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
-            </div>
-
-            <div class="mb-2">
-                <label class="form-label">소속</label>
-                <div class="row g-2">
-                    <div class="col-3">
-                        <select id="adminChoice" class="form-select">
-                            <option>본사</option>
-                            <option>지사</option>
-                            <option>지점</option>
-                            <option>스토어</option>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminCenter" id="adminCenter" class="form-select">
-                            <option th:each="centerList : ${centerDTOList}" th:text="${centerList.centerName}" th:valuie="${centerList.centerNum}"></option>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled>
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <select name="adminStore" id="adminStore" class="form-select" disabled>
-                        </select>
-                    </div>
-                    <input hidden name="adminBrand" id="adminBrand" value="">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
-                <select class="form-select" id="adminCenterRank">
-                    <option>임원진</option>
-                    <option>관리직</option>
-                    <option>사원</option>
-                </select>
-                <select class="form-select" id="adminBranchFacilityRank" hidden>
-                    <option>운영 총괄</option>
-                    <option>관리직</option>
-                    <option>사원</option>
-                    <option>협력 업체</option>
-                </select>
-                <select class="form-select" id="adminStoreRank" hidden>
-                    <option>운영총괄</option>
-                    <option>부매니저</option>
-                    <option>매장 직원</option>
-                </select>
-
-                <input hidden name="adminRank" id="adminRank">
-
-            </div>
-
-
-            <div class="mb-3">
-                <label class="form-label">직책</label>
-                <input type="text"  name="adminPosition" class="form-control">
-            </div>
-
-
-            <div class="mb-3">
-                <label class="form-label">입사일</label>
-                <input type="date" name="adminJoinDate" class="form-control">
-            </div>
-            <div class="d-flex justify-content-center gap-3">
-                <button type="submit" onclick="submitForm()" class="btn btn-success">등록</button>
-                <button class="btn btn-danger">취소</button>
-            </div>
-        </div>
-
-    </form>
-
+            <input hidden type="text" name="adminPassword" class="form-control">
+            <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%" th:value="${adminDTO.adminPhone}">
+            <input hidden name="adminResidentNum" id="adminResidentNum" th:value="${adminDTO.adminResidentNum}">
+            <input hidden name="adminRole" id="adminRole" th:value="${adminDTO.adminRole}">
+            <input hidden name="adminNum" th:value="${adminDTO.adminNum}">
+            <input hidden name="adminProfileMeta" th:value="${adminDTO.adminProfileMeta}">
+            <input hidden name="adminEmployeeNum" th:value="${adminDTO.adminEmployeeNum}">
+        </form>
+    </div>
     <script>
-        const adminChoice = document.getElementById("adminChoice");
-        const adminCenter = document.getElementById("adminCenter");
-        const adminBranchFacility = document.getElementById("adminBranchFacility");
-        const adminStore = document.getElementById("adminStore");
-        const adminCenterRank = document.getElementById("adminCenterRank");
-        const adminBranchFacilityRank = document.getElementById("adminBranchFacilityRank");
-        const adminStoreRank = document.getElementById("adminStoreRank");
+        // 프로필 사진 처리
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+            const filePath = this.value;
+            const errorMessage = document.getElementById('fileError');
+            const previewImage = document.getElementById('pictureTemp');
+            const file = this.files[0];
 
+            if (!allowedExtensions.exec(filePath)) {
+                this.value = '';
+                errorMessage.classList.remove('d-none');
+                previewImage.classList.add('d-none');
+            } else {
+                errorMessage.classList.add('d-none');
 
-        // 소속 선택 시 다른 선택 박스 활성화/비활성화
-        adminChoice.addEventListener("change", function () {
-            adminBranchFacility.innerHTML = "<option value=''></option>";
-
-            if (adminChoice.value === "본사") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
-                adminCenter.disabled = false;
-                adminBranchFacility.disabled = true;
-                adminStore.disabled = true;
-
-                adminCenterRank.hidden = false;
-                adminBranchFacilityRank.hidden = true;
-                adminStoreRank.hidden = true;
-
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
-                adminCenter.disabled = false;
-                adminBranchFacility.disabled = false;
-                adminStore.disabled = true;
-
-                adminCenterRank.hidden = true;
-                adminBranchFacilityRank.hidden = false;
-                adminStoreRank.hidden = true;
-
-            } else if (adminChoice.value === "스토어") {
-                adminCenter.value="";
-                adminBranchFacility.value="";
-                adminStore.value="";
-                adminCenter.disabled = true;
-                adminBranchFacility.disabled = true;
-                adminStore.disabled = false;
-
-                adminCenterRank.hidden = true;
-                adminBranchFacilityRank.hidden = true;
-                adminStoreRank.hidden = false;
-
-                fetch(`/searchstore`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("왜안됨?")
-                        adminStore.innerHTML = "<option value=''></option>";
-
-                        data.forEach(item => {
-                            let storeOption = document.createElement("option");
-                            storeOption.value = item.storeNum;
-                            storeOption.textContent = item.storeName;
-                            adminStore.appendChild(storeOption);
-                        });
-                    })
-            }
-
-
-            adminCenter.addEventListener("change", function () {
-                adminBranchFacility.innerHTML = "<option value=''></option>";
-                adminStore.innerHTML = "<option value=''></option>";
-                let adminCenterValue = adminCenter.value;
-                let choiceValue = adminChoice.value;
-
-                if (choiceValue === "지사") {
-                    fetch(`/searchbranch?centerName=${adminCenterValue}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            adminBranchFacility.innerHTML = "<option value=''></option>";
-
-                            data.forEach(item => {
-                                let option = document.createElement("option");
-                                option.value = item.branchNum;
-                                option.textContent = item.branchName;
-                                adminBranchFacility.appendChild(option);
-                            });
-
-                            adminBranchFacility.disabled = false;
-                        })
-                        .catch(error => console.error("지사 데이터 불러오기 실패:", error));
-
-                } else if (choiceValue === "지점") {
-                    fetch(`/searchfacility?centerName=${adminCenterValue}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            adminBranchFacility.innerHTML = "<option value=''></option>";
-
-                            data.forEach(item => {
-                                let option = document.createElement("option");
-                                option.value = item.facilityNum;
-                                option.textContent = item.facilityName;
-                                adminBranchFacility.appendChild(option);
-                            });
-
-                            adminBranchFacility.disabled = false;
-                        })
-                        .catch(error => console.error("지점 데이터 불러오기 실패:", error));
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(file);
                 }
-            });
+            }
         });
 
-        function submitForm() {
-            if (adminChoice.value === "본사") {
-                document.getElementById("adminBrand").value = adminCenter.value;
-                document.getElementById("adminRank").value = adminCenterRank.value;
-            } else if (adminChoice.value === "지사" || adminChoice.value === "지점") {
-                document.getElementById("adminBrand").value = adminBranchFacility.value;
-                document.getElementById("adminRank").value = adminBranchFacilityRank.value;
-            } else if (adminChoice.value === "스토어") {
-                document.getElementById("adminBrand").value = adminStore.value;
-                document.getElementById("adminRank").value = adminStoreRank.value;
+        document.getElementById('PictureBtn').addEventListener('click', function () {
+            document.getElementById('adminProfile').click();
+        });
+
+        document.getElementById('adminProfile').addEventListener('change', function () {
+            let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
+            document.querySelector('.file-name').textContent = fileName;
+        });
+
+        // 입력 제한
+        document.querySelectorAll('.numberOnly').forEach(input => input.addEventListener('input', () => input.value = input.value.replace(/[^0-9]/g, '')));
+
+        //주소 입력
+        function showMapBox() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    console.log(data);
+                    var zonecode = data.zonecode;
+                    var addr = data.address;
+                    document.getElementById("adminAddressOne").value = zonecode;
+                    document.getElementById("adminAddressTwo").value = addr;
+                }
+            }).open();
+        }
+
+        // 페이지 로드 시 주소 분리
+        window.addEventListener('load', function() {
+            const fullAddress = document.getElementById('adminAddress').value;
+            console.log('전체주소:', fullAddress);
+            
+            if (fullAddress) {
+                const parts = fullAddress.split('\u00A0');
+                console.log('주소 분리:', parts);
+                
+                if (parts.length >= 3) {
+                    document.getElementById('adminAddressOne').value = parts[0];
+                    document.getElementById('adminAddressTwo').value = parts[1];
+                    document.getElementById('adminAddressThree').value = parts[2];
+                }
             }
 
-            document.getElementById('adminResidentNum').value =
-                document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
+            // 전화번호 분리
+            const fullPhone = document.getElementById('adminPhone').value;
+            console.log('전체 전화번호:', fullPhone);
+            
+            if (fullPhone) {
+                const phoneParts = fullPhone.split('-');
+                console.log('전화번호 분리:', phoneParts);
+                
+                if (phoneParts.length === 3) {
+                    document.getElementById('adminPhonePartOne').value = phoneParts[0];
+                    document.getElementById('adminPhonePartTwo').value = phoneParts[1];
+                    document.getElementById('adminPhonePartThree').value = phoneParts[2];
+                }
+            } else {
+                console.log('전화번호가 없습니다.');
+            }
+        });
 
+        function submitForm(event) {
+            event.preventDefault();
+
+            // 필수 입력 필드 검사
+            const requiredFields = {
+                'adminName': '이름',
+                'adminAddressOne': '우편번호',
+                'adminAddressTwo': '기본주소',
+                'adminAddressThree': '상세주소',
+                'adminPhonePartOne': '연락처 앞자리',
+                'adminPhonePartTwo': '연락처 중간자리',
+                'adminPhonePartThree': '연락처 뒷자리',
+                'adminPosition': '직책'
+            };
+
+            let isValid = true;
+            for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    alert(`${fieldName}을(를) 입력해주세요.`);
+                    field.focus();
+                    isValid = false;
+                    return;
+                }
+            }
+
+            // 연락처 결합
             document.getElementById('adminPhone').value =
                 document.getElementById('adminPhonePartOne').value + "-" +
                 document.getElementById('adminPhonePartTwo').value + "-" +
-                document.getElementById('adminPhonePartThree').value
+                document.getElementById('adminPhonePartThree').value;
 
+            // 주소 결합
+            document.getElementById('adminAddress').value =
+                document.getElementById('adminAddressOne').value + "\u00A0" + 
+                document.getElementById('adminAddressTwo').value + "\u00A0" + 
+                document.getElementById('adminAddressThree').value;
 
-
+            // 폼 제출
+            if (isValid) {
+                event.target.form.submit();
+            }
         }
-
     </script>
-
 </div>
 </body>
 </html>

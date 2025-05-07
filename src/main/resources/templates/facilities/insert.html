@@ -4,7 +4,13 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>시설서비스 등록</title>
+    <title>시설 정보 등록</title>
+
+    <link href="/summernote-0.9.0-dist/summernote-bs5.css" rel="stylesheet">
+    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
+    <!-- language pack -->
+    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
+
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
@@ -12,37 +18,23 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
 
-        <form id="insertForm" action="/facility/insert" method="post" enctype="multipart/form-data">
+        <form id="insertForm" action="/facility/insert" method="post">
             <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-2">
-                    <label class="form-label" id="">시설명</label>
-                    <input type="text" th:value="${company}" class="form-control" readonly>
-                    <input type="hidden" th:value="${companyNum}" name="companyNum" class="form-control">
+                    <label class="form-label" for="companyName">시설명</label>
+                    <input type="text" id="companyName" th:value="${company}" class="form-control" readonly>
+                    <input type="hidden" th:value="${companyNum}" id="companyNum" name="companyNum" class="form-control">
                 </div>
                 <div class="mb-2">
-                    <label class="form-label" id="brandLabel">서비스명</label>
-                    <input type="text" name="fsName" id="fsName" class="form-control">
+                    <label class="form-label" for="facTitle">첫 번째 입력 칸</label>
+                    <textarea name="facTitle" id="facTitle" class="form-control"></textarea>
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">상세 설명</label>
-                    <textarea name="fsContent" id="fsContent" class="form-control"></textarea>
+                    <label class="form-label" for="facContent">두 번째 입력 칸</label>
+                    <textarea name="facContent" id="facContent" class="form-control"></textarea>
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">가격</label>
-                    <input type="number" name="fsPrice" id="fsPrice" class="form-control">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">수량 / 최대 수용 인원</label>
-                    <input type="number" name="fsAmountMax" id="fsAmountMax" class="form-control">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">상태</label>
-                    <select type="text" class="form-control" name="fsStatus">
-                        <option value="yes">이용가능</option>
-                        <option value="no">이용불가능</option>
-                    </select>
-                </div>
+
                 <div class="d-flex justify-content-center gap-3">
                     <button type="submit" class="btn btn-success" >등록</button>
                     <a th:href="@{/facility/list}" class="btn btn-danger">취소</a>
@@ -51,6 +43,27 @@
         </form>
 
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded",function () {
+            $('#facContent, #facTitle').summernote({
+                placeholder: '내용을 입력하세요.',
+                tabsize: 2,
+                height: 300,
+                lang: 'ko-KR', // default: 'en-US'
+
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ]
+            });
+        })
+    </script>
 
 </div>
 </body>

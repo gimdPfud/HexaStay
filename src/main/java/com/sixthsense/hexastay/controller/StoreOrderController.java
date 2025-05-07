@@ -128,6 +128,7 @@ public class StoreOrderController {
     }
     @PostMapping("/admin/store/order/list")
     public String adminOrderList(@RequestParam(value = "storeNum") Long storeNum, Principal principal, Model model){
+
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -135,13 +136,34 @@ public class StoreOrderController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
+
         List< StoreDTO> storelist = storeService.getAllList();
-        model.addAttribute("storeList",storelist);
+
+        List<OrderstoreDTO> list = orderstoreService.getOrderedList(storeNum);
+
+        //옵션용 Map 이름가격 > 하나의메뉴
+        Map<Long, List<String>> optionMap = new HashMap<>();
+        list.forEach(order->{
+            order.getOrderstoreitemDTOList().forEach(dto->{ //메뉴1개
+                if(dto.getStoremenuOptions()!=null&&!dto.getStoremenuOptions().isBlank()) {
+                    List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
+                    options = options.stream().map(option->{//옵션1개
+                        List<String> optionInfos = Arrays.stream((option.split(":"))).toList();
+                        option = optionInfos.get(1) + " (" + optionInfos.get(2) + "원)";
+                        return option;
+                    }).toList();
+                    optionMap.put(dto.getOrderstoreitemNum(),options);
+                }
+            });
+        });
+
         log.info("스토어넘버 넘어왔니? "+storeNum);
-        List<OrderstoreDTO> list = orderstoreService.getOrderedList(storeNum);//됨?
         log.info("서비스에서 찾아옴? "+list.size());
         list.forEach(log::info);
+
         model.addAttribute("list",list);
+        model.addAttribute("storeList",storelist);
+        model.addAttribute("optionMap",optionMap);
         model.addAttribute("storeNum",storeNum);
         return "store/orderlistForAdmin";
     }

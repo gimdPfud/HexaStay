@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.dto.MemberDTO;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
@@ -25,8 +26,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.sixthsense.hexastay.entity.QRoom.room;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,6 +46,8 @@ public class RoomController {
     private final HotelRoomService hotelRoomService;
 
     private final MemberService memberService;
+
+    private final RoomRepository roomRepository;
 
     //todo:0425 카테고리 분류별 페이지 리스트 localhost:8090/roomList
     //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지
@@ -128,6 +134,22 @@ public class RoomController {
         }
         return "redirect:/register-hotelroom";
     }
+
+    //RoomPassword 검색용 Controller
+    //memberinsertroom.html / hotelroominsert.html - 패스워드 추천 버튼
+    @GetMapping("/room/check-password")
+    @ResponseBody  // 👈 이걸 붙여야 함
+    public Map<String, Object> checkRoomPassword(@RequestParam("value") String roomPassword) {
+        boolean available = roomServiceimpl.isRoomPasswordAvailable(roomPassword);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("available", available);
+        response.put("message", available ? "사용 가능한 비밀번호입니다." : "이미 사용 중인 비밀번호입니다.");
+
+        return response;
+    }
+
+
 
     /**
      * 회원이 특정 호텔룸에 배정되는 등록 페이지 이동
@@ -279,30 +301,49 @@ public class RoomController {
     }
 
     @PostMapping("/qr/{hotelRoomNum}")
-    public String checkPassword(@RequestParam("roomPassword") String roomPassword,
-                                @PathVariable("hotelRoomNum") Long hotelRoomNum,
-                                RedirectAttributes redirectAttributes,
-                                HttpSession session) {
-
-        Room room;
+    public String checkPasswordByStatus(@RequestParam("roomPassword") String roomPassword,
+                                        @PathVariable("hotelRoomNum") Long hotelRoomNum,
+                                        RedirectAttributes redirectAttributes,
+                                        HttpSession session) {
         try {
-            // ✅ 서비스에서 패스워드까지 검증해서 반환
-            room = roomServiceTest.readRoomByHotelRoomNum(hotelRoomNum, roomPassword);
+            Room room = roomServiceTest.readRoomByCheckinPassword(roomPassword);
 
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+            session.setAttribute("roomNum", room.getRoomNum());
+            session.setAttribute("roomPassword", room.getRoomPassword());
+
+            return "redirect:/main?hotelRoomNum=" + room.getHotelRoom().getHotelRoomNum();
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/qr/" + hotelRoomNum;
+        }
+    }
 
-        } catch (EntityNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", "호텔룸 정보를 찾을 수 없습니다.");
-            return "redirect:/roomlist";
+    @GetMapping("/qr/validate")
+    @ResponseBody
+    public Map<String, Object> validateRoomPassword(
+            @RequestParam Long hotelRoomNum,
+            @RequestParam String roomPassword) {
+
+        List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
+
+        for (Room room : rooms) {
+            if (room.getRoomPassword() != null && room.getRoomPassword().equals(roomPassword)) {
+                boolean isCheckin = "checkin".equalsIgnoreCase(room.getHotelRoom().getHotelRoomStatus());
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("valid", isCheckin);
+                if (!isCheckin) {
+                    response.put("reason", "checkout");
+                }
+                return response;
+            }
         }
 
-        // ✅ 성공 시 roomNum과 함께 roomPassword도 세션에 저장
-        session.setAttribute("roomNum", room.getRoomNum());
-        session.setAttribute("roomPassword", room.getRoomPassword()); // ✅ 추가된 라인
-        return "redirect:/main?hotelRoomNum=" + hotelRoomNum;
+        // 비밀번호 불일치
+        return Map.of("valid", false, "reason", "no_match");
     }
+
+
 
 
 }

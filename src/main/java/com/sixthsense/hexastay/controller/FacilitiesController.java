@@ -54,7 +54,7 @@ public class FacilitiesController {
         }
     }
     @PostMapping("/facility/insert")
-    public String fsinsertPost(FacilitiesDTO dto, @RequestParam Long companyNum) throws IOException {
+    public String fsinsertPost(FacilitiesDTO dto, @RequestParam Long companyNum){
         try {
             dto.setCompanyDTO(companyService.companyRead(companyNum));
             Long result = fsService.fsInsert(dto);
@@ -75,34 +75,6 @@ public class FacilitiesController {
     public String fsread(@PathVariable Long fsNum, Model model){
         model.addAttribute("data",fsService.read(fsNum));
         return "facilities/read";
-    }
-
-    @PostMapping("/facility/activate/{num}")
-    public String fsYesPost(@PathVariable Long num, Model model){
-        try {
-            num = fsService.fsYes(num);
-        } catch (Exception e) {
-            model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
-        }
-        return "redirect:/facility/read/"+num;
-    }
-    @PostMapping("/facility/deactivate/{num}")
-    public String fsNoPost(@PathVariable Long num, Model model){
-        try {
-            num = fsService.fsNo(num);
-        } catch (Exception e) {
-            model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
-        }
-        return "redirect:/facility/read/"+num;
-    }
-    @PostMapping("/facility/refill/{num}")
-    public String fsRefillPost(@PathVariable Long num, Model model){
-        try {
-            num = fsService.refill(num);
-        } catch (Exception e) {
-            model.addAttribute("errmsg","수량을 변경할 수 없습니다.");
-        }
-        return "redirect:/facility/list/"+num;
     }
 
     @GetMapping("/facility/modify/{fsNum}")
@@ -153,7 +125,7 @@ public class FacilitiesController {
         return "facilities/mobile/list";
     }
     @GetMapping("/fs/read/{num}")
-    public String fsreadClient(@PathVariable Long num, Model model){
+    public String fsreadClient(@PathVariable Long num, Model model, HttpSession session){
         try {
             model.addAttribute("data", fsService.readMobile(num));
         }catch (Exception e){

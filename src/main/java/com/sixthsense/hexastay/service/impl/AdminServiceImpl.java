@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.AdminService;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -22,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,8 +107,18 @@ public class AdminServiceImpl implements AdminService {
             adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
         }
 
-        Admin admin = modelMapper.map(adminDTO, Admin.class);
+        //사번 자동증분
+        String yearPrefix = String.valueOf(Year.now().getValue()).substring(2);
+        String maxEmpNum = adminRepository.findMaxEmpNumStartingWith(yearPrefix + "%");
+        int nextSeq = 1;
+            int lastSeq = Integer.parseInt(maxEmpNum.substring(2)); // 뒤 6자리
+            nextSeq = lastSeq + 1;
+            String employeeNum = yearPrefix + String.format("%06d", nextSeq);
+        adminDTO.setAdminEmployeeNum(employeeNum);
 
+
+        // 이제 저변환하고 저장
+        Admin admin = modelMapper.map(adminDTO, Admin.class);
         if (adminDTO.getCompanyNum() != null) {
             admin.getCompany().setCompanyNum(adminDTO.getCompanyNum());
         } else if (adminDTO.getStoreNum() != null) {
@@ -118,11 +131,76 @@ public class AdminServiceImpl implements AdminService {
 
     //가입대기 리스트
     public List<AdminDTO> getWaitAdminList() {
-        List<Admin> adminList = adminRepository.findByAdminActive("PENDING");
-        List<AdminDTO> adminDTOList = new ArrayList<>();
-        for (Admin admin : adminList) {
-            adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
+        log.info("=== getWaitAdminList 시작 ===");
+        List<Admin> adminList = adminRepository.findByAdminActive("INACTIVE");
+        log.info("INACTIVE 상태의 회원 수: {}", adminList.size());
+        
+        if (adminList.isEmpty()) {
+            log.warn("INACTIVE 상태의 회원이 없습니다. 데이터베이스 쿼리 결과를 확인해주세요.");
+            return new ArrayList<>();
         }
+        
+        List<AdminDTO> adminDTOList = new ArrayList<>();
+        
+        // 현재 로그인한 관리자의 이메일을 가져옴
+        String currentAdminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("현재 로그인한 관리자 이메일: {}", currentAdminEmail);
+        
+        Admin currentAdmin = adminRepository.findByAdminEmail(currentAdminEmail);
+        if (currentAdmin == null) {
+            log.warn("현재 로그인한 관리자를 찾을 수 없습니다.");
+            return adminDTOList;
+        }
+        
+        String role = currentAdmin.getAdminRole().toUpperCase(); // 대문자로 변환
+        log.info("현재 관리자의 역할: {}", role);
+        log.info("현재 관리자의 회사: {}", currentAdmin.getCompany() != null ? currentAdmin.getCompany().getCompanyNum() : "없음");
+        log.info("현재 관리자의 스토어: {}", currentAdmin.getStore() != null ? currentAdmin.getStore().getStoreNum() : "없음");
+        
+        // 계층별 조회 권한 설정
+        List<String> allowedRoles = new ArrayList<>();
+        switch (role) {
+            case "EXEC":
+            case "GM":
+            case "MGR":
+                allowedRoles.addAll(Arrays.asList("EXEC", "GM", "MGRHEAD", "CREW", "SV", "AGENT", "PARTNER", "SUBMGR", "STAFF"));
+                break;
+            case "HEAD":
+            case "SV":
+            case "SUBMGR":
+                allowedRoles.addAll(Arrays.asList("HEAD", "SV", "SUBMGR", "CREW", "AGENT", "PARTNER", "STAFF"));
+                break;
+            default:
+                log.warn("권한이 없는 역할입니다: {}", role);
+                return adminDTOList;
+        }
+        log.info("허용된 역할 목록: {}", allowedRoles);
+        
+        // 현재 관리자의 소속 회사/스토어에 속한 관리자만 필터링
+        for (Admin admin : adminList) {
+            log.info("처리 중인 회원: {}, 역할: {}, 회사: {}, 스토어: {}", 
+                admin.getAdminName(), 
+                admin.getAdminRole(),
+                admin.getCompany() != null ? admin.getCompany().getCompanyNum() : "없음",
+                admin.getStore() != null ? admin.getStore().getStoreNum() : "없음");
+                
+            if (allowedRoles.contains(admin.getAdminRole().toUpperCase())) { // 대문자로 변환하여 비교
+                boolean isSameCompany = currentAdmin.getCompany() != null && admin.getCompany() != null 
+                    && currentAdmin.getCompany().getCompanyNum().equals(admin.getCompany().getCompanyNum());
+                boolean isSameStore = currentAdmin.getStore() != null && admin.getStore() != null 
+                    && currentAdmin.getStore().getStoreNum().equals(admin.getStore().getStoreNum());
+                
+                if (isSameCompany || isSameStore) {
+                    adminDTOList.add(modelMapper.map(admin, AdminDTO.class));
+                    log.info("회원 추가됨: {}", admin.getAdminName());
+                } else {
+                    log.info("회원 제외됨 (소속 불일치): {}", admin.getAdminName());
+                }
+            } else {
+                log.info("회원 제외됨 (역할 불일치): {}", admin.getAdminName());
+            }
+        }
+        log.info("=== getWaitAdminList 종료, 결과 회원 수: {} ===", adminDTOList.size());
         return adminDTOList;
     }
 
@@ -140,30 +218,44 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public void adminUpdate(AdminDTO adminDTO) throws IOException {
-        Admin admin = adminRepository.findById(adminDTO.getAdminNum()).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
+        Admin admin = adminRepository.findById(adminDTO.getAdminNum())
+                .orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
-        if (!adminDTO.getAdminProfileMeta().isEmpty()) {
+        // 기존 사진이 있고 새로운 사진이 있으면 기존 사진 삭제
+        if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty() 
+            && adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
             Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
             Files.deleteIfExists(filePath);
-
-            String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
-            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
-            String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
-            String fileName = fileFirstName + fileSubName;
-
-            adminDTO.setAdminProfileMeta("/profile/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "profile/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath);
-            }
-            adminDTO.getAdminProfile().transferTo(uploadPath.toFile());
-        } else if (adminDTO.getAdminProfileMeta().isEmpty() && !admin.getAdminProfileMeta().isEmpty()) {
-            adminDTO.setAdminProfileMeta(admin.getAdminProfileMeta());
         }
 
-        adminRepository.save(modelMapper.map(adminDTO, Admin.class));
+        // 새로운 사진이 있으면 저장
+        if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
+            String fileName = adminDTO.getAdminProfile().getOriginalFilename();
+            String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+            String newFileName = "admin_" + adminDTO.getAdminNum() + fileExtension;
+            
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static", "uploads", "admin");
+            Files.createDirectories(uploadPath);
+            
+            Path filePath = uploadPath.resolve(newFileName);
+            adminDTO.getAdminProfile().transferTo(filePath);
+            
+            admin.setAdminProfileMeta("/uploads/admin/" + newFileName);
+        }
+        // 새로운 사진이 없고 기존 사진이 있으면 기존 사진 유지
+        else if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
+            admin.setAdminProfileMeta(admin.getAdminProfileMeta());
+        }
+
+        // 나머지 필드 업데이트 (사번과 주민번호는 변경하지 않음)
+        admin.setAdminName(adminDTO.getAdminName());
+        admin.setAdminAddress(adminDTO.getAdminAddress());
+        admin.setAdminPhone(adminDTO.getAdminPhone());
+        admin.setAdminPosition(adminDTO.getAdminPosition());
+
+        adminRepository.save(admin);
     }
 
     // 회원 삭제
@@ -212,6 +304,26 @@ public class AdminServiceImpl implements AdminService {
         List<Store> storeList = storeRepository.findByCompanyNum(branchFacilityNum);
         log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Admin createAdminEmployeeNum(Admin admin) {
+        String newEmpNum = generateNextEmployeeNum();
+        admin.setAdminEmployeeNum(newEmpNum);
+        return adminRepository.save(admin);
+    }
+
+    public String generateNextEmployeeNum() {
+        String yearPrefix = String.valueOf(Year.now().getValue()).substring(2);
+        String maxEmpNum = adminRepository.findMaxEmpNumStartingWith(yearPrefix + "%");
+        int nextSeq = 1;
+        if (maxEmpNum != null) {
+            int lastSeq = Integer.parseInt(maxEmpNum.substring(2)); // 뒤 6자리
+            nextSeq = lastSeq + 1;
+            String employeeNum = yearPrefix + String.format("%06d", nextSeq);
+        }
+        return yearPrefix + String.format("%06d", nextSeq);
     }
 
 }

@@ -4,13 +4,13 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>새 ERD 항목 추가</title>
+    <title>물품 등록</title>
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
 <div class="container mt-4 w-100 bg-light">
-    <h2 class="fw-bold mb-4 text-center">물품 추가</h2>
+    <h2 class="fw-bold mb-4 text-center">물품 등록</h2>
 
     <form action="/erd/insert" method="post" enctype="multipart/form-data">
         <div class="container p-4" style="max-width: 700px;">
@@ -19,7 +19,7 @@
                 <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
                     <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
                 </div>
-                <p class="file-name">대표 사진이 선택되지 않았습니다.</p>
+                <p class="file-name">대표 이미지가 선택되지 않았습니다.</p>
                 <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
                 <input hidden type="file" id="erdPicture" name="erdPicture" class="btn btn-light form-control rounded-pill"
                        accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
@@ -27,7 +27,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="erdType" class="form-label">분류</label>
+                <label for="erdType" class="form-label">분류 선택</label>
                 <select type="text" class="form-control" id="erdType" name="erdType" required>
                     <option>호텔용품</option>
                     <option>설비</option>

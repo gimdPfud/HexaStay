@@ -30,7 +30,7 @@ public class RoomMenuOption extends BaseEntity {
     @Column(nullable = false)
     private int roomMenuOptionPrice;
 
-    private int roomMenuOptionStock;
+    private int roomMenuOptionAmount;
 
     // 옵션이 어떤 메뉴에 속하는지
     @ManyToOne
