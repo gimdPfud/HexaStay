@@ -12,6 +12,7 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -39,7 +40,8 @@ public class CompanyController {
                               @RequestParam(required = false) String select,
                               @RequestParam(required = false) String keyword,
                               Model model,
-                              Pageable pageable, Principal principal) {
+                              @PageableDefault(size = 10, sort = "id") Pageable pageable,
+                              Principal principal) {
 
         String email = principal.getName();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
@@ -47,7 +49,7 @@ public class CompanyController {
         log.info("choice : " + choice);
         log.info("select : " + select);
         log.info("keyword : " + keyword);
-        log.info("pageable : " + pageable.getPageNumber(), pageable.getPageSize());
+        log.info("pageable : page=" + pageable.getPageNumber() + ", size=" + pageable.getPageSize());
 
         if (choice == null) {
             choice = "";
