@@ -78,6 +78,7 @@ public class RoomServiceTest {
         return matchedRoom;
     }
 
+    //todo : hotelRoomStatus 가 "checkin" 상태에서만 roompassword 가 일치 하면 접속이 가능
     public Room readRoomByCheckinPassword(String roomPassword) {
 
         // 1. 호텔룸 번호로 연결된 룸 리스트 조회

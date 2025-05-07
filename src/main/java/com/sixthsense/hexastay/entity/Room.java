@@ -2,10 +2,11 @@ package com.sixthsense.hexastay.entity;
 
 
 import com.sixthsense.hexastay.entity.base.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +20,9 @@ public class Room extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomNum;
 
-    private String roomStatus;  // checkin, checkout 등 예약 배정 테이블 상태 추가
+
+    @Column(nullable = false)
+    private String roomDisplayStatus;  // VISIBLE, HIDDEN 등
 
     private String roomPassword;    //Room이용 password
 

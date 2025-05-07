@@ -129,12 +129,13 @@
                 <div class="modal-body">
                     <input type="text" id="hotelRoomSearchKeyword" class="form-control mb-3" placeholder="객실명으로 검색">
                     <table class="table table-hover">
-                        <thead>
+                        <thead><!--호텔룰 search 모달 페이지 시작-->
                         <tr>
                             <th style="width: 10%;">객실 번호</th>
-                            <th style="width: 20%;">이미지</th>
-                            <th style="width: 15%;">객실명</th>
-                            <th style="width: 15%;"></th>
+                            <th style="width: 30%;">이미지</th>
+                            <th style="width: 20%;">객실명</th>
+                            <th style="width: 10%;">현상태</th>
+                            <th style="width: 10%;"></th>
                         </tr>
                         </thead>
                         <tbody id="hotelRoomSearchResult"></tbody>
@@ -190,6 +191,7 @@
                         <td class="text-center align-middle">${hotelRoom.hotelRoomNum}</td>
                         <td class="text-center align-middle"><img src="${hotelRoom.hotelRoomProfileMeta}" width="60"></td>
                         <td class="text-center align-middle">${hotelRoom.hotelRoomName}</td>
+                        <td class="text-center align-middle">${hotelRoom.hotelRoomStatus}</td>
                         <td class="text-center align-middle">
                             <button class="btn btn-sm btn-success select-hotelroom-btn" data-hotelroom-num="${hotelRoom.hotelRoomNum}">
                                 선택
