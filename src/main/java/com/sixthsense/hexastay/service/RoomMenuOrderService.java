@@ -1,6 +1,8 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
+import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
+import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,4 +40,9 @@ public interface RoomMenuOrderService {
     // 주문을 취소하였을 때의 알람 추가.
     public RoomMenuOrder cancelOrderAsAdmin(Long orderId);
 
-}
+    // 공통 옵션 재고 차감
+
+   public void deductOptionStock(RoomMenu roomMenu, RoomMenuOrderItemDTO orderItemDTO, int orderedItemQuantity);
+
+    }
+

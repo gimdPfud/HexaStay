@@ -77,13 +77,20 @@
                     <input type="text" class="form-control" name="storePhone" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="storeAddress">주소</label>
-                    <div class="input-group">
-                        <input style="background-color: #f1f1f1;" readonly
-                               type="text" id="storeAddress" class="form-control" name="storeAddress" required>
-                        <button class="btn btn-secondary"
-                                type="button" onclick="insertAddress()">주소 검색</button>
+                    <label class="form-label" for="storeAddress">사업장 주소</label>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <input type="text" id="storeAddressZonecode" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="storeAddressFound" class="form-control" style="background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertAddress()">주소 검색</button>
+                        </div>
                     </div>
+                    <input type="text" id="storeAddressDetail" class="form-control mt-2" placeholder="상세 주소를 입력해주세요.">
+                    <input readonly type="hidden" id="storeAddress" name="storeAddress"/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">대표자명</label>
@@ -156,9 +163,7 @@
 
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
-
     <script>
-
         document.addEventListener("DOMContentLoaded",function () {
             fetch("/company/list/store",{
                 method:"POST"
@@ -341,16 +346,21 @@
 
         function insertAddress() {
             new daum.Postcode({
-                oncomplete: function(data) {
-                    var addr = data.address; // 최종 주소 변수
-                    // 주소 정보를 해당 필드에 넣는다.
-                    document.getElementById("storeAddress").value = addr;
+                oncomplete: function (data) {
+                    console.log(data)
+                    document.getElementById("storeAddressFound").value = data.address;
+                    document.getElementById("storeAddressZonecode").value = data.zonecode;
                 }
             }).open();
         }
 
         function formSubmitHandler(button) {
-            let storeAddress = document.getElementById("storeAddress").value;
+            document.getElementById('storeAddress').value =
+                document.getElementById("storeAddressFound").value + "\u00A0" + document.getElementById("storeAddressZonecode").value
+                + "\u00A0" + document.getElementById('storeAddressDetail').value;
+            
+            let storeAddress = document.getElementById("storeAddressFound").value;
+
             if(storeAddress&&storeAddress.trim().length>0){
                 // 주소로 상세 정보를 검색
                 geocoder.addressSearch(storeAddress, function(results, status) {
