@@ -155,22 +155,22 @@
                         const formattedPrice = Number(room.hotelRoomPrice).toLocaleString();
 
                         const card = `
-    <div class="col-md-3 mb-3 d-flex">
-        <div class="card flex-fill ${isDisabled ? 'disabled-room' : ''}"
-             ${isDisabled ? '' : `onclick="selectHotelRoom(${room.hotelRoomNum}, this)"`}
-             style="font-size: 0.85rem;">
-            <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지"
-                 style="height:140px; object-fit:cover;">
-            <div class="card-body py-2">
-                <span class="badge ${badgeClass}">${badgeText}</span>
-                <h6 class="card-title mt-2 text-truncate">${room.hotelRoomName}</h6>
-                <p class="card-text small">
-                    전화: ${room.hotelRoomPhone}<br>
-                    가격: ${formattedPrice}원
-                </p>
-            </div>
-        </div>
-    </div>
+                        <div class="col-md-3 mb-3 d-flex">
+                            <div class="card flex-fill ${isDisabled ? 'disabled-room' : ''}"
+                                 ${isDisabled ? '' : `onclick="selectHotelRoom(${room.hotelRoomNum}, this)"`}
+                                 style="font-size: 0.85rem;">
+                                <img src="${room.hotelRoomProfileMeta}" class="card-img-top" alt="룸 이미지"
+                                     style="height:140px; object-fit:cover;">
+                                <div class="card-body py-2">
+                                    <span class="badge ${badgeClass}">${badgeText}</span>
+                                    <h6 class="card-title mt-2 text-truncate">${room.hotelRoomName}</h6>
+                                    <p class="card-text small">
+                                        전화: ${room.hotelRoomPhone}<br>
+                                        가격: ${formattedPrice}원
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 `;
                         listContainer.insertAdjacentHTML('beforeend', card);
                     });
@@ -196,6 +196,7 @@
             }
         }
 
+        //이거 반드시 있어야함.... script 안에서 쓰이는 메소드 임
         function selectHotelRoom(hotelRoomNum, element) {
             document.getElementById('hotelRoomNum').value = hotelRoomNum;
 

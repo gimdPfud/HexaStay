@@ -155,6 +155,9 @@
       <i class="fa fa-lock fa-stack-1x"></i>
     </span>
     </p>
+    <div th:if="${param.error}" class="alert alert-danger">
+        이메일 또는 비밀번호가 올바르지 않습니다.
+    </div>
     <input type="email" name="adminEmail" class="login-username" autofocus="true" required="true" placeholder="Email" />
     <input type="password" name="adminPassword" class="login-password" required="true" placeholder="Password" />
     <input type="submit" name="Login" value="Login" class="login-submit" />

@@ -242,6 +242,14 @@ public class RoomServiceImpl {
         });
     }
 
+    /*중간테이블 쌓이는거 방지 하는 버튼 만드는 로직*/
+    public Page<RoomDTO> findRoomsByDisplayStatus(String status, Pageable pageable) {
+        return roomRepository.findByRoomDisplayStatus(status, pageable)
+                .map(room -> modelMapper.map(room, RoomDTO.class));
+    }
+
+
+
 
     //hotelroom을 참조하고 있는 member리스트 조회
     public Page<MemberDTO> getMembersByHotelRoom(Long hotelRoomNum, Pageable pageable) {
@@ -412,6 +420,21 @@ public class RoomServiceImpl {
         log.info("인증 성공: {} (roomNum: {})", member.getMemberEmail(), matchedRoom.getRoomNum());
         return matchedRoom;
     }
+
+
+
+    public void updateRoomDisplayStatus(Long roomNum, String status) {
+        Room room = roomRepository.findById(roomNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 룸이 존재하지 않습니다."));
+
+        if (room.getRoomDisplayStatus() == null) {
+            room.setRoomDisplayStatus("VISIBLE");
+        }
+        room.setRoomDisplayStatus(status);
+
+        roomRepository.save(room);
+    }
+
 
 
 

@@ -74,7 +74,7 @@
           </thead>
 
           <tbody>
-          <tr th:each="item : ${companyDTOS}" class="text-center">
+          <tr th:each="item : ${companyDTOS.content}" class="text-center">
 
             <td>
               <img th:if="${item.companyPictureMeta != null}"

@@ -71,18 +71,6 @@
             font-size: 20px;
         }
 
-        /* 버튼 스타일 */
-        .btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
         .add-to-cart-btn {
             background-color: #77b1fb;
             color: black;
@@ -321,8 +309,10 @@
 
 
             <!-- 결제하기 및 목록으로 버튼 -->
-            <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}">결제하기</button>
-            <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}">목록으로</button>
+            <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}"
+            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">결제하기</button>
+            <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}"
+            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">목록으로</button>
 
             <!-- 모달 -->
             <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">

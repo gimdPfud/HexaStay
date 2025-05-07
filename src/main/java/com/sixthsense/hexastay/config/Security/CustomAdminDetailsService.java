@@ -18,12 +18,21 @@ public class CustomAdminDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFoundException {
-        System.out.println("입력된 adminEmail: " + adminEmail);
+        log.info("로그인 시도 - 이메일: {}", adminEmail);
         Admin admin = adminRepository.findByAdminEmail(adminEmail);
-
-
-
+        
+        if (admin == null) {
+            log.error("사용자를 찾을 수 없습니다: {}", adminEmail);
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + adminEmail);
+        }
+        
+        if (!"ACTIVE".equals(admin.getAdminActive())) {
+            log.error("비활성화된 계정입니다: {}, 상태: {}", adminEmail, admin.getAdminActive());
+            throw new UsernameNotFoundException("비활성화된 계정입니다.");
+        }
+        
+        log.info("사용자 찾음: {}, 상태: {}", adminEmail, admin.getAdminActive());
+        
         return new CustomAdminDetails(admin);
-
     }
 }
