@@ -18,7 +18,7 @@ public interface CompanyService {
     //company 목록
     List<CompanyDTO> companyList ();
     Page<CompanyDTO> companyList (Pageable pageable);
-    Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Pageable pageable);
+    Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Long adminNum, Pageable pageable);
 
     //company 상세보기
     CompanyDTO companyRead(Long companyNum);

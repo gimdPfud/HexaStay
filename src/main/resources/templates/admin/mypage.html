@@ -105,8 +105,7 @@
 
                 <div class="mb-3" th:if="${adminDTO.adminRole == 'EXEC' or adminDTO.adminRole == 'SUPERADMIN' or
                 adminDTO.adminRole == 'HEAD' or adminDTO.adminRole == 'GM' or adminDTO.adminRole == 'MGR'}">
-                    <label class="form-label">직급</label>
-
+                    <label class="form-label" id="adminLabel">직급</label>
                     <select class="form-select" id="adminCenterRank"
                             th:if="${adminDTO.adminRole == 'EXEC' or adminDTO.adminRole == 'HEAD' or adminDTO.adminRole == 'SUPERADMIN'}">
                         <option value="EXEC" th:selected="${adminDTO.adminRole == 'EXEC'}">임원진</option>
@@ -146,15 +145,13 @@
             <input hidden type="text" name="adminPassword" class="form-control">
             <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%" th:value="${adminDTO.adminPhone}">
             <input hidden name="adminResidentNum" id="adminResidentNum" th:value="${adminDTO.adminResidentNum}">
-            <input hidden name="adminRole" id="adminRole">
+            <input hidden name="adminRole" id="adminRole" th:value="${adminDTO.adminRole}">
             <input hidden name="adminNum" th:value="${adminDTO.adminNum}">
-            <input hidden name="adminProfileMeta" th:value="${adminDTO.adminProfileMeta}">
-            <input hidden name="adminEmployeeNum" th:value="${adminDTO.adminEmployeeNum}">
             <input hidden name="companyNum" th:value="${adminDTO.companyNum}">
             <input hidden name="storeNum" th:value="${adminDTO.storeNum}">
         </form>
     </div>
-    <script>
+    <script th:inline="javascript">
         // 프로필 사진 처리
         document.getElementById('adminProfile').addEventListener('change', function () {
             const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
@@ -275,8 +272,8 @@
 
             // 주소 결합
             document.getElementById('adminAddress').value =
-                document.getElementById('adminAddressOne').value + "\u00A0" + 
-                document.getElementById('adminAddressTwo').value + "\u00A0" + 
+                document.getElementById('adminAddressOne').value + "\u00A0" +
+                document.getElementById('adminAddressTwo').value + "\u00A0" +
                 document.getElementById('adminAddressThree').value;
 
             // 주민등록번호 결합
@@ -285,7 +282,9 @@
                 document.getElementById('adminResidentNumPartTwo').value;
 
             // 직급
-            if (document.getElementById('adminCenterRank').value != null) {
+            if (document.getElementById('adminRole').value === "SUPERADMIN") {
+                document.getElementById('adminRole').value = "SUPERADMIN";
+            } else if (document.getElementById('adminCenterRank').value != null) {
                 document.getElementById('adminRole').value = document.getElementById('adminCenterRank').value;
             } else if (document.getElementById('adminBranchRank').value != null) {
                 document.getElementById('adminRole').value = document.getElementById('adminBranchRank').value;
@@ -293,11 +292,19 @@
                 document.getElementById('adminRole').value = document.getElementById('adminStoreRank').value;
             }
 
-            // 폼 제출
-            if (isValid) {
-                event.target.form.submit();
+                // 폼 제출
+                if (isValid) {
+                    event.target.form.submit();
+                }
             }
-        }
+
+            if (document.getElementById('adminRole').value === "SUPERADMIN") {
+                document.getElementById('adminLabel').hidden = true;
+                document.getElementById('adminCenterRank').hidden = true;
+                document.getElementById('adminBranchRank').hidden = true;
+                document.getElementById('adminStoreRank').hidden = true;
+            }
+
     </script>
 </div>
 </body>
