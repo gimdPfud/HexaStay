@@ -2,7 +2,7 @@
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      >
+>
 <head>
     <meta charset="UTF-8">
     <title>호텔 서비스 메뉴</title>
@@ -28,9 +28,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 12px; /* 20px → 12px로 간격 줄임 */
         }
-
 
         .card {
             background: transparent;
@@ -43,7 +42,7 @@
         .custom-dropdown {
             position: relative;
             display: inline-block;
-            width: 90px;
+            width: 140px;
             height: 40px;
             font-family: 'Open Sans', sans-serif;
             font-size: 11px;
@@ -83,10 +82,6 @@
             cursor: pointer;
         }
 
-        .custom-dropdown .options li:hover {
-            background: #f0f0f0;
-        }
-
         .flag {
             width: 24px;
             height: 18px;
@@ -94,22 +89,44 @@
             background-repeat: no-repeat;
             display: inline-block;
         }
+
         .flag-ko { background-position: -29px -207px; }
         .flag-ja { background-position: -87px -178px; }
         .flag-en { background-position: -116px -352px; }
         .flag-cn { background-position: 0px -62px; }
+
         span{
             text-align: center;
         }
+
         a {
             text-decoration: none;
         }
+
         .btn {
             margin: 10px;
             outline: none;
-            width: 150px;
+            width: 200px;       /* 너비 증가 */
+            height: 60px;       /* 높이 추가 */
+            font-size: 16px;    /* 글자 크기 증가 */
+            padding: 0;         /* 패딩 제거 */
+            display: flex;      /* 플렉스박스로 설정 */
+            justify-content: center; /* 가로 중앙 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            border-radius: 8px; /* 모서리 살짝 둥글게 (선택사항) */
         }
 
+        .btn-custom {
+            background-color: #77b1fb; /* 원하는 색상 */
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-custom:hover {
+            background-color: #77b1fb; /* 동일한 색상으로 유지 */
+            color: white;
+        }
 
         @font-face {
             font-family: 'S-CoreDream-6Bold';
@@ -117,60 +134,56 @@
             font-weight: normal;
             font-style: normal;
         }
+
         .logo-center {
-            position: absolute;
-            top: 130px;     /* 원하는 위치 조정 */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
+            margin-bottom: 10px; /* 추가 */
+            position: static;    /* absolute 제거 */
+            transform: none;     /* translateX 제거 */
         }
-
-
     </style>
 </head>
 <body>
-        <div class="container menu-container">
-            <span class="navbar-brand logo-center text-center">
-                <img src="/images/메인로고.png" alt="HexaStay 로고로" height="75">
-            </span>
-            <a href="/roommenu/orderpage" class="btn btn-primary" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
-            <a href="/member/store/list" class="btn btn-primary" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
-            <a href="/fs/list" class="btn btn-primary" th:text="#{main.facilityService}"><span>시설</span></a>
+<div class="container menu-container">
+          <span class="navbar-brand logo-center text-center">
+            <img src="/logo/HEXA%20white.png" alt="HexaStay 로고" height="100">
+          </span>
+    <a href="/roommenu/orderpage" class="btn btn-custom" th:text="#{main.hotelFood}"> <span>객실 메뉴</span></a>
+    <a href="/member/store/list" class="btn btn-custom" th:text="#{main.deliveryFood}"><span>배달 메뉴</span></a>
+    <a href="/fs/list" class="btn btn-custom" th:text="#{main.facilityService}"><span>시설</span></a>
 
-            <form method="get" th:action="@{/main}" class="mx-auto" style="display: flex; justify-content: center;">
-                <input type="hidden" name="type" th:value="${type}" />
-                <input type="hidden" name="keyword" th:value="${keyword}" />
-                <input type="hidden" name="category" th:value="${category}" />
+    <form method="get" th:action="@{/main}" class="mx-auto" style="display: flex; justify-content: center;">
+        <input type="hidden" name="type" th:value="${type}" />
+        <input type="hidden" name="keyword" th:value="${keyword}" />
+        <input type="hidden" name="category" th:value="${category}" />
 
-                <div class="custom-dropdown" id="languageDropdown">
-                    <div class="selected-option" tabindex="0">
-                        <span class="flag flag-ko"></span>
-                        <span class="option-text" th:text="#{main.language.korean}">한국어</span>
-                        <span>&#9662;</span>
-                    </div>
-                    <ul class="options">
-                        <li data-value="ko">
-                            <span class="flag flag-ko"></span>
-                            <span th:text="#{main.language.korean}">한국어</span>
-                        </li>
-                        <li data-value="en">
-                            <span class="flag flag-en"></span>
-                            <span th:text="#{main.language.english}">English</span>
-                        </li>
-                        <li data-value="ja">
-                            <span class="flag flag-ja"></span>
-                            <span th:text="#{main.language.japanese}">日本語</span>
-                        </li>
-                        <li data-value="cn">
-                            <span class="flag flag-cn"></span>
-                            <span th:text="#{main.language.chinese}">中國語</span>
-                        </li>
-                    </ul>
-                    <input type="hidden" name="lang" value="ko">
-                </div>
-            </form>
+        <div class="custom-dropdown" id="languageDropdown">
+            <div class="selected-option" tabindex="0">
+                <span class="flag flag-ko"></span>
+                <span class="option-text" th:text="#{main.language.korean}">한국어</span>
+                <span>&#9662;</span>
+            </div>
+            <ul class="options">
+                <li data-value="ko">
+                    <span class="flag flag-ko"></span>
+                    <span th:text="#{main.language.korean}">한국어</span>
+                </li>
+                <li data-value="en">
+                    <span class="flag flag-en"></span>
+                    <span th:text="#{main.language.english}">English</span>
+                </li>
+                <li data-value="ja">
+                    <span class="flag flag-ja"></span>
+                    <span th:text="#{main.language.japanese}">日本語</span>
+                </li>
+                <li data-value="cn">
+                    <span class="flag flag-cn"></span>
+                    <span th:text="#{main.language.chinese}">中國語</span>
+                </li>
+            </ul>
+            <input type="hidden" name="lang" value="ko">
         </div>
-
+    </form>
+</div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script th:inline="javascript">
