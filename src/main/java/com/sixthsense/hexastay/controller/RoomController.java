@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.dto.MemberDTO;
 
 import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
@@ -26,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,19 +50,22 @@ public class RoomController {
     private final MemberService memberService;
 
     private final RoomRepository roomRepository;
+    private final AdminRepository adminRepository;
 
     //todo:0425 카테고리 분류별 페이지 리스트 localhost:8090/roomList
     //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지 - 방 배정 리스트
     @GetMapping("/roomlist/{status}")
     public String getRoomListByStatus(@PathVariable("status") String status,
                                       @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
-                                      Model model) {
+                                      Model model,Principal principal) {
+
+        Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
 
         if (!status.equals("checkin") && !status.equals("checkout")) {
             throw new IllegalArgumentException("잘못된 상태입니다.");
         }
 
-        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByHotelRoomStatus(status, pageable);
+        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByHotelRoomStatus(companyNum, status, pageable);
         model.addAttribute("rooms", rooms);  // ✅ Page 객체 전달
         model.addAttribute("currentStatus", status);
         return "room/roomList"; // ✅ 파일명은 소문자 유지
@@ -69,11 +74,12 @@ public class RoomController {
     //전체 페이지 보여 주는 로직
     //todo:http://localhost:8090/roomlist
     @GetMapping("/roomlist")
-    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model)
-
+    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model, Principal principal)
     {
+        Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
+
         Pageable pageable = PageRequest.of(page, 10, Sort.by("roomNum").descending());
-        Page<RoomDTO> rooms = roomServiceimpl.getRooms(pageable);
+        Page<RoomDTO> rooms = roomServiceimpl.getRooms(companyNum, pageable);
 
         model.addAttribute("rooms", rooms);
         model.addAttribute("currentPage", page);
@@ -86,7 +92,9 @@ public class RoomController {
     @GetMapping("/roomlist/search")
     public String getRoomList(@RequestParam(value = "keyword", required = false) String keyword,
                               @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
-                              Model model) {
+                              Model model, Principal principal) {
+
+        Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
 
         Page<RoomDTO> rooms;
 
@@ -94,7 +102,7 @@ public class RoomController {
             rooms = roomServiceimpl.searchRoomsByMemberKeywordPaged(keyword, pageable);
             model.addAttribute("currentStatus", "search");
         } else {
-            rooms = roomServiceimpl.getRooms(pageable);
+            rooms = roomServiceimpl.getRooms(companyNum, pageable);
         }
 
         model.addAttribute("rooms", rooms);

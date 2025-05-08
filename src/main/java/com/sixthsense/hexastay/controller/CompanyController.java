@@ -44,6 +44,7 @@ public class CompanyController {
                               Principal principal) {
 
         String email = principal.getName();
+        Long adminNum = adminService.adminFindEmail(email).getAdminNum();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
         log.info("choice : " + choice);
@@ -59,7 +60,7 @@ public class CompanyController {
             select = "전체";
         }
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, adminNum, pageable);
 
         model.addAttribute("companyDTOS", companyDTOS);
         model.addAttribute("choice", choice);
@@ -153,13 +154,14 @@ public class CompanyController {
                               Pageable pageable, Principal principal) {
 
         String email = principal.getName();
+        Long adminNum = adminService.adminFindEmail(email).getAdminNum();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
         if (choice == null || choice.trim().isEmpty()) {
             choice = "branch";
         }
 
-        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, pageable);
+        Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, adminNum, pageable);
 
         return new ResponseEntity<>(companyDTOS, HttpStatus.OK);
     }

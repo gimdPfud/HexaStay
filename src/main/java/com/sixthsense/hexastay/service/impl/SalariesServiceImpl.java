@@ -37,12 +37,10 @@ public class SalariesServiceImpl implements SalariesService {
 
         if (admin.getCompany().getCompanyNum() != null) {
             Long companyNum = admin.getCompany().getCompanyNum();
-            adminList.addFirst(adminRepository.findByAdminEmail(email));
             adminList.addAll(adminRepository.findBySalariesCompany(companyNum));
 
         } else if (admin.getStore().getStoreNum() != null) {
             Long storeNum = admin.getStore().getStoreNum();
-            adminList.addFirst(adminRepository.findByAdminEmail(email));
             adminList.addAll(adminRepository.findBySalariesStore(storeNum));
         }
         Page<Admin> adminPageList = new PageImpl<>(adminList, pageable, adminList.size());

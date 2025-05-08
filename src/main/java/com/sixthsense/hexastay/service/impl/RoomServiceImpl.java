@@ -82,8 +82,10 @@ public class RoomServiceImpl {
 
 
     //hotelroom.hotelroomStatus 상태 즉 checkin , checkout 상태에 따른 list page
-    public Page<RoomDTO> findRoomsByHotelRoomStatus(String status, Pageable pageable) {
-        Page<Room> roomPage = roomRepository.findByHotelRoomStatus(status, pageable);
+    public Page<RoomDTO> findRoomsByHotelRoomStatus(Long companyNum, String status, Pageable pageable) {
+
+
+        Page<Room> roomPage = roomRepository.findByHotelRoom_Company_CompanyNumAndHotelRoom_HotelRoomStatus(companyNum, status, pageable);
 
         return roomPage.map(room -> {
             // 1. 기본 Room → RoomDTO 매핑
@@ -215,8 +217,8 @@ public class RoomServiceImpl {
 
 
     //Room 페이지에 있는 정보를 가져 List 메서드
-    public Page<RoomDTO> getRooms(Pageable pageable) {
-        Page<Room> rooms = roomRepository.findAll(pageable);
+    public Page<RoomDTO> getRooms(Long companyNum, Pageable pageable) {
+        Page<Room> rooms = roomRepository.findByHotelRoom_Company_CompanyNum(companyNum, pageable);
 
         return rooms.map(room -> {
             // Null 체크 후 변환

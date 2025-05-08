@@ -84,6 +84,14 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
     <script>
+        document.addEventListener("DOMContentLoaded",function () {
+            let addrs = document.getElementById('storeAddress').value.split("\u00A0")
+
+            document.getElementById("storeAddressFound").value = addrs[0] || "";
+            document.getElementById("storeAddressZonecode").value = addrs[1] || ""
+            document.getElementById('storeAddressDetail').value = addrs[2] || "";
+        })
+
         //주소 입력
         var geocoder = new daum.maps.services.Geocoder();
         function showMapBox() {
