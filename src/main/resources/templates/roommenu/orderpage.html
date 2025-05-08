@@ -243,7 +243,7 @@
             <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
             <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
             <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=디저트&keyword='">디저트</div>
-            <div class="tab" onclick="window.location.href='/roommenu/orderpage?type=C&category=%EB%A3%B8%EC%BC%80%EC%96%B4&keyword='">룸케어</div>
+            <div class="tab" th:text="#{tab.roomcare}" onclick="window.location.href='/roommenu/orderpage?type=C&category=%EB%A3%B8%EC%BC%80%EC%96%B4&keyword='">룸케어</div>
         </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
@@ -288,7 +288,7 @@
 
                                 <!-- 수량 0이면 품절 표시, 클릭 불가 -->
                                 <div th:if="${roomMenuDTO.roomMenuAmount == 0}" class="sold-out-item">
-                                    <span class="menu-badge">품절</span>
+                                    <span class="menu-badge" th:text="#{item.soldout}">품절</span>
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
                                     <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
                                     <div class="price-box">
@@ -315,7 +315,7 @@
 
     <!-- 스크립트 시작 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         // 상태 저장
         const likedStates = {};
 
@@ -399,19 +399,10 @@
 
         // 다국어 변경시 ..?
         document.addEventListener('DOMContentLoaded', function () {
-            const userLang = navigator.language || navigator.userLanguage;
+            const currentLocale = /*[[${#locale.language}]]*/ 'ko';
+            console.log("Current Locale from Server:", currentLocale); // 디버깅용 로그
 
-            // 기본 언어를 한국어로 설정하고, 다른 언어도 지원
-            let lang = 'ko'; // 기본 한국어
-            if (userLang.startsWith('en')) {
-                lang = 'en';
-            } else if (userLang.startsWith('ja')) {
-                lang = 'ja';
-            } else if (userLang.startsWith('cn')) {
-                lang = 'cn';
-            }
-
-            // 메시지 객체 (여기서는 미리 정의된 메시지를 사용)
+            // 2. 다국어 메시지 객체 정의
             const messages = {
                 ko: {
                     search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다."
@@ -422,24 +413,33 @@
                 ja: {
                     search_disabled_message: "言語を変更すると検索はサポートされません。"
                 },
+
                 cn: {
                     search_disabled_message: "更改语言时不支持搜索。"
                 }
             };
 
-            // 현재 언어에 맞는 메시지 가져오기
-            const message = messages[lang].search_disabled_message;
+            let message = (messages[currentLocale] && messages[currentLocale].search_disabled_message)
+                ? messages[currentLocale].search_disabled_message
+                : messages['ko'].search_disabled_message; // 기본 메시지
 
-            // body에 'lang-non-ko' 클래스가 있다면 현재 언어가 한국어가 아닌 것으로 가정
-            if (document.body.classList.contains('lang-non-ko')) {
+            console.log("Selected Message:", message); // 디버깅용 로그
+
+            if (currentLocale !== 'ko') {
                 const searchInput = document.getElementById('searchInput');
                 const searchBtn = document.getElementById('searchBtn');
+
                 if (searchInput && searchBtn) {
-                    // 입력창과 버튼을 비활성화
                     searchInput.disabled = true;
                     searchBtn.disabled = true;
-                    searchInput.placeholder = message; // 다국어 메시지를 동적으로 적용
+                    searchInput.placeholder = message; // 해당 언어 메시지 적용
+
+                    console.log("Search disabled and placeholder set for non-Korean locale."); // 디버깅용 로그
+                } else {
+                    console.warn("Search input or button not found.");
                 }
+            } else {
+                console.log("Locale is Korean, search remains enabled."); // 디버깅용 로그
             }
         });
 
