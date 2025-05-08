@@ -17,9 +17,9 @@
         <div class="container p-4" style="max-width: 700px;">
 
           <!-- 이미지 업로드 -->
-          <div class="mb-3 user-box text-center">
-            <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-              <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" src="#" class="d-none">
+          <div class="mb-3 user-box text-center" >
+            <div class="border mb-2" style="border: 1px solid rgba(59,132,152,0.89) !important; width: 700px; height: 300px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+              <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: cover;" src="#" class="d-none">
             </div>
             <p class="file-name">객실 이미지가 선택되지 않았습니다.</p>
             <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border">이미지 선택</button>
@@ -33,10 +33,10 @@
           <div class="row g-4">
 
             <div class="col-12">
-              <label for="companyNum" class="form-label">소속 선택</label>
-              <select class="form-select rounded-3" id="companyNum" name="companyNum">
-                <option th:text="${comapny.getCompanyName()}" th:value="${comapny.getCompanyNum()}"></option>
-              </select>
+              <label class="form-label">소속</label>
+              <input type="text" class="form-control rounded-3" th:value="${comapny.getCompanyName()}" readonly>
+              <!--벨류값 히든으로 숨겼음 이거 없으면 소속 안들어 갑니다-->
+              <input type="hidden" name="companyNum" th:value="${comapny.getCompanyNum()}">
             </div>
 
             <div class="col-md-6">

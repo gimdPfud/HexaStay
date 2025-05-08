@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Principal;
 import java.util.Collection;
@@ -14,6 +16,8 @@ import java.util.Optional;
 
 @Getter
 public class CustomAdminDetails implements UserDetails, Principal {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomAdminDetails.class);
 
     private final Admin admin;
 
@@ -30,9 +34,11 @@ public class CustomAdminDetails implements UserDetails, Principal {
 
     @Override
     public String getPassword() {
-        return Optional.ofNullable(admin)
+        String password = Optional.ofNullable(admin)
                 .map(Admin::getAdminPassword)
                 .orElse(null);
+        log.info("CustomAdminDetails - getPassword 호출됨: {}", password);
+        return password;
     }
 
     public String getAdminPosition() {
@@ -66,11 +72,10 @@ public class CustomAdminDetails implements UserDetails, Principal {
                 .orElse(null);
     }
 
-
     public String getAdminProfileMeta() {
         return Optional.ofNullable(admin)
                 .map(Admin::getAdminProfileMeta)
-                .orElse(null);
+                .orElse("/profile/default.png");
     }
 
     @Override
@@ -95,7 +100,7 @@ public class CustomAdminDetails implements UserDetails, Principal {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "ACTIVE".equals(admin.getAdminActive());
     }
 
     @Override

@@ -4,9 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum AdminRole {
+    SUPERADMIN("슈퍼어드민"),
     //본사
     EXEC("임원진"),
-    HEAD("매니저"),
+    HEAD("팀장"),
     CREW("사원"),
 
     //지사, 지점
@@ -16,8 +17,8 @@ public enum AdminRole {
     PARTNER("협력업체"),
 
     //스토어
-    MGR("운영총괄"),
-    SUBMGR("부매니저"),
+    MGR("매니저"),
+    SUBMGR("부 매니저"),
     STAFF("매장직원");
 
     private final String displayName;

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout.html}">
 <head>
@@ -28,10 +27,10 @@
                     <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
                 </div>
 
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">사번</label>-->
-<!--                    <input readonly type="text" inputmode="numeric" name="adminEmployeeNum" class="form-control numberOnly" maxlength="8">-->
-<!--                </div>-->
+                <!--                <div class="mb-3">-->
+                <!--                    <label class="form-label">사번</label>-->
+                <!--                    <input readonly type="text" inputmode="numeric" name="adminEmployeeNum" class="form-control numberOnly" maxlength="8">-->
+                <!--                </div>-->
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
@@ -130,20 +129,20 @@
                 <div class="mb-3">
                     <label class="form-label" for="adminCenterRank">직급&nbsp&nbsp</label>
                     <select class="form-select" id="adminCenterRank">
-                        <option value="exec">임원진</option>
-                        <option value="head">팀장</option>
-                        <option value="crew">사원</option>
+                        <option value="EXEC">임원진</option>
+                        <option value="HEAD">팀장</option>
+                        <option value="CREW">사원</option>
                     </select>
                     <select class="form-select" id="adminBranchFacilityRank" hidden>
-                        <option value="gm">총괄 책임자</option>
-                        <option value="sv">관리자</option>
-                        <option value="agent">사원</option>
-                        <option value="partner">협력 업체</option>
+                        <option value="GM">총괄 책임자</option>
+                        <option value="SV">관리자</option>
+                        <option value="AGENT">사원</option>
+                        <option value="PARTNER">협력 업체</option>
                     </select>
                     <select class="form-select" id="adminStoreRank" hidden>
-                        <option value="mgr">매니저</option>
-                        <option value="submgr">부매니저</option>
-                        <option value="staff">매장 직원</option>
+                        <option value="MGR">매니저</option>
+                        <option value="SUBMGR">부매니저</option>
+                        <option value="STAFF">매장 직원</option>
                     </select>
                 </div>
 
@@ -164,7 +163,6 @@
                     <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
-            <input hidden type="text" name="adminPassword" class="form-control">
             <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
             <input hidden name="companyNum" id="companyNum">
             <input hidden name="storeNum" id="storeNum">
@@ -312,14 +310,14 @@
 
         function submitForm(event) {
             event.preventDefault();
-            
+
             // 필수 입력 필드 검사
             const requiredFields = {
                 'adminEmail': '이메일',
                 'adminName': '이름',
                 'adminResidentNumPartOne': '주민등록번호 앞자리',
                 'adminResidentNumPartTwo': '주민등록번호 뒷자리',
-                'adminAddress': '주소',
+                'adminAddressOne': '주소',
                 'adminPhonePartOne': '연락처 앞자리',
                 'adminPhonePartTwo': '연락처 중간자리',
                 'adminPhonePartThree': '연락처 뒷자리',
@@ -374,23 +372,24 @@
             switch (adminChoice) {
                 case "본사":
                     document.getElementById("adminRole").value = adminCenterRank.value;
-                    companyNum.value = adminCenter.value;
+                    companyNum.value = adminCenter;
                     storeNum.value = "";
                     break;
                 case "지점":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
+                    companyNum.value = adminBranchFacility;
                     storeNum.value = "";
                     break;
                 case "외부시설":
                     document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility.value;
+                    companyNum.value = adminBranchFacility;
                     storeNum.value = "";
                     break;
                 case "스토어":
                     document.getElementById("adminRole").value = adminStoreRank.value;
                     companyNum.value = "";
-                    storeNum.value = adminStore.value;
+                    storeNum.value = adminStore;
+
                     break;
             }
 
@@ -409,8 +408,8 @@
 
             // 주소 결합
             document.getElementById('adminAddress').value =
-            document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
-            + "\u00A0" + document.getElementById('adminAddressThree').value;
+                document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
+                + "\u00A0" + document.getElementById('adminAddressThree').value;
 
             // 폼 제출
             event.target.form.submit();
@@ -487,31 +486,6 @@
                     document.getElementById('idCheck').textContent = "ID 확인 실패.";
                     signupActive = false;
                 });
-        });
-
-
-        // 사번 자동입력
-        function generateEmployeeNumber() {
-            const now = new Date();
-            const yearPrefix = String(now.getFullYear()).slice(2, 4); // "25"
-            const storageKey = `empNum_${yearPrefix}`;
-
-            let currentNum = localStorage.getItem(storageKey);
-            if (!currentNum) {
-                currentNum = 1;
-            } else {
-                currentNum = parseInt(currentNum) + 1;
-            }
-
-            localStorage.setItem(storageKey, currentNum);
-
-            const paddedNum = String(currentNum).padStart(6, '0');
-            return yearPrefix + paddedNum;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const empNum = generateEmployeeNumber();
-            document.getElementById('employeeNum').value = empNum;
         });
 
 

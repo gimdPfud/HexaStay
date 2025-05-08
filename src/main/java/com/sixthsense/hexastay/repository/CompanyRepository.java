@@ -28,7 +28,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                                      @Param("choice") String choice,
                                                      Pageable pageable);
 
-
     @Query("SELECT c FROM Company c " +
             "WHERE (:choice = '' OR c.companyType = :choice) " +
             "AND (c.companyNum = :companyNum OR c.companyParent = :companyNum) " +

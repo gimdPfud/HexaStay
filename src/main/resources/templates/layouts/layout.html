@@ -11,9 +11,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <link href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css" rel="stylesheet"/>
-    <!-- Bootstrap JS + Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!--시설정보페이지 ( facilities/insert.html & facilities/modify.html 에서 사용 중 )-->
     <style>
         /* 위에서 쓰던 스타일들 복사해서 그대로 붙여넣으세요 */
         body {
@@ -131,6 +128,14 @@
             cursor: pointer;
         }
 
+        .profile-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
         .dropdown-menu {
             font-size: 14px; /* 텍스트 크기 */
             padding: 10px 10px; /* 상하 여백 */
@@ -201,9 +206,6 @@
             pointer-events: none; /* 이미지 자체에 클릭 효과 차단 */
         }
 
-
-
-
     </style>
 </head>
 
@@ -222,11 +224,11 @@
         <!-- 프로필 이미지 드롭다운 -->
         <!-- 프로필 드롭다운 + 관리자 정보 블록 -->
         <div class="dropdown text-end">
-
-            <button class="btn p-0" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn p-0 d-flex align-items-center gap-1" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <img class="profile-img"
                      th:src="${#authentication.principal.adminProfileMeta != null ? #authentication.principal.adminProfileMeta : '/profile/default.png'}"
                      alt="프로필" />
+                <i class="bi bi-caret-down-fill text-white" style="font-size: 0.9rem;"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>
@@ -239,30 +241,21 @@
         <div class="text-white small text">
             <div class="d-flex mb-1">
                 <div class="flex-half">
-            <span th:text="${#strings.length(#authentication.principal.admin.adminName) > 8
-                            ? #strings.substring(#authentication.principal.admin.adminName, 0, 8) + '…'
-                            : #authentication.principal.admin.adminName}">이름</span>
+                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>
                 </div>
                 <div class="flex-half">
-            <span th:text="${#strings.length(#authentication.principal.admin.adminPosition) > 8
-                            ? #strings.substring(#authentication.principal.admin.adminPosition, 0, 8) + '…'
-                            : #authentication.principal.admin.adminPosition}">직책</span>
+                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
                 </div>
             </div>
             <div class="d-flex">
                 <div class="flex-half">
-            <span th:text="${#strings.length(#authentication.principal.admin.adminRole) > 8
-                            ? #strings.substring(#authentication.principal.admin.adminRole, 0, 8) + '…'
-                            : #authentication.principal.admin.adminRole}">직급</span>
+                    <span th:text="${#authentication.principal.admin.adminRole}">직급</span>
                 </div>
                 <div class="flex-half">
-            <span th:text="${#strings.length(#authentication.principal.admin.adminEmail) > 8
-                            ? #strings.substring(#authentication.principal.admin.adminEmail, 0, 8) + '…'
-                            : #authentication.principal.admin.adminEmail}">이메일</span>
+                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
                 </div>
             </div>
         </div>
-
     </div>
 </nav>
 
@@ -374,5 +367,8 @@
     /* 공통 스크립트 끝 */
 
 </script>
+<!-- Bootstrap JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

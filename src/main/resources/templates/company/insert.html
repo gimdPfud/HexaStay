@@ -145,6 +145,10 @@
                 document.getElementById('companyPhone').value = document.getElementById('companyPhoneone').value + "-" + document.getElementById('companyPhonetwo').value + "-" + document.getElementById('companyPhonethree').value;
                 console.log(document.getElementById('companyPhone').value);
 
+                if (companySelectedBrand.value === "center") {
+                    companyParent.value=""
+                }
+
                 //주소좌표..등록
                 let companyAddress = document.getElementById("companyAddress").value;
                 if(companyAddress&&companyAddress.trim().length>0){

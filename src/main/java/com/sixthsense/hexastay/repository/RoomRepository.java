@@ -20,13 +20,14 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
     //roomPassword 만 찾아와서 유효성 검사
-    //1.Boolean 타입
-    @Query("SELECT COUNT(r) > 0 FROM Room r WHERE r.roomPassword = :roomPassword")
-    boolean isRoomPasswordInUse(@Param("roomPassword") String roomPassword);
-
-    //2.Long 타입
+    //2.Long 타입 - 비밀번호 중복체크 및 비번 추천
     @Query("SELECT COUNT(r) FROM Room r WHERE r.roomPassword = :roomPassword")
     long countByRoomPassword(@Param("roomPassword") String roomPassword);
+
+    //todo : room 상태 컬럼 추가해서 상태에 따라 보여지고 안보여지는 컬럼 추가
+    //
+    @Query("SELECT r FROM Room r WHERE (r.roomDisplayStatus IS NULL OR r.roomDisplayStatus = :status)")
+    Page<Room> findByRoomDisplayStatus(@Param("status") String status, Pageable pageable);
 
 
 
@@ -46,7 +47,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     List<Room> findByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
     //todo : 검색용 roomlist.html
-    //member 의 이름관 email로 찾아 오는 조건
+    //member 의 이름과  email로 찾아 오는 조건
     @Query("SELECT r FROM Room r WHERE " +
             "LOWER(r.member.memberName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(r.member.memberEmail) LIKE LOWER(CONCAT('%', :keyword, '%'))")
@@ -57,15 +58,12 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
-    // roomNum + roomPassword 조합으로 단일 Room 조회
-    Optional<Room> findByRoomNumAndRoomPassword(Long roomNum, String roomPassword);
-
 
     //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
     Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
 
-    //qr/{hotelRoomNum}들어 갈때 쓰는 로직
+    //qr/{hotelRoomNum}들어 갈때 쓰는 로직 - hotelroom status = 'checkin' 상태에서만 패스워드로 접속 가능
     @Query("SELECT r FROM Room r WHERE r.roomPassword = :roomPassword AND r.hotelRoom.hotelRoomStatus = 'checkin'")
     Optional<Room> findCheckinRoomByPassword(@Param("roomPassword") String roomPassword);
 
@@ -88,9 +86,6 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
     List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
 
-    // hotelRoomNum 기준으로 연결된 member들만 가져오기
-    @Query("SELECT r.member FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum")
-    Optional<Member> findMemberByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
     //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
     @Query("SELECT r FROM Room r " +

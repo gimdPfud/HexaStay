@@ -15,7 +15,7 @@ public class RoomDTO {
 
         private Long roomNum;
 
-        private String roomStatus;  // checkin, checkout 등 예약 배정 테이블 상태 추가
+        private String roomDisplayStatus;  // VISIBLE, HIDDEN 등 예약 배정 테이블 상태 추가
 
         private String roomPassword;    //Room이용 password
 

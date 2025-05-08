@@ -6,6 +6,7 @@ import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,6 +42,9 @@ public class AdminController {
     private final AdminService adminService;
     private final CompanyService companyService;
     private final AdminRepository adminRepository;
+    private final CompanyRepository companyRepository;
+    private final StoreRepository storeRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     // 시큐리티 체크
@@ -84,17 +89,17 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
+
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
 
         List<CompanyDTO> companyList;
-        if (adminDTO.getAdminRole().equals("superAdmin")) {
-
+        if (adminDTO.getAdminRole().equals("SUPERADMIN")) {
             companyList = companyService.getAllList();
         } else if (adminDTO.getAdminRole().equals("EXEC") || adminDTO.getAdminRole().equals("HEAD")) {
-
             companyList = companyService.getCompanyAndSubsidiaries(adminDTO.getCompanyNum());
         } else {
             companyList = Collections.singletonList(companyService.companyRead(adminDTO.getCompanyNum()));
@@ -123,8 +128,13 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
+        log.info("요쓰" + adminDTO.getAdminRole());
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
+            bindingResult.getAllErrors().forEach(error -> {
+                log.error("유효성 검사 오류: {}", error.getDefaultMessage());
+            });
+
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
             model.addAttribute("companyList", companyList);
             return "admin/insert";
@@ -141,11 +151,14 @@ public class AdminController {
 
         try {
             adminDTO.setAdminActive("INACTIVE");
+            adminDTO.setAdminPassword(passwordEncoder.encode(adminDTO.getAdminPassword()));
             adminService.insertAdmin(adminDTO);
             return "redirect:/admin/list";
+
         } catch (IOException e) {
-            log.error("파일 업로드 중 오류 발생", e);
-            model.addAttribute("error", "파일 업로드 중 오류가 발생했습니다.");
+
+            log.error("회원 가입 중, 오류 발생", e);
+            model.addAttribute("error", "회원 가입 중, 오류가 발생했습니다.");
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
             model.addAttribute("companyList", companyList);
             return "admin/insert";
@@ -160,7 +173,7 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
@@ -185,7 +198,7 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
@@ -243,14 +256,14 @@ public class AdminController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        
+
         try {
             AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
             if (adminDTO == null) {
                 log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
                 return "redirect:/admin/logout";
             }
-            
+
             model.addAttribute("adminDTO", adminDTO);
             return "admin/mypage";
         } catch (Exception e) {
@@ -271,27 +284,18 @@ public class AdminController {
         }
 
         try {
-            // 현재 로그인한 사용자의 정보를 가져옴
             AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
             if (currentAdmin == null) {
                 log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
                 return "redirect:/admin/logout";
             }
 
-            // 수정할 수 없는 필드들은 현재 값으로 유지
-            adminDTO.setAdminNum(currentAdmin.getAdminNum());
-            adminDTO.setAdminEmail(currentAdmin.getAdminEmail());
-            adminDTO.setAdminRole(currentAdmin.getAdminRole());
-            adminDTO.setAdminEmployeeNum(currentAdmin.getAdminEmployeeNum());
-            adminDTO.setAdminResidentNum(currentAdmin.getAdminResidentNum());
-            adminDTO.setCompanyNum(currentAdmin.getCompanyNum());
-
             adminService.adminUpdate(adminDTO);
-            return "redirect:/admin/mypage";
+            return "redirect:/admin/list";
         } catch (Exception e) {
             log.error("마이페이지 수정 중 오류 발생: ", e);
             model.addAttribute("error", "정보 수정 중 오류가 발생했습니다.");
-            return "admin/mypage";
+            return "admin/list";
         }
     }
 
@@ -320,7 +324,7 @@ public class AdminController {
 
 
     @GetMapping("/update/{adminNum}")
-    public String adminUpdate(@PathVariable Long adminNum, Model model) throws IOException {
+    public String adminUpdate(@PathVariable Long adminNum, Model model) {
         AdminDTO adminDTO = adminService.adminRead(adminNum);
         model.addAttribute("adminDTO", adminDTO);
         return "admin/mypage";
