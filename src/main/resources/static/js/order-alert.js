@@ -113,7 +113,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- WebSocket 연결 및 처리 (항상 실행 시도) ---
     function connectWebSocket() {
         console.log("WebSocket 연결 시도...");
-        const socket = new SockJS("/ws-order-alert"); // 엔드포인트 확인
+       /* const socket = new SockJS("/ws-order-alert");*/
+        const ngrokBaseUrl = 'wss://e41c-116-33-138-85.ngrok-free.app'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
+        const socket = new SockJS('https://e41c-116-33-138-85.ngrok-free.app/ws-order-alert');
         const stompClient = Stomp.over(socket);
         stompClient.debug = null; // 디버그 로그 비활성화
 

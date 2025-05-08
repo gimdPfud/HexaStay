@@ -52,6 +52,7 @@ public class AdminSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login", "/admin/encrypt-admin-password", "/admin/create-admin").permitAll()
                         .requestMatchers("/admin/**").permitAll()
+                        .requestMatchers(("/ws-order-alert/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
