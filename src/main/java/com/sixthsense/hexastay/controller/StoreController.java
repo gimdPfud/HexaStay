@@ -69,8 +69,6 @@ public class StoreController {
 
     @PostMapping("/insert")
     public String insert(StoreDTO storeDTO) throws IOException {
-//        log.info("등록post : "+storeDTO);
-        //todo <option selected>검색 조건</option> -> <option value="전체" selected>검색 조건</option>
         storeService.insert(storeDTO);
         return "redirect:/admin/store/list";
     }

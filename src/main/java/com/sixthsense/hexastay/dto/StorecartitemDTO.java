@@ -7,6 +7,8 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +22,8 @@ public class StorecartitemDTO {
     private Long storecartitemNum;
     private Long storecartNum;
     private Long storemenuNum;
+    @NotNull
+    @Min(1)
     private Integer storecartitemCount;          //장바구니에 담은 수량
     private String storemenuOptions;  //주문한 상품의 옵션들??
     private Integer optionPrice;
