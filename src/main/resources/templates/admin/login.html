@@ -1,168 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css">
 
     <style>
-        @import url(https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,700);
-        @import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        body, html {
+        html, body {
             height: 100%;
+            font-family: 'Open Sans', sans-serif;
+            background: #f4f6f9; /* 눈에 편한 연한 회청색 */
         }
+
         body {
-            font-family: 'Open Sans';
-            font-weight: 100;
             display: flex;
-            overflow: hidden;
+            justify-content: center;
+            align-items: center; /* 세로 중앙 정렬 유지 */
+            flex-direction: column; /* 로고와 로그인 폼을 수직으로 배치 */
+            height: 100vh; /* 화면 높이 꽉 채우기 */
         }
-        input {
-            ::-webkit-input-placeholder {
-                color: rgba(255,255,255,0.7);
-            }
-            ::-moz-placeholder {
-                color: rgba(255,255,255,0.7);
-            }
-            :-ms-input-placeholder {
-                color: rgba(255,255,255,0.7);
-            }
-            &:focus {
-                outline: 0 transparent solid;
-                ::-webkit-input-placeholder {
-                    color: rgba(0,0,0,0.7);
-                }
-                ::-moz-placeholder {
-                    color: rgba(0,0,0,0.7);
-                }
-                :-ms-input-placeholder {
-                    color: rgba(0,0,0,0.7);
-                }
-            }
+
+        .logo-container {
+            margin-bottom: 0.5rem; /* 로고와 로그인 폼 간격을 조금 좁힘 */
+        }
+
+        .login-logo {
+            max-width: 120px; /* 로고 크기 제한을 120px로 변경 */
+            height: auto; /* 비율에 맞게 자동 조정 */
         }
 
         .login-form {
-        //background: #222;
-        //box-shadow: 0 0 1rem rgba(0,0,0,0.3);
-            min-height: 10rem;
-            margin: auto;
-            max-width: 50%;
-            padding: .5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(3px);
         }
+
         .login-text {
-        //background: hsl(40,30,60);
-        //border-bottom: .5rem solid white;
-            color: white;
+            color: #333;
+            text-align: center;
             font-size: 1.5rem;
-            margin: 0 auto;
-            max-width: 50%;
-            padding: .5rem;
-            text-align: center;
-        //text-shadow: 1px -1px 0 rgba(0,0,0,0.3);
-            .fa-stack-1x {
-                color: black;
-            }
+            margin-bottom: 1.5rem;
         }
 
-        .login-username, .login-password {
-            background: transparent;
-            border: 0 solid;
-            border-bottom: 1px solid rgba(white, .5);
+        .fa-stack-1x {
             color: white;
-            display: block;
-            margin: 1rem;
-            padding: .5rem;
-            transition: 250ms background ease-in;
-            width: calc(100% - 3rem);
-            &:focus {
-                background: white;
-                color: black;
-                transition: 250ms background ease-in;
-            }
         }
 
-        .login-forgot-pass {
-        //border-bottom: 1px solid white;
-            bottom: 0;
-            color: white;
-            cursor: pointer;
-            display: block;
-            font-size: 75%;
-            left: 0;
-            opacity: 0.6;
-            padding: .5rem;
-            position: absolute;
-            text-align: center;
-        //text-decoration: none;
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
-            &:hover {
-                opacity: 1;
-            }
-        }
-        .login-submit {
-            border: 1px solid white;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-bottom: 1px solid #ccc;
             background: transparent;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        input:focus {
+            outline: none;
+            border-bottom: 1px solid #666;
+        }
+
+        .login-submit {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #666;
+            background: transparent;
+            color: #333;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-submit:hover {
+            background: #333;
             color: white;
-            display: block;
-            margin: 1rem auto;
-            min-width: 1px;
-            padding: .25rem;
-            transition: 250ms background ease-in;
-            &:hover, &:focus {
-                background: white;
-                color: black;
-                transition: 250ms background ease-in;
-            }
         }
 
-
-
-
-        [class*=underlay] {
-            left: 0;
-            min-height: 100%;
-            min-width: 100%;
-            position: fixed;
-            top: 0;
-        }
-        .underlay-photo {
-            background: url(/background/mitchell-luo-xREzOtWzDrQ-unsplash.jpg) no-repeat;
-            background-size: 100% 100%;
-            -webkit-filter: grayscale(30%);
-            z-index: -1;
-        }
-        .underlay-black {
-            background: rgba(0,0,0,0.3);
-            z-index: -1;
+        .login-links {
+            margin-top: 1rem;
+            text-align: right;
         }
 
-        @keyframes hue-rotate {
-            from {
-                -webkit-filter: grayscale(30%) hue-rotate(0deg);
-            }
-            to {
-                -webkit-filter: grayscale(30%) hue-rotate(360deg);
-            }
+        .login-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            font-size: 0.85rem; /* 글씨 크기 줄이기 */
+            color: #d9534f;
+            margin-bottom: 1rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
+<div class="logo-container">
+    <img src="/logo/HEXA white.png" alt="Logo" class="login-logo" />
+</div>
+
 <form class="login-form" method="post" action="/admin/login">
-    <p class="login-text">
+    <div class="login-text">
     <span class="fa-stack fa-lg">
-      <i class="fa fa-circle fa-stack-2x"></i>
-      <i class="fa fa-lock fa-stack-1x"></i>
+      <i class="fa fa-circle fa-stack-2x" style="color: #666;"></i>
+      <i class="fa fa-lock fa-stack-1x" style="color: white;"></i>
     </span>
-    </p>
+        <div>manager Login</div>
+    </div>
     <div th:if="${param.error}" class="alert alert-danger">
         이메일 또는 비밀번호가 올바르지 않습니다.
     </div>
     <input type="email" name="adminEmail" class="login-username" autofocus="true" required="true" placeholder="Email" />
     <input type="password" name="adminPassword" class="login-password" required="true" placeholder="Password" />
-    <input type="submit" name="Login" value="Login" class="login-submit" />
+    <input type="submit" name="Login" value="Login" class="login-submit"/>
+    <div class="login-links">
+        <a href="#">Forgot password?</a>
+    </div>
 </form>
-<a href="#" class="login-forgot-pass">forgot password?</a>
+
 <div class="underlay-photo"></div>
 <div class="underlay-black"></div>
 

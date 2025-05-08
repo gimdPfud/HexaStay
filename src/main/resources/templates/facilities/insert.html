@@ -13,7 +13,7 @@
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
+        <h2 class="fw-bold mb-4 text-center">시설 정보 등록하기</h2>
 
         <form id="insertForm" action="/facility/insert" method="post">
             <div class="container p-4" style="max-width: 700px;">
@@ -24,17 +24,17 @@
                     <input type="hidden" th:value="${companyNum}" id="companyNum" name="companyNum" class="form-control">
                 </div>
                 <div class="mb-2">
-                    <label class="form-label" for="facTitle">첫 번째 입력 칸</label>
+                    <label class="form-label" for="facTitle">부대시설</label>
                     <textarea name="facTitle" id="facTitle" class="form-control"></textarea>
                 </div>
                 <div class="mb-2">
-                    <label class="form-label" for="facContent">두 번째 입력 칸</label>
+                    <label class="form-label" for="facContent">시설 이용 정보</label>
                     <textarea name="facContent" id="facContent" class="form-control"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" onclick="submitt()" class="btn btn-success" >등록</button>
-                    <a th:href="@{/facility/list}" class="btn btn-danger">취소</a>
+                    <a th:href="@{|/company/read/${companyNum}|}" class="btn btn-danger">취소</a>
                 </div>
             </div>
         </form>
@@ -74,7 +74,6 @@
             $('#facTitle').val(cleanTitle);
             $('#facContent').val(cleanContent);
 
-            // 버튼이 속한 폼 제출
             $('#insertForm').submit();
         }
     </script>

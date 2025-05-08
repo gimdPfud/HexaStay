@@ -59,7 +59,7 @@
             color: #495057;
         }
 
-        .fs-text, .fs-content, .fsservice p {
+        .fs-text, .fs-content {
             font-size: 14px;
             color: #343a40;
             margin-bottom: 8px;
@@ -101,15 +101,15 @@
 
     <div class="card">
         <h2>부대시설</h2>
-        <div class="fsservice" th:each="fss:${data.fssList}">
-            <p th:text="${fss.fsssTitle}"></p>
+        <div class="fs-text" th:each="fss:${data.fssList}">
+            <div th:utext="${fss.fsssTitle}"></div>
         </div>
     </div>
 
     <div class="card">
-        <h2>숙소 이용 정보</h2>
-        <div class="fsservice" th:each="fss:${data.fssList}">
-            <p th:text="${fss.fsssContent}"></p>
+        <h2>시설 이용 정보</h2>
+        <div class="fs-content" th:each="fss:${data.fssList}">
+            <div th:utext="${fss.fsssContent}"></div>
         </div>
     </div>
 

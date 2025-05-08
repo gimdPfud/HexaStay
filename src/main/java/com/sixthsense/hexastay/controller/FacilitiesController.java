@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.security.Principal;
 
 @Controller
@@ -61,28 +60,33 @@ public class FacilitiesController {
         try {
             dto.setCompanyDTO(companyService.companyRead(companyNum));
             Long result = fsService.fsInsert(dto);
-            return "redirect:/facility/list/"+result;
+            return "redirect:/facility/read/"+result;
         } catch (Exception e){
             log.info("예외발생");
             return "redirect:/facility/insert/"+companyNum;
         }
     }
 
-    @GetMapping("/facility/list/{companyNum}")
-    public String fslist(@PathVariable Long companyNum, Model model){
-        model.addAttribute("list",fsService.list(companyNum));
-        return "facilities/list";
-    }
+//    @GetMapping("/facility/list/{companyNum}")
+//    public String fslist(@PathVariable Long companyNum, Model model){
+//        model.addAttribute("list",fsService.list(companyNum));
+//        return "facilities/list";
+//    }
 
-    @GetMapping("/facility/read/{fsNum}")
-    public String fsread(@PathVariable Long fsNum, Model model){
-        model.addAttribute("data",fsService.read(fsNum));
+    @GetMapping("/facility/read/{cNum}")
+    public String fsread(@PathVariable Long cNum, Model model){
+        FacilitiesDTO dto = fsService.read(cNum);
+        if(dto == null){
+            return "redirect:/facility/insert/"+cNum;
+        }else{
+        model.addAttribute("data",dto);
         return "facilities/read";
+        }
     }
 
-    @GetMapping("/facility/modify/{fsNum}")
-    public String fsmodify(@PathVariable Long fsNum, Model model){
-        model.addAttribute("data",fsService.read(fsNum));
+    @GetMapping("/facility/modify/{cNum}")
+    public String fsmodify(@PathVariable Long cNum, Model model){
+        model.addAttribute("data",fsService.read(cNum));
         return "facilities/modify";
     }
     @PostMapping("/facility/modify")
@@ -90,7 +94,7 @@ public class FacilitiesController {
         log.info(dto.toString());
         try {
             Long num = fsService.modify(dto);
-            return "redirect:/facility/list/"+num;
+            return "redirect:/facility/read/"+num;
         }catch (Exception e){
             log.info("수정불가능");
             model.addAttribute("errmsg","상태를 변경할 수 없습니다.");
@@ -102,7 +106,7 @@ public class FacilitiesController {
     public String fsdelete(@PathVariable Long fsNum, HttpServletRequest request){
         try {
             Long result = fsService.delete(fsNum);
-            return "redirect:/facility/list/"+result;
+            return "redirect:/company/read/"+result;
         } catch (Exception e) {
             log.info("삭제할수엄슴");
             String referer = request.getHeader("Referer");

@@ -1,20 +1,82 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>매니지먼트 시스템</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+
+        h5 {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 14px;
+            color: #555;
+            word-break: break-word;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 90%;
+            margin: 1rem auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .container img.round {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card h5, .card h6, .card p {
+            margin: 0;
+            color: #333;
+        }
+
+        .card .email {
+            font-size: 14px;
+            color: #007bff;
+            word-break: break-all;
+        }
+    </style>
 </head>
 <body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
-<div class="container mt-4">
-
-
-    <p th:text="${#authentication.principal.member.memberName}"></p>
-
-
+    <h5>오늘도 좋은 하루 보내세요!</h5>
+    <div class="container mt-4">
+        <p th:text="${#authentication.principal.member.memberName}"></p>
+    </div>
 </div>
-
 </body>
 </html>

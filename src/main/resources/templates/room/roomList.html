@@ -8,11 +8,11 @@
     <style>
         .table td {
             vertical-align: middle;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .table th {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .table {
@@ -59,7 +59,7 @@
         <form action="/roomlist/search" method="get" class="d-flex align-items-end gap-2">
             <div class="flex-grow-1">
                 <input name="keyword" type="text" class="form-control"
-                       placeholder="회원 이름 또는 이메일로 검색 : [기능완료] 검색버튼을 눌러주세요" th:value="${keyword}">
+                       placeholder="회원 이름 또는 이메일로 검색 : 검색버튼을 눌러주세요" th:value="${keyword}">
             </div>
 
             <div class="d-flex gap-2">
@@ -118,17 +118,17 @@
                     <thead class="table-light text-center">
                     <tr>
                         <th style="width: 5%;">번호</th>
-                        <th style="width: 10%;">객실명</th>
+                        <th style="width: 12%;">객실명</th>
                         <th style="width: 9%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 8%;">메일</th>
+                        <th style="width: 8%;">메일 발송</th>
                         <th style="width: 10%;">객실 연락처</th>
                         <th style="width: 8%;">체크인</th>
                         <th style="width: 8%;">체크아웃</th>
                         <th style="width: 8%;">비밀번호</th>
-                        <th style="width: 9%;">현재 상태</th>
+                        <th style="width: 8%;">현재 상태</th>
                         <th style="width: 9%;">상태 변경</th>
-                        <th style="width: 10%;">표시 상태</th>
+                        <th style="width: 9%;">표시 변경</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -222,7 +222,7 @@
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(rooms.content)}">
-                        <td colspan="9" class="text-center text-muted">검색 결과가 없습니다.</td>
+                        <td colspan="12" class="text-center text-muted">검색 결과가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
