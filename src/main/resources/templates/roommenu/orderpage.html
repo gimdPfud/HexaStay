@@ -10,6 +10,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
+
         .container {
             width: 100%;
             max-width: 400px;
@@ -17,26 +18,31 @@
             background: white;
             padding: 10px;
         }
+
         .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
         .search-box {
             display: flex; align-items: center; gap: 0.5rem;
             background-color: white; border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 0.3rem;
         }
+
         .search-box input[type="text"] {
             flex: 1; height: 40px; font-size: 1rem;
             border-radius: 6px; border: 1px solid #ced4da; padding: 0 0.75rem;
         }
+
         .search-box button {
             height: 40px; padding: 0 1rem; font-size: 1rem;
             border-radius: 6px; background-color: #d0e8ff;
             border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
         }
+
         .tabs {
             display: flex; overflow-x: auto; white-space: nowrap;
             gap: 10px; padding: 10px 0; margin-bottom: 10px;
             height: 55px; text-align: center; align-items: center;
         }
+
         .tabs::-webkit-scrollbar { display: none; }
 
         .tab {
@@ -44,12 +50,14 @@
             font-size: 14px; background-color: transparent; color: black;
             height: 37px; width: 60px; text-align: center;
         }
+
         .tab.active {
             font-weight: bold;
             background-color: #e0f7fa;  /* 선택된 탭 배경 */
             border-bottom: 3px solid #00796b;  /* 탭 하단 표시선 */
             color: #00796b;
         }
+
         .btn-custom {
             background-color: transparent; /* 배경색 제거 */
             color: #ff6b6b; /* 텍스트 색상 */
@@ -62,6 +70,7 @@
             cursor: pointer; /* 클릭 가능한 포인터 */
             transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
         }
+
         .card-list {
             list-style: none;
             padding: 0;
@@ -69,6 +78,7 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
             gap: 20px; /* 카드 사이 간격 */
         }
+
         .div-card {
             background: white;
             border-radius: 15px;
@@ -78,15 +88,18 @@
             flex-direction: column;
             height: 100%; /* 카드 높이 유동적으로 */
         }
+
         .inner-wrapper {
             padding: 15px;
         }
+
         .d-flex {
             display: flex;
             justify-content: flex-end;
             gap: 5px;
             margin-top: 0;
         }
+
         .menu-image-container {
             width: 100px;
             height: 100px;
@@ -95,23 +108,28 @@
             justify-content: center;
             align-items: center;
         }
+
         .menu-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 10px;
         }
+
         .text-info { flex: 1; }
+
         .menu-name {
             font-size: 1.2rem;
             font-weight: bold;
             color: black;
             margin-bottom: 5px;
         }
+
         .menu-content {
             font-size: 0.9rem;
             color: black;
         }
+
         .menu-badge {
             display: inline-block;
             background-color: #e0f7fa;
@@ -122,31 +140,37 @@
             margin-bottom: 4px;
             font-weight: bold;
         }
+
         .like-section {
             display: flex;
             align-items: center;
             justify-content: flex-end; /* 오른쪽 정렬 */
             gap: 5px;
         }
+
         .like-icon {
             font-size: 1.5rem;
             cursor: pointer;
             color: gray;
         }
+
         .like-count {
             font-size: 1rem;
             font-weight: bold;
         }
+
         div.menu-image-container img.menu-image {
             width: 100px !important;
             height: 100px !important;
             object-fit: cover;
             border-radius: 10px;
         }
+
         a {
             color: #333; /* 진회색 - 검정에 가까움 */
             text-decoration: none; /* 밑줄 제거 */
         }
+
         .text-info {
             width: 60%;
             display: flex;
@@ -155,30 +179,35 @@
             padding-left: 10px;
             margin-top: 15px;
         }
+
         .text-info .menu-name {
             font-size: 1.2rem;
             font-weight: bold;
             margin: 5px 0;
             color: black;
         }
+
         .price-box{
             font-size: 1.2rem;
             font-weight: bold;
             margin: 5px 0;
             color: black;
         }
+
         /* 다국어 */
         .lang-en .tab {
             font-size: 13px;
             padding: 8px 10px;
             letter-spacing: -0.5px;
         }
+
         /* 영어 */
         .lang-en .tab {
             font-size: 12px;
             padding: 8px 10px;
             letter-spacing: -0.5px;
         }
+
         /* 일본어 */
         .lang-ja .tab {
             font-size: 13px;
@@ -186,6 +215,7 @@
             letter-spacing: 0px; /* 일본어는 자간을 좁히지 않는 게 가독성에 좋음 */
             font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
         }
+
         /* 중국어 */
         .lang-cn .tab {
             font-size: 13px;
@@ -193,11 +223,13 @@
             letter-spacing: 0px; /* 중국어도 자간 유지 */
             font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
         }
+
         /* 품절관련, 좋아요 관련 CSS 시작 */
         .sold-out {
             opacity: 0.5;
             position: relative;
         }
+
         .sold-out::after {
             content: "품절";
             color: white;
@@ -210,14 +242,17 @@
             right: 10px;
             border-radius: 4px;
         }
+
         .sold-out-item {
             opacity: 0.5;
             pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
             position: relative;
         }
+
         .sold-out-item .enable-click {
             pointer-events: auto; /* 좋아요 버튼만 클릭 허용 */
         }
+
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
@@ -497,8 +532,6 @@
                     console.error(err);
                 });
         }
-
-
     </script>
     <!-- 스크립트 끝 -->
 
