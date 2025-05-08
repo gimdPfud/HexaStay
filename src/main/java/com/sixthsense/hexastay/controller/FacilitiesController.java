@@ -75,13 +75,18 @@ public class FacilitiesController {
 
     @GetMapping("/facility/read/{cNum}")
     public String fsread(@PathVariable Long cNum, Model model){
-        model.addAttribute("data",fsService.read(cNum));
+        FacilitiesDTO dto = fsService.read(cNum);
+        if(dto == null){
+            return "redirect:/facility/insert/"+cNum;
+        }else{
+        model.addAttribute("data",dto);
         return "facilities/read";
+        }
     }
 
-    @GetMapping("/facility/modify/{fsNum}")
-    public String fsmodify(@PathVariable Long fsNum, Model model){
-        model.addAttribute("data",fsService.read(fsNum));
+    @GetMapping("/facility/modify/{cNum}")
+    public String fsmodify(@PathVariable Long cNum, Model model){
+        model.addAttribute("data",fsService.read(cNum));
         return "facilities/modify";
     }
     @PostMapping("/facility/modify")

@@ -26,7 +26,7 @@
 
       <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/company/read/{num}(num=${data.companyDTO.companyNum})}" class="btn btn-secondary">뒤로가기</a>
-        <a th:href="@{/facility/modify/{num}(num=${data.facilitiesNum})}" class="btn btn-success">수정</a>
+        <a th:href="@{/facility/modify/{num}(num=${data.companyDTO.companyNum})}" class="btn btn-success">수정</a>
       </div>
     </div>
   </div>
