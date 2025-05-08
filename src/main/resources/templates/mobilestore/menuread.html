@@ -101,19 +101,16 @@
                 <img th:unless="${data.storemenuImgMeta != null}"
                      th:src="@{/store/menu/default.png}" class="item-img">
             </div>
-            <p class="menu-name" th:text="${data.storemenuName}">메뉴 이름</p>
-            <p class="menu-content" th:text="${data.storemenuContent}">메뉴 설명</p>
-            <p class="price-text">
-                <span th:id="'storemenuPrice'" th:text="${data.storemenuPrice}">0</span>
-                <span th:text="#{item.currency}">원</span>
-            </p>
+            <p class="menu-name" th:text="${data.storemenuName}"></p> <p class="menu-content" th:text="${data.storemenuContent}"></p> <p class="price-text">
+            <span th:id="'storemenuPrice'" th:text="${#numbers.formatInteger(data.storemenuPrice, 0, 'COMMA')}"></span> <span th:text="#{item.currency}"></span>
+        </p>
         </div>
 
         <form>
             <input th:value="${data.storemenuNum}" name="storemenuNum" type="hidden" readonly>
             <div class="row align-items-center">
                 <div class="col-4 text-end">
-                    <label class="col-form-label fw-bold label-center">주문 수량</label>
+                    <label class="col-form-label fw-bold label-center" th:text="#{menuRead.orderQuantityLabel}"></label>
                 </div>
                 <div class="col-8 d-flex justify-content-center">
                     <div class="quantity-input">
@@ -125,15 +122,14 @@
             </div>
 
             <div class="text-start mt-3">
-                <label class="form-label fw-bold">추가 옵션</label>
+                <label class="form-label fw-bold" th:text="#{menuRead.addOptionLabel}"></label>
                 <div th:each="option : ${data.storemenuOptionDTOList}" class="form-check">
                     <input class="form-check-input" type="checkbox"
                            name="storemenuOptions"
                            th:value="|${option.storemenuOptionNum}:${option.storemenuOptionName}:${option.storemenuOptionPrice}|"
                            onchange="updateTotal()">
                     <label class="form-check-label" th:for="'option-' + ${option.storemenuOptionNum}">
-                        <span th:text="${option.storemenuOptionName}">옵션 이름</span>
-                        (<span th:text="${option.storemenuOptionPrice}">0</span>원)
+                        <span th:text="${option.storemenuOptionName}"></span> (<span th:text="${#numbers.formatInteger(option.storemenuOptionPrice, 0, 'COMMA')}"></span><span th:text="#{menuRead.optionCurrencySuffix}"></span>)
                     </label>
                 </div>
             </div>
@@ -141,11 +137,10 @@
         </form>
 
         <div class="total-price-display">
-            결재금액 <span id="totalPrice">0</span> 원
-        </div>
+            <span th:text="#{menuRead.totalPriceLabel}"></span> <span id="totalPrice">0</span> <span th:text="#{item.currency}"></span> </div>
 
-        <button type="button" onclick="addcart()" class="add-to-cart-btn">장바구니 담기</button>
-        <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'">스토어 목록으로</button>
+        <button type="button" onclick="addcart()" class="add-to-cart-btn" th:text="#{menuRead.addToCartButton}"></button>
+        <button class="back-to-list-btn" onclick="window.location.href='/member/store/list'" th:text="#{menuRead.backToStoreListButton}"></button>
     </div>
 
     <script th:inline="javascript">

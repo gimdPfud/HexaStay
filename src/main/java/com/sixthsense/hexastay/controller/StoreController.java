@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
@@ -137,46 +138,66 @@ public class StoreController {
 
 
     @GetMapping("/read")
-    public String read(Long idid, Principal principal, Model model) {
+    public String read(Long idid, Principal principal, Model model, Locale locale) {
+        log.info("Admin store read request for idid: {}, locale: {}", idid, locale);
+
         if (principal == null) {
             return "redirect:/admin/login";
         }
         AdminDTO admin = adminService.adminFindEmail(principal.getName());
         if (idid == null) {
             if(admin.getStoreNum()==null){
-                log.info("스토어소속이 아닌데 /admin/store/read로 접근. /list로 반환한다.");
-                return "redirect:/admin/store/list";
+                log.info("스토어 소속이 아닌데 /admin/store/read로 접근. /list로 반환한다.");
+                return "redirect:/admin/store/list"; // 이 경로는 실제 프로젝트에 맞게 확인 필요
             }else{
                 idid = admin.getStoreNum();
+                log.info("ID not provided, using admin's store ID: {}", idid); // 로그 추가
             }
         }
-        StoreDTO data = storeService.read(idid);
-        boolean result = storeService.validStoreAdmin(admin, data);
+
+        StoreDTO data = storeService.read(idid, locale);
+
+        boolean result = storeService.validStoreAdmin(admin, data); // 이 서비스 메소드도 확인 필요
         if (result) {
             model.addAttribute("data", data);
-            return "store/read";
+
+            model.addAttribute("currentLang", locale.getLanguage());
+            return "store/read"; // templates/store/read.html
         } else {
-            log.info("다른 가게의 상세정보를 보려고 함.");
-            return "redirect:/admin/logout";
+            log.info("Admin {} attempted to access unauthorized store {}", admin.getAdminEmail(), idid); // 로그 개선
+            return "redirect:/admin/logout"; // 또는 접근 거부 페이지
         }
     }
 
 
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable Long id,Principal principal, Model model){
+    public String modify(@PathVariable Long id, Principal principal, Model model, Locale locale){
+
+
         if (principal == null) {
             return "redirect:/admin/login";
         }
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
         if (adminDTO == null) {
-            return "redirect:/admin/logout";
+            return "redirect:/admin/logout"; // 또는 에러 페이지
         }
-        StoreDTO data = storeService.read(id);
-        storeService.validStoreAdmin(adminDTO,data);
-        model.addAttribute("data",data);
-        model.addAttribute("storeCategoryList",List.of("한식", "중식", "일식", "아시안", "양식", "패스트푸드", "카페"));
-        return "store/modify";
+
+        StoreDTO data = storeService.read(id, locale);
+
+        if (!storeService.validStoreAdmin(adminDTO, data)) {
+            return "redirect:/admin/logout"; // 또는 접근 거부 페이지
+        }
+
+        model.addAttribute("data", data);
+
+        // TODO: 카테고리 리스트 다국어 처리 필요 시 MessageSource 사용 고려하는것도 괜찮은 방법일지도..?
+        model.addAttribute("storeCategoryList", List.of("한식", "중식", "일식", "아시안", "양식", "패스트푸드", "카페"));
+
+        model.addAttribute("currentLang", locale.getLanguage());
+
+        return "store/modify"; // templates/store/modify.html
     }
+
     @PostMapping("/modify")
     public String modify(StoreDTO storeDTO) throws IOException {
         log.info(storeDTO.toString());

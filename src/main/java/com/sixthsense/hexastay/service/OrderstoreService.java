@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Locale;
 
 public interface OrderstoreService {
     /*1. 주문 본인확인*/
@@ -30,7 +31,7 @@ public interface OrderstoreService {
     /*4. 고객용 주문내역 목록*/
 //    List<OrderstoreViewDTO> getOrderList(String email);
     List<OrderstoreViewDTO> getOrderList(Long roomNum);
-    Page<OrderstoreViewDTO> getOrderList(Long roomNum, Pageable pageable);
+    Page<OrderstoreViewDTO> getOrderList(Long roomNum, Pageable pageable, Locale locale);
 
     /*5. 매출용 주문 목록? : 완료된 주문들만 전부 DTO리스트로 내보내는 메소드*/
     List<OrderstoreDTO> getAllList();

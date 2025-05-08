@@ -111,7 +111,6 @@
 <body>
 <div layout:fragment="contentorder">
 
-    <!-- 매장 정보 -->
     <div class="container">
         <div class="store-header text-center">
             <div class="item-image">
@@ -120,8 +119,7 @@
                 <img th:unless="${data.storeProfileMeta != null}"
                      th:src="@{/store/default.png}" class="item-img">
             </div>
-            <h5 class="mb-2" th:text="${data.storeName}"></h5>
-            <small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
+            <h5 class="mb-2" th:text="${data.storeName}"></h5><small class="text-muted"><i class="bi bi-person-circle"></i> [[${data.storeCeoName}]] </small>
             <small class="text-muted"><i class="bi bi-telephone"></i>
                 <a class="text-muted underline" th:href="@{'tel:'+${data.storePhone}}" th:text="${data.storePhone}"></a>
             </small><br>
@@ -129,30 +127,27 @@
                 <a class="text-muted underline" th:href="@{'https://map.kakao.com/link/map/'+${data.storeName}+','+${data.storeLatitude}+','+${data.storeLongitude}}" th:text="${data.storeAddress}"></a>
             </small>
             <br>
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mapmodal" onclick="showMapBox()">지도보기</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mapmodal" onclick="showMapBox()" th:text="#{storeRead.viewMapButton}"></button>
         </div>
 
         <input type="hidden" id="storeLatitude" name="storeLatitude" th:value="${data.storeLatitude}" readonly>
         <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
 
-        <!-- 카테고리 탭 -->
         <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
-            <li class="nav-item"><a class="nav-link" href="#메인">메인</a></li>
-            <li class="nav-item"><a class="nav-link" href="#사이드">사이드</a></li>
-            <li class="nav-item"><a class="nav-link" href="#음료">음료</a></li>
-            <li class="nav-item"><a class="nav-link" href="#추가">추가</a></li>
+            <li class="nav-item"><a class="nav-link" href="#메인" th:text="#{storeRead.category.main}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#사이드" th:text="#{storeRead.category.side}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#음료" th:text="#{storeRead.category.beverage}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#추가" th:text="#{storeRead.category.extra}"></a></li>
         </ul>
 
-        <!-- 메뉴 리스트 -->
         <div class="menu-list mt-3" id="menuList"></div>
     </div>
 
-    <!-- 지도 모달 -->
     <div class="modal" id="mapmodal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">지도 보기</h5>
+                    <h5 class="modal-title" th:text="#{storeRead.mapModal.title}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

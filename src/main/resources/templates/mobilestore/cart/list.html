@@ -42,53 +42,56 @@
 </head>
 <body>
 <div layout:fragment="contentorder">
-    <form>
-        <div class="container">
-            <ul class="food-list">
-                <li th:each="item : ${list}" class="food-item" th:attr="data-item-id=${item.storecartitemNum}">
-                    <div class="col-4 cart-image">
-                        <img th:if="${item.imgName != null}" th:src="@{${item.imgName}}" class="cart-img">
-                        <img th:unless="${item.imgName != null}" th:src="@{/store/menu/default.png}" class="cart-img">
-                    </div>
-                    <div class="food-info col-6">
-                        <p th:text="${item.storemenuName}"></p>
-                        <div class="quantity">
-                            <button type="button" class="decrease" th:disabled="${item.storemenuCount <= 1}"
-                                    onclick="minusCount(this)"
-                                    th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
-                            <input type="text" class="quantity-input" th:value="${item.storemenuCount}" readonly>
-                            <button type="button" class="increase" onclick="plusCount(this)"
-                                    th:disabled="${item.storemenuCount > 99}"
-                                    th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
-                        </div>
+    <form> <div class="container">
+        <div th:if="${list == null or #lists.isEmpty(list)}" style="text-align:center; padding: 50px; color: #888;">
+            <span th:text="#{cart.emptyMessage}">장바구니가 비었습니다.</span>
+        </div>
 
-                        <!--추가한부분시작-->
-                        <p class="card-text small text-muted mb-1" th:each="optionList : ${optionMap[item.storecartitemNum]}">
-                            <span th:text="'+'+ ${optionList[1]}"></span>
-                            <span th:text="${optionList[2]}+' 원'"></span>
-                        </p>
-                        <!--추가한부분끝-->
+        <ul class="food-list" th:unless="${list == null or #lists.isEmpty(list)}">
+            <li th:each="item : ${list}" class="food-item" th:attr="data-item-id=${item.storecartitemNum}">
+                <div class="col-4 cart-image">
+                    <img th:if="${item.imgName != null}" th:src="@{${item.imgName}}" class="cart-img">
+                    <img th:unless="${item.imgName != null}" th:src="@{/store/menu/default.png}" class="cart-img">
+                </div>
+                <div class="food-info col-6">
+                    <p th:text="${item.storemenuName}"></p> <div class="quantity">
+                    <button type="button" class="decrease" th:disabled="${item.storemenuCount <= 1}"
+                            onclick="minusCount(this)"
+                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">-</button>
+                    <input type="text" class="quantity-input" th:value="${item.storemenuCount}" readonly>
+                    <button type="button" class="increase" onclick="plusCount(this)"
+                            th:disabled="${item.storemenuCount > 99}"
+                            th:data-count="${item.storemenuCount}" th:data-cartitemid="${item.storecartitemNum}">+</button>
+                </div>
 
-                        <p class="item-total" th:text="${#numbers.formatInteger((item.storemenuPrice+item.optionPrice) * item.storemenuCount, 3, 'COMMA')} + ' 원'"></p>
-                    </div>
-                    <div class="col-2 button-container">
-                        <button class="mini-btn delete-btn" type="button" th:onclick="|deleteCart(${item.storecartitemNum})|">삭제</button>
-                    </div>
-                    <input type="hidden" name="items" th:value="${item.storecartitemNum}">
-                </li>
-            </ul>
+                    <p class="card-text small text-muted mb-1" th:each="optionList : ${optionMap[item.storecartitemNum]}">
+                        <span th:text="'+'+ ${optionList[1]}"></span> <span th:text="${optionList[2]} + ' ' + #{item.currency}"></span>
+                    </p>
+                    <p class="item-total" th:text="${#numbers.formatInteger((item.storemenuPrice+item.optionPrice) * item.storemenuCount, 3, 'COMMA')} + ' ' + #{item.currency}"></p>
+                </div>
+                <div class="col-2 button-container">
+                    <button class="mini-btn delete-btn" type="button" th:onclick="|deleteCart(${item.storecartitemNum})|" th:text="#{cart.delete}"></button>
+                </div>
+                <input type="hidden" name="items" th:value="${item.storecartitemNum}">
+            </li>
+        </ul>
+        <div th:unless="${list == null or #lists.isEmpty(list)}">
             <div class="request-section">
-                <label for="orderstoreMessage">요청사항</label>
-                <textarea id="orderstoreMessage" name="orderstoreMessage" placeholder="요청사항 입력"></textarea>
+                <label for="orderstoreMessage" th:text="#{cart.request}"></label>
+                <textarea id="orderstoreMessage" name="orderstoreMessage" th:placeholder="#{cart.request.placeholder}"></textarea>
             </div>
             <div class="pricing-section">
-                <div class="final-total">최종 주문 금액 : <span class="text-danger fs-5" th:text="${#numbers.formatInteger(totalPrice, 3, 'COMMA') + ' 원'}"></span></div>
+                <div class="final-total">
+                    <span th:text="#{cart.finalTotalLabel}"></span>
+                    <span class="text-danger fs-5" th:text="${#numbers.formatInteger(totalPrice, 3, 'COMMA')} + ' ' + #{item.currency}"></span>
+                </div>
             </div>
             <button type="button" class="btn add-to-cart-btn" th:data-price="${totalPrice}" onclick="processPayment(this)"
-            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">결제하기</button>
+                    style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;" th:text="#{cart.pay}"></button>
             <button type="button" class="btn back-btn" onclick="window.location.href='/roommenu/orderpage'"
-            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">목록으로</button>
+                    style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;" th:text="#{cart.back}"></button>
         </div>
+    </div>
     </form>
     <script th:inline="javascript">
         const redirectToQR = window.location.origin + "/cart/qr";//unAuth 오류 걸리면 여기로 이동함

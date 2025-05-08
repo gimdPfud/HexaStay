@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Controller
@@ -52,31 +53,50 @@ public class StoreClientController {
 //        return "mobilestore/list";
 //    }
 
+
     @GetMapping("/list")
     public String typelist(@RequestParam(required = false) String type,
                            @RequestParam(required = false) String keyword,
-                           Model model, Pageable pageable, Principal principal, HttpSession session){
+                           Model model, Pageable pageable, Principal principal, HttpSession session,
+                           Locale locale) {
+
         log.info("type : "+type);
         log.info("keyword : "+keyword);
-        if(principal==null){return "sample/qrcamera";}
+
+        if(principal==null){
+            // 로그인되지 않은 경우, 기존 로직 유지
+            return "sample/qrcamera";
+        }
 
         Long hotelroomNum = zzService.sessionToHotelroomNum(session);
 
-        Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable);
+        Page<StoreDTO> storeDTOPage = storeService.clientlist(hotelroomNum, type, keyword, pageable, locale);
 
-        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());//맨 아래 버튼 (숫자)를 위해..
-        model.addAttribute("list",storeDTOPage);
-        return "mobilestore/list";
+        model.addAttribute("totalCartItemCount",storecartService.getCartList(hotelroomNum).size());
+        model.addAttribute("list", storeDTOPage.getContent());
+
+
+        model.addAttribute("번역상황", locale.getLanguage());
+        log.info("보여질 번역의 언어: {}", locale.getLanguage());
+
+        return "mobilestore/list"; // mobilestore/list.html 템플릿 반환
     }
 
 
     /* 2. 스토어 상세 보기
         get. */
-    @GetMapping("/read/{storeNum}")
-    public String storeRead(@PathVariable Long storeNum, Model model){
-        StoreDTO storeDTO = storeService.read(storeNum);
-        model.addAttribute("data", storeDTO);
-        return "mobilestore/read";
+    @GetMapping("/read/{storeNum}") //
+    public String storeRead(@PathVariable Long storeNum, Model model, Locale locale) {
+        log.info("읽을 매장의 번호: {}, 번역될 언어: {}", storeNum, locale);
+
+        StoreDTO storeDTO = storeService.read(storeNum, locale); // 서비스 메소드 시그니처 변경 필요
+
+        model.addAttribute("data", storeDTO); // 기존 로직: 모델에 DTO 추가
+
+        model.addAttribute("currentLang", locale.getLanguage());
+        log.info("Passing language code to view: {}", locale.getLanguage());
+
+        return "mobilestore/read"; // mobilestore/read.html 반환
     }
 
 /* 3. 스토어메뉴 목록 보기 (rest)
@@ -94,12 +114,19 @@ public class StoreClientController {
 
 /* 4. 스토어메뉴 상세 보기
         get. */
-    @GetMapping("/menu/read/{storemenuNum}")
-    public String menuRead(@PathVariable Long storemenuNum, Model model){
-        StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum);
-        model.addAttribute("data",storemenuDTO);
-        return "mobilestore/menuread";
-    }
+@GetMapping("/menu/read/{storemenuNum}")
+public String menuRead(@PathVariable Long storemenuNum, Model model, Locale locale) {
+    log.info("Store menu read request for storemenuNum: {}, locale: {}", storemenuNum, locale); // ✅ locale 로그 추가
+
+
+    StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum, locale);
+
+    model.addAttribute("data", storemenuDTO);
+
+    model.addAttribute("currentLang", locale.getLanguage());
+
+    return "mobilestore/menuread"; // templates/mobilestore/menuread.html
+}
 
 
     /*5. 스토어 좋아요~ 또는 싫어요~?*/
