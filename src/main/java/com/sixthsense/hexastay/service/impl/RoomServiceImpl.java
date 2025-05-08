@@ -388,6 +388,7 @@ public class RoomServiceImpl {
 
     //검색용 추가1
     public Page<RoomDTO> searchRoomsByStatusAndKeyword(Long companyNum, String status, String keyword, Pageable pageable) {
+
         return roomRepository.findByCompanyAndStatusAndKeyword(companyNum, status, keyword, pageable)
                 .map(room -> modelMapper.map(room, RoomDTO.class));
     }
