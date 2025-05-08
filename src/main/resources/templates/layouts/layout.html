@@ -137,11 +137,11 @@
         }
 
         .dropdown-menu {
-            font-size: 14px; /* 텍스트 크기 */
-            padding: 10px 10px; /* 상하 여백 */
-            min-width: 60px;
+            font-size: 14px;
+            padding: 5px 5px;
+            min-width: 40px;
             z-index: 100;
-            transform: translateX(20%);
+            transform: translateX(10%);  /* 기존보다 왼쪽으로 10% 이동 */
         }
 
         .dropdown-item{
@@ -216,7 +216,7 @@
     <div class="d-flex align-items-center">
         <button id="sidebarToggleBtn" class="toggle-btn me-3" onclick="toggleSidebar()">☰</button>
         <a class="navbar-brand logo-center text-center" href="/admin/main">
-            <img src="/images/logo.png" alt="HexaStay 로고" height="75">
+            <img src="/logo/HEXA%20black.jpg" alt="HexaStay 로고" height="75">
         </a>
     </div>
     <!-- 사용자 고정 정보 + 토글 프로필 -->
@@ -230,7 +230,7 @@
                      alt="프로필" />
                 <i class="bi bi-caret-down-fill text-white" style="font-size: 0.9rem;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <ul class="dropdown-menu dropdown-menu-end text-center" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="/admin/mypage">마이페이지</a></li>
                 <li><a class="dropdown-item" href="/logout">로그아웃</a></li>
             </ul>

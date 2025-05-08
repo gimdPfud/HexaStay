@@ -13,6 +13,17 @@
             width: 100%;
             table-layout: fixed;
         }
+        input[type="checkbox"] {
+            transform: scale(1.5); /* 원하는 크기로 조절 (기본은 1) */
+            margin-right: 6px; /* 텍스트와의 간격 */
+            cursor: pointer;
+        }
+
+        /* 선택 전체 텍스트도 조금 더 잘 보이게 */
+        th input[type="checkbox"] + label {
+            font-size: 1rem;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -39,8 +50,8 @@
                             <th style="width: 10%;">주문번호</th>
                             <th style="width: 20%;">주문자</th>
                             <th style="width: 10%;">상태</th>
-                            <th style="width: 10%;">객실</th>
-                            <th style="width: 40%;">주문내용</th>
+                            <th style="width: 15%;">객실</th>
+                            <th style="width: 35%;">주문내용</th>
                         </tr>
                         </thead>
 
@@ -88,7 +99,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <small>
+                                                <small class="text-start d-block">
                                                     요청: <span th:text="${item.roomMenuOrderRequestMessage}"></span>
                                                 </small>
                                             </div>
