@@ -56,18 +56,79 @@
         </div>
 
         <!-- 검색 폼 Roomcontroll 에 getmapping-->
-        <form action="/roomlist/search" method="get" class="d-flex align-items-end gap-2">
-            <div class="flex-grow-1">
-                <input name="keyword" type="text" class="form-control"
-                       placeholder="회원 이름 또는 이메일로 검색 : 검색버튼을 눌러주세요" th:value="${keyword}">
-            </div>
+        <div th:switch="${currentStatus}">
+            <!-- checkin 상태 -->
+            <form th:case="'checkin'" method="get" th:action="@{/roomlist/checkin}" class="d-flex align-items-end gap-2">
+                <!-- form 내용은 공통으로 아래에 -->
+                <div class="flex-grow-1">
+                    <input name="keyword" class="form-control"
+                           placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
+                    <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
+                </div>
+            </form>
 
-            <div class="d-flex gap-2">
-                <button type="submit" id="searchBtn" class="btn btn-primary">검색</button> <!-- ✅ 여기에 연동됨 -->
-                <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
-                <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
-            </div>
-        </form>
+            <!-- checkout 상태 -->
+            <form th:case="'checkout'" method="get" th:action="@{/roomlist/checkout}" class="d-flex align-items-end gap-2">
+                <div class="flex-grow-1">
+                    <input name="keyword" class="form-control"
+                           placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
+                    <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
+                </div>
+            </form>
+
+            <!-- VISIBLE / HIDDEN -->
+            <form th:case="'VISIBLE'" method="get" th:action="@{/roomlist/display/VISIBLE}" class="d-flex align-items-end gap-2">
+                <div class="flex-grow-1">
+                    <input name="keyword" class="form-control"
+                           placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
+                    <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
+                </div>
+            </form>
+
+            <form th:case="'HIDDEN'" method="get" th:action="@{/roomlist/display/HIDDEN}" class="d-flex align-items-end gap-2">
+                <div class="flex-grow-1">
+                    <input name="keyword" class="form-control"
+                           placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
+                    <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
+                </div>
+            </form>
+
+            <!-- 전체 목록일 때 -->
+            <form th:case="*"
+                  method="get"
+                  th:action="@{/roomlist}"
+                  class="d-flex align-items-end gap-2">
+                <div class="flex-grow-1">
+                    <input name="keyword" class="form-control"
+                           placeholder="회원 이름 또는 이메일로 검색" th:value="${keyword}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                    <a th:href="@{/register-hotelroom}" class="btn btn-success">회원 객실 배정</a>
+                    <a th:href="@{/member-insertroom}" class="btn btn-outline-success">비회원 객실 배정</a>
+                </div>
+            </form>
+        </div>
+
+
+
+
 
         <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
@@ -117,7 +178,7 @@
                 <table class="table table-bordered text-company mb-0" style="table-layout: fixed; width: 100%;">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="width: 5%;">번호</th>
+                        <th style="width: 6%;">번호</th>
                         <th style="width: 12%;">객실명</th>
                         <th style="width: 9%;">회원 이름</th>
                         <th style="width: 18%;">회원 이메일</th>
@@ -128,12 +189,20 @@
                         <th style="width: 8%;">비밀번호</th>
                         <th style="width: 8%;">현재 상태</th>
                         <th style="width: 9%;">상태 변경</th>
-                        <th style="width: 9%;">표시 변경</th>
+                        <th style="width: 9%;" th:if="${currentStatus != 'VISIBLE'}">표시 변경</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="room : ${rooms.content}">
-                        <td class="text-center text-truncate" th:text="${room.roomNum}"></td>
+                    <tr th:each="room, stat : ${rooms.content}">
+                        <!--최종에는 이 코드로 변경-->
+                        <!--<td class="text-center" th:text="${rooms.pageable.offset + stat.index + 1}">11</td>-->
+
+                        <!--임시-->
+                        <td class="text-center">
+                            <span th:text="${stat.index + 1}">1</span>
+                            <small class="text-muted" th:text="${room.roomNum}"> (11)</small>
+                        </td>
+
                         <td class="text-center text-truncate">
                             <a href="javascript:void(0);"
                                onclick="openHotelRoomPopup(this)"
@@ -203,7 +272,10 @@
                             </div>
                         </td>
 
-                        <td class="text-center">
+                        <!--Room DB 쌓이는거 방지 테이블-->
+                        <td class="text-center"
+                            th:if="${currentStatus != 'VISIBLE'}">
+
                             <!-- null, 빈 문자열, VISIBLE 상태일 때 -->
                             <button th:if="${#strings.isEmpty(room.roomDisplayStatus) or room.roomDisplayStatus.equals('VISIBLE')}"
                                     class="btn btn-sm btn-secondary"
@@ -238,23 +310,30 @@
                 <!-- ⬅ 이전 버튼 -->
                 <li class="page-item" th:classappend="${rooms.first} ? 'disabled'">
 
-                    <!-- 검색 결과일 때 -->
+                    <!-- 검색 결과 -->
                     <a class="page-link"
                        th:if="${keyword != null}"
                        th:href="@{/roomlist/search(page=${rooms.number - 1}, keyword=${keyword})}">
                         이전
                     </a>
 
-                    <!-- 상태별(checkin/checkout) 목록일 때 -->
+                    <!-- 표시 상태 VISIBLE / HIDDEN -->
                     <a class="page-link"
-                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:if="${keyword == null and (currentStatus == 'VISIBLE' or currentStatus == 'HIDDEN')}"
+                       th:href="@{/roomlist/display/{visionstatus}(visionstatus=${currentStatus}, page=${rooms.number - 1})}">
+                        이전
+                    </a>
+
+                    <!-- checkin / checkout 상태 -->
+                    <a class="page-link"
+                       th:if="${keyword == null and currentStatus != null and currentStatus != 'VISIBLE' and currentStatus != 'HIDDEN' and currentStatus != 'search'}"
                        th:href="@{/roomlist/{status}(status=${currentStatus}, page=${rooms.number - 1})}">
                         이전
                     </a>
 
-                    <!-- 전체 목록일 때 -->
+                    <!-- 전체 목록 -->
                     <a class="page-link"
-                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:if="${keyword == null and (currentStatus == null or currentStatus == 'search')}"
                        th:href="@{/roomlist(page=${rooms.number - 1})}">
                         이전
                     </a>
@@ -270,15 +349,21 @@
                        th:href="@{/roomlist/search(page=${i}, keyword=${keyword})}"
                        th:text="${i + 1}"></a>
 
-                    <!-- 상태 목록 -->
+                    <!-- 표시 상태 -->
                     <a class="page-link"
-                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:if="${keyword == null and (currentStatus == 'VISIBLE' or currentStatus == 'HIDDEN')}"
+                       th:href="@{/roomlist/display/{visionstatus}(visionstatus=${currentStatus}, page=${i})}"
+                       th:text="${i + 1}"></a>
+
+                    <!-- checkin / checkout -->
+                    <a class="page-link"
+                       th:if="${keyword == null and currentStatus != null and currentStatus != 'VISIBLE' and currentStatus != 'HIDDEN' and currentStatus != 'search'}"
                        th:href="@{/roomlist/{status}(status=${currentStatus}, page=${i})}"
                        th:text="${i + 1}"></a>
 
                     <!-- 전체 목록 -->
                     <a class="page-link"
-                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:if="${keyword == null and (currentStatus == null or currentStatus == 'search')}"
                        th:href="@{/roomlist(page=${i})}"
                        th:text="${i + 1}"></a>
                 </li>
@@ -286,23 +371,30 @@
                 <!-- ➡ 다음 버튼 -->
                 <li class="page-item" th:classappend="${rooms.last} ? 'disabled'">
 
-                    <!-- 검색 결과일 때 -->
+                    <!-- 검색 결과 -->
                     <a class="page-link"
                        th:if="${keyword != null}"
                        th:href="@{/roomlist/search(page=${rooms.number + 1}, keyword=${keyword})}">
                         다음
                     </a>
 
-                    <!-- 상태별 목록일 때 -->
+                    <!-- 표시 상태 -->
                     <a class="page-link"
-                       th:if="${keyword == null} and ${currentStatus} != null and ${currentStatus} != 'search'"
+                       th:if="${keyword == null and (currentStatus == 'VISIBLE' or currentStatus == 'HIDDEN')}"
+                       th:href="@{/roomlist/display/{visionstatus}(visionstatus=${currentStatus}, page=${rooms.number + 1})}">
+                        다음
+                    </a>
+
+                    <!-- checkin / checkout -->
+                    <a class="page-link"
+                       th:if="${keyword == null and currentStatus != null and currentStatus != 'VISIBLE' and currentStatus != 'HIDDEN' and currentStatus != 'search'}"
                        th:href="@{/roomlist/{status}(status=${currentStatus}, page=${rooms.number + 1})}">
                         다음
                     </a>
 
-                    <!-- 전체 목록일 때 -->
+                    <!-- 전체 목록 -->
                     <a class="page-link"
-                       th:if="${keyword == null} and (${currentStatus} == null or ${currentStatus} == 'search')"
+                       th:if="${keyword == null and (currentStatus == null or currentStatus == 'search')}"
                        th:href="@{/roomlist(page=${rooms.number + 1})}">
                         다음
                     </a>
@@ -310,6 +402,17 @@
             </ul>
         </nav>
     </div>
+    <div class="d-flex justify-content-end mb-2">
+        <select id="filterSelect" class="form-select form-select-sm w-auto"
+                onchange="location.href=this.value">
+            <option th:value="@{/roomlist}" th:selected="${currentStatus == null}">전체</option>
+            <option th:value="@{/roomlist/checkin}" th:selected="${currentStatus == 'checkin'}">체크인</option>
+            <option th:value="@{/roomlist/checkout}" th:selected="${currentStatus == 'checkout'}">체크아웃</option>
+            <option th:value="@{/roomlist/display/VISIBLE}" th:selected="${currentStatus == 'VISIBLE'}">표시됨</option>
+            <option th:value="@{/roomlist/display/HIDDEN}" th:selected="${currentStatus == 'HIDDEN'}">숨김</option>
+        </select>
+    </div>
+
 
 
     <script th:inline="javascript">

@@ -29,6 +29,36 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT r FROM Room r WHERE (r.roomDisplayStatus IS NULL OR r.roomDisplayStatus = :status)")
     Page<Room> findByRoomDisplayStatus(@Param("status") String status, Pageable pageable);
 
+    //추가 검색용 레포지토리 링크별로
+    //1.검색
+    @Query("SELECT r FROM Room r " +
+            "WHERE r.hotelRoom.company.companyNum = :companyNum " +
+            "AND r.hotelRoom.hotelRoomStatus = :status " +
+            "AND (r.member.memberName LIKE %:keyword% OR r.member.memberEmail LIKE %:keyword%)")
+    Page<Room> findByCompanyAndStatusAndKeyword(@Param("companyNum") Long companyNum,
+                                                @Param("status") String status,
+                                                @Param("keyword") String keyword,
+                                                Pageable pageable);
+
+    //2.검색
+    @Query("SELECT r FROM Room r WHERE " +
+            "(r.roomDisplayStatus = :status OR r.roomDisplayStatus IS NULL) " +
+            "AND r.hotelRoom.company.companyNum = :companyNum " +
+            "AND (r.member.memberName LIKE %:keyword% OR r.member.memberEmail LIKE %:keyword%)")
+    Page<Room> findByDisplayStatusAndKeyword(@Param("companyNum") Long companyNum,
+                                             @Param("status") String status,
+                                             @Param("keyword") String keyword,
+                                             Pageable pageable);
+
+
+    //3.검색
+    @Query("SELECT r FROM Room r " +
+            "WHERE r.hotelRoom.company.companyNum = :companyNum " +
+            "AND (r.member.memberName LIKE %:keyword% OR r.member.memberEmail LIKE %:keyword%)")
+    Page<Room> findByCompanyAndKeyword(@Param("companyNum") Long companyNum,
+                                       @Param("keyword") String keyword,
+                                       Pageable pageable);
+
 
 
     //todo:@GetMapping("/membersByHotelRoom/{hotelRoomNum}") - RoomController

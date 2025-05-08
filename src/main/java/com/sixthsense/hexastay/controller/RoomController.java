@@ -56,33 +56,53 @@ public class RoomController {
     //checkIN  checkOut 상태별로 보여주는 Roomlist 페이지 - 방 배정 리스트
     @GetMapping("/roomlist/{status}")
     public String getRoomListByStatus(@PathVariable("status") String status,
+                                      @RequestParam(value = "keyword", required = false) String keyword,
                                       @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
                                       Model model,Principal principal) {
 
         Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
 
+        Page<RoomDTO> rooms;
         if (!status.equals("checkin") && !status.equals("checkout")) {
             throw new IllegalArgumentException("잘못된 상태입니다.");
         }
 
-        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByHotelRoomStatus(companyNum, status, pageable);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            rooms = roomServiceimpl.searchRoomsByStatusAndKeyword(companyNum, status, keyword, pageable);
+        } else {
+            rooms = roomServiceimpl.findRoomsByHotelRoomStatus(companyNum, status, pageable);
+        }
+
+
+
         model.addAttribute("rooms", rooms);  // ✅ Page 객체 전달
         model.addAttribute("currentStatus", status);
+        model.addAttribute("keyword", keyword);
         return "room/roomList"; // ✅ 파일명은 소문자 유지
     }
 
     //전체 페이지 보여 주는 로직
     //todo:http://localhost:8090/roomlist
     @GetMapping("/roomlist")
-    public String getRoomList(@RequestParam(defaultValue = "0") int page, Model model, Principal principal)
-    {
+    public String getRoomList(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(value = "keyword", required = false) String keyword,
+                              Model model,
+                              Principal principal) {
+
         Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("roomNum").descending());
-        Page<RoomDTO> rooms = roomServiceimpl.getRooms(companyNum, pageable);
+        Page<RoomDTO> rooms;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            rooms = roomServiceimpl.searchRoomsByCompanyAndKeyword(companyNum, keyword, pageable);
+        } else {
+            rooms = roomServiceimpl.getRooms(companyNum, pageable);
+        }
 
         model.addAttribute("rooms", rooms);
         model.addAttribute("currentPage", page);
+        model.addAttribute("keyword", keyword);
         return "room/roomList";
     }
 
@@ -320,6 +340,7 @@ public class RoomController {
         try {
             Room room = roomServiceTest.readRoomByCheckinPassword(roomPassword);
 
+            /*qr 패스워드 로그인시 session 에 보내주는 키 필수 요소*/
             session.setAttribute("roomNum", room.getRoomNum());
             session.setAttribute("roomPassword", room.getRoomPassword());
 
@@ -330,6 +351,8 @@ public class RoomController {
         }
     }
 
+    //qr 패스워드 입력시 유효성 검사용
+    //todo: 체크아웃 상태에서 비밀번호 입력시 alert
     @GetMapping("/qr/validate")
     @ResponseBody
     public Map<String, Object> validateRoomPassword(
@@ -356,13 +379,24 @@ public class RoomController {
     }
 
     //room 중간 테이블 쌓이는거 방지
-    @GetMapping("/roomlist/display/{status:VISIBLE|HIDDEN}")
-    public String getRoomsByDisplayStatus(@PathVariable String status,
+    @GetMapping("/roomlist/display/{visionstatus:VISIBLE|HIDDEN}")
+    public String getRoomsByDisplayStatus(@PathVariable String visionstatus,
+                                          @RequestParam(value = "keyword", required = false) String keyword,
                                           @PageableDefault(size = 10, sort = "roomNum", direction = Sort.Direction.DESC) Pageable pageable,
-                                          Model model) {
-        Page<RoomDTO> rooms = roomServiceimpl.findRoomsByDisplayStatus(status, pageable);
+                                          Model model, Principal principal) {
+
+        Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
+
+        Page<RoomDTO> rooms;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            rooms = roomServiceimpl.searchRoomsByDisplayStatusAndKeyword(companyNum, visionstatus, keyword, pageable);
+        } else {
+            rooms = roomServiceimpl.findRoomsByDisplayStatus(visionstatus, pageable);
+        }
+
         model.addAttribute("rooms", rooms);
-        model.addAttribute("currentStatus", status);
+        model.addAttribute("currentStatus", visionstatus);
+        model.addAttribute("keyword", keyword);
         return "room/roomList";
     }
 

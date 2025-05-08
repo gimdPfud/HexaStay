@@ -214,8 +214,6 @@ public class RoomServiceImpl {
     }
 
 
-
-
     //Room 페이지에 있는 정보를 가져 List 메서드
     public Page<RoomDTO> getRooms(Long companyNum, Pageable pageable) {
         Page<Room> rooms = roomRepository.findByHotelRoom_Company_CompanyNum(companyNum, pageable);
@@ -228,7 +226,8 @@ public class RoomServiceImpl {
             if (room.getHotelRoom() != null) {
                 roomDTO.setHotelRoomName(room.getHotelRoom().getHotelRoomName());
                 roomDTO.setHotelRoomPhone(room.getHotelRoom().getHotelRoomPhone());
-                roomDTO.setHotelRoomStatus(room.getHotelRoom().getHotelRoomStatus());            }
+                roomDTO.setHotelRoomStatus(room.getHotelRoom().getHotelRoomStatus());
+            }
 
             if (room.getMember() != null) {
                 roomDTO.setMemberName(room.getMember().getMemberName());
@@ -245,12 +244,10 @@ public class RoomServiceImpl {
     }
 
     /*중간테이블 쌓이는거 방지 하는 버튼 만드는 로직*/
-    public Page<RoomDTO> findRoomsByDisplayStatus(String status, Pageable pageable) {
-        return roomRepository.findByRoomDisplayStatus(status, pageable)
+    public Page<RoomDTO> findRoomsByDisplayStatus(String visionstatus, Pageable pageable) {
+        return roomRepository.findByRoomDisplayStatus(visionstatus, pageable)
                 .map(room -> modelMapper.map(room, RoomDTO.class));
     }
-
-
 
 
     //hotelroom을 참조하고 있는 member리스트 조회
@@ -317,7 +314,7 @@ public class RoomServiceImpl {
     //todo: http://localhost:8090/qr/${hotelRoomNum}
     //Room DB 에서 HotelRoomNum fk 을 찾아 와서 그 기준으로 member fk을 찾아 오는 로직
 // 호텔룸 번호를 받아서 룸을 찾고, 로그인 인증까지 해주는 메소드
-    public Room readRoomByHotelRoomNum(Long hotelRoomNum,String roomPassword) {
+    public Room readRoomByHotelRoomNum(Long hotelRoomNum, String roomPassword) {
 
         // 1. 호텔룸 번호로 연결된 룸 리스트 조회
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
@@ -389,6 +386,23 @@ public class RoomServiceImpl {
         return rooms.map(room -> modelMapper.map(room, RoomDTO.class));
     }
 
+    //검색용 추가1
+    public Page<RoomDTO> searchRoomsByStatusAndKeyword(Long companyNum, String status, String keyword, Pageable pageable) {
+        return roomRepository.findByCompanyAndStatusAndKeyword(companyNum, status, keyword, pageable)
+                .map(room -> modelMapper.map(room, RoomDTO.class));
+    }
+
+    //검색용 추가2
+    public Page<RoomDTO> searchRoomsByDisplayStatusAndKeyword(Long companyNum, String displayStatus, String keyword, Pageable pageable) {
+        return roomRepository.findByDisplayStatusAndKeyword(companyNum, displayStatus, keyword, pageable)
+                .map(room -> modelMapper.map(room, RoomDTO.class));
+    }
+
+    //검색용 추가3
+    public Page<RoomDTO> searchRoomsByCompanyAndKeyword(Long companyNum, String keyword, Pageable pageable) {
+        return roomRepository.findByCompanyAndKeyword(companyNum, keyword, pageable)
+                .map(room -> modelMapper.map(room, RoomDTO.class));
+    }
 
 
     public Room authenticateRoomByHotelRoomNumAndPassword(Long hotelRoomNum, String inputPassword) {
@@ -424,7 +438,6 @@ public class RoomServiceImpl {
     }
 
 
-
     public void updateRoomDisplayStatus(Long roomNum, String status) {
         Room room = roomRepository.findById(roomNum)
                 .orElseThrow(() -> new EntityNotFoundException("해당 룸이 존재하지 않습니다."));
@@ -436,10 +449,6 @@ public class RoomServiceImpl {
 
         roomRepository.save(room);
     }
-
-
-
-
 
 
 }
