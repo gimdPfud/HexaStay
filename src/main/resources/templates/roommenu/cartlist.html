@@ -204,17 +204,13 @@
 <div layout:fragment="contentorderA">
     <div class="container ">
 
-        <!-- 장바구니가 비어있는 경우 -->
         <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
-            <div th:text="#{cart.emptyMessage}">장바구니에 아이템이 존재하지 않습니다</div>
+            <div th:text="#{cart.emptyMessage}"></div>
         </div>
 
-        <!-- 장바구니에 아이템이 있는 경우 -->
         <div th:unless="${isCartEmpty}" class="container">
-            <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
             <ul class="food-list">
                 <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
-                    <!-- 이미지: 왼쪽에 위치 -->
                     <div class="col-4 cart-image">
                         <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
                              th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
@@ -224,7 +220,6 @@
                              class="cart-img">
                     </div>
 
-                    <!-- 메뉴 이름, 수량, 금액: 이미지 오른쪽에 위치 -->
                     <div class="food-info col-6">
                         <p class="item-name">
                             <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
@@ -241,43 +236,36 @@
                             </p>
                         </th:block>
 
-                        <!--옵션-->
                         <div class="option-list" style="margin-top: 10px;">
                             <div th:if="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
                                 <details>
-                                    <summary style="cursor: pointer; color: #007bff;">옵션 상세 보기</summary>
+                                    <summary style="cursor: pointer; color: #007bff;" th:text="#{cart.option.viewDetails}"></summary>
                                     <ul style="padding-left: 15px;">
                                         <li th:each="opt : ${roomMenuCartDTO.optionList}">
                                             <span th:text="${opt.roomMenuCartItemOptionName}">옵션이름</span> /
-                                            <span th:text="${opt.roomMenuCartItemOptionAmount}">개수</span>개 /
-                                            +<span class="option-line-total" th:text="${opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount}">옵션라인총가격</span>원
-                                        </li>
+                                            <span th:text="${opt.roomMenuCartItemOptionAmount}">개수</span><span th:text="#{cart.option.countSuffix}"></span> / +<span class="option-line-total" th:text="${opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount}">옵션라인총가격</span><span th:text="#{item.currency}"></span> </li>
                                     </ul>
                                 </details>
                             </div>
                             <div th:unless="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
-                                <span style="font-size: 0.9em; color: #888;">옵션 없음</span>
+                                <span style="font-size: 0.9em; color: #888;" th:text="#{cart.option.none}"></span>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- 수량 변경 버튼 -->
                     <div class="col-2 button-container">
-                        <button class="mini-btn delete-btn" th:text="#{cart.delete}">삭제</button>
+                        <button class="mini-btn delete-btn" th:text="#{cart.delete}"></button>
                     </div>
 
 
                 </li>
             </ul>
 
-
-
-
             <div class="coupon-select-box">
-                <label for="couponSelect">쿠폰 선택:</label>
+                <label for="couponSelect" th:text="#{cart.coupon.selectLabel}"></label>
                 <select id="couponSelect" name="couponNum">
-                    <option value="">쿠폰 선택</option>
+                    <option value="" th:text="#{cart.coupon.selectDefault}"></option>
                     <option th:each="coupon : ${couponList}"
                             th:value="${coupon.couponNum}"
                             th:text="|${coupon.couponType.name()} (${coupon.discountRate}%)|">
@@ -286,35 +274,30 @@
             </div>
 
             <div class="request-section">
-                <label for="request-input" name="requestMessage" th:text="#{cart.request}">요청사항</label>
+                <label for="request-input" name="requestMessage" th:text="#{cart.request}"></label>
                 <textarea id="request-input" th:placeholder="#{cart.request.placeholder}"></textarea>
             </div>
 
-            <!-- 할인금액과 최종결제금액 표시 -->
-            <!-- 결제금액 -->
             <div class="pricing-section" style="flex-direction: column; gap: 10px;">
                 <div class="discount">
-                    <span>할인금액</span> :
+                    <span th:text="#{cart.discountAmount}"></span> :
                     <span th:if="${finalDiscount != null}"
-                          th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
-                    <span th:unless="${finalDiscount != null}" id="discountAmount">0원</span>
+                          th:text="${#numbers.formatDecimal(finalDiscount, 0, 'COMMA', 0, 'POINT')} + ' ' + #{item.currency}"></span>
+                    <span th:unless="${finalDiscount != null}" id="discountAmount">0<span th:text="#{item.currency}"></span></span>
                 </div>
                 <div class="final-total">
-            <span
-                    th:if="${finalTotal != null}"
-                    th:text="'최종결제금액: ' + ${finalTotal} + '원'">최종결제금액:</span>
-                    <span th:unless="${finalTotal != null}" id="finalAmount">최종결제금액: 0원</span>
+                    <span th:text="#{cart.finalTotal}"></span>: <span th:if="${finalTotal != null}"
+                                                                      th:text="${#numbers.formatDecimal(finalTotal, 0, 'COMMA', 0, 'POINT')} + ' ' + #{item.currency}"></span>
+                    <span th:unless="${finalTotal != null}" id="finalAmount">0<span th:text="#{item.currency}"></span></span>
                 </div>
             </div>
 
 
-            <!-- 결제하기 및 목록으로 버튼 -->
             <button class="btn add-to-cart-btn" onclick="processPayment()" th:text="#{cart.pay}"
-            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">결제하기</button>
+                    style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;"></button>
             <button class="btn back-btn" onclick="goToOrderPage()" th:text="#{cart.back}"
-            style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">목록으로</button>
+                    style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;"></button>
 
-            <!-- 모달 -->
             <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
                 <div style="position:relative; width:90%; max-width:600px; margin:5% auto; background:white; border-radius:10px; padding:20px;">
                     <iframe id="paymentFrame" style="width:100%; height:600px; border:none;"></iframe>
@@ -323,6 +306,7 @@
             </div>
 
         </div>
+    </div>
 
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -350,10 +334,10 @@
                 if (finalTotalEl) {
                     // couponFinalTotal 값이 있으면 할인된 금액을 최종 금액으로 표시
                     if (couponFinalTotal !== null) {
-                        finalTotalEl.innerText = `최종결제금액: ${couponFinalTotal.toLocaleString()}원`;
+                        finalTotalEl.innerText = `: ${couponFinalTotal.toLocaleString()}원`;
                     } else {
                         // couponFinalTotal이 null이면 (쿠폰 적용 안 됨) 할인 적용 전 금액 표시
-                        finalTotalEl.innerText = `최종결제금액: ${grandTotal.toLocaleString()}원`;
+                        finalTotalEl.innerText = `: ${grandTotal.toLocaleString()}원`;
                     }
                 }
 

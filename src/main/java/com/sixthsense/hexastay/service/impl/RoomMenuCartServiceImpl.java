@@ -172,7 +172,7 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                     RoomMenuCartItemOption option = new RoomMenuCartItemOption();
                     option.setRoomMenuCartItem(savedCartItem); // 저장된 CartItem 참조 설정
                     option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName());
-                    option.setRoomMenuOption(menuOption);
+                    option.setRoomMenuOption(menuOption); // 메뉴의 옵션 차감을 위해서 필요한 필드
                     option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 옵션 개당 가격
                     option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 해당 옵션의 선택 수량
 
@@ -411,10 +411,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         // 쿠폰 할인 적용
         int discount = (originalPrice * coupon.getDiscountRate()) / 100;
-        log.info("--- 쿠폰 할인 계산 값 확인 ---");
-        log.info("원본 장바구니 총액 (originalPrice): {}", originalPrice);
-        log.info("쿠폰 할인율 (coupon.getDiscountRate()): {}", coupon.getDiscountRate());
-        log.info("--------------------------");
         // 할인 금액 계산
         int finalPrice = originalPrice - discount; // 최종 가격 계산
 
