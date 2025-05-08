@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ObjectInputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -338,7 +339,59 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 savedOrder.getHotelRoom() != null ? savedOrder.getHotelRoom().getHotelRoomName() : "연결된 HotelRoom 없음");
 
         if (couponNum != null) {
-            // ... (쿠폰 처리 로직) ...
+            if (couponNum != null && couponNum > 0) { // couponNum 유효성 체크 추가
+                log.info("주문 저장 후 쿠폰 사용 처리 시작. 쿠폰 번호: {}", couponNum);
+                try {
+                    // 쿠폰 정보를 다시 조회하여 최신 상태 확인 (동시성 문제 방지)
+                    Coupon coupon = couponRepository.findById(couponNum)
+                            .orElseThrow(() -> new EntityNotFoundException("쿠폰 정보를 찾을 수 없습니다. CouponNum: " + couponNum));
+
+                    // 쿠폰 유효성 재검증 (주문 생성 중 상태가 변경될 수 있으므로)
+                    if (!coupon.getMember().getMemberEmail().equals(email)) {
+                        throw new IllegalStateException("쿠폰 소유자가 일치하지 않습니다.");
+                    }
+                    if (coupon.getExpirationDate().isBefore(LocalDate.now())) {
+                        throw new IllegalStateException("쿠폰이 만료되었습니다.");
+                    }
+
+                    // 사용 처리 로직
+                    if (coupon.isUsed()) {
+                        if (coupon.getRepeatCouponCount() != null && coupon.getRepeatCouponCount() > 0) {
+                            // 반복 쿠폰이고 횟수가 남아있음
+                            coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
+                            log.info("반복 쿠폰(ID:{}) 사용, 남은 횟수: {}", couponNum, coupon.getRepeatCouponCount());
+                            if (coupon.getRepeatCouponCount() <= 0) {
+                                coupon.setUsed(true); // 횟수 소진 시 사용 완료 처리
+                                log.info("반복 쿠폰(ID:{}) 횟수 소진으로 사용 완료 처리.", couponNum);
+                            }
+                        } else {
+                            log.warn("이미 사용 완료 처리된 쿠폰(ID:{})에 대한 주문(ID:{})이 생성되었습니다. (확인 필요)", couponNum, savedOrder.getRoomMenuOrderNum());
+                        }
+                    } else {
+
+                        if (coupon.getRepeatCouponCount() != null) {
+
+                            coupon.setRepeatCouponCount(coupon.getRepeatCouponCount() - 1);
+                            log.info("반복 쿠폰(ID:{}) 사용, 남은 횟수: {}", couponNum, coupon.getRepeatCouponCount());
+                            if (coupon.getRepeatCouponCount() <= 0) {
+                                coupon.setUsed(true); // 횟수 소진 시 사용 완료 처리
+                                log.info("반복 쿠폰(ID:{}) 횟수 소진으로 사용 완료 처리.", couponNum);
+                            }
+                        } else {
+                            // 단일 사용 쿠폰
+                            coupon.setUsed(true); // 사용 완료 처리
+                            log.info("단일 사용 쿠폰(ID:{}) 사용 완료 처리.", couponNum);
+                        }
+                    }
+
+                    coupon.setUsedTime(LocalDateTime.now()); // 사용 시간 기록
+                    couponRepository.save(coupon); //
+                    log.info("쿠폰(ID:{}) 상태 변경 저장 완료.", couponNum);
+
+                } catch (Exception e) {
+                    log.error("주문(ID:{}) 생성 후 쿠폰(ID:{}) 처리 중 오류 발생: {}", savedOrder.getRoomMenuOrderNum(), couponNum, e.getMessage(), e);
+                }
+            }
         }
 
         roomMenuCartItemRepository.deleteAll(cartItems); // 장바구니 아이템 삭제

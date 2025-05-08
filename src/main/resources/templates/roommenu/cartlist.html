@@ -523,83 +523,76 @@
             }); // --- DOMContentLoaded 이벤트 리스너 끝 ---
 
 
-            // 결제 처리를 시작합니다. (DOMContentLoaded 밖에서 전역 함수로 선언)
-            // function processPayment() {
-            //     const roomMenuOrderRequestMessage = document.getElementById('request-input').value;
-            //
-            //     const selectedCoupon = document.getElementById('couponSelect').value;
-            //     const discountedTotal = couponFinalTotal; // 전역 변수에서 가져옴
-            //
-            //     const formData = new URLSearchParams();
-            //     formData.append('requestMessage', roomMenuOrderRequestMessage);
-            //
-            //     if (selectedCoupon) {
-            //         formData.append('couponNum', selectedCoupon);
-            //     }
-            //
-            //     if (discountedTotal !== null) {
-            //         formData.append('discountedTotalPrice', discountedTotal);
-            //     }
-            //
-            //     fetch('/roommenu/cart', {
-            //         method: 'POST',
-            //         headers: {
-            //             'Content-Type': 'application/x-www-form-urlencoded'
-            //         },
-            //         body: formData
-            //     })
-            //         .then(res => {
-            //             if (!res.ok) {
-            //                 return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
-            //             }
-            //             return res.text();
-            //         })
-            //         .then(result => {
-            //             alert("결제가 완료되었습니다.");
-            //             // 결제 성공 후 요청사항 저장 값 삭제
-            //             localStorage.removeItem('roomMenuRequestMessage');
-            //             window.location.href = '/roommenu/orderList';
-            //         })
-            //         .catch(error => {
-            //             console.error("결제 중 오류 발생:", error);
-            //             alert("❌ 결제 중 오류 발생: " + error.message);
-            //         });
-            // }
-
             // 결제여부에 따라서 이동되는 페이지
             function processPayment() {
                 const requestMessage = document.getElementById('request-input').value;
 
-                fetch("/roommenu/cart", {
+                let finalAmountText = "0"; // 기본값 0
+                const finalAmountSpan = document.getElementById('finalAmount'); // ID로 찾는 것이 더 정확
+                const finalTotalDiv = document.querySelector('.final-total > span.text-danger'); // 다른 span 선택자 (필요 시 조정)
+
+                if (finalAmountSpan && finalAmountSpan.textContent.includes('원')) {
+                    finalAmountText = finalAmountSpan.textContent;
+                } else if (finalTotalDiv && finalTotalDiv.textContent.includes('원')) {
+                    const match = finalTotalDiv.textContent.match(/:\s*([\d,]+)\s*원/);
+                    if (match && match[1]) {
+                        finalAmountText = match[1];
+                    }
+                }
+                // 콤마(,) 제거 및 숫자로 변환
+                const tossprice = parseInt(finalAmountText.replace(/[^0-9]/g, ''), 10) || 0;
+                console.log("Final price for Toss payment:", tossprice); // ✅ 금액 확인 로그
+                // --- 수정 끝 ---
+
+
+                // 쿠폰 정보 및 할인된 금액도 함께 보내야 할 수 있음
+                const selectedCouponNum = document.getElementById('couponSelect').value;
+                const discountedFinalPrice = couponFinalTotal;
+
+                const formData = new URLSearchParams();
+                formData.append('requestMessage', requestMessage);
+                if (selectedCouponNum) {
+                    formData.append('couponNum', selectedCouponNum);
+                }
+
+                if (couponFinalTotal !== null) {
+                    formData.append('discountedTotalPrice', couponFinalTotal);
+                }
+                formData.append('finalOrderPrice', tossprice);
+
+
+                fetch("/roommenu/cart", { // 이 URL이 주문 생성 API가 맞는지 확인
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: new URLSearchParams({ requestMessage: requestMessage })
+                    body: formData //
                 })
-                    .then(res => res.text())
-                    .then(data => {
-                        alert("결제 페이지로 이동합니다!");
-
-                        // 주문 완료 후 toss 결제 페이지로 이동 (옵션)
-                        const url = "/payment?tossprice=" + tossprice;
-                        const popup = window.open(url, "_blank", "width=600,height=800");
-                        if (!popup) {
-                            alert("팝업 차단 해제해 주세요.");
+                    .then(res => {
+                        if (!res.ok) {
+                            // 에러 응답 처리
+                            return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
                         }
 
-                        // 로딩 페이지로도 이동 (필요 시)
+                        return res.text(); // 또는 res.json()
+                    })
+                    .then(orderResult => { // orderResult는 서버 응답 (예: 주문번호 텍스트 또는 JSON 객체)
+                        console.log("Order creation successful:", orderResult);
+                        alert("결제 페이지로 이동합니다!");
+
+                        const url = `/payment?tossprice=${tossprice}`; // 여기에 orderId 등 추가 정보 필요할 수 있음
+                        const popup = window.open(url, "_blank", "width=600,height=800");
+                        if (!popup) {
+                            alert("팝업 차단 기능을 해제해주세요.");
+                        }
+
+                        // 로딩 페이지로 이동
                         window.location.href = "/tossloading";
                     })
                     .catch(err => {
-                        alert("에러 발생: " + err.message);
+                        console.error("결제 중 오류 발생:", err);
+                        alert("❌ 결제 중 오류 발생: " + err.message);
                     });
             }
 
-            // 주문 페이지로 이동합니다. (DOMContentLoaded 밖에서 전역 함수로 선언)
-            function goToOrderPage() {
-                // 목록으로 돌아가기 전에 요청사항 저장 값 삭제
-                localStorage.removeItem('roomMenuRequestMessage');
-                window.location.href = '/roommenu/orderpage';
-            }
         </script>
     </div>
 </div>
