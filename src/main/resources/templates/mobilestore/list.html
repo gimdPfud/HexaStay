@@ -170,23 +170,23 @@
         <div id="search-container" class="search-container">
             <form th:action="@{/member/store/list}" method="get">
                 <div class="search-box">
-                    <input type="text" name="keyword" th:placeholder="'매장명 검색'">
-                    <button type="submit">검색</button>
+                    <input type="text" name="keyword" th:placeholder="#{storeList.search.placeholder}">
+                    <button type="submit" th:text="#{storeList.search.button}"></button>
                 </div>
             </form>
         </div>
         <div class="tabs">
             <button type="button" onclick="filterByLikes()" class="btn-custom">
-                ❤️ <span class="like-count" style="margin-left: 4px;">인기순</span>
+                ❤️ <span class="like-count" style="margin-left: 4px;" th:text="#{storeList.category.popular}"></span>
             </button>
-            <div class="tab" style="text-align: center" onclick="filterByCategory('전체')">전체</div>
-            <div class="tab" onclick="filterByCategory('한식')">한식</div>
-            <div class="tab" onclick="filterByCategory('일식')">일식</div>
-            <div class="tab" onclick="filterByCategory('중식')">중식</div>
-            <div class="tab " onclick="filterByCategory('아시안')">아시안</div>
-            <div class="tab" onclick="filterByCategory('양식')">양식</div>
-            <div class="tab" onclick="filterByCategory('패스트푸드')">패스트푸드</div>
-            <div class="tab" onclick="filterByCategory('카페')">카페</div>
+            <div class="tab" style="text-align: center" onclick="filterByCategory('전체')" th:text="#{storeList.category.all}"></div>
+            <div class="tab" onclick="filterByCategory('한식')" th:text="#{storeList.category.korean}"></div>
+            <div class="tab" onclick="filterByCategory('일식')" th:text="#{storeList.category.japanese}"></div>
+            <div class="tab" onclick="filterByCategory('중식')" th:text="#{storeList.category.chinese}"></div>
+            <div class="tab " onclick="filterByCategory('아시안')" th:text="#{storeList.category.asian}"></div>
+            <div class="tab" onclick="filterByCategory('양식')" th:text="#{storeList.category.western}"></div>
+            <div class="tab" onclick="filterByCategory('패스트푸드')" th:text="#{storeList.category.fastfood}"></div>
+            <div class="tab" onclick="filterByCategory('카페')" th:text="#{storeList.category.cafe}"></div>
         </div>
         <ul class="store-list card-list">
             <li th:each="store : ${list}" class="store-item" th:attr="data-category=${store.storeCategory}">
