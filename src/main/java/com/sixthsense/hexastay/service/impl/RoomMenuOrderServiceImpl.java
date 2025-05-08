@@ -96,7 +96,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 throw new IllegalStateException("옵션 '" + selectedOption.getRoomMenuOptionName() + "'의 재고가 부족합니다. (요청: " + optionOrderQuantityFromDto + ", 현재: " + selectedOption.getRoomMenuOptionAmount() +")");
             }
             selectedOption.setRoomMenuOptionAmount(selectedOption.getRoomMenuOptionAmount() - optionOrderQuantityFromDto);
-            // roomMenuOptionRepository.save(selectedOption); // @Transactional이면 더티 체킹
+             roomMenuOptionRepository.save(selectedOption);
             optionToRecordInOrderItem = selectedOption;
             log.info("옵션 '{}' (ID: {}) 재고 {} 차감 완료. 남은 재고: {}",
                     selectedOption.getRoomMenuOptionName(), selectedOption.getRoomMenuOptionNum(),
@@ -226,7 +226,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
             // 상품 재고 차감
             roomMenu.setRoomMenuAmount(roomMenu.getRoomMenuAmount() - productOrderQuantity);
-            // roomMenuRepository.save(roomMenu); // @Transactional이면 더티 체킹, 또는 마지막에 일괄 저장
 
             // --- 선택된 옵션들의 재고 차감 로직 ---
             StringBuilder selectedOptionsNameBuilder = new StringBuilder();
@@ -275,6 +274,7 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                     totalOptionsPriceForThisItem += (actualOptionToDeduct.getRoomMenuOptionPrice() * orderedOptionQuantity);
                 }
             }
+
             // --- 옵션 재고 차감 로직 끝 ---
 
             // 주문 아이템 생성
@@ -305,8 +305,11 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
                 orderItem.setRoomMenuSelectOptionPrice(cartItem.getRoomMenuSelectOptionPrice());
             }
 
+            roomMenuRepository.save(roomMenu);
             orderItems.add(orderItem);
         } // end of for (RoomMenuCartItem cartItem : cartItems)
+
+
 
         roomMenuOrder.setOrderItems(orderItems);
 
@@ -711,8 +714,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
 
     @Override
     public void deductOptionStock(RoomMenu roomMenu, RoomMenuOrderItemDTO orderItemDTO, int orderedItemQuantity) {
-        // ✅ 클라이언트 DTO에 선택된 옵션 ID가 넘어온다고 가정 (예: orderItemDTO.getSelectedRoomMenuOptionNum())
-        //    만약 필드명이 다르거나, 옵션 이름으로 찾아야 한다면 이 부분 수정 필요
         Long selectedOptionNum = orderItemDTO.getRoomMenuOrderItemNum(); // DTO에 이 필드가 있어야 함!
 
         if (selectedOptionNum != null && selectedOptionNum > 0) {
