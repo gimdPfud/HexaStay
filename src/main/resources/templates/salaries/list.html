@@ -151,10 +151,6 @@
             </form>
         </div>
 
-        <div th:if="${salList.content == null or #lists.isEmpty(salList.content)}" class="no-data">
-            항목 없음
-        </div>
-
         <div class="row mt-4">
             <div class="col-12">
                 <table class="table table-bordered text-company mb-0" id="salaryTable">
@@ -174,6 +170,11 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr>
+                        <td colspan="11" class="text-center py-4 text-muted" style="font-size: 1.1rem;">
+                            항목 없음
+                        </td>
+                    </tr>
                     <tr th:each="salary, stat : ${salList.content}" class="text-center salary-row" th:data-row-index="${stat.index}">
                         <td class="profile-cell">
                             <img th:if="${salary.adminDTO.adminProfileMeta != null}"
