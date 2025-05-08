@@ -172,46 +172,84 @@
         </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dropdown = document.getElementById('languageDropdown');
-            const selected = dropdown.querySelector('.selected-option');
-            const optionsContainer = dropdown.querySelector('.options');
-            const optionsList = optionsContainer.querySelectorAll('li');
-            const hiddenInput = dropdown.querySelector('input[name="lang"]');
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/ // Thymeleaf 표현식 사용을 위해 CDATA 섹션 권장
+            document.addEventListener('DOMContentLoaded', function () {
+                const dropdown = document.getElementById('languageDropdown');
+                const selected = dropdown.querySelector('.selected-option');
+                const optionsContainer = dropdown.querySelector('.options');
+                const optionsList = optionsContainer.querySelectorAll('li');
+                const hiddenInput = dropdown.querySelector('input[name="lang"]');
 
-            selected.addEventListener('click', (e) => {
-                e.stopPropagation();
-                optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
-            });
+                // ---  초기 상태 설정 로직 수정 ---
+                // 1. 서버에서 전달된 현재 언어 코드를 가져옵니다. (Thymeleaf 사용)
+                const currentLang = /*[[${currentLang}]]*/ 'ko'; // 모델에 'currentLang' 속성이 전달되어야 함
+                console.log("Initial language from server:", currentLang);
 
-            optionsList.forEach(option => {
-                option.addEventListener('click', () => {
-                    const flagHTML = option.querySelector('.flag').outerHTML;
-                    const text = option.querySelector('span:nth-of-type(2)').textContent;
+                // 2. 현재 언어 코드에 해당하는 li 요소를 찾습니다.
+                const currentOptionLi = optionsContainer.querySelector(`li[data-value="${currentLang}"]`);
+                console.log("Found li for current language:", currentOptionLi);
+
+                // 3. 찾은 li 요소가 있으면 해당 내용으로 selected-option을 업데이트합니다.
+                if (currentOptionLi) {
+                    const flagHTML = currentOptionLi.querySelector('.flag').outerHTML;
+                    const text = currentOptionLi.querySelector('span:nth-of-type(2)').textContent;
                     selected.innerHTML = flagHTML + '<span class="option-text">' + text + '</span><span>&#9662;</span>';
-                    hiddenInput.value = option.getAttribute('data-value');
-                    optionsContainer.style.display = 'none';
-                    dropdown.closest('form').submit();
-                });
-            });
-
-            document.addEventListener('click', (event) => {
-                if (!dropdown.contains(event.target)) {
-                    optionsContainer.style.display = 'none';
+                    hiddenInput.value = currentLang; // hidden input 초기값도 현재 언어로 설정
+                    console.log("Dropdown initialized to:", currentLang);
+                } else {
+                    // 4. 현재 언어에 맞는 li가 없으면 기본값(예: 한국어)으로 설정합니다.
+                    console.warn("Could not find li for language:", currentLang, ". Falling back to 'ko'.");
+                    const defaultOptionLi = optionsContainer.querySelector(`li[data-value="ko"]`);
+                    if (defaultOptionLi) {
+                        const flagHTML = defaultOptionLi.querySelector('.flag').outerHTML;
+                        const text = defaultOptionLi.querySelector('span:nth-of-type(2)').textContent;
+                        selected.innerHTML = flagHTML + '<span class="option-text">' + text + '</span><span>&#9662;</span>';
+                        hiddenInput.value = 'ko';
+                        console.log("Dropdown initialized to default: ko");
+                    } else {
+                        console.error("Default 'ko' language option not found in the dropdown!");
+                    }
                 }
-            });
+                // --- 초기 상태 설정 로직 끝 ---
 
-            selected.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+
+                // --- 나머지 이벤트 리스너 (클릭, 키다운 등)는 이전과 동일하게 유지 ---
+                selected.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
-                } else if (e.key === 'Escape') {
-                    optionsContainer.style.display = 'none';
-                }
+                });
+
+                optionsList.forEach(option => {
+                    option.addEventListener('click', () => {
+                        const flagHTML = option.querySelector('.flag').outerHTML;
+                        const text = option.querySelector('span:nth-of-type(2)').textContent;
+                        selected.innerHTML = flagHTML + '<span class="option-text">' + text + '</span><span>&#9662;</span>';
+                        hiddenInput.value = option.getAttribute('data-value');
+                        optionsContainer.style.display = 'none';
+                        console.log("Language changed to:", hiddenInput.value, ". Submitting form.");
+                        dropdown.closest('form').submit(); // 폼 제출
+                    });
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!dropdown.contains(event.target)) {
+                        optionsContainer.style.display = 'none';
+                    }
+                });
+
+                selected.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
+                    } else if (e.key === 'Escape') {
+                        optionsContainer.style.display = 'none';
+                    }
+                });
+                // --- 이벤트 리스너 끝 ---
             });
-        });
-    </script>
+            /*]]>*/
+        </script>
 </body>
 </html>

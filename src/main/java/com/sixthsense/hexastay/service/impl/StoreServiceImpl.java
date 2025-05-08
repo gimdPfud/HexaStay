@@ -29,10 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,9 +97,14 @@ public class StoreServiceImpl implements StoreService {
      * 기  능 : pk값으로 StoreDTO 단일 객체를 찾아옴
      * */
     @Override
-    public StoreDTO read(Long pk) {
-        Store store = storeRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+    public StoreDTO read(Long pk, Locale locale) { //
+        log.info("다국어 서비스 진입 읽을 pk의 번호 : {}, 번역된 언어: {}", pk, locale); //
+
+        Store store = storeRepository.findById(pk)
+                .orElseThrow(() -> new EntityNotFoundException("스토어의 pk를 찾을 수 없습니다아아아~: " + pk));
+
         StoreDTO storeDTO = modelMapper.map(store, StoreDTO.class);
+
         return storeDTO;
     }
 
@@ -268,12 +270,17 @@ public class StoreServiceImpl implements StoreService {
         return list;
     }
     @Override
-    public Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable) {
+    public Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable, Locale locale) {
+        log.info("다국어 서비스 진입 - {}", locale); //
+
         Long companyNum = zzService.hotelroomNumToCompany(hotelroomNum).getCompanyNum();
         Page<Store> storeList = storeRepository.storeTypeSearch(companyNum, type, keyword, pageable);
+
         Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
             storeDTO.setCompanyName(data.getCompany().getCompanyName());
+
+
             return storeDTO;
         });
         return list;

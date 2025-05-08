@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Log4j2
@@ -166,7 +167,7 @@ public class OrderstoreServiceImpl implements OrderstoreService {
     }
 
     @Override
-    public Page<OrderstoreViewDTO> getOrderList(Long roomNum, Pageable pageable) {
+    public Page<OrderstoreViewDTO> getOrderList(Long roomNum, Pageable pageable, Locale locale) {
         Page<Orderstore> orderlist = orderstoreRepository.findByRoom_RoomNum(roomNum, pageable);
         Page<OrderstoreViewDTO> viewOrderPage = orderlist.map(orderstore->{
             OrderstoreViewDTO orderstoreViewDTO = new OrderstoreViewDTO(orderstore);

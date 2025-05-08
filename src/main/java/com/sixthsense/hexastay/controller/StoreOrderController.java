@@ -27,10 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -79,36 +76,59 @@ public class StoreOrderController {
         }
     }
     /*2. 내역보기 (목록)*/
-    @GetMapping("/member/store/order/list") //근데주문내역은 일회용이잔아
+    @GetMapping("/member/store/order/list") // 클래스 레벨 /member/store/order 와 결합됨
     public String clientOrderList(Model model, HttpSession session,
-                                  @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable, Principal principal){
+                                  @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable,
+                                  Principal principal, Locale locale){
+        log.info("오더리스트 다국어 서비스 진입: {}", locale);
         if (principal == null) {
             return "sample/qrcamera";
         }
 
         Long roomNum = (Long) session.getAttribute("roomNum");
+        if (roomNum == null) {
+            // 에러 처리
+            model.addAttribute("errorMessage", "객실 정보를 찾을 수 없습니다.");
+            model.addAttribute("currentLang", locale.getLanguage()); // 에러 페이지에서도 언어 코드 전달
+            return "error/error";
+        }
 
-        Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(roomNum, pageable);
-        model.addAttribute("list",list);
+        Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(roomNum, pageable, locale);
+        model.addAttribute("list", list);
 
-        //옵션용 Map 이름가격 > 하나의메뉴
+        // 옵션용 Map 계산
         Map<Long, List<String>> optionMap = new HashMap<>();
-        list.forEach(order->{
-            order.getOrderstoreitemDTOList().forEach(dto->{ //메뉴1개
-                if(dto.getStoremenuOptions()!=null&&!dto.getStoremenuOptions().isBlank()) {
-                    List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
-                    options = options.stream().map(option->{//옵션1개
-                        List<String> optionInfos = Arrays.stream((option.split(":"))).toList();
-                        option = optionInfos.get(1) + " (" + optionInfos.get(2) + " 원)";
-                        return option;
-                    }).toList();
-                    optionMap.put(dto.getOrderstoreitemNum(),options);
-                }
-            });
+        list.getContent().forEach(order -> { // Page 객체에서 콘텐츠 리스트 가져오기
+            if (order.getOrderstoreitemDTOList() != null) {
+                order.getOrderstoreitemDTOList().forEach(dto -> {
+                    if (dto.getStoremenuOptions() != null && !dto.getStoremenuOptions().isBlank()) {
+                        try {
+                            List<String> options = Arrays.stream(dto.getStoremenuOptions().split(","))
+                                    .map(option -> {
+                                        List<String> optionInfos = Arrays.stream(option.split(":")).map(String::trim).toList();
+                                        if (optionInfos.size() >= 3) {
+                                            return optionInfos.get(1) + " (" + optionInfos.get(2) + " " + "원" + ")";
+                                        } else {
+                                            log.warn("유효성검사가 올바르지 않음. {}: {}", dto.getOrderstoreitemNum(), option);
+                                            return option;
+                                        }
+                                    }).toList();
+                            optionMap.put(dto.getOrderstoreitemNum(), options);
+                        } catch (Exception e) {
+                            log.error("패싱 오류, 멤버 Num을 찾을 수 없음.", dto.getOrderstoreitemNum(), e.getMessage());
+                        }
+                    }
+                });
+            }
         });
-        model.addAttribute("optionMap",optionMap);
+        model.addAttribute("optionMap", optionMap); // 옵션 맵 모델에 추가
+
+        model.addAttribute("currentLang", locale.getLanguage());
+
+
         return "mobilestore/order/list";
     }
+
 
 
     @GetMapping("/admin/store/order/list")

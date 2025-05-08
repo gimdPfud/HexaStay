@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -88,15 +89,22 @@ public class StoremenuServiceImpl implements StoremenuService {
      * 기  능 : pk를 받아 해당하는 데이터를 찾아 반환함.
      * */
     @Override
-    public StoremenuDTO read(Long pk) {
-        Storemenu storemenu = storemenuRepository.findById(pk).orElseThrow(EntityNotFoundException::new);
+    public StoremenuDTO read(Long pk, Locale locale) {
+        log.info("다국어 서비스 read 진입", pk, locale);
+
+        Storemenu storemenu = storemenuRepository.findById(pk)
+                .orElseThrow(() -> new EntityNotFoundException("Storemenu not found with id: " + pk)); // 예외 메시지 명확화
+
         StoremenuDTO data = modelMapper.map(storemenu, StoremenuDTO.class);
+
+        // 옵션 리스트 처리 (기존 로직 유지)
         data.setStoremenuOptionDTOList(
                 storemenu.getStoremenuOptionList().stream()
-                        .filter(option->option.getStoremenuOptionStatus().equals("alive"))
-                        .map(StoremenuOptionDTO::new)
+                        .filter(option -> option.getStoremenuOptionStatus().equals("alive")) // "alive" 상태인 옵션만 필터링
+                        .map(StoremenuOptionDTO::new) // StoremenuOption을 StoremenuOptionDTO로 변환 (DTO 생성자 방식 사용)
                         .toList()
         );
+
         return data;
     }
 

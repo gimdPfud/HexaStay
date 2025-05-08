@@ -61,39 +61,57 @@ public class StoreCartController {
 
     /*2. 장바구니 보기 (목록)*/
     @GetMapping("/list")
-    public String cartList(Model model, Principal principal, HttpSession session){
-        if(principal == null){return "sample/qrcamera";}
-        List<StorecartitemViewDTO> list = storecartService.getCartList((Long) session.getAttribute("roomNum"));
-        final Long[] totalPrice = {0L};
+    public String cartList(Model model, Principal principal, HttpSession session, Locale locale) {
+        log.info("카트리스트 다국어 서비스 진입", locale);
 
-        //옵션용 map ??
+        if(principal == null){
+            // 기존 로직: 비로그인 시 QR 카메라 페이지로
+            return "sample/qrcamera";
+        }
+
+        Long roomNum = (Long) session.getAttribute("roomNum");
+        if (roomNum == null) {
+            model.addAttribute("errorMessage", "객실 정보가 세션에 없습니다."); // 에러 메시지 전달
+            return "error/error"; // 예시 에러 페이지
+        }
+
+        List<StorecartitemViewDTO> list = storecartService.getCartList(roomNum);
+
+        final Long[] totalPrice = {0L};
         Map<Long, List<List<String>>> optionMap = new HashMap<>();
 
         list.forEach(dto -> {
-            if(dto.getStoremenuOptions()!=null&&!dto.getStoremenuOptions().isBlank()){
-
+            if(dto.getStoremenuOptions()!=null && !dto.getStoremenuOptions().isBlank()){
                 List<String> options = Arrays.stream(dto.getStoremenuOptions().split(",")).toList();
-
-                //옵션가격 더하기
                 List<List<String>> optionList = new ArrayList<>();
                 for (String option : options) {
                     List<String> optionInfo = Arrays.stream(option.split(":")).toList();
-                    totalPrice[0] += Long.parseLong(optionInfo.get(2))*dto.getStoremenuCount();
+                    try {
+                        totalPrice[0] += Long.parseLong(optionInfo.get(2).trim()) * dto.getStoremenuCount(); // trim() 추가
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                    }
                     optionList.add(optionInfo);
                 }
-
-                optionMap.put(dto.getStorecartitemNum(),optionList);
-
+                optionMap.put(dto.getStorecartitemNum(), optionList);
             }
-            //메뉴가격 더하기
-            totalPrice[0] += (long) dto.getStoremenuCount() * dto.getStoremenuPrice();
+            // 메뉴 가격 계산 부분에서 NullPointerException 발생 가능성 있음 (dto.getStoremenuCount() 또는 dto.getStoremenuPrice()가 null일 경우)
+            if (dto.getStoremenuCount() != null && dto.getStoremenuPrice() != null) {
+                totalPrice[0] += (long) dto.getStoremenuCount() * dto.getStoremenuPrice();
+            } else {
+                log.warn("StoremenuCount or StoremenuPrice is null for cart item {}", dto.getStorecartitemNum());
+            }
         });
-        optionMap.forEach((key, value) -> value.forEach(data->log.info("Key: {}, Value: {}", key, data)));
-        model.addAttribute("optionMap",optionMap);
-        model.addAttribute("list",list);
+
+        model.addAttribute("optionMap", optionMap);
+        model.addAttribute("list", list);
         model.addAttribute("totalPrice", totalPrice[0]);
+        model.addAttribute("isCartEmpty", list.isEmpty());
+        model.addAttribute("currentLang", locale.getLanguage());
+        log.info("패싱될 다국어 언어 :: {}", locale.getLanguage());
+
         return "mobilestore/cart/list";
     }
+
     /*3. 장바구니 수정 (수정)*/
     @GetMapping("/modify/{cartItemId}/{count}")
     public ResponseEntity cartModify(@PathVariable("count") int count, @PathVariable("cartItemId") Long cartItemId, Principal principal, HttpSession session){

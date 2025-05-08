@@ -12,13 +12,14 @@ import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public interface StoremenuService {
     /*등록*/
     Long insert(StoremenuDTO storemenuDTO) throws IOException;
 
     /*상세보기*/
-    StoremenuDTO read(Long pk);
+    StoremenuDTO read(Long pk, Locale locale);
 
     /*수정*/
     Long modify(StoremenuDTO storemenuDTO) throws IOException;

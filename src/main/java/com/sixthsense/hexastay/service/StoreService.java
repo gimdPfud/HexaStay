@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface StoreService {
@@ -22,7 +23,7 @@ public interface StoreService {
     Long insert(StoreDTO storeDTO) throws IOException;
 
     /*읽기*/
-    StoreDTO read(Long pk);
+    StoreDTO read(Long pk, Locale locale);
 
     /*수정*/
     Long modify(StoreDTO storeDTO) throws IOException;
@@ -40,7 +41,7 @@ public interface StoreService {
     Page<StoreDTO> searchlist(Long companyNum, String searchType, String keyword, Pageable pageable, String... status);
 
     Page<StoreDTO> clientlist(Pageable pageable);
-    Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable);
+    Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable, Locale locale);
 
     /*삭제: 활성화->비활성화 바꾸기*/
     void delete(Long pk);

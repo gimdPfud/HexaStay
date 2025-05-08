@@ -27,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
@@ -145,17 +146,17 @@ public class StoremenuController {
 
 
     @GetMapping("/read/{id}")
-    public String read(@PathVariable Long id, Model model){
+    public String read(@PathVariable Long id, Model model, Locale locale){
         log.info("메뉴상세보기 메뉴Num: "+id);
-        StoremenuDTO data = storemenuService.read(id);
+        StoremenuDTO data = storemenuService.read(id, locale);
         model.addAttribute("data",data);
         return "storemenu/read";
     }
 
 
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, Model model){
-        StoremenuDTO data = storemenuService.read(id);
+    public String modify(@PathVariable Long id, Model model, Locale locale){
+        StoremenuDTO data = storemenuService.read(id, locale);
         model.addAttribute("data",data);
         return "storemenu/modify";
     }
