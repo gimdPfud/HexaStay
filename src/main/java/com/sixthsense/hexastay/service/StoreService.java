@@ -29,18 +29,18 @@ public interface StoreService {
     Long modify(StoreDTO storeDTO) throws IOException;
 
     /*목록 : 전부 가져오기*/
-    List<StoreDTO> getAllList();
+    List<StoreDTO> getAllList(AdminDTO adminDTO);
     Map<Long, String> getCompanyMap();
     /*목록
     * 활성화된 외부업체만 목록으로 보여주기
     * 모든 외부 업체 목록 보여주기*/
-    Page<StoreDTO> list(String status, Pageable pageable);
-    Page<StoreDTO> list(Pageable pageable);
-    List<StoreDTO> list(Long companyNum);
-    Page<StoreDTO> list(Long companyNum, Pageable pageable);
+//    Page<StoreDTO> list(String status, Pageable pageable);
+//    Page<StoreDTO> list(Pageable pageable);
+//    List<StoreDTO> list(Long companyNum);
+//    Page<StoreDTO> list(Long companyNum, Pageable pageable);
     Page<StoreDTO> searchlist(Long companyNum, String searchType, String keyword, Pageable pageable, String... status);
 
-    Page<StoreDTO> clientlist(Pageable pageable);
+//    Page<StoreDTO> clientlist(Pageable pageable);
     Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable, Locale locale);
 
     /*삭제: 활성화->비활성화 바꾸기*/
