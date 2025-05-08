@@ -100,6 +100,13 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                             .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + roomMenuCartItemDTO.getRoomMenuCartItemNum()));
             log.info("메뉴 찾음: {}", roomMenu.getRoomMenuName());
 
+        Long menuIdFromDto = roomMenuCartItemDTO.getRoomMenuCartItemNum(); //
+        if (menuIdFromDto == null) throw new IllegalArgumentException("상품 ID가 DTO에 없습니다.");
+
+        RoomMenu roomMenuA = roomMenuRepository.findById(menuIdFromDto)
+                .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + menuIdFromDto));
+        log.info("메뉴 찾음: {}", roomMenuA.getRoomMenuName());
+
 
 
             List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions(); // DTO에서 선택된 옵션 목록 가져옴
@@ -155,9 +162,17 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                     RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRoomMenuCartItemOptionNum())
                             .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRoomMenuCartItemOptionNum()));
 
+                    // 3.  이 옵션이 해당 상품(roomMenu)에 속하는지 검증
+                    if (!menuOption.getRoomMenu().getRoomMenuNum().equals(roomMenu.getRoomMenuNum())) {
+                        throw new IllegalArgumentException("옵션 '" + menuOption.getRoomMenuOptionName() + "'는 상품 '" + roomMenu.getRoomMenuName() + "'의 옵션이 아닙니다.");
+                    }
+
+
+
                     RoomMenuCartItemOption option = new RoomMenuCartItemOption();
                     option.setRoomMenuCartItem(savedCartItem); // 저장된 CartItem 참조 설정
                     option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName());
+                    option.setRoomMenuOption(menuOption);
                     option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 옵션 개당 가격
                     option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 해당 옵션의 선택 수량
 
