@@ -44,6 +44,9 @@
               th:action="@{/company/deactivate/{num}(num=${companyDTO.companyNum})}" method="post">
           <button type="submit" class="btn btn-outline-danger w-auto">비활성화</button>
         </form>
+
+        <a th:if="${companyDTO.companyType.toUpperCase().equals('FACILITY')}"
+           th:href="@{|/facility/read/${companyDTO.companyNum}|}" class="btn btn-outline-primary">시설 안내 정보 상세보기</a>
       </div>
     </div>
   </div>
