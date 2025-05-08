@@ -28,17 +28,17 @@ public class Store extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String storeName;
 
-    //외부업체 매장번호
+    //외부업체 매장 전화번호
     @Column(nullable = false)
     private String storePhone;
 
     //외부 업체주소
-    //  문자열 주소
+    //  문자열 주소 우편번호\주소\상세주소
     @Column(nullable = false)
     private String storeAddress;
     //  경도 x
     private Double storeLongitude;
-    //  위도 y 카카오맵에서는 위도,경도 순으로 받음
+    //  위도 y
     private Double storeLatitude;
     private Double storeWtmX;
     private Double storeWtmY;

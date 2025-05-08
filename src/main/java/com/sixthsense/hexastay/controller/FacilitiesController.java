@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
+import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
@@ -37,7 +38,7 @@ public class FacilitiesController {
     private final FsService fsService;
     private final ZzService zzService;
     private final CompanyService companyService;
-    private final AdminService adminService;
+    private final AdminRepository adminRepository;
     /*
      * 메소드명 :
      * 인수 값 :
@@ -115,7 +116,8 @@ public class FacilitiesController {
         if(principal==null){
             return "redirect:/cart/qr";}
         Long companyNum = 0L;
-        Long adminNum = adminService.adminFindEmail(principal.getName()).getAdminNum();
+        Long adminNum = adminRepository.findAll().getLast().getAdminNum();
+        //fixme 고객용 시설조회 시 제일 마지막에 등록 된 admin을 가져옵니다
         try {
             companyNum = zzService.sessionToCompany(session).getCompanyNum();
             log.info("컴퍼니넘 : "+companyNum);

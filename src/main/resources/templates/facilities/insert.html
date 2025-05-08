@@ -7,9 +7,6 @@
     <title>시설 정보 등록</title>
 
     <link href="/summernote-0.9.0-dist/summernote-bs5.css" rel="stylesheet">
-    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
-    <!-- language pack -->
-    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
 
 </head>
 <body style="background-color: #f8f9fa;">
@@ -36,7 +33,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center gap-3">
-                    <button type="submit" class="btn btn-success" >등록</button>
+                    <button type="button" onclick="submitt()" class="btn btn-success" >등록</button>
                     <a th:href="@{/facility/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
@@ -44,8 +41,11 @@
 
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
+    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded",function () {
+        $(document).ready(function () {
             $('#facContent, #facTitle').summernote({
                 placeholder: '내용을 입력하세요.',
                 tabsize: 2,
@@ -63,6 +63,20 @@
                 ]
             });
         })
+
+        function submitt() {
+            const dirtyTitle = $('#facTitle').val();
+            const dirtyContent = $('#facContent').val();
+            const cleanTitle = DOMPurify.sanitize(dirtyTitle);
+            const cleanContent = DOMPurify.sanitize(dirtyContent);
+
+            // 정제된 값 다시 설정 (optional)
+            $('#facTitle').val(cleanTitle);
+            $('#facContent').val(cleanContent);
+
+            // 버튼이 속한 폼 제출
+            $('#insertForm').submit();
+        }
     </script>
 
 </div>

@@ -311,7 +311,7 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
-        List<String> possibleRoles = Arrays.asList("gm","exec","head","crew");
+        List<String> possibleRoles = Arrays.asList("SUPERADMIN","EXEC","HEAD","SV","PARTNER");
         //상위 관리자라면 무조건 참.
         if(possibleRoles.contains(adminDTO.getAdminRole())){
             return true;
