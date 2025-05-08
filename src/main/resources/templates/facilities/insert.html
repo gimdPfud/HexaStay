@@ -13,7 +13,7 @@
 <div layout:fragment="content">
 
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">시설서비스 등록</h2>
+        <h2 class="fw-bold mb-4 text-center">시설 정보 등록하기</h2>
 
         <form id="insertForm" action="/facility/insert" method="post">
             <div class="container p-4" style="max-width: 700px;">
@@ -24,11 +24,11 @@
                     <input type="hidden" th:value="${companyNum}" id="companyNum" name="companyNum" class="form-control">
                 </div>
                 <div class="mb-2">
-                    <label class="form-label" for="facTitle">첫 번째 입력 칸</label>
+                    <label class="form-label" for="facTitle">부대시설</label>
                     <textarea name="facTitle" id="facTitle" class="form-control"></textarea>
                 </div>
                 <div class="mb-2">
-                    <label class="form-label" for="facContent">두 번째 입력 칸</label>
+                    <label class="form-label" for="facContent">시설 이용 정보</label>
                     <textarea name="facContent" id="facContent" class="form-control"></textarea>
                 </div>
 

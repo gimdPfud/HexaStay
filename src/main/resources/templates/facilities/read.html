@@ -16,12 +16,12 @@
   </script>
 
   <div class="container mt-4 w-100 bg-light">
-    <h2 class="fw-bold mb-4 text-center">조직 상세보기</h2>
+    <h2 class="fw-bold mb-4 text-center">시설 정보 상세보기</h2>
     <div class="container p-4" style="max-width: 700px;">
       <!-- 상세 -->
       <div class="mb-2"><label class="form-label">시설명</label><div class="form-control" th:utext="${data.companyDTO.companyName}"></div></div>
-      <div class="mb-2"><label class="form-label">정보 글 1</label><div class="form-control" th:utext="${data.facTitle}"></div></div>
-      <div class="mb-2"><label class="form-label">정보 글 2</label><div class="form-control" th:utext="${data.facContent}"></div></div>
+      <div class="mb-2"><label class="form-label">부대시설</label><div class="form-control" th:utext="${data.facTitle}"></div></div>
+      <div class="mb-2"><label class="form-label">시설 이용 정보</label><div class="form-control" th:utext="${data.facContent}"></div></div>
 
       <div class="d-flex justify-content-center gap-3">
         <a th:href="@{/company/read/{num}(num=${data.companyDTO.companyNum})}" class="btn btn-secondary">뒤로가기</a>

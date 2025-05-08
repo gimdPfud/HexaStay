@@ -14,7 +14,7 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
     <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">시설 정보 수정</h2>
+        <h2 class="fw-bold mb-4 text-center">시설 정보 수정하기</h2>
 
         <form id="modifyForm" action="/facility/modify" method="post" enctype="multipart/form-data">
             <div class="container p-4" style="max-width: 500px;">
@@ -26,12 +26,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">시설 정보 입력 칸 1</label>
+                    <label class="form-label">부대시설</label>
                     <textarea class="form-control" id="facTitle" name="facTitle" th:utext="${data.facTitle}"></textarea>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">시설 정보 입력 칸 2</label>
+                    <label class="form-label">시설 이용 정보</label>
                     <textarea class="form-control" name="facContent" id="facContent" rows="4" th:utext="${data.facContent}"></textarea>
                 </div>
 
