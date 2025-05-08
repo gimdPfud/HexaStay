@@ -68,12 +68,12 @@ public class FsService {
 
         // 반환할거에 시설(fs) 찾아서 넣어야됨.
         Facilities fss = fsRepository.findByCompany_CompanyNum(num);
-        FacilitiesDTO fssDTO = modelMapper.map(fss,FacilitiesDTO.class);
-        fssDTO.setCompanyDTO(cdto);
-        result.addFssList(fssDTO);
-
+        if(fss!=null){
+            FacilitiesDTO fssDTO = modelMapper.map(fss,FacilitiesDTO.class);
+            fssDTO.setCompanyDTO(cdto);
+            result.addFssList(fssDTO);
+        }
         log.info(result.toString());
-
         return result;
     }
 

@@ -6,6 +6,7 @@
     display: inline-block;
     cursor: pointer;
     border: none;
+    margin-right: 20px;
 }
 
 .flag-ko { background-position: -29px -207px; }

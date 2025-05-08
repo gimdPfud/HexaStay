@@ -21,25 +21,16 @@ import java.util.List;
 @Builder
 public class OrderstoreDTO {
 
-    private Long orderstoreNum;
-
-    //외부업체 상품판매일
-    private LocalDateTime createDate;
-
-    //외부업체 상품 수정일자
-    private LocalDateTime modifyDate;
-
-    //외부업체 결재 (이체/카드/현금 사용여부)
-    private String orderstorePay;
-
-    private String orderstoreStatus; // 주문 상태. alive, cancel ?
-    private String orderstoreMessage;//주문 요처사항
-
+    private Long orderstoreNum;         //pk
+    private String orderstoreStatus;    //주문상태
+    private String orderstoreMessage;   //요청사항
+    private LocalDateTime createDate;   //베이스엔티티-생성날짜
+    private LocalDateTime modifyDate;   //베이스엔티티-수정날짜
 
     //**********************************
     //멤버 정보를 가져올 PK - room
-    private Long roomNum;
     private Long storeNum;
+    private Long roomNum;
 
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
 }

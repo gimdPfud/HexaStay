@@ -239,11 +239,12 @@
                 ❤️ <span th:text="#{category.popular}">인기순</span>
                 <span class="like-count" style="margin-left: 4px;" th:text="${roomMenuLikes}"></span>
             </button>
-            <div class="tab" th:text="#{tab.korean}" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='">한식</div>
-            <div class="tab" th:text="#{tab.western}" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='">양식</div>
-            <div class="tab" th:text="#{tab.chinese}" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='">중식</div>
-            <div class="tab" th:text="#{tab.appetizer}" onclick="window.location.href='/roommenu/orderpage?type=C&category=디저트&keyword='">디저트</div>
-            <div class="tab" th:text="#{tab.roomcare}" onclick="window.location.href='/roommenu/orderpage?type=C&category=%EB%A3%B8%EC%BC%80%EC%96%B4&keyword='">룸케어</div>
+            <!-- ✅ data-category 속성 추가 -->
+            <div class="tab" th:text="#{tab.korean}" data-category="한식" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='"></div>
+            <div class="tab" th:text="#{tab.western}" data-category="양식" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='"></div>
+            <div class="tab" th:text="#{tab.chinese}" data-category="중식" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='"></div>
+            <div class="tab" th:text="#{tab.appetizer}" data-category="디저트" onclick="window.location.href='/roommenu/orderpage?type=C&category=디저트&keyword='"></div>
+            <div class="tab" th:text="#{tab.roomcare}" data-category="룸케어" onclick="window.location.href='/roommenu/orderpage?type=C&category=%EB%A3%B8%EC%BC%80%EC%96%B4&keyword='"></div>
         </div>
 
         <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
@@ -383,13 +384,38 @@
         // 탭 클릭 이벤트 처리
         document.addEventListener('DOMContentLoaded', function () {
             const tabs = document.querySelectorAll('.tab');
+            const currentUrlParams = new URLSearchParams(window.location.search);
+            const currentCategory = currentUrlParams.get('category');
+            const currentType = currentUrlParams.get('type'); // '
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));  // 모든 탭에서 active 클래스 제거
-                    this.classList.add('active');  // 클릭한 탭에 active 클래스 추가
+            console.log("Current Category from URL:", currentCategory);
+            console.log("Current Type from URL:", currentType);
+
+
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (currentType === 'L') {
+                const popularButton = document.querySelector('.btn-custom');
+                if (popularButton) {
+                    popularButton.style.fontWeight = 'bold';
+                    popularButton.style.backgroundColor = '#e0f7fa';
+                    popularButton.style.borderBottom = '3px solid #00796b'
+                    popularButton.style.color = '#00796b';
+                    console.log("Popular tab activated");
+                }
+            } else if (currentCategory) {
+                tabs.forEach(tab => {
+                    const tabCategory = tab.getAttribute('data-category');
+                    if (tabCategory && decodeURIComponent(currentCategory) === tabCategory) {
+                        tab.classList.add('active');
+                        console.log("Tab activated:", tabCategory);
+                    }
                 });
-            });
+            } else {
+
+                console.log("No specific category or type selected in URL.");
+            }
+
         });
 
         function submitLang(lang) {
