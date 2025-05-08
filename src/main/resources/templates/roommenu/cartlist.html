@@ -522,7 +522,6 @@
 
             }); // --- DOMContentLoaded 이벤트 리스너 끝 ---
 
-
             // 결제여부에 따라서 이동되는 페이지
             function processPayment() {
                 const requestMessage = document.getElementById('request-input').value;
@@ -590,6 +589,7 @@
                     .catch(err => {
                         console.error("결제 중 오류 발생:", err);
                         alert("❌ 결제 중 오류 발생: " + err.message);
+
                     });
             }
 
