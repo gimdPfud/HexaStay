@@ -34,6 +34,7 @@ public class Storemenu extends BaseEntity {
     private Integer storemenuPrice;
 
     //룸서비스외부 업체상품 설명
+    @Column(length = 500)
     private String storemenuContent;
 
     //룸서비스외부 업체상품 카테고리
