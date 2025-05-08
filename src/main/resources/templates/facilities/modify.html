@@ -7,9 +7,7 @@
     <title>수정하기</title>
 
     <link href="/summernote-0.9.0-dist/summernote-bs5.css" rel="stylesheet">
-    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
-    <!-- language pack -->
-    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
+
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
@@ -45,6 +43,9 @@
         </form>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+    <script src="/summernote-0.9.0-dist/summernote-bs5.js"></script>
+    <script src="/summernote-0.9.0-dist/lang/summernote-ko-KR.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#facContent, #facTitle').summernote({
@@ -75,7 +76,7 @@
             $('#facTitle').val(cleanTitle);
             $('#facContent').val(cleanContent);
 
-            $('#insertForm').submit();
+            $('#modifyForm').submit();
         }
     </script>
 
