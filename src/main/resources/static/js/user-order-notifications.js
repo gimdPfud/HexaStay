@@ -15,7 +15,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error("알림 모달 요소를 찾을 수 없습니다: #orderAlertModal. 모달 알림을 사용할 수 없습니다.");
     }
 
-    const socket = new SockJS("/ws-order-alert");
+    const ngrokBaseUrl = 'wss://e41c-116-33-138-85.ngrok-free.app'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
+
+    /*const socket = new SockJS("/ws-order-alert"); todo : 지우지마 !!! */
+    const socket = new SockJS('https://e41c-116-33-138-85.ngrok-free.app/ws-order-alert');
     const stompClient = Stomp.over(socket);
     stompClient.debug = null; // 개발 완료 후에는 null로 설정하여 콘솔 로그 최소화
 
