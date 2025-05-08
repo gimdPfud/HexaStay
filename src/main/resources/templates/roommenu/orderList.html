@@ -135,9 +135,9 @@
                                 <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}"></strong>
-                                <span class="flex-grow-1"></span>
-                                <strong><span th:text="#{item.currency}"></span><span th:text="${T(java.lang.String).format('%,d', item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount)}"></span></strong>
+                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}"></strong> <span class="flex-grow-1"></span> <strong>
+                                <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
+                            </strong>
                             </div>
                             <div class="card-body">
                                <span th:if="${order.discountedPrice != null}">
