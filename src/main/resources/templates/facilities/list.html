@@ -1,70 +1,70 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}">
-<head>
-  <meta charset="UTF-8">
-  <title>시설서비스 관리</title>
-  <style>
-    .table td {
-      vertical-align: middle;
-    }
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko" xmlns:th="http://www.thymeleaf.org"-->
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layouts/layout.html}">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <title>시설서비스 관리</title>-->
+<!--  <style>-->
+<!--    .table td {-->
+<!--      vertical-align: middle;-->
+<!--    }-->
 
-    .badge-outline-danger {
-      color: #dc3545;
-      background-color: #fff;
-      border: 1px solid #dc3545;
-      padding: 0.35em 0.6em;
-      font-size: 0.75rem;
-      border-radius: 0.25rem;
-    }
-    .badge-outline-success {
-      color: #198754;
-      background-color: #fff;
-      border: 1px solid #198754;
-      padding: 0.35em 0.6em;
-      font-size: 0.75rem;
-      border-radius: 0.25rem;
-    }
-  </style>
-</head>
-<body style="background-color: #f8f9fa;">
-<div layout:fragment="content">
+<!--    .badge-outline-danger {-->
+<!--      color: #dc3545;-->
+<!--      background-color: #fff;-->
+<!--      border: 1px solid #dc3545;-->
+<!--      padding: 0.35em 0.6em;-->
+<!--      font-size: 0.75rem;-->
+<!--      border-radius: 0.25rem;-->
+<!--    }-->
+<!--    .badge-outline-success {-->
+<!--      color: #198754;-->
+<!--      background-color: #fff;-->
+<!--      border: 1px solid #198754;-->
+<!--      padding: 0.35em 0.6em;-->
+<!--      font-size: 0.75rem;-->
+<!--      border-radius: 0.25rem;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body style="background-color: #f8f9fa;">-->
+<!--<div layout:fragment="content">-->
 
-  <div class="container mt-4 w-100 bg-light">
-    <h2 class="fw-bold mb-4 text-center">시설정보 관리</h2>
+<!--  <div class="container mt-4 w-100 bg-light">-->
+<!--    <h2 class="fw-bold mb-4 text-center">시설정보 관리</h2>-->
 
-    <div class="row mt-4">
-      <div class="col-12">
-        <table class="table table-bordered text-fs mb-0">
-          <thead class="table-light text-center">
-            <tr>
-              <th style="width: 45%;">첫번째입력(정보?)</th>
-              <th style="width: 45%;">두번째입력(내용?)</th>
-              <th style="width: 10%;"></th>
-            </tr>
-          </thead>
+<!--    <div class="row mt-4">-->
+<!--      <div class="col-12">-->
+<!--        <table class="table table-bordered text-fs mb-0">-->
+<!--          <thead class="table-light text-center">-->
+<!--            <tr>-->
+<!--              <th style="width: 45%;">첫번째입력(정보?)</th>-->
+<!--              <th style="width: 45%;">두번째입력(내용?)</th>-->
+<!--              <th style="width: 10%;"></th>-->
+<!--            </tr>-->
+<!--          </thead>-->
 
-          <tbody>
-            <tr th:each="item : ${list}" class="text-center">
+<!--          <tbody>-->
+<!--            <tr th:each="item : ${list}" class="text-center">-->
 
-              <td th:utext="${item.facTitle}"></td>
-              <td th:utext="${item.facContent}"></td>
-              <td>
-                <a th:href="@{/facility/read/{fsNum}(fsNum=${item.facilitiesNum})}"
-                   class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">
-                  상세보기
-                </a>
-              </td>
+<!--              <td th:utext="${item.facTitle}"></td>-->
+<!--              <td th:utext="${item.facContent}"></td>-->
+<!--              <td>-->
+<!--                <a th:href="@{/facility/read/{fsNum}(fsNum=${item.facilitiesNum})}"-->
+<!--                   class="btn btn-success px-2 py-1" style="font-size: 0.8rem; line-height: 1;">-->
+<!--                  상세보기-->
+<!--                </a>-->
+<!--              </td>-->
 
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<!--            </tr>-->
+<!--          </tbody>-->
+<!--        </table>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
 
-</div>
-</body>
+<!--</div>-->
+<!--</body>-->
 
-</html>
+<!--</html>-->

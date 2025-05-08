@@ -29,7 +29,7 @@ public class Facilities {
     @Column(columnDefinition = "LONGTEXT")
     private String facContent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "companyNum")
     private Company company;
 }

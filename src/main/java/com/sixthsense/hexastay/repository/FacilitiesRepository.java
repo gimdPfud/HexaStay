@@ -14,5 +14,6 @@ import java.util.List;
 
 public interface FacilitiesRepository extends JpaRepository<Facilities, Long> {
 
-    List<Facilities> findByCompany_CompanyNum(Long companyNum);
+//    List<Facilities> findByCompany_CompanyNum(Long companyNum);
+    Facilities findByCompany_CompanyNum(Long companyNum);
 }

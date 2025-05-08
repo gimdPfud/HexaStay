@@ -22,10 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,18 +41,22 @@ public class FsService {
     }
 
     //목록 반환 DTO
-    public List<FacilitiesDTO> list (Long companyNum){
-        List<Facilities> facilities = fsRepository.findByCompany_CompanyNum(companyNum);
-        return facilities.stream().map((element) ->
-                        modelMapper.map(element, FacilitiesDTO.class)
-                                .setCompanyDTO(modelMapper.map(element.getCompany(), CompanyDTO.class)))
-                .toList();
-    }
+//    public List<FacilitiesDTO> list (Long companyNum){
+//        List<Facilities> facilities = fsRepository.findByCompany_CompanyNum(companyNum);
+//        return facilities.stream().map((element) ->
+//                        modelMapper.map(element, FacilitiesDTO.class)
+//                                .setCompanyDTO(modelMapper.map(element.getCompany(), CompanyDTO.class)))
+//                .toList();
+//    }
 
     //읽기 반환 DTO
-    public FacilitiesDTO read (Long fsNum){
-        Facilities a = fsRepository.findById(fsNum).orElseThrow(EntityNotFoundException::new);
-        return modelMapper.map(a,FacilitiesDTO.class).setCompanyDTO(modelMapper.map(a.getCompany(),CompanyDTO.class));
+    public FacilitiesDTO read (Long companyNum){
+        Facilities a = fsRepository.findByCompany_CompanyNum(companyNum);
+        if(a!=null){
+            return modelMapper.map(a,FacilitiesDTO.class).setCompanyDTO(modelMapper.map(a.getCompany(),CompanyDTO.class));
+        }else{
+            return null;
+        }
     }
     public FacViewDTO readMobile (Long num){
         // 시설(company)찾음
@@ -67,12 +67,10 @@ public class FsService {
         FacViewDTO result = new FacViewDTO(cdto);
 
         // 반환할거에 시설(fs) 찾아서 넣어야됨.
-        List<Facilities> fsslist = fsRepository.findByCompany_CompanyNum(num);
-        fsslist.forEach(fss->{
-            FacilitiesDTO fssDTO = modelMapper.map(fss,FacilitiesDTO.class);
-            fssDTO.setCompanyDTO(cdto);
-            result.addFssList(fssDTO);
-        });
+        Facilities fss = fsRepository.findByCompany_CompanyNum(num);
+        FacilitiesDTO fssDTO = modelMapper.map(fss,FacilitiesDTO.class);
+        fssDTO.setCompanyDTO(cdto);
+        result.addFssList(fssDTO);
 
         log.info(result.toString());
 
