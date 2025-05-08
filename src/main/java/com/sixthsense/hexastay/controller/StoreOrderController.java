@@ -142,7 +142,7 @@ public class StoreOrderController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        List< StoreDTO> storelist = storeService.getAllList();//됨
+        List< StoreDTO> storelist = storeService.getAllList(adminDTO);//됨
         model.addAttribute("storeList",storelist);
         return "store/orderlistForAdmin";
     }
@@ -157,7 +157,7 @@ public class StoreOrderController {
             return "redirect:/admin/logout";
         }
 
-        List< StoreDTO> storelist = storeService.getAllList();
+        List< StoreDTO> storelist = storeService.getAllList(adminDTO);
 
         List<OrderstoreDTO> list = orderstoreService.getOrderedList(storeNum);
 
