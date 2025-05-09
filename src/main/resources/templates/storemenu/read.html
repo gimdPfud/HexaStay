@@ -76,70 +76,6 @@
     </div>
 
 
-    <!--등록모달-->
-    <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="insertModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <form action="/admin/store/menu/option/insert" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="insertModalLabel">옵션 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="col">
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 이름</span>
-                                <input type="text" class="form-control" name="storemenuOptionName">
-                            </div>
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 가격</span>
-                                <input type="number" class="form-control" name="storemenuOptionPrice">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="submit" class="btn btn-success">등록</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!--수정모달-->
-    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="modifyModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content">
-                <form action="/admin/store/menu/option/modify" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modifyModalLabel">옵션 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="col">
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 이름</span>
-                                <input type="text" class="form-control" name="storemenuOptionName">
-                            </div>
-                            <div class="mb-3 input-group">
-                                <span class="input-group-text">옵션 가격</span>
-                                <input type="number" class="form-control" name="storemenuOptionPrice">
-                            </div>
-                            <input hidden type="hidden" class="form-control" name="storemenuOptionStatus" value="alive" readonly>
-                            <input hidden type="hidden" class="form-control" name="storemenuNum" th:value="${data.storemenuNum}" readonly>
-                            <input hidden type="hidden" class="form-control" name="storemenuOptionNum" readonly>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="submit" class="btn btn-success">등록</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
     <script th:inline="javascript">
         let optionlist = document.querySelector(".optionlist");
         let deletedoptionlist = document.querySelector(".deletedoptionlist");
@@ -226,24 +162,6 @@
             optionlist.innerHTML=totaltags;
 
         }
-
-        const modifyModal = document.getElementById('modifyModal');
-        modifyModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const optionNum = button.getAttribute('data-option-num');
-
-            fetch(`/admin/store/menu/option/modify/${optionNum}`)
-                .then(response => response.json())
-                .then(option => {
-                    const modal = modifyModal;
-                    modal.querySelector('input[name="storemenuOptionName"]').value = option.storemenuOptionName;
-                    modal.querySelector('input[name="storemenuOptionPrice"]').value = option.storemenuOptionPrice;
-                    modal.querySelector('input[name="storemenuOptionNum"]').value = option.storemenuOptionNum;
-                }).catch(error => console.log(error));
-        });
-
-
-
 
         function showdeletedmenu(list) {
             let tagsstart = `<table class="table table-bordered text-center align-middle">

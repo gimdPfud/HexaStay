@@ -146,18 +146,18 @@ public class StoremenuServiceImpl implements StoremenuService {
 
         /*옵션 리스트 변환*/
         if(storemenuDTO.getStoremenuOptionDTOList()!=null &&
-                storemenuDTO.getStoremenuOptionDTOList().size()!=entity.getStoremenuOptionList().size() &&
                 !storemenuDTO.getStoremenuOptionDTOList().isEmpty()){
-            Storemenu finalStoremenu = entity;
-            entity.setStoremenuOptionList(
+            List<StoremenuOption> optionList = entity.getStoremenuOptionList();
+            optionList.addAll(
                     storemenuDTO.getStoremenuOptionDTOList().stream()
                             .map(data-> {
                                 StoremenuOption optionEntity = modelMapper.map(data, StoremenuOption.class);
-                                optionEntity.setStoremenu(finalStoremenu);
+                                optionEntity.setStoremenu(entity);
                                 return optionEntity;
                             })
                             .collect(Collectors.toList())
             );
+            entity.setStoremenuOptionList(optionList);
         }
 
         return entity.getStoremenuNum();
