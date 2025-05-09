@@ -109,6 +109,7 @@ public class StoreClientController {
 @GetMapping("/menu/read/{storemenuNum}")
 public String menuRead(@PathVariable Long storemenuNum, Model model, Locale locale) {
     StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum, locale);
+    log.info(storemenuDTO);
     model.addAttribute("data", storemenuDTO);
     model.addAttribute("currentLang", locale.getLanguage());
 
