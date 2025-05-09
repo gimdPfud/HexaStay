@@ -37,7 +37,7 @@ public class StoreOrderController {
     private final StorecartService storecartService;
     private final AdminService adminService;
     private final StoreService storeService;
-    private final ZzService zzService;
+//    private final ZzService zzService;
 
 
 
@@ -87,10 +87,11 @@ public class StoreOrderController {
 
         Long roomNum = (Long) session.getAttribute("roomNum");
         if (roomNum == null) {
-            // 에러 처리
-            model.addAttribute("errorMessage", "객실 정보를 찾을 수 없습니다.");
-            model.addAttribute("currentLang", locale.getLanguage()); // 에러 페이지에서도 언어 코드 전달
-            return "error/error";
+//            // 에러 처리
+//            model.addAttribute("errorMessage", "객실 정보를 찾을 수 없습니다.");
+//            model.addAttribute("currentLang", locale.getLanguage()); // 에러 페이지에서도 언어 코드 전달
+//            return "error/error";
+            return "redirect:/cart/qr"; //세션에 roomNum이 저장 안되었다 == 로그인 시 세션에 저장 안했다
         }
 
         Page<OrderstoreViewDTO> list = orderstoreService.getOrderList(roomNum, pageable, locale);
@@ -106,7 +107,7 @@ public class StoreOrderController {
                             List<String> options = Arrays.stream(dto.getStoremenuOptions().split(","))
                                     .map(option -> {
                                         List<String> optionInfos = Arrays.stream(option.split(":")).map(String::trim).toList();
-                                        if (optionInfos.size() >= 3) {
+                                        if (optionInfos.size() == 3) {
                                             return optionInfos.get(1) + " (" + optionInfos.get(2) + " " + "원" + ")";
                                         } else {
                                             log.warn("유효성검사가 올바르지 않음. {}: {}", dto.getOrderstoreitemNum(), option);
@@ -122,9 +123,7 @@ public class StoreOrderController {
             }
         });
         model.addAttribute("optionMap", optionMap); // 옵션 맵 모델에 추가
-
         model.addAttribute("currentLang", locale.getLanguage());
-
 
         return "mobilestore/order/list";
     }
@@ -142,7 +141,7 @@ public class StoreOrderController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        List< StoreDTO> storelist = storeService.getAllList(adminDTO);//됨
+        List< StoreDTO> storelist = storeService.getAllList(adminDTO);
         model.addAttribute("storeList",storelist);
         return "store/orderlistForAdmin";
     }

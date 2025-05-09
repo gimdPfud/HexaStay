@@ -15,12 +15,14 @@ import com.sixthsense.hexastay.service.StoremenuOptionService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,29 +34,31 @@ import java.util.List;
 @Log4j2
 @RequestMapping("/admin/store/menu/option")
 public class StoremenuOptionController {
+    private final StoremenuOptionService storemenuOptionService;
 //    private final StoremenuService storemenuService;
 //    private final StoreService storeService;
-    private final StoremenuOptionService storemenuOptionService;
-
-    /*
-     * 메소드명 :
-     * 인수 값 :
-     * 리턴 값 :
-     * 기  능 :
-     * */
-    @GetMapping("/insert/{id}")
-    public String insertGet(@PathVariable Long id, Model model){
-        log.info("등록 : "+id);
-        model.addAttribute("storeNum",id);
-        return "storemenu/insert";
-    }
-    @PostMapping("/insert")
-    public String insertPost(StoremenuOptionDTO storemenuOptionDTO) throws IOException {
-        storemenuOptionService.insert(storemenuOptionDTO);
-        return "redirect:/admin/store/menu/read/"+storemenuOptionDTO.getStoremenuNum();
-    }
-
-
+//    /*
+//     * 메소드명 :
+//     * 인수 값 :
+//     * 리턴 값 :
+//     * 기  능 :
+//     * */
+//    @GetMapping("/insert/{id}")
+//    public String insertGet(@PathVariable Long id, Model model){
+//        log.info("등록 : "+id);
+//        model.addAttribute("storeNum",id);
+//        return "storemenu/insert";
+//    }
+//    @PostMapping("/insert")
+//    public String insertPost(@Valid StoremenuOptionDTO storemenuOptionDTO, BindingResult bindingResult){
+//
+//        try {
+//            storemenuOptionService.insert(storemenuOptionDTO);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return "redirect:/admin/store/menu/read/"+storemenuOptionDTO.getStoremenuNum();
+//    }
     @ResponseBody
     @GetMapping("/list/{id}")
     public ResponseEntity listGet(@PathVariable Long id){
