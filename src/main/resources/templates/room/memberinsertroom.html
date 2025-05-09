@@ -41,8 +41,9 @@
                 <!-- 호텔룸 이미지로 보여주는 레이아웃 메소드 -->
                 <div class="mt-3">
                     <h5>객실 선택</h5>
+                    <!--이미지 카드 형시으로 script-->
                     <div class="row gx-2 gy-3" id="hotelRoomList"></div>
-                    <!-- ✅ 수정: ID 이름 통일 -->
+                    <!-- ✅ 페이지 네이션 script  -->
                     <div class="d-flex justify-content-center mt-2" id="hotelRoomPagination"></div>
                 </div>
 
@@ -105,7 +106,7 @@
 
     <!-- 호텔룸 자동 선택 JS -->
     <script th:inline="javascript">
-        // 실시간 중복 체크
+        // 비밀 번호 등록 버튼 -  실시간 중복 체크
         document.getElementById("roomPassword").addEventListener("input", function () {
             const pw = this.value;
             const message = document.getElementById("passwordCheckMessage");

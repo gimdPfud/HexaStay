@@ -40,17 +40,17 @@ import java.util.NoSuchElementException;
 @RequestMapping("/admin/hotelroom")
 public class HotelRoomController {
 
-    //member 서비스 가져오기
-    private final MemberService memberService;
+
+    //소속 가져오기
     private final AdminService adminService;
     private final CompanyService companyService;
 
     //호텔 룸 서비스 가져오기
     private final HotelRoomService hotelRoomService;
 
-    private final QrCodeServiceimpl qrCodeServiceimpl;
 
 
+    // roomlist.html - checkin , checkout 변경용 로직 <script>
     @PostMapping("/checkinout/{hotelRoomNum}")
     @ResponseBody
     public ResponseEntity<?> checkInOut(@PathVariable Long hotelRoomNum,
@@ -70,21 +70,6 @@ public class HotelRoomController {
     }
 
 
-    //0411
-    @GetMapping("/latest")
-    @ResponseBody
-    public ResponseEntity<HotelRoomDTO> getLatestRoomByName(@RequestParam String hotelRoomName) {
-        try {
-            HotelRoomDTO hotelRoomDTO = hotelRoomService.HotelRoomByName(hotelRoomName);
-            return ResponseEntity.ok(hotelRoomDTO);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-
-    //호텔룸 등록
-
     //호텔룸 등록페이지
 
     //todo:http://localhost:8090/admin/hotelroom/input
@@ -94,7 +79,7 @@ public class HotelRoomController {
         AdminDTO adminDTO = adminService.adminFindEmail(loginEmail);
 
 
-        //여기에 소속되어 있는 보든 리스트 정보 가져 오기
+        //여기에 소속되어 있는 모든 리스트 정보 가져 오기
         Long companyNum =  adminDTO.getCompanyNum();
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
@@ -139,9 +124,9 @@ public class HotelRoomController {
         }
     }
 
+    // list.html - 객실 정보 리스트 페이지
     @GetMapping("/list")
     public String hotelRoomList(Model model,Principal principal,
-                                HotelRoomDTO hotelRoomDTO,
           @PageableDefault(page = 1, size = 20, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
 
     )
@@ -165,7 +150,6 @@ public class HotelRoomController {
 
     //todo:/hotelRoomsByMember/{memberNum}
     //모달 페이지 수정 하기
-
     //modal창에서 호텔룸 수정 페이지
     @PostMapping("/update")
     public String hotelRoomUpdatePost(@RequestParam Long hotelRoomNum,
@@ -246,6 +230,7 @@ public class HotelRoomController {
         return "redirect:/admin/hotelroom/list"; // 수정 후 목록 페이지로 이동하거나 필요에 맞게 수정
     }
 
+    //회원 일시 룸배정 객실 정보 리스트로 보여주는 메소드
     //todo:http://localhost:8090/register-hotelroom
     @GetMapping("/listpage")
     @ResponseBody
