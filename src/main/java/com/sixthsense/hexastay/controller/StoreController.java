@@ -188,6 +188,7 @@ public class StoreController {
         log.info(storeDTO.toString());
         if(bindingResult.hasErrors()){
             log.info("유효성체크");
+            bindingResult.getAllErrors().forEach(log::info);
             model.addAttribute("errmsg","수정에 실패했습니다. 내용을 다시 확인해주세요.");
             return "redirect:/admin/store/modify/"+storeDTO.getStoreNum();
         }

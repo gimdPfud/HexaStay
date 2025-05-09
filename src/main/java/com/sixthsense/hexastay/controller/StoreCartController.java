@@ -31,8 +31,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("/member/store/cart")
 public class StoreCartController {
     private final StorecartService storecartService;
-    private final ZzService zzService;
-    private final OrderstoreService orderstoreService;
+//    private final ZzService zzService;
+//    private final OrderstoreService orderstoreService;
 
     /* 5. 장바구니페이지 이동해서 보기.
            ??......get?*/
@@ -62,19 +62,16 @@ public class StoreCartController {
     /*2. 장바구니 보기 (목록)*/
     @GetMapping("/list")
     public String cartList(Model model, Principal principal, HttpSession session, Locale locale) {
-        log.info("카트리스트 다국어 서비스 진입", locale);
-
+        log.info("카트리스트 다국어 서비스 진입 : "+locale);
         if(principal == null){
             // 기존 로직: 비로그인 시 QR 카메라 페이지로
             return "sample/qrcamera";
         }
-
         Long roomNum = (Long) session.getAttribute("roomNum");
-        if (roomNum == null) {
-            model.addAttribute("errorMessage", "객실 정보가 세션에 없습니다."); // 에러 메시지 전달
-            return "error/error"; // 예시 에러 페이지
-        }
-
+//        if (roomNum == null) {
+//            model.addAttribute("errorMessage", "객실 정보가 세션에 없습니다."); // 에러 메시지 전달
+//            return "error/error"; // 예시 에러 페이지
+//        }
         List<StorecartitemViewDTO> list = storecartService.getCartList(roomNum);
 
         final Long[] totalPrice = {0L};
@@ -94,18 +91,16 @@ public class StoreCartController {
                 }
                 optionMap.put(dto.getStorecartitemNum(), optionList);
             }
-            // 메뉴 가격 계산 부분에서 NullPointerException 발생 가능성 있음 (dto.getStoremenuCount() 또는 dto.getStoremenuPrice()가 null일 경우)
             if (dto.getStoremenuCount() != null && dto.getStoremenuPrice() != null) {
                 totalPrice[0] += (long) dto.getStoremenuCount() * dto.getStoremenuPrice();
             } else {
-                log.warn("StoremenuCount or StoremenuPrice is null for cart item {}", dto.getStorecartitemNum());
+                log.warn("dto 값 오류 {}", dto);
             }
         });
 
         model.addAttribute("optionMap", optionMap);
         model.addAttribute("list", list);
         model.addAttribute("totalPrice", totalPrice[0]);
-        model.addAttribute("isCartEmpty", list.isEmpty());
         model.addAttribute("currentLang", locale.getLanguage());
         log.info("패싱될 다국어 언어 :: {}", locale.getLanguage());
 
