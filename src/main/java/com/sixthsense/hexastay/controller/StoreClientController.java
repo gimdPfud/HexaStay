@@ -43,8 +43,8 @@ public class StoreClientController {
     private final StorecartService storecartService;
 
 
-/* 1. 스토어 목록 보기
-        get. */
+///* 1. 스토어 목록 보기
+//        get. */
 //    @GetMapping("/list")
 //    public String list(Model model, Pageable pageable){
 //        Page<StoreDTO> storeDTOPage = storeService.clientlist(pageable);
@@ -52,7 +52,6 @@ public class StoreClientController {
 //        model.addAttribute("list",storeDTOPage);
 //        return "mobilestore/list";
 //    }
-
 
     @GetMapping("/list")
     public String typelist(@RequestParam(required = false) String type,

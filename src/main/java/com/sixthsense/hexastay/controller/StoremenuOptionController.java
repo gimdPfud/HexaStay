@@ -117,4 +117,30 @@ public class StoremenuOptionController {
         Long storemenuNum = storemenuOptionService.restore(id);
         return "redirect:/admin/store/menu/read/"+storemenuNum;
     }
+
+    //------------ Rest 방식 ------------//
+    @ResponseBody
+    @GetMapping("/del/{id}")
+    public ResponseEntity deleteRest(@PathVariable Long id){
+        try {
+            storemenuOptionService.delete(id);
+        } catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @ResponseBody
+    @GetMapping("/res/{id}")
+    public ResponseEntity restoreRest(@PathVariable Long id){
+        try {
+            storemenuOptionService.restore(id);
+        } catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

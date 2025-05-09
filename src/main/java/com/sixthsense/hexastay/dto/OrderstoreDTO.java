@@ -7,7 +7,9 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ public class OrderstoreDTO {
 
     private Long orderstoreNum;         //pk
     private String orderstoreStatus;    //주문상태
+    @Size(min = 0, max = 500)
     private String orderstoreMessage;   //요청사항
     private LocalDateTime createDate;   //베이스엔티티-생성날짜
     private LocalDateTime modifyDate;   //베이스엔티티-수정날짜

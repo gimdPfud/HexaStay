@@ -59,18 +59,21 @@
                 <div class="mb-3">
                     <label class="form-label">메뉴 옵션 리스트</label>
                     <div class="d-flex flex-column gap-3">
-                        <div class="card p-3 bg-white border" th:each="option : ${data.storemenuOptionDTOList}" style="width: 100%;">
+                        <div class="card p-3 bg-white border" th:each="option, iterStat : ${data.storemenuOptionDTOList}"
+                             th:id="${option.storemenuOptionNum}"
+                             style="width: 100%;">
                             <div class="row align-items-center g-2">
                                 <div class="col-md-5">
                                     <label class="form-label mb-1">옵션명</label>
-                                    <input type="text" class="form-control" th:value="${option.storemenuOptionName}" name="existingOptionNames" readonly>
+                                    <p type="text" class="form-control" th:text="${option.storemenuOptionName}"></p>
                                 </div>
                                 <div class="col-md-5">
                                     <label class="form-label mb-1">옵션 가격</label>
-                                    <input type="number" class="form-control" th:value="${option.storemenuOptionPrice}" name="existingOptionPrices" readonly>
+                                    <p type="number" class="form-control" th:text="${option.storemenuOptionPrice}"></p>
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
-                                    <button type="button" class="btn btn-outline-danger btn-sm ms-4">삭제</button>
+                                    <button type="button" th:onclick="|optiondel(${option.storemenuOptionNum})|"
+                                            class="btn btn-outline-danger btn-sm ms-4">삭제</button>
                                 </div>
                             </div>
                         </div>
@@ -94,7 +97,28 @@
 
     <!-- SCRIPT -->
     <script th:inline="javascript">
-        let indexNum = [[${#lists.size(data.storemenuOptionDTOList)}]];
+
+        function optiondel(oNum) {
+            if(confirm("옵션을 삭제하시겠습니까?")){
+                fetch(`/admin/store/menu/option/del/${oNum}`,{
+                    method: "GET"
+                }).then(response=>{
+                    if(!response.ok){
+                        if(response.status===400){
+                            alert("삭제 중 문제가 발생했습니다.")
+                        }else{
+                            console.log(response.status)
+                            console.log(response.json())
+                        }
+                    }else{
+                        document.getElementById(oNum).remove();
+                    }
+                })
+            }
+        }
+
+
+        let indexNum = 0;
 
         function addStoreMenuOptionInputs() {
             const template = `

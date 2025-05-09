@@ -7,6 +7,8 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,27 +22,20 @@ import java.time.LocalDateTime;
 public class OrderstoreitemDTO {
 
     private Long orderstoreitemNum; //pk
-    //주문한 메뉴 양
-    private Long orderstoreitemAmount;
-    //주문한 메뉴 가격
-    private Long orderstoreitemPrice;
-    //주문한 메뉴들의 총가격
-    private Long orderstoreitemTotalPrice;
 
-    //외부업체 상품판매일
-    private LocalDateTime createDate;
-
-    //외부업체 상품 수정일자
-    private LocalDateTime modifyDate;
-
-    //*********************************
-    //외부업체 상품 가져올 PK - Storemenu
+    private Long orderstoreNum;
     private StoremenuDTO storemenuDTO;
 
-    //**********************************
-    //멤버 정보를 가져올 PK - orderstoreNum
-    private Long orderstoreNum;
+    @NotNull
+    @Min(1)
+    private Long orderstoreitemAmount;
+    private Long orderstoreitemPrice;
+    private Long orderstoreitemTotalPrice;
 
     private String storemenuOptions;
+
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
+
 
 }

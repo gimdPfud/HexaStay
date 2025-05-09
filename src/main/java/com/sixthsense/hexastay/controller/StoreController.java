@@ -12,12 +12,14 @@ import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -68,9 +70,12 @@ public class StoreController {
     }
 
     @PostMapping("/insert")
-    public String insert(StoreDTO storeDTO) throws IOException {
-//        log.info("등록post : "+storeDTO);
-        //todo <option selected>검색 조건</option> -> <option value="전체" selected>검색 조건</option>
+    public String insert(@Valid StoreDTO storeDTO, BindingResult bindingResult) throws IOException {
+        if(bindingResult.hasErrors()){
+            log.info("유효성오류발생");
+            bindingResult.getAllErrors().forEach(log::info);
+            return "redirect:/admin/store/insert";
+        }
         storeService.insert(storeDTO);
         return "redirect:/admin/store/list";
     }
