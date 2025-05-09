@@ -139,12 +139,17 @@
                                 <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
                             </strong>
                             </div>
-                            <div class="card-body">
-                               <span th:if="${order.discountedPrice != null}">
-                                   <strong style="color: #f75b5b;" th:text="#{orderList.discountedPrice}"></strong>
-                                   <span th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|"></span>
-                               </span>
+                            <div class="d-flex align-items-center">
+                                <div th:if="${order.discountedPrice != null}" class="d-flex justify-content-between text-end w-100">
+                                    <!-- 왼쪽 텍스트 -->
+                                    <strong class="text-danger ">할인 적용 금액:</strong>
+                                    <!-- 오른쪽 가격 -->
+                                    <span class="fw-bold ms-auto"
+                                          th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|">
+                                    </span>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </li>
@@ -162,21 +167,29 @@
 
         <!-- 주문 내역이 있을 때만 페이지네이션 출력 -->
         <nav th:if="${!orderList.isEmpty()}">
-            <ul class="pagination justify-content-center align-items-center mt-3">
+            <ul class="pagination justify-content-center align-items-center mt-3"
+                th:with="start=${T(java.lang.Math).max(1, currentPage - 1)},
+                end=${T(java.lang.Math).min(totalPages, currentPage + 1)}"
+                th:if="${totalPages > 1}">
+
+                <!-- 처음 -->
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo; <span th:text="#{pagination.first}"></span></a>
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo;</a>
                 </li>
-                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}" th:text="#{pagination.previous}"></a>
+
+                <!-- 중앙 페이징 (pageIndex는 반드시 with로 추출해야 안전) -->
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(start, end)}"
+                    th:with="pageIndex=${i - 1}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/roommenu/orderList(page=${pageIndex})}"
+                       th:text="${i}"></a>
                 </li>
-                <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=${i - 1})}" th:text="${i}"></a>
-                </li>
+
+                <!-- 마지막 -->
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}" th:text="#{pagination.next}"></a>
-                </li>
-                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}"><span th:text="#{pagination.last}"></span> &raquo;</a>
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">&raquo;</a>
                 </li>
             </ul>
         </nav>
