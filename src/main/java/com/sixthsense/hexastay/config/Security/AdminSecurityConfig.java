@@ -50,7 +50,8 @@ public class AdminSecurityConfig {
                 .authenticationManager(authManager)
                 .userDetailsService(adminDetailsService)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login", "/admin/encrypt-admin-password", "/admin/create-admin").permitAll()
+                        .requestMatchers("/admin/login", "/admin/encrypt-admin-password", "/admin/create-admin",
+                                "/admin/verify-identity", "/admin/verify-code", "/admin/reset-password").permitAll()
                         .requestMatchers(("/ws-order-alert/**")).permitAll()
                         .anyRequest().authenticated()
                 )

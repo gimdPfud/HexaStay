@@ -9,6 +9,8 @@ import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
+import com.sixthsense.hexastay.service.EmailService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,8 +32,9 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -45,6 +48,8 @@ public class AdminController {
     private final CompanyRepository companyRepository;
     private final StoreRepository storeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final HttpServletRequest request;
+    private final EmailService emailService;
 
 
     // 시큐리티 체크
@@ -73,8 +78,8 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public String adminLoginPost () {
-        return "/admin/login";
+    public String adminLoginPost() {
+        return "redirect:/admin/main";
     }
 
 
@@ -432,6 +437,88 @@ public class AdminController {
         } catch (Exception e) {
             log.error("마이페이지 접근 중 오류 발생: ", e);
             return "redirect:/admin/logout";
+        }
+    }
+
+    @PostMapping("/verify-identity")
+    @ResponseBody
+    public ResponseEntity<?> verifyIdentity(@RequestParam("adminName") String name,
+                                          @RequestParam("adminEmployeeNum") String employeeNum,
+                                          @RequestParam("adminResidentNum") String birth) {
+        try {
+            log.info("본인 확인 요청 - 이름: {}, 사번: {}, 생년월일: {}", name, employeeNum, birth);
+            
+            Admin admin = adminRepository.findByAdminNameAndAdminEmployeeNumAndAdminResidentNumStartingWith(
+                name, employeeNum, birth);
+            
+            if (admin == null) {
+                log.info("일치하는 정보 없음");
+                return ResponseEntity.ok(Map.of("success", false, "message", "일치하는 정보가 없습니다."));
+            }
+
+            // 인증번호 생성 및 이메일 전송
+            String verificationCode = String.format("%06d", (int)(Math.random() * 1000000));
+            emailService.sendVerificationCode(admin.getAdminEmail(), verificationCode);
+            
+            // 세션에 인증번호 저장
+            HttpSession session = request.getSession();
+            session.setAttribute("verificationCode", verificationCode);
+            session.setAttribute("adminEmail", admin.getAdminEmail());
+            
+            log.info("본인 확인 성공 - 이메일: {}", admin.getAdminEmail());
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            log.error("본인 확인 중 오류 발생: ", e);
+            return ResponseEntity.ok(Map.of("success", false, "message", "본인 확인 중 오류가 발생했습니다."));
+        }
+    }
+
+    @PostMapping("/verify-code")
+    @ResponseBody
+    public ResponseEntity<?> verifyCode(@RequestParam String verificationCode) {
+        try {
+            HttpSession session = request.getSession();
+            String savedCode = (String) session.getAttribute("verificationCode");
+            
+            if (savedCode == null || !savedCode.equals(verificationCode)) {
+                return ResponseEntity.ok(Map.of("success", false, "message", "인증번호가 일치하지 않습니다."));
+            }
+            
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            log.error("인증번호 확인 중 오류 발생: ", e);
+            return ResponseEntity.ok(Map.of("success", false, "message", "인증번호 확인 중 오류가 발생했습니다."));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public ResponseEntity<?> resetPassword(@RequestParam String newPassword,
+                                         @RequestParam String confirmPassword) {
+        try {
+            if (!newPassword.equals(confirmPassword)) {
+                return ResponseEntity.ok(Map.of("success", false, "message", "비밀번호가 일치하지 않습니다."));
+            }
+            HttpSession session = request.getSession();
+            String adminEmail = (String) session.getAttribute("adminEmail");
+            if (adminEmail == null) {
+                return ResponseEntity.ok(Map.of("success", false, "message", "세션이 만료되었습니다."));
+            }
+            AdminDTO adminDTO = adminService.adminFindEmail(adminEmail);
+            if (adminDTO == null) {
+                return ResponseEntity.ok(Map.of("success", false, "message", "사용자를 찾을 수 없습니다."));
+            }
+            // 비밀번호 변경
+            adminDTO.setAdminPassword(passwordEncoder.encode(newPassword));
+            adminService.adminUpdate(adminDTO);
+
+            session.removeAttribute("verificationCode");
+            session.removeAttribute("adminEmail");
+
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            log.error("비밀번호 변경 중 오류 발생: ", e);
+            return ResponseEntity.ok(Map.of("success", false, "message", "비밀번호 변경 중 오류가 발생했습니다."));
         }
     }
 
