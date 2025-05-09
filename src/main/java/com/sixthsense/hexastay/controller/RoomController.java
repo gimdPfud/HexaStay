@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -188,7 +188,9 @@ public class RoomController {
      */
     //todo:http://localhost:8090/member-insertroom
     @GetMapping("/member-insertroom")
-    public String insertMemberGet(Model model,@PageableDefault(page=1)Pageable pageable) {
+    public String insertMemberGet(Model model,@PageableDefault(page=1)Pageable pageable)
+
+    {
         Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList(pageable); // 호텔룸 목록 조회
         model.addAttribute("hotelRoomList", hotelRoomList); // hotelRoomList를 모델에 추가
         model.addAttribute("memberDTO", new MemberDTO());
@@ -200,10 +202,14 @@ public class RoomController {
      */
     //todo:http://localhost:8090/member-insertroom
     @PostMapping("/member-insertroom")
-    public String registerMember(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
+    public String registerMember(@ModelAttribute MemberDTO memberDTO,
+                                 RedirectAttributes redirectAttributes,
+                                HotelRoomDTO hotelRoomDTO) {
+
+
         try {
             // 호텔룸 정보 가져오기
-            HotelRoomDTO hotelRoomDTO = new HotelRoomDTO();
+
             hotelRoomDTO.setHotelRoomNum(memberDTO.getHotelRoomNum()); // 회원이 선택한 호텔룸 번호 세팅
 
             log.info("회원 등록 요청 - 회원: {}, 배정 객실: {}", memberDTO.getMemberName(), hotelRoomDTO.getHotelRoomNum());
@@ -213,6 +219,7 @@ public class RoomController {
 
             redirectAttributes.addFlashAttribute("message", "회원이 성공적으로 객실에 배정되었습니다.");
             return "redirect:/member-insertroom"; // 성공 시 다시 등록 페이지로 이동
+
         } catch (Exception e) {
             log.error("회원 등록 실패: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", "회원 등록 실패");

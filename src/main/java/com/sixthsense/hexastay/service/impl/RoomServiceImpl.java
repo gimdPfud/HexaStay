@@ -1,6 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.beust.ah.A;
+
 import com.sixthsense.hexastay.config.Security.CustomMemberDetails;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
@@ -8,13 +8,12 @@ import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.entity.RoomService;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Email;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -32,20 +31,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.security.Principal;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import jakarta.servlet.http.HttpSession;
 
+//todo: DB 명 _ Room
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class RoomServiceImpl {
-    //todo: DB 명 _ Room
+
 
     //시큐리티에 있는 함수 및 클래스
     private final AuthenticationManager authenticationManager;
@@ -119,7 +117,7 @@ public class RoomServiceImpl {
 
     //todo: [[Member_PK]] 기준으로 hotelroom FK 를 등록 하는 메서드
     //todo:http://localhost:8090/register-hotelroom
-    //RoomController
+    //RoomController - 예약 등록
     @Transactional
     public void memberPkRoominsert(MemberDTO memberDTO, HotelRoomDTO hotelRoomDTO) throws MessagingException {
         // 1️⃣ 회원 정보 조회
@@ -128,11 +126,7 @@ public class RoomServiceImpl {
 
         HotelRoom hotelRoom =
                 hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum()).orElseThrow(EntityNotFoundException::new);
-        // 2️⃣ 호텔룸 저장 (Member와 연결)
-//        HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
-//        hotelRoom.setMember(member); // 회원과 연결
-//        hotelRoom = hotelRoomRepository.save(hotelRoom);
-//        log.info("호텔룸 저장 완료 - 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
         LocalDateTime checkInDateTime = LocalDateTime.from(hotelRoomDTO.getCheckInDate());
@@ -143,11 +137,14 @@ public class RoomServiceImpl {
                 .member(member)
                 .checkInDate(checkInDateTime)
                 .checkOutDate(checkOutDateTime)
+                /* fixme: 예약 테이블에서 표시 여부  VISIBLE(표시), HIDDEN(숨기기) 초기 값은 String "VISIBLE" 설정*/
+                .roomDisplayStatus("VISIBLE")
                 .roomPassword(memberDTO.getRoomPassword())
                 .build();
         roomRepository.save(room);
 
         // 5️⃣ 이메일 발송
+        //room 테이블에서 저장후에 room 안에 memberFK 기준으로 찾아와서 멤버의 이메일로 이메이 발송
         try {
             // ✅ room 기준으로 mailService 호출
             mailService.sendRoomReservationEmail(room);
@@ -168,7 +165,7 @@ public class RoomServiceImpl {
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomDTO.getHotelRoomNum())
                 .orElseThrow(() -> new EntityNotFoundException("호텔룸 정보 없음 - 호텔룸 번호: " + hotelRoomDTO.getHotelRoomNum()));
 
-        // 2️⃣ 회원 저장 (호텔룸과 연결)
+        // 2️⃣ 비회원 저장 (호텔룸과 연결)
         Member member = modelMapper.map(memberDTO, Member.class);
         member = memberRepository.save(member);
         log.info("회원 저장 완료 - 번호: {}", member.getMemberNum());
@@ -188,6 +185,10 @@ public class RoomServiceImpl {
                 .member(member)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkOutDate)
+
+                /* todo: 예약 테이블에서 표시 여부  VISIBLE(표시), HIDDEN(숨기기) 초기 값은 String "VISIBLE" 설정*/
+                .roomDisplayStatus("VISIBLE")
+
                 .roomPassword(memberDTO.getRoomPassword()) // ✅ 추가된 부분
                 .build();
         log.info("체크인: {}, 체크아웃: {}", checkInDate, checkOutDate);

@@ -55,7 +55,7 @@
             <span th:text="${error}"></span>
         </div>
 
-        <!-- 검색 폼 Roomcontroll 에 getmapping-->
+        <!-- 검색 필수 페이지 링크에 들어 가서 검색 Roomcontroll 에 getmapping-->
         <div th:switch="${currentStatus}">
             <!-- checkin 상태 -->
             <form th:case="'checkin'" method="get" th:action="@{/roomlist/checkin}" class="d-flex align-items-end gap-2">
@@ -443,7 +443,7 @@
         }
 
 
-        /*체크인 체크아웃 변경 버튼*/
+        /*체크인 체크아웃 변경 버튼 todo:HotelRoomConroller */
         function roomStatusUpdate(element) {
             const hotelRoomNum = element.getAttribute("data-hotelRoomNum");
             const status = element.getAttribute("data-status");

@@ -58,10 +58,12 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // 어드민 조회용
-    private final AdminRepository adminRepository;
     private final CompanyRepository companyRepository;
 
-    private final QrCodeServiceimpl qrCodeServiceimpl;
+    //QR 메서드 호츨 하기
+    private final QrCodeGeneratorService qrCodeGeneratorService;
+
+
 
 
 
@@ -83,7 +85,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
 
     //todo: 메소드 예외 처리는 추후에 할 예정 입니다.
-
     //******************************//
     //1-1.void 방식의 메서드 체이닝을 이용한 등록 메서드
     @Override
@@ -163,7 +164,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         hotelRoom.setCompany(company); // 찾은 회사 정보를 호텔방에 다시 넣어줌
 
         // 일단 호텔방 정보를 DB에 저장 (PK 값 생김)
-        hotelRoomRepository.save(hotelRoom);
+        hotelRoom = hotelRoomRepository.save(hotelRoom);
+
         log.info("호텔룸 정보 저장 완료: {}", hotelRoomDTO.getHotelRoomProfile());
 
         // 만약 이미지 파일이 있다면, 저장 처리를 시작함
@@ -182,6 +184,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             // 이미지 파일을 저장할 경로 지정
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "hotelroom/" + fileName);
             Path createPath = Paths.get(System.getProperty("user.dir"), "hotelroom/");
+
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath); // 폴더 없으면 새로 만들기
             }
@@ -193,38 +196,29 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 이미지 경로를 실제 Entity에도 넣어주기
         hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
 
-        try {
-            // ✅ QR 코드 만들기 시작!
-            // QR 코드에 넣을 URL 주소 (핸드폰으로 찍으면 이 주소로 이동함)
-            String qrText = "localhost:8090/qr/" + hotelRoomDTO.getHotelRoomNum();; // 👉 여기 나중에 진짜 URL로 바꾸면 됨!
+        log.info(hotelRoom.getHotelRoomNum() + "몇번의 호텔룸 pk 가 들어 오고 있는거야 ");
 
-            // QR 코드 이미지 파일 이름 만들기 (ex. 방이름_qr.png)
-            String fileName = hotelRoom.getHotelRoomName() + "_qr.png";
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "qrfile/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "qrfile/");
-            if (!Files.exists(createPath)) {
-                Files.createDirectory(createPath); // 폴더 없으면 만들기
+
+        try {
+            Long roomNum = hotelRoom.getHotelRoomNum();
+            if (roomNum == null) {
+                throw new IllegalStateException("호텔룸 번호가 null입니다. QR 코드 생성 불가.");
             }
 
-            log.info(fileName + " 파일 네임 경로 까지는 들어 와 지니 ??????");
+            String qrText = "http://localhost:8090/" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
-            // QR 코드 만들기 도구로 이미지 생성
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300); // QR 크기 300x300
-            Path path = uploadPath;
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path); // QR 코드를 파일로 저장
+            log.info("QR 인코딩용 최종 경로: {}", qrText);
 
-            log.info(path + "파일 생성은 되고 있는 거냐 있냐고 ~~~~~~~");
+            //QR  메소드를 활용 해서 Web 인코딩 경로 만 Service 에서만 지정 파라미터를 Qrcode 생성 메소드에 추가 하기
+            String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName());
 
-            // QR 이미지 파일 경로를 DB에 저장할 수 있게 세팅
-            hotelRoom.setHotelRoomQr(fileName);
-
-            // QR 이미지까지 포함된 호텔방 정보 다시 저장
+            hotelRoom.setHotelRoomQr(qrPath);  // ✅ 이미 /qrfile/파일명.png 형식
             hotelRoomRepository.save(hotelRoom);
 
+            log.info("QR 코드 생성 완료 및 저장: {}", qrPath);
+
         } catch (Exception e) {
-            // QR 코드 만들다가 에러나면 알려주기
-            throw new RuntimeException("호텔 룸 등록 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("QR 코드 생성 중 오류 발생: " + e.getMessage(), e);
         }
 
         // 다시 한번 전체 정보 저장 (이미 PK가 있어서 update처럼 동작함)
@@ -358,8 +352,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             hotelRoom.setHotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta());
         }
 
-        // 6. QR코드 삭제 후 재생성
-        String oldQrFile = hotelRoom.getHotelRoomQr(); // 💡 기존 QR 경로 미리 저장
+        // 6. 기존 QR 파일 삭제
+        String oldQrFile = hotelRoom.getHotelRoomQr();
         if (oldQrFile != null) {
             Path oldQrPath = Paths.get(System.getProperty("user.dir"), oldQrFile.startsWith("/") ? oldQrFile.substring(1) : oldQrFile);
             try {
@@ -370,20 +364,18 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             }
         }
 
-        // QR 코드 재생성
-        String qrText = "localhost:8090/qr/" + hotelRoomDTO.getHotelRoomNum();
-        String qrFileName = hotelRoom.getHotelRoomName() + "_qr.png";
-        Path newQrPath = Paths.get(System.getProperty("user.dir"), "qrfile", qrFileName);
-        Files.createDirectories(newQrPath.getParent());
-
+        // 7. QR 코드 재생성 (service 사용)
         try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 300, 300);
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", newQrPath);
+            String qrText = "http://localhost:8090/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
-            hotelRoom.setHotelRoomQr("/qrfile/" + qrFileName); // 새 경로 저장
+            /*QR 생성 모듈화 클래스 */
+            String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
+
+            hotelRoom.setHotelRoomQr(qrPath); // 새 QR 경로 저장
+            log.info("새 QR 코드 생성 완료: {}", qrPath);
+
         } catch (Exception e) {
-            throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage());
+            throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage(), e);
         }
 
         // 7. 저장
