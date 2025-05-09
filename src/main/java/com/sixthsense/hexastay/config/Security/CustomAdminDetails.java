@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.config.Security;
 
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.enums.AdminRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -106,5 +107,11 @@ public class CustomAdminDetails implements UserDetails, Principal {
     @Override
     public String getName() {
         return getUsername();
+    }
+
+    public String getAdminRoleKorean() {
+        return Optional.ofNullable(getAdminRole())
+                .map(AdminRole::displayNameFromCode)
+                .orElse("알 수 없음");
     }
 }
