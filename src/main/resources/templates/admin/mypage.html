@@ -139,7 +139,7 @@
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
                     <button type="submit" onclick="submitForm(event)" class="btn btn-success">수정</button>
-                    <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
+                    <button type="button" class="btn btn-danger" onclick="history.back()">취소</button>
                 </div>
             </div>
             <input hidden type="text" name="adminPassword" class="form-control">

@@ -94,7 +94,9 @@
     <div class="container">
 
         <div th:if="${orderList.isEmpty()}">
-            <div class="alert alert-info text-center" th:text="#{orderList.noOrders}"></div>
+            <div style="background-color: #f8f9fa; color: #333; padding: 1rem; text-align: center;">
+                <span th:text="#{orderList.noOrders}"></span>
+            </div>
         </div>
 
         <div th:each="order : ${orderList}" class="card mt-4">
