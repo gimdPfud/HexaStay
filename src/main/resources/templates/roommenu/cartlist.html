@@ -204,7 +204,7 @@
 <div layout:fragment="contentorderA">
     <div class="container ">
 
-        <div th:if="${isCartEmpty}" class="container" style="text-align:center; padding: 50px; color: #888;">
+        <div th:if="${isCartEmpty}" style="text-align: center; padding: 50px;">
             <div th:text="#{cart.emptyMessage}"></div>
         </div>
 
@@ -251,7 +251,6 @@
                                 <span style="font-size: 0.9em; color: #888;" th:text="#{cart.option.none}"></span>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="col-2 button-container">

@@ -127,9 +127,16 @@
                                 <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
                             </div>
 
+                            <!-- 옵션이 있을 경우 표시, 없으면 자동 줄바꿈 -->
                             <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
-                                 class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
+                                 class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em; flex-wrap: wrap;">
                                 <span th:utext="${#strings.replace(item.roomMenuSelectOptionName, ',', '<br>')}" class="flex-grow-1"></span>
+                            </div>
+
+                            <!-- 옵션이 없으면 빈 공간 추가 -->
+                            <div th:unless="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
+                                 class="d-flex mb-1" style="height: 1.5rem;">
+                                &nbsp; <!-- 빈 공간을 유지 -->
                             </div>
 
                             <div class="d-flex align-items-center mb-1">
@@ -137,25 +144,24 @@
                                 <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}"></strong> <span class="flex-grow-1"></span> <strong>
-                                <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
-                            </strong>
+                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}"></strong>
+                                <span class="flex-grow-1"></span>
+                                <strong>
+                                    <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
+                                </strong>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <div th:if="${order.discountedPrice != null}" class="d-flex justify-content-between text-end w-100">
-                                    <!-- 왼쪽 텍스트 -->
-                                    <strong class="text-danger ">할인 적용 금액:</strong>
-                                    <!-- 오른쪽 가격 -->
-                                    <span class="fw-bold ms-auto"
-                                          th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|">
-                                    </span>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </li>
             </ul>
+
+
+            <div th:if="${order.discountedPrice != null}" class="d-flex align-items-center mt-2">
+                <strong class="text-danger" style="margin-left: 107px; min-width: 105px; line-height: 1.5; margin-bottom: 5px;">할인 적용 금액:</strong>
+                <div class="text-danger fw-bold" style="margin-left: auto; margin-right: 15px; line-height: 1.5;">
+                    <span th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|"></span>
+                </div>
+            </div>
 
             <div class="card-footer text-muted text-end">
                 <small>
