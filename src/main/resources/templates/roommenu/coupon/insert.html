@@ -23,50 +23,31 @@
         h1 { font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; color: #333; }
         .card-body .btn { width: 100%; margin-bottom: 0.75rem; }
 
-        /* 나의 발급 쿠폰 섹션 스타일 */
-        #myCouponsSection {
-            /* .card 및 .mt-4 스타일 사용 */
+        #success-message {
+            background-color: #007bff;  /* 기존 파란색 배경 */
+            color: white;  /* 흰색 텍스트 */
+            border: 1px solid #007bff;  /* 동일한 색상으로 연하게 변경 */
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+            text-align: center;
+            white-space: pre-line;
+            opacity: 0.8;  /* 전체적인 투명도를 조금 낮춰 연하게 표시 */
         }
 
-        #myCouponsSection .card-title {
-            font-size: 1.5rem;
-            border-bottom: 1px solid #eee; /* 제목 아래 옅은 선 */
-            padding-bottom: 10px;
-        }
-
-        #myCouponsList {
-            /* Bootstrap list-group-flush 사용 */
-        }
-
-        #myCouponsList .list-group-item {
-            /* Bootstrap list-group-item 스타일 사용 */
-            border-bottom: 1px solid #eee; /* 아이템 구분선 */
-            padding: 15px;
-        }
-
-        #myCouponsList .list-group-item:last-child {
-            border-bottom: none; /* 마지막 아이템은 아래 선 없음 */
-        }
-
-        #myCouponsList .list-group-item strong {
-            /* 라벨 스타일 */
-            margin-right: 5px;
-            color: #555; /* 라벨 색상 */
-        }
-
-        #myCouponsList .list-group-item div {
-            margin-bottom: 5px; /* 아이템 내 각 줄 사이 간격 */
-        }
-
-        #myCouponsList .list-group-item div:last-child {
-            margin-bottom: 0; /* 마지막 줄은 간격 없음 */
-        }
-
-        #myCouponsList .list-group-item small {
-            display: block;
-            margin-top: 5px; /* 작은 텍스트 위 간격 */
-            color: #888; /* 작은 텍스트 색상 */
-            font-size: 0.8em; /* 작은 텍스트 크기 */
+        #error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+            text-align: center;  /* 중앙 정렬 */
+            white-space: pre-line;  /* 줄바꿈 허용 */
         }
 
         .back-to-list-btn {
@@ -79,39 +60,126 @@
             width: 117.25px;
             height: 38px;
         }
+
+        .btn-outline-blue1 {
+            background-color: white;
+            color: #4A90E2;
+            border: 2px solid #4A90E2;
+        }
+
+        .btn-outline-blue2 {
+            background-color: white;
+            color: #5CACEB;
+            border: 2px solid #5CACEB;
+        }
+
+        .btn-outline-blue3 {
+            background-color: white;
+            color: #7FB3E6;
+            border: 2px solid #7FB3E6;
+        }
+
+        .btn-outline-blue1, .btn-outline-blue2, .btn-outline-blue3 {
+            border-radius: 8px;
+            font-weight: bold;
+            padding: 10px 0;
+            width: 100%;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .btn-outline-blue1 small,
+        .btn-outline-blue2 small,
+        .btn-outline-blue3 small {
+            color: inherit;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            font-weight: bold;
+            padding: 10px 0;
+        }
+
+        .btn-blue-main {
+            background-color: #77b1fb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 48%;
+            height: 45px;
+            font-size: 1rem;
+        }
+
+        .btn-group-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 3%;
+            margin-top: 0.5rem; /* 더 위로 붙게 만듦 */
+        }
+
+        .btn:hover,
+        .btn-blue-main:hover,
+        .back-to-list-btn:hover {
+            /* 제거 또는 hover 시 변경이 없도록 */
+            background-color: inherit;
+            color: inherit;
+        }
+
+        .card-footer {
+            background-color: transparent !important;
+            border-top: none !important;
+        }
+
     </style>
 </head>
 <body>
 <div layout:fragment="contentorderA">
     <div class="container">
+        <div style="text-align:center; font-size: 1.25rem; font-weight: bold; margin: 1.5rem 0 0.5rem 0; color: #333;">
+            쿠폰 발급
+        </div>
+
+        <!-- 오류 메시지를 표시할 영역 -->
+        <div id="error-message"></div>
+
+        <!-- 성공 메시지를 표시할 영역 추가 -->
+        <div id="success-message"></div>
+
         <div class="card">
             <div class="card-body">
-                <h1>쿠폰 발급</h1>
                 <div class="mb-3">
                     <label for="email" class="form-label">이메일 입력</label>
                     <input type="email" class="form-control" id="email" placeholder="your@email.com">
                 </div>
-                <button type="button" class="btn btn-warning" onclick="createCoupon('가입쿠폰')">
-                    신규 가입 쿠폰 (20% 할인) <br><small>계정당 최초 1개</small>
+                <button type="button" class="btn-outline-blue1" onclick="createCoupon('가입쿠폰')">
+                    신규 가입 쿠폰 (20% 할인)<br><small style="font-size: 0.7em;">계정당 최초 1개</small>
                 </button>
-                <button type="button" class="btn btn-success" onclick="createCoupon('멤버쿠폰')">
-                    회원 쿠폰 (5% 할인) <br><small>무제한</small>
+
+                <button type="button" class="btn-outline-blue2" onclick="createCoupon('멤버쿠폰')">
+                    회원 쿠폰 (5% 할인)<br><small style="font-size: 0.7em;">무제한</small>
                 </button>
-                <button type="button" class="btn btn-info" onclick="createCoupon('이벤트쿠폰')">
-                    이벤트 쿠폰 (15% 할인) <br><small>최대 3개</small>
+
+                <button type="button" class="btn-outline-blue3" onclick="createCoupon('이벤트쿠폰')">
+                    이벤트 쿠폰 (15% 할인)<br><small style="font-size: 0.7em;">최대 3개</small>
                 </button>
-            </div> <div class="card-footer text-center">
-            <button type="button" class="btn btn-primary" onclick="fetchAndDisplayMyCoupons()">보유중인 쿠폰</button>
-            <button class="back-to-list-btn" onclick="window.location.href='/roommenu/orderpage'">주문하러 가기</button>
+            </div>
+            <div class="card-footer text-center">
+                <div class="btn-group-row">
+                    <button type="button" class="btn-blue-main" onclick="fetchAndDisplayMyCoupons()">보유중인 쿠폰</button>
+                    <button class="btn-blue-main" onclick="window.location.href='/roommenu/orderpage'">주문하러 가기</button>
+                </div>
+            </div>
         </div>
 
-        </div> <div id="myCouponsSection" class="card mt-4" style="display: none;">
-        <div class="card-body">
-            <h2 class="card-title text-center mb-3">내 쿠폰</h2>
-            <ul id="myCouponsList" class="list-group list-group-flush">
-            </ul>
+        <div id="myCouponsSection" class="card mt-4" style="display: none;">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-3">내 쿠폰</h2>
+                <ul id="myCouponsList" class="list-group list-group-flush"></ul>
+            </div>
         </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -131,41 +199,61 @@
             return mapping[type];
         }
 
-        // createCoupon 함수 (이전에 수정한 내용)
-        function createCoupon(type) { // 할인율 파라미터 제거
+        // createCoupon 함수
+        // createCoupon 함수
+        // 기존의 alert 대신 error-message 영역에 메시지를 표시하도록 변경
+        function createCoupon(type) {
             const email = document.getElementById('email').value;
+            const successMessageDiv = document.getElementById('success-message');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            successMessageDiv.style.display = 'none';
+            errorMessageDiv.style.display = 'none';
+
+            // 이메일 입력이 비어있다면 오류 메시지 표시
             if (!email) {
-                alert("이메일을 입력해주세요!");
+                errorMessageDiv.style.display = 'block';
+                errorMessageDiv.textContent = "❌ 이메일을 입력해주세요!";
                 return;
             }
+
+            errorMessageDiv.style.display = 'none'; // 이전에 표시된 오류 메시지 숨기기
 
             const mappedType = mapCouponType(type);
             if (mappedType === null) {
-                alert("❌ 알 수 없는 쿠폰 타입입니다.");
+                errorMessageDiv.style.display = 'block';
+                errorMessageDiv.textContent = "❌ 알 수 없는 쿠폰 타입입니다.";
                 return;
             }
 
-            fetch('/roommenu/coupon/exists', {
+            return fetch('/roommenu/coupon/exists', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
             })
                 .then(res => {
-                    if (!res.ok) { return res.json().then(err => { throw new Error(err.error || `회원 확인 실패 (${res.status})`); }); }
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.error || `회원 확인 실패 (${res.status})`); });
+                    }
                     return res.json();
                 })
                 .then(data => {
                     if (!data.exists) {
-                        alert("❌ 존재하지 않는 이메일입니다. 회원만 쿠폰을 받을 수 있어요.");
+                        errorMessageDiv.style.display = 'block';
+                        errorMessageDiv.innerHTML = "❌ 존재하지 않는 이메일입니다.<br>회원만 쿠폰을 받을 수 있어요.";
                         return Promise.reject(new Error("회원 정보 없음"));
                     }
+
                     if (mappedType === 'SIGNUP') {
                         return fetch(`/roommenu/coupon/already-issued?email=${email}&couponType=${mappedType}`)
                             .then(res => {
-                                if (!res.ok) { return res.json().then(err => { throw new Error(err.error || `중복 확인 실패 (${res.status})`); }); }
+                                if (!res.ok) {
+                                    return res.json().then(err => { throw new Error(err.error || `중복 확인 실패 (${res.status})`); });
+                                }
                                 return res.json();
                             })
                             .then(dupCheck => {
                                 if (dupCheck.issued) {
-                                    alert("❌ 이미 발급된 가입쿠폰입니다.");
+                                    errorMessageDiv.style.display = 'block';
+                                    errorMessageDiv.textContent = "❌ 이미 발급된 가입쿠폰입니다.";
                                     throw new Error("중복된 가입쿠폰");
                                 }
                                 return Promise.resolve();
@@ -176,11 +264,8 @@
                 .then(() => {
                     const couponData = {
                         memberEmail: email,
-                        couponType: mappedType, // CouponType enum 상수 이름 (예: "SIGNUP")
-                        // 할인율은 백엔드에서 결정하므로 여기서 보내지 않음
-                        // 만료일도 백엔드에서 결정하게 하는 것이 더 안전할 수 있습니다. (여기서는 그대로 보냄)
+                        couponType: mappedType,
                         expirationDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
-                        // isGuest, used, repeatCouponCount, usedTime 등 DTO 필드는 백엔드 요구사항에 따라 추가
                     };
 
                     return fetch('/roommenu/coupon/insert', {
@@ -190,8 +275,8 @@
                 .then(res => {
                     if (res.ok) {
                         return res.text().then(msg => {
-                            alert(`✅ ${type} 발급 완료: ${msg}`);
-                            // 발급 성공 후 발급된 쿠폰 목록 새로고침
+                            successMessageDiv.style.display = 'block';  // 메시지 보이게 설정
+                            successMessageDiv.innerHTML = `✅ ${type} 발급 완료: <br> ${msg}`;
                             fetchAndDisplayMyCoupons();
                         });
                     } else {
@@ -206,15 +291,17 @@
                     console.error("쿠폰 발급 최종 실패 처리:", err);
                     const errorMessage = err.message;
 
-                    if (errorMessage && errorMessage.includes(" 쿠폰은 최대 ") && errorMessage.includes("개까지 발급 가능합니다.")) {
-                        alert("❌ 발급 실패: " + errorMessage);
-                    } else if (errorMessage === '중복된 가입쿠폰') {
-                        alert("❌ 발급 실패: 이미 발급된 가입쿠폰입니다.");
-                    } else if (errorMessage !== "회원 정보 없음") {
-                        alert("❌ 쿠폰 발급 중 오류 발생: " + errorMessage);
+                    if (err.message && err.message.includes("중복된 가입쿠폰")) {
+                        errorMessageDiv.textContent = "❌ 발급 실패: 이미 발급된 가입쿠폰입니다.";
+                    } else if (err.message && err.message.includes("회원 정보 없음")) {
+                        errorMessageDiv.innerHTML = "❌ 존재하지 않는 이메일입니다.<br>회원만 쿠폰을 받을 수 있어요.";
+                    } else {
+                        errorMessageDiv.textContent = `❌ 쿠폰 발급 중 오류 발생: ${err.message}`;
                     }
                 });
         }
+
+
 
 
         /* 쿠폰 조회 및 표시 토글 */
@@ -224,22 +311,17 @@
 
             if (myCouponsSection && myCouponsSection.style.display !== 'none') {
                 myCouponsSection.style.display = 'none';
-                console.log("내 쿠폰 목록 숨김 처리."); // 디버깅 로그
-                return; // 숨긴 후 함수 종료
-            }
-            // >>> **추가된 로직 끝** <<<
-
-
-            // 목록 섹션이 숨김 상태이면 쿠폰을 가져와서 표시합니다.
-            console.log("내 쿠폰 목록 표시 요청."); // 디버깅 로그
-
-            const email = document.getElementById('email').value; // 이메일 입력 필드에서 이메일 가져오기
-            if (!email) {
-                alert("쿠폰을 조회할 이메일을 입력하세요.");
+                console.log("내 쿠폰 목록 숨김 처리.");
                 return;
             }
 
-            // Fetch coupons
+            const email = document.getElementById('email').value;
+            if (!email) {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = "❌ 쿠폰을 조회할 이메일을 입력하세요.";
+                return;
+            }
+
             fetch(`/roommenu/coupon/list?email=${encodeURIComponent(email)}`)
                 .then(res => {
                     if (!res.ok) {
@@ -252,123 +334,50 @@
                     return res.json();
                 })
                 .then(coupons => {
-
-                    // 이전 목록 아이템 모두 제거
                     if (couponListUl) {
                         couponListUl.innerHTML = '';
                     }
 
-                    // 쿠폰이 없는 경우 메시지 표시
                     if (coupons.length === 0) {
                         if (couponListUl) {
                             couponListUl.innerHTML = '<li class="list-group-item text-center text-muted">보유한 쿠폰이 없습니다.</li>';
                         }
                         if (myCouponsSection) {
-                            myCouponsSection.style.display = 'block'; // 목록 섹션 표시
+                            myCouponsSection.style.display = 'block';
                         }
-                        console.log("보유 쿠폰 없음 메시지 표시."); // 디버깅 로그
+                        console.log("보유 쿠폰 없음 메시지 표시.");
                         return;
                     }
 
-                    // 쿠폰 목록 동적 생성
                     if (couponListUl) {
                         coupons.forEach((coupon) => {
                             const listItem = document.createElement('li');
-                            listItem.classList.add('list-group-item');
-
-                            const couponTypeName = coupon.couponType ? String(coupon.couponType) : '알 수 없음'; // String() 사용 또는 필요시 coupon.couponType 바로 사용
-                            // Optional: 영어 Enum 상수 이름을 한글 이름으로 매핑하는 함수 사용
-                            const couponTypeKoreanName = getKoreanCouponTypeName(couponTypeName);
-
-
-                            const couponDiscount = coupon.discountRate !== undefined ? coupon.discountRate : 'N/A';
-                            const couponIssueDate = coupon.issueDate ? new Date(coupon.issueDate).toLocaleDateString() : 'N/A';
-                            const couponExpirationDate = coupon.expirationDate ? new Date(coupon.expirationDate).toLocaleDateString() : 'N/A';
-
-                            const couponUsed = coupon.used !== undefined ? coupon.used : false;
-                            // >>> **수정: repeatCouponCount 필드 이름 확인** <<<
-                            // CouponDTO 필드 이름은 repeatCouponCount 입니다.
-                            const couponRepeatCount = coupon.repeatCouponCount !== undefined && coupon.repeatCouponCount !== null ? coupon.repeatCouponCount : 'N/A';
-
-
-                            // 사용 상태 문자열 결정
-                            let statusText = '알 수 없음';
-                            if (couponUsed) {
-                                statusText = '✅ 사용됨';
-                            } else if (couponExpirationDate !== 'N/A' && new Date(couponExpirationDate) < new Date()) { // 만료일 변수 사용
-                                statusText = '만료됨';
-                            } else {
-                                statusText = '❌ 미사용';
-                                // 반복 쿠폰이고 남은 횟수가 0보다 크고 미사용 상태일 때만 남은 횟수 표시
-                                if (couponRepeatCount !== 'N/A' && couponRepeatCount > 0 && !couponUsed) {
-                                    statusText += ` (${couponRepeatCount}회 남음)`;
-                                }
-                            }
-
-
-                            // 목록 아이템 내부 HTML 구성
-                            let itemHtml = `
-                            <div>
-                                 <strong>타입:</strong> ${couponTypeKoreanName} </div>
-                            <div>
-                                 <strong>할인율:</strong> ${couponDiscount}%
-                            </div>
-                            <div>
-                                 <strong>상태:</strong> ${statusText}
-                            </div>
-                        `;
-
-                            if (couponExpirationDate !== 'N/A') {
-                                itemHtml += `
-                                 <div>
-                                      <strong>만료일:</strong> ${couponExpirationDate}
-                                 </div>
-                             `;
-                            }
-                            if (coupon.couponNum !== undefined) {
-                                itemHtml += `
-                                 <div>
-                                      <small class="text-muted">쿠폰 번호: ${coupon.couponNum}</small>
-                                 </div>
-                             `;
-                            }
-
-                            // 리스트 아이템에 HTML 설정 후 목록에 추가
-                            listItem.innerHTML = itemHtml;
+                            listItem.className = 'list-group-item';
+                            listItem.textContent = `${coupon.type} - 만료일: ${coupon.expirationDate}`;
                             couponListUl.appendChild(listItem);
                         });
                     }
-
-
-                    // 목록 섹션 표시
                     if (myCouponsSection) {
                         myCouponsSection.style.display = 'block';
                     }
-                    console.log(`${coupons.length}개 쿠폰 목록 표시 완료.`); // 디버깅 로그
+                    console.log("보유 쿠폰 목록 표시.");
                 })
                 .catch(err => {
-                    console.error("쿠폰을 불러오는 중 오류가 발생했습니다:", err);
-                    alert("❌ 쿠폰을 불러오는 중 오류가 발생했습니다: " + err.message);
-
-                    // 목록 섹션 표시 및 오류 메시지 아이템 추가
-                    if (myCouponsSection && couponListUl) {
-                        myCouponsSection.style.display = 'block';
-                        couponListUl.innerHTML = `<li class="list-group-item text-center text-danger">오류 발생: ${err.message}</li>`;
-                    }
+                    console.error("쿠폰 조회 중 오류 발생:", err);
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('error-message').textContent = "❌ 쿠폰 조회 중 오류 발생: " + err.message;
                 });
-        }
 
-        function getKoreanCouponTypeName(englishName) {
-            const mapping = {
-                "BIRTHDAY": "생일쿠폰",
-                "MEMBER": "멤버쿠폰",
-                "SIGNUP": "가입쿠폰",
-                "EVENT": "이벤트쿠폰"
-            };
-            return mapping[englishName] || englishName;
+            function getKoreanCouponTypeName(englishName) {
+                const mapping = {
+                    "BIRTHDAY": "생일쿠폰",
+                    "MEMBER": "멤버쿠폰",
+                    "SIGNUP": "가입쿠폰",
+                    "EVENT": "이벤트쿠폰"
+                };
+                return mapping[englishName] || englishName;
+            }
         }
     </script>
-
-</div>
 </body>
 </html>
