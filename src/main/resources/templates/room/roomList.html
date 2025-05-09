@@ -132,6 +132,23 @@
 
         <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
+
+            <!-- 전체 목록 -->
+            <a th:href="@{/roomlist}"
+               class="text-decoration-none text-dark"
+               th:classappend="${currentStatus} == null ? 'border-bottom border-dark fw-bold' : ''">
+                전체 내역
+            </a>
+            <span>|</span>
+
+            <!-- 표시된 객실 -->
+            <a th:href="@{/roomlist/display/VISIBLE}"
+               class="text-decoration-none text-success"
+               th:classappend="${currentStatus} == 'VISIBLE' ? 'border-bottom border-success fw-bold' : ''">
+                현재 예약 목록
+            </a>
+            <span>|</span>
+
             <!-- 체크인 목록 -->
             <a th:href="@{/roomlist/checkin}"
                class="text-decoration-none text-primary"
@@ -148,27 +165,15 @@
             </a>
             <span>|</span>
 
-            <!-- 전체 목록 -->
-            <a th:href="@{/roomlist}"
-               class="text-decoration-none text-dark"
-               th:classappend="${currentStatus} == null ? 'border-bottom border-dark fw-bold' : ''">
-                전체 목록
-            </a>
-            <span>|</span>
 
-            <!-- 표시된 객실 -->
-            <a th:href="@{/roomlist/display/VISIBLE}"
-               class="text-decoration-none text-success"
-               th:classappend="${currentStatus} == 'VISIBLE' ? 'border-bottom border-success fw-bold' : ''">
-                표시된 객실
-            </a>
-            <span>|</span>
+
+
 
             <!-- 숨김 객실 -->
             <a th:href="@{/roomlist/display/HIDDEN}"
                class="text-decoration-none text-secondary"
                th:classappend="${currentStatus} == 'HIDDEN' ? 'border-bottom border-secondary fw-bold' : ''">
-                숨김 객실
+                취소 완료 목록
             </a>
         </div>
 

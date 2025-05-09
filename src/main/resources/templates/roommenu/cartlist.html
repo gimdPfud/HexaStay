@@ -286,7 +286,7 @@
                     <span th:unless="${finalDiscount != null}" id="discountAmount">0<span th:text="#{item.currency}"></span></span>
                 </div>
                 <div class="final-total">
-                    <span th:text="#{cart.finalTotal}"></span>: <span th:if="${finalTotal != null}"
+                    <span th:text="#{cart.finalTotal}"></span> <span th:if="${finalTotal != null}"
                                                                       th:text="${#numbers.formatDecimal(finalTotal, 0, 'COMMA', 0, 'POINT')} + ' ' + #{item.currency}"></span>
                     <span th:unless="${finalTotal != null}" id="finalAmount">0<span th:text="#{item.currency}"></span></span>
                 </div>
