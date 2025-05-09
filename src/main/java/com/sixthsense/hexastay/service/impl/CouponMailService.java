@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.service.impl;
-
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -8,8 +7,18 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+
+/**************************************************
+ * 클래스명 : CouponMailService
+ * 기능   : 쿠폰 발급 관련 이메일 발송 서비스를 제공하는 클래스입니다.
+ * JavaMailSender를 사용하여 HTML 형식의 쿠폰 안내 메일을 구성하고,
+ * `@Async` 어노테이션을 통해 이메일 발송 작업을 비동기적으로 처리하여 시스템 응답성을 향상시킵니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-30
+ * 수정일 :
+ * 주요 메소드/기능 : sendCouponEmail (비동기 쿠폰 정보 이메일 발송)
+ **************************************************/
 
 @Log4j2
 @EnableAsync // ✨ 이 클래스 안에서만 @Async 활성화
@@ -19,7 +28,6 @@ import java.time.LocalDate;
 public class CouponMailService {
 
     private final JavaMailSender mailSender;
-
 
     private String senderEmail = "kimbbuhhwan@gmail.com";
 

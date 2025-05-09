@@ -1,10 +1,8 @@
 package com.sixthsense.hexastay.service.impl;
-
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
-import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +12,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+/**************************************************
+ * 클래스명 : RoomMenuCartServiceImpl
+ * 기능   : 룸서비스 장바구니 관련 비즈니스 로직을 처리하는 서비스 구현 클래스입니다.
+ * (RoomMenuCartService 인터페이스 구현)
+ * 장바구니 아이템 추가, 장바구니 아이템 목록 상세 조회(옵션 포함, 페이지네이션), 장바구니 아이템 소유자 검증,
+ * 장바구니 아이템 수량 변경 및 삭제, 메뉴 상세 정보 조회(옵션 및 다국어 지원),
+ * 장바구니 내 총 아이템 개수 조회, 장바구니 총액 계산 및 쿠폰 적용 시 최종 금액 계산 기능을 제공합니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-02
+ * 수정일 : 2025-05-09
+ * 주요 메소드/기능 : RoomMenuCartRead, RoomMenuCartInsert, RoomMenuCartItemList,
+ * verificationRoomMenuCartItem, RoomMenuCartItemAmountUpdate, RoomCartMenuCartItemDelete,
+ * read, getTotalCartItemCount, getTotalPriceWithCoupon, getCartTotal
+ **************************************************/
 
 @Service
 @RequiredArgsConstructor
@@ -36,20 +48,21 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
     private final CouponRepository couponRepository;
     private final RoomMenuOptionRepository roomMenuOptionRepository;
-    private final RoomMenuService roomMenuService;
     private final RoomMenuCartItemOptionRepository roomMenuCartItemOptionRepository;
 
 
-    /***************************************************
-     *
-     * 메소드명   : RoomMenuCartRead
-     * 기능      : 이메일을 사용하여 룸서비스 메뉴 정보를 조회하고, 해당 정보를 DTO로 변환하여 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     * 상세 설명 : 이 메소드는 사용자의 이메일을 기반으로 해당 사용자의 룸서비스 메뉴 정보를 조회
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartRead
+     * 사용자 이메일 기반 룸서비스 메뉴 정보 조회 (단일 메뉴)
+     * 기능: 제공된 회원 이메일(`email`)을 사용하여 해당 회원의 객실과 연관된 룸서비스 메뉴 정보
+     * (현재 구현 상 첫 번째 또는 특정 대표 메뉴로 추정)를 조회하고 `RoomMenuDTO`로 변환하여 반환합니다.
+     * @param email String : 조회할 회원의 이메일.
+     * @return RoomMenuDTO : 조회된 룸서비스 메뉴 DTO. 해당 메뉴가 없으면 null을 반환할 수 있습니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : -
+     **************************************************/
+
     @Override
     public RoomMenuDTO RoomMenuCartRead(String email) {
         RoomMenu roomMenu =
@@ -63,17 +76,22 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         return roomMenuDTO;
     }
 
-    /***************************************************
-     *
-     * 메소드명   : RoomMenuCartInsert
-     * 기능      : 룸서비스 장바구니에 아이템을 추가하거나 기존 아이템의 수량을 업데이트하는 서비스 메소드
-     *            - 장바구니가 존재하지 않으면 새로 생성
-     *            - 아이템이 이미 장바구니에 있으면 수량을 추가
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartInsert
+     * 장바구니 아이템 추가 (옵션 포함)
+     * 기능: 로그인한 회원(`email`)의 장바구니에 새로운 아이템(`roomMenuCartItemDTO`)을 추가합니다.
+     * 회원의 장바구니가 없으면 새로 생성합니다. 선택된 옵션 정보를 포함하여
+     * `RoomMenuCartItem` 및 `RoomMenuCartItemOption` 엔티티를 생성하고 저장합니다.
+     * 최종 아이템 가격은 (기본가 + 총 옵션가) * 수량으로 계산됩니다.
+     * @param email String : 아이템을 추가할 회원의 이메일.
+     * @param roomMenuCartItemDTO RoomMenuCartItemDTO : 추가할 장바구니 아이템의 정보 (메뉴 ID, 수량, 선택된 옵션 목록 등).
+     * @return Long : 새로 생성된 `RoomMenuCartItem`의 ID.
+     * @throws IllegalArgumentException : 회원 정보가 없거나, DTO에 상품 ID가 없거나, 옵션이 상품에 속하지 않는 경우.
+     * @throws EntityNotFoundException : DTO에 명시된 메뉴나 옵션을 찾을 수 없는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-28
+     **************************************************/
 
     @Override
         public Long RoomMenuCartInsert(String email, RoomMenuCartItemDTO roomMenuCartItemDTO) {
@@ -107,8 +125,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                 .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + menuIdFromDto));
         log.info("메뉴 찾음: {}", roomMenuA.getRoomMenuName());
 
-
-
             List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions(); // DTO에서 선택된 옵션 목록 가져옴
 
             // --- RoomMenuCartItem의 옵션 요약 정보 설정 (새 아이템용) ---
@@ -127,13 +143,10 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                         selectedOptionName.append(", ");
                     }
                 }
-                log.info("선택된 옵션 요약 이름: {}", selectedOptionName.toString());
-                log.info("선택된 옵션 총 가격 (개당 합산): {}", totalSelectedOptionPrice);
             } else {
                 log.info("선택된 옵션이 없습니다.");
             }
             // --- 옵션 요약 정보 설정 끝 ---
-
 
             log.info("새 아이템을 장바구니에 추가합니다."); // 이 로그는 항상 실행
             RoomMenuCartItem insertCartItem = new RoomMenuCartItem(); // 항상 새 아이템 생성
@@ -167,8 +180,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
                         throw new IllegalArgumentException("옵션 '" + menuOption.getRoomMenuOptionName() + "'는 상품 '" + roomMenu.getRoomMenuName() + "'의 옵션이 아닙니다.");
                     }
 
-
-
                     RoomMenuCartItemOption option = new RoomMenuCartItemOption();
                     option.setRoomMenuCartItem(savedCartItem); // 저장된 CartItem 참조 설정
                     option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName());
@@ -184,17 +195,19 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             return savedCartItem.getRoomMenuCartItemNum(); // 새로 저장된 아이템의 ID 반환
         }
 
-    /***************************************************
-     *
-     * 메소드명   : RoomMenuCartItemList
-     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템 목록을 조회하고, 해당 아이템이
-     *            특정 회원의 카트에 속하는지 검증하는 서비스 메소드
-     *            - 특정 카트 아이템을 카트 소유자와 비교하여, 해당 아이템이 로그인한 회원의 카트에 속하는지 확인
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartItemList
+     * 회원 장바구니 아이템 목록 상세 조회 (옵션 포함, 페이지네이션)
+     * 기능: 특정 회원(`email`)의 장바구니에 담긴 아이템 목록을 페이지네이션하여 조회합니다.
+     * 각 장바구니 아이템(`RoomMenuCartDetailDTO`)에 대해 연관된 선택 옵션(`RoomMenuCartItemOptionDTO`) 목록을
+     * 함께 조회하여 DTO에 포함시켜 반환합니다.
+     * @param email String : 장바구니 목록을 조회할 회원의 이메일.
+     * @param pageable Pageable : 페이징 처리 정보 (페이지 번호, 페이지 크기 등).
+     * @return Page<RoomMenuCartDetailDTO> : 조회된 장바구니 아이템 상세 DTO 페이지 객체.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-27
+     **************************************************/
 
     @Override
     public Page<RoomMenuCartDetailDTO> RoomMenuCartItemList(String email, Pageable pageable) {
@@ -203,13 +216,9 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         Page<RoomMenuCartDetailDTO> roomMenuCartDetailDTOPage =
                 roomMenuCartItemRepository.findByCartDetailDTOList(email, pageable);
 
-
-
         roomMenuCartDetailDTOPage.forEach(dto -> {
             List<RoomMenuCartItemOption> optionList =
                     roomMenuCartItemOptionRepository.findDistinctByRoomMenuCartItem_RoomMenuCartItemNum(dto.getRoomMenuCartDetailNum());
-
-            log.info("옵션 엔티티 리스트: {}", optionList);
 
             List<RoomMenuCartItemOptionDTO> optionDTOs = optionList.stream()
                     .map(opt -> new RoomMenuCartItemOptionDTO(
@@ -220,28 +229,25 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
             dto.setOptionList(optionDTOs); // 옵션 리스트 주입
 
-            log.info("옵션 DTO 리스트: {}", optionDTOs);
         });
-
-        roomMenuCartDetailDTOPage.forEach(dto -> log.info("DTO 확인: {}", dto));
-
 
         return roomMenuCartDetailDTOPage;
     }
 
 
-    /***************************************************
-     *
-     * 클래스명   : verificationRoomMenuCartItem
-     * 기능      : 룸서비스 장바구니에서 특정 회원의 아이템이 해당 회원의 카트에 속하는지 확인하는 서비스 메소드
-     *            - 주어진 이메일을 기준으로 로그인한 회원 정보를 조회
-     *            - 카트 아이템 번호를 기준으로 아이템을 조회하고, 해당 아이템이 로그인한 회원의 카트에 속하는지 검증
-     *            - 동일한 회원의 카트에 속하면 true를, 아니면 false를 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : verificationRoomMenuCartItem
+     * 장바구니 아이템 소유자 검증
+     * 기능: 특정 장바구니 아이템 ID(`RoomMenuCartItemNum`)가 주어진 이메일(`email`)을 가진
+     * 회원의 장바구니에 속하는지를 검증합니다.
+     * @param RoomMenuCartItemNum Long : 검증할 장바구니 아이템의 ID.
+     * @param email String : 검증할 회원의 이메일.
+     * @return boolean : 해당 회원의 장바구니 아이템이면 true, 아니면 false.
+     * @throws EntityNotFoundException : `RoomMenuCartItemNum`에 해당하는 아이템이 존재하지 않는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : -
+     **************************************************/
 
     @Override
     public boolean verificationRoomMenuCartItem(Long RoomMenuCartItemNum, String email) {
@@ -277,17 +283,19 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         }
     }
 
-    /***************************************************
-     *
-     * 메소드명   : updateRoomCartItemCount
-     * 기능      : 룸서비스 장바구니 아이템의 수량을 업데이트하는 서비스 메소드
-     *            - 특정 장바구니 아이템의 수량을 업데이트
-     *            - 장바구니 아이템이 존재하지 않으면 예외를 던짐
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartItemAmountUpdate
+     * 장바구니 아이템 수량 변경
+     * 기능: 특정 장바구니 아이템(`RoomMenuCartItemNum`)의 수량(`roomMenuCartItemAmount`)을 업데이트합니다.
+     * 수량 변경에 따른 총 가격 재계산 및 반영 로직도 함께 처리합니다.
+     * @param RoomMenuCartItemNum Long : 수량을 변경할 장바구니 아이템의 ID.
+     * @param roomMenuCartItemAmount Integer : 변경할 새로운 수량. (0 이하일 경우 아이템 삭제 고려)
+     * @throws EntityNotFoundException : `RoomMenuCartItemNum`에 해당하는 아이템이 존재하지 않는 경우.
+     * @throws IllegalArgumentException : 수량이 유효하지 않은 경우 (예: 음수).
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : -
+     **************************************************/
 
     @Override
     public void RoomMenuCartItemAmountUpdate(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount) {
@@ -301,17 +309,17 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     }
 
-    /***************************************************
-     *
-     * 매소드명   : RoomCartMenuCartItemDelete
-     * 기능      : 룸서비스 장바구니에서 특정 아이템을 삭제하는 서비스 메소드
-     *            - 주어진 아이템 번호를 기준으로 장바구니 아이템을 찾아 삭제 처리
-     *            - 삭제 후 해당 아이템을 조회하여 삭제 확인
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomCartMenuCartItemDelete
+     * 장바구니 아이템 삭제
+     * 기능: 특정 장바구니 아이템(`roomMenuCartItemNum`)을 데이터베이스에서 삭제합니다.
+     * 해당 아이템에 연결된 `RoomMenuCartItemOption`들도 함께 삭제됩니다(cascade 설정에 따름).
+     * @param roomMenuCartItemNum Long : 삭제할 장바구니 아이템의 ID.
+     * @throws EntityNotFoundException : `roomMenuCartItemNum`에 해당하는 아이템이 존재하지 않는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : -
+     **************************************************/
 
     @Override
     public void RoomCartMenuCartItemDelete(Long roomMenuCartItemNum) {
@@ -325,22 +333,24 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         roomMenuCartItemRepository.delete(roomMenuCartItem);
         log.info("아이템 삭제 완료: {}", roomMenuCartItemNum);
 
-//        // 삭제 후 해당 아이템이 존재하는지 확인 (아이템이 존재하면 예외가 발생)
-//        roomMenuCartItemRepository.findById(roomMenuCartItemNum).orElseThrow(() -> {
-//            log.info("삭제된 아이템은 더 이상 존재하지 않습니다: {}", roomMenuCartItemNum);
-//            return new EntityNotFoundException("아이템이 삭제되었습니다.");
-//        }); // todo(7) 코드를 제거했음 오류 생길수도 있음
     }
 
-    /***********************************************
-     * 메서드명 : read
-     * 기능 : 특정 룸 메뉴 번호를 기반으로 룸 메뉴 상세 정보를 조회
-     * 매개변수 : Long num - 룸 메뉴 번호
-     * 반환값 : RoomMenuDTO - 조회된 룸 메뉴 DTO
+    /**************************************************
+     * 메소드명 : read
+     * 룸서비스 메뉴 상세 정보 조회 (옵션 및 다국어 지원)
+     * 기능: 특정 룸서비스 메뉴 번호(`num`)를 기준으로 메뉴의 상세 정보를 조회합니다.
+     * 현재 로케일(`locale`)에 맞는 번역된 메뉴 이름과 내용을 적용하고,
+     * 해당 메뉴에 속한 모든 옵션 목록을 함께 조회하여 `RoomMenuDTO`로 구성합니다.
+     * 조회된 정보는 파라미터로 전달된 `Model` 객체에도 추가됩니다. (서비스에서 Model 객체 직접 사용은 비권장)
+     * @param num Long : 조회할 룸서비스 메뉴의 ID.
+     * @param locale Locale : 다국어 처리를 위한 현재 로케일 정보.
+     * @param model Model : (비권장) 뷰에 데이터를 전달하기 위한 모델 객체. 서비스 결과는 DTO로만 반환하는 것이 좋음.
+     * @return RoomMenuDTO : 조회된 룸서비스 메뉴의 상세 정보 DTO (번역 및 옵션 포함).
+     * @throws EntityNotFoundException : `num`에 해당하는 메뉴가 존재하지 않는 경우.
      * 작성자 : 김윤겸
-     * 작성일 : 2025-04-09
-     * 수정일 : -
-     * ***********************************************/
+     * 등록일 : 2025-04-09
+     * 수정일 : 2025-04-27
+     **************************************************/
 
     // 상세보기
     @Override
@@ -350,7 +360,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         // DB에서 메뉴 정보를 가져옴
         RoomMenu roomMenu = roomMenuRepository.findByRoomMenuNum(num);
         RoomMenuDTO roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
-
 
         // 메뉴에 해당하는 번역 정보 찾기
         Optional<RoomMenuTranslation> translation = roomMenuTranslationRepository
@@ -376,42 +385,57 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
         model.addAttribute("roomMenuDTO", roomMenuDTO);
 
-        log.info("옵션 목록: {}", roomMenuDTO.getOptions());
-
-        log.info("최종 반환되는 roomMenuDTO: {}", roomMenuDTO);
-
-
         return roomMenuDTO;  // 최종적으로 옵션을 포함한 DTO 반환
     }
 
-    /***********************************************
-     * 메서드명 : getTotalCartItemCount
-     * 기능 : 특정 회원의 이메일을 기반으로 장바구니에 담긴 총 아이템 수를 조회.
-     * 매개변수 : String memberEmail - 회원 이메일
-     * 반환값 : Integer - 총 장바구니 아이템 수 (null일 경우 0 반환)
-     * 작성자 : 자동 생성
-     * 작성일 : 2025-04-14
+    /**************************************************
+     * 메소드명 : getTotalCartItemCount
+     * 회원 장바구니 총 아이템 개수 조회
+     * 기능: 특정 회원(`memberEmail`)의 장바구니에 담긴 모든 아이템들의 총 개수(각 아이템의 수량을 합산)를
+     * 조회하여 반환합니다. 장바구니가 비어있거나 아이템이 없으면 0을 반환합니다.
+     * @param memberEmail String : 조회할 회원의 이메일.
+     * @return Integer : 장바구니 내 총 아이템 개수 (각 아이템의 수량 합).
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-15
      * 수정일 : -
-     * ***********************************************/
+     **************************************************/
 
     @Override
     public Integer getTotalCartItemCount(String memberEmail) {
+        log.info("장바구니 아이템 조회 서비스 진입");
         Integer count = roomMenuCartItemRepository.getTotalItemCountByMemberEmail(memberEmail);
         return count != null ? count : 0;
     }
 
+    /**************************************************
+     * 메소드명 : getTotalPriceWithCoupon
+     * (장바구니 서비스 내) 쿠폰 적용 시 최종 결제 금액 계산
+     * 기능: 특정 회원(`email`)의 장바구니 총액에 지정된 쿠폰(`couponNum`)을 적용했을 때의
+     * 할인된 최종 결제 금액을 계산하여 반환합니다.
+     * 이 메소드는 쿠폰의 유효성(소유권, 만료일, 사용여부)을 직접 검사하지 않고,
+     * `getCartTotal`을 호출하여 장바구니 총액을 계산하고, CouponRepository에서 쿠폰 정보를 가져와
+     * 할인율을 적용합니다.
+     * (주의: 쿠폰 유효성 검증은 CouponService에서 수행하거나 이 메소드 내에 추가해야 합니다.)
+     * @param email String : 할인을 적용할 회원의 이메일.
+     * @param couponNum Long : 적용할 쿠폰의 번호(ID).
+     * @return Integer : 쿠폰 할인이 적용된 최종 결제 금액.
+     * @throws RuntimeException : 회원이 존재하지 않거나, 쿠폰을 찾을 수 없는 경우, 또는 장바구니가
+     * 없는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-24
+     * 수정일 : 2025-04-29
+     **************************************************/
+
     // 쿠폰 할인
     @Override
     public Integer getTotalPriceWithCoupon(String email, Long couponNum) {
+        log.info("쿠폰 적용 최종금액 서비스 진입" + couponNum);
+
         Member member = memberRepository.findByMemberEmail(email);
         Coupon coupon = couponRepository.findById(couponNum).orElseThrow();
 
-        // 총 금액 계산
         int originalPrice = getCartTotal(member); // 장바구니 금액 계산 메서드
-
-        // 쿠폰 할인 적용
         int discount = (originalPrice * coupon.getDiscountRate()) / 100;
-        // 할인 금액 계산
         int finalPrice = originalPrice - discount; // 최종 가격 계산
 
         log.info("쿠폰 적용 결과: 원 가격 {}, 할인 {}, 최종 {}", originalPrice, discount, finalPrice);
@@ -419,9 +443,23 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
 
     }
 
-    // 장바구니 조회 후 쿠폰 적용
+    /**************************************************
+     * 메소드명 : getCartTotal (Member 파라미터)
+     * (장바구니 서비스 내) 장바구니 총액 계산
+     * 기능: 특정 `Member` 객체를 기준으로 해당 회원의 장바구니에 담긴 모든 상품들의
+     * 총액(각 상품의 메뉴 기본 가격 * 수량)을 계산하여 반환합니다.
+     * (주의: 현재 로직은 각 아이템의 옵션 가격을 총액 계산에 포함하지 않고 있습니다.)
+     * @param member Member : 장바구니 총액을 계산할 회원 엔티티.
+     * @return Integer : 계산된 장바구니 총액.
+     * @throws RuntimeException : 해당 회원의 장바구니가 존재하지 않는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-24
+     * 수정일 : -
+     **************************************************/
+
     @Override
     public Integer getCartTotal(Member member) {
+        log.info("장바구니 최종 결제 금액 계산 서비스 진입" + member);
         // 1. 해당 멤버의 장바구니 조회
         RoomMenuCart cart = roomMenuCartRepository.findByMember(member)
                 .orElseThrow(() -> new RuntimeException("장바구니가 존재하지 않습니다."));
@@ -436,7 +474,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
             int quantity = item.getRoomMenuCartItemAmount();
             total += itemPrice * quantity;
         }
-
         return total;
     }
 
