@@ -31,8 +31,8 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 /**************************************************
  * 클래스명 : RoomMenuCartController
  * 기능   : 룸서비스(장바구니)와 관련된 컨트롤러
- *        - 룸서비스 메뉴 목록 조회 및 필터링 기능
- *        - 장바구니 추가 및 조회 기능
+ * - 룸서비스 메뉴 목록 조회 및 필터링 기능
+ * - 장바구니 추가 및 조회 기능
  * 작성자 : 김윤겸
  * 작성일 : 2025-04-01
  * 수정일 : 2025-04-07
@@ -50,14 +50,15 @@ public class RoomMenuCartController {
     private final RoomMenuService roomMenuService;
     private final CouponService couponService;
 
-    /***************************************************
-     *
-     * 메소드명   : RoomMenuCartItem
-     * 기능      : 장바구니에 메뉴 아이템을 추가
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : 2025-04-10
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartItem
+     * 장바구니 메뉴 아이템 추가
+     * 기능: 사용자로부터 룸서비스 메뉴 아이템 정보(RoomMenuCartItemDTO)를 받아 유효성 검사를 수행한 후,
+     * 로그인한 사용자의 장바구니에 해당 아이템을 추가합니다. 처리 결과를 ResponseEntity로 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 04-08
+     * 수정일 : 04-10
+     **************************************************/
 
     @PostMapping("/orderpage/orderread")
     public ResponseEntity RoomMenuCartItem(
@@ -65,16 +66,12 @@ public class RoomMenuCartController {
             BindingResult bindingResult,
             Principal principal) {
         log.info("장바구니 카트 컨트롤러 진입" + roomMenuCartItemDTO);
-        log.info(" 받은 DTO: {}", roomMenuCartItemDTO);
-        log.info(" 수량: {}", roomMenuCartItemDTO.getRoomMenuCartItemAmount());//이게 널로 나오지 말아야함 OK
 
-        // 유효성 검사
         if (bindingResult.hasErrors()) {
             log.info("장바구니 유효성검사 에러");
             log.info(bindingResult.getAllErrors());
 
             List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
-
             StringBuilder stringBuilder = new StringBuilder();
 
             for (FieldError error : fieldErrorList) {
@@ -82,47 +79,39 @@ public class RoomMenuCartController {
                 stringBuilder.append(error.getDefaultMessage());
             }
 
-            // 입력된 에러를 다시 보여주기 위해 반환값으로 에러내용을 반환
             return new ResponseEntity<>(stringBuilder.toString(), HttpStatus.BAD_REQUEST);
         }
 
-        // 로그아웃이 되어 principal이 null일 경우 처리
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        String memberEmail = principal.getName();  // 로그인한 사용자의 이메일
+        String memberEmail = principal.getName();
         log.info("로그인한 사용자 이메일 : " + memberEmail);
-        log.info(principal.toString());
 
         Long roomCartItemNum = null;
 
         try {
-            // RoomMenuCartInsert 메서드 호출 시, 이메일과 DTO만 전달
             roomCartItemNum = roomMenuCartService.RoomMenuCartInsert(memberEmail, roomMenuCartItemDTO);
         } catch (EntityNotFoundException e) {
-            // 예외 발생 시 처리
-            log.error("장바구니에 아이템을 추가할 수 없습니다. : " + e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (IllegalArgumentException e) {
-            // 수량이 잘못된 경우 예외 처리
-            log.error("잘못된 수량 입력: " + e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        // 성공적으로 처리되면 생성된 roomCartItemNum을 반환
         return new ResponseEntity<>(roomCartItemNum, HttpStatus.CREATED);
 
     }
 
-    /***************************************************
-     *
-     * 메소드명   : getRoomMenuCartItems
-     * 기능      : 로그인한 회원의 장바구니 아이템 목록을 조회
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : 2025-04-10
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : getRoomMenuCartItems
+     * 장바구니 아이템 목록 조회
+     * 기능: 로그인한 사용자의 장바구니에 담긴 아이템 목록과 사용 가능한 쿠폰 목록을 조회하여,
+     * 모델에 담아 장바구니 목록 페이지('roommenu/cartlist')로 전달합니다. 페이지네이션을 지원합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-10
+     **************************************************/
 
     @GetMapping("/cartlist")
     public String getRoomMenuCartItems(
@@ -131,55 +120,44 @@ public class RoomMenuCartController {
             Pageable pageable,
             RoomMenuDTO roomMenuDTO,
             @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
-
         log.info("장바구니 리스트 컨트롤러 진입");
 
         if (principal == null) {
-            log.info("로그인되지 않은 사용자의 장바구니 접근 시도");
             return "redirect:/member/login";
         }
 
-        String email = principal.getName(); // 또는 customMemberDetails.getUsername();
+        String email = principal.getName();
         log.info("로그인한 사용자: {}", email);
 
-        // 장바구니 아이템 리스트 조회
         Page<RoomMenuCartDetailDTO> cartDetailDTOList = roomMenuCartService.RoomMenuCartItemList(email, pageable);
         boolean isCartEmpty = cartDetailDTOList == null || cartDetailDTOList.isEmpty();
 
-        //  쿠폰 리스트 가져오기
         List<CouponDTO> couponList = couponService.getCoupons(email);
 
-        // 모델에 데이터 추가
         model.addAttribute("cartDetailDTOList", cartDetailDTOList);
         model.addAttribute("isCartEmpty", isCartEmpty);
         model.addAttribute("roomMenuDTO", roomMenuDTO);
         model.addAttribute("couponList", couponList); //
 
-
-        log.info("장바구니 전체 아이템 수: {}", cartDetailDTOList.getTotalElements());
-        log.info("페이지당 아이템 수: {}", cartDetailDTOList.getSize());
-        log.info("현재 페이지 번호: {}", cartDetailDTOList.getNumber());
-
-        for (RoomMenuCartDetailDTO dto : cartDetailDTOList.getContent()) {
-            log.info("메뉴 이름: {}, 가격: {}", dto.getRoomMenuCartDetailMenuItemName(), dto.getRoomMenuCartDetailMenuItemPrice());
-        }
-
         return "roommenu/cartlist";
     }
 
 
-    /***************************************************
-     *
-     * 메소드명   : verifyRoomMenuCartItem
-     * 기능      : 특정 회원의 장바구니 아이템이 해당 회원의 카트에 속하는지 검증
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : 2025-04-10
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : verifyRoomMenuCartItem
+     * 장바구니 아이템 소유자 검증
+     * 기능: 특정 장바구니 아이템 번호(roomMenuCartItemNum)와 사용자 이메일(email)을 받아,
+     * 해당 아이템이 명시된 사용자의 장바구니에 속하는지를 검증하고 그 결과를 Boolean 형태로 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-10
+     **************************************************/
 
     @GetMapping("/verify/{roomMenuCartItemNum}")
     public ResponseEntity<Boolean> verifyRoomMenuCartItem(@PathVariable Long roomMenuCartItemNum,
                                                           @RequestParam String email) {
+        log.info("장바구니 유효성 검사 컨트롤러 진입");
+
         try {
             boolean isVerified = roomMenuCartService.verificationRoomMenuCartItem(roomMenuCartItemNum, email);
             return ResponseEntity.ok(isVerified);  // 200 OK 응답 반환
@@ -188,14 +166,15 @@ public class RoomMenuCartController {
         }
     }
 
-    /***************************************************
-     *
-     * 메소드명   : modifyRoomMenuCartItemAmount
-     * 기능      : 장바구니 아이템의 수량을 업데이트
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : 2025-04-10
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : modifyRoomMenuCartItemAmount
+     * 장바구니 아이템 수량 변경
+     * 기능: 특정 장바구니 아이템(roomMenuCartItemNum)의 수량(roomMenuCartItemAmount)을 변경합니다.
+     * 수량은 1 이상이어야 하며, 요청한 사용자가 해당 아이템의 소유자인지 검증 후 처리합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-10
+     **************************************************/
 
     @PutMapping("/orderpage/read/{roomMenuCartItemNum}/{roomMenuCartItemAmount}")
     public ResponseEntity modifyRoomMenuCartItemAmount(
@@ -203,10 +182,7 @@ public class RoomMenuCartController {
             @PathVariable("roomMenuCartItemAmount") Integer roomMenuCartItemAmount,
             Principal principal) {
         log.info("장바구니 수량 변경 컨트롤러 진입" + roomMenuCartItemNum);
-        log.info("해당 장바구니의 아이템 번호" + roomMenuCartItemNum);
-        log.info("장바구니에 있는 해당 수량" + roomMenuCartItemAmount);
 
-        // 수량이 0 이하일 경우 예외 처리
         if (roomMenuCartItemAmount <= 0) {
             return new ResponseEntity<String>("최소 1개 이상 담아주세요", HttpStatus.BAD_REQUEST);
         }
@@ -228,20 +204,19 @@ public class RoomMenuCartController {
 
     }
 
-    /***************************************************
-     *
-     * 메소드명   : RoomMenuCartItemDeleteItem
-     * 기능      : 장바구니에서 특정 아이템을 삭제
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-08
-     * 수정일    : 2025-04-10
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : RoomMenuCartItemDeleteItem
+     * 장바구니 아이템 삭제
+     * 기능: 특정 장바구니 아이템(roomCartItemNum)을 삭제합니다.
+     * 요청한 사용자가 해당 아이템의 소유자인지 검증 후 처리합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-08
+     * 수정일 : 2025-04-13
+     **************************************************/
 
     @DeleteMapping("/roomMenuCartItemDelete/{roomCartItemNum}")
     public ResponseEntity<?> RoomMenuCartItemDeleteItem(@PathVariable Long roomCartItemNum, Principal principal) {
         log.info("장바구니 삭제 컨트롤러 진입 - 삭제할 번호: " + roomCartItemNum);
-        log.info("현재 로그인 사용자: " + (principal != null ? principal.getName() : "null"));
 
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -260,8 +235,20 @@ public class RoomMenuCartController {
         }
     }
 
+    /**************************************************
+     * 메소드명 : applyCouponToCart
+     * 장바구니에 쿠폰 적용 및 할인된 총액 계산
+     * 기능: 특정 사용자(email)의 장바구니에 지정된 쿠폰(couponNum)을 적용하여,
+     * 할인된 최종 결제 금액을 계산하여 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-24
+     * 수정일 :
+     **************************************************/
+
     @PostMapping("/apply-coupon")
     public ResponseEntity<?> applyCouponToCart(@RequestParam String email, @RequestParam Long couponNum) {
+        log.info("장바구니 쿠폰 적용 컨트롤러 진입");
+
         int discountedTotal = roomMenuCartService.getTotalPriceWithCoupon(email, couponNum);
         return ResponseEntity.ok(discountedTotal);
     }

@@ -1,19 +1,19 @@
 package com.sixthsense.hexastay.controller;
 
-/* 클래스명 : RoomMenuController
- * 기능 : 룸서비스(메뉴)와 관련된 컨트롤러
- *        룸서비스의 메뉴를 관리하는 다양한 페이지를 처리하는 컨트롤러.
- *        메뉴 목록 조회, 상세보기, 등록, 수정, 삭제 등의 기능을 담당
+/**************************************************
+ * 클래스명 : RoomMenuOrderController
+ * 기능   : 룸서비스 주문과 관련된 요청을 처리하는 컨트롤러입니다.
+ * 주문 생성(개별/장바구니), 주문 목록 조회(사용자/관리자), 주문 취소 등의 기능을 담당합니다.
  * 작성자 : 김윤겸
- * 작성일 : 2025-04-09
- * 수정일 : 2025-00-00 입출력변수설계 : 김윤겸 */
+ * 작성일 : 2025-04-11
+ * 수정일 : 2025-05-09
+ * 입출력 변수 설계 : 김윤겸
+ **************************************************/
 
 import com.sixthsense.hexastay.dto.RoomMenuOrderDTO;
-import com.sixthsense.hexastay.dto.RoomMenuOrderItemDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.AdminRole;
-import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
@@ -38,16 +38,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.AccessDeniedException;
-
-import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 
 @Controller
 @RequiredArgsConstructor
@@ -56,25 +49,19 @@ import static com.sixthsense.hexastay.util.PaginationUtil.Pagination;
 public class RoomMenuOrderController {
 
     private final RoomMenuOrderService roomMenuOrderService;
-    private final RoomMenuOrderRepository roomMenuOrderRepository;
     private final MemberRepository memberRepository;
-    private final HotelRoomService hotelRoomService;
-    private final HotelRoomRepository hotelRoomRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    /***************************************************
-     *
-     * 클래스명   : roomMenuOrderPost
-     * 기능      : 룸서비스 메뉴 주문을 처리하는 POST 컨트롤러 메소드
-     *            - 클라이언트로부터 전달받은 주문 DTO의 유효성 검증
-     *            - 로그인 여부 확인 후, 주문 서비스 호출
-     *            - 주문 수량이 재고보다 많을 경우 예외 처리
-     *            - 처리 결과를 ResponseEntity 형태로 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-11
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : roomMenuOrderPost
+     * 룸서비스 개별 메뉴 주문 처리
+     * 기능: 클라이언트로부터 전달받은 개별 룸서비스 주문 정보(RoomMenuOrderDTO)의 유효성을 검증하고,
+     * 로그인한 사용자의 이름으로 주문을 생성합니다. 재고 부족 등 예외 발생 시 적절한 HTTP 상태 코드로 응답하며,
+     * 성공 시 생성된 주문 번호를 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-11
+     * 수정일 : -
+     **************************************************/
 
     @PostMapping("/order")
     public ResponseEntity roomMenuOrderPost(@RequestBody @Valid RoomMenuOrderDTO roomMenuOrderDTO,
@@ -111,16 +98,13 @@ public class RoomMenuOrderController {
             return new ResponseEntity<String>(request.getHeader("referer"), HttpStatus.UNAUTHORIZED);
         }
 
-        // 현재 로그인한 사용자의 이메일 가져오기
         String email = principal.getName();
-
         Long roomMenuOrderNum = null;
 
         try {
-            log.info("1️⃣ 주문 insert 시작");
+            log.info("주문 insert 시작");
             roomMenuOrderNum = roomMenuOrderService.roomMenuOrderInsert(roomMenuOrderDTO, email);
             log.info("2️⃣ 주문 insert 완료 - 주문번호: {}", roomMenuOrderNum);
-
 
         } catch (IllegalStateException e) {
             // 재고 부족 등의 IllegalStateException 발생 시 BAD_REQUEST로 에러 메시지 반환
@@ -128,33 +112,28 @@ public class RoomMenuOrderController {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        // 주문 생성 성공 시, 주문 번호 반환 (HTTP 200 OK)
         return new ResponseEntity<Long>(roomMenuOrderNum, HttpStatus.OK);
     }
 
 
-    /***************************************************
-     *
-     * 클래스명   : createOrderFromCart
-     * 기능      : 장바구니를 기반으로 룸서비스 메뉴 주문을 처리하는 POST 컨트롤러 메소드
-     * - 로그인한 사용자의 장바구니 정보를 이용하여 주문 생성
-     * - requestMessage 파라미터를 통해 추가적인 요청 사항을 전달받음
-     * - 주문 서비스 호출 후 생성된 주문 번호를 ResponseEntity 형태로 반환
-     * - 주문 실패 시 에러 메시지를 담아 HTTP 상태 코드를 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-15
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : createOrderFromCart
+     * 장바구니 기반 룸서비스 주문 처리
+     * 기능: 로그인한 사용자의 장바구니 정보를 기반으로 룸서비스 주문을 생성합니다.
+     * 추가 요청 메시지, 쿠폰 정보, 할인된 총액 등을 파라미터로 받아 처리하며,
+     * 주문 생성 후 알림 전송 로직을 호출합니다. 성공 시 생성된 주문 번호를, 실패 시 오류 메시지를 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-15
+     * 수정일 : 2025-05-01
+     **************************************************/
 
     @PostMapping("/roommenu/cart")
     public ResponseEntity<?> createOrderFromCart(Principal principal, String requestMessage, RoomMenuOrderDTO roomMenuOrderDTO,
-                                                 RoomMenuOrder roomMenuOrder, Long couponNum, Integer discountedTotalPrice, Pageable pageable, HttpSession session) {
+                                                 Long couponNum, Integer discountedTotalPrice, Pageable pageable, HttpSession session) {
         log.info("POST /order/cart 컨트롤러 진입");
         log.info("로그인한 사용자 : " + principal.getName());
 
         if (principal == null) {
-            log.info("로그인이 필요합니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
@@ -162,13 +141,11 @@ public class RoomMenuOrderController {
         String password = (String) session.getAttribute("roomPassword");
 
         try {
-            // 서비스 호출 시 hotelRoomNum 인자 제거됨
             RoomMenuOrder order = roomMenuOrderService.roomMenuOrderInsertFromCart(email, requestMessage, couponNum, discountedTotalPrice, pageable, password);
             log.info("주문 생성 완료 - 주문번호: {}", order.getRoomMenuOrderNum());
 
             roomMenuOrderService.RoomMenuSendOrderAlert(roomMenuOrderDTO, order, pageable); // orderDto가 어떻게 채워지는지 확인 필요
             log.info("3️⃣ 알람 전송 완료");
-
 
             return ResponseEntity.ok(order.getRoomMenuOrderNum());
 
@@ -182,18 +159,15 @@ public class RoomMenuOrderController {
         }
     }
 
-    /***************************************************
-     *
-     * 클래스명   : getOrderList
-     * 기능      : 현재 로그인한 사용자의 룸서비스 주문 목록을 조회하여 화면에 표시하는 GET 컨트롤러 메소드
-     * - 로그인 여부 확인 후, 주문 서비스 호출
-     * - 조회된 주문 목록을 Model 객체에 담아 뷰로 전달
-     * - 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-15
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : getOrderList
+     * 사용자 룸서비스 주문 목록 조회
+     * 기능: 현재 로그인한 사용자의 룸서비스 주문 목록을 페이지네이션하여 조회합니다.
+     * 조회된 주문 목록과 페이징 관련 정보를 모델에 담아 'roommenu/orderList' 뷰로 전달합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-16
+     * 수정일 : 2025-04-29
+     **************************************************/
 
     @GetMapping("/roommenu/orderList")
     public String getOrderList(Principal principal,
@@ -212,12 +186,10 @@ public class RoomMenuOrderController {
         // Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "regDate")); // 기존 10건
         Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "regDate")); // 5건으로 수정하신 듯
 
-
         Page<RoomMenuOrderDTO> orderPage = roomMenuOrderService.getOrderListByEmail(email, pageable);
 
         // 서비스로부터 받은 DTO 리스트
         List<RoomMenuOrderDTO> orderListForModel = orderPage.getContent();
-
 
         // Model에 데이터 추가
         model.addAttribute("orderList", orderListForModel); // DTO 리스트를 "orderList" 이름으로 Model에 담습니다.
@@ -246,23 +218,22 @@ public class RoomMenuOrderController {
         return "roommenu/orderList"; // templates/roommenu/orderList.html 템플릿 사용
     }
 
-    /***************************************************
-     *
-     * 클래스명   : cancelOrder
-     * 기능      : 특정 주문 번호에 해당하는 룸서비스 주문을 취소하는 POST 컨트롤러 메소드
-     * - 로그인 여부 확인 및 주문 취소 권한 검증
-     * - 주문 서비스의 주문 취소 기능 호출
-     * - 처리 결과를 ResponseEntity 형태로 반환 (성공 시 "주문이 성공적으로 취소되었습니다.", 실패 시 에러 메시지)
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-15
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : cancelOrder
+     * 룸서비스 주문 취소 처리
+     * 기능: 특정 주문 번호(orderNum)에 해당하는 룸서비스 주문을 취소합니다.
+     * 로그인한 사용자가 해당 주문을 취소할 권한이 있는지 확인 후, 주문 취소 서비스를 호출합니다.
+     * 처리 결과를 ResponseEntity로 반환합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-16
+     * 수정일 : -
+     **************************************************/
 
     // 주문 취소
     @PostMapping("/roommenu/deleteOrder")
     public ResponseEntity<String> cancelOrder(@RequestParam Long orderNum, Principal principal) {
         log.info("주문 취소 컨트롤러 post 진입");
+
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
@@ -278,36 +249,16 @@ public class RoomMenuOrderController {
         }
     }
 
-    /***************************************************
-     *
-     * 클래스명   : CashOrderPageGet
-     * 기능      : 현금 결제 페이지를 보여주는 GET 컨트롤러 메소드
-     * - 별도의 데이터 조회 없이 현금 결제 관련 뷰를 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-15
-     * 수정일    : -
-     *
-     ****************************************************/
-
-    @GetMapping("/roommenu/cashOrder")
-    public String CashOrderPageGet() {
-        log.info("현금 결제 컨트롤러 진입");
-//            // 룸방번호
-//            model.addAttribute("roomName", roomName);
-        return "roommenu/cashOrder";  // templates/cashOrder.html로 연결
-    }
-
-    /***************************************************
-     *
-     * 클래스명   : viewAllOrders
-     * 기능      : 관리자 권한으로 모든 룸서비스 주문 목록을 조회하여 화면에 표시하는 GET 컨트롤러 메소드
-     * - 주문 서비스의 모든 주문 조회 기능 호출
-     * - 조회된 주문 목록을 Model 객체에 담아 관리자 주문 목록 뷰로 전달
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-15
-     * 수정일    : -
-     *
-     ****************************************************/
+    /**************************************************
+     * 메소드명 : viewAllOrders
+     * 관리자용 전체 룸서비스 주문 목록 조회
+     * 기능: 관리자 권한으로 모든 룸서비스 주문 목록을 페이지네이션하여 조회합니다.
+     * 로그인한 사용자가 관리자 역할을 가졌는지 확인 후, 조회된 주문 목록과 페이징 정보를
+     * 모델에 담아 'roommenu/adminOrderList' 뷰로 전달합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-23
+     * 수정일 : -
+     **************************************************/
 
     @GetMapping("/roommenu/adminOrderList")
     public String viewAllOrders(
@@ -315,7 +266,6 @@ public class RoomMenuOrderController {
             Model model,
             Principal principal) {
         log.info("관리자용 룸 메뉴 오더 컨트롤러 진입");
-
         log.info("로그인한 사용자 : " + principal.getName());
         Member member = memberRepository.findByMemberEmail(principal.getName());
 
@@ -352,94 +302,4 @@ public class RoomMenuOrderController {
 
         return "roommenu/adminOrderList";
     }
-
-    /***************************************************
-     *
-     * 클래스명   : completeOrders
-     * 기능      : 전달받은 주문 ID 목록을 기준으로 주문 완료 처리 (임시 기능)
-     * - 요청 Body에 JSON 형태로 주문 ID 목록을 받음
-     * - 각 주문 ID에 대해 주문 삭제 (or 상태 변경) 로직 수행
-     * - 처리 완료 메시지를 ResponseEntity 형태로 반환
-     * - 오류 발생 시 HTTP 상태 코드와 에러 메시지 반환
-     * 작성자    : 김윤겸
-     * 작성일    : 2025-04-17
-     * 수정일    : -
-     *
-     ****************************************************/
-
-    /*// 임시임.. 체크여부에 따라서 삭제 기능
-    @PostMapping("/roommenu/complete-orders")
-    public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds) {
-        log.info("관리자용 오더 컨트롤러 주문완료 컨트롤러 진입");
-        try {
-            for (Long orderId : orderIds) {
-                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
-
-                if (optionalOrder.isPresent()) {
-                    RoomMenuOrder order = optionalOrder.get();
-                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.COMPLETE);
-                    roomMenuOrderRepository.save(order);
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
-                }
-            }
-
-            return ResponseEntity.ok("주문이 완료 처리되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("에러: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/roommenu/cancel-orders")
-    public ResponseEntity<?> cancelOrders(@RequestBody List<Long> orderIds) {
-        try {
-            for (Long orderId : orderIds) {
-                // 주문 ID를 이용해 해당 주문을 찾습니다.
-                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
-
-                if (optionalOrder.isPresent()) {
-                    RoomMenuOrder order = optionalOrder.get();
-
-                    // 주문 상태를 CANCEL로 변경
-                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.CANCEL);
-
-                    // 변경된 주문을 저장
-                    roomMenuOrderRepository.save(order);
-                } else {
-                    // 주문이 존재하지 않으면 에러 메시지 반환
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
-                }
-            }
-
-            return ResponseEntity.ok("주문이 취소 처리되었습니다.");
-        } catch (Exception e) {
-            // 예외 발생 시 처리
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/roommenu/accept-orders")
-    public ResponseEntity<?> acceptOrders(@RequestBody List<Long> orderIds) {
-        try {
-            for (Long orderId : orderIds) {
-                Optional<RoomMenuOrder> optionalOrder = roomMenuOrderRepository.findById(orderId);
-
-                if (optionalOrder.isPresent()) {
-                    RoomMenuOrder order = optionalOrder.get();
-                    order.setRoomMenuOrderStatus(RoomMenuOrderStatus.ACCEPT);
-                    roomMenuOrderRepository.save(order);
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("주문을 찾을 수 없습니다. 주문 번호: " + orderId);
-                }
-            }
-
-            return ResponseEntity.ok("주문이 접수 처리되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("에러: " + e.getMessage());
-        }
-    }*/
 }

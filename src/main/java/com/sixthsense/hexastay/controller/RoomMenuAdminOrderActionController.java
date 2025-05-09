@@ -31,12 +31,21 @@ import java.util.Optional;
 public class RoomMenuAdminOrderActionController {
 
     private static final Logger log = LoggerFactory.getLogger(RoomMenuAdminOrderActionController.class);
-    private final RoomMenuOrderRepository roomMenuOrderRepository; // Repository 주입
+    private final RoomMenuOrderRepository roomMenuOrderRepository;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    // 주문 접수
+    /**************************************************
+     * 메소드명 : acceptOrders
+     * 룸서비스 주문 접수 처리
+     * 기능: 전달받은 주문 ID 목록에 대해 각 주문의 상태를 'ACCEPT'(접수)로 변경하고, 데이터베이스에 저장합니다.
+     * 성공 시 해당 주문자에게 실시간으로 주문 접수 알림을 전송합니다. 관리자가 수행합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-05-07
+     * 수정일 : -
+     **************************************************/
+
     @PostMapping("/accept-orders")
     public ResponseEntity<?> acceptOrders(@RequestBody List<Long> orderIds, Principal principal) {
         log.info("관리자 [{}] 주문 접수 API 호출 (Repository 직접 사용). 대상 주문 ID: {}", principal.getName(), orderIds);
@@ -50,9 +59,7 @@ public class RoomMenuAdminOrderActionController {
                     RoomMenuOrder order = optionalOrder.get();
                     order.setRoomMenuOrderStatus(RoomMenuOrderStatus.ACCEPT);
                     updatedOrderEntity = roomMenuOrderRepository.save(order);
-                    log.info("주문 ID [{}] 상태 ACCEPT로 DB 저장 완료.", orderId);
                 } else {
-                    log.warn("주문 ID [{}]를 찾을 수 없어 상태 변경 실패.", orderId);
                     continue; // 다음 orderId 처리
                 }
 
@@ -79,7 +86,16 @@ public class RoomMenuAdminOrderActionController {
         return ResponseEntity.ok(Map.of("message", "선택된 주문에 대한 '접수' 처리가 시도되었습니다."));
     }
 
-    // 주문 완료
+    /**************************************************
+     * 메소드명 : completeOrders
+     * 룸서비스 주문 완료 처리
+     * 기능: 전달받은 주문 ID 목록에 대해 각 주문의 상태를 'COMPLETE'(완료)로 변경하고, 데이터베이스에 저장합니다.
+     * 성공 시 해당 주문자에게 실시간으로 주문 완료 알림을 전송합니다. 관리자가 수행합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-05-07
+     * 수정일 : -
+     **************************************************/
+
     @PostMapping("/complete-orders")
     public ResponseEntity<?> completeOrders(@RequestBody List<Long> orderIds, Principal principal) {
         log.info("관리자 [{}] 주문 완료 API 호출 (Repository 직접 사용). 대상 주문 ID: {}", principal.getName(), orderIds);
@@ -95,7 +111,6 @@ public class RoomMenuAdminOrderActionController {
                     updatedOrderEntity = roomMenuOrderRepository.save(order);
                     log.info("주문 ID [{}] 상태 COMPLETE로 DB 저장 완료.", orderId);
                 } else {
-                    log.warn("주문 ID [{}]를 찾을 수 없어 상태 변경 실패.", orderId);
                     continue;
                 }
 
@@ -115,13 +130,21 @@ public class RoomMenuAdminOrderActionController {
                     log.info("주문 ID [{}] 사용자 [{}]에게 '완료' 알림 전송.", orderId, userPrincipalName);
                 }
             } catch (Exception e) {
-                log.error("주문 ID [{}] '완료' 처리 중 예외 발생: {}", orderId, e.getMessage(), e);
             }
         }
         return ResponseEntity.ok(Map.of("message", "선택된 주문에 대한 '완료' 처리가 시도되었습니다."));
     }
 
-    // 주문 취소
+    /**************************************************
+     * 메소드명 : cancelOrders
+     * 룸서비스 주문 취소 처리
+     * 기능: 전달받은 주문 ID 목록에 대해 각 주문의 상태를 'CANCEL'(취소)로 변경하고, 데이터베이스에 저장합니다.
+     * 성공 시 해당 주문자에게 실시간으로 주문 취소 알림을 전송합니다. 관리자가 수행합니다.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-05-07
+     * 수정일 : -
+     **************************************************/
+
     @PostMapping("/cancel-orders")
     public ResponseEntity<?> cancelOrders(@RequestBody List<Long> orderIds, Principal principal) {
         log.info("관리자 [{}] 주문 취소 API 호출 (Repository 직접 사용). 대상 주문 ID: {}", principal.getName(), orderIds);
@@ -137,7 +160,6 @@ public class RoomMenuAdminOrderActionController {
                     updatedOrderEntity = roomMenuOrderRepository.save(order);
                     log.info("주문 ID [{}] 상태 CANCEL로 DB 저장 완료.", orderId);
                 } else {
-                    log.warn("주문 ID [{}]를 찾을 수 없어 상태 변경 실패.", orderId);
                     continue;
                 }
 
@@ -157,7 +179,7 @@ public class RoomMenuAdminOrderActionController {
                     log.info("주문 ID [{}] 사용자 [{}]에게 '취소' 알림 전송.", orderId, userPrincipalName);
                 }
             } catch (Exception e) {
-                log.error("주문 ID [{}] '취소' 처리 중 예외 발생: {}", orderId, e.getMessage(), e);
+
             }
         }
         return ResponseEntity.ok(Map.of("message", "선택된 주문에 대한 '취소' 처리가 시도되었습니다."));
