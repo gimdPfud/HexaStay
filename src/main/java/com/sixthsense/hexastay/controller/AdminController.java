@@ -330,4 +330,109 @@ public class AdminController {
         return "admin/mypage";
     }
 
+
+    // 비번 변경
+
+    @GetMapping("/password/update")
+    public String adminPasswordReset(Principal principal) {
+        return "admin/passwordupdate";
+    }
+
+    @PostMapping("/password/verify")
+    @ResponseBody
+    public ResponseEntity<?> verifyIdentity(
+        @RequestParam String name,
+        @RequestParam String employeeNum,
+        @RequestParam String birth,
+        Principal principal
+    ) {
+        try {
+            if (principal == null) {
+                return ResponseEntity.badRequest().body("로그인이 필요합니다.");
+            }
+
+            // 현재 로그인한 사용자 정보 조회
+            Admin currentAdmin = adminRepository.findByAdminEmail(principal.getName());
+            if (currentAdmin == null) {
+                return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+            }
+
+            // 입력한 정보와 현재 로그인한 사용자 정보 비교
+            if (!currentAdmin.getAdminName().equals(name) ||
+                !currentAdmin.getAdminEmployeeNum().equals(employeeNum) ||
+                !currentAdmin.getAdminResidentNum().startsWith(birth)) {
+                return ResponseEntity.badRequest().body("본인 확인에 실패했습니다.");
+            }
+
+            return ResponseEntity.ok("본인 확인 성공");
+        } catch (Exception e) {
+            log.error("본인 확인 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("본인 확인 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/password/update")
+    @ResponseBody
+    public ResponseEntity<?> updatePassword(
+        @RequestParam String name,
+        @RequestParam String employeeNum,
+        @RequestParam String birth,
+        @RequestParam String currentPassword,
+        @RequestParam String newPassword,
+        @RequestParam String confirmPassword,
+        Principal principal
+    ) {
+        try {
+            if (principal == null) {
+                return ResponseEntity.badRequest().body("로그인이 필요합니다.");
+            }
+
+            // 현재 로그인한 사용자 정보 조회
+            Admin currentAdmin = adminRepository.findByAdminEmail(principal.getName());
+            if (currentAdmin == null) {
+                return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
+            }
+
+            // 입력한 정보와 현재 로그인한 사용자 정보 비교
+            if (!currentAdmin.getAdminName().equals(name) ||
+                !currentAdmin.getAdminEmployeeNum().equals(employeeNum) ||
+                !currentAdmin.getAdminResidentNum().startsWith(birth)) {
+                return ResponseEntity.badRequest().body("본인 확인에 실패했습니다.");
+            }
+
+            // 새 비밀번호 일치 확인
+            if (!newPassword.equals(confirmPassword)) {
+                return ResponseEntity.badRequest().body("새 비밀번호가 일치하지 않습니다.");
+            }
+
+            // 비밀번호 변경
+            adminService.updatePassword(name, employeeNum, birth, currentPassword, newPassword);
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error("비밀번호 변경 중 오류 발생", e);
+            return ResponseEntity.badRequest().body("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("mypageview")
+    public String myPageView (Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        try {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if (adminDTO == null) {
+                log.error("로그인 정보를 찾을 수 없습니다.: {}", principal.getName());
+                return "redirect:/admin/logout";
+            }
+            model.addAttribute("adminDTO", adminDTO);
+            return "admin/mypageview";
+        } catch (Exception e) {
+            log.error("마이페이지 접근 중 오류 발생: ", e);
+            return "redirect:/admin/logout";
+        }
+    }
+
 }

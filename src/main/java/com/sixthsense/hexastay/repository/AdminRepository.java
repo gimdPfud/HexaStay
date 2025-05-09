@@ -74,4 +74,11 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
     // 사번 생성용
     @Query("SELECT MAX(a.adminEmployeeNum) FROM Admin a WHERE a.adminEmployeeNum LIKE :prefix")
     String findMaxEmpNumStartingWith(@Param("prefix") String prefix);
+
+    // 본인 확인용
+    Admin findByAdminNameAndAdminEmployeeNumAndAdminResidentNumStartingWith(
+        String adminName, 
+        String adminEmployeeNum, 
+        String adminResidentNum
+    );
 }

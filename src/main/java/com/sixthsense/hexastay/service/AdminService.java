@@ -41,4 +41,8 @@ public interface AdminService {
     List<StoreDTO> insertStoreList (Long companyNum);
 
     List<CompanyDTO> insertSelectCompany (String companyType);
+
+    // 비밀번호 변경
+    void updatePassword(String name, String employeeNum, String birth, 
+                       String currentPassword, String newPassword);
 }

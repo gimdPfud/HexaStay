@@ -374,4 +374,26 @@ public class AdminServiceImpl implements AdminService {
         return yearPrefix + String.format("%06d", nextSeq);
     }
 
+    @Override
+    @Transactional
+    public void updatePassword(String name, String employeeNum, String birth, 
+                             String currentPassword, String newPassword) {
+        // 1. 본인 확인
+        Admin admin = adminRepository.findByAdminNameAndAdminEmployeeNumAndAdminResidentNumStartingWith(
+            name, employeeNum, birth
+        );
+        if (admin == null) {
+            throw new IllegalArgumentException("일치하는 관리자 정보가 없습니다.");
+        }
+
+        // 2. 현재 비밀번호 확인
+        if (!passwordEncoder.matches(currentPassword, admin.getAdminPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 새 비밀번호로 업데이트
+        admin.setAdminPassword(passwordEncoder.encode(newPassword));
+        adminRepository.save(admin);
+    }
+
 }

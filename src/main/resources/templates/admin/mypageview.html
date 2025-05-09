@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 정보</title>
+    <style>
+        .readonly-style {
+            background-color: #e9ecef !important;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <div class="container mt-4 w-100 bg-light">
+        <h2 class="fw-bold mb-4 text-center">회원 정보</h2>
+
+        <div class="container p-4" style="max-width: 700px;">
+            <div class="mb-3 user-box text-center">
+                <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
+                    <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" th:src="${adminDTO.adminProfileMeta != null} ? ${adminDTO.adminProfileMeta} : '#'" th:classappend="${adminDTO.adminProfileMeta == null} ? 'd-none' : ''">
+                </div>
+                <p class="file-name" th:text="${adminDTO.adminProfileMeta != null} ? '프로필 사진' : '프로필 사진이 없습니다.'"></p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">사번</label>
+                <input type="text" th:value="${adminDTO.adminEmployeeNum}" class="form-control readonly-style" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">이메일 (ID)</label>
+                <input type="email" th:value="${adminDTO.adminEmail}" class="form-control readonly-style" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">이름</label>
+                <input type="text" th:value="${adminDTO.adminName}" class="form-control readonly-style" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">주민등록번호</label>
+                <div class="row g-2">
+                    <div class="col">
+                        <input type="text" class="form-control readonly-style" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" readonly>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">-</div>
+                    <div class="col">
+                        <input type="text" class="form-control readonly-style" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6).replace('-', '') : ''}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">주소</label>
+                <div class="row g-2">
+                    <div class="col">
+                        <input type="text" class="form-control readonly-style" th:value="${adminDTO.adminAddress}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">연락처</label>
+                <div class="row g-2">
+                    <div class="col">
+                        <input type="text" class="form-control readonly-style" th:value="${adminDTO.adminPhone}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">직급</label>
+                <input type="text" class="form-control readonly-style" th:value="${adminDTO.adminRole}" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">직책</label>
+                <input type="text" class="form-control readonly-style" th:value="${adminDTO.adminPosition}" readonly>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <a th:href="@{/admin/passwordupdate}" class="btn btn-primary">비밀번호 변경</a>
+                <a th:href="@{/admin/mypage}" class="btn btn-success">개인정보 수정</a>
+                <a th:href="@{/admin/list}" class="btn btn-danger">목록으로</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
