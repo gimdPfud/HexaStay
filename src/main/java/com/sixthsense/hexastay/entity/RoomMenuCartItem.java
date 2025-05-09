@@ -1,24 +1,21 @@
 package com.sixthsense.hexastay.entity;
-import com.sixthsense.hexastay.dto.RoomMenuCartItemOptionDTO;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 
-/***************************************************
-
+/**************************************************
  * 클래스명 : RoomMenuCartItem
- * 기능 : 장바구니 항목을 나타내는 엔티티 클래스
- *        장바구니에 담긴 각 상품(RoomMenu)과 그 상품의 수량 및 가격을 관리하는 역할을 한다.
- *        하나의 장바구니 항목은 특정 상품(RoomMenu)과 수량, 가격 정보를 가지며,
- *        해당 상품이 특정 장바구니(RoomMenuCart)에 속하는 관계를 맺고 있다.
- *
+ * 기능   : 룸서비스 장바구니에 담긴 개별 항목(상품)을 나타내는 엔티티 클래스입니다.
+ * 각 항목은 특정 룸서비스 메뉴, 수량, 선택된 옵션 정보 및 가격을 포함하며,
+ * 특정 장바구니(RoomMenuCart)와 객실(Room)에 속합니다.
+ * Lombok 어노테이션을 사용하여 getter, setter, builder 등을 간편하게 생성합니다.
  * 작성자 : 김윤겸
  * 작성일 : 2025-04-03
- * 수정일 : -
- * 테이블설계 : 김윤겸
- *
- ****************************************************/
+ * 수정일 :
+ * 주요 필드 : roomMenuCartItemNum (PK), roomMenuCartItemAmount, roomMenuCartItemCount,
+ * roomMenuSelectOptionName, roomMenuSelectOptionPrice, roomMenuCartItemPrice, roomMenuCart (FK),
+ * roomMenu (FK), room (FK)
+ **************************************************/
 
 @Entity
 @Getter

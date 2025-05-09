@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.config;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,20 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-
 import java.util.Locale;
+
+/**************************************************
+ * 클래스명 : WebConfig
+ * 기능   : Spring MVC 관련 웹 설정을 담당하는 클래스입니다. (WebMvcConfigurer 구현)
+ * 다국어 지원을 위한 LocaleResolver 및 LocaleChangeInterceptor를 Bean으로 등록하고,
+ * 인터셉터 적용 규칙을 설정합니다. 또한, 외부 파일 시스템의 정적 리소스에 접근할 수 있도록
+ * 리소스 핸들러를 구성합니다.
+ * 작성자 : 핵사스테이
+ * 작성일 : 2025-04-07 (박인규)
+ * 수정일 : 2025-05-09
+ * 주요 설정/Bean : localeResolver (CookieLocaleResolver), localeChangeInterceptor
+ * (LocaleChangeInterceptor), addInterceptors, addResourceHandlers
+ **************************************************/
 
 @Configuration
 @RequiredArgsConstructor
@@ -47,8 +58,6 @@ public class WebConfig implements WebMvcConfigurer {
 
         return interceptor; // 설정한 interceptor 객체 반환
     }
-
-
 
     // 인터셉터를 등록하고, 특정 URL 패턴에 대해 적용될지 설정
     @Override
@@ -91,16 +100,6 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/hotelRoomsByMember/**")
                 .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
-
-
-        // 다국어 설정
-
-
-
-
-
-
-
 
     }
 }
