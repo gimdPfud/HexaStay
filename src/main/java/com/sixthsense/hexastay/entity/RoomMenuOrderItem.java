@@ -1,12 +1,21 @@
 package com.sixthsense.hexastay.entity;
-
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+/**************************************************
+ * 클래스명 : RoomMenuOrderItem
+ * 기능   : 룸서비스 주문에 포함된 개별 항목(메뉴)을 나타내는 엔티티 클래스입니다.
+ * 각 주문 항목은 특정 룸서비스 메뉴, 원본 주문, 주문 당시의 가격, 요청 메시지, 주문 수량 및
+ * 선택된 옵션 정보를 가집니다.
+ * Lombok 어노테이션을 사용하여 getter, setter 등을 간편하게 생성하며, BaseEntity를 상속합니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-11
+ * 수정일 :
+ * 주요 필드 : roomMenuOrderItemNum (PK), roomMenu (FK), roomMenuOrder (FK),
+ * roomMenuOrderPrice, roomMenuOrderAmount, roomMenuSelectOptionName,
+ * roomMenuSelectOptionPrice
+ **************************************************/
 
 @Entity
 @Getter
@@ -39,9 +48,4 @@ public class RoomMenuOrderItem extends BaseEntity {
 
     private Integer roomMenuSelectOptionPrice; //옵션의 가격
 
-    public int calculateTotalPrice(RoomMenuOrder order) {
-        return order.getOrderItems().stream()
-                .mapToInt(item -> item.getRoomMenuOrderPrice() * item.getRoomMenuOrderAmount())
-                .sum();
-    }
 }
