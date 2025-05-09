@@ -49,7 +49,7 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
             "JOIN o.orderstoreitemList oi " +
             "JOIN oi.storemenu sm " +
             "JOIN sm.store s " +
-            "WHERE s.storeNum = :storeNum")
+            "WHERE s.storeNum = :storeNum order by o.orderstoreNum DESC ")
     List<Orderstore> findByStoreNum(Long storeNum);
 
     @Query("SELECT DISTINCT o FROM Orderstore o " +
