@@ -1,3 +1,23 @@
+/**************************************************
+ * 파일 설명 : 실시간 알림 및 WebSocket 통신 처리 스크립트
+ * 기능   : 웹 애플리케이션의 사용자 및 관리자를 위한 실시간 알림 기능을 구현합니다.
+ * - 공통 기능:
+ * - 읽지 않은 알림 개수를 표시하는 배지 UI 업데이트
+ * - 알림 항목 HTML 생성 및 드롭다운 목록에 동적 추가/초기화
+ * - 알림 '읽음' 상태 변경 API 호출
+ * - 관리자용 기능:
+ * - 새로운 룸서비스 주문 발생 시 WebSocket을 통해 실시간 모달 알림 수신 및 표시
+ * - 새 주문 알림 수신 시 알림 드롭다운 목록 및 배지 업데이트
+ * - 사용자용 기능:
+ * - 자신의 주문 상태 변경(예: 접수, 완료, 취소)에 대한 WebSocket 실시간 모달 알림 수신
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-05-07
+ * 수정일 : 2025-05-09
+ * 주요 기능/함수 : updateNotificationBadge, createNotificationItemHTML,
+ * addNotificationToList, markNotificationsAsReadApiCall, initializeNotifications,
+ * connectWebSocket (관리자 주문 알림), 사용자 주문 상태 알림 WebSocket 구독 및 처리
+ **************************************************/
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log("사용자 주문 상태 알림 스크립트 초기화 시작");
 

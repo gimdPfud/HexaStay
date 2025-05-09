@@ -28,9 +28,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
-
-
-
     // 이름으로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)
     @Query("SELECT r FROM RoomMenu r " +
             "WHERE r.roomMenuName LIKE %:name% " +
@@ -93,19 +90,7 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     // 호텔 룸 멤버의 이메일 참조
     RoomMenu findByRoom_Member_MemberEmail(String memberEmail);
 
-    // 좋아요
-    @Modifying
-    @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes + 1 WHERE rm.roomMenuNum = :menuNum")
-    void roomMenuIncrementLikes(@Param("menuNum") Long menuNum);
-
-    // 싫어요
-    @Modifying
-    @Query("UPDATE RoomMenu rm SET rm.roomMenuDisLikes = rm.roomMenuDisLikes - 1 WHERE rm.roomMenuNum = :menuNum")
-    void roomMenuDecrementDisLikes(@Param("menuNum") Long menuNum);
-
-
     // 이걸 기반으로 번역 승인 대기 리스트 뷰에서 필요한 데이터만 딱 걸러주는 매소드
-
     Page<RoomMenu> findByApprovedByDevFalseAndSupportsMultilangTrue(Pageable pageable);
 
     // 다국어 승인을 필터를 위해 추가한 레포지토리
