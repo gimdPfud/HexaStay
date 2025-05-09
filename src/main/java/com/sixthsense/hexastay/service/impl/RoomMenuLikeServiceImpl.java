@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.service.impl;
-
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuLike;
@@ -99,82 +98,5 @@ public class RoomMenuLikeServiceImpl implements RoomMenuLikeService {
         }
 
         return roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, true).intValue();
-    }
-
-    /***********************************************
-     * 메서드명 : roomMenuDisLike
-     * 기능 : 특정 룸 메뉴에 대한 사용자의 싫어요 설정을 처리
-     * - 이미 싫어요를 누른 경우 싫어요를 취소
-     * - 좋아요를 누른 상태였다면 좋아요를 취소하고 싫어요로 변경
-     * - 처음 누르는 경우 새로운 싫어요 정보를 생성
-     * - 처리 후 해당 룸 메뉴의 총 싫어요 수를 반환
-     * 매개변수 : Long roomMenuNum - 룸 메뉴 번호
-     * String memberEmail - 사용자 이메일
-     * 반환값 : Integer - 해당 룸 메뉴의 총 싫어요 수
-     * 작성자 : 김윤겸
-     * 작성일 : 2025-04-15
-     * 수정일 : -
-     * ***********************************************/
-
-    @Override
-    public Integer roomMenuDisLike(Long roomMenuNum, String memberEmail) {
-        log.info("싫어요 서비스 진입 " + memberEmail);
-        log.info("싫어요 서비스 진입 " + roomMenuNum);
-
-        Member member = memberRepository.findByMemberEmail(memberEmail);
-        RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
-
-        Optional<RoomMenuLike> optionalLike = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
-
-        if (optionalLike.isPresent()) {
-            RoomMenuLike like = optionalLike.get();
-            if (Boolean.FALSE.equals(like.getRoomMenuLikedCheck())) {
-                // 이미 싫어요 상태면 → 취소
-                roomMenuLikeRepository.delete(like);
-            } else {
-                // 좋아요였으면 → 싫어요로 전환
-                like.setRoomMenuLikedCheck(false);
-                roomMenuLikeRepository.save(like);
-            }
-        } else {
-            // 처음 누르는 거면 → 새로 생성
-            RoomMenuLike newDislike = new RoomMenuLike();
-            newDislike.setMember(member);
-            newDislike.setRoomMenu(menu);
-            newDislike.setRoomMenuLikedCheck(false);
-            roomMenuLikeRepository.save(newDislike);
-        }
-
-        // 싫어요 수 리턴
-        return roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, false).intValue();
-    }
-
-    /***********************************************
-     * 메서드명 : roomMenuDisLikeCancel
-     * 기능 : 특정 룸 메뉴에 대한 사용자의 싫어요 취소 요청을 처리
-     * - 해당 사용자가 해당 룸 메뉴에 싫어요를 눌렀던 경우 해당 정보를 삭제
-     * - 처리 후 해당 룸 메뉴의 총 싫어요 수를 반환
-     * 매개변수 : Long roomMenuNum - 룸 메뉴 번호
-     * String memberEmail - 사용자 이메일
-     * 반환값 : Integer - 해당 룸 메뉴의 총 싫어요 수
-     * 작성자 : 김윤겸
-     * 작성일 : 2025-04-15
-     * 수정일 : -
-     * ***********************************************/
-
-    @Override
-    public Integer roomMenuDisLikeCancel(Long roomMenuNum, String memberEmail) {
-        log.info("싫어요 캔슬 서비스 진입 " + roomMenuNum);
-        log.info("싫어요 캔슬 서비스 진입 " + memberEmail);
-
-        Member member = memberRepository.findByMemberEmail(memberEmail);
-        RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
-
-        Optional<RoomMenuLike> optional = roomMenuLikeRepository.findByMember_MemberEmailAndRoomMenu(memberEmail, menu);
-        if (optional.isPresent() && Boolean.FALSE.equals(optional.get().getRoomMenuLikedCheck())) {
-            roomMenuLikeRepository.delete(optional.get()); // 싫어요 → 삭제
-        }
-
-        return roomMenuLikeRepository.countByRoomMenuAndRoomMenuLikedCheck(menu, false).intValue();
     }
 }

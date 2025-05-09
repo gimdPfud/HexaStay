@@ -40,7 +40,6 @@ public class RoomMenuOptionServiceImpl implements RoomMenuOptionService {
      *
      ****************************************************/
 
-
     // 리스트 불러오기
     @Override
     public List<RoomMenuOptionDTO> roomMenuOptionAllList(Long roomMenuNum) {
@@ -158,6 +157,7 @@ public class RoomMenuOptionServiceImpl implements RoomMenuOptionService {
     // admin/list에서 삭제 시 옵션 확인하기.
     @Override
     public boolean hasOption(Long roomMenuNum) {
+        log.info("옵션 존재여부 서비스 진입" + roomMenuNum);
             return optionRepository.existsByRoomMenu_RoomMenuNum(roomMenuNum);
         }
     }

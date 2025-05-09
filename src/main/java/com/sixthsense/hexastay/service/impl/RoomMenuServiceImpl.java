@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.service.impl;
-
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
@@ -16,8 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +23,19 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+
+/**************************************************
+ * 클래스명 : RoomMenuServiceImpl
+ * 기능   : 룸서비스 메뉴 관련 비즈니스 로직을 처리하는 서비스 구현 클래스입니다.
+ * (RoomMenuService 인터페이스 구현)
+ * 메뉴 등록(이미지 및 옵션 포함), 목록 조회(검색, 페이지네이션, 다국어 지원), 상세 조회(옵션 및 다국어 지원),
+ * 수정(이미지 및 옵션 포함), 삭제 및 관리자별 호텔 객실 목록 조회 등의 기능을 제공합니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-01
+ * 수정일 : 2025-05-09
+ * 주요 메소드/기능 : insert, RoomMenuList, read, modify, delete, getMenusWithLocale,
+ * searchRoomList, convertToHotelRoomDto
+ **************************************************/
 
 @Service
 @Transactional
@@ -36,19 +46,24 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
     private final RoomMenuRepository roomMenuRepository;
     private final RoomMenuTranslationRepository roomMenuTranslationRepository;
-    private final HotelRoomRepository hotelRoomRepository;
-    private final AdminRepository adminRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final RoomMenuOptionRepository roomMenuOptionRepository;
     private final RoomMenuLikeRepository roomMenuLikeRepository;
-    private final RoomMenuOrderItemRepository roomMenuOrderItemRepository;
 
 
     /**************************************************
-     * 룸서비스 메뉴 등록
-     * 기능 : 룸서비스 메뉴를 등록하는 서비스
-     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하여 DB에 저장하고,
-     *        다시 DTO로 변환하여 클라이언트에게 반환
+     * 메소드명 : insert
+     * 룸서비스 메뉴 신규 등록 (이미지 및 옵션 포함)
+     * 기능: 전달받은 `RoomMenuDTO` 정보를 기반으로 새로운 룸서비스 메뉴를 생성하고 데이터베이스에 저장합니다.
+     * 메뉴 정보와 함께 옵션 정보(`RoomMenuOptionDTO` 목록)도 저장하며, 메뉴 대표 이미지가 있는 경우
+     * 파일을 지정된 경로에 저장하고 메타데이터를 엔티티에 기록합니다.
+     * 다국어 지원 여부에 따라 개발자 승인 상태를 초기 설정합니다.
+     * @param roomMenuDTO RoomMenuDTO : 등록할 룸서비스 메뉴의 정보 (이름, 가격, 이미지 파일, 옵션 목록 등)를 담은 DTO.
+     * @return RoomMenuDTO : 성공적으로 등록된 룸서비스 메뉴 정보를 담은 DTO.
+     * @throws IOException : 이미지 파일 저장 중 오류가 발생한 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-01
+     * 수정일 : 2025-04-27
      **************************************************/
 
     @Override
@@ -59,7 +74,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         } else {
             log.info("업로드된 이미지가 없습니다.");
         }
-        // 모델맵퍼로 dto 변환
 
         RoomMenu roomMenu = modelMapper.map(roomMenuDTO, RoomMenu.class);
         roomMenuRepository.save(roomMenu); // 이게 먼저 되어야 함!
@@ -113,9 +127,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         // 파일 메타데이터 저장
         roomMenu.setRoomMenuImageMeta(roomMenuDTO.getRoomMenuImageMeta());
 
-        // 엔티티 업데이트 (두 번째 save 불필요, 첫 번째 저장으로 충분)
-//        roomMenu = roomMenuRepository.save(roomMenu);
-
         // 다시 DTO로 변환
         roomMenuDTO = modelMapper.map(roomMenu, RoomMenuDTO.class);
 
@@ -125,11 +136,22 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
 
     /**************************************************
-     * 룸서비스 메뉴 리스트 조회와 검색
-     * 기능 : 룸서비스 메뉴의 목록을 페이지네이션 처리하여 반환
-     * 설명 : Pageable을 사용하여 페이지 단위로 메뉴 리스트를 조회하고,
-     *        해당 리스트를 DTO로 변환하여 반환
-     *        수정일자 : 2025-04-07, 2025-04-16 - 재고량 추가 2025-04-19 : 통합매소드 합치기
+     * 메소드명 : RoomMenuList
+     * 룸서비스 메뉴 목록 조회 (검색, 페이지네이션, 다국어 지원)
+     * 기능: 다양한 검색 조건(`type`, `keyword`, `category`), 페이지네이션 정보(`pageable`),
+     * 현재 로케일(`locale`) 및 사용자 뷰 여부(`forUserView`)를 기반으로 룸서비스 메뉴 목록을 조회합니다.
+     * 조회된 각 메뉴는 현재 로케일에 따라 번역된 정보(이름, 내용, 카테고리)와 재고 상태("품절"/"판매중")를
+     * 포함하여 `RoomMenuDTO`로 변환된 후, `Page<RoomMenuDTO>` 형태로 반환됩니다.
+     * @param pageable Pageable : 페이징 처리 정보 (페이지 번호, 크기, 정렬 등).
+     * @param type String : 검색 유형 (C: 카테고리, S: 이름, P: 가격 이하, A: 재고 이상, N: 이름 또는 가격, L: 좋아요 순, PL: 가격 낮은순, PH: 가격 높은순).
+     * @param keyword String : 검색어 (검색 유형에 따라 사용됨).
+     * @param category String : 검색할 카테고리명.
+     * @param locale Locale : 다국어 처리를 위한 현재 로케일 정보.
+     * @param forUserView boolean : 사용자용 뷰인지 여부 (필터링 조건에 사용됨).
+     * @return Page<RoomMenuDTO> : 조회 및 변환된 룸서비스 메뉴 DTO 페이지 객체.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-03
+     * 수정일 : 2025-04-18
      **************************************************/
 
     public Page<RoomMenuDTO> RoomMenuList(Pageable pageable, String type, String keyword,
@@ -137,11 +159,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
         Page<RoomMenu> roomMenuPage;
         String lang = locale.getLanguage();
-
-        log.info("검색 유형(type): {}", type);
-        log.info("검색 키워드(keyword): {}", keyword);
-        log.info("카테고리(category): {}", category);
-        log.info("forUserView: {}", forUserView);
 
         // 카테고리가 존재한다면 ?
         boolean hasCategory = category != null && !category.trim().isEmpty();
@@ -213,17 +230,23 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                 })
                 .collect(Collectors.toList());
 
-        dtoList.forEach(dto -> log.info(" - {}원", dto.getRoomMenuPrice()));
-
         return new PageImpl<>(dtoList, pageable, roomMenuPage.getTotalElements());
     }
 
 
     /**************************************************
-     * 룸서비스 메뉴 상세 보기
-     * 기능 : 특정 메뉴의 상세 정보를 조회
-     * 설명 : 메뉴 번호를 이용해 DB에서 해당 메뉴를 조회하고,
-     *        이를 DTO로 변환하여 반환
+     * 메소드명 : read
+     * 룸서비스 메뉴 상세 정보 조회 (옵션 및 다국어 지원)
+     * 기능: 특정 룸서비스 메뉴 번호(`num`)를 기준으로 메뉴의 상세 정보를 조회합니다.
+     * 현재 로케일(`locale`)에 맞는 번역된 메뉴 이름과 내용을 적용하고,
+     * 해당 메뉴에 속한 모든 옵션 목록을 함께 조회하여 `RoomMenuDTO`로 구성하여 반환합니다.
+     * @param num Long : 조회할 룸서비스 메뉴의 ID.
+     * @param locale Locale : 다국어 처리를 위한 현재 로케일 정보.
+     * @return RoomMenuDTO : 조회된 룸서비스 메뉴의 상세 정보 DTO (번역 및 옵션 포함).
+     * @throws EntityNotFoundException : `num`에 해당하는 메뉴가 존재하지 않는 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-02
+     * 수정일 : 2025-04-27
      **************************************************/
 
     @Override
@@ -246,7 +269,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         List<RoomMenuOptionDTO> optionDTOs = options.stream()
                 .map(option -> modelMapper.map(option, RoomMenuOptionDTO.class))
                 .collect(Collectors.toList());
-        log.info("RoomMenuOptionDTO: {}", optionDTOs);  // DTO 출력 (roomMenuOptionStock 값 확인)
 
         roomMenuDTO.setOptions(optionDTOs);
 
@@ -255,11 +277,18 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     }
 
     /**************************************************
-     * 룸서비스 메뉴 수정
-     * 기능 : 룸서비스 메뉴 정보를 수정
-     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하고, 해당 메뉴를 수정한 후,
-     *        수정된 엔티티를 다시 DTO로 변환하여 반환
-     * 수정일 : 2025-04-09
+     * 메소드명 : modify
+     * 룸서비스 메뉴 정보 수정 (이미지 및 옵션 포함)
+     * 기능: 전달받은 `RoomMenuDTO` 정보를 사용하여 기존 룸서비스 메뉴를 수정합니다.
+     * 메뉴 기본 정보, 옵션 목록 (추가/수정/삭제), 대표 이미지를 업데이트할 수 있습니다.
+     * 새로운 이미지가 제공되면 기존 이미지는 파일 시스템에서 삭제되고 새 이미지로 대체됩니다.
+     * @param roomMenuDTO RoomMenuDTO : 수정할 룸서비스 메뉴의 정보 (메뉴 ID, 변경할 내용, 새 이미지 파일, 옵션 목록 등).
+     * @return RoomMenuDTO : 성공적으로 수정된 룸서비스 메뉴 정보를 담은 DTO.
+     * @throws EntityNotFoundException : 수정 대상 룸메뉴 또는 전달된 옵션 ID에 해당하는 옵션이 존재하지 않는 경우.
+     * @throws RuntimeException : 이미지 파일 처리(디렉토리 생성, 파일 저장) 중 오류가 발생하거나 데이터 수정 중 예외가 발생한 경우.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-02
+     * 수정일 : 2025-04-27
      **************************************************/
 
     @Override
@@ -375,25 +404,42 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
 
     /**************************************************
+     * 메소드명 : delete
      * 룸서비스 메뉴 삭제
-     * 기능 : 특정 메뉴를 삭제하는 서비스
-     * 설명 : 메뉴 번호로 해당 메뉴를 찾아 삭제
+     * 기능: 특정 룸서비스 메뉴 번호(`num`)에 해당하는 메뉴를 데이터베이스에서 삭제합니다.
+     * 해당 메뉴와 관련된 좋아요 정보(`RoomMenuLike`)도 함께 삭제됩니다.
+     * (주의: 연결된 옵션, 번역, 주문 항목 등의 삭제 정책은 이 메소드에서 직접 처리하지 않으므로,
+     * DB 제약조건 또는 CascadeType 설정에 따라 동작하거나 별도 처리가 필요할 수 있습니다.)
+     * @param num Long : 삭제할 룸서비스 메뉴의 ID.
+     * @throws EntityNotFoundException : 삭제할 메뉴 ID에 해당하는 RoomMenu가 없는 경우 (deleteById는 예외를 발생시키지 않으므로, 사전 조회 또는 다른 방식 고려)
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-02
+     * 수정일 : -
      **************************************************/
 
     @Override
     public void delete(Long num) {
 
         log.info("삭제 서비스 진입" + num);
-
         roomMenuLikeRepository.deleteByRoomMenu_RoomMenuNum(num);
         roomMenuRepository.deleteById(num);
-
         log.info("삭제완료 db를 확인하세요.");
 
     }
 
-
-
+    // todo : 오류날 수 있으니 주의 삭제 하지마
+    /* *************************************************
+     * 메소드명 : getMenusWithLocale
+     * 특정 로케일 기준 전체 메뉴 목록 조회 (다국어 적용)
+     * 기능: 모든 룸서비스 메뉴를 조회한 후, 각 메뉴에 대해 주어진 로케일 문자열(`locale`)에 해당하는
+     * 번역 정보(이름, 내용, 카테고리)를 적용하여 `RoomMenuDTO` 목록으로 변환하여 반환합니다.
+     * 번역 정보가 없으면 원본 메뉴 정보를 사용합니다.
+     * @param locale String : 적용할 로케일 코드 (예: "ko", "en").
+     * @return List<RoomMenuDTO> : 번역이 적용된 전체 룸서비스 메뉴 DTO 목록.
+     * 작성자 : 김윤겸
+     * 등록일 : 2025-04-17
+     * 수정일 : -
+     **************************************************/
 
     // 번역
     @Override
@@ -426,6 +472,23 @@ public class RoomMenuServiceImpl implements RoomMenuService {
     }
 
     // todo(10) : 중복된 매소드, 위에 통합으로 합침. 일단 오류생기니까 맵둬
+    /**************************************************
+     * 메소드명 : searchRoomMenuList
+     * (중복 가능성 있음) 룸서비스 메뉴 목록 검색 및 조회 (페이지네이션, 다국어)
+     * 기능: `RoomMenuList` 메소드와 유사하게 검색 조건, 페이지네이션, 로케일을 기반으로
+     * 룸서비스 메뉴 목록을 조회하고 `Page<RoomMenuDTO>`로 반환합니다.
+     * (주의: `RoomMenuList` 메소드와 기능 및 시그니처가 거의 동일하여 중복될 수 있습니다.)
+     * @param pageable Pageable : 페이징 정보.
+     * @param type String : 검색 유형.
+     * @param keyword String : 검색어.
+     * @param category String : 검색할 카테고리.
+     * @param locale Locale : 다국어 처리를 위한 로케일.
+     * @return Page<RoomMenuDTO> : 조회된 룸서비스 메뉴 DTO 페이지 객체.
+     * 작성자 : 김윤겸
+     * 등록일 : -
+     * 수정일 : -
+     **************************************************/
+
     @Override
     public Page<RoomMenuDTO> searchRoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale) {
         log.info("룸서비스 상품 리스트 서비스 진입");
@@ -494,133 +557,6 @@ public class RoomMenuServiceImpl implements RoomMenuService {
         return roomMenuDTOList;
     }
 
-    /* 호텔 객실 목록 조회 */
-
-    public List<HotelRoomDTO> searchRoomList(String adminEmail) {
-        log.info("관리자 이메일 '{}'로 호텔 객실 목록 조회를 시작합니다.", adminEmail);
-
-        // 1. 이메일 주소로 Admin 엔티티 조회
-        Admin admin = adminRepository.findByAdminEmail(adminEmail); // Repository 메소드 반환 타입 확인 (Optional이 아닐 수 있음)
-        if (admin == null) {
-            log.warn("이메일 '{}'에 해당하는 관리자를 찾을 수 없습니다.", adminEmail);
-            throw new EntityNotFoundException("해당 이메일의 관리자를 찾을 수 없습니다: " + adminEmail);
-        }
-
-        // 2. 조회된 Admin 엔티티에서 연결된 Company(호텔) 정보 가져오기
-        Company managedCompany = admin.getCompany();
-        if (managedCompany == null) {
-            log.warn("관리자 '{}'에게 할당된 호텔(Company) 정보가 없습니다.", adminEmail);
-            return Collections.emptyList(); // 빈 목록 반환
-        }
-        Long companyId = managedCompany.getCompanyNum(); // Company 엔티티의 PK 필드명 확인
-
-        List<HotelRoom> hotelRooms = hotelRoomRepository.findByCompany_CompanyNum(companyId);
-        log.debug("회사 ID '{}'에 속한 HotelRoom {}건을 조회했습니다.", companyId, hotelRooms.size());
-
-        List<HotelRoomDTO> hotelRoomDtos = hotelRooms.stream()
-                .map(this::convertToHotelRoomDto) // 아래 정의된 변환 메소드 사용
-                .collect(Collectors.toList());
-
-        log.info("관리자 이메일 '{}'에 대한 호텔 객실 목록 조회 완료: {} 건", adminEmail, hotelRoomDtos.size());
-        return hotelRoomDtos;
-    }
-
-    private HotelRoomDTO convertToHotelRoomDto(HotelRoom hotelRoom) {
-        if (hotelRoom == null) {
-            return null;
-        }
-
-        HotelRoomDTO.HotelRoomDTOBuilder builder = HotelRoomDTO.builder()
-                .hotelRoomNum(hotelRoom.getHotelRoomNum())
-                .hotelRoomName(hotelRoom.getHotelRoomName())
-                .hotelRoomPhone(hotelRoom.getHotelRoomPhone())
-                .hotelRoomType(hotelRoom.getHotelRoomType())
-                .hotelRoomContent(hotelRoom.getHotelRoomContent())
-                .hotelRoomStatus(hotelRoom.getHotelRoomStatus())
-                .hotelRoomLodgment(hotelRoom.getHotelRoomLodgment())
-                .hotelRoomPrice(hotelRoom.getHotelRoomPrice())
-                .hotelRoomQr(hotelRoom.getHotelRoomQr())
-                // .hotelRoomPassword(hotelRoom.getHotelRoomPassword()) // 비밀번호는 DTO에 포함하지 않는 것이 좋습니다.
-                .hotelRoomProfileMeta(hotelRoom.getHotelRoomProfileMeta());
-
-        // Company 정보 매핑 (Company 정보가 있는 경우)
-        if (hotelRoom.getCompany() != null) {
-            builder.companyNum(hotelRoom.getCompany().getCompanyNum());
-            builder.companyName(hotelRoom.getCompany().getCompanyName()); // DTO에 companyName 필드가 있다고 가정
-        }
-
-
-        return builder.build();
-    }
 }
-
-
-
-//    /**************************************************
-//     * 좋아요 서비스 등록
-//     * 기능 : 룸서비스 메뉴를 등록하는 서비스
-//     * 설명 : 전달된 RoomMenuDTO를 엔티티로 변환하여 DB에 저장하고,
-//     *        다시 DTO로 변환하여 클라이언트에게 반환
-//     **************************************************/
-//
-//    // 좋아요
-//    @Override
-//    public Integer roomMenuLike(Long roomMenuNum) {
-//        log.info("좋아요 서비스 진입 : " + roomMenuNum);
-//        roomMenuRepository.incrementLikes(roomMenuNum);
-//        return roomMenuRepository.findById(roomMenuNum)
-//                .map(RoomMenu::getRoomMenuLikes)
-//                .orElse(0);
-//    }
-//
-//    // 싫어요
-//    @Override
-//    public Integer roomMenuDisLike(Long roomMenuNum) {
-//        RoomMenu roomMenu = roomMenuRepository.findById(roomMenuNum)
-//                .orElseThrow(() -> new EntityNotFoundException("해당 메뉴가 없습니다."));
-//
-//        int currentDislikes = Optional.ofNullable(roomMenu.getRoomMenuDislikes()).orElse(0);
-//        roomMenu.setRoomMenuDislikes(currentDislikes + 1);
-//        roomMenuRepository.save(roomMenu);
-//
-//        return roomMenu.getRoomMenuDislikes();
-//    }
-//
-//    // 싫어요 취소
-//    @Override
-//    public Integer roomMenuDisLikeCancel(Long roomMenuNum) {
-//        log.info("싫어요 취소 서비스 진입 : " + roomMenuNum);
-//        RoomMenu menu = roomMenuRepository.findById(roomMenuNum).orElseThrow();
-//        menu.setRoomMenuDislikes(Math.max(menu.getRoomMenuDislikes() - 1, 0)); // 최소 0
-//        roomMenuRepository.save(menu);
-//        return menu.getRoomMenuDislikes();
-//    }
-//
-//    // 좋아요 취소
-//    @Override
-//    public Integer roomMenuLikeCancel(Long roomMenuNum) {
-//    log.info("좋아요 취소 서비스 진입 : " + roomMenuNum);
-//
-//        roomMenuRepository.decrementLikes(roomMenuNum);
-//        return roomMenuRepository.findById(roomMenuNum)
-//                .map(RoomMenu::getRoomMenuLikes)
-//                .orElse(0);
-//    }
-//
-//    // 좋아요수
-//    @Override
-//    public int getLikeCount(Long roomMenuNum) {
-//        return roomMenuRepository.findById(roomMenuNum)
-//                .map(RoomMenu::getRoomMenuLikes)
-//                .orElse(0);
-//    }
-//
-//    // 싫어요 수
-//    @Override
-//    public int getDislikeCount(Long roomMenuNum) {
-//        return roomMenuRepository.findById(roomMenuNum)
-//                .map(RoomMenu::getRoomMenuDislikes)
-//                .orElse(0);
-//    }
 
 
