@@ -35,9 +35,8 @@ import java.util.Locale;
 @RequestMapping("/admin/store/menu")
 public class StoremenuController {
     private final StoremenuService storemenuService;
-    private final StoreService storeService;
-    private final AdminService adminService;
-
+//    private final StoreService storeService;
+//    private final AdminService adminService;
 //    /*storeNum없이 바로 메뉴 등록하려고 할 때
 //    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
 //    @GetMapping("/insert")

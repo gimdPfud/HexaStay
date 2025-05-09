@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -63,9 +64,6 @@ public class StoreController {
 //            }
 //        }
         model.addAttribute("companyList",companyService.getBnFList());
-//         정상적인 호텔 소속 어드민
-//        CompanyDTO companyDTO = companyService.companyRead(adminDTO.getCompanyNum());
-//        model.addAttribute("data", companyDTO);
         return "store/insert";
     }
 
@@ -126,7 +124,6 @@ public class StoreController {
         Long companyNum = 0L;
         try {companyNum = Long.valueOf(chosenCompany);}
         catch (NumberFormatException ignored){}
-        //todo <option value="">모두 보기</option> 추가 (26번째 줄)
         model.addAttribute("companyNum",companyNum);
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
@@ -149,25 +146,16 @@ public class StoreController {
         if (principal == null) {
             return "redirect:/admin/login";
         }
-        AdminDTO admin = adminService.adminFindEmail(principal.getName());
-        if (idid == null) {
-            if(admin.getStoreNum()==null){
-                log.info("스토어 소속이 아닌데 /admin/store/read로 접근. /list로 반환한다.");
-                return "redirect:/admin/store/list"; // 이 경로는 실제 프로젝트에 맞게 확인 필요
-            }else{
-                idid = admin.getStoreNum();
-                log.info("ID not provided, using admin's store ID: {}", idid); // 로그 추가
-            }
+        if(idid==null){
+            return null;
         }
-
+        AdminDTO admin = adminService.adminFindEmail(principal.getName());
         StoreDTO data = storeService.read(idid, locale);
-
-        boolean result = storeService.validStoreAdmin(admin, data); // 이 서비스 메소드도 확인 필요
+        boolean result = storeService.validStoreAdmin(admin, data);
         if (result) {
             model.addAttribute("data", data);
-
             model.addAttribute("currentLang", locale.getLanguage());
-            return "store/read"; // templates/store/read.html
+            return "store/read";
         } else {
             log.info("Admin {} attempted to access unauthorized store {}", admin.getAdminEmail(), idid); // 로그 개선
             return "redirect:/admin/logout"; // 또는 접근 거부 페이지
@@ -177,37 +165,38 @@ public class StoreController {
 
     @GetMapping("/modify/{id}")
     public String modify(@PathVariable Long id, Principal principal, Model model, Locale locale){
-
-
         if (principal == null) {
             return "redirect:/admin/login";
         }
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
         if (adminDTO == null) {
-            return "redirect:/admin/logout"; // 또는 에러 페이지
+            return "redirect:/admin/logout";
         }
-
         StoreDTO data = storeService.read(id, locale);
-
         if (!storeService.validStoreAdmin(adminDTO, data)) {
             return "redirect:/admin/logout"; // 또는 접근 거부 페이지
         }
-
         model.addAttribute("data", data);
-
         // TODO: 카테고리 리스트 다국어 처리 필요 시 MessageSource 사용 고려하는것도 괜찮은 방법일지도..?
         model.addAttribute("storeCategoryList", List.of("한식", "중식", "일식", "아시안", "양식", "패스트푸드", "카페"));
-
         model.addAttribute("currentLang", locale.getLanguage());
-
-        return "store/modify"; // templates/store/modify.html
+        return "store/modify";
     }
 
     @PostMapping("/modify")
-    public String modify(StoreDTO storeDTO) throws IOException {
+    public String modify(@Valid StoreDTO storeDTO, BindingResult bindingResult, RedirectAttributes model){
         log.info(storeDTO.toString());
-        Long storeNum = storeService.modify(storeDTO);
-        return "redirect:/admin/store/read?idid="+storeNum;
+        if(bindingResult.hasErrors()){
+            log.info("유효성체크");
+            model.addAttribute("errmsg","수정에 실패했습니다. 내용을 다시 확인해주세요.");
+            return "redirect:/admin/store/modify/"+storeDTO.getStoreNum();
+        }
+        try {
+            Long storeNum = storeService.modify(storeDTO);
+            return "redirect:/admin/store/read?idid="+storeNum;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
