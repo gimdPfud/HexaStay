@@ -57,7 +57,8 @@
         }
 
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
@@ -114,6 +115,75 @@
             margin-bottom: 1rem;
             text-align: center;
         }
+
+        .success {
+            color: #5cb85c;
+        }
+
+        /* 비밀번호 찾기 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-form {
+            display: none;
+        }
+
+        .modal-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -138,12 +208,234 @@
     <input type="submit" name="Login" value="Login" class="login-submit"/>
     <div class="login-links">
         <a href="/member/signup">Sign up</a> |
-        <a href="#">Forgot password?</a>
+        <a href="#" id="forgotPasswordLink">Forgot password?</a>
     </div>
 </form>
 
+<!-- 비밀번호 찾기 모달 -->
+<div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        
+        <!-- 본인 확인 폼 -->
+        <form id="verifyForm" class="modal-form active">
+            <div class="login-text">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x" style="color: #666;"></i>
+                    <i class="fa fa-user fa-stack-1x" style="color: white;"></i>
+                </span>
+                <div>본인 확인</div>
+            </div>
+            <div id="verifyAlert" class="alert" style="display: none;"></div>
+            <input type="text" name="adminName" required placeholder="이름" />
+            <input type="text" name="adminEmployeeNum" maxlength="8" required placeholder="사번" />
+            <input type="text" name="adminResidentNum" required placeholder="생년월일 6자리" maxlength="6" />
+            <input type="submit" value="확인" class="login-submit" />
+        </form>
+
+        <!-- 인증번호 입력 폼 -->
+        <form id="verifyCodeForm" class="modal-form">
+            <div class="login-text">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x" style="color: #666;"></i>
+                    <i class="fa fa-key fa-stack-1x" style="color: white;"></i>
+                </span>
+                <div>인증번호 입력</div>
+            </div>
+            <div id="codeAlert" class="alert" style="display: none;"></div>
+            <input type="text" name="verificationCode" required placeholder="인증번호 6자리" maxlength="6" />
+            <input type="submit" value="확인" class="login-submit" />
+        </form>
+
+        <!-- 새 비밀번호 입력 폼 -->
+        <form id="newPasswordForm" class="modal-form">
+            <div class="login-text">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x" style="color: #666;"></i>
+                    <i class="fa fa-lock fa-stack-1x" style="color: white;"></i>
+                </span>
+                <div>새 비밀번호 설정</div>
+            </div>
+            <div id="passwordAlert" class="alert" style="display: none;"></div>
+            <input type="password" name="newPassword" required placeholder="새 비밀번호" />
+            <input type="password" name="confirmPassword" required placeholder="비밀번호 확인" />
+            <input type="submit" value="변경" class="login-submit" />
+        </form>
+    </div>
+</div>
+
 <div class="underlay-photo"></div>
 <div class="underlay-black"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const modal = document.getElementById('forgotPasswordModal');
+    const verifyForm = document.getElementById('verifyForm');
+    const verifyCodeForm = document.getElementById('verifyCodeForm');
+    const newPasswordForm = document.getElementById('newPasswordForm');
+    const verifyAlert = document.getElementById('verifyAlert');
+    const codeAlert = document.getElementById('codeAlert');
+    const passwordAlert = document.getElementById('passwordAlert');
+
+    // 모달 열기
+    forgotPasswordLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.add('active');
+    });
+
+    // 모달 닫기
+    window.closeModal = function() {
+        modal.classList.remove('active');
+        // 폼 초기화
+        verifyForm.classList.add('active');
+        verifyCodeForm.classList.remove('active');
+        newPasswordForm.classList.remove('active');
+        verifyAlert.style.display = 'none';
+        codeAlert.style.display = 'none';
+        passwordAlert.style.display = 'none';
+        verifyForm.reset();
+        verifyCodeForm.reset();
+        newPasswordForm.reset();
+    };
+
+    // 본인 확인
+    verifyForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(verifyForm);
+        const name = formData.get('adminName');
+        const employeeNum = formData.get('adminEmployeeNum');
+        const birth = formData.get('adminResidentNum');
+
+        if (!name || !employeeNum || !birth) {
+            verifyAlert.textContent = '모든 필드를 입력해주세요.';
+            verifyAlert.style.display = 'block';
+            return;
+        }
+
+        if (birth.length !== 6 || !/^\d{6}$/.test(birth)) {
+            verifyAlert.textContent = '주민번호 앞 6자리를 정확히 입력해주세요.';
+            verifyAlert.style.display = 'block';
+            return;
+        }
+
+        fetch('/admin/updateidentity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                adminName: name,
+                adminEmployeeNum: employeeNum,
+                adminResidentNum: birth
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                verifyForm.classList.remove('active');
+                verifyCodeForm.classList.add('active');
+            } else {
+                verifyAlert.textContent = data.message;
+                verifyAlert.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            verifyAlert.textContent = '본인 확인 중 오류가 발생했습니다.';
+            verifyAlert.style.display = 'block';
+        });
+    });
+
+    // 인증번호 확인
+    verifyCodeForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(verifyCodeForm);
+        const verificationCode = formData.get('verificationCode');
+
+        if (!verificationCode || verificationCode.length !== 6) {
+            codeAlert.textContent = '인증번호 6자리를 정확히 입력해주세요.';
+            codeAlert.style.display = 'block';
+            return;
+        }
+
+        fetch('/admin/passwordcode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                verificationCode: verificationCode
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                verifyCodeForm.classList.remove('active');
+                newPasswordForm.classList.add('active');
+            } else {
+                codeAlert.textContent = data.message;
+                codeAlert.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            codeAlert.textContent = '인증번호 확인 중 오류가 발생했습니다.';
+            codeAlert.style.display = 'block';
+        });
+    });
+
+    // 비밀번호 변경
+    newPasswordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(newPasswordForm);
+        const newPassword = formData.get('newPassword');
+        const confirmPassword = formData.get('confirmPassword');
+
+        if (!newPassword || !confirmPassword) {
+            passwordAlert.textContent = '모든 필드를 입력해주세요.';
+            passwordAlert.style.display = 'block';
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            passwordAlert.textContent = '새 비밀번호가 일치하지 않습니다.';
+            passwordAlert.style.display = 'block';
+            return;
+        }
+
+        fetch('/admin/resetpassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                passwordAlert.textContent = '비밀번호가 성공적으로 변경되었습니다.';
+                passwordAlert.classList.add('success');
+                passwordAlert.style.display = 'block';
+                setTimeout(() => {
+                    closeModal();
+                }, 1500);
+            } else {
+                passwordAlert.textContent = data.message;
+                passwordAlert.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            passwordAlert.textContent = '비밀번호 변경 중 오류가 발생했습니다.';
+            passwordAlert.style.display = 'block';
+        });
+    });
+});
+</script>
 
 </body>
 </html>
