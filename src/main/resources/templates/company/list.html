@@ -26,7 +26,6 @@
   <div class="container mt-4 w-100 bg-light">
     <h2 class="fw-bold mb-4 text-center">조직 관리</h2>
 
-    <!-- 검색 폼 -->
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
@@ -57,7 +56,6 @@
       </div>
     </form>
 
-    <!-- 결과 테이블 -->
     <div class="row mt-4">
       <div class="col-12">
         <table class="table table-bordered text-company mb-0">
@@ -103,54 +101,39 @@
                       onclick="loadAdmins(this)">
                 직원조회
               </button>
-              <!-- 비활성화 상태 배지 -->
               <span th:if="${item.companyStatus != null and item.companyStatus.toUpperCase() == 'INACTIVE'}"
                     class="badge badge-outline-danger">비활성화</span>
             </td>
           </tr>
-
           </tbody>
-
         </table>
       </div>
     </div>
   </div>
 
-  <!--    &lt;!&ndash;페이징&ndash;&gt;-->
-  <!--    <div class="row m-0 p-0 mt-3">-->
-  <!--      <div class="col-3"></div>-->
-  <!--      <ul class="col-6 pagination justify-content-company col">-->
-  <!--        &lt;!&ndash; 처음 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page=0}">처음</a>-->
-  <!--        </li>-->
+  <div class="row m-0 p-0 mt-3" th:if="${companyDTOS != null && !companyDTOS.isEmpty() && companyDTOS.totalPages > 1}">
+    <div class="col-3"></div> <ul class="col-6 pagination justify-content-company col" th:with="currentPage_1_indexed=${companyDTOS.number + 1},
+                 startPage_1_indexed=${T(java.lang.Math).max(1, currentPage_1_indexed - 1)},
+                 endPage_1_indexed=${T(java.lang.Math).min(companyDTOS.totalPages, currentPage_1_indexed + 1)}">
 
-  <!--        &lt;!&ndash; 이전 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasPrevious()} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={prev}(prev=${companyDTOS.number - 1})}">이전</a>-->
-  <!--        </li>-->
+    <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">
+      <a class="page-link" th:href="@{/company/list(page=0, choice=${choice}, select=${select}, keyword=${keyword})}">&laquo;</a>
+    </li>
 
-  <!--        &lt;!&ndash; 현재 페이지 기준 앞 4개, 뒤 5개 &ndash;&gt;-->
-  <!--        <li class="page-item"-->
-  <!--            th:each="pageNum : ${#numbers.sequence(-->
-  <!--    (companyDTOS.number - 4 > 0 ? companyDTOS.number - 4 : 0),-->
-  <!--    (companyDTOS.number + 5 < companyDTOS.totalPages - 1 ? companyDTOS.number + 5 : companyDTOS.totalPages - 1)-->
-  <!--    )}"-->
-  <!--            th:classappend="${pageNum == companyDTOS.number} ? 'active'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>-->
-  <!--        </li>-->
+    <li class="page-item"
+        th:each="pageNumber_1_indexed : ${#numbers.sequence(startPage_1_indexed, endPage_1_indexed)}"
+        th:with="pageIndex_0_indexed=${pageNumber_1_indexed - 1}"
+        th:classappend="${pageNumber_1_indexed == currentPage_1_indexed} ? 'active'">
+      <a class="page-link"
+         th:href="@{/company/list(page=${pageIndex_0_indexed}, choice=${choice}, select=${select}, keyword=${keyword})}"
+         th:text="${pageNumber_1_indexed}"></a>
+    </li>
 
-  <!--        &lt;!&ndash; 다음 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${!companyDTOS.hasNext()} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={next}(next=${companyDTOS.number + 1})}">다음</a>-->
-  <!--        </li>-->
-
-  <!--        &lt;!&ndash; 마지막 페이지 버튼 &ndash;&gt;-->
-  <!--        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">-->
-  <!--          <a class="page-link" th:href="@{/company/list?page={last}(last=${companyDTOS.totalPages - 1})}">마지막</a>-->
-  <!--        </li>-->
-
-  <!--      </ul>-->
+    <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">
+      <a class="page-link" th:href="@{/company/list(page=${companyDTOS.totalPages - 1}, choice=${choice}, select=${select}, keyword=${keyword})}">&raquo;</a>
+    </li>
+  </ul>
+  </div>
 
 
   <script>
@@ -194,7 +177,6 @@
 
   </script>
 
-  <!-- 직원 목록 모달 -->
   <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -217,7 +199,6 @@
             </tr>
             </thead>
             <tbody id="adminTableBody">
-            <!-- JS로 채울 부분 -->
             </tbody>
           </table>
         </div>
@@ -225,8 +206,6 @@
       </div>
     </div>
   </div>
-
-
 
 </div>
 </body>
