@@ -156,23 +156,41 @@
         <button class="back-to-list-btn" th:text="#{cart.back}" onclick="window.location.href='/member/store/list'">목록으로</button>
 
         <nav>
-            <ul class="pagination justify-content-center align-items-center mt-3">
+            <ul class="pagination justify-content-center align-items-center mt-3"
+                th:if="${list.totalPages > 1}"
+                th:with="startPage=${T(java.lang.Math).max(0, list.number - 1)},
+                 endPage=${T(java.lang.Math).min(list.totalPages - 1, list.number + 1)},
+                 prevPage=${list.number - 1},
+                 nextPage=${list.number + 1},
+                 lastPage=${list.totalPages - 1}">
+
+                <!-- 처음 -->
                 <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-                    <a class="page-link" th:text="#{pagination.first}" th:href="@{/member/store/order/list?page=0}">&laquo; 처음</a>
+                    <a class="page-link" th:href="@{/member/store/order/list(page=0)}">&laquo; <span th:text="#{pagination.first}">처음</span></a>
                 </li>
+
+                <!-- 이전 -->
                 <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
-                    <a class="page-link" th:text="#{pagination.previous}" th:href="@{/member/store/order/list?page={prev}(prev=${list.number - 1})}">이전</a>
+                    <a class="page-link" th:href="@{/member/store/order/list(page=${prevPage})}" th:text="#{pagination.previous}">이전</a>
                 </li>
+
+                <!-- 중앙 3개 페이지만 출력 -->
                 <li class="page-item"
-                    th:each="pageNum : ${#numbers.sequence((list.number - 4 > 0 ? list.number - 4 : 0), (list.number + 5 < list.totalPages - 1 ? list.number + 5 : list.totalPages - 1))}"
+                    th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                     th:classappend="${pageNum == list.number} ? 'active'">
-                    <a class="page-link" th:href="@{/member/store/order/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
+                    <a class="page-link"
+                       th:href="@{/member/store/order/list(page=${pageNum})}"
+                       th:text="${pageNum + 1}">1</a>
                 </li>
+
+                <!-- 다음 -->
                 <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
-                    <a class="page-link" th:text="#{pagination.next}" th:href="@{/member/store/order/list?page={next}(next=${list.number + 1})}">다음</a>
+                    <a class="page-link" th:href="@{/member/store/order/list(page=${nextPage})}" th:text="#{pagination.next}">다음</a>
                 </li>
+
+                <!-- 마지막 -->
                 <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-                    <a class="page-link" th:text="#{pagination.last}" th:href="@{/member/store/order/list?page={last}(last=${list.totalPages - 1})}">마지막 &raquo;</a>
+                    <a class="page-link" th:href="@{/member/store/order/list(page=${lastPage})}"><span th:text="#{pagination.last}">마지막</span> &raquo;</a>
                 </li>
             </ul>
         </nav>
