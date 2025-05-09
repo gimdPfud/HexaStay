@@ -160,7 +160,8 @@
 
         <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'"></button>
 
-        <nav>
+        <!-- 주문 내역이 있을 때만 페이지네이션 출력 -->
+        <nav th:if="${!orderList.isEmpty()}">
             <ul class="pagination justify-content-center align-items-center mt-3">
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo; <span th:text="#{pagination.first}"></span></a>
@@ -169,7 +170,8 @@
                     <a class="page-link" th:href="@{/roommenu/orderList(page=${prevPage - 1})}" th:text="#{pagination.previous}"></a>
                 </li>
                 <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link" th:href="@{/roommenu/orderList(page=${i - 1})}" th:text="${i}"></a> </li>
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${i - 1})}" th:text="${i}"></a>
+                </li>
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                     <a class="page-link" th:href="@{/roommenu/orderList(page=${nextPage - 1})}" th:text="#{pagination.next}"></a>
                 </li>
