@@ -127,8 +127,7 @@
 
                             <div th:if="${item.storemenuOptions != null and item.storemenuOptions != ''}"
                                  class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em;">
-                                <strong class="me-2" th:text="#{orderList.option} ?: '옵션: '">옵션:</strong>
-                                <span th:each="option : ${optionMap[item.orderstoreitemNum]}" th:text="${option}" class="flex-grow-1">옵션 요약 정보</span>
+                                <span th:utext="${#strings.listJoin(optionMap[item.orderstoreitemNum], '<br>')}" class="flex-grow-1"></span>
                             </div>
                             <div class="d-flex align-items-center mb-1">
                                 <strong class="me-2" th:text="#{orderList.quantity}">수량 :</strong>
