@@ -878,20 +878,31 @@
                 const months = Object.keys(monthlyData).sort();
                 const growth = [];
 
+                // 최소 2개월 이상의 데이터가 있어야 성장률 계산 가능
+                if (months.length < 2) {
+                    return {
+                        labels: months,
+                        growth: months.map(() => 0)
+                    };
+                }
+
+                // 첫 달의 성장률은 0으로 설정
+                growth.push(0);
+
+                // 나머지 달들의 성장률 계산
                 for (let i = 1; i < months.length; i++) {
                     const currentMonth = monthlyData[months[i]];
                     const previousMonth = monthlyData[months[i - 1]];
-                    const growthRate = ((currentMonth - previousMonth) / previousMonth) * 100;
-                    growth.push(growthRate.toFixed(1));
+                    const growthRate = previousMonth === 0 ? 0 : ((currentMonth - previousMonth) / previousMonth) * 100;
+                    growth.push(parseFloat(growthRate.toFixed(1)));
                 }
 
                 return {
-                    labels: months.slice(1),
+                    labels: months,
                     growth: growth
                 };
             }
 
-            // 데이터 그룹화 함수들
             function groupDataByDate(data) {
                 const grouped = {};
                 data.forEach(room => {
@@ -911,7 +922,7 @@
             function groupDataByMonth(data) {
                 const grouped = {};
                 data.forEach(room => {
-                    const date = new Date(room.createDate);
+                    const date = new Date(room.checkInDate);
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                     if (!grouped[monthKey]) {
                         grouped[monthKey] = 0;
