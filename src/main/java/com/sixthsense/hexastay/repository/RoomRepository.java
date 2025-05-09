@@ -146,11 +146,16 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             "ORDER BY r.roomNum DESC, r.hotelRoom.hotelRoomNum DESC")
     List<Room> findActiveRoomsOrdered(@Param("member") Member member, @Param("now") LocalDateTime now);
 
-
     // 직원이 속한 룸 리스트
     Page<Room> findByHotelRoom_Company_CompanyNum(Long companyNum, Pageable pageable);
 
     // 직속 + 체크인이냐 체크아웃이냐
     Page<Room> findByHotelRoom_Company_CompanyNumAndHotelRoom_HotelRoomStatus(Long companyNum, String hotelStatus, Pageable pageable);
-
+            
+    // 페이지네이션 없는 전체 데이터 조회용
+    List<Room> findByHotelRoom_HotelRoomNumIn(List<Long> hotelRoomNums);
+    
+    // 페이지네이션 없는 날짜 범위 데이터 조회용
+    List<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
+            List<Long> hotelRoomNums, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

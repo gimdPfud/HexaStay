@@ -23,6 +23,7 @@ import org.springframework.data.web.PageableDefault;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -81,6 +82,23 @@ public class SettleController {
         response.put("hasNext", roomDTOList.hasNext());
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/chart/all-data")
+    @ResponseBody
+    public ResponseEntity<List<RoomDTO>> getAllData(Principal principal,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        Long companyNum = adminRepository.findByAdminEmail(principal.getName()).getCompany().getCompanyNum();
+        List<RoomDTO> allData;
+
+        if (startDate != null && endDate != null) {
+            allData = settleService.getAllSettleListByDateRange(companyNum, startDate, endDate);
+        } else {
+            allData = settleService.getAllSettleList(companyNum);
+        }
+
+        return ResponseEntity.ok(allData);
     }
 
     @GetMapping("/chartstore")

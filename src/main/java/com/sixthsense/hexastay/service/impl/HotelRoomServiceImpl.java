@@ -8,10 +8,12 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
+import com.sixthsense.hexastay.dto.SettleDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
@@ -37,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
@@ -424,11 +427,50 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     @Override
     public Page<HotelRoomDTO> getSettleList(Long companyNum, Pageable pageable) {
-
         Page<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum, pageable);
         Page<HotelRoomDTO> hotelRoomDTOList = hotelRoomList.map(data -> modelMapper.map(data, HotelRoomDTO.class));
         return hotelRoomDTOList;
     }
 
-
+    @Override
+    public List<SettleDTO> getSettleListByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        
+        List<HotelRoom> hotelRooms = hotelRoomRepository.findByCreateDateBetween(startDateTime, endDateTime);
+        
+        return hotelRooms.stream().map(room -> {
+            SettleDTO settleDTO = new SettleDTO();
+            settleDTO.setHotelRoomNum(room.getHotelRoomNum());
+            settleDTO.setCreateDate(room.getCreateDate());
+            
+            // Room 엔티티에서 체크인/체크아웃 날짜 가져오기
+            Room roomInfo = room.getRooms().stream()
+                .filter(r -> r.getCheckInDate() != null && r.getCheckOutDate() != null)
+                .findFirst()
+                .orElse(null);
+                
+            if (roomInfo != null) {
+                settleDTO.setCheckInDate(roomInfo.getCheckInDate().toLocalDate());
+                settleDTO.setCheckOutDate(roomInfo.getCheckOutDate().toLocalDate());
+            }
+            
+            // Member 정보 설정
+            if (room.getMember() != null) {
+                MemberDTO memberDTO = new MemberDTO();
+                memberDTO.setMemberNum(room.getMember().getMemberNum());
+                memberDTO.setMemberName(room.getMember().getMemberName());
+                settleDTO.setMemberDTO(memberDTO);
+            }
+            
+            // HotelRoom 정보 설정
+            HotelRoomDTO hotelRoomDTO = new HotelRoomDTO();
+            hotelRoomDTO.setHotelRoomNum(room.getHotelRoomNum());
+            hotelRoomDTO.setHotelRoomName(room.getHotelRoomName());
+            hotelRoomDTO.setHotelRoomPrice(room.getHotelRoomPrice());
+            settleDTO.setHotelRoomDTO(hotelRoomDTO);
+            
+            return settleDTO;
+        }).collect(Collectors.toList());
+    }
 }

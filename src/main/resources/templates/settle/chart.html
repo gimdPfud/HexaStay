@@ -5,33 +5,72 @@
       layout:decorate="~{layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
-    <title>재무 정산 차트</title>
+    <title>재무 정산 대시보드</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        .chart-section {
+        .dashboard-container {
             background: #f8f9fa;
-            border-radius: 10px;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1D6F42;
+            margin: 8px 0;
+        }
+
+        .stat-card .label {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
 
         .table-container {
-            max-height: 500px; /* 테이블 영역의 최대 높이 설정 */
-            overflow-y: auto; /* 세로 스크롤 추가 */
-            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .table-container::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .table-container::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .table-container::-webkit-scrollbar-thumb {
             background: #888;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .table-container::-webkit-scrollbar-thumb:hover {
@@ -39,318 +78,429 @@
         }
 
         .form-select {
-            margin: 10px;
+            margin: 5px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
         }
 
-        .download-btn {
-            font-size: 0.9rem;
-            margin-right: 5px;
-        }
-
-        table {
-            font-size: 0.9rem;
-        }
-
-        table td {
-            font-size: 0.81rem !important;
-        }
-
-        table td input {
-            font-size: 0.81rem !important;
-            text-align: center;
-        }
-
-        canvas {
-            background-color: #fff;
-            border-radius: 10px;
-        }
-
-        .date-range-form {
-            display: flex;
-            align-items: center;
-            margin: 10px;
-        }
-
-        .date-range-form input[type="date"] {
-            width: 160px; /* 너비 추가 */
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ced4da;
-            margin-right: 8px;
-        }
-
-        .date-range-form button {
-            height: 38px; /* 버튼 높이를 input과 맞춤 */
-            margin-left: 8px;
+        .form-select:hover {
+            border-color: #1D6F42;
         }
 
         .excel-btn {
             background-color: #1D6F42;
             color: white;
             border: none;
-            height: 40px;
-            margin-left: 8px;
+            height: 36px;
+            padding: 0 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
         }
 
         .excel-btn:hover {
             background-color: #145a35;
             color: white;
+            transform: translateY(-2px);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1D6F42;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-left: 6px;
+        }
+
+        .trend-up {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .trend-down {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .date-range-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .date-range-form input[type="date"] {
+            width: 140px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .date-range-form button {
+            height: 36px;
+            padding: 0 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        table th {
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+
+        table td {
+            padding: 8px;
+            font-size: 0.8rem !important;
+        }
+
+        table td input {
+            font-size: 0.8rem !important;
+            padding: 4px;
+        }
+
+        h5 {
+            font-size: 1rem;
+            margin-bottom: 12px;
         }
     </style>
 </head>
-<body style="background-color: #f8f9fa;">
-<div layout:fragment="content" >
+<body>
+<div layout:fragment="content">
+    <div class="dashboard-container">
+        <div class="container-fluid">
+            <h2 class="fw-bold mb-3 text-center" style="font-size: 1.5rem;">재무 정산 대시보드</h2>
 
-    <div class="container mt-4 w-100 bg-light">
-        <h2 class="fw-bold mb-4 text-center">재무 정산 차트</h2>
+            <!-- 필터 섹션 -->
+            <div class="card mb-3">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <select class="form-select" id="hqSelect" style="width: 180px;">
+                                <option selected>본사 선택</option>
+                                <option>서울본사</option>
+                                <option>부산본사</option>
+                            </select>
+                            <select class="form-select" id="branchSelect" style="width: 180px;">
+                                <option selected>지사 선택</option>
+                                <option>중부지사</option>
+                                <option>남부지사</option>
+                            </select>
+                            <select class="form-select" id="officeSelect" style="width: 180px;">
+                                <option selected>지점 선택</option>
+                                <option>강남지점</option>
+                                <option>대구지점</option>
+                            </select>
+                            <select class="form-select" id="storeSelect" style="width: 180px;">
+                                <option selected>스토어 선택</option>
+                                <option>스토어 A</option>
+                                <option>스토어 B</option>
+                            </select>
+                            <button type="button" id="excelDownloadBtn" class="btn excel-btn">
+                                <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
+                            </button>
+                        </div>
 
-        <!-- 🔽 선택 필터 + 다운로드 버튼 -->
-        <!-- 🔽 선택 필터 + 다운로드 버튼 -->
-        <div class="row align-items-center mb-4 gx-3 gy-2">
-            <div class="col-12">
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <select class="form-select" id="hqSelect" style="width: 200px;">
-                        <option selected>본사 선택</option>
-                        <option>서울본사</option>
-                        <option>부산본사</option>
-                    </select>
-                    <select class="form-select" id="branchSelect" style="width: 200px;">
-                        <option selected>지사 선택</option>
-                        <option>중부지사</option>
-                        <option>남부지사</option>
-                    </select>
-                    <select class="form-select" id="officeSelect" style="width: 200px;">
-                        <option selected>지점 선택</option>
-                        <option>강남지점</option>
-                        <option>대구지점</option>
-                    </select>
-                    <select class="form-select" id="storeSelect" style="width: 200px;">
-                        <option selected>스토어 선택</option>
-                        <option>스토어 A</option>
-                        <option>스토어 B</option>
-                    </select>
-                    <button type="button" id="excelDownloadBtn" class="btn excel-btn px-4" style="margin-left: 8px;">
-                        <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
-                    </button>
-                </div>
-
-                <div class="d-flex flex-wrap align-items-center gap-3 ms-2 mt-3">
-                    <input type="date" id="startDate" class="form-control" style="width: 160px;">
-                    <span>~</span>
-                    <input type="date" id="endDate" class="form-control" style="width: 160px;">
-                    <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
-                    <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- 📊 테이블 & 차트 -->
-        <div class="chart-section">
-
-            <!-- 테이블 -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="table-container">
-                        <table class="table table-bordered text-company mb-0 text-center">
-                            <thead class="table-light">
-                            <tr>
-                                <th id="days" style="width: 12%">날짜</th>
-                                <th style="width: 12%">예약자</th>
-                                <th style="width: 12%">객실</th>
-                                <th style="width: 12%">체크인</th>
-                                <th style="width: 12%">체크아웃</th>
-                                <th style="width: 10%">매출 금액</th>
-                                <th style="width: 9%">수수료</th>
-                                <th style="width: 9%">공제 금액</th>
-                                <th style="width: 10%;" class="text-success" >최종 정산 금액</th>
-                            </tr>
-                            </thead>
-                            <tbody class="text-center">
-                            <tr th:each="roomList, stat : ${roomDTOList.content}">
-                                <td><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yy-MM-dd HH:mm')}" readonly></td>
-                                <td><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
-                                <td><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
-
-                                <!-- 날짜 데이터용 input -->
-                                <td><input type="text" class="form-control checkin" th:value="${#temporals.format(roomList.checkInDate, 'yy-MM-dd HH:mm')}" readonly></td>
-                                <td><input type="text" class="form-control checkout" th:value="${#temporals.format(roomList.checkOutDate, 'yy-MM-dd HH:mm')}" readonly></td>
-
-                                <!-- 가격 데이터 -->
-                                <td>
-                                    <input hidden type="text" class="checkDays">
-                                    <input hidden type="text" class="price" th:value="${roomList.hotelRoomDTO.hotelRoomPrice}" readonly>
-                                    <input type="text" class="form-control priceResult" readonly>
-                                </td>
-
-                                <!-- 계산 결과용 input -->
-                                <td><input type="text" class="form-control commission" readonly></td>
-                                <td><input type="text" class="form-control deduct" readonly></td>
-                                <td><input type="text" class="form-control final" readonly></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div class="date-range-form mt-2">
+                            <input type="date" id="startDate" class="form-control">
+                            <span>~</span>
+                            <input type="date" id="endDate" class="form-control">
+                            <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
+                            <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- 📊 차트들 -->
-            <div class="row mt-5">
-                <div class="col-lg-8 mb-4">
-                    <h5 class="mb-3">매출 & 정산 추이</h5>
-                    <canvas id="mixedChart" height="260"></canvas>
+
+            <!-- 상세 데이터 테이블 -->
+            <div class="card mb-3">
+                <h5 class="mb-2">상세 정산 내역</h5>
+                <div class="table-container">
+                    <table class="table table-bordered text-company mb-0 text-center">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 12%">날짜</th>
+                            <th style="width: 12%">예약자</th>
+                            <th style="width: 12%">객실</th>
+                            <th style="width: 12%">체크인</th>
+                            <th style="width: 12%">체크아웃</th>
+                            <th style="width: 10%">매출 금액</th>
+                            <th style="width: 9%">수수료</th>
+                            <th style="width: 9%">공제 금액</th>
+                            <th style="width: 10%" class="text-success">최종 정산 금액</th>
+                        </tr>
+                        </thead>
+                        <tbody class="text-center">
+                        <tr th:each="roomList, stat : ${roomDTOList.content}">
+                            <td><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
+                            <td><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
+                            <td><input type="text" class="form-control checkin" th:value="${#temporals.format(roomList.checkInDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td><input type="text" class="form-control checkout" th:value="${#temporals.format(roomList.checkOutDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td>
+                                <input hidden type="text" class="checkDays">
+                                <input hidden type="text" class="price" th:value="${roomList.hotelRoomDTO.hotelRoomPrice}" readonly>
+                                <input type="text" class="form-control priceResult" readonly>
+                            </td>
+                            <td><input type="text" class="form-control commission" readonly></td>
+                            <td><input type="text" class="form-control deduct" readonly></td>
+                            <td><input type="text" class="form-control final" readonly></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-lg-4">
-                    <h5 class="mb-3">정산 비율 분석</h5>
-                    <canvas id="donutChart" height="260"></canvas>
+            </div>
+
+            <!-- 주요 지표 카드 -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">총 매출액</div>
+                        <div class="value" id="totalSales">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">총 정산액</div>
+                        <div class="value" id="totalSettlement">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">객실 평균 요금</div>
+                        <div class="value" id="averagePrice">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">예약 건수</div>
+                        <div class="value" id="totalReservations">0건</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 차트 섹션 -->
+            <div class="row">
+                <!-- 매출 & 정산 추이 -->
+                <div class="col-lg-8 mb-3">
+                    <div class="card">
+                        <h5>매출 & 정산 추이</h5>
+                        <div class="chart-container">
+                            <canvas id="mixedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 정산 비율 분석 -->
+                <div class="col-lg-4 mb-3">
+                    <div class="card">
+                        <h5>정산 비율 분석</h5>
+                        <div class="chart-container">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 객실별 매출 분석 -->
+                <div class="col-lg-6 mb-3">
+                    <div class="card">
+                        <h5>객실별 매출 분석</h5>
+                        <div class="chart-container">
+                            <canvas id="roomSalesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 월별 성장률 -->
+                <div class="col-lg-6 mb-3">
+                    <div class="card">
+                        <h5>월별 성장률</h5>
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            let currentPage = 0;
+            let allData = []; // 모든 데이터를 저장할 배열
+            let filteredData = []; // 필터링된 데이터를 저장할 배열
             let isLoading = false;
-            let hasMore = true;
+
+            // 현재 날짜 기준으로 당월 1일과 당일 설정
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            // 날짜 입력 필드에 기본값 설정
+            document.getElementById('startDate').value = formatDateForInput(firstDayOfMonth);
+            document.getElementById('endDate').value = formatDateForInput(today);
+            
             let startDate = document.getElementById('startDate').value;
             let endDate = document.getElementById('endDate').value;
 
-            // 테이블 컨테이너의 스크롤 이벤트 리스너
-            const tableContainer = document.querySelector('.table-container');
-            tableContainer.addEventListener('scroll', () => {
-                if (isLoading || !hasMore) return;
+            // 날짜 포맷 함수 (YYYY-MM-DD)
+            function formatDateForInput(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
-                const { scrollTop, scrollHeight, clientHeight } = tableContainer;
-                if (scrollTop + clientHeight >= scrollHeight - 50) {
-                    loadMoreData();
+            // 초기 데이터 로드
+            loadData();
+
+            // 데이터 로드 함수
+            async function loadData() {
+                const loadingOverlay = document.querySelector('.loading-overlay');
+                loadingOverlay.style.display = 'flex';
+
+                try {
+                    const response = await fetch(`/settle/chart/all-data?startDate=${startDate}&endDate=${endDate}`);
+                    if (!response.ok) {
+                        throw new Error('데이터 로드 실패');
+                    }
+                    const data = await response.json();
+                    if (!Array.isArray(data)) {
+                        throw new Error('잘못된 데이터 형식');
+                    }
+                    // 날짜 기준으로 정렬
+                    allData = data.sort((a, b) => new Date(a.createDate) - new Date(b.createDate));
+                    filteredData = [...allData];
+                    updateTable();
+                    updateCharts();
+                    updateStats();
+                } catch (error) {
+                    console.error('데이터 로드 중 오류 발생:', error);
+                    alert('데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+
+            // 이벤트 리스너
+            document.getElementById('dateSearchBtn').addEventListener('click', () => {
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+                loadData();
+            });
+
+            document.getElementById('resetDateBtn').addEventListener('click', () => {
+                document.getElementById('startDate').value = formatDateForInput(firstDayOfMonth);
+                document.getElementById('endDate').value = formatDateForInput(today);
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+                loadData();
+            });
+
+            document.getElementById('excelDownloadBtn').addEventListener('click', () => {
+                const loadingOverlay = document.querySelector('.loading-overlay');
+                loadingOverlay.style.display = 'flex';
+
+                try {
+                    const data = [];
+                    const headers = [];
+                    document.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
+                    data.push(headers);
+
+                    filteredData.forEach(room => {
+                        const rowData = [
+                            formatDate(room.createDate),
+                            room.memberDTO.memberName,
+                            room.hotelRoomDTO.hotelRoomName,
+                            formatDate(room.checkInDate),
+                            formatDate(room.checkOutDate),
+                            calculatePrice(room),
+                            calculateCommission(room),
+                            calculateDeduct(room),
+                            calculateFinal(room)
+                        ];
+                        data.push(rowData);
+                    });
+
+                    const worksheet = XLSX.utils.aoa_to_sheet(data);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, '정산 데이터');
+
+                    const fileName = `정산데이터_${formatDateForInput(new Date())}.xlsx`;
+                    XLSX.writeFile(workbook, fileName);
+                } catch (error) {
+                    console.error('엑셀 다운로드 중 오류 발생:', error);
+                    alert('엑셀 다운로드 중 오류가 발생했습니다.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
                 }
             });
 
-            // 추가 데이터 로드 함수
-            function loadMoreData() {
-                if (isLoading || !hasMore) return;
-
-                isLoading = true;
-                currentPage++;
-
-                fetch(`/settle/chart/load-more?page=${currentPage}&startDate=${startDate}&endDate=${endDate}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const tbody = document.querySelector('tbody');
-
-                        data.content.forEach(room => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td><input type="text" class="form-control" value="${formatDate(room.createDate)}" readonly></td>
-                                <td><input type="text" class="form-control" value="${room.memberDTO.memberName}" readonly></td>
-                                <td><input type="text" class="form-control" value="${room.hotelRoomDTO.hotelRoomName}" readonly></td>
-                                <td><input type="text" class="form-control checkin" value="${formatDate(room.checkInDate)}" readonly></td>
-                                <td><input type="text" class="form-control checkout" value="${formatDate(room.checkOutDate)}" readonly></td>
-                                <td>
-                                    <input hidden type="text" class="checkDays">
-                                    <input hidden type="text" class="price" value="${room.hotelRoomDTO.hotelRoomPrice}" readonly>
-                                    <input type="text" class="form-control priceResult" readonly>
-                                </td>
-                                <td><input type="text" class="form-control commission" readonly></td>
-                                <td><input type="text" class="form-control deduct" readonly></td>
-                                <td><input type="text" class="form-control final" readonly></td>
-                            `;
-                            tbody.appendChild(row);
-                        });
-
-                        hasMore = data.hasNext;
-                        calculateAll(); // 새로 추가된 행에 대한 계산 수행
-                        initAndUpdateCharts(); // 차트 업데이트
-                    })
-                    .catch(error => {
-                        console.error('데이터 로드 중 오류 발생:', error);
-                    })
-                    .finally(() => {
-                        isLoading = false;
-                    });
-            }
-
-            // 날짜 포맷 함수
-            function formatDate(dateStr) {
-                const date = new Date(dateStr);
-                const year = date.getFullYear().toString().slice(2);
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                return `${year}-${month}-${day} ${hours}:${minutes}`;
-            }
-
-            // 날짜로 조회 버튼 클릭 이벤트
-            document.getElementById('dateSearchBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                startDate = document.getElementById('startDate').value;
-                endDate = document.getElementById('endDate').value;
-
-                // 테이블 초기화
+            // 테이블 업데이트 함수
+            function updateTable() {
                 const tbody = document.querySelector('tbody');
                 tbody.innerHTML = '';
 
-                // 페이지 초기화
-                currentPage = 0;
-                hasMore = true;
-
-                // 현재 URL에서 pathname 부분만 가져옴
-                const pathName = window.location.pathname;
-
-                // 새 URL 생성 (쿼리 파라미터 추가)
-                window.location.href = `${pathName}?startDate=${startDate}&endDate=${endDate}`;
-            });
-
-            // 전체 조회 버튼 클릭 이벤트
-            document.getElementById('resetDateBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                // 현재 URL에서 pathname 부분만 가져와서 쿼리 파라미터 없이 이동
-                const pathName = window.location.pathname;
-                window.location.href = pathName;
-            });
-
-            // URL에서 쿼리 파라미터를 통해 날짜 필터 적용
-            const urlParams = new URLSearchParams(window.location.search);
-            const startDateParam = urlParams.get('startDate');
-            const endDateParam = urlParams.get('endDate');
-
-            if(startDateParam && endDateParam) {
-                // URL에 날짜 파라미터가 있으면 필터링 로직 실행
-                document.getElementById('startDate').value = startDateParam;
-                document.getElementById('endDate').value = endDateParam;
-
-                // 날짜 범위에 속하지 않는 행 숨기기
-                filterTableByDateRange(startDateParam, endDateParam);
-            }
-
-            // 기본 계산 처리
-            calculateAll();
-
-            // 차트 업데이트
-            initAndUpdateCharts();
-
-            // 필터링 함수
-            function filterTableByDateRange(start, end) {
-                const startDate = new Date(start);
-                const endDate = new Date(end);
-                endDate.setHours(23, 59, 59); // 종료일 마지막 시간으로 설정
-
-                const tableRows = document.querySelectorAll('tbody tr');
-                tableRows.forEach(row => {
-                    const dateCell = row.querySelector('td:first-child input');
-                    if(dateCell) {
-                        const rowDate = new Date(dateCell.value);
-                        if(rowDate < startDate || rowDate > endDate) {
-                            row.style.display = 'none';
-                        } else {
-                            row.style.display = '';
-                        }
-                    }
+                filteredData.forEach(room => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="text" class="form-control" value="${formatDate(room.createDate)}" readonly></td>
+                        <td><input type="text" class="form-control" value="${room.memberDTO.memberName}" readonly></td>
+                        <td><input type="text" class="form-control" value="${room.hotelRoomDTO.hotelRoomName}" readonly></td>
+                        <td><input type="text" class="form-control checkin" value="${formatDate(room.checkInDate)}" readonly></td>
+                        <td><input type="text" class="form-control checkout" value="${formatDate(room.checkOutDate)}" readonly></td>
+                        <td>
+                            <input hidden type="text" class="checkDays">
+                            <input hidden type="text" class="price" value="${room.hotelRoomDTO.hotelRoomPrice}" readonly>
+                            <input type="text" class="form-control priceResult" readonly>
+                        </td>
+                        <td><input type="text" class="form-control commission" readonly></td>
+                        <td><input type="text" class="form-control deduct" readonly></td>
+                        <td><input type="text" class="form-control final" readonly></td>
+                    `;
+                    tbody.appendChild(row);
                 });
 
-                // 필터링 후 차트 업데이트
-                initAndUpdateCharts();
+                calculateAll();
             }
 
             // 모든 행에 대한 계산 처리
@@ -391,110 +541,119 @@
                     // 매출 금액 표시
                     const priceResultInput = row.querySelector('.priceResult');
                     if (priceResultInput) {
-                        priceResultInput.value = Math.round(sales).toLocaleString() + '원';
+                        priceResultInput.value = formatCurrency(sales);
                     }
 
                     // 수수료 (5%)
                     const fee = sales * 0.05;
                     const commissionInput = row.querySelector('.commission');
                     if (commissionInput) {
-                        commissionInput.value = Math.round(fee).toLocaleString() + '원';
+                        commissionInput.value = formatCurrency(fee);
                     }
 
                     // 공제 금액 (5%)
                     const deduction = sales * 0.05;
                     const deductInput = row.querySelector('.deduct');
                     if (deductInput) {
-                        deductInput.value = Math.round(deduction).toLocaleString() + '원';
+                        deductInput.value = formatCurrency(deduction);
                     }
 
                     // 최종 정산 금액 (매출 - 수수료 - 공제)
                     const final = sales - fee - deduction;
                     const finalInput = row.querySelector('.final');
                     if (finalInput) {
-                        finalInput.value = Math.round(final).toLocaleString() + '원';
+                        finalInput.value = formatCurrency(final);
                         finalInput.style.color = '#198754';
                     }
                 });
             }
 
-            // 차트 초기화 및 업데이트 함수
-            function initAndUpdateCharts() {
-                // 보이는 행(display가 none이 아닌 행)만 선택
-                const visibleRows = Array.from(document.querySelectorAll('tbody tr')).filter(row =>
-                    row.style.display !== 'none'
-                );
+            // 통계 업데이트 함수
+            function updateStats() {
+                const totalSales = filteredData.reduce((sum, room) => sum + calculatePrice(room), 0);
+                const totalSettlement = filteredData.reduce((sum, room) => sum + calculateFinal(room), 0);
+                
+                // 총 숙박 일수 계산
+                const totalNights = filteredData.reduce((sum, room) => {
+                    const checkIn = new Date(room.checkInDate);
+                    const checkOut = new Date(room.checkOutDate);
+                    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                    return sum + nights;
+                }, 0);
+                
+                // 객실 평균 요금 계산 (총 매출액 / 총 숙박 일수)
+                const averagePrice = totalNights > 0 ? totalSales / totalNights : 0;
+                const totalReservations = filteredData.length;
 
-                const labels = []; // 날짜
-                const salesList = []; // 매출
-                const finalList = []; // 최종 정산
-                let totalSales = 0;
-                let totalCommission = 0;
-                let totalDeduct = 0;
-                let totalFinal = 0;
+                document.getElementById('totalSales').textContent = formatCurrency(totalSales);
+                document.getElementById('totalSettlement').textContent = formatCurrency(totalSettlement);
+                document.getElementById('averagePrice').textContent = formatCurrency(averagePrice);
+                document.getElementById('totalReservations').textContent = `${totalReservations}건`;
+            }
 
-                visibleRows.forEach(row => {
-                    const date = row.querySelector('td input')?.value || '';
-                    const priceText = row.querySelector('.priceResult')?.value.replace(/[^\d]/g, '') || '0';
-                    const commissionText = row.querySelector('.commission')?.value.replace(/[^\d]/g, '') || '0';
-                    const deductText = row.querySelector('.deduct')?.value.replace(/[^\d]/g, '') || '0';
-                    const finalText = row.querySelector('.final')?.value.replace(/[^\d]/g, '') || '0';
+            // 차트 업데이트 함수
+            function updateCharts() {
+                updateMixedChart();
+                updateDonutChart();
+                updateRoomSalesChart();
+                updateGrowthChart();
+            }
 
-                    const price = parseInt(priceText);
-                    const commission = parseInt(commissionText);
-                    const deduct = parseInt(deductText);
-                    const final = parseInt(finalText);
+            // 혼합형 차트 업데이트
+            function updateMixedChart() {
+                const ctx = document.getElementById('mixedChart').getContext('2d');
+                const data = prepareChartData();
 
-                    labels.push(date.split(' ')[0]);
-                    salesList.push(price);
-                    finalList.push(final);
-
-                    totalSales += price;
-                    totalCommission += commission;
-                    totalDeduct += deduct;
-                    totalFinal += final;
-                });
-
-                // 혼합형 차트 (매출 & 정산) - Chart.js 라이브러리 사용
-                const mixedCtx = document.getElementById('mixedChart').getContext('2d');
-
-                // 기존 차트가 있으면 제거
                 if (window.mixedChart instanceof Chart) {
                     window.mixedChart.destroy();
                 }
 
-                // 새 차트 생성
-                window.mixedChart = new Chart(mixedCtx, {
+                window.mixedChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: data.labels,
                         datasets: [
                             {
                                 type: 'bar',
                                 label: '매출 금액',
-                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                data: salesList,
-                                borderRadius: 5
+                                backgroundColor: 'rgba(29, 111, 66, 0.7)',
+                                data: data.sales,
+                                borderRadius: 8,
+                                borderWidth: 0
                             },
                             {
                                 type: 'line',
                                 label: '최종 정산 금액',
                                 borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 2,
+                                borderWidth: 3,
                                 fill: false,
-                                data: finalList
+                                data: data.settlement,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
                             }
                         ]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
                                 beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
                                 ticks: {
-                                    callback: function(value) {
-                                        return value.toLocaleString() + '원';
-                                    }
+                                    callback: value => formatCurrency(value)
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
                                 }
                             }
                         },
@@ -504,12 +663,12 @@
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
+                                    label: context => {
                                         let label = context.dataset.label || '';
                                         if (label) {
                                             label += ': ';
                                         }
-                                        label += context.parsed.y.toLocaleString() + '원';
+                                        label += formatCurrency(context.parsed.y);
                                         return label;
                                     }
                                 }
@@ -517,47 +676,51 @@
                         }
                     }
                 });
+            }
 
-                // 도넛 차트 (정산 비율)
-                const donutCtx = document.getElementById('donutChart').getContext('2d');
+            // 도넛 차트 업데이트
+            function updateDonutChart() {
+                const ctx = document.getElementById('donutChart').getContext('2d');
+                const data = prepareDonutData();
 
-                // 기존 차트가 있으면 제거
                 if (window.donutChart instanceof Chart) {
                     window.donutChart.destroy();
                 }
 
-                // 새 차트 생성
-                window.donutChart = new Chart(donutCtx, {
+                window.donutChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['정산금액', '수수료', '공제금액'],
                         datasets: [{
-                            data: [totalFinal, totalCommission, totalDeduct],
+                            data: data,
                             backgroundColor: [
-                                'rgba(75, 192, 192, 0.7)',
-                                'rgba(255, 205, 86, 0.7)',
-                                'rgba(255, 99, 132, 0.7)'
+                                'rgba(29, 111, 66, 0.7)',
+                                'rgba(255, 193, 7, 0.7)',
+                                'rgba(220, 53, 69, 0.7)'
                             ],
                             borderColor: [
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(255, 205, 86, 1)',
-                                'rgba(255, 99, 132, 1)'
+                                'rgba(29, 111, 66, 1)',
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(220, 53, 69, 1)'
                             ],
-                            borderWidth: 1
+                            borderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
                         plugins: {
                             legend: {
                                 position: 'bottom'
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
-                                        const sum = totalFinal + totalCommission + totalDeduct;
-                                        const percentage = ((context.parsed / sum) * 100).toFixed(1);
-                                        return `${context.label}: ${context.parsed.toLocaleString()}원 (${percentage}%)`;
+                                    label: context => {
+                                        const value = context.parsed;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
                                     }
                                 }
                             }
@@ -565,49 +728,238 @@
                     }
                 });
             }
-        });
 
-        // 엑셀 다운로드 버튼 이벤트 리스너
-        document.getElementById('excelDownloadBtn').addEventListener('click', () => {
-            const table = document.querySelector('table');
+            // 객실별 매출 차트 업데이트
+            function updateRoomSalesChart() {
+                const ctx = document.getElementById('roomSalesChart').getContext('2d');
+                const data = prepareRoomSalesData();
 
-            // 테이블 데이터를 2차원 배열로 변환
-            const data = [];
-            const headers = [];
-            table.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
-            data.push(headers);
+                if (window.roomSalesChart instanceof Chart) {
+                    window.roomSalesChart.destroy();
+                }
 
-            table.querySelectorAll('tbody tr').forEach(row => {
-                const rowData = [];
-                row.querySelectorAll('td').forEach(td => {
-                    const input = td.querySelector('input');
-                    rowData.push(input ? input.value : td.innerText);
+                window.roomSalesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: '객실별 매출',
+                            data: data.sales,
+                            backgroundColor: 'rgba(29, 111, 66, 0.7)',
+                            borderRadius: 8,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: value => formatCurrency(value)
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.parsed.y)
+                                }
+                            }
+                        }
+                    }
                 });
-                data.push(rowData);
-            });
+            }
 
-            // SheetJS를 이용한 Excel 생성
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, '정산 데이터');
+            // 성장률 차트 업데이트
+            function updateGrowthChart() {
+                const ctx = document.getElementById('growthChart').getContext('2d');
+                const data = prepareGrowthData();
 
-            // 선택된 날짜 범위 가져오기
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+                if (window.growthChart instanceof Chart) {
+                    window.growthChart.destroy();
+                }
 
-            // 날짜 형식 변환 (YYYY-MM-DD -> YYYYMMDD)
-            const formatDate = (dateStr) => {
-                return dateStr.replace(/-/g, '');
-            };
+                window.growthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: '매출 성장률',
+                            data: data.growth,
+                            borderColor: 'rgba(29, 111, 66, 1)',
+                            backgroundColor: 'rgba(29, 111, 66, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: value => `${value}%`
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => `${context.parsed.y}%`
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
-            const fileName = `${formatDate(startDate)}_${formatDate(endDate)}_정산데이터.xlsx`;
+            // 차트 데이터 준비 함수들
+            function prepareChartData() {
+                const groupedData = groupDataByDate(filteredData);
+                return {
+                    labels: Object.keys(groupedData),
+                    sales: Object.values(groupedData).map(data => data.sales),
+                    settlement: Object.values(groupedData).map(data => data.settlement)
+                };
+            }
 
-            // 파일 다운로드
-            XLSX.writeFile(workbook, fileName);
+            function prepareDonutData() {
+                const totalSales = filteredData.reduce((sum, room) => sum + calculatePrice(room), 0);
+                const totalCommission = filteredData.reduce((sum, room) => sum + calculateCommission(room), 0);
+                const totalDeduct = filteredData.reduce((sum, room) => sum + calculateDeduct(room), 0);
+                const totalSettlement = totalSales - totalCommission - totalDeduct;
+
+                return [totalSettlement, totalCommission, totalDeduct];
+            }
+
+            function prepareRoomSalesData() {
+                const roomSales = {};
+                filteredData.forEach(room => {
+                    const roomName = room.hotelRoomDTO.hotelRoomName;
+                    if (!roomSales[roomName]) {
+                        roomSales[roomName] = 0;
+                    }
+                    roomSales[roomName] += calculatePrice(room);
+                });
+
+                return {
+                    labels: Object.keys(roomSales),
+                    sales: Object.values(roomSales)
+                };
+            }
+
+            function prepareGrowthData() {
+                const monthlyData = groupDataByMonth(filteredData);
+                const months = Object.keys(monthlyData).sort();
+                const growth = [];
+
+                for (let i = 1; i < months.length; i++) {
+                    const currentMonth = monthlyData[months[i]];
+                    const previousMonth = monthlyData[months[i - 1]];
+                    const growthRate = ((currentMonth - previousMonth) / previousMonth) * 100;
+                    growth.push(growthRate.toFixed(1));
+                }
+
+                return {
+                    labels: months.slice(1),
+                    growth: growth
+                };
+            }
+
+            // 데이터 그룹화 함수들
+            function groupDataByDate(data) {
+                const grouped = {};
+                data.forEach(room => {
+                    const date = formatDate(room.createDate).split(' ')[0];
+                    if (!grouped[date]) {
+                        grouped[date] = {
+                            sales: 0,
+                            settlement: 0
+                        };
+                    }
+                    grouped[date].sales += calculatePrice(room);
+                    grouped[date].settlement += calculateFinal(room);
+                });
+                return grouped;
+            }
+
+            function groupDataByMonth(data) {
+                const grouped = {};
+                data.forEach(room => {
+                    const date = new Date(room.createDate);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    if (!grouped[monthKey]) {
+                        grouped[monthKey] = 0;
+                    }
+                    grouped[monthKey] += calculatePrice(room);
+                });
+                return grouped;
+            }
+
+            // 유틸리티 함수들
+            function formatDate(dateStr) {
+                const date = new Date(dateStr);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}`;
+            }
+
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('ko-KR', {
+                    style: 'currency',
+                    currency: 'KRW'
+                }).format(value);
+            }
+
+            function calculatePrice(room) {
+                const price = room.hotelRoomDTO.hotelRoomPrice;
+                const checkIn = new Date(room.checkInDate);
+                const checkOut = new Date(room.checkOutDate);
+                const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                return price * days;
+            }
+
+            function calculateCommission(room) {
+                return calculatePrice(room) * 0.05;
+            }
+
+            function calculateDeduct(room) {
+                return calculatePrice(room) * 0.05;
+            }
+
+            function calculateFinal(room) {
+                return calculatePrice(room) - calculateCommission(room) - calculateDeduct(room);
+            }
         });
     </script>
-
-
 </div>
 </body>
 </html>
