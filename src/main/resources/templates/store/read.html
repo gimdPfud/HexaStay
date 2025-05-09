@@ -36,14 +36,24 @@
                 <label class="form-label">대표자명</label>
                 <input type="text" class="form-control" th:value="${data.storeCeoName}" readonly>
             </div>
+
             <div class="mb-3">
-                <label class="form-label">사업장 주소</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" th:value="${data.storeAddress}" readonly>
-                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                            data-bs-toggle="modal" data-bs-target="#mapmodal"
-                            onclick="showMapBox()">지도 보기</button>
+                <label class="form-label" for="storeAddress">사업장 주소</label>
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <input type="text" id="storeAddressZonecode" class="form-control" style="width: 120px; background-color: #ced4da;" readonly>
+                    </div>
+                    <div class="col">
+                        <input type="text" id="storeAddressFound" class="form-control" style="background-color: #ced4da;" readonly>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-bs-toggle="modal" data-bs-target="#mapmodal"
+                                onclick="showMapBox()">지도 보기</button>
+                    </div>
                 </div>
+                <input type="text" id="storeAddressDetail" class="form-control mt-2" placeholder="상세 주소입니다." readonly>
+                <input readonly type="hidden" id="storeAddress" th:value="${data.storeAddress}" name="storeAddress"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">등록일자</label>
@@ -121,6 +131,12 @@
         document.addEventListener("DOMContentLoaded", function () {
             console.log("페이지 로드 됨")
             menuList();
+
+            let addrs = document.getElementById('storeAddress').value.split("\u00A0")
+
+            document.getElementById("storeAddressFound").value = addrs[0] || "";
+            document.getElementById("storeAddressZonecode").value = addrs[1] || ""
+            document.getElementById('storeAddressDetail').value = addrs[2] || "";
         })
 
         document.querySelectorAll("a").forEach(a=>{

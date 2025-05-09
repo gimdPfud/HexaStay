@@ -74,7 +74,25 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">전화번호</label>
-                    <input type="text" class="form-control" name="storePhone" required>
+                    <div class="row g-2">
+                        <div class="col">
+                            <select id="storePhoneone" class="form-select">
+                                <option>02</option>
+                                <option>031</option>
+                                <option>032</option>
+                                <option>041</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="storePhonetwo" class="form-control">
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="storePhonethree" class="form-control">
+                        </div>
+                        <input hidden name="storePhone" id="storePhone" th:value="${data.storePhone}">
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="storeAddress">사업장 주소</label>
@@ -355,6 +373,11 @@
         }
 
         function formSubmitHandler(button) {
+
+            document.getElementById('storePhone').value = document.getElementById('storePhoneone').value + "-" + document.getElementById('storePhonetwo').value + "-" + document.getElementById('storePhonethree').value;
+            console.log(document.getElementById('storePhone').value);
+
+
             document.getElementById('storeAddress').value =
                 document.getElementById("storeAddressFound").value + "\u00A0" + document.getElementById("storeAddressZonecode").value
                 + "\u00A0" + document.getElementById('storeAddressDetail').value;

@@ -8,6 +8,12 @@
 </head>
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+    <script>
+        let errmsg = [[${errmsg}]]
+        if(errmsg){
+            alert(errmsg);
+        }
+    </script>
 
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">요식업체 수정</h2>
@@ -21,6 +27,8 @@
                 <input type="hidden" id="originalAddress" th:value="${data.storeAddress}">
                 <input type="hidden" id="storeWtmX" name="storeWtmX" readonly>
                 <input type="hidden" id="storeWtmY" name="storeWtmY" readonly>
+                <input type="hidden" name="companyNum" th:value="${data.companyNum}" readonly>
+                <input type="hidden" name="companyName" th:value="${data.companyName}" readonly>
 
                 <div class="mb-3 user-box text-center">
                     <div class="border mb-2" style="width: 103px; height: 132px; margin: auto; display: flex; align-items: center; justify-content: center;">
@@ -40,7 +48,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">상호명</label>
-                    <input type="text" class="form-control" name="storeName" th:value="${data.storeName}" required>
+                    <input type="text" class="form-control" name="storeName" maxlength="20" th:value="${data.storeName}" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label d-block">카테고리</label>
@@ -52,23 +60,52 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">전화번호</label>
-                    <input type="text" class="form-control" name="storePhone" th:value="${data.storePhone}" required>
+                    <div class="row g-2">
+                        <div class="col">
+                            <select id="storePhoneone" class="form-select">
+                                <option>02</option>
+                                <option>031</option>
+                                <option>032</option>
+                                <option>041</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="storePhonetwo" class="form-control">
+                        </div>
+                        <div class="col-auto">-</div>
+                        <div class="col">
+                            <input type="number" id="storePhonethree" class="form-control">
+                        </div>
+                        <input hidden name="storePhone" id="storePhone" th:value="${data.storePhone}">
+                    </div>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">대표자명</label>
                     <input type="text" class="form-control" name="storeCeoName" th:value="${data.storeCeoName}" required>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">사업장 주소</label>
-                    <div class="input-group">
-                        <input style="background-color: #ced4da;" readonly
-                               type="text" id="storeAddress" class="form-control" name="storeAddress"
-                               th:value="${data.storeAddress}" required>
-                        <button class="btn btn-outline-secondary" type="button" onclick="showMapBox()">주소 검색</button>
+                    <label class="form-label" for="storeAddress">사업장 주소</label>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <input type="text" id="storeAddressZonecode" class="form-control" style="width: 120px; background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="storeAddressFound" class="form-control" style="background-color: #ced4da;" readonly required>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary" onclick="showMapBox()">주소 검색</button>
+                        </div>
                     </div>
+                    <input type="text" id="storeAddressDetail" class="form-control mt-2" placeholder="상세 주소를 입력해주세요.">
+                    <input readonly type="hidden" id="storeAddress" th:value="${data.storeAddress}" name="storeAddress"/>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">가게 패스워드</label>
                     <input type="text" class="form-control" name="storePassword" th:value="${data.storePassword}" required>
@@ -90,6 +127,14 @@
             document.getElementById("storeAddressFound").value = addrs[0] || "";
             document.getElementById("storeAddressZonecode").value = addrs[1] || ""
             document.getElementById('storeAddressDetail').value = addrs[2] || "";
+
+            const phone = document.getElementById('storePhone').value;
+            if (phone) {
+                const [p1, p2, p3] = phone.split("-");
+                document.getElementById('storePhoneone').value = p1 || '';
+                document.getElementById('storePhonetwo').value = p2 || '';
+                document.getElementById('storePhonethree').value = p3 || '';
+            }
         })
 
         //주소 입력
@@ -97,14 +142,23 @@
         function showMapBox() {
             new daum.Postcode({
                 oncomplete: function(data) {
-                    var addr = data.address;
-                    document.getElementById("storeAddress").value = addr;
+                    document.getElementById("storeAddressFound").value = data.address;
+                    document.getElementById("storeAddressZonecode").value = data.zonecode;
                 }
             }).open();
         }
 
         function formSubmitHandler(button) {
-            let storeAddress = document.getElementById("storeAddress").value;
+
+            document.getElementById('storePhone').value = document.getElementById('storePhoneone').value + "-" + document.getElementById('storePhonetwo').value + "-" + document.getElementById('storePhonethree').value;
+            console.log(document.getElementById('storePhone').value);
+
+            document.getElementById('storeAddress').value =
+                document.getElementById("storeAddressFound").value + "\u00A0" + document.getElementById("storeAddressZonecode").value
+                + "\u00A0" + document.getElementById('storeAddressDetail').value;
+
+
+            let storeAddress = document.getElementById("storeAddressFound").value;
             let originalAddress = document.getElementById("originalAddress").value;
             if (storeAddress!==originalAddress) {
                 geocoder.addressSearch(storeAddress, function(results, status) {

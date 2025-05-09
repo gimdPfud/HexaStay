@@ -59,9 +59,24 @@
             font-size: 1rem;
         }
 
-        .btn-outline-blue1 { background-color: white; color: #4A90E2; border: 2px solid #4A90E2; }
-        .btn-outline-blue2 { background-color: white; color: #5CACEB; border: 2px solid #5CACEB; }
-        .btn-outline-blue3 { background-color: white; color: #7FB3E6; border: 2px solid #7FB3E6; }
+        .btn-outline-blue1 {
+            background-color: white;
+            color: #A3C9F1; /* 더 연하고 파스텔 느낌 블루 */
+            border: 2px solid #A3C9F1;
+
+        }
+
+        .btn-outline-blue2 {
+            background-color: white;
+            color: #5CACEB; /* 현재 유지 (중간 밝기 블루) */
+            border: 2px solid #5CACEB;
+        }
+
+        .btn-outline-blue3 {
+            background-color: white;
+            color: #2D77D2; /* 더 진하고 선명한 블루 */
+            border: 2px solid #2D77D2;
+        }
 
         .btn-outline-blue1 small,
         .btn-outline-blue2 small,
@@ -124,7 +139,7 @@
                     신규 가입 쿠폰 (20% 할인)<br><small style="font-size: 0.7em;">계정당 최초 1개</small>
                 </button>
                 <button type="button" class="btn-outline-blue2" onclick="createCoupon('멤버쿠폰')">
-                    회원 쿠폰 (5% 할인)<br><small style="font-size: 0.7em;">무제한</small>
+                    회원 전용 쿠폰 (5% 할인)<br><small style="font-size: 0.7em;">무제한</small>
                 </button>
                 <button type="button" class="btn-outline-blue3" onclick="createCoupon('이벤트쿠폰')">
                     이벤트 쿠폰 (15% 할인)<br><small style="font-size: 0.7em;">최대 3개</small>
@@ -137,14 +152,17 @@
                 </div>
             </div>
         </div>
-
         <div id="myCouponsSection" class="card mt-4" style="display: none;">
             <div class="card-body">
-                <h2 class="card-title text-center mb-3">내 쿠폰</h2>
+                <div style="text-align:center; font-size: 1.25rem; font-weight: bold; margin: 0.5rem 0 0.5rem 0; color: #333;">
+                    내 쿠폰
+                </div>
                 <ul id="myCouponsList" class="list-group list-group-flush"></ul>
             </div>
         </div>
     </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -314,7 +332,14 @@
 
                             const listItem = document.createElement('li');
                             listItem.className = 'list-group-item';
-                            listItem.textContent = `${getKoreanCouponTypeName(coupon.couponType)} - 만료일: ${coupon.expirationDate}`;
+                            listItem.innerHTML = `
+                              <span style="float: left;">
+                                ${getKoreanCouponTypeName(coupon.couponType)}
+                              </span>
+                              <span style="float: right; font-size: 0.875rem; color: #888;">
+                                만료일: ${coupon.expirationDate}
+                              </span>
+                            `;
                             couponListUl.appendChild(listItem);
                         });
                     }

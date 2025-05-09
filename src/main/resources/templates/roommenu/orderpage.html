@@ -54,8 +54,10 @@
         .tab.active {
             font-weight: bold;
             background-color: #e0f7fa;  /* 선택된 탭 배경 */
-            border-bottom: 3px solid #00796b;  /* 탭 하단 표시선 */
-            color: #00796b;
+            border-bottom:  #ff6b6b;  /* 탭 하단 표시선 */
+        }
+        .btn-custom.active {
+            /* 아무 것도 없음: 클릭 상태에서도 변화 없음 */
         }
 
         .btn-custom {
@@ -434,8 +436,7 @@
                 if (popularButton) {
                     popularButton.style.fontWeight = 'bold';
                     popularButton.style.backgroundColor = '#e0f7fa';
-                    popularButton.style.borderBottom = '3px solid #00796b'
-                    popularButton.style.color = '#00796b';
+                    popularButton.style.color = '#ff6b6b';
                     console.log("Popular tab activated");
                 }
             } else if (currentCategory) {

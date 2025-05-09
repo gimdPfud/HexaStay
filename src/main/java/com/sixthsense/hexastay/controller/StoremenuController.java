@@ -14,6 +14,7 @@ import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.StoremenuService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,9 +37,8 @@ import java.util.Locale;
 @RequestMapping("/admin/store/menu")
 public class StoremenuController {
     private final StoremenuService storemenuService;
-    private final StoreService storeService;
-    private final AdminService adminService;
-
+//    private final StoreService storeService;
+//    private final AdminService adminService;
 //    /*storeNum없이 바로 메뉴 등록하려고 할 때
 //    *   어떤 가게에 메뉴를 추가하시겠습니까? 하는 페이지*/
 //    @GetMapping("/insert")
@@ -103,7 +104,12 @@ public class StoremenuController {
         return "storemenu/insert";
     }
     @PostMapping("/insert")
-    public String insertPost(StoremenuDTO storemenuDTO) throws IOException {
+    public String insertPost(@Valid StoremenuDTO storemenuDTO, BindingResult bindingResult) throws IOException {
+        if(bindingResult.hasErrors()){
+            log.info("유효성오류발생");
+            bindingResult.getAllErrors().forEach(log::info);
+            return "redirect:/admin/store/menu/insert/"+storemenuDTO.getStoreNum();
+        }
         storemenuService.insert(storemenuDTO);
         return "redirect:/admin/store/read?idid="+storemenuDTO.getStoreNum();
     }
@@ -161,10 +167,19 @@ public class StoremenuController {
         return "storemenu/modify";
     }
     @PostMapping("/modify")
-    public String modify(StoremenuDTO storemenuDTO) throws IOException {
-        Long storemenuNum = storemenuService.modify(storemenuDTO);
-        log.info(storemenuNum);
-        return "redirect:/admin/store/menu/read/"+storemenuNum;
+    public String modify(@Valid StoremenuDTO storemenuDTO, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            log.info("유효성오류발생");
+            bindingResult.getAllErrors().forEach(log::info);
+            return "redirect:/admin/store/menu/modify/"+storemenuDTO.getStoremenuNum();
+        }
+        try {
+            Long storemenuNum = storemenuService.modify(storemenuDTO);
+            log.info(storemenuNum);
+            return "redirect:/admin/store/menu/read/" + storemenuNum;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/delete/{id}")
