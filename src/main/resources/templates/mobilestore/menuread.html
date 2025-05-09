@@ -102,7 +102,8 @@
                      th:src="@{/store/menu/default.png}" class="item-img">
             </div>
             <p class="menu-name" th:text="${data.storemenuName}"></p> <p class="menu-content" th:text="${data.storemenuContent}"></p> <p class="price-text">
-            <span th:id="'storemenuPrice'" th:text="${#numbers.formatInteger(data.storemenuPrice, 0, 'COMMA')}"></span> <span th:text="#{item.currency}"></span>
+            <span th:id="${storemenuPrice}" th:text="${#numbers.formatInteger(data.storemenuPrice, 0, 'COMMA')}"
+                  th:attr="data-price=${data.storemenuPrice}"></span> <span th:text="#{item.currency}"></span>
         </p>
         </div>
 
@@ -167,10 +168,10 @@
         }
 
         function updateTotal() {
-            const base = parseInt(document.getElementById('storemenuPrice').textContent) || 0;
+            const base = parseInt(document.getElementById('storemenuPrice').dataset.price) || 0;
             const qty = parseInt(document.getElementById('storecartitemCount').value);
             let optionTotal = getOptionTotal();
-            const total = (base + optionTotal) * qty;
+            const total = ( base + optionTotal ) * qty;
             document.getElementById('totalPrice').textContent = total.toLocaleString();
         }
 
