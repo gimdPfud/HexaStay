@@ -440,7 +440,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/verify-identity")
+    @PostMapping("/updateidentity")
     @ResponseBody
     public ResponseEntity<?> verifyIdentity(@RequestParam("adminName") String name,
                                           @RequestParam("adminEmployeeNum") String employeeNum,
@@ -473,7 +473,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/verify-code")
+    @PostMapping("/passwordcode")
     @ResponseBody
     public ResponseEntity<?> verifyCode(@RequestParam String verificationCode) {
         try {
@@ -491,7 +491,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/resetpassword")
     @ResponseBody
     public ResponseEntity<?> resetPassword(@RequestParam String newPassword,
                                          @RequestParam String confirmPassword) {

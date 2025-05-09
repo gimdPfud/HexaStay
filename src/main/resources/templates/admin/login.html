@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('/admin/verify-identity', {
+        fetch('/admin/updateidentity', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('/admin/verify-code', {
+        fetch('/admin/passwordcode', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch('/admin/reset-password', {
+        fetch('/admin/resetpassword', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
