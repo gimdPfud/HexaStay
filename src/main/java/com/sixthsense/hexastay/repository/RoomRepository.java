@@ -11,13 +11,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
-public interface RoomRepository extends JpaRepository<Room,Long> {
+@Repository
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
     //roomPassword 만 찾아와서 유효성 검사
     //2.Long 타입 - 비밀번호 중복체크 및 비번 추천
@@ -158,4 +159,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     // 페이지네이션 없는 날짜 범위 데이터 조회용
     List<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
             List<Long> hotelRoomNums, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    // 체크아웃 날짜 범위로 조회
+    List<Room> findByCheckOutDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

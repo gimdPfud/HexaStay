@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>설문조사 목록</title>
+    <style>
+        .survey-list-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .survey-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .survey-card:hover {
+            transform: translateY(-3px);
+        }
+        .survey-title {
+            color: #1D6F42;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .survey-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .survey-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-create {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="survey-list-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>설문조사 목록</h2>
+            <a th:href="@{/survey/form}" class="btn btn-primary btn-create">
+                <i class="bi bi-plus-circle me-1"></i>새 설문조사 작성
+            </a>
+        </div>
+
+        <div th:each="survey : ${surveys}" class="survey-card">
+            <div class="survey-title" th:text="${survey.surveyTitle}">설문 제목</div>
+            <div class="survey-meta">
+                <span th:text="${#temporals.format(survey.surveyCreatedAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+                <span class="mx-2">|</span>
+                <span th:text="${survey.surveyIsActive ? '활성' : '비활성'}">상태</span>
+            </div>
+            <div class="survey-actions">
+                <a th:href="@{/survey/view/{id}(id=${survey.surveyNum})}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>보기
+                </a>
+                <a th:href="@{/survey/edit/{id}(id=${survey.surveyNum})}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-pencil me-1"></i>수정
+                </a>
+                <a th:href="@{/survey/result/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-graph-up me-1"></i>결과
+                </a>
+                <button th:onclick="'deleteSurvey(' + ${survey.surveyNum} + ')'" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash me-1"></i>삭제
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function deleteSurvey(id) {
+            if (confirm('정말로 이 설문조사를 삭제하시겠습니까?')) {
+                fetch(`/survey/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || '설문조사 삭제 실패');
+                        });
+                    }
+                    return response.text();
+                })
+                .then(message => {
+                    alert(message);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

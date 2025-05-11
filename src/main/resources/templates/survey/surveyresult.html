@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>설문조사 안내</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <p>안녕하세요, <span th:text="${memberName}">고객</span>님.</p>
+        <!-- 아래에 설문조사 작성 폼에서 입력한 본문이 동적으로 삽입될 예정 -->
+    </div>
+</div>
+</body>
+</html>

@@ -45,7 +45,7 @@ public class AdminSecurityConfig {
                         "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/settle",
                         "/toss/**", "/js/**", "/roomlist/**", "/member-insertroom/**",
                         "/success", "/fail", "/payment", "/settle/**", "/erd/**",
-                        "/register-hotelroom/**", "/salaries/**")
+                        "/register-hotelroom/**", "/salaries/**", "/survey/**", "/surveresult/**")
 
                 .authenticationManager(authManager)
                 .userDetailsService(adminDetailsService)
