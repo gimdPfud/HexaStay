@@ -102,7 +102,20 @@ public class EmailServiceImpl implements EmailService {
     public void sendSurveyEmail(String subject, String content, String memberEmail, String memberName, String roomName, Long roomNum, Room room) {
         try {
             Context context = new Context();
-            Survey activeSurvey = surveyService.getActiveSurvey();
+            
+            // 객실의 회사 정보를 가져와서 해당 회사의 활성화된 설문조사 조회
+            Long companyNum = null;
+            if (room.getHotelRoom() != null && room.getHotelRoom().getCompany() != null) {
+                companyNum = room.getHotelRoom().getCompany().getCompanyNum();
+            }
+            
+            Survey activeSurvey = null;
+            if (companyNum != null) {
+                activeSurvey = surveyService.getActiveSurveyByCompany(companyNum);
+            } else {
+                activeSurvey = surveyService.getActiveSurvey(); // 회사 정보가 없는 경우 기본 설문 사용
+            }
+            
             if (activeSurvey == null) {
                 log.error("활성화된 설문조사가 없습니다.");
                 return;
@@ -138,7 +151,8 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(emailContent, true);
             
             getHardcodedMailSender().send(message);
-            log.info("설문조사 이메일 전송 완료: {} ({}) - 방: {} ({})", memberName, memberEmail, roomName, roomNum);
+            log.info("설문조사 이메일 전송 완료: {} ({}) - 방: {} ({}), 회사: {}", 
+                    memberName, memberEmail, roomName, roomNum, companyName);
         } catch (Exception e) {
             log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("이메일 발송 실패", e);

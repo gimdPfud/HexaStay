@@ -89,7 +89,7 @@
                         <a th:href="@{/survey/results/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
                             <i class="bi bi-graph-up me-1"></i>결과
                         </a>
-                        <button th:onclick="'toggleActive(' + ${survey.surveyNum} + ')'" class="btn btn-sm"
+                        <button th:onclick="'toggleActive(' + ${survey.surveyNum} + ', ' + ${survey.surveyIsActive} + ')'" class="btn btn-sm"
                                 th:classappend="${survey.surveyIsActive} ? 'btn-outline-secondary' : 'btn-outline-primary'">
                             <i class="bi" th:classappend="${survey.surveyIsActive} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
                             <span th:text="${survey.surveyIsActive} ? '비활성화' : '활성화'"></span>
@@ -102,16 +102,6 @@
             </div>
         </div>
     </div>
-
-
-
-</div><!--레이아웃 끝 부분-->
-
-
-
-
-
-
 
     <script th:inline="javascript">
         function deleteSurvey(id) {
@@ -141,8 +131,15 @@
             }
         }
         
-        function toggleActive(id) {
-            const message = '이 설문조사를 활성화하면 다른 모든 설문조사는 비활성화됩니다. 계속하시겠습니까?';
+        function toggleActive(id, isActive) {
+            let message;
+            
+            if (isActive) {
+                message = '이 설문조사를 비활성화하시겠습니까?';
+            } else {
+                message = '이 설문조사를 활성화하면 다른 모든 설문조사는 비활성화됩니다. 계속하시겠습니까?';
+            }
+            
             if (confirm(message)) {
                 fetch(`/survey/toggle-active/${id}`, {
                     method: 'POST',
@@ -169,6 +166,7 @@
             }
         }
     </script>
-</div>
+
+</div><!--레이아웃 끝 부분-->
 </body>
 </html>

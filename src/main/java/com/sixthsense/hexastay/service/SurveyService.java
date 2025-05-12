@@ -32,4 +32,10 @@ public interface SurveyService {
     SurveyResult saveSurveyResult(SurveyResult surveyResult);
     boolean hasParticipated(Long surveyId, String memberEmail);
     void saveSurveyResult(SurveyResultDTO surveyResultDTO, String memberEmail, Long roomNum);
+    
+    // 회사별 설문조사 목록 조회
+    List<Survey> getSurveysByCompany(Long companyNum);
+    
+    // 회사별 활성화된 설문조사 조회
+    Survey getActiveSurveyByCompany(Long companyNum);
 }
