@@ -4,187 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${surveyTitle}">설문조사</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 414px;
-            margin: 0 auto;
-            padding: 0;
-            background: #fff;
-            min-height: 100vh;
-        }
-        .header {
-            background: linear-gradient(135deg, #1D6F42 0%, #2d8a5a 100%);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            font-weight: 600;
-        }
-        .content {
-            padding: 20px;
-        }
-        .greeting {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .greeting p {
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-        .greeting .member-name {
-            color: #1D6F42;
-            font-weight: 600;
-        }
-        .rating-group {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .rating-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #1D6F42;
-        }
-        .rating-options {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .rating-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px 5px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.8rem;
-        }
-        .rating-option:hover {
-            border-color: #1D6F42;
-            background: #f8f9fa;
-        }
-        .rating-option.selected {
-            background: #1D6F42;
-            color: white;
-            border-color: #1D6F42;
-        }
-        .rating-option input {
-            display: none;
-        }
-        .comment-group {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .comment-group label {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #1D6F42;
-        }
-        .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95rem;
-        }
-        .form-control:focus {
-            border-color: #1D6F42;
-            box-shadow: 0 0 0 0.2rem rgba(29, 111, 66, 0.25);
-        }
-        .submit-btn {
-            background: linear-gradient(135deg, #1D6F42 0%, #2d8a5a 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.8rem;
-            color: #6c757d;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1 th:text="${surveyTitle}">설문조사</h1>
+<body style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;line-height:1.6;color:#333333;margin:0;padding:0;background-color:#ffffff;">
+    <div style="max-width:600px;margin:0 auto;padding:20px;">
+        <div style="text-align:center;padding:20px;background-color:#1D6F42;">
+            <h1 style="color:#ffffff;margin:0;font-size:20px;font-weight:bold;" th:text="${surveyTitle}">설문조사</h1>
         </div>
-        
-        <div class="content">
-            <div class="greeting">
-                <p><span class="member-name" th:text="${memberName}">홍길동</span>님, 안녕하세요.</p>
-                <p>헥사스테이를 이용해 주셔서 감사합니다.</p>
-                <p th:text="${surveyContent}">고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
+        <div style="padding:20px;background-color:#ffffff;">
+            <div style="margin-bottom:20px;">
+                <p style="margin:0 0 10px 0;font-size:15px;"><span style="color:#1D6F42;font-weight:bold;font-size:16px;" th:text="${memberName}">홍길동</span> 고객님,</p>
+                <p style="margin:0 0 10px 0;font-size:15px;"><span style="color:#1D6F42;font-weight:bold;" th:text="${companyName}">헥사스테이</span>을 이용해 주셔서 진심으로 감사드립니다.</p>
             </div>
-            
-            <div class="survey-info">
-                <p>아래 링크를 클릭하여 설문조사에 참여해주세요:</p>
-                <p style="text-align: center; margin: 20px 0;">
-                    <a th:href="@{'/survey/participate/' + ${survey.surveyNum} + '?memberEmail=' + ${memberEmail}}" 
-                       style="display: inline-block; padding: 15px 30px; background: #1D6F42; color: white; text-decoration: none; border-radius: 8px;">
-                        설문조사 참여하기
-                    </a>
-                </p>
+            <div style="background-color:#f5f5f5;padding:15px;margin:20px 0;border:1px solid #dddddd;">
+                <p style="margin:0;font-size:14px;">이용하신 객실: <span style="color:#1D6F42;font-weight:bold;" th:text="${roomName}">디럭스 룸</span></p>
             </div>
+            <p style="font-size:15px;" th:utext="${surveyContent}">고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
+            <div style="height:1px;background-color:#dddddd;margin:20px 0;"></div>
+            <div style="text-align:center;">
+                <a th:href="${baseUrl} + '/survey/participate/' + ${survey.surveyNum} + '?memberEmail=' + ${memberEmail} + '&roomNum=' + ${roomNum} + '&memberName=' + ${memberName}"
+                   style="display:inline-block;background-color:#1D6F42;color:#ffffff;padding:12px 25px;text-decoration:none;font-weight:bold;font-size:15px;margin:20px 0;text-align:center;border:1px solid #1D6F42;">
+                    설문조사 참여하기
+                </a>
+            </div>
+            <p style="font-size:13px;color:#666666;text-align:center;margin-top:15px;">여러분의 의견이 더 나은 서비스의 시작입니다.</p>
         </div>
-        
-        <div class="footer">
-            <p>본 메일은 발신 전용입니다.</p>
-            <p>&copy; 2024 HexaStay. All rights reserved.</p>
+        <div style="text-align:center;padding:20px;font-size:12px;color:#666666;border-top:1px solid #dddddd;margin-top:20px;">
+            <p style="margin:0;">본 메일은 발신 전용입니다.</p>
+<!--            <p style="margin:0;">&copy; 2025 HexaStay. All rights reserved.</p>-->
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // 라디오 버튼 선택 시 스타일 변경
-        document.querySelectorAll('.rating-option').forEach(option => {
-            option.addEventListener('click', function() {
-                // 같은 그룹의 다른 옵션들의 선택 해제
-                const group = this.closest('.rating-options');
-                group.querySelectorAll('.rating-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                // 현재 옵션 선택
-                this.classList.add('selected');
-            });
-        });
-    </script>
 </body>
 </html> 

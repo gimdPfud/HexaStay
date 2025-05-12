@@ -1,7 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.entity.Survey;
+import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.RoomRepository;
+import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.EmailService;
 import com.sixthsense.hexastay.service.SurveyService;
 import jakarta.mail.MessagingException;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
     private final RoomRepository roomRepository;
+    private final MemberRepository memberRepository;
     
     @Value("${spring.mail.username}")
     private String FROM_EMAIL;
@@ -101,11 +105,26 @@ public class EmailServiceImpl implements EmailService {
                 return;
             }
             
+            // 회원 정보 조회
+            Member member = memberRepository.findByMemberEmail(memberEmail);
+            if (member == null) {
+                log.error("회원 정보를 찾을 수 없습니다: {}", memberEmail);
+                return;
+            }
+            
+            // 최근 체크아웃한 방 정보 조회
+            Room room = roomRepository.findTopByMemberOrderByCheckOutDateDesc(member)
+                    .orElseThrow(() -> new RuntimeException("방 정보를 찾을 수 없습니다."));
+            
             context.setVariable("survey", activeSurvey);
-            context.setVariable("memberName", memberEmail.split("@")[0]); // 이메일에서 이름 추출
-            context.setVariable("memberEmail", memberEmail); // 전체 이메일 주소 추가
+            context.setVariable("memberName", member.getMemberName());
+            context.setVariable("memberEmail", memberEmail);
+            context.setVariable("roomName", room.getHotelRoom().getHotelRoomName());
+            context.setVariable("roomNum", room.getRoomNum());
+            context.setVariable("companyName", room.getHotelRoom().getCompany().getCompanyName());
             context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
             context.setVariable("surveyContent", activeSurvey.getSurveyContent());
+            context.setVariable("baseUrl", "http://localhost:8090");
 
             String emailContent = templateEngine.process("survey/surveytemplate", context);
 
@@ -115,12 +134,13 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(FROM_EMAIL);
             helper.setTo(memberEmail);
             helper.setSubject(subject);
-            helper.setText(emailContent, true); // HTML 형식으로 설정
+            helper.setText(emailContent, true);
             
             getHardcodedMailSender().send(message);
-            log.info("설문조사 이메일 전송 성공: {}", memberEmail);
+            log.info("설문조사 이메일 전송 완료: {}", memberEmail);
         } catch (Exception e) {
-            log.error("설문조사 이메일 전송 중 오류 발생: {}", e.getMessage(), e);
+            log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("이메일 발송 실패", e);
         }
     }
 }

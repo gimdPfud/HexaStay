@@ -128,8 +128,6 @@
 
 
 
-
-
         <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
 
@@ -406,16 +404,6 @@
                 </li>
             </ul>
         </nav>
-    </div>
-    <div class="d-flex justify-content-end mb-2">
-        <select id="filterSelect" class="form-select form-select-sm w-auto"
-                onchange="location.href=this.value">
-            <option th:value="@{/roomlist}" th:selected="${currentStatus == null}">전체</option>
-            <option th:value="@{/roomlist/checkin}" th:selected="${currentStatus == 'checkin'}">체크인</option>
-            <option th:value="@{/roomlist/checkout}" th:selected="${currentStatus == 'checkout'}">체크아웃</option>
-            <option th:value="@{/roomlist/display/VISIBLE}" th:selected="${currentStatus == 'VISIBLE'}">표시됨</option>
-            <option th:value="@{/roomlist/display/HIDDEN}" th:selected="${currentStatus == 'HIDDEN'}">숨김</option>
-        </select>
     </div>
 
 

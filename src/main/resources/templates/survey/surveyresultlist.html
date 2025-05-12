@@ -96,57 +96,73 @@
 <body>
 <div layout:fragment="content">
     <div class="container-fluid">
-        <h2 class="fw-bold mb-4">설문조사 결과</h2>
-        
-        <div class="search-container">
-            <form id="searchForm" class="date-range-form">
-                <input type="month" id="startMonth" name="startMonth" th:value="${startMonth}">
-                <span>~</span>
-                <input type="month" id="endMonth" name="endMonth" th:value="${endMonth}">
-                <button type="submit">검색</button>
-            </form>
-        </div>
-        
-        <div class="survey-list">
-            <div th:if="${surveys.empty}" class="empty-state">
-                <i class="bi bi-clipboard-x"></i>
-                <p>해당 기간의 설문조사 결과가 없습니다.</p>
-            </div>
-            
-            <div th:each="survey : ${surveys}" class="survey-item" th:onclick="'location.href=\'/survey/results/' + ${survey.surveyNum} + '\''">
-                <div class="survey-date" th:text="${#temporals.format(survey.createDate, 'yyyy년 MM월 dd일')}">2024년 03월 15일</div>
-                <div class="survey-title" th:text="${survey.surveyTitle}">설문조사 제목</div>
-                <div class="survey-stats">
-                    <div class="stat-item">
-                        <i class="bi bi-people"></i>
-                        <span th:text="${survey.participantCount} + '명 참여'">0명 참여</span>
-                    </div>
-                    <div class="stat-item">
-                        <i class="bi bi-star"></i>
-                        <span th:text="${#numbers.formatDecimal(survey.averageRating, 1, 1)} + '점'">0.0점</span>
-                    </div>
-                </div>
+        <h2 class="fw-bold mb-4">설문조사 결과 (월별)</h2>
+
+        <!-- 연도/월 선택 필터 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <form id="filterForm" class="d-flex gap-2">
+                    <select id="yearSelect" class="form-select" style="width: auto;">
+                        <option value="">모든 연도</option>
+                        <option th:each="year : ${years}" th:value="${year}" th:text="${year}" th:selected="${selectedYear == year}">2024</option>
+                    </select>
+                    <select id="monthSelect" class="form-select" style="width: auto;">
+                        <option value="">모든 월</option>
+                        <option th:each="month : ${#numbers.sequence(1, 12)}" th:value="${month}" th:text="${month}" th:selected="${selectedMonth == month}">3</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">조회</button>
+                </form>
             </div>
         </div>
+
+        <!-- 설문조사 결과 테이블 -->
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>연도</th>
+                    <th>월</th>
+                    <th>응답 수</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 아래 부분은 컨트롤러 변수에 맞게 수정 (surveyResults 또는 surveys 등) -->
+                <tr th:each="result : ${surveyResults}" th:onclick="'location.href=\'/survey/results/month/' + ${result.year} + '-' + ${result.month} + '\''" style="cursor:pointer;">
+                    <td th:text="${result.year}">2024</td>
+                    <td th:text="${result.month}">03</td>
+                    <td th:text="${result.count}">0</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(surveyResults)}">
+                    <td colspan="3" class="text-center">
+                        <p>설문 응답이 없습니다.</p>
+                        <small>참고: 컨트롤러에서 'surveyResults' 변수로 데이터를 전달해야 합니다.</small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
-    // 현재 날짜 기준으로 당월 1일과 당일 설정
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    // 날짜 입력 필드에 기본값 설정
-    document.getElementById('startMonth').value = formatDateForInput(firstDayOfMonth);
-    document.getElementById('endMonth').value = formatDateForInput(today);
+    // 필터 폼 제출 처리
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const year = document.getElementById('yearSelect').value;
+        const month = document.getElementById('monthSelect').value;
+        
+        let url = '/survey/results';
+        if (year) {
+            url += '?year=' + year;
+            if (month) {
+                url += '&month=' + month;
+            }
+        } else if (month) {
+            url += '?month=' + month;
+        }
+        
+        window.location.href = url;
+    });
 });
-
-function formatDateForInput(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}`;
-}
 </script>
 </body>
 </html> 

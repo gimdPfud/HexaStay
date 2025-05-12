@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설문 완료</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .complete-container {
+            max-width: 414px;
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+        .complete-icon {
+            font-size: 4rem;
+            color: #1D6F42;
+            margin-bottom: 1.5rem;
+        }
+        .complete-title {
+            color: #1D6F42;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .complete-message {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .home-btn {
+            background: linear-gradient(135deg, #1D6F42 0%, #2d8a5a 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="complete-container">
+        <i class="bi bi-check-circle-fill complete-icon"></i>
+        <h1 class="complete-title">설문이 완료되었습니다</h1>
+        <p class="complete-message">
+            소중한 의견 감사합니다.<br>
+            더 나은 서비스로 보답하겠습니다.
+        </p>
+        <a href="/" class="home-btn">
+            <i class="bi bi-house-door me-2"></i>홈으로 돌아가기
+        </a>
+    </div>
+</body>
+</html> 

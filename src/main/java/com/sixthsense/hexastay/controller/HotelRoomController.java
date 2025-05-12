@@ -8,19 +8,18 @@ import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.HotelRoomService;
-import com.sixthsense.hexastay.service.MemberService;
 
-import com.sixthsense.hexastay.service.impl.QrCodeServiceimpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,9 +28,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
+
 import java.util.Map;
-import java.util.NoSuchElementException;
+
 
 
 @Controller
@@ -67,6 +66,7 @@ public class HotelRoomController {
             log.error("체크인/아웃 처리 중 예외 발생", e);
             return ResponseEntity.internalServerError().build();
         }
+
     }
 
 
@@ -126,24 +126,29 @@ public class HotelRoomController {
 
     // list.html - 객실 정보 리스트 페이지
     @GetMapping("/list")
-    public String hotelRoomList(Model model,Principal principal,
-          @PageableDefault(page = 1, size = 20, sort = "companyNum", direction = Sort.Direction.DESC) Pageable pageable
-
-    )
+    public String hotelRoomList(Model model, Principal principal,
+                                @RequestParam(value = "page", defaultValue = "0") int page)
     {
+
+        System.out.println("✅ hotelRoomList Controller 호출됨");
+        log.info("✅ hotelRoomList Controller 호출됨");
+
+        Pageable pageable = PageRequest.of(page, 9,
+                Sort.by(Sort.Order.desc("hotelRoomNum"), Sort.Order.desc("createDate"))
+        );
+        //페이지 사이즈 체크 로그
+        log.info("pageable : page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
 
-        Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList( pageable);
+        Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList(pageable);
 
         model.addAttribute("companylist", hotelRoomService.listCompany(adminDTO.getCompanyNum()));
         model.addAttribute("hotelRoomList", hotelRoomList);
 
-
-        // 혹시 페이징 처리된 호텔 룸 리스트도 넘기고 싶다면 아래처럼:
-        // Page<HotelRoomDTO> hotelRoomList = hotelRoomService.getHotelRooms(adminDTO.getCompanyNum(), pageable);
-        // model.addAttribute("hotelRoomList", hotelRoomList);
-
+        // ✔ Principal email 그대로 넘기기
+        model.addAttribute("adminEmail", principal.getName());
 
         return "hotelroom/list";
     }
@@ -238,8 +243,6 @@ public class HotelRoomController {
         Page<HotelRoomDTO> rooms = hotelRoomService.hotelroomList(pageable); // 이미지 포함한 DTO 반환
         return ResponseEntity.ok(rooms);
     }
-
-
 
 
 

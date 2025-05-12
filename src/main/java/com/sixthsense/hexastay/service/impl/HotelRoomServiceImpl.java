@@ -208,7 +208,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                 throw new IllegalStateException("호텔룸 번호가 null입니다. QR 코드 생성 불가.");
             }
 
-            String qrText = "http://localhost:8090/" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             log.info("QR 인코딩용 최종 경로: {}", qrText);
 
@@ -250,19 +250,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //todo:http://localhost:8090/register-hotelroom
     //2.리스트
     @Override
-    public Page<HotelRoomDTO> hotelroomList(Pageable page) {
-        // 페이지 번호 0 이상 유지
-        int firstPage = Math.max(page.getPageNumber(), 0);
-
-        // 페이지 크기 제한 (예: 50개 이상은 제한)
-        int pageSize = (page.getPageSize() > 0 && page.getPageSize() <= 50) ? page.getPageSize() : 30;
-
-        Pageable pageable = PageRequest.of(firstPage, pageSize, Sort.by(Sort.Direction.DESC, "hotelRoomNum"));
-
-        Page<HotelRoom> hotelroomEntity = hotelRoomRepository.findAll(pageable);
-
-        // DTO로 변환
-        return hotelroomEntity.map(entity -> modelMapper.map(entity, HotelRoomDTO.class));
+    public Page<HotelRoomDTO> hotelroomList(Pageable pageable) {
+        Page<HotelRoom> hotelRooms = hotelRoomRepository.findAllHotelRooms(pageable);
+        return hotelRooms.map(entity -> modelMapper.map(entity, HotelRoomDTO.class));
     }
 
     //3.읽기
@@ -369,7 +359,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. QR 코드 재생성 (service 사용)
         try {
-            String qrText = "http://localhost:8090/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             /*QR 생성 모듈화 클래스 */
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
