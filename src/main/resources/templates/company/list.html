@@ -32,7 +32,7 @@
   <div class="container mt-4 w-100 bg-light">
     <h2 class="fw-bold mb-4 text-center">조직 관리</h2>
 
-    <form action="/company/list" method="get" class="row g-3 align-items-end">
+    <form action="/company/list" method="get" id="searchForm" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
         <select name="choice" id="choice" class="form-select">
@@ -57,10 +57,15 @@
       </div>
 
       <div class="col-md-2 d-flex gap-3" style="width: 20%;">
-        <button type="submit" id="searchBtn" class="btn btn-primary w-50" style=" height: 40px;">검색</button>
+        <button type="button" id="searchBtn" class="btn btn-primary w-50" style=" height: 40px;">검색</button>
         <a href="/company/insert" class="btn btn-success w-50" style=" height: 40px;">등록</a>
       </div>
     </form>
+
+    <!-- 검색 결과가 없을 때 메시지 -->
+    <div class="alert alert-info mt-3" th:if="${companyDTOS != null && companyDTOS.empty && (keyword != null && !keyword.isEmpty())}" role="alert">
+      '<span th:text="${keyword}"></span>' 에 대한 검색 결과가 없습니다.
+    </div>
 
     <div class="row mt-4">
       <div class="col-12">
@@ -144,8 +149,6 @@
     </div>
   </div>
 
-
-
   <script>
     function loadAdmins(button) {
       const companyNum = button.getAttribute('data-companynum');
@@ -179,13 +182,42 @@
               });
     }
 
-    // 페이지 로드 시 검색 관련 이벤트 설정
+    // 검색 관련 기능
     document.addEventListener('DOMContentLoaded', function() {
       // choice 선택 변경 시 자동 검색
       const choiceEl = document.getElementById('choice');
       if (choiceEl) {
         choiceEl.addEventListener('change', function() {
-          document.querySelector('form').submit();
+          document.getElementById('searchForm').submit();
+        });
+      }
+      
+      // 검색 버튼 클릭 시
+      const searchBtn = document.getElementById('searchBtn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+          const select = document.getElementById('select').value;
+          const keyword = document.getElementById('keyword').value;
+          
+          // 검색 조건이 '전체'가 아니고 키워드가 비어있을 때 경고
+          if (select !== '전체' && keyword.trim() === '') {
+            alert('검색어를 입력해주세요.');
+            document.getElementById('keyword').focus();
+            return;
+          }
+          
+          document.getElementById('searchForm').submit();
+        });
+      }
+      
+      // 엔터 키로 검색
+      const keywordInput = document.getElementById('keyword');
+      if (keywordInput) {
+        keywordInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('searchBtn').click();
+          }
         });
       }
     });

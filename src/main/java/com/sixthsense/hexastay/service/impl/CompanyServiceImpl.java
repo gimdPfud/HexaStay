@@ -133,38 +133,55 @@ public class CompanyServiceImpl implements CompanyService {
     // 검색용
     @Override
     public Page<CompanyDTO> companySearchList(String select, String choice, String keyword, Long companyNum, Long adminNum, Pageable pageable) {
-
-        Page<Company> companyPage = null;
-
-        if (adminRepository.findByAdminNum(adminNum).getAdminRole().equals("SUPERADMIN")) {
+        log.info("=== 조직 검색 시작 ===");
+        log.info("검색 조건: select=" + select + ", choice=" + choice + ", keyword=" + keyword);
+        log.info("조직 번호: " + companyNum + ", 관리자 번호: " + adminNum);
+        
+        Admin admin = adminRepository.findByAdminNum(adminNum);
+        boolean isSuperAdmin = admin.getAdminRole().equals("SUPERADMIN");
+        
+        Page<Company> companyPage;
+        
+        // 슈퍼어드민인 경우 전체 조직에 대한 검색 허용
+        if (isSuperAdmin) {
+            log.info("슈퍼어드민 권한으로 검색");
+            
+            // 키워드나 검색 조건이 없는 경우 전체 목록 조회
             if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
                 if (choice == null || choice.isEmpty()) {
+                    log.info("조건 없이 전체 조회");
                     return companyRepository.findAllIgnoringCompanyNum(null, pageable)
                             .map(this::convertToCompanyDTO);
                 } else {
+                    log.info("타입(" + choice + ")으로만 조회");
                     return companyRepository.findAllIgnoringCompanyNum(choice, pageable)
                             .map(this::convertToCompanyDTO);
                 }
             }
-            companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
+            
+            // 검색 조건이 있는 경우 검색 실행 (companyNum은 NULL로 전달)
+            companyPage = companyRepository.listSelectSearch(select, choice, keyword, null, pageable);
         } else {
-
-            // 소속만 선택하고 검색 조건/키워드가 없을 때
+            log.info("일반 관리자 권한으로 검색 - 소속 조직 또는 하위 조직만 조회 가능");
+            
+            // 키워드나 검색 조건이 없는 경우 소속 조직 목록 조회
             if ((keyword == null || keyword.trim().isEmpty()) && (select == null || "전체".equals(select))) {
                 if (choice == null || choice.isEmpty()) {
-                    // 전체 선택 시
+                    log.info("조건 없이 소속 조직 조회");
                     return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, null, pageable)
                             .map(this::convertToCompanyDTO);
                 } else {
-                    // 특정 타입 선택 시
+                    log.info("타입(" + choice + ")으로 소속 조직 조회");
                     return companyRepository.findByCompanyNumOrParentCompanyNum(companyNum, choice, pageable)
                             .map(this::convertToCompanyDTO);
                 }
             }
-
-            // 검색 조건 + 키워드가 있을 때
+            
+            // 검색 조건이 있는 경우 소속 조직 내에서 검색
             companyPage = companyRepository.listSelectSearch(select, choice, keyword, companyNum, pageable);
         }
+        
+        log.info("검색 결과 수: " + companyPage.getTotalElements());
         return companyPage.map(this::convertToCompanyDTO);
     }
 
