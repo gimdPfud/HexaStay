@@ -58,7 +58,7 @@
                         </div>
                     </div>
 
-                    <!-- 주문 정보 (영수증 스타일) -->
+                    <!-- 주문 정보 -->
                     <div class="small">
                         <!-- 메뉴명 + 수량 -->
                         <div th:each="item : ${orderDTO.orderstoreitemDTOList}" class="mb-1">
@@ -74,12 +74,21 @@
                             <span th:text="${orderDTO.orderstoreMessage}"></span>
                         </div>
 
-                        <!-- 룸번호, 주문일 -->
-                        <div>
-                            <strong>룸번호:</strong> <span th:text="${orderDTO.roomNum}"></span>
-                            <span class="ms-3"><strong>주문일:</strong>
+                        <!-- 방 이름 -->
+                        <div class="mt-2">
+                            <strong>룸:</strong> <span th:text="${orderDTO.roomName}"></span>
+                        </div>
+
+                        <!-- 룸 주소 -->
+                        <div class="mt-2">
+                            <strong>주소:</strong>
+                            <span th:text="${orderDTO.roomAddress}"></span>
+                        </div>
+
+                        <!-- 주문일 -->
+                        <div class="mt-2">
+                            <strong>주문일:</strong>
                             <span th:text="${#temporals.format(orderDTO.createDate, 'yyyy-MM-dd HH:mm')}"></span>
-                            </span>
                         </div>
                     </div>
                 </div>

@@ -211,6 +211,19 @@ public class OrderstoreServiceImpl implements OrderstoreService {
                                 return itemDTO;
                             }).toList()
             );
+            String[] hotelAdress = data.getRoom().getHotelRoom().getCompany().getCompanyAddress().split("\u00A0");
+            String hotelroomName = data.getRoom().getHotelRoom().getHotelRoomName();
+            String hotelName = data.getRoom().getHotelRoom().getCompany().getCompanyBrand() + " " + data.getRoom().getHotelRoom().getCompany().getCompanyName();
+            dto.setRoomName(hotelName+", "+hotelroomName);
+            if(hotelAdress.length==3){
+                dto.setRoomAddress(hotelAdress[1]+" "+hotelAdress[2]);
+            } else if (hotelAdress.length==2) {
+                dto.setRoomAddress(hotelAdress[1]);
+            } else if (hotelAdress.length==1) {
+                dto.setRoomAddress(hotelAdress[0]);
+            }else {
+                dto.setRoomAddress("-");
+            }
             return dto;
         }).toList();
         log.info("서비스에서 찾음? "+result.size());
