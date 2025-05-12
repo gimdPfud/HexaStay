@@ -186,6 +186,8 @@ public class StoreOrderController {
         model.addAttribute("storeNum",storeNum);
         return "store/orderlistForAdmin";
     }
+
+
     @GetMapping("/admin/store/order/cancel/{orderNum}")
     public ResponseEntity cancelOrder(@PathVariable(value = "orderNum") Long orderNum){
         try {
