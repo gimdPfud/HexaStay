@@ -292,8 +292,6 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      * 장바구니 아이템 수량 변경
      * 기능: 특정 장바구니 아이템(`RoomMenuCartItemNum`)의 수량(`roomMenuCartItemAmount`)을 업데이트합니다.
      * 수량 변경에 따른 총 가격 재계산 및 반영 로직도 함께 처리합니다.
-     * @param RoomMenuCartItemNum Long : 수량을 변경할 장바구니 아이템의 ID.
-     * @param roomMenuCartItemAmount Integer : 변경할 새로운 수량. (0 이하일 경우 아이템 삭제 고려)
      * @throws EntityNotFoundException : `RoomMenuCartItemNum`에 해당하는 아이템이 존재하지 않는 경우.
      * @throws IllegalArgumentException : 수량이 유효하지 않은 경우 (예: 음수).
      * 작성자 : 김윤겸
@@ -302,14 +300,68 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
      **************************************************/
 
     @Override
-    public void RoomMenuCartItemAmountUpdate(Long RoomMenuCartItemNum, Integer roomMenuCartItemAmount) {
-        log.info("장바구니 수량 업데이트 서비스 진입");
-        log.info("아이템의 pk" + RoomMenuCartItemNum);
-        log.info("아이템의 수량" + roomMenuCartItemAmount);
-        RoomMenuCartItem roomMenuCartItem =
-                roomMenuCartItemRepository.findById(RoomMenuCartItemNum).orElseThrow(EntityNotFoundException::new);
+    public void RoomMenuCartItemAmountUpdate(Long roomMenuCartItemNum, Integer newAmount) {
+        {
+            log.info("장바구니 아이템 ID {}의 수량을 {}로 변경하는 서비스 진입", roomMenuCartItemNum, newAmount);
 
-        roomMenuCartItem.setRoomMenuCartItemAmount(roomMenuCartItemAmount);
+            if (newAmount == null || newAmount <= 0) {
+                // 수량이 0 이하이면 아이템 삭제 처리 또는 예외 발생
+                // 여기서는 예외를 발생시키거나, 최소 수량을 1로 강제하는 등의 정책이 필요합니다.
+                // 일단 최소 수량 1로 가정하지 않고, 0이하 요청 시 오류로 처리하겠습니다.
+                // 또는, 수량이 0이 되면 해당 아이템을 장바구니에서 삭제하는 RoomCartMenuCartItemDelete(roomMenuCartItemNum)를 호출할 수도 있습니다.
+                log.warn("잘못된 수량 요청: ID {}, 수량 {}", roomMenuCartItemNum, newAmount);
+                throw new IllegalArgumentException("수량은 1 이상이어야 합니다. 아이템을 삭제하려면 삭제 버튼을 이용해주세요.");
+            }
+
+            RoomMenuCartItem cartItem = roomMenuCartItemRepository.findById(roomMenuCartItemNum)
+                    .orElseThrow(() -> {
+                        log.error("장바구니 아이템 ID {}를 찾을 수 없습니다.", roomMenuCartItemNum);
+                        return new EntityNotFoundException("장바구니 아이템을 찾을 수 없습니다. ID: " + roomMenuCartItemNum);
+                    });
+
+            RoomMenu product = cartItem.getRoomMenu();
+            if (product == null) {
+                log.error("장바구니 아이템 ID {}에 연결된 상품 정보가 없습니다.", roomMenuCartItemNum);
+                throw new EntityNotFoundException("장바구니 아이템에 연결된 상품 정보를 찾을 수 없습니다.");
+            }
+
+            // 상품 재고 확인
+            if (product.getRoomMenuAmount() < newAmount) {
+                log.warn("상품 '{}'(ID:{}) 재고 부족. 요청 수량: {}, 현재 재고: {}",
+                        product.getRoomMenuName(), product.getRoomMenuNum(), newAmount, product.getRoomMenuAmount());
+                throw new SoldOutException("상품 '" + product.getRoomMenuName() + "'의 재고가 부족합니다. (요청 수량: " + newAmount + ", 현재 재고: " + product.getRoomMenuAmount() + ")");
+            }
+            // 여기에 연결된 옵션들의 재고도 함께 고려해야 한다면 추가 로직 필요 (현재는 주 상품 재고만 체크)
+
+            cartItem.setRoomMenuCartItemAmount(newAmount); // 새 수량 설정
+
+            // 아이템 가격 재계산: (상품 기본 단가 * 새 수량) + 아이템의 총 옵션 추가 금액
+            // cartItem.getRoomMenuSelectOptionPrice() 필드가 "해당 아이템의 모든 옵션에 대한 총 추가 금액"을 이미 담고 있다고 가정합니다.
+            // 이 값은 옵션 변경 시 RoomMenuCartServiceImpl.updateCartItemWithOptions 에서 계산되어 저장되었습니다.
+            int itemBasePrice = product.getRoomMenuPrice();
+            int totalOptionPriceForItem = cartItem.getRoomMenuSelectOptionPrice() != null ? cartItem.getRoomMenuSelectOptionPrice() : 0;
+
+            int newItemTotalPrice = (itemBasePrice * newAmount) + totalOptionPriceForItem;
+            cartItem.setRoomMenuCartItemPrice(newItemTotalPrice); // 재계산된 최종 아이템 가격 설정
+            log.info("장바구니 아이템 ID {} 가격 재계산 완료. 상품 기본가: {}, 새 수량: {}, 총 옵션가: {}, 새 총 아이템 가격: {}",
+                    roomMenuCartItemNum, itemBasePrice, newAmount, totalOptionPriceForItem, newItemTotalPrice);
+
+            roomMenuCartItemRepository.save(cartItem); // 변경된 RoomMenuCartItem 저장 (수량 및 가격)
+
+            // 전체 장바구니(RoomMenuCart)의 총액 업데이트
+            RoomMenuCart cart = cartItem.getRoomMenuCart();
+            if (cart != null) {
+                List<RoomMenuCartItem> updatedCartItems = roomMenuCartItemRepository.findByRoomMenuCart(cart);
+                int finalCartTotalPrice = updatedCartItems.stream()
+                        .mapToInt(ci -> ci.getRoomMenuCartItemPrice() != null ? ci.getRoomMenuCartItemPrice() : 0)
+                        .sum();
+                cart.setRoomMenuCartTotalPrice(finalCartTotalPrice);
+                roomMenuCartRepository.save(cart);
+                log.info("장바구니 ID {}의 전체 총액 업데이트 완료: {}", cart.getRoomMenuCartNum(), cart.getRoomMenuCartTotalPrice());
+            } else {
+                log.warn("장바구니 아이템 ID {}에 연결된 장바구니(RoomMenuCart)가 없습니다. 전체 총액 업데이트를 건너<0xE1><0xB9><0xA5>니다.", roomMenuCartItemNum);
+            }
+        }
 
     }
 

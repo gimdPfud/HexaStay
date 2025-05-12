@@ -334,555 +334,536 @@
     </div>
 
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script th:inline="javascript">
-            const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
-            let couponFinalTotal = null;
-            let currentEditingCartItemId = null;
-            let currentEditingProductId = null;
-            let currentCartItemOptions = []; // 이 변수는 openOptionChangeModal 내에서 지역적으로 사용되므로 전역일 필요는 없어 보입니다.
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
+        let couponFinalTotal = null;
+        let currentEditingCartItemId = null;
+        let currentEditingProductId = null;
 
-            // ★★★ Thymeleaf 모델 객체에서 실제 데이터 목록(배열)을 가져오도록 수정 ★★★
-            const cartDetailPageData = /*[[${cartDetailDTOList}]]*/ null; // 서버에서 온 Page 객체 전체
-            const jsCartDetailDTOList = cartDetailPageData ? cartDetailPageData.content : []; // Page 객체의 content (실제 DTO 배열)
+        const cartDetailPageData = /*[[${cartDetailDTOList}]]*/ null;
+        const jsCartDetailDTOList = cartDetailPageData ? cartDetailPageData.content : [];
+        const currencySymbol = /*[[#{item.currency}]]*/ '원';
 
-            function closeOptionModal() {
-                document.getElementById('optionChangeModal').style.display = 'none';
-                currentEditingCartItemId = null;
-                currentEditingProductId = null;
-                // currentCartItemOptions = []; // 이 함수의 지역 변수로 변경하거나, 사용처에서 초기화
+        function closeOptionModal() {
+            const modal = document.getElementById('optionChangeModal');
+            if (modal) modal.style.display = 'none';
+            currentEditingCartItemId = null;
+            currentEditingProductId = null;
+            const optionsContainer = document.getElementById('optionModalBody');
+            if (optionsContainer) optionsContainer.innerHTML = '';
+            const selectedOptionTotalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
+            if(selectedOptionTotalPriceEl) selectedOptionTotalPriceEl.textContent = '0';
+        }
+
+        async function openOptionChangeModal(cartItemId, productId) {
+            currentEditingCartItemId = cartItemId;
+            currentEditingProductId = productId;
+            let localCurrentCartItemOptions = [];
+
+            const modal = document.getElementById('optionChangeModal');
+            const modalTitle = document.getElementById('optionModalProductTitle');
+            const optionsContainer = document.getElementById('optionModalBody');
+            const selectedOptionTotalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
+
+            if (!modal || !modalTitle || !optionsContainer || !selectedOptionTotalPriceEl) {
+                console.error("옵션 변경 모달의 필수 요소 중 일부를 찾을 수 없습니다.");
+                return;
             }
 
-            // 모달 열기 및 옵션 표시 함수
-            async function openOptionChangeModal(cartItemId, productId) {
-                currentEditingCartItemId = cartItemId;
-                currentEditingProductId = productId;
-                let localCurrentCartItemOptions = []; // 함수 내 지역 변수로 사용
+            optionsContainer.innerHTML = '<p class="text-center text-muted">옵션 정보를 불러오는 중...</p>';
+            selectedOptionTotalPriceEl.textContent = '0';
+            modal.style.display = 'flex';
 
-                const modal = document.getElementById('optionChangeModal');
-                const modalTitle = document.getElementById('optionModalProductTitle');
-                const optionsContainer = document.getElementById('optionModalBody');
-                const selectedOptionTotalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
+            try {
+                const availableOptionsResponse = await fetch(`/roommenu/api/products/${productId}/options`);
+                if (!availableOptionsResponse.ok) {
+                    const errorData = await availableOptionsResponse.json().catch(() => ({ error: '서버 응답 형식이 올바르지 않거나, 옵션 조회에 실패했습니다.' }));
+                    throw new Error(errorData.error || `사용 가능한 옵션 목록을 불러오는데 실패했습니다. (상태: ${availableOptionsResponse.status})`);
+                }
+                const availableOptions = await availableOptionsResponse.json();
 
-                optionsContainer.innerHTML = '<p>옵션 정보를 불러오는 중...</p>';
-                modal.style.display = 'flex';
+                const currentCartItemDTO = jsCartDetailDTOList.find(dto => dto.roomMenuCartDetailNum == cartItemId);
+                localCurrentCartItemOptions = currentCartItemDTO ? (currentCartItemDTO.optionList || []) : [];
 
-                try {
-                    // 1. 해당 상품의 사용 가능한 모든 옵션 목록 가져오기
-                    const availableOptionsResponse = await fetch(`/roommenu/api/products/${productId}/options`); // 이전 단계에서 이 URL이 맞다고 확인됨
-                    if (!availableOptionsResponse.ok) {
-                        const errorData = await availableOptionsResponse.json().catch(() => ({ error: '서버 응답 형식이 올바르지 않거나, 옵션 조회에 실패했습니다.' }));
-                        throw new Error(errorData.error || `사용 가능한 옵션 목록을 불러오는데 실패했습니다. (상태: ${availableOptionsResponse.status})`);
-                    }
-                    const availableOptions = await availableOptionsResponse.json();
+                const productName = currentCartItemDTO ? currentCartItemDTO.roomMenuCartDetailMenuItemName : '상품';
+                modalTitle.textContent = `${productName} - 옵션 변경`;
+                optionsContainer.innerHTML = '';
 
-                    // 2. 현재 장바구니 아이템에 이미 선택된 옵션 정보 가져오기
-                    //    수정된 jsCartDetailDTOList 변수 사용
-                    const currentCartItemDTO = jsCartDetailDTOList.find(dto => dto.roomMenuCartDetailNum == cartItemId);
-                    localCurrentCartItemOptions = currentCartItemDTO ? (currentCartItemDTO.optionList || []) : [];
+                if (!availableOptions || availableOptions.length === 0) {
+                    optionsContainer.innerHTML = '<p class="text-center text-muted">선택 가능한 추가 옵션이 없습니다.</p>';
+                    updateModalSelectedOptionTotalPriceUI();
+                    return;
+                }
 
-                    const productName = currentCartItemDTO ? currentCartItemDTO.roomMenuCartDetailMenuItemName : '상품';
-                    modalTitle.textContent = `${productName} - 옵션 변경`;
-                    optionsContainer.innerHTML = '';
+                availableOptions.forEach(option => {
+                    const selectedOpt = localCurrentCartItemOptions.find(co => co.roomMenuOptionNum === option.roomMenuOptionNum);
+                    const currentQuantity = selectedOpt ? selectedOpt.roomMenuCartItemOptionAmount : 0;
 
-                    if (!availableOptions || availableOptions.length === 0) { // availableOptions가 null일 수도 있으니 체크
-                        optionsContainer.innerHTML = '<p class="text-muted">선택 가능한 추가 옵션이 없습니다.</p>';
-                        updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                        return;
-                    }
-
-                    availableOptions.forEach(option => {
-                        console.log("모달에 표시할 옵션 정보:", JSON.stringify(option))
-                        // localCurrentCartItemOptions 사용
-                        const selectedOpt = localCurrentCartItemOptions.find(co => co.roomMenuOptionNum === option.roomMenuOptionNum);
-                        const currentQuantity = selectedOpt ? selectedOpt.roomMenuCartItemOptionAmount : 0;
-
-                        const optionDiv = document.createElement('div');
-                        // optionDiv.className = 'option-item'; // 이전 코드에 있던 것, 필요하면 다시 추가
-                        optionDiv.className = 'modal-option-item d-flex justify-content-between align-items-center mb-2'; // 부트스트랩 활용 스타일
-
-                        // ★★★ HTML 구조 약간 수정 (체크박스와 레이블을 한 div로 묶고, 수량 조절 부분을 다른 div로) ★★★
-                        optionDiv.innerHTML = `
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'modal-option-item d-flex justify-content-between align-items-center mb-2';
+                    optionDiv.innerHTML = `
                     <div class="form-check flex-grow-1 me-2">
                         <input class="form-check-input option-checkbox" type="checkbox" value="${option.roomMenuOptionNum}"
                                id="modal-opt-${option.roomMenuOptionNum}" data-price="${option.roomMenuOptionPrice}"
                                ${currentQuantity > 0 ? 'checked' : ''}>
                         <label class="form-check-label" for="modal-opt-${option.roomMenuOptionNum}" style="font-size:0.9rem;">
-                            ${option.roomMenuOptionName} (+${option.roomMenuOptionPrice != null ? option.roomMenuOptionPrice.toLocaleString() : 0}원)
+                            ${option.roomMenuOptionName} (+${option.roomMenuOptionPrice != null ? option.roomMenuOptionPrice.toLocaleString() : 0}${currencySymbol})
                         </label>
                     </div>
                     <div class="input-group input-group-sm" style="width: 120px; display: ${currentQuantity > 0 ? 'flex' : 'none'};">
                         <button class="btn btn-outline-secondary option-qty-decrease" type="button">-</button>
                         <input type="number" class="form-control option-quantity-input text-center"
-                               value="${currentQuantity}" min="0" max="${option.roomMenuOptionAmount}" data-option-id="${option.roomMenuOptionNum}">
+                               value="${currentQuantity}" min="0" max="${option.roomMenuOptionAmount}" data-option-id="${option.roomMenuOptionNum}" readonly>
                         <button class="btn btn-outline-secondary option-qty-increase" type="button">+</button>
                     </div>
                     <small class="text-muted ms-2" style="font-size:0.8rem; min-width: 60px;">(재고: ${option.roomMenuOptionAmount != null ? option.roomMenuOptionAmount : 'N/A'})</small>
                 `;
-                        optionsContainer.appendChild(optionDiv);
+                    optionsContainer.appendChild(optionDiv);
 
-                        const checkbox = optionDiv.querySelector('.option-checkbox');
-                        const quantityControlDiv = optionDiv.querySelector('.input-group');
-                        const quantityInput = optionDiv.querySelector('.option-quantity-input');
-                        const decreaseBtn = optionDiv.querySelector('.option-qty-decrease');
-                        const increaseBtn = optionDiv.querySelector('.option-qty-increase');
+                    const checkbox = optionDiv.querySelector('.option-checkbox');
+                    const quantityControlDiv = optionDiv.querySelector('.input-group');
+                    const quantityInput = optionDiv.querySelector('.option-quantity-input');
+                    const decreaseBtn = optionDiv.querySelector('.option-qty-decrease');
+                    const increaseBtn = optionDiv.querySelector('.option-qty-increase');
 
-                        checkbox.addEventListener('change', function() {
-                            if (this.checked) {
-                                quantityControlDiv.style.display = 'flex';
-                                if (parseInt(quantityInput.value) < 1) quantityInput.value = 1;
-                            } else {
-                                quantityControlDiv.style.display = 'none';
-                                quantityInput.value = 0;
-                            }
-                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                        });
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            quantityControlDiv.style.display = 'flex';
+                            if (parseInt(quantityInput.value) < 1) quantityInput.value = 1;
+                        } else {
+                            quantityControlDiv.style.display = 'none';
+                            quantityInput.value = 0;
+                        }
+                        updateModalSelectedOptionTotalPriceUI();
+                    });
 
-                        quantityInput.addEventListener('change', function() {
-                            let val = parseInt(this.value);
-                            const max = parseInt(this.max);
-                            if (isNaN(val) || val < 0) val = 0;
-                            if (val > max) {
-                                alert(`최대 선택 가능 수량은 ${max}개 입니다.`);
-                                val = max;
-                            }
-                            this.value = val;
-                            if (val <= 0 && checkbox.checked) { // 수량이 0이 되면 체크박스도 해제
-                                checkbox.checked = false;
-                                quantityControlDiv.style.display = 'none';
-                            } else if (val > 0 && !checkbox.checked) { // 수량이 있으면 체크박스도 체크
+                    quantityInput.addEventListener('input', function() {
+                        let val = parseInt(this.value);
+                        const min = parseInt(this.min);
+                        const max = parseInt(this.max);
+                        if (isNaN(val)) val = min;
+                        if (val < min) val = min;
+                        if (val > max) val = max;
+                        this.value = val;
+
+                        if (val <= 0 && checkbox.checked) {
+                            checkbox.checked = false;
+                            quantityControlDiv.style.display = 'none';
+                        } else if (val > 0 && !checkbox.checked) {
+                            checkbox.checked = true;
+                            quantityControlDiv.style.display = 'flex';
+                        }
+                        updateModalSelectedOptionTotalPriceUI();
+                    });
+
+                    decreaseBtn.addEventListener('click', function() {
+                        let qty = parseInt(quantityInput.value);
+                        if (qty > 1) {
+                            quantityInput.value = qty - 1;
+                        } else {
+                            quantityInput.value = 0;
+                            checkbox.checked = false;
+                            quantityControlDiv.style.display = 'none';
+                        }
+                        updateModalSelectedOptionTotalPriceUI();
+                    });
+
+                    increaseBtn.addEventListener('click', function() {
+                        let qty = parseInt(quantityInput.value);
+                        const maxQty = parseInt(quantityInput.max);
+                        if (qty < maxQty) {
+                            quantityInput.value = qty + 1;
+                            if (!checkbox.checked) {
                                 checkbox.checked = true;
                                 quantityControlDiv.style.display = 'flex';
                             }
-                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                        });
-
-                        decreaseBtn.addEventListener('click', function() {
-                            let qty = parseInt(quantityInput.value);
-                            if (qty > 1) {
-                                quantityInput.value = qty - 1;
-                            } else {
-                                quantityInput.value = 0;
-                                checkbox.checked = false;
-                                quantityControlDiv.style.display = 'none';
-                            }
-                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                        });
-
-                        increaseBtn.addEventListener('click', function() {
-                            let qty = parseInt(quantityInput.value);
-                            const maxQty = parseInt(quantityInput.max);
-                            if (qty < maxQty) {
-                                quantityInput.value = qty + 1;
-                                if (!checkbox.checked) {
-                                    checkbox.checked = true;
-                                    quantityControlDiv.style.display = 'flex';
-                                }
-                            } else {
-                                alert(`최대 선택 가능 수량은 ${maxQty}개 입니다.`);
-                            }
-                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                        });
-                    });
-                    updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
-                } catch (error) {
-                    console.error("옵션 변경 모달 생성 중 오류:", error);
-                    optionsContainer.innerHTML = `<p class="text-danger">옵션 정보를 불러오는데 실패했습니다: ${error.message}</p>`;
-                }
-            }
-
-            // ... (updateModalSelectedOptionTotalPrice, saveChangedOptions 함수는 이전과 동일하게 유지) ...
-            // 모달 내 선택된 옵션들의 총 추가 금액 계산 및 표시 함수
-            function updateModalSelectedOptionTotalPrice(optionsContainer, totalPriceEl) {
-                let totalOptionPrice = 0;
-                optionsContainer.querySelectorAll('.modal-option-item').forEach(itemDiv => { // 클래스명 modal-option-item으로 변경
-                    const checkbox = itemDiv.querySelector('.option-checkbox');
-                    const quantityInput = itemDiv.querySelector('.option-quantity-input');
-                    if (checkbox.checked) {
-                        const price = parseFloat(checkbox.dataset.price);
-                        const quantity = parseInt(quantityInput.value);
-                        if (!isNaN(price) && !isNaN(quantity) && quantity > 0) {
-                            totalOptionPrice += price * quantity;
+                        } else {
+                            alert(`최대 선택 가능 수량은 ${maxQty}개 입니다.`);
                         }
-                    }
-                });
-                totalPriceEl.textContent = totalOptionPrice.toLocaleString();
-            }
-
-
-            // 변경된 옵션 저장 함수
-            // saveChangedOptions 함수 내부
-            async function saveChangedOptions() {
-                if (!currentEditingCartItemId) {
-                    alert("오류: 변경할 장바구니 아이템 정보가 없습니다.");
-                    return;
-                }
-
-                const selectedOptionUpdates = [];
-                document.querySelectorAll('#optionModalBody .modal-option-item').forEach(itemDiv => {
-                    const checkbox = itemDiv.querySelector('.option-checkbox');
-                    const quantityInput = itemDiv.querySelector('.option-quantity-input');
-                    const optionId = parseInt(checkbox.value); // RoomMenuOptionNum
-                    const originalCheckboxValue = checkbox.value; // 원래 value 값도 확인
-                    console.log(`체크박스 값: '${originalCheckboxValue}', 파싱된 ID: ${optionId}`); // ★★★ 로그 추가 ★★★
-                    let quantity = 0;
-
-                    if (checkbox.checked) {
-                        quantity = parseInt(quantityInput.value);
-                    }
-
-                    if (quantity > 0) {
-                        selectedOptionUpdates.push({
-                            roomMenuOptionNum: optionId,
-                            roomMenuCartItemOptionAmount: quantity
-                        });
-                    }
-                });
-
-                console.log("서버로 전송할 옵션 업데이트 정보:", JSON.stringify(selectedOptionUpdates));
-
-                const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
-                const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
-                const headers = { 'Content-Type': 'application/json' };
-                if (csrfToken && csrfHeader) {
-                    headers[csrfHeader] = csrfToken;
-                }
-
-                try {
-                    // ★★★ URL 수정: "item"을 "items"로 변경 ★★★
-                    const finalUrl = `/roommenu/api/cart/items/${currentEditingCartItemId}/options`;
-                    console.log("옵션 업데이트 요청 URL:", finalUrl); // 전송될 URL 확인
-
-                    const response = await fetch(finalUrl, {
-                        method: 'PUT',
-                        headers: headers,
-                        body: JSON.stringify(selectedOptionUpdates)
-                    });
-
-                    const responseData = await response.json(); // 서버 응답은 JSON으로 가정
-                    if (response.ok) {
-                        alert(responseData.message || '옵션이 성공적으로 변경되었습니다.');
-                        closeOptionModal();
-                        location.reload(); // 페이지 새로고침
-                    } else {
-                        // 서버에서 보낸 에러 메시지가 있다면 사용, 없다면 일반 메시지
-                        throw new Error(responseData.error || responseData.message || `옵션 변경에 실패했습니다. (상태: ${response.status})`);
-                    }
-                } catch (error) {
-                    console.error('옵션 변경 저장 실패:', error);
-                    // 여기서 error.message는 fetch 실패(네트워크 오류 등) 또는 위에서 throw한 Error의 메시지가 됩니다.
-                    alert(`❌ 옵션 변경 실패: ${error.message}`);
-                }
-            }
-            /*]]>*/
-
-
-            // DOMContentLoaded 이벤트 리스너 수정
-            document.addEventListener('DOMContentLoaded', function () {
-
-                // 위 이벤트 위임 방식이 더 안전하지만, 일단은 기존 forEach 방식으로.
-                document.querySelectorAll('.change-options-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const cartItemId = this.dataset.cartItemId;
-                        const productId = this.dataset.productId;
-
-                        openOptionChangeModal(cartItemId, productId /*, currentOptionsJson */); // 세번째 인자는 openOptionChangeModal 내부에서 처리
+                        updateModalSelectedOptionTotalPriceUI();
                     });
                 });
+                updateModalSelectedOptionTotalPriceUI();
+            } catch (error) {
+                console.error("옵션 변경 모달 생성 중 오류:", error);
+                optionsContainer.innerHTML = `<p class="text-danger">옵션 정보를 불러오는데 실패했습니다: ${error.message}</p>`;
+            }
+        }
 
+        function updateModalSelectedOptionTotalPriceUI() {
+            const optionsContainer = document.getElementById('optionModalBody');
+            const totalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
+            if (!optionsContainer || !totalPriceEl) return;
 
-                // 모달 저장 버튼에 이벤트 리스너 연결
-                const saveOptionBtn = document.getElementById('saveOptionChangesBtn');
-                if (saveOptionBtn) {
-                    saveOptionBtn.addEventListener('click', saveChangedOptions);
+            let totalOptionPrice = 0;
+            optionsContainer.querySelectorAll('.modal-option-item').forEach(itemDiv => {
+                const checkbox = itemDiv.querySelector('.option-checkbox');
+                const quantityInput = itemDiv.querySelector('.option-quantity-input');
+                if (checkbox.checked) {
+                    const price = parseFloat(checkbox.dataset.price);
+                    const quantity = parseInt(quantityInput.value);
+                    if (!isNaN(price) && !isNaN(quantity) && quantity > 0) {
+                        totalOptionPrice += price * quantity;
+                    }
+                }
+            });
+            totalPriceEl.textContent = totalOptionPrice.toLocaleString();
+        }
+
+        async function saveChangedOptions() {
+            if (!currentEditingCartItemId) {
+                alert("오류: 변경할 장바구니 아이템 정보가 없습니다.");
+                return;
+            }
+
+            const selectedOptionUpdates = [];
+            document.querySelectorAll('#optionModalBody .modal-option-item').forEach(itemDiv => {
+                const checkbox = itemDiv.querySelector('.option-checkbox');
+                const quantityInput = itemDiv.querySelector('.option-quantity-input');
+                const optionId = parseInt(checkbox.value);
+                let quantity = 0;
+
+                if (checkbox.checked) {
+                    quantity = parseInt(quantityInput.value);
                 }
 
-                // 페이지 로드 시 초기 총 금액 계산 및 표시
-                updateFinalTotal();
+                if (quantity > 0) {
+                    selectedOptionUpdates.push({
+                        roomMenuOptionNum: optionId,
+                        roomMenuCartItemOptionAmount: quantity
+                    });
+                }
             });
 
-            // ✅ 전역 함수로 선언
-            // 장바구니 아이템들의 총 금액을 계산하고 화면에 표시합니다.
-            function updateFinalTotal() {
-                let grandTotal = 0; // 장바구니 아이템들의 총 금액 (쿠폰 적용 전의 원래 금액)
+            console.log("서버로 전송할 옵션 업데이트 정보:", JSON.stringify(selectedOptionUpdates));
 
-                // 모든 장바구니 아이템(.food-item)을 순회하여 총 금액 계산 (쿠폰 적용 전)
-                document.querySelectorAll('.food-item').forEach(item => {
-                    // 각 아이템의 최종 가격 가져오기 (.item-total)
-                    const itemTotalSpan = item.querySelector('.item-total');
-                    if (itemTotalSpan) {
-                        const itemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-                        grandTotal += itemTotal; // 각 아이템의 최종 가격을 합산
-                    }
+            const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+            const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+            const headers = { 'Content-Type': 'application/json' };
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+
+            try {
+                const finalUrl = `/roommenu/api/cart/items/${currentEditingCartItemId}/options`;
+                console.log("옵션 업데이트 요청 URL:", finalUrl);
+
+                const response = await fetch(finalUrl, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(selectedOptionUpdates)
                 });
 
-                // 최종 결제 금액을 화면(#finalAmount)에 업데이트
-                const finalTotalEl = document.getElementById('finalAmount');
-                if (finalTotalEl) {
-                    // couponFinalTotal 값이 있으면 할인된 금액을 최종 금액으로 표시
-                    if (couponFinalTotal !== null) {
-                        finalTotalEl.innerText = `: ${couponFinalTotal.toLocaleString()}원`;
-                    } else {
-                        // couponFinalTotal이 null이면 (쿠폰 적용 안 됨) 할인 적용 전 금액 표시
-                        finalTotalEl.innerText = `: ${grandTotal.toLocaleString()}원`;
-                    }
+                const responseData = await response.json();
+                if (response.ok) {
+                    alert(responseData.message || '옵션이 성공적으로 변경되었습니다.');
+                    closeOptionModal();
+                    location.reload();
+                } else {
+                    throw new Error(responseData.error || responseData.message || `옵션 변경에 실패했습니다. (상태: ${response.status})`);
                 }
+            } catch (error) {
+                console.error('옵션 변경 저장 실패:', error);
+                alert(`❌ 옵션 변경 실패: ${error.message}`);
+            }
+        }
 
-                // 할인 금액 표시 업데이트 (#discountAmount)
-                const discountEl = document.getElementById('discountAmount');
-                if (discountEl) {
-                    // 할인 금액은 원래 총 금액(grandTotal)에서 할인된 최종 금액(couponFinalTotal)을 뺀 값입니다.
-                    if (couponFinalTotal !== null) {
-                        const discountAmount = grandTotal - couponFinalTotal;
-                        discountEl.innerText = `${discountAmount.toLocaleString()}원`;
+        function updateFinalTotal() {
+            let grandTotal = 0;
+            console.warn("----- updateFinalTotal 함수 실행 시작 -----");
+
+            const foodItems = document.querySelectorAll('.food-item');
+            console.log(`총 ${foodItems.length}개의 .food-item 요소를 찾았습니다.`);
+
+            foodItems.forEach((item, index) => {
+                const itemNumberForLog = index + 1;
+                const itemNameSpan = item.querySelector('.item-name span');
+                const itemName = itemNameSpan ? itemNameSpan.textContent.trim() : '이름 없음';
+                const itemTotalSpan = item.querySelector('.item-total');
+
+                if (itemTotalSpan) {
+                    const rawText = itemTotalSpan.textContent.trim();
+                    const numericString = rawText.replace(/[^\d]/g, ''); // 숫자만 추출
+                    const itemTotal = parseInt(numericString, 10);
+
+                    console.log(`아이템 [${itemNumberForLog}] (${itemName}): .item-total 원본 텍스트 = "${rawText}"`);
+                    console.log(`아이템 [${itemNumberForLog}] (${itemName}): 숫자만 추출된 문자열 = "${numericString}"`);
+
+                    if (isNaN(itemTotal)) {
+                        console.error(`아이템 [${itemNumberForLog}] (${itemName}): 가격 "${rawText}" (추출: "${numericString}")을 숫자로 변환하는데 실패 (NaN). 합산에서 0으로 처리합니다.`);
+                        // grandTotal에 0을 더하거나 아무것도 하지 않음 (기본값 0 유지)
                     } else {
-                        // couponFinalTotal이 null이면 할인 없음
-                        discountEl.innerText = `0원`;
+                        grandTotal += itemTotal; // ★★★ grandTotal 합산은 한 번만 수행 ★★★
+                        console.log(`아이템 [${itemNumberForLog}] (${itemName}): 파싱된 itemTotal = ${itemTotal}, 현재까지 grandTotal = ${grandTotal}`);
                     }
+                } else {
+                    console.warn(`아이템 [${itemNumberForLog}] (${itemName})에서 .item-total span을 찾을 수 없습니다.`);
+                }
+            });
+
+            console.log("모든 아이템 합산 후 최종 grandTotal (쿠폰 적용 전):", grandTotal);
+
+            const finalTotalEl = document.getElementById('finalAmount');
+            const discountEl = document.getElementById('discountAmount');
+
+            if (finalTotalEl) {
+                if (couponFinalTotal !== null && !isNaN(couponFinalTotal)) {
+                    finalTotalEl.innerHTML = `: ${couponFinalTotal.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
+                } else {
+                    finalTotalEl.innerHTML = `: ${grandTotal.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
                 }
             }
 
-            // 장바구니 아이템 수량 변경 요청을 백엔드에 전송합니다.
-            function updateQuantity(itemId, quantity) {
-                fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
+            if (discountEl) {
+                if (couponFinalTotal !== null && !isNaN(couponFinalTotal)) {
+                    const discountAmount = grandTotal - couponFinalTotal;
+                    discountEl.innerHTML = `${discountAmount.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
+                } else {
+                    discountEl.innerHTML = `0<span class="currency">${currencySymbol}</span>`;
+                }
+            }
+            console.warn("----- updateFinalTotal 함수 실행 완료 -----");
+        }
+
+        function updateQuantity(itemId, quantity) {
+            const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+            const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+            const headers = { 'Content-Type': 'application/json' };
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+
+            fetch(`/roommenu/orderpage/read/${itemId}/${quantity}`, {
+                method: 'PUT',
+                headers: headers
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('수량 변경 성공');
+                        location.reload();
+                    } else {
+                        response.text().then(text => {
+                            alert(`❌ 수량 변경 실패: ${text || '서버 오류'}`);
+                        });
                     }
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            console.log('수량 변경 성공');
-                            // 성공 후 페이지 새로고침 (또는 수량/가격만 업데이트)
-                            location.reload();
-                        } else {
-                            alert('❌ 수량 변경 실패');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('에러 발생:', error);
-                        alert('❌ 수량 변경 중 오류가 발생했습니다.');
-                    });
+                .catch(error => {
+                    console.error('수량 변경 중 에러 발생:', error);
+                    alert('❌ 수량 변경 중 오류가 발생했습니다.');
+                });
+        }
+
+        function goToOrderPage() {
+            window.location.href = '/roommenu/orderpage';
+        }
+
+        function processPayment() {
+            const requestMessage = document.getElementById('request-input').value;
+            let finalAmountText = "0";
+            const finalAmountSpan = document.getElementById('finalAmount');
+
+            if (finalAmountSpan && finalAmountSpan.textContent.includes(currencySymbol)) {
+                const match = finalAmountSpan.textContent.match(/:\s*([\d,]+)/); // '원' 제외하고 숫자와 콤마만 추출
+                if (match && match[1]) {
+                    finalAmountText = match[1];
+                } else {
+                    finalAmountText = finalAmountSpan.textContent.replace(/[^\d,]/g, '');
+                }
+            }
+            const tossprice = parseInt(finalAmountText.replace(/,/g, ''), 10) || 0; // 콤마만 제거
+            console.log("Final price for Toss payment:", tossprice);
+
+            const selectedCouponNum = document.getElementById('couponSelect').value;
+            const formData = new URLSearchParams();
+            formData.append('requestMessage', requestMessage);
+            if (selectedCouponNum) {
+                formData.append('couponNum', selectedCouponNum);
+            }
+            if (couponFinalTotal !== null) {
+                formData.append('discountedTotalPrice', couponFinalTotal);
+            }
+            formData.append('finalOrderPrice', tossprice);
+
+            const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+            const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+            const headers = { "Content-Type": "application/x-www-form-urlencoded" }; // POST는 form-urlencoded 유지
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
             }
 
-            // 주문 페이지로 이동합니다.
-            function goToOrderPage() {
-                window.location.href = '/roommenu/orderpage';
-            }
+            fetch("/roommenu/cart", {
+                method: "POST",
+                headers: headers,
+                body: formData
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
+                    }
+                    return res.text();
+                })
+                .then(orderResult => {
+                    console.log("Order creation successful:", orderResult);
+                    alert("결제 페이지로 이동합니다!");
+                    const url = `/payment?tossprice=${tossprice}`;
+                    const popup = window.open(url, "_blank", "width=600,height=800");
+                    if (!popup) {
+                        alert("팝업 차단 기능을 해제해주세요.");
+                    }
+                    window.location.href = "/tossloading";
+                })
+                .catch(err => {
+                    console.error("결제 중 오류 발생:", err);
+                    alert("❌ 결제 중 오류 발생: " + err.message);
+                });
+        }
 
-            // --- DOMContentLoaded 이벤트 리스너 시작 ---
-            // DOM 트리가 완전히 로드된 후 실행될 코드를 이곳에 둡니다.
-            document.addEventListener('DOMContentLoaded', function () {
-                const couponSelect = document.getElementById('couponSelect');
-                const foodItems = document.querySelectorAll('.food-item');
-                const deleteButtons = document.querySelectorAll('.delete-btn');
-                const requestInput = document.getElementById('request-input'); // 요청사항 입력 필드
+        // DOMContentLoaded 이벤트 리스너 (하나로 통합)
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("DOMContentLoaded 이벤트 리스너 실행 (통합)");
 
-                // 쿠폰 선택 변경 이벤트 리스너
+            const couponSelect = document.getElementById('couponSelect');
+            if (couponSelect) {
                 couponSelect.addEventListener('change', function () {
                     const couponNum = this.value;
-
                     if (couponNum === "") {
-                        // "쿠폰 선택" 옵션 선택 시
-                        document.getElementById('discountAmount').innerText = "0원";
-                        couponFinalTotal = null; // couponFinalTotal 초기화
-                        updateFinalTotal(); // 할인 해제된 상태로 총 금액 업데이트
+                        document.getElementById('discountAmount').innerHTML = `0<span class="currency">${currencySymbol}</span>`;
+                        couponFinalTotal = null;
+                        updateFinalTotal();
                         return;
                     }
-
-                    // 쿠폰 적용 결과 백엔드에서 가져오기
                     fetch(`/roommenu/coupon/apply?email=${encodeURIComponent(currentUserEmail)}&couponNum=${encodeURIComponent(couponNum)}`)
                         .then(response => {
                             if (!response.ok) {
-                                // 서버 오류 응답 처리
-                                return response.json().then(err => { throw new Error(err.error || `서버 오류 (${response.status})`); });
+                                return response.json().then(err => { throw new Error(err.error || `쿠폰 적용 중 서버 오류 (${response.status})`); });
                             }
-                            return response.json(); // 성공 시 JSON 응답 파싱
+                            return response.json();
                         })
                         .then(data => {
-                            const discount = data.discount;
-                            const finalTotal = data.finalTotal;
-
-                            document.getElementById('discountAmount').innerText = discount.toLocaleString() + "원";
-                            couponFinalTotal = finalTotal; // 계산된 최종 금액 저장
-                            updateFinalTotal(); // 화면 업데이트
+                            document.getElementById('discountAmount').innerHTML = `${data.discount.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
+                            couponFinalTotal = data.finalTotal;
+                            updateFinalTotal();
                         })
                         .catch(error => {
                             console.error("쿠폰 적용 실패:", error);
                             alert("❌ 쿠폰 적용에 실패했습니다: " + error.message);
-                            // 오류 발생 시 할인 및 최종 금액 초기화
-                            document.getElementById('discountAmount').innerText = "0원";
+                            document.getElementById('discountAmount').innerHTML = `0<span class="currency">${currencySymbol}</span>`;
                             couponFinalTotal = null;
                             updateFinalTotal();
                         });
                 });
+            }
 
+            document.querySelectorAll('.food-item').forEach(item => {
+                const decreaseBtn = item.querySelector('.decrease');
+                const increaseBtn = item.querySelector('.increase');
+                const input = item.querySelector('.quantity-input');
+                const itemTotalSpan = item.querySelector('.item-total');
+                const itemId = item.getAttribute('data-item-id');
+                let pricePerItem = 0;
 
-                // 각 장바구니 아이템에 대한 이벤트 리스너 (수량 변경, 삭제) 연결
-                foodItems.forEach(item => {
-                    const decreaseBtn = item.querySelector('.decrease');
-                    const increaseBtn = item.querySelector('.increase');
-                    const input = item.querySelector('.quantity-input');
-                    const itemTotalSpan = item.querySelector('.item-total');
+                if(input && itemTotalSpan) {
+                    const initialQuantity = parseInt(input.value, 10) || 1;
+                    const rawTotalText = itemTotalSpan.textContent;
+                    const numericTotalString = rawTotalText.replace(/[^\d]/g, '');
+                    const initialItemTotal = parseInt(numericTotalString, 10) || 0;
+                    pricePerItem = initialQuantity > 0 ? initialItemTotal / initialQuantity : 0;
+                    if (isNaN(pricePerItem) || !isFinite(pricePerItem)) {
+                        console.warn(`아이템 ID ${itemId}의 pricePerItem 계산 실패. initialItemTotal=${initialItemTotal}, initialQuantity=${initialQuantity}`);
+                        pricePerItem = 0;
+                    }
+                }
 
-                    // 아이템 개당 가격 계산 (기본 가격 + 옵션 가격 합계)
-                    const initialQuantity = parseInt(input.value, 10) || 0;
-                    const initialItemTotal = parseInt(itemTotalSpan.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-                    // 0으로 나누는 경우 방지
-                    const pricePerItem = initialQuantity > 0 ? initialItemTotal / initialQuantity : 0;
-
-                    const itemId = item.getAttribute('data-item-id');
-
-                    // 수량 감소 버튼 리스너
+                if(decreaseBtn && input && itemTotalSpan) {
                     decreaseBtn.addEventListener('click', () => {
-                        let quantity = parseInt(input.value, 10) || 0;
+                        let quantity = parseInt(input.value, 10);
                         if (quantity > 1) {
                             quantity--;
                             input.value = quantity;
-                            const newTotal = pricePerItem * quantity; // 아이템 총액 재계산
-                            itemTotalSpan.textContent = newTotal.toLocaleString();
-                            updateFinalTotal(); // 전체 총액 업데이트
-                            updateQuantity(itemId, quantity); // 백엔드 업데이트 및 페이지 새로고침 (location.reload 포함)
+                            itemTotalSpan.textContent = (pricePerItem * quantity).toLocaleString();
+                            updateFinalTotal(); // 화면상 총액 먼저 업데이트
+                            updateQuantity(itemId, quantity); // 그 후 서버 업데이트 및 새로고침
                         }
                     });
+                }
 
-                    // 수량 증가 버튼 리스너
+                if(increaseBtn && input && itemTotalSpan) {
                     increaseBtn.addEventListener('click', () => {
-                        let quantity = parseInt(input.value, 10) || 0;
+                        let quantity = parseInt(input.value, 10);
                         quantity++;
                         input.value = quantity;
-                        const newTotal = pricePerItem * quantity; // 아이템 총액 재계산
-                        itemTotalSpan.textContent = newTotal.toLocaleString();
-                        updateFinalTotal(); // 전체 총액 업데이트
-                        updateQuantity(itemId, quantity); // 백엔드 업데이트 및 페이지 새로고침
+                        // 서버에서 재고 체크를 한다고 가정하고, 여기서는 일단 수량 증가 허용
+                        itemTotalSpan.textContent = (pricePerItem * quantity).toLocaleString();
+                        updateFinalTotal(); // 화면상 총액 먼저 업데이트
+                        updateQuantity(itemId, quantity); // 그 후 서버 업데이트 및 새로고침
                     });
-                });
+                }
+            });
 
-                // 삭제 버튼 리스너 연결
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        const item = button.closest('.food-item');
-                        const itemId = item.getAttribute('data-item-id');
-                        if (!confirm("정말 삭제하시겠습니까?")) return;
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const itemElement = this.closest('.food-item');
+                    const itemId = itemElement.getAttribute('data-item-id');
+                    if (!confirm("정말 삭제하시겠습니까?")) return;
 
-                        // jQuery AJAX를 사용하여 DELETE 요청 전송
-                        $.ajax({
-                            url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
-                            type: 'DELETE',
-                            success: () => {
-                                item.remove(); // 아이템 제거
-                                updateFinalTotal(); // 전체 총액 업데이트
-
-                                const remainingItems = document.querySelectorAll('.food-item');
-                                if (remainingItems.length === 0) {
-                                    // 아이템이 없으면 .container 전체를 비우고 메시지만 표시
-                                    const container = document.querySelector('.container');
-                                    if (container) {
-                                        container.innerHTML = `
-                                    <div style="text-align:center; padding:50px; color:#888;">
-                                        🛒 장바구니에 아이템이 존재하지 않습니다.
-                                    </div>`;
-                                    }
+                    $.ajax({ // 삭제는 jQuery Ajax 유지 (CSRF 토큰 처리 간편)
+                        url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
+                        type: 'DELETE',
+                        beforeSend: function(xhr) {
+                            const csrfToken = $("meta[name='_csrf']").attr("content");
+                            const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+                            if (csrfToken && csrfHeader) {
+                                xhr.setRequestHeader(csrfHeader, csrfToken);
+                            }
+                        },
+                        success: () => {
+                            itemElement.remove();
+                            updateFinalTotal();
+                            if (document.querySelectorAll('.food-item').length === 0) {
+                                const containerDiv = document.querySelector('#cart-items-wrapper').closest('.container');
+                                if (containerDiv) {
+                                    containerDiv.innerHTML = `<div style="text-align:center; padding:50px; color:#888;">🛒 장바구니에 아이템이 존재하지 않습니다.</div>`;
                                 }
-                            },
-                            error: () => alert("❌ 삭제 실패")
-                        });
-
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error("삭제 실패:", status, error, xhr.responseText);
+                            alert("❌ 삭제 실패: " + (xhr.responseText || "서버 오류"));
+                        }
                     });
                 });
+            });
 
-                // 페이지 로드 시 초기 총 금액 계산 및 표시
-                // 모든 이벤트 리스너가 연결된 후 호출합니다.
-                updateFinalTotal();
+            document.querySelectorAll('.change-options-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const cartItemId = this.dataset.cartItemId;
+                    const productId = this.dataset.productId;
+                    openOptionChangeModal(cartItemId, productId);
+                });
+            });
 
+            const saveOptionBtn = document.getElementById('saveOptionChangesBtn');
+            if (saveOptionBtn) {
+                saveOptionBtn.addEventListener('click', saveChangedOptions);
+            }
 
-                // 요청사항 입력 필드에 저장된 값이 있다면 로드
+            const requestInput = document.getElementById('request-input');
+            if (requestInput) {
                 const savedRequestMessage = localStorage.getItem('roomMenuRequestMessage');
                 if (savedRequestMessage) {
                     requestInput.value = savedRequestMessage;
                 }
-
-                // 요청사항 입력 필드 값이 변경될 때마다 저장
                 requestInput.addEventListener('input', function() {
                     localStorage.setItem('roomMenuRequestMessage', this.value);
                 });
-
-
-            }); // --- DOMContentLoaded 이벤트 리스너 끝 ---
-
-            // 결제여부에 따라서 이동되는 페이지
-            function processPayment() {
-                const requestMessage = document.getElementById('request-input').value;
-
-                let finalAmountText = "0"; // 기본값 0
-                const finalAmountSpan = document.getElementById('finalAmount'); // ID로 찾는 것이 더 정확
-                const finalTotalDiv = document.querySelector('.final-total > span.text-danger'); // 다른 span 선택자 (필요 시 조정)
-
-                if (finalAmountSpan && finalAmountSpan.textContent.includes('원')) {
-                    finalAmountText = finalAmountSpan.textContent;
-                } else if (finalTotalDiv && finalTotalDiv.textContent.includes('원')) {
-                    const match = finalTotalDiv.textContent.match(/:\s*([\d,]+)\s*원/);
-                    if (match && match[1]) {
-                        finalAmountText = match[1];
-                    }
-                }
-                // 콤마(,) 제거 및 숫자로 변환
-                const tossprice = parseInt(finalAmountText.replace(/[^0-9]/g, ''), 10) || 0;
-                console.log("Final price for Toss payment:", tossprice); // ✅ 금액 확인 로그
-                // --- 수정 끝 ---
-
-
-                // 쿠폰 정보 및 할인된 금액도 함께 보내야 할 수 있음
-                const selectedCouponNum = document.getElementById('couponSelect').value;
-                const discountedFinalPrice = couponFinalTotal;
-
-                const formData = new URLSearchParams();
-                formData.append('requestMessage', requestMessage);
-                if (selectedCouponNum) {
-                    formData.append('couponNum', selectedCouponNum);
-                }
-
-                if (couponFinalTotal !== null) {
-                    formData.append('discountedTotalPrice', couponFinalTotal);
-                }
-                formData.append('finalOrderPrice', tossprice);
-
-
-                fetch("/roommenu/cart", { // 이 URL이 주문 생성 API가 맞는지 확인
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: formData //
-                })
-                    .then(res => {
-                        if (!res.ok) {
-                            // 에러 응답 처리
-                            return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
-                        }
-
-                        return res.text(); // 또는 res.json()
-                    })
-                    .then(orderResult => { // orderResult는 서버 응답 (예: 주문번호 텍스트 또는 JSON 객체)
-                        console.log("Order creation successful:", orderResult);
-                        alert("결제 페이지로 이동합니다!");
-
-                        const url = `/payment?tossprice=${tossprice}`; // 여기에 orderId 등 추가 정보 필요할 수 있음
-                        const popup = window.open(url, "_blank", "width=600,height=800");
-                        if (!popup) {
-                            alert("팝업 차단 기능을 해제해주세요.");
-                        }
-
-                        // 로딩 페이지로 이동
-                        window.location.href = "/tossloading";
-                    })
-                    .catch(err => {
-                        console.error("결제 중 오류 발생:", err);
-                        alert("❌ 결제 중 오류 발생: " + err.message);
-
-                    });
             }
 
-        </script>
-    </div>
+            // 페이지 로드 시 초기 총 금액 계산 및 표시
+            updateFinalTotal();
+        });
+        /*]]>*/
+    </script>
 </div>
 </body>
 </html>
