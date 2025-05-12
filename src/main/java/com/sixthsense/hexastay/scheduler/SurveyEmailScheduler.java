@@ -37,10 +37,14 @@ public class SurveyEmailScheduler {
 
                 for (Room room : checkedOutRooms) {
                     if (room.getMember() != null && room.getMember().getMemberEmail() != null) {
+                        String memberEmail = room.getMember().getMemberEmail();
                         String memberName = room.getMember().getMemberName();
-                        emailService.sendSurveyEmail(title, content, memberName);
+                        emailService.sendSurveyEmail(title, content, memberEmail);
+                        log.info("설문조사 이메일 전송 요청: {} ({})", memberName, memberEmail);
                     }
                 }
+            } else {
+                log.warn("활성화된 설문조사가 없습니다.");
             }
         } catch (Exception e) {
             log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());

@@ -77,10 +77,11 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public Survey getActiveSurvey() {
-        return surveyRepository.findBySurveyIsActiveTrue()
-                .stream()
-                .findFirst()
-                .orElse(null);
+        List<Survey> activeSurveys = surveyRepository.findBySurveyIsActiveTrue();
+        if (activeSurveys.isEmpty()) {
+            return null;
+        }
+        return activeSurveys.get(0);
     }
 
     @Override

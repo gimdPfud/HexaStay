@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>설문조사</title>
+    <title th:text="${surveyTitle}">설문조사</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -144,194 +144,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 th:text="${survey.surveyTitle}">설문조사</h1>
+            <h1 th:text="${surveyTitle}">설문조사</h1>
         </div>
         
         <div class="content">
             <div class="greeting">
                 <p><span class="member-name" th:text="${memberName}">홍길동</span>님, 안녕하세요.</p>
                 <p>헥사스테이를 이용해 주셔서 감사합니다.</p>
-                <p>고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
+                <p th:text="${surveyContent}">고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
             </div>
             
-            <form th:action="@{/surveyresult/submit}" method="post">
-                <input type="hidden" name="surveyNum" th:value="${survey.surveyNum}">
-                
-                <div class="rating-group">
-                    <div class="rating-title">청결도</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="cleanlinessRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="cleanlinessRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="cleanlinessRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="cleanlinessRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="cleanlinessRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="rating-group">
-                    <div class="rating-title">직원 친절도</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="staffRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="staffRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="staffRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="staffRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="staffRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="rating-group">
-                    <div class="rating-title">체크인/아웃</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="checkInOutRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="checkInOutRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="checkInOutRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="checkInOutRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="checkInOutRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="rating-group">
-                    <div class="rating-title">시설</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="facilityRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="facilityRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="facilityRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="facilityRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="facilityRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="rating-group">
-                    <div class="rating-title">음식</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="foodRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="foodRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="foodRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="foodRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="foodRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="rating-group">
-                    <div class="rating-title">가격 대비 만족도</div>
-                    <div class="rating-options">
-                        <label class="rating-option">
-                            <input type="radio" name="valueRating" value="1" required>
-                            매우 불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="valueRating" value="2">
-                            불만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="valueRating" value="3">
-                            보통
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="valueRating" value="4">
-                            만족
-                        </label>
-                        <label class="rating-option">
-                            <input type="radio" name="valueRating" value="5">
-                            매우 만족
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="comment-group">
-                    <label>만족한 점</label>
-                    <textarea class="form-control" name="satisfactionComment" rows="3" placeholder="만족하신 점을 자유롭게 작성해주세요."></textarea>
-                </div>
-                
-                <div class="comment-group">
-                    <label>개선이 필요한 점</label>
-                    <textarea class="form-control" name="improvementComment" rows="3" placeholder="개선이 필요한 점을 자유롭게 작성해주세요."></textarea>
-                </div>
-                
-                <div class="comment-group">
-                    <label>추가 의견</label>
-                    <textarea class="form-control" name="additionalComment" rows="3" placeholder="추가로 말씀하고 싶으신 점이 있다면 자유롭게 작성해주세요."></textarea>
-                </div>
-                
-                <button type="submit" class="submit-btn">
-                    <i class="bi bi-check-circle me-2"></i>설문 제출하기
-                </button>
-            </form>
+            <div class="survey-info">
+                <p>아래 링크를 클릭하여 설문조사에 참여해주세요:</p>
+                <p style="text-align: center; margin: 20px 0;">
+                    <a href="https://hexastay.com/survey/participate" style="display: inline-block; padding: 15px 30px; background: #1D6F42; color: white; text-decoration: none; border-radius: 8px;">
+                        설문조사 참여하기
+                    </a>
+                </p>
+            </div>
         </div>
         
         <div class="footer">

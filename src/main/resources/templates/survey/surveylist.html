@@ -62,13 +62,13 @@
                 <span th:text="${survey.surveyIsActive ? '활성' : '비활성'}">상태</span>
             </div>
             <div class="survey-actions">
-                <a th:href="@{/survey/view/{id}(id=${survey.surveyNum})}" class="btn btn-outline-primary btn-sm">
+                <a th:href="@{/survey/results/{id}(id=${survey.surveyNum})}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-eye me-1"></i>보기
                 </a>
                 <a th:href="@{/survey/edit/{id}(id=${survey.surveyNum})}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-pencil me-1"></i>수정
                 </a>
-                <a th:href="@{/survey/result/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
+                <a th:href="@{/survey/results/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
                     <i class="bi bi-graph-up me-1"></i>결과
                 </a>
                 <button th:onclick="'deleteSurvey(' + ${survey.surveyNum} + ')'" class="btn btn-outline-danger btn-sm">
