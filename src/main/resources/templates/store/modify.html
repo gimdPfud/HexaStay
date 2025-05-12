@@ -198,12 +198,12 @@
             const previewImage = document.getElementById('pictureTemp');
             const file = this.files[0];
 
-            if (file.size > 1024 * 1024) {
-                alert("파일 용량이 너무 큽니다. (최대 1MB)");
-                this.value = null;
-                document.querySelector('.file-name').textContent = "사진이 선택되지 않았습니다.";
-                return;
-            }
+            // if (file.size > 1024 * 1024) {
+            //     alert("파일 용량이 너무 큽니다. (최대 1MB)");
+            //     this.value = null;
+            //     document.querySelector('.file-name').textContent = "사진이 선택되지 않았습니다.";
+            //     return;
+            // }
 
             if (!allowedExtensions.exec(filePath)) {
                 this.value = '';
