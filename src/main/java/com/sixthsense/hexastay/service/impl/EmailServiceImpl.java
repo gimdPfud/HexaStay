@@ -112,9 +112,27 @@ public class EmailServiceImpl implements EmailService {
                 return;
             }
             
-            // 최근 체크아웃한 방 정보 조회
-            Room room = roomRepository.findTopByMemberOrderByCheckOutDateDesc(member)
-                    .orElseThrow(() -> new RuntimeException("방 정보를 찾을 수 없습니다."));
+            // 최근 체크아웃한 방 정보 조회 (findFirstBy 사용)
+            Room room;
+            try {
+                room = roomRepository.findFirstByMemberOrderByCheckOutDateDesc(member)
+                        .orElseThrow(() -> new RuntimeException("방 정보를 찾을 수 없습니다."));
+            } catch (Exception e) {
+                log.warn("방 정보 조회 중 오류 발생: {}", e.getMessage());
+                // 다른 방법으로 room 정보 가져오기
+                List<Room> rooms = roomRepository.findByCheckOutDateBetween(
+                    LocalDateTime.now().minusDays(7), LocalDateTime.now())
+                    .stream()
+                    .filter(r -> r.getMember() != null && r.getMember().getMemberNum().equals(member.getMemberNum()))
+                    .toList();
+                
+                if (rooms.isEmpty()) {
+                    log.error("사용자의 최근 체크아웃 방을 찾을 수 없습니다: {}", memberEmail);
+                    return;
+                }
+                // 가장 최근 체크아웃 방 선택
+                room = rooms.get(0); 
+            }
             
             context.setVariable("survey", activeSurvey);
             context.setVariable("memberName", member.getMemberName());
