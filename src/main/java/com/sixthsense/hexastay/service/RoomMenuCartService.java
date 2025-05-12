@@ -1,13 +1,11 @@
 package com.sixthsense.hexastay.service;
-import com.sixthsense.hexastay.dto.RoomMenuCartDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO;
-import com.sixthsense.hexastay.dto.RoomMenuCartItemDTO;
-import com.sixthsense.hexastay.dto.RoomMenuDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -42,5 +40,11 @@ public interface RoomMenuCartService {
 
     // 장바구니 검색 후 쿠폰 적용을 위한 서비스
     public Integer getCartTotal(Member member);
+
+    // 옵션 목록을 조회
+    List<RoomMenuOptionDTO> getAvailableOptionsForProduct(Long roomMenuNum);
+
+    // 옵션을 업데이트
+    void updateCartItemWithOptions(Long cartItemId, String userEmail, List<UpdateCartOptionRequestDTO> selectedOptionUpdates); // ★ DTO 타입 변경
 
 }

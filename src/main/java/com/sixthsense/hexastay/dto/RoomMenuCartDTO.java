@@ -30,6 +30,8 @@ public class RoomMenuCartDTO {
 
     private Member member;  // 사용자와 장바구니의 연관관계
 
+    private Integer roomMenuCartTotalPrice;
+
     private Room room;
 
 

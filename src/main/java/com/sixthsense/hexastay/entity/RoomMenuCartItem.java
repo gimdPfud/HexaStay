@@ -51,6 +51,7 @@ public class RoomMenuCartItem {
     @OneToMany(mappedBy = "roomMenuCartItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomMenuCartItemOption> roomMenuCartItemOptions;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room") // Room 참조
     private Room room;

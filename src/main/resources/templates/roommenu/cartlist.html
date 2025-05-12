@@ -232,7 +232,8 @@
                             </div>
                             <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
                                 <p>
-                                    <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
+                                    <!-- ★ DTO의 roomMenuCartItemPrice (서버에서 계산된 최종 아이템 가격) 사용 ★ -->
+                                    <span class="item-total" th:text="${#numbers.formatDecimal(roomMenuCartDTO.roomMenuCartItemPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
                                     <span th:text="#{item.currency}" style="font-weight: bold;"></span>
                                 </p>
                             </th:block>
@@ -248,6 +249,12 @@
                                         </ul>
                                     </details>
                                 </div>
+
+                                <button type="button" class="mini-btn change-options-btn"
+                                        style="background-color: #5bc0de; color:white; margin-top:5px;"
+                                        th:attr="data-cart-item-id=${roomMenuCartDTO.roomMenuCartDetailNum},
+                 data-product-id=${roomMenuCartDTO.roomMenuId}" >옵션 변경</button>
+
                                 <div th:unless="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
                                     <span style="font-size: 0.9em; color: #888;" th:text="#{cart.option.none}"></span>
                                 </div>
@@ -305,6 +312,24 @@
                 </div>
             </div>
 
+
+            <!-- 옵션 변경 모달 -->
+            <div id="optionChangeModal" class="modal-overlay">
+                <div class="modal-content">
+                    <h3 id="optionModalProductTitle">상품명 - 옵션 변경</h3>
+                    <div id="optionModalBody" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; text-align: left;">
+                        <!-- 여기에 사용 가능한 옵션들이 동적으로 채워짐 -->
+                    </div>
+                    <div id="optionModalSelectedSummary" style="margin-bottom: 15px; font-weight: bold;">
+                        총 추가금액: <span id="modalSelectedOptionTotalPrice">0</span>원
+                    </div>
+                    <div class="modal-buttons">
+                        <button id="saveOptionChangesBtn" class="mini-btn" style="background-color: #007bff; color:white;">변경 저장</button>
+                        <button type="button" onclick="closeOptionModal()" class="mini-btn" style="background-color: #6c757d; color:white;">취소</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -313,6 +338,268 @@
         <script th:inline="javascript">
             const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
             let couponFinalTotal = null;
+            let currentEditingCartItemId = null;
+            let currentEditingProductId = null;
+            let currentCartItemOptions = []; // 이 변수는 openOptionChangeModal 내에서 지역적으로 사용되므로 전역일 필요는 없어 보입니다.
+
+            // ★★★ Thymeleaf 모델 객체에서 실제 데이터 목록(배열)을 가져오도록 수정 ★★★
+            const cartDetailPageData = /*[[${cartDetailDTOList}]]*/ null; // 서버에서 온 Page 객체 전체
+            const jsCartDetailDTOList = cartDetailPageData ? cartDetailPageData.content : []; // Page 객체의 content (실제 DTO 배열)
+
+            function closeOptionModal() {
+                document.getElementById('optionChangeModal').style.display = 'none';
+                currentEditingCartItemId = null;
+                currentEditingProductId = null;
+                // currentCartItemOptions = []; // 이 함수의 지역 변수로 변경하거나, 사용처에서 초기화
+            }
+
+            // 모달 열기 및 옵션 표시 함수
+            async function openOptionChangeModal(cartItemId, productId) {
+                currentEditingCartItemId = cartItemId;
+                currentEditingProductId = productId;
+                let localCurrentCartItemOptions = []; // 함수 내 지역 변수로 사용
+
+                const modal = document.getElementById('optionChangeModal');
+                const modalTitle = document.getElementById('optionModalProductTitle');
+                const optionsContainer = document.getElementById('optionModalBody');
+                const selectedOptionTotalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
+
+                optionsContainer.innerHTML = '<p>옵션 정보를 불러오는 중...</p>';
+                modal.style.display = 'flex';
+
+                try {
+                    // 1. 해당 상품의 사용 가능한 모든 옵션 목록 가져오기
+                    const availableOptionsResponse = await fetch(`/roommenu/api/products/${productId}/options`); // 이전 단계에서 이 URL이 맞다고 확인됨
+                    if (!availableOptionsResponse.ok) {
+                        const errorData = await availableOptionsResponse.json().catch(() => ({ error: '서버 응답 형식이 올바르지 않거나, 옵션 조회에 실패했습니다.' }));
+                        throw new Error(errorData.error || `사용 가능한 옵션 목록을 불러오는데 실패했습니다. (상태: ${availableOptionsResponse.status})`);
+                    }
+                    const availableOptions = await availableOptionsResponse.json();
+
+                    // 2. 현재 장바구니 아이템에 이미 선택된 옵션 정보 가져오기
+                    //    수정된 jsCartDetailDTOList 변수 사용
+                    const currentCartItemDTO = jsCartDetailDTOList.find(dto => dto.roomMenuCartDetailNum == cartItemId);
+                    localCurrentCartItemOptions = currentCartItemDTO ? (currentCartItemDTO.optionList || []) : [];
+
+                    const productName = currentCartItemDTO ? currentCartItemDTO.roomMenuCartDetailMenuItemName : '상품';
+                    modalTitle.textContent = `${productName} - 옵션 변경`;
+                    optionsContainer.innerHTML = '';
+
+                    if (!availableOptions || availableOptions.length === 0) { // availableOptions가 null일 수도 있으니 체크
+                        optionsContainer.innerHTML = '<p class="text-muted">선택 가능한 추가 옵션이 없습니다.</p>';
+                        updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                        return;
+                    }
+
+                    availableOptions.forEach(option => {
+                        console.log("모달에 표시할 옵션 정보:", JSON.stringify(option))
+                        // localCurrentCartItemOptions 사용
+                        const selectedOpt = localCurrentCartItemOptions.find(co => co.roomMenuOptionNum === option.roomMenuOptionNum);
+                        const currentQuantity = selectedOpt ? selectedOpt.roomMenuCartItemOptionAmount : 0;
+
+                        const optionDiv = document.createElement('div');
+                        // optionDiv.className = 'option-item'; // 이전 코드에 있던 것, 필요하면 다시 추가
+                        optionDiv.className = 'modal-option-item d-flex justify-content-between align-items-center mb-2'; // 부트스트랩 활용 스타일
+
+                        // ★★★ HTML 구조 약간 수정 (체크박스와 레이블을 한 div로 묶고, 수량 조절 부분을 다른 div로) ★★★
+                        optionDiv.innerHTML = `
+                    <div class="form-check flex-grow-1 me-2">
+                        <input class="form-check-input option-checkbox" type="checkbox" value="${option.roomMenuOptionNum}"
+                               id="modal-opt-${option.roomMenuOptionNum}" data-price="${option.roomMenuOptionPrice}"
+                               ${currentQuantity > 0 ? 'checked' : ''}>
+                        <label class="form-check-label" for="modal-opt-${option.roomMenuOptionNum}" style="font-size:0.9rem;">
+                            ${option.roomMenuOptionName} (+${option.roomMenuOptionPrice != null ? option.roomMenuOptionPrice.toLocaleString() : 0}원)
+                        </label>
+                    </div>
+                    <div class="input-group input-group-sm" style="width: 120px; display: ${currentQuantity > 0 ? 'flex' : 'none'};">
+                        <button class="btn btn-outline-secondary option-qty-decrease" type="button">-</button>
+                        <input type="number" class="form-control option-quantity-input text-center"
+                               value="${currentQuantity}" min="0" max="${option.roomMenuOptionAmount}" data-option-id="${option.roomMenuOptionNum}">
+                        <button class="btn btn-outline-secondary option-qty-increase" type="button">+</button>
+                    </div>
+                    <small class="text-muted ms-2" style="font-size:0.8rem; min-width: 60px;">(재고: ${option.roomMenuOptionAmount != null ? option.roomMenuOptionAmount : 'N/A'})</small>
+                `;
+                        optionsContainer.appendChild(optionDiv);
+
+                        const checkbox = optionDiv.querySelector('.option-checkbox');
+                        const quantityControlDiv = optionDiv.querySelector('.input-group');
+                        const quantityInput = optionDiv.querySelector('.option-quantity-input');
+                        const decreaseBtn = optionDiv.querySelector('.option-qty-decrease');
+                        const increaseBtn = optionDiv.querySelector('.option-qty-increase');
+
+                        checkbox.addEventListener('change', function() {
+                            if (this.checked) {
+                                quantityControlDiv.style.display = 'flex';
+                                if (parseInt(quantityInput.value) < 1) quantityInput.value = 1;
+                            } else {
+                                quantityControlDiv.style.display = 'none';
+                                quantityInput.value = 0;
+                            }
+                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                        });
+
+                        quantityInput.addEventListener('change', function() {
+                            let val = parseInt(this.value);
+                            const max = parseInt(this.max);
+                            if (isNaN(val) || val < 0) val = 0;
+                            if (val > max) {
+                                alert(`최대 선택 가능 수량은 ${max}개 입니다.`);
+                                val = max;
+                            }
+                            this.value = val;
+                            if (val <= 0 && checkbox.checked) { // 수량이 0이 되면 체크박스도 해제
+                                checkbox.checked = false;
+                                quantityControlDiv.style.display = 'none';
+                            } else if (val > 0 && !checkbox.checked) { // 수량이 있으면 체크박스도 체크
+                                checkbox.checked = true;
+                                quantityControlDiv.style.display = 'flex';
+                            }
+                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                        });
+
+                        decreaseBtn.addEventListener('click', function() {
+                            let qty = parseInt(quantityInput.value);
+                            if (qty > 1) {
+                                quantityInput.value = qty - 1;
+                            } else {
+                                quantityInput.value = 0;
+                                checkbox.checked = false;
+                                quantityControlDiv.style.display = 'none';
+                            }
+                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                        });
+
+                        increaseBtn.addEventListener('click', function() {
+                            let qty = parseInt(quantityInput.value);
+                            const maxQty = parseInt(quantityInput.max);
+                            if (qty < maxQty) {
+                                quantityInput.value = qty + 1;
+                                if (!checkbox.checked) {
+                                    checkbox.checked = true;
+                                    quantityControlDiv.style.display = 'flex';
+                                }
+                            } else {
+                                alert(`최대 선택 가능 수량은 ${maxQty}개 입니다.`);
+                            }
+                            updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                        });
+                    });
+                    updateModalSelectedOptionTotalPrice(optionsContainer, selectedOptionTotalPriceEl);
+                } catch (error) {
+                    console.error("옵션 변경 모달 생성 중 오류:", error);
+                    optionsContainer.innerHTML = `<p class="text-danger">옵션 정보를 불러오는데 실패했습니다: ${error.message}</p>`;
+                }
+            }
+
+            // ... (updateModalSelectedOptionTotalPrice, saveChangedOptions 함수는 이전과 동일하게 유지) ...
+            // 모달 내 선택된 옵션들의 총 추가 금액 계산 및 표시 함수
+            function updateModalSelectedOptionTotalPrice(optionsContainer, totalPriceEl) {
+                let totalOptionPrice = 0;
+                optionsContainer.querySelectorAll('.modal-option-item').forEach(itemDiv => { // 클래스명 modal-option-item으로 변경
+                    const checkbox = itemDiv.querySelector('.option-checkbox');
+                    const quantityInput = itemDiv.querySelector('.option-quantity-input');
+                    if (checkbox.checked) {
+                        const price = parseFloat(checkbox.dataset.price);
+                        const quantity = parseInt(quantityInput.value);
+                        if (!isNaN(price) && !isNaN(quantity) && quantity > 0) {
+                            totalOptionPrice += price * quantity;
+                        }
+                    }
+                });
+                totalPriceEl.textContent = totalOptionPrice.toLocaleString();
+            }
+
+
+            // 변경된 옵션 저장 함수
+            // saveChangedOptions 함수 내부
+            async function saveChangedOptions() {
+                if (!currentEditingCartItemId) {
+                    alert("오류: 변경할 장바구니 아이템 정보가 없습니다.");
+                    return;
+                }
+
+                const selectedOptionUpdates = [];
+                document.querySelectorAll('#optionModalBody .modal-option-item').forEach(itemDiv => {
+                    const checkbox = itemDiv.querySelector('.option-checkbox');
+                    const quantityInput = itemDiv.querySelector('.option-quantity-input');
+                    const optionId = parseInt(checkbox.value); // RoomMenuOptionNum
+                    const originalCheckboxValue = checkbox.value; // 원래 value 값도 확인
+                    console.log(`체크박스 값: '${originalCheckboxValue}', 파싱된 ID: ${optionId}`); // ★★★ 로그 추가 ★★★
+                    let quantity = 0;
+
+                    if (checkbox.checked) {
+                        quantity = parseInt(quantityInput.value);
+                    }
+
+                    if (quantity > 0) {
+                        selectedOptionUpdates.push({
+                            roomMenuOptionNum: optionId,
+                            roomMenuCartItemOptionAmount: quantity
+                        });
+                    }
+                });
+
+                console.log("서버로 전송할 옵션 업데이트 정보:", JSON.stringify(selectedOptionUpdates));
+
+                const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+                const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken;
+                }
+
+                try {
+                    // ★★★ URL 수정: "item"을 "items"로 변경 ★★★
+                    const finalUrl = `/roommenu/api/cart/items/${currentEditingCartItemId}/options`;
+                    console.log("옵션 업데이트 요청 URL:", finalUrl); // 전송될 URL 확인
+
+                    const response = await fetch(finalUrl, {
+                        method: 'PUT',
+                        headers: headers,
+                        body: JSON.stringify(selectedOptionUpdates)
+                    });
+
+                    const responseData = await response.json(); // 서버 응답은 JSON으로 가정
+                    if (response.ok) {
+                        alert(responseData.message || '옵션이 성공적으로 변경되었습니다.');
+                        closeOptionModal();
+                        location.reload(); // 페이지 새로고침
+                    } else {
+                        // 서버에서 보낸 에러 메시지가 있다면 사용, 없다면 일반 메시지
+                        throw new Error(responseData.error || responseData.message || `옵션 변경에 실패했습니다. (상태: ${response.status})`);
+                    }
+                } catch (error) {
+                    console.error('옵션 변경 저장 실패:', error);
+                    // 여기서 error.message는 fetch 실패(네트워크 오류 등) 또는 위에서 throw한 Error의 메시지가 됩니다.
+                    alert(`❌ 옵션 변경 실패: ${error.message}`);
+                }
+            }
+            /*]]>*/
+
+
+            // DOMContentLoaded 이벤트 리스너 수정
+            document.addEventListener('DOMContentLoaded', function () {
+
+                // 위 이벤트 위임 방식이 더 안전하지만, 일단은 기존 forEach 방식으로.
+                document.querySelectorAll('.change-options-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const cartItemId = this.dataset.cartItemId;
+                        const productId = this.dataset.productId;
+
+                        openOptionChangeModal(cartItemId, productId /*, currentOptionsJson */); // 세번째 인자는 openOptionChangeModal 내부에서 처리
+                    });
+                });
+
+
+                // 모달 저장 버튼에 이벤트 리스너 연결
+                const saveOptionBtn = document.getElementById('saveOptionChangesBtn');
+                if (saveOptionBtn) {
+                    saveOptionBtn.addEventListener('click', saveChangedOptions);
+                }
+
+                // 페이지 로드 시 초기 총 금액 계산 및 표시
+                updateFinalTotal();
+            });
 
             // ✅ 전역 함수로 선언
             // 장바구니 아이템들의 총 금액을 계산하고 화면에 표시합니다.

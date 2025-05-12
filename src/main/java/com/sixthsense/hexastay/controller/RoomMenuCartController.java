@@ -5,6 +5,7 @@ import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.service.CouponService;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.RoomMenuService;
+import com.sixthsense.hexastay.util.exception.SoldOutException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -251,5 +252,50 @@ public class RoomMenuCartController {
 
         int discountedTotal = roomMenuCartService.getTotalPriceWithCoupon(email, couponNum);
         return ResponseEntity.ok(discountedTotal);
+    }
+
+    @GetMapping("/api/products/{productId}/options")
+    @ResponseBody // @RestController가 아니라면 필요
+    public ResponseEntity<?> getAvailableOptions(@PathVariable("productId") Long productId) {
+        try {
+            log.info("(컨트롤러) 상품 ID {}에 대한 옵션 목록 조회 요청", productId);
+            List<RoomMenuOptionDTO> options = roomMenuCartService.getAvailableOptionsForProduct(productId);
+            return ResponseEntity.ok(options);
+        } catch (EntityNotFoundException e) {
+            log.warn("(컨트롤러) 옵션 목록 조회 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("(컨트롤러) 옵션 목록 조회 중 서버 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "옵션 목록 조회 중 오류가 발생했습니다."));
+        }
+    }
+
+    // (추가) 장바구니 아이템 옵션 업데이트 API
+    @PutMapping("/api/cart/items/{cartItemId}/options")
+    @ResponseBody
+    public ResponseEntity<?> updateCartOptions(
+            @PathVariable("cartItemId") Long cartItemId,
+            @RequestBody List<UpdateCartOptionRequestDTO> selectedOptionUpdates, // ★ DTO 타입 변경 ★
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+        String userEmail = principal.getName();
+        log.info("(컨트롤러) 장바구니 아이템 ID {}의 옵션 업데이트 요청 - 사용자: {}", cartItemId, userEmail);
+
+        try {
+            roomMenuCartService.updateCartItemWithOptions(cartItemId, userEmail, selectedOptionUpdates);
+            log.info("(컨트롤러) 장바구니 아이템 ID {} 옵션 업데이트 성공", cartItemId);
+            return ResponseEntity.ok(Map.of("message", "옵션이 성공적으로 변경되었습니다."));
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            log.warn("(컨트롤러) 옵션 업데이트 실패 (데이터 오류 또는 권한 없음): {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (SoldOutException e) {
+            log.warn("(컨트롤러) 옵션 업데이트 실패 (재고 부족): {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage())); // 409 Conflict가 적절할 수 있음
+        } catch (Exception e) {
+            log.error("(컨트롤러) 옵션 업데이트 중 서버 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "옵션 변경 중 오류가 발생했습니다."));
+        }
     }
 }

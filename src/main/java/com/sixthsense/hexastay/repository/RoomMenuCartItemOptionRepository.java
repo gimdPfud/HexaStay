@@ -10,4 +10,6 @@ public interface RoomMenuCartItemOptionRepository extends JpaRepository<RoomMenu
 
     List<RoomMenuCartItemOption> findDistinctByRoomMenuCartItem_RoomMenuCartItemNum(Long roomMenuCartItemNum);
 
+    // 아이템 찾기
+    List<RoomMenuCartItemOption> findByRoomMenuCartItem(RoomMenuCartItem cartItem);
 }
