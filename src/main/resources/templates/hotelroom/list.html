@@ -87,6 +87,27 @@
         </div>
     </div>
 
+    <!-- 페이지네이션 -->
+    <nav>
+        <ul class="pagination">
+            <!-- 이전 버튼 -->
+            <li class="page-item" th:classappend="${hotelRoomList.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/hotelroom/list(page=${hotelRoomList.number - 1}, size=9 ) }">이전</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, hotelRoomList.totalPages)}"
+                th:classappend="${hotelRoomList.number + 1} == pageNum ? 'active' : ''">
+                <a class="page-link" th:href="@{/admin/hotelroom/list(page=${pageNum - 1}, size=9 ) }" th:text="${pageNum}"></a>
+            </li>
+
+            <!-- 다음 버튼 -->
+            <li class="page-item" th:classappend="${hotelRoomList.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/hotelroom/list(page=${hotelRoomList.number + 1}, size=9 ) }">다음</a>
+            </li>
+        </ul>
+    </nav>
+
 
 
 
