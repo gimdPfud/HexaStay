@@ -4,15 +4,18 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.EmailService;
 import com.sixthsense.hexastay.service.SurveyService;
+import com.sixthsense.hexastay.service.impl.EmailServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +47,9 @@ import java.util.NoSuchElementException;
 @RequestMapping("/survey")
 public class SurveyController {
     private final SurveyService surveyService;
+    private final EmailService emailService;
+
+    private RoomRepository roomRepository;
 
     // 설문조사 목록 페이지
     @GetMapping("/list")
@@ -149,5 +156,31 @@ public class SurveyController {
         List<Survey> surveys = surveyService.getAllSurveys();
         model.addAttribute("surveys", surveys);
         return "survey/surveyresultlist";
+    }
+
+    @GetMapping("/suyveytest")
+    public void surveytest() {
+        try {
+            Survey activeSurvey = surveyService.getActiveSurvey();
+            if (activeSurvey != null) {
+                String title = activeSurvey.getSurveyTitle();
+                String content = activeSurvey.getSurveyContent();
+
+                // 체크아웃한 고객들의 이메일 주소 목록을 가져옴
+                List<Room> checkedOutRooms = roomRepository.findByCheckOutDateBetween(
+                        LocalDateTime.now().minusDays(1).withHour(0).withMinute(0).withSecond(0),
+                        LocalDateTime.now().minusDays(1).withHour(23).withMinute(59).withSecond(59)
+                );
+
+                for (Room room : checkedOutRooms) {
+                    if (room.getMember() != null && room.getMember().getMemberEmail() != null) {
+                        String memberName = room.getMember().getMemberName();
+                        emailService.sendSurveyEmail(title, content, memberName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());
+        }
     }
 }

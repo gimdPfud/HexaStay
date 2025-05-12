@@ -298,6 +298,7 @@ public class AdminServiceImpl implements AdminService {
 
         // 나머지 필드 업데이트
         admin.setAdminName(adminDTO.getAdminName());
+        admin.setAdminPassword(adminDTO.getAdminPassword());
         admin.setAdminAddress(adminDTO.getAdminAddress());
         admin.setAdminPhone(adminDTO.getAdminPhone());
         admin.setAdminPosition(adminDTO.getAdminPosition());

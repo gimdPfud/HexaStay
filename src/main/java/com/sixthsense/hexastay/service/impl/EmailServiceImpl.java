@@ -107,15 +107,12 @@ public class EmailServiceImpl implements EmailService {
                 .map(room -> room.getMember().getMemberEmail())
                 .collect(Collectors.toList());
 
-            // Thymeleaf 컨텍스트 생성
             Context context = new Context();
             context.setVariable("survey", surveyService.getActiveSurvey());
             context.setVariable("memberName", memberName);
 
-            // 템플릿 처리
             String emailContent = templateEngine.process("survey/survey-template", context);
 
-            // 이메일 전송
             for (String email : recipientEmails) {
                 try {
                     MimeMessage message = javaMailSender.createMimeMessage();
