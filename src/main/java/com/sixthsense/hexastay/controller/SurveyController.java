@@ -172,12 +172,118 @@ public class SurveyController {
         return "survey/surveyresult";
     }
 
-    // 설문조사 결과 목록 페이지
+    // 설문조사 결과 목록 페이지 - 월별 그룹핑
     @GetMapping("/results")
-    public String resultsList(Model model) {
-        List<Survey> surveys = surveyService.getAllSurveys();
-        model.addAttribute("surveys", surveys);
+    public String resultsList(Model model, 
+                             @RequestParam(required = false) Integer year,
+                             @RequestParam(required = false) Integer month) {
+        List<SurveyResult> allResults = surveyResultRepository.findAll();
+        
+        // 연도 목록 (중복 제거)
+        List<Integer> years = allResults.stream()
+                .map(r -> r.getSurveyResultSubmittedAt().getYear())
+                .distinct()
+                .sorted()
+                .toList();
+        
+        // 필터링할 연도와 월이 있으면 적용
+        List<SurveyResult> filteredResults = allResults;
+        if (year != null) {
+            filteredResults = filteredResults.stream()
+                    .filter(r -> r.getSurveyResultSubmittedAt().getYear() == year)
+                    .toList();
+            
+            if (month != null) {
+                filteredResults = filteredResults.stream()
+                        .filter(r -> r.getSurveyResultSubmittedAt().getMonthValue() == month)
+                        .toList();
+            }
+        } else if (month != null) {
+            filteredResults = filteredResults.stream()
+                    .filter(r -> r.getSurveyResultSubmittedAt().getMonthValue() == month)
+                    .toList();
+        }
+        
+        // 월별로 그룹핑하여 MonthlyResultDTO 리스트 생성
+        Map<Integer, Map<Integer, Long>> groupedByYearAndMonth = filteredResults.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        r -> r.getSurveyResultSubmittedAt().getYear(),
+                        java.util.stream.Collectors.groupingBy(
+                                r -> r.getSurveyResultSubmittedAt().getMonthValue(),
+                                java.util.stream.Collectors.counting()
+                        )
+                ));
+        
+        List<MonthlyResultDTO> monthlyResults = new java.util.ArrayList<>();
+        
+        groupedByYearAndMonth.forEach((y, monthMap) -> {
+            monthMap.forEach((m, count) -> {
+                monthlyResults.add(new MonthlyResultDTO(y, m, count));
+            });
+        });
+        
+        // 연도-월 내림차순 정렬
+        monthlyResults.sort((a, b) -> {
+            int yearCompare = Integer.compare(b.getYear(), a.getYear());
+            if (yearCompare == 0) {
+                return Integer.compare(b.getMonth(), a.getMonth());
+            }
+            return yearCompare;
+        });
+        
+        model.addAttribute("surveyResults", monthlyResults);
+        model.addAttribute("years", years);
+        model.addAttribute("selectedYear", year);
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("searchMonth", year != null && month != null ? 
+                String.format("%04d-%02d", year, month) : "");
+        
         return "survey/surveyresultlist";
+    }
+    
+    // 월별 설문조사 결과 상세 페이지
+    @GetMapping("/results/month/{yearMonth}")
+    public String monthlyResults(@PathVariable String yearMonth, Model model, Principal principal) {
+        try {
+            // yearMonth 형식: "2024-05"
+            String[] parts = yearMonth.split("-");
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            
+            // 로그인한 사용자의 회사번호 찾기
+            String email = principal.getName();
+            Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+            
+            // 해당 월의 설문 응답 조회
+            LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+            
+            List<SurveyResult> responses = surveyResultRepository.findBySurvey_Company_CompanyNumAndSurveyResultSubmittedAtBetween(
+                    companyNum, startDate, endDate);
+            
+            if (responses.isEmpty()) {
+                model.addAttribute("responses", Collections.emptyList());
+                model.addAttribute("participantCount", 0);
+                return "survey/surveyresult";
+            }
+            
+            // 참여자 수
+            int participantCount = responses.size();
+            
+            // 기준 설문(설명용, 첫 응답의 설문으로 설정)
+            Survey referenceSurvey = responses.get(0).getSurvey();
+            
+            model.addAttribute("survey", referenceSurvey);
+            model.addAttribute("responses", responses);
+            model.addAttribute("participantCount", participantCount);
+            model.addAttribute("yearMonth", yearMonth);
+            
+            return "survey/surveyresult";
+            
+        } catch (Exception e) {
+            log.error("월별 설문 결과 조회 오류: " + e.getMessage(), e);
+            return "error/400";
+        }
     }
 
     @GetMapping("/suyveytest")

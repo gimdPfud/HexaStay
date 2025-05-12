@@ -21,7 +21,7 @@
 <div class="result-container">
     <h2 class="result-title" th:text="${survey.surveyTitle}">설문조사 제목</h2>
     <div class="mb-4">
-        <strong>설문 설명:</strong> <span th:text="${survey.surveyContent}">설문 설명</span>
+        <strong>설문 설명:</strong> <span th:utext="${survey.surveyContent}">설문 설명</span>
     </div>
     <div class="mb-4">
         <strong>참여 인원:</strong> <span th:text="${participantCount}">0</span>명
@@ -40,13 +40,13 @@
         </thead>
         <tbody>
         <tr>
-            <td th:text="${#numbers.formatDecimal(averageRating, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(cleanlinessAvg, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(staffAvg, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(checkInOutAvg, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(facilityAvg, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(foodAvg, 1, 2)}">0.00</td>
-            <td th:text="${#numbers.formatDecimal(valueAvg, 1, 2)}">0.00</td>
+            <td id="avgTotal">0.00</td>
+            <td id="avgCleanliness">0.00</td>
+            <td id="avgStaff">0.00</td>
+            <td id="avgCheckInOut">0.00</td>
+            <td id="avgFacility">0.00</td>
+            <td id="avgFood">0.00</td>
+            <td id="avgValue">0.00</td>
         </tr>
         </tbody>
     </table>
@@ -58,7 +58,7 @@
     <table class="table table-striped table-bordered participant-table" th:if="${!#lists.isEmpty(responses)}">
         <thead>
         <tr>
-            <th>이메일</th>
+            <th>이름(이메일)</th>
             <th>객실명</th>
             <th>청결도</th>
             <th>직원</th>
@@ -72,7 +72,7 @@
         </thead>
         <tbody>
         <tr th:each="r : ${responses}">
-            <td th:text="${r.member != null ? r.member.memberEmail : '-'}">이메일</td>
+            <td th:text="${r.member != null ? r.member.memberName + ' (' + r.memberEmail + ')' : '-'}">이메일(이름)</td>
             <td th:text="${r.room != null && r.room.hotelRoom != null ? r.room.hotelRoom.hotelRoomName : '-'}">객실명</td>
             <td th:text="${r.surveyResultCleanliness}">0</td>
             <td th:text="${r.surveyResultStaff}">0</td>
@@ -86,5 +86,94 @@
         </tbody>
     </table>
 </div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // JS로 평균 점수 계산
+        calculateAverages();
+    });
+
+    function calculateAverages() {
+        // responses 데이터를 Thymeleaf에서 가져옴
+        const responses = /*[[${responses}]]*/ [];
+        
+        if (responses.length === 0) {
+            return;
+        }
+        
+        // 각 항목별 합계
+        let totalCleanliness = 0;
+        let totalStaff = 0;
+        let totalCheckInOut = 0;
+        let totalFacility = 0;
+        let totalFood = 0;
+        let totalValue = 0;
+        let validCountCleanliness = 0;
+        let validCountStaff = 0;
+        let validCountCheckInOut = 0;
+        let validCountFacility = 0;
+        let validCountFood = 0;
+        let validCountValue = 0;
+        
+        // 각 응답의 점수를 합산
+        responses.forEach(response => {
+            if (response.surveyResultCleanliness) {
+                totalCleanliness += response.surveyResultCleanliness;
+                validCountCleanliness++;
+            }
+            if (response.surveyResultStaff) {
+                totalStaff += response.surveyResultStaff;
+                validCountStaff++;
+            }
+            if (response.surveyResultCheckInOut) {
+                totalCheckInOut += response.surveyResultCheckInOut;
+                validCountCheckInOut++;
+            }
+            if (response.surveyResultFacility) {
+                totalFacility += response.surveyResultFacility;
+                validCountFacility++;
+            }
+            if (response.surveyResultFood) {
+                totalFood += response.surveyResultFood;
+                validCountFood++;
+            }
+            if (response.surveyResultValue) {
+                totalValue += response.surveyResultValue;
+                validCountValue++;
+            }
+        });
+        
+        // 평균 계산 (유효한 데이터만 계산)
+        const avgCleanliness = validCountCleanliness > 0 ? totalCleanliness / validCountCleanliness : 0;
+        const avgStaff = validCountStaff > 0 ? totalStaff / validCountStaff : 0;
+        const avgCheckInOut = validCountCheckInOut > 0 ? totalCheckInOut / validCountCheckInOut : 0;
+        const avgFacility = validCountFacility > 0 ? totalFacility / validCountFacility : 0;
+        const avgFood = validCountFood > 0 ? totalFood / validCountFood : 0;
+        const avgValue = validCountValue > 0 ? totalValue / validCountValue : 0;
+        
+        // 유효한 카테고리 수 계산
+        const validCategories = [
+            validCountCleanliness > 0, 
+            validCountStaff > 0, 
+            validCountCheckInOut > 0, 
+            validCountFacility > 0, 
+            validCountFood > 0, 
+            validCountValue > 0
+        ].filter(Boolean).length;
+        
+        // 전체 평균 (유효한 카테고리 평균만 계산)
+        const avgTotal = validCategories > 0 ? 
+            (avgCleanliness + avgStaff + avgCheckInOut + avgFacility + avgFood + avgValue) / validCategories : 0;
+        
+        // 계산된 값을 테이블에 표시
+        document.getElementById('avgTotal').textContent = avgTotal.toFixed(2);
+        document.getElementById('avgCleanliness').textContent = avgCleanliness.toFixed(2);
+        document.getElementById('avgStaff').textContent = avgStaff.toFixed(2);
+        document.getElementById('avgCheckInOut').textContent = avgCheckInOut.toFixed(2);
+        document.getElementById('avgFacility').textContent = avgFacility.toFixed(2);
+        document.getElementById('avgFood').textContent = avgFood.toFixed(2);
+        document.getElementById('avgValue').textContent = avgValue.toFixed(2);
+    }
+</script>
 </body>
 </html>
