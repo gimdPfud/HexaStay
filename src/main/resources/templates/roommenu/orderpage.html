@@ -49,28 +49,36 @@
             flex-shrink: 0; cursor: pointer; padding: 8px 14px;
             font-size: 14px; background-color: transparent; color: black;
             height: 37px; width: 60px; text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tab.active {
             font-weight: bold;
             background-color: #e0f7fa;  /* 선택된 탭 배경 */
-            border-bottom:  #ff6b6b;  /* 탭 하단 표시선 */
         }
         .btn-custom.active {
             /* 아무 것도 없음: 클릭 상태에서도 변화 없음 */
         }
 
         .btn-custom {
-            background-color: transparent; /* 배경색 제거 */
-            color: #ff6b6b; /* 텍스트 색상 */
-            border: 2px solid #ff6b6b; /* 빨간색 테두리 */
-            border-radius: 12px; /* 둥근 모서리 */
-            padding: 8px 16px; /* 여백을 조금 더 줄임 */
-            font-size: 12px; /* 폰트 크기 약간 증가 */
-            font-weight: normal; /* 폰트 굵기 조정 */
-            box-shadow: none; /* 그림자 제거 */
-            cursor: pointer; /* 클릭 가능한 포인터 */
-            transition: transform 0.2s, box-shadow 0.2s, color 0.2s; /* 부드러운 애니메이션 */
+            display: flex;
+            align-items: center;       /* 세로 중앙 정렬 */
+            justify-content: center;   /* 가로 중앙 정렬 */
+            gap: 4px;                  /* 아이콘과 텍스트 간격 */
+
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: normal;
+            box-shadow: none;
+            cursor: pointer;
+            line-height: 1;            /* 높이 기준 정렬 보정 */
+            transition: transform 0.2s, box-shadow 0.2s, color 0.2s;
         }
 
         .card-list {
@@ -271,10 +279,10 @@
         </div>
         <!-- 카테고리 탭 -->
         <div class="tabs">
-            <button type="button" onclick="window.location.href=
-                '/roommenu/orderpage?type=L'" class="btn btn-custom">
+            <button type="button" onclick="window.location.href='/roommenu/orderpage?type=L'"
+                    style="height: 37px;width: 90px;" class="btn btn-custom " >
                 ❤️ <span th:text="#{category.popular}">인기순</span>
-                <span class="like-count" style="margin-left: 4px;" th:text="${roomMenuLikes}"></span>
+                <span class="like-count" th:text="${roomMenuLikes}"></span>
             </button>
             <!-- ✅ data-category 속성 추가 -->
             <div class="tab" th:text="#{tab.korean}" data-category="한식" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='"></div>
@@ -420,7 +428,7 @@
 
         // 탭 클릭 이벤트 처리
         document.addEventListener('DOMContentLoaded', function () {
-            const tabs = document.querySelectorAll('.tab');
+            const tab = document.querySelectorAll('.tab');
             const currentUrlParams = new URLSearchParams(window.location.search);
             const currentCategory = currentUrlParams.get('category');
             const currentType = currentUrlParams.get('type'); // '
@@ -429,10 +437,10 @@
             console.log("Current Type from URL:", currentType);
 
 
-            tabs.forEach(t => t.classList.remove('active'));
+            tab.forEach(t => t.classList.remove('active'));
 
             if (currentType === 'L') {
-                const popularButton = document.querySelector('.btn-custom');
+                const popularButton = document.querySelector();
                 if (popularButton) {
                     popularButton.style.fontWeight = 'bold';
                     popularButton.style.backgroundColor = '#e0f7fa';
@@ -440,7 +448,7 @@
                     console.log("Popular tab activated");
                 }
             } else if (currentCategory) {
-                tabs.forEach(tab => {
+                tab.forEach(tab => {
                     const tabCategory = tab.getAttribute('data-category');
                     if (tabCategory && decodeURIComponent(currentCategory) === tabCategory) {
                         tab.classList.add('active');
