@@ -114,6 +114,7 @@ public class RoomMenuOptionServiceImpl implements RoomMenuOptionService {
         option.setRoomMenuOptionPrice(roomMenuOptionDTO.getRoomMenuOptionPrice());
         option.setRoomMenuOptionAmount(roomMenuOptionDTO.getRoomMenuOptionAmount()); // 추가
         optionRepository.save(option);
+
         return modelMapper.map(option, RoomMenuOptionDTO.class);
     }
 
