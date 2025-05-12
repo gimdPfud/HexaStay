@@ -10,8 +10,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,9 +32,20 @@ public class CouponController {
     private final CouponService couponService;
 
     @GetMapping("/insert")
-    public String createCouponGet() {
+    public String createCouponGet(Model model, Principal principal) { // ★ Model과 Principal 파라미터 추가
         log.info("쿠폰 발급 받기 페이지 컨트롤러 진입 (GET)");
-        return "roommenu/coupon/insert";
+
+        // (추가) 로그인한 사용자 정보가 있다면 이메일을 모델에 추가
+        if (principal != null) {
+            String userEmail = principal.getName(); // Spring Security를 통해 현재 로그인한 사용자의 이름(보통 이메일 또는 아이디)을 가져옵니다.
+            log.info("로그인한 사용자 이메일 확인: {}", userEmail);
+            model.addAttribute("currentUserEmail", userEmail); // "currentUserEmail"이라는 이름으로 모델에 이메일 저장
+        } else {
+            log.info("비로그인 사용자가 쿠폰 발급 페이지 접근");
+            model.addAttribute("currentUserEmail", ""); // 로그인하지 않은 경우 빈 문자열 전달
+        }
+
+        return "roommenu/coupon/insert"; // templates/roommenu/coupon/insert.html 템플릿을 반환
     }
 
     @ResponseBody

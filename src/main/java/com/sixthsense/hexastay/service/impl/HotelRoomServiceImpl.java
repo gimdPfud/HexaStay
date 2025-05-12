@@ -208,7 +208,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                 throw new IllegalStateException("호텔룸 번호가 null입니다. QR 코드 생성 불가.");
             }
 
-            String qrText = "http://localhost:8090/" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             log.info("QR 인코딩용 최종 경로: {}", qrText);
 
@@ -369,7 +369,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. QR 코드 재생성 (service 사용)
         try {
-            String qrText = "http://localhost:8090/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             /*QR 생성 모듈화 클래스 */
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
