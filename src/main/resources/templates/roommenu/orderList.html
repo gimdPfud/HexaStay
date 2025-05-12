@@ -139,6 +139,8 @@
                                 &nbsp; <!-- 빈 공간을 유지 -->
                             </div>
 
+
+
                             <div class="d-flex align-items-center mb-1">
                                 <strong class="me-2" th:text="#{orderList.quantity}"></strong>
                                 <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
@@ -149,6 +151,7 @@
                                 <strong>
                                     <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
                                 </strong>
+
                             </div>
                         </div>
                     </div>
@@ -156,11 +159,19 @@
             </ul>
 
 
+
             <div th:if="${order.discountedPrice != null}" class="d-flex align-items-center mt-2">
                 <strong class="text-danger" style="margin-left: 107px; min-width: 105px; line-height: 1.5; margin-bottom: 5px;">할인 적용 금액:</strong>
                 <div class="text-danger fw-bold" style="margin-left: auto; margin-right: 15px; line-height: 1.5;">
                     <span th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|"></span>
                 </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-2 me-2">
+                <button type="button" class="btn btn-sm btn-outline-primary reorder-btn"
+                        th:data-order-num="${order.roomMenuOrderNum}">
+                    <i class="fas fa-redo-alt"></i> 재주문
+                </button>
             </div>
 
             <div class="card-footer text-muted text-end">
@@ -202,4 +213,54 @@
             </ul>
         </nav>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    console.log("HTML 하단 스크립트 블록 실행 시작"); // ★ 로그 추가 1
+
+    $(document).ready(function() {
+
+        const csrfToken = $("meta[name='_csrf']").attr("content");
+        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+        $(document).on('click', '.reorder-btn', function() {
+            const orderNum = $(this).data('order-num');
+
+            if (!orderNum) {
+                alert("주문번호를 찾을 수 없습니다. HTML의 data-order-num 속성을 확인해주세요.");
+                return;
+            }
+
+            if (confirm("주문번호 " + orderNum + "의 상품들을 장바구니에 담으시겠습니까?")) {
+                console.log("[이벤트 핸들러 내부] Ajax 요청 준비...");
+                $.ajax({
+                    // ... (Ajax 설정은 이전과 동일) ...
+                    url: '/api/reorder/' + orderNum,
+                    type: 'POST',
+                    beforeSend: function(xhr) {
+                        if (csrfToken && csrfHeader) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        }
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            window.location.href = '/roommenu/cartlist';
+                        } else {
+                            alert("재주문 실패: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("[Ajax] 재주문 요청 오류. Status: " + status + ", Error: " + error + ", ResponseText:", xhr.responseText);
+                        let errorMessage = "재주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                        if(xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        alert(errorMessage);
+                    }
+                });
+            }
+        });
+    });
+    </script>
 </div>

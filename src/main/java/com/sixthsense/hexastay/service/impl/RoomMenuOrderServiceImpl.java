@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.math3.stat.descriptive.summary.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -795,4 +796,6 @@ public class RoomMenuOrderServiceImpl implements RoomMenuOrderService {
             log.info("상품 '{}'에 대해 선택된 옵션이 없거나 옵션 ID가 유효하지 않습니다. 옵션 재고 차감을 건너뜁니다.", roomMenu.getRoomMenuName());
         }
     }
+
+
 }

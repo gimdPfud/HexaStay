@@ -1,6 +1,8 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuCartItem;
+import com.sixthsense.hexastay.entity.RoomMenuCartItemOption;
 import com.sixthsense.hexastay.entity.RoomMenuOption;
 import org.apache.poi.sl.draw.geom.GuideIf;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +20,6 @@ public interface RoomMenuOptionRepository extends JpaRepository<RoomMenuOption, 
 
     // 삭제시 옵션 확인
     boolean existsByRoomMenu_RoomMenuNum(Long roomMenuNum);
+
 
 }
