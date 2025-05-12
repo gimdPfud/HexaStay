@@ -29,4 +29,6 @@ public interface SurveyService {
     Map<String, Double> getSurveyChartData(Long surveyId);
     Survey getActiveSurvey();
     SurveyResult saveSurveyResult(SurveyResult surveyResult);
+    boolean hasParticipated(Long surveyId, String memberEmail);
+    void saveSurveyResult(SurveyResult surveyResult, String memberEmail);
 }

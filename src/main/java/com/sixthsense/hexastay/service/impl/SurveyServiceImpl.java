@@ -47,6 +47,17 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
+    public boolean hasParticipated(Long surveyId, String memberEmail) {
+        return surveyResultRepository.existsBySurvey_SurveyNumAndMemberEmail(surveyId, memberEmail);
+    }
+
+    @Override
+    public void saveSurveyResult(SurveyResult surveyResult, String memberEmail) {
+        surveyResult.setMemberEmail(memberEmail);
+        surveyResultRepository.save(surveyResult);
+    }
+
+    @Override
     public Map<String, Double> getSurveyChartData(Long surveyId) {
         List<SurveyResult> results = getSurveyResults(surveyId);
         Map<String, Double> chartData = new HashMap<>();

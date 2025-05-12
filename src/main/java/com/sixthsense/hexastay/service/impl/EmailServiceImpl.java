@@ -103,6 +103,7 @@ public class EmailServiceImpl implements EmailService {
             
             context.setVariable("survey", activeSurvey);
             context.setVariable("memberName", memberEmail.split("@")[0]); // 이메일에서 이름 추출
+            context.setVariable("memberEmail", memberEmail); // 전체 이메일 주소 추가
             context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
             context.setVariable("surveyContent", activeSurvey.getSurveyContent());
 
