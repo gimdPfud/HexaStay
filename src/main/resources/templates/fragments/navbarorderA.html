@@ -1,4 +1,4 @@
-<div id="navbarorder" th:fragment="navbarorder">
+<div id="navbarorder" th:fragment="navbarorderA">
     <nav class="navbar navbar-light bg-white border-bottom fixed-top">
         <div class="container d-flex justify-content-between align-items-center" style="height: 80px;">
             <!-- 좌측: 뒤로가기 버튼 -->
@@ -17,6 +17,9 @@
 
             <!-- 우측: 주문내역, 장바구니 -->
             <div style="width: 150px; text-align: right;">
+                <a href="/roommenu/coupon/insert" class="d-inline-block me-2" style="color: black;">
+                    <i class="bi bi-coin fs-3"></i>
+                </a>
                 <a href="/cart/receipt" class="d-inline-block me-2" style="color: black;">
                     <i class="bi bi-receipt-cutoff fs-3"></i>
                 </a>
