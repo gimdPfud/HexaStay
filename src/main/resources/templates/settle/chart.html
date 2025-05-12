@@ -24,10 +24,6 @@
             transition: transform 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-        }
-
         .stat-card {
             text-align: center;
             padding: 15px;
@@ -42,7 +38,6 @@
 
         .stat-card .label {
             color: #6c757d;
-            font-size: 0.85rem;
         }
 
         .chart-container {
@@ -82,7 +77,6 @@
             border-radius: 6px;
             border: 1px solid #e0e0e0;
             padding: 8px 12px;
-            font-size: 0.85rem;
             transition: all 0.3s ease;
         }
 
@@ -101,7 +95,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.85rem;
         }
 
         .excel-btn:hover {
@@ -142,7 +135,6 @@
             align-items: center;
             padding: 3px 6px;
             border-radius: 10px;
-            font-size: 0.75rem;
             margin-left: 6px;
         }
 
@@ -169,14 +161,12 @@
             border-radius: 6px;
             border: 1px solid #e0e0e0;
             transition: all 0.3s ease;
-            font-size: 0.85rem;
         }
 
         .date-range-form button {
             height: 36px;
             padding: 0 15px;
             border-radius: 6px;
-            font-size: 0.85rem;
         }
 
         table {
@@ -204,52 +194,60 @@
         }
     </style>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
-    <div class="dashboard-container">
+
+    <div class="container mt-4 w-100 bg-light">
         <div class="container-fluid">
-            <h2 class="fw-bold mb-3 text-center" style="font-size: 1.5rem;">재무 정산 대시보드</h2>
+            <h2 class="fw-bold mb-4 text-center">재무 정산 대시보드</h2>
 
             <!-- 필터 섹션 -->
-            <div class="card mb-3">
-                <div class="row align-items-center">
+            <div class="card mb-2">
+                <div class="row">
                     <div class="col-12">
-                        <div class="d-flex flex-wrap align-items-center gap-2">
-                            <select class="form-select" id="hqSelect" style="width: 180px;">
-                                <option selected>본사 선택</option>
-                                <option>서울본사</option>
-                                <option>부산본사</option>
-                            </select>
-                            <select class="form-select" id="branchSelect" style="width: 180px;">
-                                <option selected>지사 선택</option>
-                                <option>중부지사</option>
-                                <option>남부지사</option>
-                            </select>
-                            <select class="form-select" id="officeSelect" style="width: 180px;">
-                                <option selected>지점 선택</option>
-                                <option>강남지점</option>
-                                <option>대구지점</option>
-                            </select>
-                            <select class="form-select" id="storeSelect" style="width: 180px;">
-                                <option selected>스토어 선택</option>
-                                <option>스토어 A</option>
-                                <option>스토어 B</option>
-                            </select>
-                            <button type="button" id="excelDownloadBtn" class="btn excel-btn">
-                                <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
-                            </button>
-                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <!-- 1줄: 본사~스토어 선택 -->
+                            <div class="d-flex flex-wrap gap-3 justify-content-start">
+                                <select class="form-select" id="hqSelect" style="width: 180px;">
+                                    <option selected>본사 선택</option>
+                                    <option>서울본사</option>
+                                    <option>부산본사</option>
+                                </select>
+                                <select class="form-select" id="branchSelect" style="width: 180px;">
+                                    <option selected>지사 선택</option>
+                                    <option>중부지사</option>
+                                    <option>남부지사</option>
+                                </select>
+                                <select class="form-select" id="officeSelect" style="width: 180px;">
+                                    <option selected>지점 선택</option>
+                                    <option>강남지점</option>
+                                    <option>대구지점</option>
+                                </select>
+                                <select class="form-select" id="storeSelect" style="width: 180px;">
+                                    <option selected>스토어 선택</option>
+                                    <option>스토어 A</option>
+                                    <option>스토어 B</option>
+                                </select>
+                                <button type="button" id="excelDownloadBtn" class="btn excel-btn">
+                                    <i class="bi bi-file-earmark-excel"></i> 엑셀 다운로드
+                                </button>
+                            </div>
 
-                        <div class="date-range-form mt-2">
-                            <input type="date" id="startDate" class="form-control">
-                            <span>~</span>
-                            <input type="date" id="endDate" class="form-control">
-                            <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
-                            <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
+                            <!-- 2줄: 날짜 조회 -->
+                            <div class="d-flex align-items-center gap-3 justify-content-start" style="margin-right: 347px;">
+                                <input type="date" id="startDate" class="form-control" style="width: 180px;">
+                                <span>~</span>
+                                <input type="date" id="endDate" class="form-control" style="width: 180px;">
+                                <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
+                                <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+
 
             <!-- 상세 데이터 테이블 -->
             <div class="card mb-3">
@@ -271,21 +269,22 @@
                         </thead>
                         <tbody class="text-center">
                         <tr th:each="roomList, stat : ${roomDTOList.content}">
-                            <td><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yy-MM-dd HH:mm')}" readonly></td>
-                            <td><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
-                            <td><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
-                            <td><input type="text" class="form-control checkin" th:value="${#temporals.format(roomList.checkInDate, 'yy-MM-dd HH:mm')}" readonly></td>
-                            <td><input type="text" class="form-control checkout" th:value="${#temporals.format(roomList.checkOutDate, 'yy-MM-dd HH:mm')}" readonly></td>
-                            <td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${#temporals.format(roomList.createDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${roomList.memberDTO.memberName}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${roomList.hotelRoomDTO.hotelRoomName}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control checkin" th:value="${#temporals.format(roomList.checkInDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control checkout" th:value="${#temporals.format(roomList.checkOutDate, 'yy-MM-dd HH:mm')}" readonly></td>
+                            <td class="text-center">
                                 <input hidden type="text" class="checkDays">
                                 <input hidden type="text" class="price" th:value="${roomList.hotelRoomDTO.hotelRoomPrice}" readonly>
                                 <input type="text" class="form-control priceResult" readonly>
                             </td>
-                            <td><input type="text" class="form-control commission" readonly></td>
-                            <td><input type="text" class="form-control deduct" readonly></td>
-                            <td><input type="text" class="form-control final" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control commission" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control deduct" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control final" readonly></td>
                         </tr>
                         </tbody>
+
                     </table>
                 </div>
             </div>

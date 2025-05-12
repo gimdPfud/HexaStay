@@ -45,7 +45,7 @@
 
     <button onclick="toggleMenu('settle')"><strong>매출 관리</strong></button>
     <div id="settle" class="submenu">
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/settle/chart">- 매출 조회</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/settle/chart">- 재무 정산</a>
         <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/salaries/insert">- 급여 등록</a>
         <a href="/salaries/list">- 급여 조회</a>
     </div>
