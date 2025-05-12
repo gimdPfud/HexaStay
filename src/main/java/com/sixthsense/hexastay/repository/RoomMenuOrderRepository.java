@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,13 @@ public interface RoomMenuOrderRepository extends JpaRepository<RoomMenuOrder, Lo
     // 기존 메서드: List<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member);
     // 페이징을 위해 Pageable 인자를 추가하여 Page를 반환하도록 수정
     Page<RoomMenuOrder> findByMemberOrderByRegDateDesc(Member member, Pageable pageable);
+
+    //주문 상세 정보와 함께 주문자 이메일로 조회
+    @Query("SELECT DISTINCT rmo FROM RoomMenuOrder rmo " +
+            "LEFT JOIN FETCH rmo.orderItems oi " +
+            "LEFT JOIN FETCH oi.roomMenu rm " + // RoomMenuOrderItem의 roomMenu 필드
+            "WHERE rmo.roomMenuOrderNum = :orderNum AND rmo.member.memberEmail = :email")
+    Optional<RoomMenuOrder> findOrderDetailsByOrderNumAndMemberEmail(@Param("orderNum") Long orderNum, @Param("email") String email);
 
 
 }

@@ -37,5 +37,7 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     // RoomMenuCartItemRepository
     List<RoomMenuCartItem> findByRoomMenuCart(RoomMenuCart cart);
 
+    Optional<RoomMenuCartItem> findByRoomMenuCartAndRoomMenu(RoomMenuCart cart, RoomMenu roomMenu);
+
 }
 

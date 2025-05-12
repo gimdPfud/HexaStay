@@ -44,5 +44,7 @@ public interface RoomMenuOrderService {
 
    public void deductOptionStock(RoomMenu roomMenu, RoomMenuOrderItemDTO orderItemDTO, int orderedItemQuantity);
 
+   // 주문 오더 재주문
+
     }
 
