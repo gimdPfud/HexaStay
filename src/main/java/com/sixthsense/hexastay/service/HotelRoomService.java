@@ -2,8 +2,8 @@ package com.sixthsense.hexastay.service;
 
 
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
-
 import com.sixthsense.hexastay.dto.MemberDTO;
+import com.sixthsense.hexastay.dto.SettleDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import org.springframework.data.domain.Page;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,4 +63,5 @@ public interface HotelRoomService {
     List<HotelRoomDTO> getSettleList(Long companyNum);
     Page<HotelRoomDTO> getSettleList(Long companyNum, Pageable pageable);
 
+    List<SettleDTO> getSettleListByDateRange(LocalDate startDate, LocalDate endDate);
 }

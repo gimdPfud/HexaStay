@@ -90,6 +90,51 @@ public class SettleServiceImpl implements SettleService {
         return roomDTOList;
     }
 
+    @Override
+    public List<RoomDTO> getAllSettleList(Long companyNum) {
+        List<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum);
+        List<Long> hotelRoomNums = hotelRoomList.stream()
+                .map(HotelRoom::getHotelRoomNum)
+                .collect(Collectors.toList());
+        
+        List<Room> roomList = roomRepository.findByHotelRoom_HotelRoomNumIn(hotelRoomNums);
+        
+        return roomList.stream().map(room -> {
+            RoomDTO roomDTO = modelMapper.map(room, RoomDTO.class);
+            if (room.getHotelRoom() != null) {
+                roomDTO.setHotelRoomDTO(modelMapper.map(room.getHotelRoom(), HotelRoomDTO.class));
+            }
+            if (room.getMember() != null) {
+                roomDTO.setMemberDTO(modelMapper.map(room.getMember(), MemberDTO.class));
+            }
+            return roomDTO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RoomDTO> getAllSettleListByDateRange(Long companyNum, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        
+        List<HotelRoom> hotelRoomList = hotelRoomRepository.findByCompany_CompanyNum(companyNum);
+        List<Long> hotelRoomNums = hotelRoomList.stream()
+                .map(HotelRoom::getHotelRoomNum)
+                .collect(Collectors.toList());
+        
+        List<Room> roomList = roomRepository.findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
+                hotelRoomNums, startDateTime, endDateTime);
+        
+        return roomList.stream().map(room -> {
+            RoomDTO roomDTO = modelMapper.map(room, RoomDTO.class);
+            if (room.getHotelRoom() != null) {
+                roomDTO.setHotelRoomDTO(modelMapper.map(room.getHotelRoom(), HotelRoomDTO.class));
+            }
+            if (room.getMember() != null) {
+                roomDTO.setMemberDTO(modelMapper.map(room.getMember(), MemberDTO.class));
+            }
+            return roomDTO;
+        }).collect(Collectors.toList());
+    }
 
     // 정산용 (스토어)
     @Override

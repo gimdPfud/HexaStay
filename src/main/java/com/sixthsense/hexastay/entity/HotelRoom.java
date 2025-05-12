@@ -64,7 +64,8 @@ public class HotelRoom extends BaseEntity{
     private String hotelRoomPassword;           //비밀번호
     //****룸의 권한 설정 컬럼모음**********//
 
-
+    @OneToMany(mappedBy = "hotelRoom", cascade = CascadeType.ALL)
+    private List<Room> rooms = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "companyNum")
@@ -75,18 +76,18 @@ public class HotelRoom extends BaseEntity{
 
     //*********참조 테이블 모음*********//
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberNum")
+    private Member member;
 
-
-    // 🔹 일대다 관계 설정 (기존 ManyToOne 제거)
-
-
-    public void setMember(Member memberEntity) {
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public Object getMember() {
-
-        return null;
+    public Member getMember() {
+        return member;
     }
+
     //*********참조 테이블 모음*********//
 
 }

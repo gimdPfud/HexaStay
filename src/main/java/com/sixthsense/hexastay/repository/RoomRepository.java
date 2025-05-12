@@ -11,13 +11,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
-public interface RoomRepository extends JpaRepository<Room,Long> {
+@Repository
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
     //roomPassword 만 찾아와서 유효성 검사
     //2.Long 타입 - 비밀번호 중복체크 및 비번 추천
@@ -146,11 +147,19 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             "ORDER BY r.roomNum DESC, r.hotelRoom.hotelRoomNum DESC")
     List<Room> findActiveRoomsOrdered(@Param("member") Member member, @Param("now") LocalDateTime now);
 
-
     // 직원이 속한 룸 리스트
     Page<Room> findByHotelRoom_Company_CompanyNum(Long companyNum, Pageable pageable);
 
     // 직속 + 체크인이냐 체크아웃이냐
     Page<Room> findByHotelRoom_Company_CompanyNumAndHotelRoom_HotelRoomStatus(Long companyNum, String hotelStatus, Pageable pageable);
+            
+    // 페이지네이션 없는 전체 데이터 조회용
+    List<Room> findByHotelRoom_HotelRoomNumIn(List<Long> hotelRoomNums);
+    
+    // 페이지네이션 없는 날짜 범위 데이터 조회용
+    List<Room> findByHotelRoom_HotelRoomNumInAndCreateDateBetween(
+            List<Long> hotelRoomNums, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
+    // 체크아웃 날짜 범위로 조회
+    List<Room> findByCheckOutDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }
