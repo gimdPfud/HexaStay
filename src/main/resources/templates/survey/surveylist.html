@@ -89,6 +89,11 @@
                         <a th:href="@{/survey/results/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
                             <i class="bi bi-graph-up me-1"></i>결과
                         </a>
+                        <button th:onclick="'toggleActive(' + ${survey.surveyNum} + ')'" class="btn btn-sm"
+                                th:classappend="${survey.surveyIsActive} ? 'btn-outline-secondary' : 'btn-outline-primary'">
+                            <i class="bi" th:classappend="${survey.surveyIsActive} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                            <span th:text="${survey.surveyIsActive} ? '비활성화' : '활성화'"></span>
+                        </button>
                         <button th:onclick="'deleteSurvey(' + ${survey.surveyNum} + ')'" class="btn btn-outline-danger btn-sm">
                             <i class="bi bi-trash me-1"></i>삭제
                         </button>
@@ -121,6 +126,34 @@
                     if (!response.ok) {
                         return response.text().then(text => {
                             throw new Error(text || '설문조사 삭제 실패');
+                        });
+                    }
+                    return response.text();
+                })
+                .then(message => {
+                    alert(message);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
+                    console.error('Error:', error);
+                });
+            }
+        }
+        
+        function toggleActive(id) {
+            const message = '이 설문조사를 활성화하면 다른 모든 설문조사는 비활성화됩니다. 계속하시겠습니까?';
+            if (confirm(message)) {
+                fetch(`/survey/toggle-active/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || '설문조사 활성화 상태 변경 실패');
                         });
                     }
                     return response.text();
