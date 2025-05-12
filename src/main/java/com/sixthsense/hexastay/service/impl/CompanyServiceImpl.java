@@ -183,8 +183,11 @@ public class CompanyServiceImpl implements CompanyService {
         if (companyDTO.getCompanyPicture() != null && !companyDTO.getCompanyPicture().isEmpty()) {
 
             Company companyOri = companyRepository.findById(companyDTO.getCompanyNum()).orElseThrow();
-            Path filePath = Paths.get(System.getProperty("user.dir"), companyOri.getCompanyPictureMeta().substring(1));
-            Files.deleteIfExists(filePath);
+
+            if (companyOri.getCompanyPictureMeta() != null && !companyOri.getCompanyPictureMeta().isEmpty()) {
+                Path filePath = Paths.get(System.getProperty("user.dir"), companyOri.getCompanyPictureMeta().substring(1));
+                Files.deleteIfExists(filePath);
+            }
 
             String fileOriginalName = companyDTO.getCompanyPicture().getOriginalFilename();
             String fileFirstName = companyDTO.getCompanyNum() + "_" + companyDTO.getCompanyName();

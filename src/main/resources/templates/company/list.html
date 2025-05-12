@@ -18,6 +18,12 @@
       font-size: 0.75rem;
       border-radius: 0.25rem;
     }
+
+    .img-profile {
+      width: 60px;
+      height: 80px;
+      object-fit: contain; /* 또는 cover */
+    }
   </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -38,7 +44,7 @@
       </div>
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="select" class="form-select" onchange="submitForm()">
+        <select name="select" class="form-select">
           <option value="전체" th:selected="${select == null || select == '전체'}">검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
@@ -61,13 +67,13 @@
         <table class="table table-bordered text-company mb-0">
           <thead class="table-light text-center">
           <tr>
-            <th style="width: 11%">프로필 사진</th>
+            <th style="width: 13%">프로필 사진</th>
             <th style="width: 14%;">브랜드명</th>
             <th style="width: 14%;">본사명</th>
             <th style="width: 14%;">지점명</th>
             <th style="width: 14%;">외부시설명</th>
             <th style="width: 14%;">전화번호</th>
-            <th style="width: 12%;"></th>
+            <th style="width: 9%;"></th>
           </tr>
           </thead>
 
@@ -77,10 +83,12 @@
             <td>
               <img th:if="${item.companyPictureMeta != null}"
                    th:src="@{${item.companyPictureMeta}}"
-                   style="width: 60px; height: 80px;">
+                   style="width: 60px; height: 80px;"
+                   class="img-profile">
               <img th:unless="${item.companyPictureMeta != null}"
                    th:src="@{/profile/default.png}"
-                   style="width: 60px; height: 80px;">
+                   style="width: 60px; height: 80px;"
+                   class="img-profile">
             </td>
             <td th:text="${item.companyBrand}"></td>
             <td th:text="${item.companyParentName}">본사명</td>

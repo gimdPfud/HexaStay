@@ -93,6 +93,11 @@
                                 <option>031</option>
                                 <option>032</option>
                                 <option>041</option>
+                                <option>042</option>
+                                <option>043</option>
+                                <option>044</option>
+                                <option>055</option>
+                                <option>064</option>
                             </select>
                         </div>
                         <div class="col-auto">-</div>
@@ -220,6 +225,9 @@
                 const previewImage = document.getElementById('pictureTemp');
                 const file = this.files[0];
 
+                // 파일명 표시
+                document.querySelector('.file-name').textContent = file ? file.name : "사진이 선택되지 않았습니다.";
+
                 if (!allowedExtensions.exec(filePath)) {
                     this.value = '';
                     errorMessage.classList.remove('d-none');
@@ -238,14 +246,9 @@
                 }
             });
 
+
             document.getElementById('pictureBtn').addEventListener('click', function () {
                 document.getElementById('adminProfile').click();
-            });
-
-
-            document.getElementById('adminProfile').addEventListener('change', function () {
-                let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-                document.querySelector('.file-name').textContent = fileName;
             });
 
             window.addEventListener('DOMContentLoaded', function () {

@@ -18,9 +18,11 @@
 
                 <div class="mb-3 user-box text-center">
                     <div class="border mb-2" style="width: 103px; height: 132px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;" th:src="${adminDTO.adminProfileMeta != null} ? ${adminDTO.adminProfileMeta} : '#'" th:classappend="${adminDTO.adminProfileMeta == null} ? 'd-none' : ''">
+                        <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: contain;"
+                             th:src="${adminDTO.adminProfileMeta != null} ? ${adminDTO.adminProfileMeta} : '#'"
+                             th:classappend="${adminDTO.adminProfileMeta == null} ? 'd-none' : ''">
                     </div>
-                    <p class="file-name" th:text="${adminDTO.adminProfileMeta != null} ? '기존 프로필 사진' : '프로필 사진이 선택되지 않았습니다.'"></p>
+                    <p class="file-name" th:text="${adminDTO.adminProfileMeta != null} ? '기존 프로필 이미지' : '프로필 이미지가 선택되지 않았습니다.'"></p>
                     <button id="PictureBtn" type="button" class="custom-file-upload btn btn-primary border" style="z-index: 99">이미지 선택</button>
                     <input hidden type="file" id="adminProfile" name="adminProfile" class="btn btn-light form-control rounded-pill"
                            accept=".webp, .png, .jpeg, .jpg, .gif" style="padding: 8px;">
