@@ -202,64 +202,65 @@
 *
 -------------------------------------------------------------->
 <div layout:fragment="contentorderA">
-    <div class="container ">
+    <div class="container">
 
         <div th:if="${isCartEmpty}" style="text-align: center; padding: 50px;">
             <div th:text="#{cart.emptyMessage}"></div>
         </div>
 
-        <div th:unless="${isCartEmpty}" class="container">
-            <ul class="food-list">
-                <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
-                    <div class="col-4 cart-image">
-                        <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
-                             th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
-                             class="cart-img">
-                        <img th:unless="${roomMenuCartDTO.roomMenuImageMeta != null}"
-                             th:src="@{/profile/default.png}"
-                             class="cart-img">
-                    </div>
-
-                    <div class="food-info col-6">
-                        <p class="item-name">
-                            <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
-                        </p>
-                        <div class="quantity" style="display: flex; align-items: center;">
-                            <button class="decrease">-</button>
-                            <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
-                            <button class="increase">+</button>
+        <div th:unless="${isCartEmpty}">
+            <div id="cart-items-wrapper">
+                <ul class="food-list">
+                    <li th:each="roomMenuCartDTO : ${cartDetailDTOList}" class="food-item" th:attr="data-item-id=${roomMenuCartDTO.roomMenuCartDetailNum}">
+                        <div class="col-4 cart-image">
+                            <img th:if="${roomMenuCartDTO.roomMenuImageMeta != null}"
+                                 th:src="@{${roomMenuCartDTO.roomMenuImageMeta}}"
+                                 class="cart-img">
+                            <img th:unless="${roomMenuCartDTO.roomMenuImageMeta != null}"
+                                 th:src="@{/profile/default.png}"
+                                 class="cart-img">
                         </div>
-                        <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
-                            <p>
-                                <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
-                                <span th:text="#{item.currency}" style="font-weight: bold;"></span>
+
+                        <div class="food-info col-6">
+                            <p class="item-name">
+                                <span th:text="${roomMenuCartDTO.roomMenuCartDetailMenuItemName}">메뉴 이름</span>
                             </p>
-                        </th:block>
-
-                        <div class="option-list" style="margin-top: 10px;">
-                            <div th:if="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
-                                <details>
-                                    <summary style="cursor: pointer; color: #007bff;" th:text="#{cart.option.viewDetails}"></summary>
-                                    <ul style="padding-left: 15px;">
-                                        <li th:each="opt : ${roomMenuCartDTO.optionList}">
-                                            <span th:text="${opt.roomMenuCartItemOptionName}">옵션이름</span> /
-                                            <span th:text="${opt.roomMenuCartItemOptionAmount}">개수</span><span th:text="#{cart.option.countSuffix}"></span> / +<span class="option-line-total" th:text="${opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount}">옵션라인총가격</span><span th:text="#{item.currency}"></span> </li>
-                                    </ul>
-                                </details>
+                            <div class="quantity" style="display: flex; align-items: center;">
+                                <button class="decrease">-</button>
+                                <input type="text" class="quantity-input" th:value="${roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}" readonly>
+                                <button class="increase">+</button>
                             </div>
-                            <div th:unless="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
-                                <span style="font-size: 0.9em; color: #888;" th:text="#{cart.option.none}"></span>
+                            <th:block th:with="totalPrice=${roomMenuCartDTO.roomMenuCartDetailMenuItemPrice * roomMenuCartDTO.roomMenuCartDetailMenuItemAmount}">
+                                <p>
+                                    <span class="item-total" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}" style="font-weight: bold;"></span>
+                                    <span th:text="#{item.currency}" style="font-weight: bold;"></span>
+                                </p>
+                            </th:block>
+
+                            <div class="option-list" style="margin-top: 10px;">
+                                <div th:if="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
+                                    <details>
+                                        <summary style="cursor: pointer; color: #007bff;" th:text="#{cart.option.viewDetails}"></summary>
+                                        <ul style="padding-left: 15px;">
+                                            <li th:each="opt : ${roomMenuCartDTO.optionList}">
+                                                <span th:text="${opt.roomMenuCartItemOptionName}">옵션이름</span> /
+                                                <span th:text="${opt.roomMenuCartItemOptionAmount}">개수</span><span th:text="#{cart.option.countSuffix}"></span> / +<span class="option-line-total" th:text="${opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount}">옵션라인총가격</span><span th:text="#{item.currency}"></span> </li>
+                                        </ul>
+                                    </details>
+                                </div>
+                                <div th:unless="${roomMenuCartDTO.optionList != null and !#lists.isEmpty(roomMenuCartDTO.optionList)}">
+                                    <span style="font-size: 0.9em; color: #888;" th:text="#{cart.option.none}"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-2 button-container">
-                        <button class="mini-btn delete-btn" th:text="#{cart.delete}"></button>
-                    </div>
+                        <div class="col-2 button-container">
+                            <button class="mini-btn delete-btn" th:text="#{cart.delete}"></button>
+                        </div>
 
-
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
 
             <div class="coupon-select-box">
                 <label for="couponSelect" th:text="#{cart.coupon.selectLabel}"></label>
@@ -487,18 +488,19 @@
 
                                 const remainingItems = document.querySelectorAll('.food-item');
                                 if (remainingItems.length === 0) {
-                                    // 아이템이 없으면 장바구니 비어있음 메시지 표시
+                                    // 아이템이 없으면 .container 전체를 비우고 메시지만 표시
                                     const container = document.querySelector('.container');
                                     if (container) {
                                         container.innerHTML = `
-                                <div style="text-align:center; padding:50px; color:#888;">
-                                    🛒 장바구니에 아이템이 존재하지 않습니다.
-                                </div>`;
+                                    <div style="text-align:center; padding:50px; color:#888;">
+                                        🛒 장바구니에 아이템이 존재하지 않습니다.
+                                    </div>`;
                                     }
                                 }
                             },
                             error: () => alert("❌ 삭제 실패")
                         });
+
                     });
                 });
 

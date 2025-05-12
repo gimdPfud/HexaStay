@@ -111,29 +111,31 @@
     </div>
   </div>
 
-  <div class="row m-0 p-0 mt-3" th:if="${companyDTOS != null && !companyDTOS.isEmpty() && companyDTOS.totalPages > 1}">
-    <div class="col-3"></div> <ul class="col-6 pagination justify-content-company col" th:with="currentPage_1_indexed=${companyDTOS.number + 1},
-                 startPage_1_indexed=${T(java.lang.Math).max(1, currentPage_1_indexed - 1)},
-                 endPage_1_indexed=${T(java.lang.Math).min(companyDTOS.totalPages, currentPage_1_indexed + 1)}">
+  <div class="row m-0 p-0 mt-3 justify-content-center" th:if="${companyDTOS != null && !companyDTOS.isEmpty() && companyDTOS.totalPages > 1}">
+    <div class="col-auto">
+      <ul class="pagination justify-content-center" th:with="currentPage_1_indexed=${companyDTOS.number + 1},
+               startPage_1_indexed=${T(java.lang.Math).max(1, currentPage_1_indexed - 1)},
+               endPage_1_indexed=${T(java.lang.Math).min(companyDTOS.totalPages, currentPage_1_indexed + 1)}">
+        <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">
+          <a class="page-link" th:href="@{/company/list(page=0, choice=${choice}, select=${select}, keyword=${keyword})}">&laquo;</a>
+        </li>
 
-    <li class="page-item" th:classappend="${companyDTOS.number == 0} ? 'disabled'">
-      <a class="page-link" th:href="@{/company/list(page=0, choice=${choice}, select=${select}, keyword=${keyword})}">&laquo;</a>
-    </li>
+        <li class="page-item"
+            th:each="pageNumber_1_indexed : ${#numbers.sequence(startPage_1_indexed, endPage_1_indexed)}"
+            th:with="pageIndex_0_indexed=${pageNumber_1_indexed - 1}"
+            th:classappend="${pageNumber_1_indexed == currentPage_1_indexed} ? 'active'">
+          <a class="page-link"
+             th:href="@{/company/list(page=${pageIndex_0_indexed}, choice=${choice}, select=${select}, keyword=${keyword})}"
+             th:text="${pageNumber_1_indexed}"></a>
+        </li>
 
-    <li class="page-item"
-        th:each="pageNumber_1_indexed : ${#numbers.sequence(startPage_1_indexed, endPage_1_indexed)}"
-        th:with="pageIndex_0_indexed=${pageNumber_1_indexed - 1}"
-        th:classappend="${pageNumber_1_indexed == currentPage_1_indexed} ? 'active'">
-      <a class="page-link"
-         th:href="@{/company/list(page=${pageIndex_0_indexed}, choice=${choice}, select=${select}, keyword=${keyword})}"
-         th:text="${pageNumber_1_indexed}"></a>
-    </li>
-
-    <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">
-      <a class="page-link" th:href="@{/company/list(page=${companyDTOS.totalPages - 1}, choice=${choice}, select=${select}, keyword=${keyword})}">&raquo;</a>
-    </li>
-  </ul>
+        <li class="page-item" th:classappend="${companyDTOS.number == companyDTOS.totalPages - 1} ? 'disabled'">
+          <a class="page-link" th:href="@{/company/list(page=${companyDTOS.totalPages - 1}, choice=${choice}, select=${select}, keyword=${keyword})}">&raquo;</a>
+        </li>
+      </ul>
+    </div>
   </div>
+
 
 
   <script>
