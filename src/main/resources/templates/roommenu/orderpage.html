@@ -319,7 +319,7 @@
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
                                     <p class="menu-content" th:text="${roomMenuDTO.roomMenuContent}"></p>
                                     <div class="price-box">
-                                        <span th:text="${roomMenuDTO.roomMenuPrice}" class="price-text"></span>
+                                        <span th:text="${#numbers.formatInteger(roomMenuDTO.roomMenuPrice, 1, 'COMMA')}" class="price-text"></span>
                                         <span th:text="#{item.currency}">원</span>
                                     </div>
                                     <div class="d-flex justify-content-end">
