@@ -127,8 +127,7 @@ public class HotelRoomController {
     // list.html - 객실 정보 리스트 페이지
     @GetMapping("/list")
     public String hotelRoomList(Model model, Principal principal,
-                                @RequestParam(value = "page", defaultValue = "0") int page
-                                )
+                                @RequestParam(value = "page", defaultValue = "0") int page)
     {
 
         System.out.println("✅ hotelRoomList Controller 호출됨");
@@ -137,7 +136,8 @@ public class HotelRoomController {
         Pageable pageable = PageRequest.of(page, 9,
                 Sort.by(Sort.Order.desc("hotelRoomNum"), Sort.Order.desc("createDate"))
         );
-
+        //페이지 사이즈 체크 로그
+        log.info("pageable : page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
 
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
