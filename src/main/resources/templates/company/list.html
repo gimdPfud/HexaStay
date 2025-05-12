@@ -35,7 +35,7 @@
     <form action="/company/list" method="get" class="row g-3 align-items-end">
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="choice" id="choice" class="form-select" onchange="submitForm()">
+        <select name="choice" id="choice" class="form-select">
           <option value="" th:selected="${choice == null || choice == ''}">전체</option>
           <option value="center" th:selected="${choice == 'center'}">본사</option>
           <option value="branch" th:selected="${choice == 'branch'}">지점</option>
@@ -44,7 +44,7 @@
       </div>
 
       <div class="col-md-3" style="width: 15%;">
-        <select name="select" class="form-select">
+        <select name="select" id="select" class="form-select">
           <option value="전체" th:selected="${select == null || select == '전체'}">검색 조건</option>
           <option value="company" th:selected="${select == 'company'}">조직명</option>
           <option value="brandName" th:selected="${select == 'brandName'}">브랜드명</option>
@@ -53,7 +53,7 @@
       </div>
 
       <div class="col-md-4" style="width: 50%;">
-        <input name="keyword" type="text" class="form-control" placeholder="검색어 입력" th:value="${keyword}">
+        <input name="keyword" id="keyword" type="text" class="form-control" placeholder="검색어 입력" th:value="${keyword}">
       </div>
 
       <div class="col-md-2 d-flex gap-3" style="width: 20%;">
@@ -147,7 +147,6 @@
 
 
   <script>
-
     function loadAdmins(button) {
       const companyNum = button.getAttribute('data-companynum');
 
@@ -180,11 +179,16 @@
               });
     }
 
-    function submitForm() {
-      const form = document.querySelector('form');
-      form.submit();
-    }
-
+    // 페이지 로드 시 검색 관련 이벤트 설정
+    document.addEventListener('DOMContentLoaded', function() {
+      // choice 선택 변경 시 자동 검색
+      const choiceEl = document.getElementById('choice');
+      if (choiceEl) {
+        choiceEl.addEventListener('change', function() {
+          document.querySelector('form').submit();
+        });
+      }
+    });
   </script>
 
   <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">

@@ -3,8 +3,10 @@ package com.sixthsense.hexastay.service.impl;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
+import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.service.EmailService;
 import com.sixthsense.hexastay.service.SurveyService;
 import jakarta.mail.MessagingException;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class EmailServiceImpl implements EmailService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
+    private final HotelRoomRepository hotelRoomRepository;
     
     @Value("${spring.mail.username}")
     private String FROM_EMAIL;
@@ -56,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
 
         return mailSender;
     }
@@ -96,7 +99,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSurveyEmail(String subject, String content, String memberEmail) {
+    public void sendSurveyEmail(String subject, String content, String memberEmail, String memberName, String roomName, Long roomNum, Room room) {
         try {
             Context context = new Context();
             Survey activeSurvey = surveyService.getActiveSurvey();
@@ -105,41 +108,21 @@ public class EmailServiceImpl implements EmailService {
                 return;
             }
             
-            // 회원 정보 조회
-            Member member = memberRepository.findByMemberEmail(memberEmail);
-            if (member == null) {
-                log.error("회원 정보를 찾을 수 없습니다: {}", memberEmail);
-                return;
-            }
-            
-            // 최근 체크아웃한 방 정보 조회 (findFirstBy 사용)
-            Room room;
-            try {
-                room = roomRepository.findFirstByMemberOrderByCheckOutDateDesc(member)
-                        .orElseThrow(() -> new RuntimeException("방 정보를 찾을 수 없습니다."));
-            } catch (Exception e) {
-                log.warn("방 정보 조회 중 오류 발생: {}", e.getMessage());
-                // 다른 방법으로 room 정보 가져오기
-                List<Room> rooms = roomRepository.findByCheckOutDateBetween(
-                    LocalDateTime.now().minusDays(7), LocalDateTime.now())
-                    .stream()
-                    .filter(r -> r.getMember() != null && r.getMember().getMemberNum().equals(member.getMemberNum()))
-                    .toList();
-                
-                if (rooms.isEmpty()) {
-                    log.error("사용자의 최근 체크아웃 방을 찾을 수 없습니다: {}", memberEmail);
-                    return;
-                }
-                // 가장 최근 체크아웃 방 선택
-                room = rooms.get(0); 
+            // 회원 정보는 이미 room 객체에 있으므로 다시 조회할 필요 없음
+            // 회사명 가져오기
+            String companyName = "헥사스테이"; // 기본값
+            if (room.getHotelRoom() != null && 
+                room.getHotelRoom().getCompany() != null &&
+                room.getHotelRoom().getCompany().getCompanyName() != null) {
+                companyName = room.getHotelRoom().getCompany().getCompanyName();
             }
             
             context.setVariable("survey", activeSurvey);
-            context.setVariable("memberName", member.getMemberName());
+            context.setVariable("memberName", memberName);
             context.setVariable("memberEmail", memberEmail);
-            context.setVariable("roomName", room.getHotelRoom().getHotelRoomName());
-            context.setVariable("roomNum", room.getRoomNum());
-            context.setVariable("companyName", room.getHotelRoom().getCompany().getCompanyName());
+            context.setVariable("roomName", roomName != null ? roomName : "객실");
+            context.setVariable("roomNum", roomNum);
+            context.setVariable("companyName", companyName);
             context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
             context.setVariable("surveyContent", activeSurvey.getSurveyContent());
             context.setVariable("baseUrl", "http://localhost:8090");
@@ -155,7 +138,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(emailContent, true);
             
             getHardcodedMailSender().send(message);
-            log.info("설문조사 이메일 전송 완료: {}", memberEmail);
+            log.info("설문조사 이메일 전송 완료: {} ({}) - 방: {} ({})", memberName, memberEmail, roomName, roomNum);
         } catch (Exception e) {
             log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("이메일 발송 실패", e);

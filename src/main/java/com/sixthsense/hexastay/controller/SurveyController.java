@@ -349,11 +349,6 @@ public class SurveyController {
         return "survey/already-participated";
     }
 
-    @GetMapping("/thank-you")
-    public String thankYou() {
-        return "survey/thank-you";
-    }
-
     @GetMapping("/error")
     public String error() {
         return "survey/error";
