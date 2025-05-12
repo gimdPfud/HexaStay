@@ -157,7 +157,8 @@
             <div class="survey-info">
                 <p>아래 링크를 클릭하여 설문조사에 참여해주세요:</p>
                 <p style="text-align: center; margin: 20px 0;">
-                    <a href="https://hexastay.com/survey/participate" style="display: inline-block; padding: 15px 30px; background: #1D6F42; color: white; text-decoration: none; border-radius: 8px;">
+                    <a th:href="@{'/survey/participate/' + ${survey.surveyNum} + '?memberEmail=' + ${memberEmail}}" 
+                       style="display: inline-block; padding: 15px 30px; background: #1D6F42; color: white; text-decoration: none; border-radius: 8px;">
                         설문조사 참여하기
                     </a>
                 </p>

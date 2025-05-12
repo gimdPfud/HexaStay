@@ -58,6 +58,8 @@ public class SurveyResult {
 
     private Double surveyResultAverage;
 
+    private String memberEmail;
+
     @PrePersist
     @PreUpdate
     public void calculateAverageRating() {

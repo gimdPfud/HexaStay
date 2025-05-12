@@ -163,4 +163,46 @@ public class SurveyController {
         surveyEmailScheduler.sendSurveyEmails();
         return ResponseEntity.ok("설문 이메일이 성공적으로 전송되었습니다.");
     }
+
+    @GetMapping("/participate/{surveyId}")
+    public String participateSurvey(@PathVariable Long surveyId, 
+                                  @RequestParam String memberEmail,
+                                  Model model) {
+        // 이미 설문에 참여했는지 확인
+        if (surveyService.hasParticipated(surveyId, memberEmail)) {
+            return "redirect:/survey/already-participated";
+        }
+
+        Survey survey = surveyService.getSurveyById(surveyId);
+        model.addAttribute("survey", survey);
+        model.addAttribute("memberEmail", memberEmail);
+        return "survey/surveyform";
+    }
+
+    @PostMapping("/submit")
+    public String submitSurvey(@ModelAttribute SurveyResult surveyResult,
+                             @RequestParam String memberEmail) {
+        try {
+            surveyService.saveSurveyResult(surveyResult, memberEmail);
+            return "redirect:/survey/thank-you";
+        } catch (Exception e) {
+            log.error("설문조사 제출 중 오류 발생: {}", e.getMessage());
+            return "redirect:/survey/error";
+        }
+    }
+
+    @GetMapping("/already-participated")
+    public String alreadyParticipated() {
+        return "survey/already-participated";
+    }
+
+    @GetMapping("/thank-you")
+    public String thankYou() {
+        return "survey/thank-you";
+    }
+
+    @GetMapping("/error")
+    public String error() {
+        return "survey/error";
+    }
 }
