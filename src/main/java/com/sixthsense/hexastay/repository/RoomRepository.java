@@ -163,5 +163,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     // 체크아웃 날짜 범위로 조회
     List<Room> findByCheckOutDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    Optional<Room> findTopByMemberOrderByCheckOutDateDesc(Member member);
+    // 첫 번째 결과만 반환하는 메서드 (findFirst를 사용)
+    Optional<Room> findFirstByMemberOrderByCheckOutDateDesc(Member member);
 }
