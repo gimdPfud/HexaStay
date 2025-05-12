@@ -363,4 +363,40 @@ public class SurveyController {
     public String complete() {
         return "survey/complete";
     }
+
+    // 설문조사 활성화/비활성화
+    @PostMapping("/toggle-active/{id}")
+    @ResponseBody
+    public ResponseEntity<String> toggleActive(@PathVariable Long id, Principal principal) {
+        try {
+            // 로그인한 사용자의 회사 정보 가져오기
+            String email = principal.getName();
+            Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+            
+            // 활성화할 설문 조회
+            Survey survey = surveyService.getSurveyById(id);
+            
+            // 설문이 해당 회사 소속인지 확인
+            if (survey == null || survey.getCompany() == null || !survey.getCompany().getCompanyNum().equals(companyNum)) {
+                return ResponseEntity.badRequest().body("권한이 없습니다.");
+            }
+            
+            // 회사 소속의 모든 설문 조회
+            List<Survey> allCompanySurveys = surveyRepository.findByCompany_CompanyNum(companyNum);
+            
+            // 모든 설문을 비활성화
+            for (Survey s : allCompanySurveys) {
+                s.setSurveyIsActive(false);
+                surveyRepository.save(s);
+            }
+            
+            // 선택한 설문만 활성화
+            survey.setSurveyIsActive(true);
+            surveyRepository.save(survey);
+            
+            return ResponseEntity.ok("설문조사 활성화 상태가 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("설문조사 활성화 상태 변경 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
 }

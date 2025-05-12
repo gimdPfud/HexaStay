@@ -101,10 +101,8 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public Survey getActiveSurvey() {
-
-        Survey activeSurveys = surveyRepository.findBySurveyIsActiveTrue().getFirst();
-
-        return activeSurveys;
+        return surveyRepository.findTopBySurveyIsActiveTrueOrderBySurveyNumDesc()
+                .orElse(null);
     }
 
     @Override
