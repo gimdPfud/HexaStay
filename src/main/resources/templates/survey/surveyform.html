@@ -42,7 +42,7 @@
 
             <div class="form-group">
                 <label for="surveyContent" class="form-label">인사말</label>
-                <textarea class="form-control" id="surveyContent" th:field="*{surveyContent}" required></textarea>
+                <textarea class="form-control" id="surveyContent" th:field="*{surveyContent}"></textarea>
             </div>
 
             <div class="form-group">
@@ -53,23 +53,26 @@
             </div>
 
             <div class="btn-group">
-                <a th:href="@{/survey/list}" class="btn btn-secondary">취소</a>
                 <button type="submit" class="btn btn-primary">저장</button>
+                <a th:href="@{/survey/list}" class="btn btn-secondary">취소</a>
             </div>
         </form>
     </div>
 
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            ClassicEditor
-                .create(document.querySelector('#surveyContent'), {
-                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
-                    placeholder: '인사말을 입력하세요...'
-                })
-                .catch(error => {
-                    console.error(error);
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#surveyContent'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
+                placeholder: '설문조사 인사말을 입력해주세요.'
+            })
+            .then(editor => {
+                editor.model.document.on('change:data', () => {
+                    document.querySelector('#surveyContent').value = editor.getData();
                 });
-        });
+            })
+            .catch(error => {
+                console.error(error);
+            });
     </script>
 </div>
 </body>

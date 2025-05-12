@@ -1,5 +1,6 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.EmailService;
 import com.sixthsense.hexastay.service.SurveyService;
@@ -35,21 +36,17 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.password}")
     private String EMAIL_PASSWORD;
 
-    @Autowired
-    private TemplateEngine templateEngine;
+    private final TemplateEngine templateEngine;
 
-    @Autowired
-    private SurveyService surveyService;
+    private final SurveyService surveyService;
 
-    @Autowired
-    private JavaMailSender javaMailSender;
 
     private JavaMailSender getHardcodedMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername(FROM_EMAIL);
-        mailSender.setPassword(EMAIL_PASSWORD); // 앱 비밀번호 설정
+        mailSender.setUsername("welstorypark@gmail.com");
+        mailSender.setPassword("xkurhrjcqgyabgbk");
 
         java.util.Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -95,42 +92,34 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSurveyEmail(String subject, String content, String memberName) {
+    public void sendSurveyEmail(String subject, String content, String memberEmail) {
         try {
-            // 어제 체크아웃한 고객들의 이메일 주소 조회
-            LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
-            LocalDateTime startOfYesterday = yesterday.toLocalDate().atStartOfDay();
-            LocalDateTime endOfYesterday = yesterday.toLocalDate().atTime(23, 59, 59);
-            
-            List<String> recipientEmails = roomRepository.findByCheckOutDateBetween(startOfYesterday, endOfYesterday)
-                .stream()
-                .map(room -> room.getMember().getMemberEmail())
-                .collect(Collectors.toList());
-
             Context context = new Context();
-            context.setVariable("survey", surveyService.getActiveSurvey());
-            context.setVariable("memberName", memberName);
-
-            String emailContent = templateEngine.process("survey/survey-template", context);
-
-            for (String email : recipientEmails) {
-                try {
-                    MimeMessage message = javaMailSender.createMimeMessage();
-                    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-                    
-                    helper.setFrom(FROM_EMAIL);
-                    helper.setTo(email);
-                    helper.setSubject(subject);
-                    helper.setText(emailContent, true); // HTML 형식으로 설정
-                    
-                    javaMailSender.send(message);
-                    log.info("설문조사 이메일 전송 성공: {}", email);
-                } catch (Exception e) {
-                    log.error("설문조사 이메일 전송 실패: {} - {}", email, e.getMessage());
-                }
+            Survey activeSurvey = surveyService.getActiveSurvey();
+            if (activeSurvey == null) {
+                log.error("활성화된 설문조사가 없습니다.");
+                return;
             }
+            
+            context.setVariable("survey", activeSurvey);
+            context.setVariable("memberName", memberEmail.split("@")[0]); // 이메일에서 이름 추출
+            context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
+            context.setVariable("surveyContent", activeSurvey.getSurveyContent());
+
+            String emailContent = templateEngine.process("survey/surveytemplate", context);
+
+            MimeMessage message = getHardcodedMailSender().createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom(FROM_EMAIL);
+            helper.setTo(memberEmail);
+            helper.setSubject(subject);
+            helper.setText(emailContent, true); // HTML 형식으로 설정
+            
+            getHardcodedMailSender().send(message);
+            log.info("설문조사 이메일 전송 성공: {}", memberEmail);
         } catch (Exception e) {
-            log.error("설문조사 이메일 전송 중 오류 발생: {}", e.getMessage());
+            log.error("설문조사 이메일 전송 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 }
