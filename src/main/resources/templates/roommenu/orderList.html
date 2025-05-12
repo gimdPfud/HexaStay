@@ -167,18 +167,19 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end mt-2 me-2">
+            <div class="card-footer text-muted text-end d-flex justify-content-between align-items-center">
+
+                <!-- 재주문 버튼 -->
                 <button type="button" class="btn btn-sm btn-outline-primary reorder-btn"
                         th:data-order-num="${order.roomMenuOrderNum}">
                     <i class="fas fa-redo-alt"></i> 재주문
                 </button>
-            </div>
 
-            <div class="card-footer text-muted text-end">
                 <small>
                     <span th:text="#{orderList.orderTime}"></span>
                     <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
                 </small>
+
             </div>
         </div>
 
