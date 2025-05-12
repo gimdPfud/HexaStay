@@ -1,22 +1,24 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.CompanyDTO;
-import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
+import com.sixthsense.hexastay.repository.SurveyRepository;
+import com.sixthsense.hexastay.repository.SurveyResultRepository;
 import com.sixthsense.hexastay.scheduler.SurveyEmailScheduler;
-import com.sixthsense.hexastay.service.AdminService;
-import com.sixthsense.hexastay.service.CompanyService;
-import com.sixthsense.hexastay.service.EmailService;
-import com.sixthsense.hexastay.service.SurveyService;
+import com.sixthsense.hexastay.service.*;
 import com.sixthsense.hexastay.service.impl.EmailServiceImpl;
+import com.sixthsense.hexastay.service.impl.MemberServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -49,6 +51,13 @@ import java.util.NoSuchElementException;
 public class SurveyController {
     private final SurveyService surveyService;
     private final SurveyEmailScheduler surveyEmailScheduler;
+    private final RoomRepository roomRepository;
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
+    private final SurveyResultRepository surveyResultRepository;
+    private final SurveyRepository surveyRepository;
+    private final AdminService adminService;
+    private final CompanyRepository companyRepository;
 
     // 설문조사 목록 페이지
     @GetMapping("/list")
@@ -66,7 +75,12 @@ public class SurveyController {
 
     // 설문조사 저장
     @PostMapping("/save")
-    public String save(@ModelAttribute Survey survey) {
+    public String save(@ModelAttribute Survey survey, Principal principal) {
+        // 로그인한 사용자의 회사 정보 세팅
+        String email = principal.getName();
+        Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+        Company company = companyRepository.findById(companyNum).orElseThrow();
+        survey.setCompany(company);
         surveyService.saveSurvey(survey);
         return "redirect:/survey/list";
     }
@@ -92,49 +106,58 @@ public class SurveyController {
 
     // 설문조사 결과 페이지
     @GetMapping("/results/{id}")
-    public String surveyResult(@PathVariable Long id, Model model) {
+    public String surveyResult(@PathVariable Long id, Model model, Principal principal) {
+        // 로그인한 사용자의 회사번호 찾기
+        String email = principal.getName();
+        Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+
         Survey survey = surveyService.getSurveyById(id);
+        // 설문이 해당 회사 소속인지 체크
+        if (survey == null || survey.getCompany() == null || !survey.getCompany().getCompanyNum().equals(companyNum)) {
+            return "error/400";
+        }
+
         List<SurveyResult> responses = surveyService.getSurveyResults(id);
-        
+
         // 통계 데이터 계산
         int participantCount = responses.size();
         double averageRating = responses.stream()
-                .mapToDouble(r -> (r.getSurveyResultCleanliness() + r.getSurveyResultStaff() + 
-                                 r.getSurveyResultCheckInOut() + r.getSurveyResultFacility() + 
-                                 r.getSurveyResultFood() + r.getSurveyResultValue()) / 6.0)
+                .mapToDouble(r -> (r.getSurveyResultCleanliness() + r.getSurveyResultStaff() +
+                        r.getSurveyResultCheckInOut() + r.getSurveyResultFacility() +
+                        r.getSurveyResultFood() + r.getSurveyResultValue()) / 6.0)
                 .average()
                 .orElse(0.0);
-                
+
         double cleanlinessAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultCleanliness)
                 .average()
                 .orElse(0.0);
-                
+
         double staffAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultStaff)
                 .average()
                 .orElse(0.0);
-                
+
         double checkInOutAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultCheckInOut)
                 .average()
                 .orElse(0.0);
-                
+
         double facilityAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultFacility)
                 .average()
                 .orElse(0.0);
-                
+
         double foodAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultFood)
                 .average()
                 .orElse(0.0);
-                
+
         double valueAvg = responses.stream()
                 .mapToDouble(SurveyResult::getSurveyResultValue)
                 .average()
                 .orElse(0.0);
-        
+
         model.addAttribute("survey", survey);
         model.addAttribute("responses", responses);
         model.addAttribute("participantCount", participantCount);
@@ -145,7 +168,7 @@ public class SurveyController {
         model.addAttribute("facilityAvg", facilityAvg);
         model.addAttribute("foodAvg", foodAvg);
         model.addAttribute("valueAvg", valueAvg);
-        
+
         return "survey/surveyresult";
     }
 
@@ -164,30 +187,54 @@ public class SurveyController {
         return ResponseEntity.ok("설문 이메일이 성공적으로 전송되었습니다.");
     }
 
-    @GetMapping("/participate/{surveyId}")
-    public String participateSurvey(@PathVariable Long surveyId, 
+    @GetMapping("/participate/{id}")
+    public String participateSurvey(@PathVariable("id") Long id, 
                                   @RequestParam String memberEmail,
+                                  @RequestParam Long roomNum,
                                   Model model) {
-        // 이미 설문에 참여했는지 확인
-        if (surveyService.hasParticipated(surveyId, memberEmail)) {
+        Survey survey = surveyService.getSurveyById(id);
+        if (survey == null) {
+            return "redirect:/survey/list";
+        }
+        
+        // 이미 참여했는지 확인
+        if (surveyService.hasParticipated(id, memberEmail)) {
             return "redirect:/survey/already-participated";
         }
-
-        Survey survey = surveyService.getSurveyById(surveyId);
+        
         model.addAttribute("survey", survey);
         model.addAttribute("memberEmail", memberEmail);
-        return "survey/surveyform";
+        model.addAttribute("roomNum", roomNum);
+        return "survey/survey-participate";
     }
 
     @PostMapping("/submit")
     public String submitSurvey(@ModelAttribute SurveyResult surveyResult,
-                             @RequestParam String memberEmail) {
+                         @RequestParam Long roomNum,
+                         @RequestParam String memberEmail,
+                         Model model) {
         try {
-            surveyService.saveSurveyResult(surveyResult, memberEmail);
-            return "redirect:/survey/thank-you";
+            // 회원 정보 조회
+            Member member = memberRepository.findByMemberEmail(memberEmail);
+            if (member == null) {
+                throw new RuntimeException("회원을 찾을 수 없습니다.");
+            }
+            
+            // 객실 정보 조회
+            Room room = roomRepository.findById(roomNum)
+                    .orElseThrow(() -> new RuntimeException("객실 정보를 찾을 수 없습니다."));
+            
+            // 설문 결과 저장
+            surveyResult.setMember(member);
+            surveyResult.setRoom(room);
+            surveyResult.setSurveyResultSubmittedAt(LocalDateTime.now());
+            
+            surveyResultRepository.save(surveyResult);
+            
+            return "redirect:/survey/complete";
         } catch (Exception e) {
-            log.error("설문조사 제출 중 오류 발생: {}", e.getMessage());
-            return "redirect:/survey/error";
+            model.addAttribute("error", "설문 제출 중 오류가 발생했습니다.");
+            return "error/400";
         }
     }
 
@@ -204,5 +251,10 @@ public class SurveyController {
     @GetMapping("/error")
     public String error() {
         return "survey/error";
+    }
+
+    @GetMapping("/complete")
+    public String complete() {
+        return "survey/complete";
     }
 }

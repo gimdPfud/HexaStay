@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설문조사</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            padding: 0;
+            background: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1D6F42 0%, #2d8a5a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        .content {
+            padding: 20px;
+        }
+        .greeting {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .greeting p {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        .greeting .member-name {
+            color: #1D6F42;
+            font-weight: 600;
+        }
+        .rating-group {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .rating-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1D6F42;
+        }
+        .rating-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .rating-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px 5px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .rating-option:hover {
+            border-color: #1D6F42;
+            background: #f8f9fa;
+        }
+        .rating-option.selected {
+            background: #1D6F42;
+            color: white;
+            border-color: #1D6F42;
+        }
+        .rating-option input {
+            display: none;
+        }
+        .comment-group {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .comment-group label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1D6F42;
+        }
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+        .form-control:focus {
+            border-color: #1D6F42;
+            box-shadow: 0 0 0 0.2rem rgba(29, 111, 66, 0.25);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #1D6F42 0%, #2d8a5a 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${survey.surveyTitle}">설문조사</h1>
+    </div>
+
+    <form th:action="@{/survey/submit}" method="post">
+        <input type="hidden" name="survey.surveyNum" th:value="${survey.surveyNum}">
+        <input type="hidden" name="memberEmail" th:value="${memberEmail}">
+        <input type="hidden" name="roomNum" th:value="${roomNum}">
+        <input type="hidden" name="memberNum" th:value="${memberNum}">
+
+        <div class="content">
+            <div class="greeting">
+                <p><span class="member-name" th:text="${memberName}">홍길동</span>님, 안녕하세요.</p>
+                <p>헥사스테이를 이용해 주셔서 감사합니다.</p>
+                <p>고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">청결도</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCleanliness" value="1" required>
+                        <span>매우 불만족</span>
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCleanliness" value="2">
+                        <span>불만족</span>
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCleanliness" value="3">
+                        <span>보통</span>
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCleanliness" value="4">
+                        <span>만족</span>
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCleanliness" value="5">
+                        <span>매우 만족</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">직원 친절도</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultStaff" value="1" required>
+                        매우 불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultStaff" value="2">
+                        불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultStaff" value="3">
+                        보통
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultStaff" value="4">
+                        만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultStaff" value="5">
+                        매우 만족
+                    </label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">체크인/아웃</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCheckInOut" value="1" required>
+                        매우 불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCheckInOut" value="2">
+                        불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCheckInOut" value="3">
+                        보통
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCheckInOut" value="4">
+                        만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultCheckInOut" value="5">
+                        매우 만족
+                    </label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">시설</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFacility" value="1" required>
+                        매우 불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFacility" value="2">
+                        불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFacility" value="3">
+                        보통
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFacility" value="4">
+                        만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFacility" value="5">
+                        매우 만족
+                    </label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">음식</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFood" value="1" required>
+                        매우 불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFood" value="2">
+                        불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFood" value="3">
+                        보통
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFood" value="4">
+                        만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultFood" value="5">
+                        매우 만족
+                    </label>
+                </div>
+            </div>
+
+            <div class="rating-group">
+                <div class="rating-title">가격 대비 만족도</div>
+                <div class="rating-options">
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultValue" value="1" required>
+                        매우 불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultValue" value="2">
+                        불만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultValue" value="3">
+                        보통
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultValue" value="4">
+                        만족
+                    </label>
+                    <label class="rating-option">
+                        <input type="radio" name="surveyResultValue" value="5">
+                        매우 만족
+                    </label>
+                </div>
+            </div>
+
+            <div class="comment-group">
+                <label>만족한 점</label>
+                <textarea class="form-control" name="surveyResultComment" rows="3" placeholder="만족하신 점을 자유롭게 작성해주세요."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="bi bi-check-circle me-2"></i>설문 제출하기
+            </button>
+        </div>
+    </form>
+
+    <div class="footer">
+        <p>본 메일은 발신 전용입니다.</p>
+        <p>&copy; 2024 HexaStay. All rights reserved.</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 라디오 버튼 선택 시 스타일 변경
+    document.querySelectorAll('.rating-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // 같은 그룹의 다른 옵션들의 선택 해제
+            const group = this.closest('.rating-options');
+            group.querySelectorAll('.rating-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // 현재 옵션 선택
+            this.classList.add('selected');
+        });
+    });
+</script>
+</body>
+</html>

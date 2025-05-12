@@ -18,8 +18,11 @@ public class Room extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "room_num")
     private Long roomNum;
 
+    @Column(name = "room_name")
+    private String roomName;
 
     @Column(nullable = false)
     private String roomDisplayStatus;  // VISIBLE, HIDDEN 등
@@ -36,7 +39,7 @@ public class Room extends BaseEntity {
     //*****참조 테이블****//
     //1.Member
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberNum")
+    @JoinColumn(name = "member_num")
     private Member member;
 
     //2.HotelRoom

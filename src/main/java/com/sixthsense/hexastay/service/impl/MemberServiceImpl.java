@@ -130,4 +130,12 @@ public class MemberServiceImpl implements MemberService {
                 .map(member -> modelMapper.map(member, MemberDTO.class))
                 .collect(Collectors.toList());
     }
+
+
+    // 맴버 조회
+
+    public MemberDTO memberSerach(String memberEmail) {
+        Member member = memberRepository.findByMemberEmail(memberEmail);
+        return modelMapper.map(member, MemberDTO.class);
+    }
 }
