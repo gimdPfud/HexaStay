@@ -22,19 +22,22 @@ public interface RoomMenuCartItemRepository extends JpaRepository<RoomMenuCartIt
     @Query("SELECT new com.sixthsense.hexastay.dto.RoomMenuCartDetailDTO(" +
             "rmci.roomMenuCartItemNum, " +                 // Long roomMenuCartDetailNum
             "rmi.roomMenuName, " +                         // String roomMenuCartDetailMenuItemName
-            "rmi.roomMenuPrice, " +                        // Integer roomMenuCartDetailMenuItemPrice (상품의 개당 기본 가격)
-            "rmci.roomMenuCartItemAmount, " +              // Integer roomMenuCartDetailMenuItemAmount
+            "rmi.roomMenuPrice, " +                        // Integer roomMenuCartDetailMenuItemPrice
+            "rmci.roomMenuCartItemAmount, " +              // Integer roomMenuCartDetailMenuItemAmount (장바구니 수량)
             "rmci.roomMenuSelectOptionName, " +            // String roomMenuSelectOptionName
-            "rmci.roomMenuSelectOptionPrice, " +           // Integer roomMenuSelectOptionPrice (해당 아이템의 총 옵션 추가금액)
-            "rmi.roomMenuImageMeta, " +                    // String roomMenuImageMeta
-            "rmi.roomMenuNum, " +                          // ★ Long roomMenuId (실제 상품 RoomMenu의 PK)
-            "rmci.roomMenuCartItemPrice" +                 // ★ Integer roomMenuCartItemPrice (장바구니 아이템의 최종 계산된 가격)
+            "rmci.roomMenuSelectOptionPrice, " +           // Integer roomMenuSelectOptionPrice
+            "rmi.roomMenuImageMeta, " +                   // String roomMenuImageMeta (주의: rmci에서 가져오는지 rmi에서 가져오는지 확인)
+            // 만약 RoomMenu 엔티티에 이미지가 있다면 rmi.roomMenuImageMeta 일 수 있음
+            "rmi.roomMenuNum, " +                          // Long roomMenuId
+            "rmci.roomMenuCartItemPrice, " +               // Integer roomMenuCartItemPrice
+            "rmi.roomMenuAmount" +                                  // ★★★ Integer availableStock (rmi = RoomMenu 엔티티의 stock 필드) ★★★
             ") " +
             "FROM RoomMenuCartItem rmci " +
-            "JOIN rmci.roomMenu rmi " + // RoomMenu 엔티티를 rmi 별칭으로 조인
+            "JOIN rmci.roomMenu rmi " +                    // RoomMenu 엔티티 조인
             "WHERE rmci.roomMenuCart.member.memberEmail = :email " +
             "ORDER BY rmci.roomMenuCartItemNum DESC")
     Page<RoomMenuCartDetailDTO> findByCartDetailDTOList(@Param("email") String email, Pageable pageable);
+
     // 장바구니 안의 총 수량 반환 (member 기준)
     @Query("SELECT SUM(i.roomMenuCartItemAmount) FROM RoomMenuCartItem i WHERE i.roomMenuCart.member.memberEmail = :memberEmail")
     Integer getTotalItemCountByMemberEmail(@Param("memberEmail") String memberEmail);
