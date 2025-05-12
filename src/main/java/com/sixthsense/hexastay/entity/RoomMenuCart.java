@@ -28,6 +28,8 @@ public class RoomMenuCart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomMenuCartNum; // 장바구니의 pk
 
+    private Integer roomMenuCartTotalPrice;
+
     @OneToOne
     @JoinColumn(name = "member")
     private Member member;  // 사용자와 장바구니의 연관관계
