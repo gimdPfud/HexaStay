@@ -39,4 +39,8 @@ public class Survey {
     private LocalDateTime surveyUpdatedAt;
 
     private String surveyCreatedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "companyNum")
+    private Company company;
 }

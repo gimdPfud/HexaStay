@@ -9,6 +9,7 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.dto.SurveyResultDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
@@ -30,5 +31,5 @@ public interface SurveyService {
     Survey getActiveSurvey();
     SurveyResult saveSurveyResult(SurveyResult surveyResult);
     boolean hasParticipated(Long surveyId, String memberEmail);
-    void saveSurveyResult(SurveyResult surveyResult, String memberEmail);
+    void saveSurveyResult(SurveyResultDTO surveyResultDTO, String memberEmail, Long roomNum);
 }

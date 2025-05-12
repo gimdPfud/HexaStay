@@ -31,5 +31,7 @@ public interface MemberService {
     public List<MemberDTO> searchByNameOrEmail(String query);
 
 
+    // 맴버 조회
+    MemberDTO memberSerach(String memberEmail);
 
 }

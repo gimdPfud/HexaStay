@@ -43,13 +43,7 @@ public class SurveyResult {
 
     private Integer surveyResultValue;
 
-    @Column(length = 1000)
-    private String surveyResultSatisfaction;
-
-    @Column(length = 1000)
-    private String surveyResultImprovement;
-
-    @Column(length = 1000)
+    @Column(name = "survey_result_comment", length = 1000)
     private String surveyResultComment;
 
     @CreationTimestamp
@@ -58,6 +52,7 @@ public class SurveyResult {
 
     private Double surveyResultAverage;
 
+    @Column(name = "member_email")
     private String memberEmail;
 
     @PrePersist

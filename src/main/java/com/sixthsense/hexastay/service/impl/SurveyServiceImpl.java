@@ -1,11 +1,17 @@
 package com.sixthsense.hexastay.service.impl;
 
+import com.sixthsense.hexastay.dto.SurveyResultDTO;
+import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
+import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.repository.SurveyRepository;
 import com.sixthsense.hexastay.repository.SurveyResultRepository;
 import com.sixthsense.hexastay.service.SurveyService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +25,9 @@ import java.util.Map;
 public class SurveyServiceImpl implements SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyResultRepository surveyResultRepository;
+    private final MemberRepository memberRepository;
+    private final RoomRepository roomRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<Survey> getAllSurveys() {
@@ -52,8 +61,12 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void saveSurveyResult(SurveyResult surveyResult, String memberEmail) {
-        surveyResult.setMemberEmail(memberEmail);
+    public void saveSurveyResult(SurveyResultDTO surveyResultDTO, String memberEmail, Long roomNum) {
+        SurveyResult surveyResult = modelMapper.map( surveyResultDTO, SurveyResult.class);
+        Member member = memberRepository.findByMemberEmail(memberEmail);
+        Room room = roomRepository.findById(roomNum).orElseThrow(() -> new RuntimeException("방 정보가 없음"));
+        surveyResult.setMember(member);
+        surveyResult.setRoom(room);
         surveyResultRepository.save(surveyResult);
     }
 
