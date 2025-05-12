@@ -1,15 +1,23 @@
 package com.sixthsense.hexastay.entity;
-
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+/**************************************************
+ * 클래스명 : RoomMenuOption
+ * 기능   : 룸서비스 메뉴에 적용할 수 있는 개별 옵션을 정의하는 엔티티 클래스입니다.
+ * 각 옵션은 이름, 가격, 관련 수량 정보를 가지며 특정 룸서비스 메뉴(RoomMenu)에 속합니다.
+ * Lombok 어노테이션을 사용하여 getter, setter 등을 간편하게 생성하며, BaseEntity를 상속받아 생성/수정일을
+ * 자동 관리합니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-25
+ * 수정일 : 2025-05-09
+ * 주요 필드 : roomMenuOptionNum (PK), roomMenuOptionName, roomMenuOptionPrice, roomMenuOptionAmount,
+ * roomMenu (FK)
+ **************************************************/
 
 @Entity
 @Getter
@@ -36,8 +44,5 @@ public class RoomMenuOption extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "roomMenu")
     private RoomMenu roomMenu;
-
-
-
 
 }

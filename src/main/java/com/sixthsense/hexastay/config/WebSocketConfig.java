@@ -1,14 +1,21 @@
 package com.sixthsense.hexastay.config;
-
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import java.net.http.WebSocket;
+/**************************************************
+ * 클래스명 : WebSocketConfig
+ * 기능   : 웹소켓 및 STOMP 메시징을 설정하는 클래스입니다. (WebSocketMessageBrokerConfigurer 구현)
+ * 클라이언트가 웹소켓 연결을 맺을 수 있는 STOMP 엔드포인트를 등록하고,
+ * 메시지 브로커(메시지 발행/구독 처리)의 동작 방식을 구성합니다.
+ * 이를 통해 실시간 양방향 통신 기능을 애플리케이션에 제공합니다.
+ * 작성자 : 김윤겸
+ * 작성일 : 2025-04-21
+ * 수정일 :
+ * 주요 설정/메소드 : registerStompEndpoints, configureMessageBroker
+ **************************************************/
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -25,11 +32,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // ✅ "/queue" 추가
+        config.enableSimpleBroker("/topic", "/queue"); //
 
         config.setApplicationDestinationPrefixes("/app");
 
-        config.setUserDestinationPrefix("/user"); // ✅ 사용자 목적지 접두사 추가
+        config.setUserDestinationPrefix("/user");
     }
 
 }

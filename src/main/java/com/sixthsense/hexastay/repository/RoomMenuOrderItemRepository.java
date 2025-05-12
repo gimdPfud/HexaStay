@@ -8,7 +8,4 @@ public interface RoomMenuOrderItemRepository extends JpaRepository<RoomMenuOrder
     // 주문 정보가 있는지 확인
     boolean existsByRoomMenuRoomMenuNum(Long roomMenuNum);
 
-    // 연결된 주문 내역을 삭제
-    void deleteByRoomMenu_RoomMenuNum(Long roomMenuNum);
-
 }

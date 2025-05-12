@@ -1,19 +1,20 @@
-/***********************************************
+/**************************************************
  * 클래스명 : RoomMenu
- * 기능 : RoomMenu 엔티티
+ * 기능   : 룸서비스 메뉴 정보를 나타내는 엔티티 클래스입니다.
+ * 각 메뉴의 이름, 가격, 수량, 설명, 카테고리, 상태, 이미지 정보 등을 관리하며,
+ * 객실(Room) 정보와 다국어 지원 및 개발자 승인 상태도 포함합니다.
+ * Lombok 어노테이션을 사용하여 getter, setter, builder 등을 간편하게 생성합니다.
  * 작성자 : 김윤겸
  * 작성일 : 2025-03-31
- * 수정 :
- * ***********************************************/
-package com.sixthsense.hexastay.entity;
+ * 수정일 : 2025-05-09
+ * 주요 필드 : roomMenuNum (PK), roomMenuName, roomMenuPrice, roomMenuAmount, roomMenuContent, roomMenuCategory, roomMenuStatus, roomMenuImageMeta, room (FK), supportsMultilang, approvedByDev
+ **************************************************/
 
+package com.sixthsense.hexastay.entity;
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

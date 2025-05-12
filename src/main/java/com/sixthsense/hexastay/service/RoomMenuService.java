@@ -33,9 +33,6 @@ public interface RoomMenuService {
 
     public Page<RoomMenuDTO> searchRoomMenuList(Pageable pageable, String type, String keyword, String category, Locale locale);
 
-    // 조회
-    public List<HotelRoomDTO> searchRoomList(String adminEmail);
-
 
 }
 

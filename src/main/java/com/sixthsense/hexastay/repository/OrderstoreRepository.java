@@ -37,10 +37,10 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
             Pageable pageable);
     
     /*페이지로 가져오기*/
-    Page<Orderstore> findByRoom_Member_MemberEmail (String email, Pageable pageable);
+//    Page<Orderstore> findByRoom_Member_MemberEmail (String email, Pageable pageable);
     Page<Orderstore> findByRoom_RoomNum (Long roomNum, Pageable pageable);
     /*리스트로 가져오기. 근데 주문내역이면........... 계속 나오지않나*/
-    List<Orderstore> findByRoom_Member_MemberEmail (String email);
+//    List<Orderstore> findByRoom_Member_MemberEmail (String email);
     List<Orderstore> findByRoom_RoomNum (Long roomNum);
 
     /*스토어넘버로 가져오기*/
@@ -49,7 +49,7 @@ public interface OrderstoreRepository extends JpaRepository<Orderstore, Long> {
             "JOIN o.orderstoreitemList oi " +
             "JOIN oi.storemenu sm " +
             "JOIN sm.store s " +
-            "WHERE s.storeNum = :storeNum")
+            "WHERE s.storeNum = :storeNum order by o.orderstoreNum DESC ")
     List<Orderstore> findByStoreNum(Long storeNum);
 
     @Query("SELECT DISTINCT o FROM Orderstore o " +

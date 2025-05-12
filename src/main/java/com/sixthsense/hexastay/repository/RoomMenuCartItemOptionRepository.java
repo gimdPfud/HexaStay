@@ -8,10 +8,6 @@ import java.util.List;
 
 public interface RoomMenuCartItemOptionRepository extends JpaRepository<RoomMenuCartItemOption, Long> {
 
-
     List<RoomMenuCartItemOption> findDistinctByRoomMenuCartItem_RoomMenuCartItemNum(Long roomMenuCartItemNum);
-
-    void deleteByRoomMenuCartItem(RoomMenuCartItem roomMenuCartItem);
-
 
 }

@@ -8,11 +8,4 @@ public interface RoomMenuLikeService {
 
     public Integer roomMenuLikeCancel(Long roomMenuNum, String memberEmail);
 
-    public Integer roomMenuDisLike(Long roomMenuNum, String memberEmail);
-
-    public Integer roomMenuDisLikeCancel(Long roomMenuNum, String memberEmail);
-
-
-
-
 }

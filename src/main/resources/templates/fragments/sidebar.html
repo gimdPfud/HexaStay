@@ -6,33 +6,33 @@
     <button onclick="toggleMenu('memberMenu')"><strong>회원 관리</strong></button>
     <div id="memberMenu" class="submenu">
         <a href="/admin/list">- 회원 목록</a>
-        <a href="/admin/approve">- 회원 승인</a>
-        <a href="/admin/insert">- 회원 등록</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/admin/approve">- 회원 승인</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'', ''MGR'')')}" href="/admin/insert">- 회원 등록</a>
     </div>
 
     <button onclick="toggleMenu('roomList')"><strong>객실 관리</strong></button>
     <div id="roomList" class="submenu">
         <a href="/admin/hotelroom/list">- 객실 목록 </a>
-        <a href="/admin/hotelroom/input ">- 객실 등록 </a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/admin/hotelroom/input">- 객실 등록 </a>
     </div>
 
     <button onclick="toggleMenu('roomBook')"><strong>객실 예약</strong></button>
     <div id="roomBook" class="submenu">
         <a href="/roomlist">- 객실 예약 목록</a>
-        <a href="/member-insertroom ">- 객실 예약 등록</a>
+        <a href="/member-insertroom">- 객실 예약 등록</a>
     </div>
 
     <button onclick="toggleMenu('roomService')"><strong>객실 서비스</strong></button>
     <div id="roomService" class="submenu">
         <a href="/roommenu/list">- 객실 서비스 목록</a>
-        <a href="/roommenu/insert">- 객실 서비스 등록</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/roommenu/insert">- 객실 서비스 등록</a>
         <a href="/roommenu/adminOrderList">- 객실 주문 내역</a>
     </div>
 
     <button onclick="toggleMenu('extMenu')"><strong>요식업체</strong></button>
     <div id="extMenu" class="submenu">
         <a href="/admin/store/list">- 요식업체 목록</a>
-        <a href="/admin/store/insert">- 요식업체 등록</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/admin/store/insert">- 요식업체 등록</a>
     </div>
 
     <button onclick='location.href="/admin/store/order/list"'><strong>요식업체 주문 내역</strong></button>
@@ -45,12 +45,12 @@
 
     <button onclick="toggleMenu('settle')"><strong>매출 관리</strong></button>
     <div id="settle" class="submenu">
-        <a href="/settle/chart">- 매출 조회</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/settle/chart">- 매출 조회</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/salaries/insert">- 급여 등록</a>
         <a href="/salaries/list">- 급여 조회</a>
-        <a href="/salaries/insert">- 급여 등록</a>
     </div>
 
-    <button onclick='location.href="/roommenu/dev/translation"'><strong>번역 승인 관리</strong></button>
+    <button th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" onclick='location.href="/roommenu/dev/translation"'><strong>번역 승인 관리</strong></button>
 
     <button onclick="toggleMenu('notice')"><strong>공지사항</strong></button>
     <div id="notice" class="submenu">
@@ -60,6 +60,13 @@
     <button onclick="toggleMenu('mobile')"><strong>모바일(임시)</strong></button>
     <div id="mobile" class="submenu">
         <a href="/main">- 모바일</a>
+    </div>
+
+    <button onclick="toggleMenu('survey')"><strong>설문조사</strong></button>
+    <div id="survey" class="submenu">
+        <a href="/survey/list">- 설문조사 목록</a>
+        <a href="/survey/form">- 설문조사 작성</a>
+        <a href="/survey/results">- 설문조사 결과</a>
     </div>
 
 </div>
