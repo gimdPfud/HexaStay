@@ -272,7 +272,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     * */
     @Override
     public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
-
+        log.info("HotelRoom 수정 Service 진입");
 
         // 1. 기존 HotelRoom 조회
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
@@ -319,9 +319,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                         existingMeta.startsWith("/") ? existingMeta.substring(1) : existingMeta);
                 try {
                     Files.deleteIfExists(deletePath);
-
+                    log.info("기존 이미지 파일 삭제 완료: {}", deletePath);
                 } catch (IOException e) {
-
+                    log.warn("기존 이미지 파일 삭제 실패: {}", e.getMessage());
                 }
             }
 
@@ -354,13 +354,13 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. QR 코드 재생성 (service 사용)
         try {
-            String qrText = "http://wooriproject.iptime.org:9002"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             /*QR 생성 모듈화 클래스 */
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
 
             hotelRoom.setHotelRoomQr(qrPath); // 새 QR 경로 저장
-
+            log.info("새 QR 코드 생성 완료: {}", qrPath);
 
         } catch (Exception e) {
             throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage(), e);
@@ -368,7 +368,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. 저장
         hotelRoomRepository.save(hotelRoom);
-
+        log.info("호텔룸 정보 수정 완료: {}", hotelRoom.getHotelRoomNum());
     }
 
 
@@ -386,7 +386,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //6.호텔룸 조회 - princpal을 활용한 서지스 로직
     @Override
     public List<HotelRoom> listCompany(Long companyNUm) {
-
+        log.info(companyNUm.toString() + "company  num 을 가지고 왔지 ");
 
         List<HotelRoom> hotelRoomList =
         hotelRoomRepository.findByCompany_CompanyNum(companyNUm);

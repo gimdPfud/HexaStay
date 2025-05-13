@@ -16,6 +16,10 @@
             z-index: 1000;
             position: relative;
         }
+        .room-type-single { color: #0d6efd; }  /* 파랑 */
+        .room-type-double { color: #198754; }  /* 초록 */
+        .room-type-twin   { color: #b29004; }  /* 노랑 */
+        .room-type-suite  { color: #dc3545; }  /* 빨강 */
 
     </style>
 </head>
@@ -51,7 +55,12 @@
                                 </span>
                                     <h6 class="fw-bold mb-1" th:text="${hotelList.hotelRoomName}">객실명</h6>
                                     <p class="mb-1"><strong>회사:</strong> <span th:text="${hotelList.getCompany().getCompanyName()}"></span></p>
-                                    <p class="mb-1"><strong>유형:</strong> <span th:text="${hotelList.hotelRoomType}"></span></p>
+                                    <p class="mb-1">
+                                        <strong>객실유형:</strong>
+                                        <span th:text="${hotelList.hotelRoomType}"
+                                              th:classappend="'room-type-' + ${hotelList.hotelRoomType}">
+                                        </span>
+                                    </p>
                                     <p class="mb-1"><strong>가격:</strong> <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'"></span></p>
                                     <p class="mb-1"><strong>전화:</strong> <span th:text="${hotelList.hotelRoomPhone}"></span></p>
                                 </div>

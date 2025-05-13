@@ -41,9 +41,11 @@
                 <!-- 호텔룸 이미지로 보여주는 레이아웃 메소드 -->
                 <div class="mt-3">
                     <h5>객실 선택</h5>
-                    <!--이미지 카드 형시으로 script-->
+
+                    <!--이미지 카드 형식으로 script ******************-->
                     <div class="row gx-2 gy-3" id="hotelRoomList"></div>
-                    <!-- ✅ 페이지 네이션 script  -->
+
+                    <!-- ✅ 페이지 네이션 script  ******************-->
                     <div class="d-flex justify-content-center mt-2" id="hotelRoomPagination"></div>
                 </div>
 
@@ -166,6 +168,7 @@
                                     <span class="badge ${badgeClass}">${badgeText}</span>
                                     <h6 class="card-title mt-2 text-truncate">${room.hotelRoomName}</h6>
                                     <p class="card-text small">
+                                        객실유형: <span class="${getRoomTypeClass(room.hotelRoomType)}">${room.hotelRoomType}</span><br>
                                         전화: ${room.hotelRoomPhone}<br>
                                         가격: ${formattedPrice}원
                                     </p>
@@ -181,6 +184,17 @@
                 .catch(err => {
                     console.error("객실 불러오기 오류:", err);
                 });
+        }
+
+        /*hotelRoomType 별로 색상 변경 Script*/
+        function getRoomTypeClass(type) {
+            switch(type) {
+                case 'single': return 'text-primary';
+                case 'double': return 'text-success';
+                case 'twin': return 'text-warning';
+                case 'suite': return 'text-danger';
+                default: return '';
+            }
         }
 
         function setupPagination(data) {

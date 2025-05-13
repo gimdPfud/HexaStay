@@ -84,6 +84,7 @@
             <select class="form-select" name="hotelRoomType">
               <option th:value="single" th:selected="${hotelRoomDTO.hotelRoomType == 'single'}">싱글</option>
               <option th:value="double" th:selected="${hotelRoomDTO.hotelRoomType == 'double'}">더블</option>
+              <option th:value="twin   " th:selected="${hotelRoomDTO.hotelRoomType == 'double'}">트윈</option>
               <option th:value="suite" th:selected="${hotelRoomDTO.hotelRoomType == 'suite'}">스위트룸</option>
             </select>
           </div>
