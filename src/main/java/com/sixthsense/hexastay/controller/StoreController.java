@@ -53,6 +53,11 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
+        if (Arrays.asList("MGR","SUBMGR","STAFF").contains(adminDTO.getAdminRole().toUpperCase())){
+            log.warn("스토어소속 insert 접근 {}",adminDTO);
+            log.warn("수정으로 반환합니다.");
+            return "redirect:/admin/store/modify/"+adminDTO.getStoreNum();
+        }
 //        log.info(adminDTO);
 //        // 소속된 회사 없음
 //        if (adminDTO.getCompanyNum() == null) {
@@ -64,7 +69,7 @@ public class StoreController {
 //                return "redirect:/admin/logout";
 //            }
 //        }
-        model.addAttribute("companyList",companyService.getBnFList());
+//        model.addAttribute("companyList",companyService.getBnFList());
         return "store/insert";
     }
 
