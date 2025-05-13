@@ -74,11 +74,11 @@
                         </div>
                         <div class="col-auto">-</div>
                         <div class="col">
-                            <input type="number" id="storePhonetwo" class="form-control">
+                            <input type="number" id="storePhonetwo" oninput="limitLength(this, 4)" class="form-control">
                         </div>
                         <div class="col-auto">-</div>
                         <div class="col">
-                            <input type="number" id="storePhonethree" class="form-control">
+                            <input type="number" id="storePhonethree" oninput="limitLength(this, 4)" class="form-control">
                         </div>
                         <input hidden name="storePhone" id="storePhone" th:value="${data.storePhone}">
                     </div>
@@ -136,6 +136,12 @@
                 document.getElementById('storePhonethree').value = p3 || '';
             }
         })
+
+        function limitLength(el, maxLength) {
+            if (el.value.length > maxLength) {
+                el.value = el.value.slice(0, maxLength);
+            }
+        }
 
         //주소 입력
         var geocoder = new daum.maps.services.Geocoder();
