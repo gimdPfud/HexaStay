@@ -133,7 +133,6 @@ public class AdminController {
 
     @PostMapping("/insert")
     public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
-        log.info("요쓰" + adminDTO.getAdminRole());
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
             bindingResult.getAllErrors().forEach(error -> {

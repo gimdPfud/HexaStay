@@ -138,7 +138,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("companyName", companyName);
             context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
             context.setVariable("surveyContent", activeSurvey.getSurveyContent());
-            context.setVariable("baseUrl", "http://localhost:8090");
+            context.setVariable("baseUrl", "http://wooriproject.iptime.org:9002");
 
             String emailContent = templateEngine.process("survey/surveytemplate", context);
 

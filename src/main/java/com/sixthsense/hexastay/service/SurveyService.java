@@ -22,12 +22,10 @@ import java.util.Locale;
 import java.util.Map;
 
 public interface SurveyService {
-    List<Survey> getAllSurveys();
     Survey getSurveyById(Long id);
     Survey saveSurvey(Survey survey);
     void deleteSurvey(Long id);
     List<SurveyResult> getSurveyResults(Long surveyId);
-    Map<String, Double> getSurveyChartData(Long surveyId);
     Survey getActiveSurvey();
     SurveyResult saveSurveyResult(SurveyResult surveyResult);
     boolean hasParticipated(Long surveyId, String memberEmail);

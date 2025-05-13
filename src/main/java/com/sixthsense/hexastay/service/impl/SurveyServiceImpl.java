@@ -30,11 +30,6 @@ public class SurveyServiceImpl implements SurveyService {
     private final ModelMapper modelMapper;
 
     @Override
-    public List<Survey> getAllSurveys() {
-        return surveyRepository.findAll();
-    }
-
-    @Override
     public Survey getSurveyById(Long id) {
         return surveyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("설문조사를 찾을 수 없습니다."));
@@ -68,35 +63,6 @@ public class SurveyServiceImpl implements SurveyService {
         surveyResult.setMember(member);
         surveyResult.setRoom(room);
         surveyResultRepository.save(surveyResult);
-    }
-
-    @Override
-    public Map<String, Double> getSurveyChartData(Long surveyId) {
-        List<SurveyResult> results = getSurveyResults(surveyId);
-        Map<String, Double> chartData = new HashMap<>();
-        
-        if (!results.isEmpty()) {
-            double avgCleanliness = results.stream()
-                    .mapToDouble(SurveyResult::getSurveyResultCleanliness)
-                    .average()
-                    .orElse(0.0);
-            
-            double avgStaffRating = results.stream()
-                    .mapToDouble(SurveyResult::getSurveyResultStaff)
-                    .average()
-                    .orElse(0.0);
-            
-            double avgCheckInOut = results.stream()
-                    .mapToDouble(SurveyResult::getSurveyResultCheckInOut)
-                    .average()
-                    .orElse(0.0);
-            
-            chartData.put("청결도", avgCleanliness);
-            chartData.put("직원 친절도", avgStaffRating);
-            chartData.put("체크인/아웃", avgCheckInOut);
-        }
-        
-        return chartData;
     }
 
     @Override

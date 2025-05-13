@@ -38,7 +38,6 @@ public class CustomAdminDetails implements UserDetails, Principal {
         String password = Optional.ofNullable(admin)
                 .map(Admin::getAdminPassword)
                 .orElse(null);
-        log.info("CustomAdminDetails - getPassword 호출됨: {}", password);
         return password;
     }
 

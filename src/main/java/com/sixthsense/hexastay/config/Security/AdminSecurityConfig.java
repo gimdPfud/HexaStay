@@ -81,15 +81,7 @@ public class AdminSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder() {
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                log.info("비밀번호 검증 시작");
-                log.info("입력된 비밀번호: {}", rawPassword);
-                log.info("DB의 비밀번호: {}", encodedPassword);
-                boolean matches = super.matches(rawPassword, encodedPassword);
-                log.info("비밀번호 일치 여부: {}", matches);
-                return matches;
-            }
+
         };
     }
 
