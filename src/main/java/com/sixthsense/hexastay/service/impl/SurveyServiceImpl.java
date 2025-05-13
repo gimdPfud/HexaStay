@@ -111,4 +111,16 @@ public class SurveyServiceImpl implements SurveyService {
         surveyResult.calculateAverageRating();
         return surveyResultRepository.save(surveyResult);
     }
+    
+    @Override
+    public List<Survey> getSurveysByCompany(Long companyNum) {
+        return surveyRepository.findByCompany_CompanyNum(companyNum);
+    }
+    
+    @Override
+    public Survey getActiveSurveyByCompany(Long companyNum) {
+        // 회사 번호로 활성화된 설문조사 중 가장 최근 것을 반환
+        return surveyRepository.findTopByCompany_CompanyNumAndSurveyIsActiveTrueOrderBySurveyNumDesc(companyNum)
+                .orElse(null);
+    }
 }

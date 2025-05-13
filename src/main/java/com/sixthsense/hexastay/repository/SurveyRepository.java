@@ -17,4 +17,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
     
     // 회사별 설문조사 조회
     List<Survey> findByCompany_CompanyNum(Long companyNum);
+    
+    // 회사별 활성화된 설문조사 조회 (최신순)
+    Optional<Survey> findTopByCompany_CompanyNumAndSurveyIsActiveTrueOrderBySurveyNumDesc(Long companyNum);
 }

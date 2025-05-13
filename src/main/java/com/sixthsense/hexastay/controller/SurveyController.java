@@ -61,8 +61,13 @@ public class SurveyController {
 
     // 설문조사 목록 페이지
     @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("surveys", surveyService.getAllSurveys());
+    public String list(Model model, Principal principal) {
+        // 로그인한 사용자의 회사 정보 가져오기
+        String email = principal.getName();
+        Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
+        
+        // 회사별 설문조사 목록 조회
+        model.addAttribute("surveys", surveyService.getSurveysByCompany(companyNum));
         return "survey/surveylist";
     }
 
@@ -347,11 +352,6 @@ public class SurveyController {
     @GetMapping("/already-participated")
     public String alreadyParticipated() {
         return "survey/already-participated";
-    }
-
-    @GetMapping("/thank-you")
-    public String thankYou() {
-        return "survey/thank-you";
     }
 
     @GetMapping("/error")

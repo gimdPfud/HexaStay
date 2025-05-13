@@ -30,12 +30,15 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @Query("SELECT c FROM Company c " +
             "WHERE (:choice = '' OR c.companyType = :choice) " +
-            "AND (c.companyNum = :companyNum OR c.companyParent = :companyNum) " +
+            "AND ((:companyNum IS NULL) OR (c.companyNum = :companyNum OR c.companyParent = :companyNum)) " +
             "AND (" +
-            "(:select = '전체') OR " +
-            "(:select = 'company' AND c.companyName LIKE CONCAT('%', :keyword, '%')) OR " +
-            "(:select = 'brandName' AND c.companyBrand LIKE CONCAT('%', :keyword, '%')) OR " +
-            "(:select = 'businessNum' AND c.companyBusinessNum LIKE CONCAT('%', :keyword, '%'))" +
+            "(:select = '전체' AND (:keyword = '' OR " +
+            "    c.companyName LIKE %:keyword% OR " +
+            "    c.companyBrand LIKE %:keyword% OR " +
+            "    c.companyBusinessNum LIKE %:keyword%)) OR " +
+            "(:select = 'company' AND c.companyName LIKE %:keyword%) OR " +
+            "(:select = 'brandName' AND c.companyBrand LIKE %:keyword%) OR " +
+            "(:select = 'businessNum' AND c.companyBusinessNum LIKE %:keyword%)" +
             ") " +
             "ORDER BY c.companyNum DESC")
     Page<Company> listSelectSearch(@Param("select") String select,
