@@ -106,7 +106,6 @@
             let secretSequence = [];
             let isPasswordCorrect = false;
             
-            // 비밀번호 확인
             submitBtn.addEventListener('click', function() {
                 const password = passwordInput.value;
                 
@@ -122,18 +121,15 @@
                 }
             });
             
-            // 엔터 키 처리
             passwordInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     submitBtn.click();
                 }
             });
             
-            // 방향키 시퀀스 처리
             document.addEventListener('keydown', function(e) {
                 if (!isPasswordCorrect) return;
                 
-                // 방향키: 위(38), 아래(40)
                 if (e.keyCode === 38 || e.keyCode === 40) {
                     secretSequence.push(e.keyCode);
                     checkSequence();
@@ -141,15 +137,12 @@
             });
             
             function checkSequence() {
-                // 방향키 시퀀스: 위(3번), 아래(3번), 위(7번)
                 const targetSequence = [38, 38, 38, 40, 40, 40, 38, 38, 38, 38, 38, 38, 38];
-                
-                // 시퀀스가 길어지면 앞부분 자르기
+
                 if (secretSequence.length > targetSequence.length) {
                     secretSequence = secretSequence.slice(-targetSequence.length);
                 }
                 
-                // 시퀀스 비교
                 if (secretSequence.length === targetSequence.length) {
                     let isMatch = true;
                     for (let i = 0; i < targetSequence.length; i++) {
