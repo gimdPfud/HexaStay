@@ -267,22 +267,29 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findById(adminDTO.getAdminNum())
                 .orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
-        // 기존 사진이 있고 새로운 사진이 있으면 기존 사진 삭제
-        if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty() 
-            && adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
-            Files.deleteIfExists(filePath);
-        }
-
-        // 새로운 사진이 있으면 저장
+        // 새로운 사진이 있으면 처리
         if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
+            log.info("새 프로필 사진 업데이트 시작");
+            
+            // 기존 사진이 있으면 삭제
+            if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
+                try {
+                    Path oldFilePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
+                    log.info("기존 프로필 사진 삭제: {}", oldFilePath);
+                    Files.deleteIfExists(oldFilePath);
+                } catch (IOException e) {
+                    log.error("기존 프로필 사진 삭제 실패: {}", e.getMessage());
+                }
+            }
+
             String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
-            String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
+            String fileFirstName = admin.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
             String fileName = fileFirstName + fileSubName;
 
             // 프로필 메타 경로 설정
             String profileMetaPath = "/profile/" + fileName;
+            log.info("새 프로필 메타 경로: {}", profileMetaPath);
             
             // 파일 저장
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
@@ -290,21 +297,34 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectories(uploadPath);
             }
             Path filePath = uploadPath.resolve(fileName);
+            log.info("새 프로필 사진 저장 경로: {}", filePath);
+            
             adminDTO.getAdminProfile().transferTo(filePath.toFile());
-
-            // Admin 엔티티에 메타 경로 설정
             admin.setAdminProfileMeta(profileMetaPath);
+            log.info("새 프로필 사진 업데이트 완료");
         }
 
         // 나머지 필드 업데이트
         admin.setAdminName(adminDTO.getAdminName());
-        admin.setAdminPassword(admin.getAdminPassword());
         admin.setAdminAddress(adminDTO.getAdminAddress());
         admin.setAdminPhone(adminDTO.getAdminPhone());
         admin.setAdminPosition(adminDTO.getAdminPosition());
         admin.setAdminRole(adminDTO.getAdminRole());
+        
+        // 이메일과 주민번호 업데이트 (슈퍼어드민인 경우)
+        if ("SUPERADMIN".equalsIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority())) {
+            if (adminDTO.getAdminEmail() != null) {
+                log.info("이메일 업데이트: {} -> {}", admin.getAdminEmail(), adminDTO.getAdminEmail());
+                admin.setAdminEmail(adminDTO.getAdminEmail());
+            }
+            if (adminDTO.getAdminResidentNum() != null) {
+                log.info("주민번호 업데이트");
+                admin.setAdminResidentNum(adminDTO.getAdminResidentNum());
+            }
+        }
 
         adminRepository.save(admin);
+        log.info("관리자 정보 업데이트 완료: {}", admin.getAdminNum());
     }
 
 
