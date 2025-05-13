@@ -81,15 +81,6 @@
                     <input type="hidden" name="keyword" th:value="${keyword}" />
                     <input type="hidden" name="category" th:value="${category}" />
 
-                    <select name="lang"
-                            onchange="this.form.submit()"
-                            class="form-select form-select-sm"
-                            style="width: 150px; padding: 0.3rem 0.6rem; font-size: 0.9rem;">
-                        <option value="ko" th:selected="${#locale.language == 'ko'}">한국어</option>
-                        <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-                        <option value="ja" th:selected="${#locale.language == 'ja'}">日本語</option>
-                        <option value="cn" th:selected="${#locale.language == 'cn'}">中國語</option>
-                    </select>
                 </form>
 
             </div>
