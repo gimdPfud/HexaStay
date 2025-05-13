@@ -151,7 +151,7 @@ public class CompanyController {
                               @RequestParam(required = false) String choice,
                               @RequestParam(required = false) String select,
                               @RequestParam(required = false) String keyword,
-                              Pageable pageable, Principal principal) {
+                              @PageableDefault(size = 3) Pageable pageable, Principal principal) {
 
         String email = principal.getName();
         Long adminNum = adminService.adminFindEmail(email).getAdminNum();
