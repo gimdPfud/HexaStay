@@ -44,6 +44,8 @@ public class StoreServiceImpl implements StoreService {
     private final ZzService zzService;
     private final StoreRepository storeRepository;
     private final StoreLikeRepository storeLikeRepository;
+    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -191,6 +193,28 @@ public class StoreServiceImpl implements StoreService {
         return maps;
     }
 
+    @Override
+    public List<Long> getCompanyNums(AdminDTO adminDTO) {
+        log.info(adminDTO);
+
+        String role = adminDTO.getAdminRole().toUpperCase();
+        List<Long> result = null;
+        if(role.equals("SUPERADMIN")){
+            return result;
+        } else if (Arrays.asList("EXEC","HEAD","CREW").contains(role)) {
+            Long parentCom = adminDTO.getCompanyNum();
+            result.add(parentCom);
+            List<Company> companies = companyRepository.findByCompanyParent(parentCom);
+            companies.forEach(comp-> result.add(comp.getCompanyNum()));
+            return result;
+        }else if(Arrays.asList("GM","SV","AGENT").contains(role)){
+            result.add(adminDTO.getCompanyNum());
+            return result;
+        }else {
+            return null;
+        }
+    }
+
 
 //    /*
 //     * 메소드명 : list
@@ -231,7 +255,7 @@ public class StoreServiceImpl implements StoreService {
 //        return list;
 //    }
     @Override
-    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable, String... status) {
+    public Page<StoreDTO> searchlist(List<Long> companyNum,String searchType, String keyword, Pageable pageable, String... status) {
         Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable, status);
         Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);

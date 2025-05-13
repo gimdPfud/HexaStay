@@ -23,7 +23,6 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
     QStoremenu storemenu = QStoremenu.storemenu;
 
-
     @Override
     public Page<Store> storeTypeSearch(Long companyNum, String storeType, String menuKeyword, Pageable pageable) {
         BooleanExpression conditions = filteringConditions(companyNum,storeType);
@@ -66,13 +65,8 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         return condition;
     }
 
-
-
-
-
-
     @Override
-    public Page<Store> listStoreSearch(Long companyNum, String searchType, String keyword, Pageable pageable, String... status) {
+    public Page<Store> listStoreSearch(List<Long> companyNum, String searchType, String keyword, Pageable pageable, String... status) {
         //조건
         BooleanExpression whereCondition = buildSearchCondition(companyNum, searchType, keyword, status);
         List<Store> content = queryFactory
@@ -91,7 +85,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private BooleanExpression buildSearchCondition(Long companyNum, String searchType, String keyword, String... status) {
+    private BooleanExpression buildSearchCondition(List<Long> companyNum, String searchType, String keyword, String... status) {
         BooleanExpression condition = Expressions.TRUE; // 기본 조건
 
         //스토어 활성화여부
@@ -100,8 +94,8 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         }
 
         // 회사 유형
-        if (companyNum != null && companyNum!=0L) {
-            condition = condition.and(store.company.companyNum.eq(companyNum));
+        if (companyNum != null) {
+            condition = condition.and(store.company.companyNum.in(companyNum));
         }
 
         // 검색 필드

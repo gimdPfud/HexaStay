@@ -85,8 +85,13 @@ public class StoreController {
     @GetMapping("/list")
     public String list(Pageable pageable, Model model, Principal principal,
                        @RequestParam(required = false) String searchType,
-                       @RequestParam(required = false) Long companyNum,
+                       @RequestParam(required = false) List<Long> companyNum,
                        @RequestParam(required = false) String keyword){
+        log.info("겟겟겟리스트");
+        if(companyNum!=null){
+            log.info(companyNum.toString());
+        }
+
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -94,27 +99,38 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
+        if (adminDTO.getStoreNum()!=null){
+            return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
+        }
 
         //todo 프린시펄로 companyNum
-
-
+        // admin마다 볼 수 있는 업체가 달라야함
+        // 사장님 : 내가게만
+        // 지사 : 본인 소속 업체만
+        // 본사 : 본인 소속 업체 + 본인 소속 지사 업체
+        // 슈퍼어드민 : 전부다?
+        //필요한거 : 어드민이 볼 수 있는 companyNum 배열
+        //입력 : adminDTo 반환 : List<Long> companyNum
+        if(companyNum==null || companyNum.isEmpty() || companyNum.contains(0L)){
+            companyNum = storeService.getCompanyNums(adminDTO);
+        }
 
         Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable, "alive", "closed");
         model.addAttribute("list",list);
         Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable, "deleted");
         model.addAttribute("deletedList",listA);
-        model.addAttribute("companyList",companyService.getBnFList());
+//        model.addAttribute("companyList",companyService.getBnFList());
         model.addAttribute("companyMap", storeService.getCompanyMap());
         model.addAttribute("searchType",searchType);
         model.addAttribute("chosenCompany",companyNum);
         model.addAttribute("keyword",keyword);
         return "store/list";
     }
-    @PostMapping("/list")
-    public String list(Model model, Principal principal, Pageable pageable,
-                       @RequestParam(required = false) String searchType,
-                       @RequestParam(required = false) String chosenCompany,
-                       @RequestParam(required = false) String keyword){
+//    @PostMapping("/list")
+//    public String list(Model model, Principal principal, Pageable pageable,
+//                       @RequestParam(required = false) String searchType,
+//                       @RequestParam(required = false) String chosenCompany,
+//                       @RequestParam(required = false) String keyword){
 //        log.info("searchType : " + searchType);
 //        log.info("chosenCompany : " + chosenCompany);
 //        log.info("keyword : " + keyword);
@@ -136,22 +152,22 @@ public class StoreController {
 //                return "redirect:/admin/logout";
 //            }
 //        }
-        Long companyNum = 0L;
-        try {companyNum = Long.valueOf(chosenCompany);}
-        catch (NumberFormatException ignored){}
-        model.addAttribute("companyNum",companyNum);
+//        Long companyNum = 0L;
+//        try {companyNum = Long.valueOf(chosenCompany);}
+//        catch (NumberFormatException ignored){}
+//        model.addAttribute("companyNum",companyNum);
 //        log.info(companyNum);
 //        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable);
 //        list.forEach(log::info);
-        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable,"alive","closed");
-        Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable,"deleted");
-        model.addAttribute("list",list);
-        model.addAttribute("deletedList",listA);
-        model.addAttribute("companyMap", storeService.getCompanyMap());
-        model.addAttribute("searchType",searchType);
-        model.addAttribute("keyword",keyword);
-        return "store/list";
-    }
+//        Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable,"alive","closed");
+//        Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable,"deleted");
+//        model.addAttribute("list",list);
+//        model.addAttribute("deletedList",listA);
+//        model.addAttribute("companyMap", storeService.getCompanyMap());
+//        model.addAttribute("searchType",searchType);
+//        model.addAttribute("keyword",keyword);
+//        return "store/list";
+//    }
 
 
     @GetMapping("/read")
