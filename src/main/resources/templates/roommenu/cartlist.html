@@ -171,9 +171,17 @@
             font-weight: bold;
         }
 
-        /* Toast 알림을 위한 z-index 조정 (모달보다 위에 표시되도록) */
+        /* Toast 컨테이너 z-index (모달보다 위에 표시되도록) */
         .toast-container {
-            z-index: 1100 !important; /* 부트스트랩 모달 z-index(1050)보다 높게 설정 */
+            z-index: 1100 !important;
+        }
+
+        .toast-container .toast {
+            position: fixed;
+            top: 50%; /* 화면 세로 중앙 */
+            left: 50%; /* 화면 가로 중앙 */
+            transform: translate(-50%, -50%); /* 정확히 가운데 정렬 */
+            z-index: 1150;
         }
 
     </style>

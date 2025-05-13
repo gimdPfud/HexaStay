@@ -19,6 +19,11 @@
         .no-data { color: #888; text-align: center; padding: 40px 0; }
         td, th {
             vertical-align: middle;
+            background-color: white; /* td 배경색 흰색으로 설정 */
+        }
+
+        tbody {
+            background-color: white;
         }
 
         .comment-preview {
@@ -33,6 +38,30 @@
         .modal-dialog {
             margin-top: 120px;
         }
+
+        .low-score {
+            color: #D32F2F !important;
+            font-weight: 600;
+        }
+
+        .comment-preview {
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            display: block;
+            max-height: 100px;
+            transition: all 0.2s ease;
+            color: #6c757d;
+            position: relative;
+        }
+
+        .participant-count {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -41,18 +70,21 @@
 
 <div class="result-container">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
-    <h2 class="result-title">설문조사 결과</h2>
-    <div class="mb-4">
-        <strong>참여 인원:</strong> <span th:text="${participantCount}">0</span>명
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="fw-bold w-100 text-center mb-4">설문조사 결과</h2>
     </div>
-    
-    <div class="d-flex justify-content-end mb-3">
-        <button id="excelDownloadBtn" class="btn btn-success">
-            <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
-        </button>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <strong>참여 인원:</strong> <span class="participant-count" th:text="${participantCount}">0</span>명
+        </div>
+        <div>
+            <button id="excelDownloadBtn" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel me-1"></i> 엑셀 다운로드
+            </button>
+        </div>
     </div>
     
     <table class="table table-bordered stat-table">
@@ -84,7 +116,7 @@
     <div th:if="${#lists.isEmpty(responses)}" class="no-data">
         참여자가 없습니다.
     </div>
-    <table class="table table-striped table-bordered participant-table" th:if="${!#lists.isEmpty(responses)}">
+    <table class="table table-bordered participant-table" th:if="${!#lists.isEmpty(responses)}">
         <thead>
         <tr>
             <th style="width: 15%">이름(이메일)</th>
@@ -141,6 +173,25 @@
 </div>
 
     <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            calculateAverages();
+            document.getElementById('excelDownloadBtn').addEventListener('click', downloadExcel);
+            highlightLowScores();
+        });
+
+        function highlightLowScores() {
+            const rows = document.querySelectorAll('.participant-table tbody tr');
+            rows.forEach(row => {
+                for (let i = 2; i <= 7; i++) {
+                    const cell = row.cells[i];
+                    const score = parseInt(cell.textContent);
+                    if (score === 1 || score === 2) {
+                        cell.classList.add('low-score');
+                    }
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM 로드됨, 평균값 계산 시작');
             // JS로 평균 점수 계산
