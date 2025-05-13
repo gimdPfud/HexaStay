@@ -185,6 +185,23 @@
                     document.getElementById('adminAddressThree').value = parts[2];
                 }
             }
+            
+            // 전화번호 분리
+            const fullPhone = document.getElementById('adminPhone').value;
+            console.log('전체 전화번호:', fullPhone);
+            
+            if (fullPhone) {
+                const phoneParts = fullPhone.split('-');
+                console.log('전화번호 분리:', phoneParts);
+                
+                if (phoneParts.length === 3) {
+                    document.getElementById('adminPhonePartOne').value = phoneParts[0];
+                    document.getElementById('adminPhonePartTwo').value = phoneParts[1];
+                    document.getElementById('adminPhonePartThree').value = phoneParts[2];
+                }
+            } else {
+                console.log('전화번호가 없습니다.');
+            }
         });
 
         function submitForm(event) {
@@ -207,27 +224,59 @@
                 const field = document.getElementById(fieldId);
                 if (!field || !field.value.trim()) {
                     alert(`${fieldName}을(를) 입력해주세요.`);
-                    field.focus();
+                    if (field) field.focus();
                     isValid = false;
                     return;
                 }
             }
 
-            // 연락처 결합
-            document.getElementById('adminPhone').value =
-                document.getElementById('adminPhonePartOne').value + "-" +
-                document.getElementById('adminPhonePartTwo').value + "-" +
-                document.getElementById('adminPhonePartThree').value;
+            try {
+                // 연락처 결합
+                const phonePartOne = document.getElementById('adminPhonePartOne');
+                const phonePartTwo = document.getElementById('adminPhonePartTwo');
+                const phonePartThree = document.getElementById('adminPhonePartThree');
+                const phoneInput = document.getElementById('adminPhone');
+                
+                if (phonePartOne && phonePartTwo && phonePartThree && phoneInput) {
+                    phoneInput.value = phonePartOne.value + "-" + phonePartTwo.value + "-" + phonePartThree.value;
+                    console.log('연락처 결합:', phoneInput.value);
+                }
 
-            // 주소 결합
-            document.getElementById('adminAddress').value =
-                document.getElementById('adminAddressOne').value + "\u00A0" + 
-                document.getElementById('adminAddressTwo').value + "\u00A0" + 
-                document.getElementById('adminAddressThree').value;
+                // 주소 결합
+                const addressOne = document.getElementById('adminAddressOne');
+                const addressTwo = document.getElementById('adminAddressTwo');
+                const addressThree = document.getElementById('adminAddressThree');
+                const addressInput = document.getElementById('adminAddress');
+                
+                if (addressOne && addressTwo && addressThree && addressInput) {
+                    addressInput.value = addressOne.value + "\u00A0" + addressTwo.value + "\u00A0" + addressThree.value;
+                    console.log('주소 결합:', addressInput.value);
+                }
+                
+                // 주민번호 결합
+                const residentNumPartOne = document.getElementById('adminResidentNumPartOne');
+                const residentNumPartTwo = document.getElementById('adminResidentNumPartTwo');
+                const residentNumInput = document.getElementById('adminResidentNum');
+                
+                if (residentNumPartOne && residentNumPartTwo && residentNumInput) {
+                    residentNumInput.value = residentNumPartOne.value + residentNumPartTwo.value;
+                    console.log('주민번호 결합:', residentNumInput.value);
+                }
 
-            // 폼 제출
-            if (isValid) {
-                event.target.form.submit();
+                // 폼 제출 전 모든 히든 필드 로깅
+                console.log("폼 제출 시작");
+                const hiddenFields = document.querySelectorAll('input[type="hidden"]');
+                hiddenFields.forEach(field => {
+                    console.log(`${field.name}: ${field.value}`);
+                });
+                
+                // 폼 제출
+                if (isValid) {
+                    event.target.form.submit();
+                }
+            } catch (error) {
+                console.error('폼 제출 중 오류 발생:', error);
+                alert('폼 제출 중 오류가 발생했습니다: ' + error.message);
             }
         }
     </script>

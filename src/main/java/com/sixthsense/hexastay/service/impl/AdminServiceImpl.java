@@ -265,10 +265,31 @@ public class AdminServiceImpl implements AdminService {
             if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
                 try {
                     Path oldFilePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
-                    log.info("기존 프로필 사진 삭제: {}", oldFilePath);
-                    Files.deleteIfExists(oldFilePath);
+                    log.info("기존 프로필 사진 삭제 시도: {}", oldFilePath);
+                    
+                    // 파일 존재 여부 확인
+                    boolean fileExists = Files.exists(oldFilePath);
+                    log.info("파일 존재 여부: {}", fileExists);
+                    
+                    if (fileExists) {
+                        boolean deleted = Files.deleteIfExists(oldFilePath);
+                        log.info("파일 삭제 성공 여부: {}", deleted);
+                        
+                        if (!deleted) {
+                            // 파일 삭제에 실패한 경우, 추가 시도
+                            try {
+                                java.io.File file = oldFilePath.toFile();
+                                boolean forcedDelete = file.delete();
+                                log.info("강제 삭제 시도 결과: {}", forcedDelete);
+                            } catch (Exception e) {
+                                log.error("강제 삭제 실패: {}", e.getMessage());
+                            }
+                        }
+                    } else {
+                        log.warn("삭제할 파일이 존재하지 않습니다: {}", oldFilePath);
+                    }
                 } catch (IOException e) {
-                    log.error("기존 프로필 사진 삭제 실패: {}", e.getMessage());
+                    log.error("기존 프로필 사진 삭제 실패: {}", e.getMessage(), e);
                 }
             }
 
@@ -279,6 +300,7 @@ public class AdminServiceImpl implements AdminService {
 
             // 프로필 메타 경로 설정
             String profileMetaPath = "/profile/" + fileName;
+            log.info("새 프로필 메타 경로: {}", profileMetaPath);
             
             // 파일 저장
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
@@ -286,9 +308,16 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectories(uploadPath);
             }
             Path filePath = uploadPath.resolve(fileName);
+            log.info("새 프로필 사진 저장 경로: {}", filePath);
             
-            adminDTO.getAdminProfile().transferTo(filePath.toFile());
-            admin.setAdminProfileMeta(profileMetaPath);
+            try {
+                adminDTO.getAdminProfile().transferTo(filePath.toFile());
+                log.info("새 프로필 사진 저장 성공");
+                admin.setAdminProfileMeta(profileMetaPath);
+                log.info("프로필 메타 정보 업데이트 완료");
+            } catch (IOException e) {
+                log.error("새 프로필 사진 저장 실패: {}", e.getMessage(), e);
+            }
         }
 
         // 나머지 필드 업데이트

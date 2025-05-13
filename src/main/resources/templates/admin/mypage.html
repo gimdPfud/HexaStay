@@ -149,6 +149,7 @@
             <input hidden name="adminNum" th:value="${adminDTO.adminNum}">
             <input hidden name="companyNum" th:value="${adminDTO.companyNum}">
             <input hidden name="storeNum" th:value="${adminDTO.storeNum}">
+            <input hidden name="adminProfileMeta" th:value="${adminDTO.adminProfileMeta}">
         </form>
     </div>
     <script th:inline="javascript">
@@ -277,34 +278,59 @@
                 document.getElementById('adminAddressThree').value;
 
             // 주민등록번호 결합
-            document.getElementById('adminResidentNum').value =
-                document.getElementById('adminResidentNumPartOne').value +
-                document.getElementById('adminResidentNumPartTwo').value;
-
-            // 직급
-            if (document.getElementById('adminRole').value === "SUPERADMIN") {
-                document.getElementById('adminRole').value = "SUPERADMIN";
-            } else if (document.getElementById('adminCenterRank').value != null) {
-                document.getElementById('adminRole').value = document.getElementById('adminCenterRank').value;
-            } else if (document.getElementById('adminBranchRank').value != null) {
-                document.getElementById('adminRole').value = document.getElementById('adminBranchRank').value;
-            } else if (document.getElementById('adminStoreRank').value != null) {
-                document.getElementById('adminRole').value = document.getElementById('adminStoreRank').value;
+            const partOne = document.getElementById('adminResidentNumPartOne');
+            const partTwo = document.getElementById('adminResidentNumPartTwo');
+            if (partOne && partTwo && partOne.value && partTwo.value) {
+                document.getElementById('adminResidentNum').value = partOne.value + partTwo.value;
             }
 
-                // 폼 제출
-                if (isValid) {
-                    event.target.form.submit();
+            // 직급 - 요소 존재 여부 확인 후 처리
+            const adminRole = document.getElementById('adminRole');
+            const centerRank = document.getElementById('adminCenterRank');
+            const branchRank = document.getElementById('adminBranchRank');
+            const storeRank = document.getElementById('adminStoreRank');
+
+            if (adminRole) {
+                if (adminRole.value === "SUPERADMIN") {
+                    // 슈퍼어드민은 그대로 유지
+                } else if (centerRank && centerRank.style.display !== "none") {
+                    adminRole.value = centerRank.value;
+                } else if (branchRank && branchRank.style.display !== "none") {
+                    adminRole.value = branchRank.value;
+                } else if (storeRank && storeRank.style.display !== "none") {
+                    adminRole.value = storeRank.value;
                 }
             }
 
-            if (document.getElementById('adminRole').value === "SUPERADMIN") {
-                document.getElementById('adminLabel').hidden = true;
-                document.getElementById('adminCenterRank').hidden = true;
-                document.getElementById('adminBranchRank').hidden = true;
-                document.getElementById('adminStoreRank').hidden = true;
+            // 폼 제출
+            if (isValid) {
+                console.log("폼 제출 시작");
+                // 폼 전송 전 모든 히든 필드 로깅
+                const hiddenFields = document.querySelectorAll('input[type="hidden"]');
+                hiddenFields.forEach(field => {
+                    console.log(`${field.name}: ${field.value}`);
+                });
+                event.target.form.submit();
             }
+        }
 
+        // 페이지 로드 시 직급 선택 UI 숨기기 처리
+        window.addEventListener('load', function() {
+            const adminRole = document.getElementById('adminRole');
+            if (adminRole && adminRole.value === "SUPERADMIN") {
+                const adminLabel = document.getElementById('adminLabel');
+                if (adminLabel) adminLabel.hidden = true;
+                
+                const centerRank = document.getElementById('adminCenterRank');
+                if (centerRank) centerRank.hidden = true;
+                
+                const branchRank = document.getElementById('adminBranchRank');
+                if (branchRank) branchRank.hidden = true;
+                
+                const storeRank = document.getElementById('adminStoreRank');
+                if (storeRank) storeRank.hidden = true;
+            }
+        });
     </script>
 </div>
 </body>
