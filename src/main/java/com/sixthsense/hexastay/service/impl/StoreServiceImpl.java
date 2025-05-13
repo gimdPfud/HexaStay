@@ -44,6 +44,8 @@ public class StoreServiceImpl implements StoreService {
     private final ZzService zzService;
     private final StoreRepository storeRepository;
     private final StoreLikeRepository storeLikeRepository;
+    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /*
@@ -148,7 +150,7 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreWtmX(storeDTO.getStoreWtmX());
         store.setStoreWtmY(storeDTO.getStoreWtmY());
         store.setStoreCategory(storeDTO.getStoreCategory());
-        store.setStorePassword(storeDTO.getStorePassword());
+//        store.setStorePassword(storeDTO.getStorePassword());
         return store.getStoreNum();
     }
 
@@ -175,13 +177,17 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Map<Long, String> getCompanyMap() {
+    public Map<Long, String> getCompanyMap(AdminDTO adminDTO) {
         List<Store> storeList = storeRepository.findAll("alive");
         storeList.forEach(this::checkAndUpdateOrphanStatus);
         storeList = storeRepository.findAll("alive");
+
+        List<Long> comNums = getCompanyNums(adminDTO);
+
         Map<Long, String> maps = storeList.stream()
                 .map(Store::getCompany)
                 .filter(company -> company != null && company.getCompanyNum() != null && company.getCompanyName() != null)
+                .filter(comp-> comNums.contains(comp.getCompanyNum()))
                 .collect(Collectors.toMap(
                         Company::getCompanyNum,
                         Company::getCompanyName,
@@ -189,6 +195,30 @@ public class StoreServiceImpl implements StoreService {
                         LinkedHashMap::new
                 ));
         return maps;
+    }
+
+    @Override
+    public List<Long> getCompanyNums(AdminDTO adminDTO) {
+//        log.info(adminDTO);
+        String role = adminDTO.getAdminRole().toUpperCase();
+        List<Long> result = new ArrayList<>();
+        if(role.equals("SUPERADMIN")){
+            companyRepository.findAll().forEach(comp->result.add(comp.getCompanyNum()));
+            return result;
+        } else if (Arrays.asList("EXEC","HEAD","CREW").contains(role)) {
+            Long parentCom = adminDTO.getCompanyNum();
+            result.add(parentCom);
+            List<Company> companies = companyRepository.findByCompanyParent(parentCom);
+            companies.forEach(comp-> result.add(comp.getCompanyNum()));
+            return result;
+        }else if(Arrays.asList("GM","SV","AGENT").contains(role)){
+//            log.info(adminDTO);
+//            log.info(adminDTO.getCompanyNum());
+            result.add(adminDTO.getCompanyNum());
+            return result;
+        }else {
+            return null;
+        }
     }
 
 
@@ -231,7 +261,7 @@ public class StoreServiceImpl implements StoreService {
 //        return list;
 //    }
     @Override
-    public Page<StoreDTO> searchlist(Long companyNum,String searchType, String keyword, Pageable pageable, String... status) {
+    public Page<StoreDTO> searchlist(List<Long> companyNum,String searchType, String keyword, Pageable pageable, String... status) {
         Page<Store> storeList = storeRepository.listStoreSearch(companyNum, searchType, keyword, pageable, status);
         Page<StoreDTO> list = storeList.map(data -> {
             StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);

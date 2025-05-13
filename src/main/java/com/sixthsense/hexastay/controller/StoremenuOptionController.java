@@ -107,7 +107,7 @@ public class StoremenuOptionController {
     @PostMapping("/modify")
     public String modify(StoremenuOptionDTO storemenuOptionDTO) throws IOException {
         Long storemenuNum = storemenuOptionService.modify(storemenuOptionDTO);
-        log.info(storemenuNum);
+//        log.info(storemenuNum);
         return "redirect:/admin/store/menu/read/"+storemenuNum;
     }
 

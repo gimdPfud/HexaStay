@@ -57,7 +57,8 @@
         <!-- 검색 조건 및 등록 버튼 -->
         <form class="row g-3 align-items-end" action="/admin/store/list" method="get">
             <div class="col-md-3">
-                <select class="form-select" name="chosenCompany">
+                <select class="form-select" name="companyNum">
+                    <option value="0">전체보기</option>
                     <option th:each="data : ${companyMap}"
                             th:value="${data.key}"
                             th:text="${data.value}"

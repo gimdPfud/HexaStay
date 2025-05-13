@@ -33,8 +33,8 @@ import java.security.Principal;
 @Log4j2
 @Transactional
 public class ZzService {
-    private final MemberRepository memberRepository;
-    private final RoomServiceImpl roomService;
+//    private final MemberRepository memberRepository;
+//    private final RoomServiceImpl roomService;
     private final RoomRepository roomRepository;
     private final HotelRoomRepository hotelRoomRepository;
     /*

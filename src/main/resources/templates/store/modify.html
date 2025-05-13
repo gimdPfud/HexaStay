@@ -106,10 +106,10 @@
                     <input readonly type="hidden" id="storeAddress" th:value="${data.storeAddress}" name="storeAddress"/>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">가게 패스워드</label>
-                    <input type="text" class="form-control" name="storePassword" th:value="${data.storePassword}" required>
-                </div>
+<!--                <div class="mb-3">-->
+<!--                    <label class="form-label">가게 패스워드</label>-->
+<!--                    <input type="text" class="form-control" name="storePassword" th:value="${data.storePassword}" required>-->
+<!--                </div>-->
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" onclick="formSubmitHandler(this)" class="btn btn-success">저장</button>
                     <a th:href="@{'/admin/store/read?idid=' + ${data.storeNum}}" class="btn btn-danger">취소</a>

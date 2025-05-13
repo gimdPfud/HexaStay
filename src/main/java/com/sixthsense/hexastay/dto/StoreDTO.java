@@ -41,7 +41,7 @@ public class StoreDTO {
     private Double storeWtmY;
 
     private String storeCeoName;
-    private String storePassword;
+//    private String storePassword;
     private String storeStatus; //활성화 상태
     @NotBlank
     private String storeCategory;//가게 카테고리 (한식 중식 일식 아시안 양식 패푸 카페)

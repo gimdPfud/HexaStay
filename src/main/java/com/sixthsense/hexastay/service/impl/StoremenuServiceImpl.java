@@ -90,7 +90,7 @@ public class StoremenuServiceImpl implements StoremenuService {
      * */
     @Override
     public StoremenuDTO read(Long pk, Locale locale) {
-        log.info("다국어 서비스 read 진입", pk, locale);
+//        log.info("다국어 서비스 read 진입", pk, locale);
 
         Storemenu storemenu = storemenuRepository.findById(pk)
                 .orElseThrow(() -> new EntityNotFoundException("Storemenu not found with id: " + pk)); // 예외 메시지 명확화
@@ -116,7 +116,7 @@ public class StoremenuServiceImpl implements StoremenuService {
      * */
     @Override
     public Long modify(StoremenuDTO storemenuDTO) throws IOException {
-        log.info("수정 서비스 진입 : "+storemenuDTO);
+//        log.info("수정 서비스 진입 : "+storemenuDTO);
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
         if(storemenuDTO.getStoremenuImg()!=null&&!storemenuDTO.getStoremenuImg().isEmpty()) {
             if (entity.getStoremenuImgMeta()!=null&&!entity.getStoremenuImgMeta().isEmpty()) {
