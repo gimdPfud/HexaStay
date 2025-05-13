@@ -131,243 +131,243 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM 로드됨, 평균값 계산 시작');
-        // JS로 평균 점수 계산
-        calculateAverages();
-        
-        // 엑셀 다운로드 버튼 이벤트 설정
-        document.getElementById('excelDownloadBtn').addEventListener('click', downloadExcel);
-    });
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM 로드됨, 평균값 계산 시작');
+            // JS로 평균 점수 계산
+            calculateAverages();
 
-    function downloadExcel() {
-        // 설문조사 제목 가져오기
-        const surveyTitle = document.querySelector('.result-title').textContent;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const fileName = `${surveyTitle}_설문결과_${timestamp}.xlsx`;
-        
-        // 엑셀 워크북 생성
-        const wb = XLSX.utils.book_new();
-        
-        // 요약 시트 데이터 생성
-        const summaryData = [
-            ['설문조사 결과 요약'],
-            [''],
-            ['설문 제목', surveyTitle],
-            ['참여 인원', document.querySelector('.mb-4 span').textContent],
-            [''],
-            ['구분', '평균 점수'],
-            ['전체 평균', document.getElementById('avgTotal').textContent],
-            ['청결도', document.getElementById('avgCleanliness').textContent],
-            ['직원 친절도', document.getElementById('avgStaff').textContent],
-            ['체크인/아웃', document.getElementById('avgCheckInOut').textContent],
-            ['시설', document.getElementById('avgFacility').textContent],
-            ['음식', document.getElementById('avgFood').textContent],
-            ['가성비', document.getElementById('avgValue').textContent]
-        ];
-        
-        // 요약 시트 생성
-        const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, summaryWs, '요약');
-        
-        // 응답자 상세 데이터 생성
-        const detailsTable = document.querySelector('.participant-table');
-        if (detailsTable) {
-            const detailsData = [];
-            
-            // 헤더 추가
-            const headerRow = [];
-            const headerCells = detailsTable.querySelectorAll('thead th');
-            headerCells.forEach(cell => {
-                headerRow.push(cell.textContent);
-            });
-            detailsData.push(headerRow);
-            
-            // 데이터 행 추가
-            const rows = detailsTable.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-                const dataRow = [];
-                const cells = row.querySelectorAll('td');
-                cells.forEach(cell => {
-                    dataRow.push(cell.textContent);
+            // 엑셀 다운로드 버튼 이벤트 설정
+            document.getElementById('excelDownloadBtn').addEventListener('click', downloadExcel);
+        });
+
+        function downloadExcel() {
+            // 설문조사 제목 가져오기
+            const surveyTitle = document.querySelector('.result-title').textContent;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const fileName = `${surveyTitle}_설문결과_${timestamp}.xlsx`;
+
+            // 엑셀 워크북 생성
+            const wb = XLSX.utils.book_new();
+
+            // 요약 시트 데이터 생성
+            const summaryData = [
+                ['설문조사 결과 요약'],
+                [''],
+                ['설문 제목', surveyTitle],
+                ['참여 인원', document.querySelector('.mb-4 span').textContent],
+                [''],
+                ['구분', '평균 점수'],
+                ['전체 평균', document.getElementById('avgTotal').textContent],
+                ['청결도', document.getElementById('avgCleanliness').textContent],
+                ['직원 친절도', document.getElementById('avgStaff').textContent],
+                ['체크인/아웃', document.getElementById('avgCheckInOut').textContent],
+                ['시설', document.getElementById('avgFacility').textContent],
+                ['음식', document.getElementById('avgFood').textContent],
+                ['가성비', document.getElementById('avgValue').textContent]
+            ];
+
+            // 요약 시트 생성
+            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summaryWs, '요약');
+
+            // 참여자 리스트 시트 생성
+            const detailsTable = document.querySelector('.participant-table');
+            if (detailsTable) {
+                const detailsData = [];
+
+                // 헤더 추가
+                const headerRow = [];
+                const headerCells = detailsTable.querySelectorAll('thead th');
+                headerCells.forEach(cell => {
+                    headerRow.push(cell.textContent);
                 });
-                detailsData.push(dataRow);
+                detailsData.push(headerRow);
+
+                // 데이터 행 추가
+                const rows = detailsTable.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const dataRow = [];
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        dataRow.push(cell.textContent);
+                    });
+                    detailsData.push(dataRow);
+                });
+
+                // 상세 시트 생성
+                const detailsWs = XLSX.utils.aoa_to_sheet(detailsData);
+                XLSX.utils.book_append_sheet(wb, detailsWs, '참여자 리스트');
+            }
+
+            // 엑셀 파일 다운로드
+            XLSX.writeFile(wb, fileName);
+
+            console.log('엑셀 파일 다운로드:', fileName);
+        }
+
+        function calculateAverages() {
+            // 테이블에서 각 항목의 값을 읽어와서 계산
+            const tableRows = document.querySelectorAll('.participant-table tbody tr');
+            console.log('찾은 행 개수:', tableRows.length);
+
+            if (tableRows.length === 0) {
+                console.log('참여자 데이터가 없음');
+                return;
+            }
+
+            // 각 항목별 합계
+            let totalCleanliness = 0;
+            let totalStaff = 0;
+            let totalCheckInOut = 0;
+            let totalFacility = 0;
+            let totalFood = 0;
+            let totalValue = 0;
+            let validCountCleanliness = 0;
+            let validCountStaff = 0;
+            let validCountCheckInOut = 0;
+            let validCountFacility = 0;
+            let validCountFood = 0;
+            let validCountValue = 0;
+
+            // 각 행(row)에서 데이터 추출 및 합산
+            tableRows.forEach((row, index) => {
+                const cells = row.cells;
+                console.log(`${index+1}번째 행 처리 중, 셀 개수: ${cells.length}`);
+
+                // 값 확인
+                console.log('셀 값 확인:',
+                    '청결도:', cells[2].textContent,
+                    '직원 친절도:', cells[3].textContent,
+                    '체크인/아웃:', cells[4].textContent,
+                    '시설:', cells[5].textContent,
+                    '음식:', cells[6].textContent,
+                    '가성비:', cells[7].textContent
+                );
+
+                const cleanliness = parseInt(cells[2].textContent);
+                const staff = parseInt(cells[3].textContent);
+                const checkInOut = parseInt(cells[4].textContent);
+                const facility = parseInt(cells[5].textContent);
+                const food = parseInt(cells[6].textContent);
+                const value = parseInt(cells[7].textContent);
+
+                console.log('파싱된 값:',
+                    '청결도:', cleanliness,
+                    '직원 친절도:', staff,
+                    '체크인/아웃:', checkInOut,
+                    '시설:', facility,
+                    '음식:', food,
+                    '가성비:', value
+                );
+
+                if (!isNaN(cleanliness)) {
+                    totalCleanliness += cleanliness;
+                    validCountCleanliness++;
+                }
+                if (!isNaN(staff)) {
+                    totalStaff += staff;
+                    validCountStaff++;
+                }
+                if (!isNaN(checkInOut)) {
+                    totalCheckInOut += checkInOut;
+                    validCountCheckInOut++;
+                }
+                if (!isNaN(facility)) {
+                    totalFacility += facility;
+                    validCountFacility++;
+                }
+                if (!isNaN(food)) {
+                    totalFood += food;
+                    validCountFood++;
+                }
+                if (!isNaN(value)) {
+                    totalValue += value;
+                    validCountValue++;
+                }
             });
-            
-            // 상세 시트 생성
-            const detailsWs = XLSX.utils.aoa_to_sheet(detailsData);
-            XLSX.utils.book_append_sheet(wb, detailsWs, '상세응답');
-        }
-        
-        // 엑셀 파일 다운로드
-        XLSX.writeFile(wb, fileName);
-        
-        console.log('엑셀 파일 다운로드:', fileName);
-    }
 
-    function calculateAverages() {
-        // 테이블에서 각 항목의 값을 읽어와서 계산
-        const tableRows = document.querySelectorAll('.participant-table tbody tr');
-        console.log('찾은 행 개수:', tableRows.length);
-        
-        if (tableRows.length === 0) {
-            console.log('참여자 데이터가 없음');
-            return;
-        }
-        
-        // 각 항목별 합계
-        let totalCleanliness = 0;
-        let totalStaff = 0;
-        let totalCheckInOut = 0;
-        let totalFacility = 0;
-        let totalFood = 0;
-        let totalValue = 0;
-        let validCountCleanliness = 0;
-        let validCountStaff = 0;
-        let validCountCheckInOut = 0;
-        let validCountFacility = 0;
-        let validCountFood = 0;
-        let validCountValue = 0;
-        
-        // 각 행(row)에서 데이터 추출 및 합산
-        tableRows.forEach((row, index) => {
-            const cells = row.cells;
-            console.log(`${index+1}번째 행 처리 중, 셀 개수: ${cells.length}`);
-            
-            // 값 확인
-            console.log('셀 값 확인:',
-                '청결도:', cells[2].textContent,
-                '직원 친절도:', cells[3].textContent,
-                '체크인/아웃:', cells[4].textContent,
-                '시설:', cells[5].textContent,
-                '음식:', cells[6].textContent,
-                '가성비:', cells[7].textContent
+            console.log('유효 데이터 카운트:',
+                '청결도:', validCountCleanliness,
+                '직원 친절도:', validCountStaff,
+                '체크인/아웃:', validCountCheckInOut,
+                '시설:', validCountFacility,
+                '음식:', validCountFood,
+                '가성비:', validCountValue
             );
-            
-            const cleanliness = parseInt(cells[2].textContent);
-            const staff = parseInt(cells[3].textContent);
-            const checkInOut = parseInt(cells[4].textContent);
-            const facility = parseInt(cells[5].textContent);
-            const food = parseInt(cells[6].textContent);
-            const value = parseInt(cells[7].textContent);
-            
-            console.log('파싱된 값:',
-                '청결도:', cleanliness, 
-                '직원 친절도:', staff,
-                '체크인/아웃:', checkInOut, 
-                '시설:', facility, 
-                '음식:', food, 
-                '가성비:', value
-            );
-            
-            if (!isNaN(cleanliness)) {
-                totalCleanliness += cleanliness;
-                validCountCleanliness++;
-            }
-            if (!isNaN(staff)) {
-                totalStaff += staff;
-                validCountStaff++;
-            }
-            if (!isNaN(checkInOut)) {
-                totalCheckInOut += checkInOut;
-                validCountCheckInOut++;
-            }
-            if (!isNaN(facility)) {
-                totalFacility += facility;
-                validCountFacility++;
-            }
-            if (!isNaN(food)) {
-                totalFood += food;
-                validCountFood++;
-            }
-            if (!isNaN(value)) {
-                totalValue += value;
-                validCountValue++;
-            }
-        });
-        
-        console.log('유효 데이터 카운트:', 
-            '청결도:', validCountCleanliness, 
-            '직원 친절도:', validCountStaff,
-            '체크인/아웃:', validCountCheckInOut, 
-            '시설:', validCountFacility, 
-            '음식:', validCountFood, 
-            '가성비:', validCountValue
-        );
-        
-        console.log('합계:', 
-            '청결도:', totalCleanliness, 
-            '직원 친절도:', totalStaff,
-            '체크인/아웃:', totalCheckInOut, 
-            '시설:', totalFacility, 
-            '음식:', totalFood, 
-            '가성비:', totalValue
-        );
-        
-        // 평균 계산 (유효한 데이터만 계산)
-        const avgCleanliness = validCountCleanliness > 0 ? totalCleanliness / validCountCleanliness : 0;
-        const avgStaff = validCountStaff > 0 ? totalStaff / validCountStaff : 0;
-        const avgCheckInOut = validCountCheckInOut > 0 ? totalCheckInOut / validCountCheckInOut : 0;
-        const avgFacility = validCountFacility > 0 ? totalFacility / validCountFacility : 0;
-        const avgFood = validCountFood > 0 ? totalFood / validCountFood : 0;
-        const avgValue = validCountValue > 0 ? totalValue / validCountValue : 0;
-        
-        console.log('계산된 평균:', 
-            '청결도:', avgCleanliness, 
-            '직원 친절도:', avgStaff,
-            '체크인/아웃:', avgCheckInOut, 
-            '시설:', avgFacility, 
-            '음식:', avgFood, 
-            '가성비:', avgValue
-        );
-        
-        // 유효한 카테고리 수 계산
-        const validCategories = [
-            validCountCleanliness > 0, 
-            validCountStaff > 0, 
-            validCountCheckInOut > 0, 
-            validCountFacility > 0, 
-            validCountFood > 0, 
-            validCountValue > 0
-        ].filter(Boolean).length;
-        
-        console.log('유효 카테고리 수:', validCategories);
-        
-        // 전체 평균 (유효한 카테고리 평균만 계산)
-        const avgTotal = validCategories > 0 ? 
-            (avgCleanliness + avgStaff + avgCheckInOut + avgFacility + avgFood + avgValue) / validCategories : 0;
-        
-        console.log('전체 평균:', avgTotal);
-        
-        // 계산된 값을 테이블에 표시
-        document.getElementById('avgTotal').textContent = avgTotal.toFixed(2);
-        document.getElementById('avgCleanliness').textContent = avgCleanliness.toFixed(2);
-        document.getElementById('avgStaff').textContent = avgStaff.toFixed(2);
-        document.getElementById('avgCheckInOut').textContent = avgCheckInOut.toFixed(2);
-        document.getElementById('avgFacility').textContent = avgFacility.toFixed(2);
-        document.getElementById('avgFood').textContent = avgFood.toFixed(2);
-        document.getElementById('avgValue').textContent = avgValue.toFixed(2);
-        
-        console.log('화면에 표시된 평균값:', {
-            avgTotal: avgTotal.toFixed(2),
-            avgCleanliness: avgCleanliness.toFixed(2),
-            avgStaff: avgStaff.toFixed(2),
-            avgCheckInOut: avgCheckInOut.toFixed(2),
-            avgFacility: avgFacility.toFixed(2),
-            avgFood: avgFood.toFixed(2),
-            avgValue: avgValue.toFixed(2)
-        });
-    }
 
-    function openCommentModal(button) {
-        const comment = button.getAttribute('data-comment');
-        const modalBody = document.getElementById('commentModalBody');
-        modalBody.textContent = comment && comment.trim() !== '' ? comment : '내용이 없습니다.';
-        const modal = new bootstrap.Modal(document.getElementById('commentModal'));
-        modal.show();
-    }
-</script>
+            console.log('합계:',
+                '청결도:', totalCleanliness,
+                '직원 친절도:', totalStaff,
+                '체크인/아웃:', totalCheckInOut,
+                '시설:', totalFacility,
+                '음식:', totalFood,
+                '가성비:', totalValue
+            );
+
+            // 평균 계산 (유효한 데이터만 계산)
+            const avgCleanliness = validCountCleanliness > 0 ? totalCleanliness / validCountCleanliness : 0;
+            const avgStaff = validCountStaff > 0 ? totalStaff / validCountStaff : 0;
+            const avgCheckInOut = validCountCheckInOut > 0 ? totalCheckInOut / validCountCheckInOut : 0;
+            const avgFacility = validCountFacility > 0 ? totalFacility / validCountFacility : 0;
+            const avgFood = validCountFood > 0 ? totalFood / validCountFood : 0;
+            const avgValue = validCountValue > 0 ? totalValue / validCountValue : 0;
+
+            console.log('계산된 평균:',
+                '청결도:', avgCleanliness,
+                '직원 친절도:', avgStaff,
+                '체크인/아웃:', avgCheckInOut,
+                '시설:', avgFacility,
+                '음식:', avgFood,
+                '가성비:', avgValue
+            );
+
+            // 유효한 카테고리 수 계산
+            const validCategories = [
+                validCountCleanliness > 0,
+                validCountStaff > 0,
+                validCountCheckInOut > 0,
+                validCountFacility > 0,
+                validCountFood > 0,
+                validCountValue > 0
+            ].filter(Boolean).length;
+
+            console.log('유효 카테고리 수:', validCategories);
+
+            // 전체 평균 (유효한 카테고리 평균만 계산)
+            const avgTotal = validCategories > 0 ?
+                (avgCleanliness + avgStaff + avgCheckInOut + avgFacility + avgFood + avgValue) / validCategories : 0;
+
+            console.log('전체 평균:', avgTotal);
+
+            // 계산된 값을 테이블에 표시
+            document.getElementById('avgTotal').textContent = avgTotal.toFixed(2);
+            document.getElementById('avgCleanliness').textContent = avgCleanliness.toFixed(2);
+            document.getElementById('avgStaff').textContent = avgStaff.toFixed(2);
+            document.getElementById('avgCheckInOut').textContent = avgCheckInOut.toFixed(2);
+            document.getElementById('avgFacility').textContent = avgFacility.toFixed(2);
+            document.getElementById('avgFood').textContent = avgFood.toFixed(2);
+            document.getElementById('avgValue').textContent = avgValue.toFixed(2);
+
+            console.log('화면에 표시된 평균값:', {
+                avgTotal: avgTotal.toFixed(2),
+                avgCleanliness: avgCleanliness.toFixed(2),
+                avgStaff: avgStaff.toFixed(2),
+                avgCheckInOut: avgCheckInOut.toFixed(2),
+                avgFacility: avgFacility.toFixed(2),
+                avgFood: avgFood.toFixed(2),
+                avgValue: avgValue.toFixed(2)
+            });
+        }
+
+        function openCommentModal(button) {
+            const comment = button.getAttribute('data-comment');
+            const modalBody = document.getElementById('commentModalBody');
+            modalBody.textContent = comment && comment.trim() !== '' ? comment : '내용이 없습니다.';
+            const modal = new bootstrap.Modal(document.getElementById('commentModal'));
+            modal.show();
+        }
+    </script>
 
 </div>
 </body>
