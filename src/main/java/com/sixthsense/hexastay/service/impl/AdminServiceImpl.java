@@ -343,25 +343,39 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // 나머지 필드 업데이트
-        admin.setAdminName(adminDTO.getAdminName());
         admin.setAdminAddress(adminDTO.getAdminAddress());
         admin.setAdminPhone(adminDTO.getAdminPhone());
         admin.setAdminPosition(adminDTO.getAdminPosition());
         admin.setAdminRole(adminDTO.getAdminRole());
         
-        // 이메일과 주민번호 업데이트 (슈퍼어드민인 경우)
+        // 이메일, 이름, 주민번호 업데이트 (슈퍼어드민인 경우)
         String currentAdminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Admin currentAdmin = adminRepository.findByAdminEmail(currentAdminEmail);
         
         if (currentAdmin != null && "SUPERADMIN".equalsIgnoreCase(currentAdmin.getAdminRole())) {
             log.info("슈퍼어드민 권한으로 추가 정보 업데이트");
+            
+            // 이메일 업데이트
             if (adminDTO.getAdminEmail() != null) {
                 log.info("이메일 업데이트: {} -> {}", admin.getAdminEmail(), adminDTO.getAdminEmail());
                 admin.setAdminEmail(adminDTO.getAdminEmail());
             }
+            
+            // 이름 업데이트
+            if (adminDTO.getAdminName() != null) {
+                log.info("이름 업데이트: {} -> {}", admin.getAdminName(), adminDTO.getAdminName());
+                admin.setAdminName(adminDTO.getAdminName());
+            }
+            
+            // 주민번호 업데이트
             if (adminDTO.getAdminResidentNum() != null) {
                 log.info("주민번호 업데이트");
                 admin.setAdminResidentNum(adminDTO.getAdminResidentNum());
+            }
+        } else {
+            // 슈퍼어드민이 아닌 경우 본인의 이름만 수정 가능
+            if (admin.getAdminEmail().equals(currentAdminEmail)) {
+                admin.setAdminName(adminDTO.getAdminName());
             }
         }
 

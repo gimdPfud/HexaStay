@@ -335,6 +335,7 @@ public class AdminController {
         // 현재 로그인한 사용자의 역할 확인
         AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
         model.addAttribute("adminRole", currentAdmin.getAdminRole());
+        model.addAttribute("adminEmail", currentAdmin.getAdminEmail());
         
         return "admin/mypage";
     }

@@ -41,7 +41,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">이름</label>
-                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'">
+                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminRole != 'SUPERADMIN' && adminEmail != adminDTO.adminEmail}">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
                 </div>
 
@@ -213,7 +213,6 @@
 
             // 필수 입력 필드 검사
             const requiredFields = {
-                'adminName': '이름',
                 'adminAddressOne': '우편번호',
                 'adminAddressTwo': '기본주소',
                 'adminAddressThree': '상세주소',
@@ -222,6 +221,14 @@
                 'adminPhonePartThree': '연락처 뒷자리',
                 'adminPosition': '직책'
             };
+            
+            // 슈퍼어드민이거나 본인 계정인 경우 이름 필드도 필수 체크
+            const adminRole = document.getElementById('adminRole').value;
+            const isSuperAdmin = adminRole === 'SUPERADMIN';
+            
+            if (isSuperAdmin) {
+                requiredFields['adminName'] = '이름';
+            }
 
             let isValid = true;
             for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
