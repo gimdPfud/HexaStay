@@ -70,7 +70,10 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findByAdminEmail(email);
         Page<Admin> adminList = null;
 
-        if (admin.getCompany() != null) {
+        // SUPERADMIN인 경우 모든 직원 목록을 볼 수 있음
+        if (admin.getAdminRole().equals("SUPERADMIN")) {
+            adminList = adminRepository.findAll(pageable);
+        } else if (admin.getCompany() != null) {
             Long companyNum = admin.getCompany().getCompanyNum();
             adminList = adminRepository.findByCompany_CompanyNum(companyNum, pageable);
         } else if (admin.getStore() != null) {
@@ -99,7 +102,17 @@ public class AdminServiceImpl implements AdminService {
             }
 
             Page<Admin> adminList;
-            if (admin.getCompany() != null) {
+            
+            // SUPERADMIN인 경우 모든 직원을 대상으로 검색
+            if (admin.getAdminRole().equals("SUPERADMIN")) {
+                // 검색 조건이 없으면 전체 조회
+                if (type == null || type.isEmpty() || keyword == null || keyword.isEmpty()) {
+                    adminList = adminRepository.findAll(pageable);
+                } else {
+                    // 전체 직원 대상 검색 쿼리 실행
+                    adminList = adminRepository.searchAllAdmins(type, keyword, pageable);
+                }
+            } else if (admin.getCompany() != null) {
                 Long companyNum = admin.getCompany().getCompanyNum();
                 adminList = adminRepository.listPageAdminSearch(companyNum, type, keyword, pageable);
             } else if (admin.getStore() != null) {
@@ -109,7 +122,16 @@ public class AdminServiceImpl implements AdminService {
                 throw new IllegalStateException("Admin has no company or store");
             }
 
-            return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
+            return adminList.map(adminOne -> {
+                AdminDTO dto = modelMapper.map(adminOne, AdminDTO.class);
+                if (adminOne.getCompany() != null) {
+                    dto.setCompanyName(adminOne.getCompany().getCompanyName());
+                }
+                if (adminOne.getStore() != null) {
+                    dto.setStoreName(adminOne.getStore().getStoreName());
+                }
+                return dto;
+            });
         } catch (Exception e) {
             log.error("Error in listAdminSearch: ", e);
             throw e;
