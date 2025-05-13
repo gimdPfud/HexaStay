@@ -182,12 +182,23 @@
             font-style: italic;
         }
 
+        /* Toast 컨테이너 z-index (모달보다 위에 표시되도록) */
+        .toast-container {
+            z-index: 1100 !important;
+        }
+        /* 옵션 선택 영역 패딩 */
+        .options-section {
+            padding: 0 10px; /* 좌우 패딩 추가 */
+        }
+
     </style>
 
 </head>
 <body>
 
 <div layout:fragment="contentorderA">
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="notificationArea" style="z-index: 1150;">
+    </div>
 
     <input type="hidden" name="num" th:value="${roomMenuDTO.roomMenuNum}">
 
@@ -256,114 +267,143 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
 
+        function showNotification(message, type = 'info', delay = 3000) {
+            const notificationArea = document.getElementById('notificationArea');
+            if (!notificationArea || typeof bootstrap === 'undefined' || !bootstrap.Toast) {
+                console.warn("Toast 알림 초기화 불가:", { area: !!notificationArea, bs: typeof bootstrap, toast: typeof bootstrap !== 'undefined' ? !!bootstrap.Toast : false, message });
+                const fallbackAlert = document.createElement('div');
+                fallbackAlert.textContent = message;
+                let bgColor = '#0dcaf0';
+                if (type === 'error') bgColor = '#dc3545';
+                else if (type === 'success') bgColor = '#198754';
+                else if (type === 'warning') bgColor = '#ffc107'; // 기본 노란색 경고 배경
+                fallbackAlert.style.cssText = `position:fixed; top:10px; left:50%; transform:translateX(-50%); padding:10px 15px; background-color:${bgColor}; color: ${type === 'warning' ? 'black':'white'}; border-radius:5px; z-index:2050; font-size:0.9rem; box-shadow:0 2px 5px rgba(0,0,0,0.2);`;
+                document.body.appendChild(fallbackAlert);
+                setTimeout(() => { fallbackAlert.remove(); }, delay);
+                return;
+            }
+
+            const toastId = 'toast-' + Date.now();
+            let toastClasses = 'toast';
+            let headerClasses = 'toast-header';
+            let iconHtml = '';
+            let closeButtonWhite = false;
+
+            switch (type.toLowerCase()) {
+                case 'success':
+                    headerClasses += ' bg-success text-white';
+                    iconHtml = '<i class="bi bi-check-circle-fill me-2"></i>';
+                    closeButtonWhite = true;
+                    break;
+                case 'error':
+                    headerClasses += ' bg-danger text-white';
+                    iconHtml = '<i class="bi bi-x-octagon-fill me-2"></i>';
+                    closeButtonWhite = true;
+                    break;
+                case 'warning':
+                    toastClasses += ' bg-white';
+                    headerClasses += ' bg-light text-dark'; // 헤더는 연한 배경 또는 투명하게 할 수도 있음
+                    iconHtml = '<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>';
+                    // closeButtonWhite는 false (기본값)
+                    break;
+                default: // info
+                    headerClasses += ' bg-info text-white';
+                    iconHtml = '<i class="bi bi-info-circle-fill me-2"></i>';
+                    closeButtonWhite = true;
+                    break;
+            }
+
+            const toastHtml = `
+            <div id="${toastId}" class="${toastClasses}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${delay}">
+              <div class="${headerClasses}">
+                ${iconHtml}
+                <strong class="me-auto">알림</strong>
+                <button type="button" class="btn-close ${closeButtonWhite ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body">
+                <span style="white-space: pre-wrap;">${message}</span>
+              </div>
+            </div>
+        `;
+            notificationArea.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = document.getElementById(toastId);
+            const toastInstance = new bootstrap.Toast(toastElement);
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastInstance.dispose();
+                toastElement.remove();
+            });
+            toastInstance.show();
+        }
+
         $(document).ready(function () {
-            let price = [[${roomMenuDTO.roomMenuPrice}]];
-            let maxCount = [[${roomMenuDTO.roomMenuAmount}]];
+            let price = parseFloat([[${roomMenuDTO.roomMenuPrice}]]);
+            let maxCount = parseInt([[${roomMenuDTO.roomMenuAmount}]]);
             let cartAdd = $(".add-to-cart-btn");
 
-            // 이벤트 바인딩
             $(".option-checkbox").on("change", function () {
-                const quantityInput = $(this).closest(".mb-3").find(".option-quantity");
-                quantityInput.prop("disabled", !this.checked);
-                if (!this.checked) {
-                    quantityInput.val(1); // 기본값으로 리셋
-                }
-                updateSelectedOptionsDisplay();
                 calculateTotalPrice();
-            });
-
-            $("input[name='optionQuantities']").on("input", function () {
-                calculateTotalPrice();
-                updateSelectedOptionsDisplay();
             });
 
             $("#decreaseBtn").on("click", function () {
-                let count = parseInt($("#count").val());
+                let countInput = $("#count");
+                let count = parseInt(countInput.val());
                 if (count > 1) {
-                    $("#count").val(count - 1).trigger("change");
+                    countInput.val(count - 1).trigger("change");
                 }
             });
 
             $("#increaseBtn").on("click", function () {
-                let count = parseInt($("#count").val());
+                let countInput = $("#count");
+                let count = parseInt(countInput.val());
                 if (count < maxCount) {
-                    $("#count").val(count + 1).trigger("change");
+                    countInput.val(count + 1).trigger("change");
                 } else {
-                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
+                    showNotification("수량이 부족합니다. 현재 재고: " + maxCount + "개", 'warning');
                 }
             });
 
             $("#count").on("change", function () {
-                let count = parseInt($(this).val());
+                let countInput = $(this);
+                let count = parseInt(countInput.val());
                 if (isNaN(count) || count < 1) {
-                    alert("수량은 1개 이상이어야 합니다.");
-                    $(this).val(1);
-                    count = 1;
-                }
-                if (count > maxCount) {
-                    alert("수량이 부족합니다. 현재 재고: " + maxCount + "개");
-                    $(this).val(maxCount);
+                    showNotification("수량은 1개 이상이어야 합니다.", 'warning');
+                    countInput.val(1);
+                } else if (count > maxCount) {
+                    showNotification("수량이 부족합니다. 현재 재고: " + maxCount + "개", 'warning');
+                    countInput.val(maxCount);
                 }
                 calculateTotalPrice();
-            });
+            }).trigger("change");
+
 
             cartAdd.on("click", function () {
-                sendCartData();
+                sendCartData(false);
             });
 
-            $(".order-cart-btn").on("click", function () {
-                sendCartData(true);
-            });
-
-            // 초기 가격 설정
             updateFormattedPrice(price);
             calculateTotalPrice();
 
-            // 함수 정의
             function calculateTotalPrice() {
                 let count = parseInt($("#count").val()) || 1;
                 let optionTotal = 0;
-
                 $(".option-checkbox:checked").each(function () {
-                    const optionPrice = parseInt($(this).data("price")) || 0;
-                    optionTotal += optionPrice;
+                    optionTotal += parseFloat($(this).data("price")) || 0;
                 });
-
                 const total = (price + optionTotal) * count;
                 $("#totalPrice").text(total.toLocaleString());
             }
 
-            function updateSelectedOptionsDisplay() {
-                const selectedOptions = [];
-
-                $(".option-checkbox:checked").each(function () {
-                    const name = $(this).data("name");
-                    selectedOptions.push({ name });
-                });
-
-                const displayArea = $("#selectedOptionsDisplay");
-                displayArea.empty();
-
-                if (selectedOptions.length > 0) {
-                    selectedOptions.forEach(opt => {
-                        displayArea.append(`<div>${opt.name}</div>`);
-                    });
-                } else {
-                    displayArea.append(`<div class="text-muted">선택된 옵션이 없습니다.</div>`);
-                }
-            }
-
-            function updateFormattedPrice(price) {
-                $("#formattedPrice").text(price.toLocaleString());
+            function updateFormattedPrice(priceValue) {
+                $("#formattedPrice").text(priceValue.toLocaleString());
             }
 
             function collectOptionData() {
                 const options = [];
                 $(".option-checkbox:checked").each(function () {
                     options.push({
-                        roomMenuCartItemOptionNum: $(this).data("id"),
+                        roomMenuOptionNum: $(this).data("id"),
                         roomMenuCartItemOptionName: $(this).data("name"),
-                        roomMenuCartItemOptionPrice: $(this).data("price"),
+                        roomMenuCartItemOptionPrice: parseFloat($(this).data("price")),
                         roomMenuCartItemOptionAmount: 1
                     });
                 });
@@ -373,13 +413,9 @@
             function sendCartData(isOrder = false) {
                 const options = collectOptionData();
                 const paramData = {
-                    roomMenuCartItemNum: cartAdd.val(),
+                    roomMenuNum: parseInt($("input[name='num']").val()),
                     roomMenuCartItemAmount: parseInt($("#count").val()) || 1,
-                    selectedOptions: options,
-                    optionTotalPrice: options.reduce(
-                        (acc, opt) => acc + (opt.roomMenuCartItemOptionPrice * opt.roomMenuCartItemOptionAmount),
-                        0
-                    )
+                    selectedOptions: options
                 };
 
                 console.log("전송 데이터 확인:", JSON.stringify(paramData, null, 2));
@@ -390,41 +426,41 @@
                     contentType: "application/json",
                     data: JSON.stringify(paramData),
                     dataType: "json",
+                    beforeSend: function(xhr) {
+                        const csrfToken = $("meta[name='_csrf']").attr("content");
+                        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+                        if (csrfToken && csrfHeader) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        }
+                    },
                     success: function (data) {
                         if (isOrder) {
-                            location.href = "/roommenu/cartlist";
+                            window.location.href = "/roommenu/cartlist";
                         } else {
-                            updateCartBadge();
-                            alert("해당하신 상품을 장바구니에 담았습니다.");
+                            showNotification("해당 상품을 장바구니에 담았습니다.", 'success');
                         }
                     },
-                    error: function (jqxHR) {
-                        if (jqxHR.status === 401) {
-                            alert("로그인 후 이용해주세요.");
-                            location.href = "/member/login";
-                        } else {
-                            console.log(jqxHR.responseText);
-                            alert("처리 중 오류 발생");
+                    error: function (jqXHR) {
+                        let errorMsg = "처리 중 오류가 발생했습니다.";
+                        if (jqXHR.status === 401) {
+                            errorMsg = "로그인 후 이용해주세요.";
+                            setTimeout(function(){ window.location.href = "/member/login"; }, 2000);
+                        } else if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                            errorMsg = jqXHR.responseJSON.error;
+                        } else if (jqXHR.responseText) {
+                            try {
+                                const parsedError = JSON.parse(jqXHR.responseText);
+                                if(parsedError && parsedError.error) errorMsg = parsedError.error;
+                            } catch (e) {
+                                if(jqXHR.responseText.length < 100) errorMsg = jqXHR.responseText;
+                            }
                         }
-                    }
-                });
-            }
-
-            function updateCartBadge() {
-                $.ajax({
-                    url: "/roommenu/cart/count",
-                    type: "GET",
-                    success: function (data) {
-                        if ($("#cartBadge").length) {
-                            $("#cartBadge").text(data.cartCount);
-                        }
-                    },
-                    error: function (jqxHR) {
-                        console.log(jqxHR.responseText);
+                        showNotification(errorMsg, 'error');
                     }
                 });
             }
         });
+        /*]]>*/
 
     </script>
 
