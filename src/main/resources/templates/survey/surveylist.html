@@ -11,44 +11,37 @@
 
 
     <style>
-        .survey-list-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
         .survey-card {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
-            border: 2px solid #dee2e6; /* ✅ 추가 */
-            transition: transform 0.2s, border-color 0.3s ease, box-shadow 0.3s ease; /* ✅ 추가 */
+            border: 2px solid #dee2e6; /* ✅ 기본 테두리 */
+            transition: transform 0.2s, border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
         .survey-card:hover {
             transform: translateY(-3px);
-            border-color: #0d6efd; /* ✅ 추가 */
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.15); /* ✅ 추가 */
+            border-color: #0d6efd;
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.15);
         }
-        .survey-title {
-            color: #1D6F42;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        /* h5 기본 스타일 */
+        .survey-card h5 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #212529;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+            cursor: default;
         }
-        .survey-meta {
-            color: #6c757d;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+
+        /* ✅ 카드에 hover 시 h5도 동시에 색상 변화 */
+        .survey-card:hover h5 {
+            color: #0d6efd;
+            text-decoration: underline;
         }
-        .survey-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .btn-create {
-            margin-bottom: 20px;
-        }
+
     </style>
 
 </head>
@@ -60,7 +53,7 @@
     <div class="container my-5">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">설문조사 목록</h2>
+            <h2 class="fw-bold"><i class="bi bi-emoji-grin me-1"></i>설문조사 목록</h2>
             <a th:href="@{/survey/form}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-1"></i>새 설문조사 작성
             </a>
@@ -68,39 +61,45 @@
 
         <div class="row gy-4 gx-4">
             <div class="col-12 col-sm-6 col-lg-3" th:each="survey, stat : ${surveys}">
-                <div class="survey-card shadow-sm rounded-4 h-100 d-flex flex-column p-3"
-                     th:classappend="(${stat.index} % 2 == 0) ? 'bg-light' : 'bg-primary bg-opacity-10'">
+                <div class="card h-100 shadow-sm border-0"
+                     th:classappend="(${stat.index} % 2 == 0) ? 'bg-secondary bg-opacity-10' : 'bg-primary bg-opacity-10'">
 
-                    <div class="fs-5 fw-semibold mb-2" th:text="${survey.surveyTitle}">설문 제목</div>
-
-                    <div class="d-flex gap-2 align-items-center text-muted small mb-3">
-                        <span th:text="${#temporals.format(survey.surveyCreatedAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
-                        <span>|</span>
-                        <span class="badge fs-6 px-3 py-1 rounded-pill fw-normal"
-                              th:text="${survey.surveyIsActive ? '활성' : '비활성'}"
-                              th:classappend="${survey.surveyIsActive} ? 'bg-success text-white' : 'bg-secondary text-white'">
-                    </span>
+                    <!-- 카드 헤더 -->
+                    <div class="card-header d-flex justify-content-between align-items-center border-bottom-0 bg-transparent">
+                        <div class="badge fs-6 px-3 py-1 rounded-pill fw-normal"
+                             th:text="${survey.surveyIsActive ? '활성화' : '비활성화'}"
+                             th:classappend="${survey.surveyIsActive} ? 'bg-success text-white' : 'bg-secondary text-white'">
+                        </div>
+                        <small th:text="${#temporals.format(survey.surveyCreatedAt, 'yyyy-MM-dd HH:mm')}"
+                               class="text-muted"></small>
                     </div>
 
-                    <div class="d-flex gap-2 flex-wrap mt-auto">
-                        <a th:href="@{/survey/edit/{id}(id=${survey.surveyNum})}" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-pencil me-1"></i>수정
-                        </a>
-                        <a th:href="@{/survey/results/{id}(id=${survey.surveyNum})}" class="btn btn-outline-success btn-sm">
-                            <i class="bi bi-graph-up me-1"></i>결과
-                        </a>
-                        <button th:onclick="'toggleActive(' + ${survey.surveyNum} + ', ' + ${survey.surveyIsActive} + ')'" class="btn btn-sm"
-                                th:classappend="${survey.surveyIsActive} ? 'btn-outline-secondary' : 'btn-outline-primary'">
-                            <i class="bi" th:classappend="${survey.surveyIsActive} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
-                            <span th:text="${survey.surveyIsActive} ? '비활성화' : '활성화'"></span>
-                        </button>
-                        <button th:onclick="'deleteSurvey(' + ${survey.surveyNum} + ')'" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash me-1"></i>삭제
-                        </button>
+                    <!-- 카드 바디 -->
+                    <div class="card-body d-flex flex-column survey-card">
+                        <h5 class="card-title fw-bold mb-3" th:text="${survey.surveyTitle}">설문 제목</h5>
+
+                        <!-- 버튼 그룹 가로 정렬 -->
+                        <div class="mt-auto d-flex justify-content-between gap-2">
+                            <a th:href="@{/survey/edit/{id}(id=${survey.surveyNum})}"
+                               class="btn btn-outline-secondary btn-sm flex-fill text-nowrap">
+                                <i class="bi bi-pencil me-1"></i> 수정
+                            </a>
+                            <button th:onclick="'toggleActive(' + ${survey.surveyNum} + ', ' + ${survey.surveyIsActive} + ')'"
+                                    class="btn btn-sm flex-fill text-nowrap"
+                                    th:classappend="${survey.surveyIsActive} ? 'btn-outline-secondary' : 'btn-outline-primary'">
+                                <i class="bi" th:classappend="${survey.surveyIsActive} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                                <span th:text="${survey.surveyIsActive} ? '비활성화' : '활성화'"></span>
+                            </button>
+                            <button th:onclick="'deleteSurvey(' + ${survey.surveyNum} + ')'"
+                                    class="btn btn-outline-danger btn-sm flex-fill text-nowrap">
+                                <i class="bi bi-trash me-1"></i> 삭제
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script th:inline="javascript">
