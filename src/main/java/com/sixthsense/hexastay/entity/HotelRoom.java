@@ -79,13 +79,7 @@ public class HotelRoom extends BaseEntity{
     @JoinColumn(name = "memberNum")
     private Member member;
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
 
-    public Member getMember() {
-        return member;
-    }
 
     //*********참조 테이블 모음*********//
 

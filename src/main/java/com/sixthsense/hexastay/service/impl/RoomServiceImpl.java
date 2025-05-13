@@ -171,9 +171,7 @@ public class RoomServiceImpl {
         log.info("회원 저장 완료 - 번호: {}", member.getMemberNum());
 
         // 3️⃣ 호텔룸과 회원 연결 후 저장
-        hotelRoom.setMember(member);
-        hotelRoom = hotelRoomRepository.save(hotelRoom);
-        log.info("호텔룸과 회원 연결 완료 - 호텔룸 번호: {}, 회원 번호: {}", hotelRoom.getHotelRoomNum(), member.getMemberNum());
+
 
         // 4️⃣ checkIn/checkOut 날짜 DTO에서 받아오기
         LocalDateTime checkInDate = LocalDateTime.from(memberDTO.getCheckInDate());
