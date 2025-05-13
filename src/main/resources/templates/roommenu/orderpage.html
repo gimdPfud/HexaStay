@@ -7,6 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모바일 주문 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
@@ -56,7 +58,7 @@
 
         .tab.active {
             font-weight: bold;
-            background-color: #e0f7fa;  /* 선택된 탭 배경 */
+            background-color: #e0f7fa;
         }
         .btn-custom.active {
             /* 아무 것도 없음: 클릭 상태에서도 변화 없음 */
@@ -64,9 +66,9 @@
 
         .btn-custom {
             display: flex;
-            align-items: center;       /* 세로 중앙 정렬 */
-            justify-content: center;   /* 가로 중앙 정렬 */
-            gap: 4px;                  /* 아이콘과 텍스트 간격 */
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
 
             background-color: transparent;
             color: #ff6b6b;
@@ -77,26 +79,26 @@
             font-weight: normal;
             box-shadow: none;
             cursor: pointer;
-            line-height: 1;            /* 높이 기준 정렬 보정 */
+            line-height: 1;
             transition: transform 0.2s, box-shadow 0.2s, color 0.2s;
         }
 
         .card-list {
             list-style: none;
             padding: 0;
-            display: grid; /* 그리드 레이아웃 사용 */
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 최소 너비 300px, 가능한 만큼 확장 */
-            gap: 20px; /* 카드 사이 간격 */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .div-card {
             background: white;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* 내용이 카드 밖으로 넘치는 것 방지 */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 100%; /* 카드 높이 유동적으로 */
+            height: 100%;
         }
 
         .inner-wrapper {
@@ -154,7 +156,7 @@
         .like-section {
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* 오른쪽 정렬 */
+            justify-content: flex-end;
             gap: 5px;
         }
 
@@ -177,8 +179,8 @@
         }
 
         a {
-            color: #333; /* 진회색 - 검정에 가까움 */
-            text-decoration: none; /* 밑줄 제거 */
+            color: #333;
+            text-decoration: none;
         }
 
         .text-info {
@@ -204,37 +206,32 @@
             color: black;
         }
 
-        /* 다국어 */
         .lang-en .tab {
             font-size: 13px;
             padding: 8px 10px;
             letter-spacing: -0.5px;
         }
 
-        /* 영어 */
         .lang-en .tab {
             font-size: 12px;
             padding: 8px 10px;
             letter-spacing: -0.5px;
         }
 
-        /* 일본어 */
         .lang-ja .tab {
             font-size: 13px;
             padding: 8px 10px;
-            letter-spacing: 0px; /* 일본어는 자간을 좁히지 않는 게 가독성에 좋음 */
+            letter-spacing: 0px;
             font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
         }
 
-        /* 중국어 */
         .lang-cn .tab {
             font-size: 13px;
             padding: 8px 10px;
-            letter-spacing: 0px; /* 중국어도 자간 유지 */
+            letter-spacing: 0px;
             font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
         }
 
-        /* 품절관련, 좋아요 관련 CSS 시작 */
         .sold-out {
             opacity: 0.5;
             position: relative;
@@ -255,19 +252,23 @@
 
         .sold-out-item {
             opacity: 0.5;
-            pointer-events: none; /* 기본적으로 모든 요소 클릭 방지 */
+            pointer-events: none;
             position: relative;
         }
 
         .sold-out-item .enable-click {
-            pointer-events: auto; /* 좋아요 버튼만 클릭 허용 */
+            pointer-events: auto;
         }
-
+        .toast-container {
+            z-index: 1100 !important;
+        }
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
 <div layout:fragment="contentorderA">
     <div class="container">
+        <div class="toast-container position-fixed top-0 end-0 p-3" id="notificationArea">
+        </div>
         <div id="search-container" class="search-container">
             <form th:action="@{/roommenu/orderpage}" method="get">
                 <div class="search-box">
@@ -277,14 +278,12 @@
                 </div>
             </form>
         </div>
-        <!-- 카테고리 탭 -->
         <div class="tabs">
             <button type="button" onclick="window.location.href='/roommenu/orderpage?type=L'"
                     style="height: 37px;width: 90px;" class="btn btn-custom " >
                 ❤️ <span th:text="#{category.popular}">인기순</span>
                 <span class="like-count" th:text="${roomMenuLikes}"></span>
             </button>
-            <!-- ✅ data-category 속성 추가 -->
             <div class="tab" th:text="#{tab.korean}" data-category="한식" onclick="window.location.href='/roommenu/orderpage?type=C&category=한식&keyword='"></div>
             <div class="tab" th:text="#{tab.western}" data-category="양식" onclick="window.location.href='/roommenu/orderpage?type=C&category=양식&keyword='"></div>
             <div class="tab" th:text="#{tab.chinese}" data-category="중식" onclick="window.location.href='/roommenu/orderpage?type=C&category=중식&keyword='"></div>
@@ -292,7 +291,6 @@
             <div class="tab" th:text="#{tab.roomcare}" data-category="룸케어" onclick="window.location.href='/roommenu/orderpage?type=C&category=%EB%A3%B8%EC%BC%80%EC%96%B4&keyword='"></div>
         </div>
 
-        <!-- 메뉴 리스트: 동적으로 메뉴 아이템 출력 -->
         <ul class="food-list card-list">
             <li th:each="roomMenuDTO : ${list}" class="food-item"
                 th:classappend="${roomMenuDTO.roomMenuAmount == 0} ? 'sold-out'">
@@ -311,7 +309,6 @@
                             </div>
 
                             <div class="text-info">
-                                <!-- 수량이 남아있으면 링크 허용 -->
                                 <a th:if="${roomMenuDTO.roomMenuAmount > 0}"
                                    th:href="@{'/roommenu/orderpage/orderread?num=' + ${roomMenuDTO.roomMenuNum}}"
                                    style="text-decoration: none; color: inherit; display: block; width: 100%;">
@@ -332,7 +329,6 @@
                                     </div>
                                 </a>
 
-                                <!-- 수량 0이면 품절 표시, 클릭 불가 -->
                                 <div th:if="${roomMenuDTO.roomMenuAmount == 0}" class="sold-out-item">
                                     <span class="menu-badge" th:text="#{item.soldout}">품절</span>
                                     <p th:text="${roomMenuDTO.roomMenuName}" class="menu-name"></p>
@@ -356,18 +352,80 @@
                 </div>
             </li>
         </ul>
-
     </div>
 
-    <!-- 스크립트 시작 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script th:inline="javascript">
-        // 상태 저장
+        /*<![CDATA[*/
+        function showNotification(message, type = 'info', delay = 3000) {
+            const notificationArea = document.getElementById('notificationArea');
+            if (!notificationArea || typeof bootstrap === 'undefined' || !bootstrap.Toast) {
+                console.warn("Toast 알림 초기화 불가: 알림 영역 또는 Bootstrap JS(Toast)를 찾을 수 없습니다. 메시지:", message);
+                console.log(`[${type.toUpperCase()}] ${message}`);
+                const fallbackAlert = document.createElement('div');
+                fallbackAlert.textContent = message;
+                fallbackAlert.style.cssText = `
+                position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+                padding: 10px 15px; background-color: ${type === 'error' ? '#dc3545' : (type === 'success' ? '#198754' : '#0dcaf0')};
+                color: white; border-radius: 5px; z-index: 2000; font-size: 0.9rem;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);`;
+                document.body.appendChild(fallbackAlert);
+                setTimeout(() => { fallbackAlert.remove(); }, delay);
+                return;
+            }
+
+            const toastId = 'toast-' + Date.now();
+            let toastHeaderClass = '';
+            let toastIconHtml = '';
+
+            switch (type.toLowerCase()) {
+                case 'success':
+                    toastHeaderClass = 'bg-success text-white';
+                    toastIconHtml = '<i class="bi bi-check-circle-fill me-2"></i>';
+                    break;
+                case 'error':
+                    toastHeaderClass = 'bg-danger text-white';
+                    toastIconHtml = '<i class="bi bi-x-octagon-fill me-2"></i>';
+                    break;
+                case 'warning':
+                    toastHeaderClass = 'bg-warning text-dark';
+                    toastIconHtml = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+                    break;
+                default:
+                    toastHeaderClass = 'bg-info text-white';
+                    toastIconHtml = '<i class="bi bi-info-circle-fill me-2"></i>';
+                    break;
+            }
+
+            const toastHtml = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${delay}">
+              <div class="toast-header ${toastHeaderClass}">
+                ${toastIconHtml} <strong class="me-auto">알림</strong>
+                <button type="button" class="btn-close ${toastHeaderClass.includes('text-white') ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body d-flex align-items-center">
+                <span style="white-space: pre-wrap;" class="ms-2">${message}</span>
+              </div>
+            </div>
+        `;
+            notificationArea.insertAdjacentHTML('beforeend', toastHtml);
+
+            const toastElement = document.getElementById(toastId);
+            const toastInstance = new bootstrap.Toast(toastElement);
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastInstance.dispose();
+                toastElement.remove();
+            });
+            toastInstance.show();
+        }
+
         const likedStates = {};
 
         function toggleLike(menuId, event) {
-            event?.stopPropagation(); // 이벤트 전파 방지
-            event?.preventDefault();  // 링크 이동도 막기
+            event?.stopPropagation();
+            event?.preventDefault();
 
             const liked = likedStates[menuId] || false;
             const url = liked
@@ -396,70 +454,67 @@
                 })
                 .catch(err => {
                     if (err.message === '서버 오류') {
-                        alert('해당 기능을 사용할 수 없습니다. 관리자 계정이거나 서버 오류일 수 있습니다.');
+                        showNotification('해당 기능을 사용할 수 없습니다. 관리자 계정이거나 서버 오류일 수 있습니다.', 'error');
                     } else {
-                        alert('알 수 없는 오류가 발생했습니다.');
+                        showNotification('알 수 없는 오류가 발생했습니다.', 'error');
                     }
                 });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.like-section').forEach(section => {
-                const menuId = section.querySelector('[id^=likeIcon-]').id.split('-')[1];
+                const menuIdElement = section.querySelector('[id^=likeIcon-]');
+                if (!menuIdElement) return;
+                const menuId = menuIdElement.id.split('-')[1];
+
 
                 fetch(`/roommenu/orderpage/status/${menuId}`)
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) return res.text().then(text => { throw new Error(`좋아요 상태 로드 실패 (${res.status}): ${text.substring(0,100)}`) });
+                        return res.json();
+                    })
                     .then(data => {
                         const liked = data.liked;
                         const likeIcon = document.getElementById(`likeIcon-${menuId}`);
                         const likeCount = document.getElementById(`likeCount-${menuId}`);
 
-                        likedStates[menuId] = liked;
-
-                        likeIcon.textContent = liked ? '❤️' : '🤍';
-                        likeIcon.style.color = liked ? 'red' : 'gray';
-                        likeCount.textContent = data.likeCount;
+                        if (likeIcon) {
+                            likedStates[menuId] = liked;
+                            likeIcon.textContent = liked ? '❤️' : '🤍';
+                            likeIcon.style.color = liked ? 'red' : 'gray';
+                        }
+                        if (likeCount) {
+                            likeCount.textContent = data.likeCount;
+                        }
                     })
                     .catch(err => {
-                        console.error('좋아요 상태 불러오기 실패:', err);
+                        console.error('좋아요 상태 불러오기 실패:', menuId, err);
                     });
             });
         });
 
-        // 탭 클릭 이벤트 처리
         document.addEventListener('DOMContentLoaded', function () {
-            const tab = document.querySelectorAll('.tab');
+            const tabs = document.querySelectorAll('.tab');
             const currentUrlParams = new URLSearchParams(window.location.search);
             const currentCategory = currentUrlParams.get('category');
-            const currentType = currentUrlParams.get('type'); // '
+            const currentType = currentUrlParams.get('type');
 
-            console.log("Current Category from URL:", currentCategory);
-            console.log("Current Type from URL:", currentType);
-
-
-            tab.forEach(t => t.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
 
             if (currentType === 'L') {
-                const popularButton = document.querySelector();
+                const popularButton = document.querySelector('.tabs .btn-custom');
                 if (popularButton) {
                     popularButton.style.fontWeight = 'bold';
                     popularButton.style.backgroundColor = '#e0f7fa';
-                    popularButton.style.color = '#ff6b6b';
-                    console.log("Popular tab activated");
                 }
-            } else if (currentCategory) {
-                tab.forEach(tab => {
+            } else if (currentType === 'C' && currentCategory) {
+                tabs.forEach(tab => {
                     const tabCategory = tab.getAttribute('data-category');
                     if (tabCategory && decodeURIComponent(currentCategory) === tabCategory) {
                         tab.classList.add('active');
-                        console.log("Tab activated:", tabCategory);
                     }
                 });
-            } else {
-
-                console.log("No specific category or type selected in URL.");
             }
-
         });
 
         function submitLang(lang) {
@@ -467,85 +522,30 @@
             document.getElementById('langForm').submit();
         }
 
-        // 다국어 변경시 ..?
         document.addEventListener('DOMContentLoaded', function () {
             const currentLocale = /*[[${#locale.language}]]*/ 'ko';
-            console.log("Current Locale from Server:", currentLocale); // 디버깅용 로그
-
-            // 2. 다국어 메시지 객체 정의
             const messages = {
-                ko: {
-                    search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다."
-                },
-                en: {
-                    search_disabled_message: "Search is not supported when changing languages."
-                },
-                ja: {
-                    search_disabled_message: "言語を変更すると検索はサポートされません。"
-                },
-
-                cn: {
-                    search_disabled_message: "更改语言时不支持搜索。"
-                }
+                ko: { search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다." },
+                en: { search_disabled_message: "Search is not supported when changing languages." },
+                ja: { search_disabled_message: "言語を変更すると検索はサポートされません。" },
+                cn: { search_disabled_message: "更改语言时不支持搜索。" }
             };
-
             let message = (messages[currentLocale] && messages[currentLocale].search_disabled_message)
                 ? messages[currentLocale].search_disabled_message
-                : messages['ko'].search_disabled_message; // 기본 메시지
-
-            console.log("Selected Message:", message); // 디버깅용 로그
+                : messages['ko'].search_disabled_message;
 
             if (currentLocale !== 'ko') {
                 const searchInput = document.getElementById('searchInput');
                 const searchBtn = document.getElementById('searchBtn');
-
                 if (searchInput && searchBtn) {
                     searchInput.disabled = true;
                     searchBtn.disabled = true;
-                    searchInput.placeholder = message; // 해당 언어 메시지 적용
-
-                    console.log("Search disabled and placeholder set for non-Korean locale."); // 디버깅용 로그
-                } else {
-                    console.warn("Search input or button not found.");
+                    searchInput.placeholder = message;
                 }
-            } else {
-                console.log("Locale is Korean, search remains enabled."); // 디버깅용 로그
             }
         });
 
-        /* 쿠폰 조회 */
-
-        function showMyCoupons() {
-            const email = prompt("쿠폰을 조회할 이메일을 입력하세요:");
-            if (!email) return;
-
-            fetch(`/roommenu/coupon/list?email=${email}`)
-                .then(res => res.json())
-                .then(coupons => {
-                    if (coupons.length === 0) {
-                        alert("보유한 쿠폰이 없습니다.");
-                        return;
-                    }
-
-                    let message = `💌 ${email}님의 쿠폰 목록\n\n`;
-                    coupons.forEach((coupon, index) => {
-                        message += `${index + 1}. [${coupon.couponType}] - ${coupon.discountRate}% 할인\n`;
-                        message += `   발급일: ${coupon.issueDate}, 만료일: ${coupon.expirationDate}\n`;
-                        message += `   사용여부: ${coupon.used ? '✅ 사용됨' : '❌ 미사용'}\n\n`;
-                    });
-
-                    alert(message);
-                })
-                .catch(err => {
-                    alert("쿠폰을 불러오는 중 오류가 발생했습니다.");
-                    console.error(err);
-                });
-        }
     </script>
-    <!-- 스크립트 끝 -->
-
 </div>
 </body>
 </html>
-
-

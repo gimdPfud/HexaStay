@@ -20,7 +20,7 @@
     <h1>⚙️ 서버 내부 오류 (500)</h1>
     <p>요청을 처리하는 중에 예상치 못한 문제가 발생했습니다.</p>
     <p>잠시 후 다시 시도해주시거나, 문제가 지속되면 관리자에게 문의해주세요.</p>
-    <p><a th:href="@{http://localhost:8090/admin/login}">홈으로 돌아가기</a></p>
+    <p><a th:href="@{http://wooriproject.iptime.org.9002/admin/login}">홈으로 돌아가기</a></p>
 
     <div class="error-details"
          th:if="${timestamp != null or status != null or error != null or message != null or exception != null or path != null or trace != null}">

@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function connectWebSocket() {
         console.log("WebSocket 연결 시도...");
         /*const socket = new SockJS("/ws-order-alert"); /!*todo : 지우지마!!*!/*/
-        const ngrokBaseUrl = 'wss://c3d3-116-33-138-85.ngrok-free.app'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
-        const socket = new SockJS('https://c3d3-116-33-138-85.ngrok-free.app/ws-order-alert');
+        const ngrokBaseUrl = 'wss://wooriproject.iptime.org.9002'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
+        const socket = new SockJS('https://wooriproject.iptime.org.9002/ws-order-alert');
         const stompClient = Stomp.over(socket);
         stompClient.debug = null; // 디버그 로그 비활성화
 

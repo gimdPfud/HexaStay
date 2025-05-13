@@ -7,6 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="#{orderList.title}">주문 내역</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9;}
@@ -85,6 +87,10 @@
                 padding: 10px;
             }
 
+            /* 이 스타일은 <head> 안의 <style> 태그나 이 파일의 <style> 태그 안에 있어야 합니다. */
+            /* 아니면 layoutmobileA.html의 <style> 태그 안에 있어야 합니다. */
+            .toast-container { z-index: 1100 !important; }
+
         }
     </style>
 </head>
@@ -92,17 +98,19 @@
 
 <div layout:fragment="contentorderA">
     <div class="container">
+        <div class="toast-container position-fixed top-0 end-0 p-3" id="notificationArea">
+        </div>
 
         <div th:if="${orderList.isEmpty()}">
             <div style="background-color: #f8f9fa; color: #333; padding: 1rem; text-align: center;">
-                <span th:text="#{orderList.noOrders}"></span>
+                <span th:text="#{orderList.noOrders}">주문 내역이 없습니다.</span>
             </div>
         </div>
 
         <div th:each="order : ${orderList}" class="card mt-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <strong th:text="#{orderList.orderNumber}"></strong>
+                    <strong th:text="#{orderList.orderNumber}">주문번호:</strong>
                     <span th:text="${order.roomMenuOrderNum}"></span>
                 </div>
                 <div>
@@ -113,7 +121,7 @@
             <ul class="list-group list-group-flush">
                 <li th:each="item : ${order.orderItemList}" class="list-group-item">
                     <div class="row align-items-start g-3">
-                        <div class="col-4 col-md-3 text-center">
+                        <div class="col-4 text-center">
                             <img th:if="${item.roomMenuImageMeta != null}"
                                  th:src="@{${item.roomMenuImageMeta}}"
                                  class="order-img img-fluid rounded">
@@ -121,83 +129,69 @@
                                  th:src="@{/profile/default.png}"
                                  class="order-img img-fluid rounded">
                         </div>
-                        <div class="col-8 col-md-9">
+                        <div class="col-8">
                             <div class="d-flex align-items-center mb-1">
-                                <strong class="me-2" th:text="#{orderList.menuName}"></strong>
+                                <strong class="me-2" th:text="#{orderList.menuName}">메뉴명:</strong>
                                 <span th:text="${item.roomMenuOrderItemName}" class="flex-grow-1"></span>
                             </div>
 
-                            <!-- 옵션이 있을 경우 표시, 없으면 자동 줄바꿈 -->
                             <div th:if="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
                                  class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9em; flex-wrap: wrap;">
                                 <span th:utext="${#strings.replace(item.roomMenuSelectOptionName, ',', '<br>')}" class="flex-grow-1"></span>
                             </div>
-
-                            <!-- 옵션이 없으면 빈 공간 추가 -->
                             <div th:unless="${item.roomMenuSelectOptionName != null and item.roomMenuSelectOptionName != ''}"
-                                 class="d-flex mb-1" style="height: 1.5rem;">
-                                &nbsp; <!-- 빈 공간을 유지 -->
+                                 class="d-flex mb-1" style="min-height: 1.2em;">
+                                &nbsp;
                             </div>
 
-
-
                             <div class="d-flex align-items-center mb-1">
-                                <strong class="me-2" th:text="#{orderList.quantity}"></strong>
+                                <strong class="me-2" th:text="#{orderList.quantity}">수량:</strong>
                                 <span th:text="${item.roomMenuOrderItemAmount}" class="flex-grow-1"></span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}"></strong>
+                                <strong class="me-2" th:text="#{orderList.itemTotalPrice}">상품금액:</strong>
                                 <span class="flex-grow-1"></span>
                                 <strong>
-                                    <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}"></span>
+                                    <span th:text="${#numbers.formatInteger(item.roomMenuOrderItemPrice * item.roomMenuOrderItemAmount, 1, 'COMMA')} + ' ' + #{item.currency}">원</span>
                                 </strong>
-
                             </div>
                         </div>
                     </div>
                 </li>
             </ul>
 
-
-
-            <div th:if="${order.discountedPrice != null}" class="d-flex align-items-center mt-2">
-                <strong class="text-danger" style="margin-left: 107px; min-width: 105px; line-height: 1.5; margin-bottom: 5px;">할인 적용 금액:</strong>
-                <div class="text-danger fw-bold" style="margin-left: auto; margin-right: 15px; line-height: 1.5;">
+            <div th:if="${order.discountedPrice != null}" class="d-flex align-items-center mt-2 px-3">
+                <strong class="text-danger me-2" style="min-width: fit-content;">할인 적용 금액:</strong>
+                <div class="text-danger fw-bold ms-auto">
                     <span th:text="|${#numbers.formatInteger(order.discountedPrice, 0, 'COMMA')} #{item.currency}|"></span>
                 </div>
             </div>
 
             <div class="card-footer text-muted text-end d-flex justify-content-between align-items-center">
-
-                <!-- 재주문 버튼 -->
                 <button type="button" class="btn btn-sm btn-primary reorder-btn"
                         th:data-order-num="${order.roomMenuOrderNum}">
-                    <i class="fas fa-redo-alt"></i> 재주문
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>재주문</span>
                 </button>
-
                 <small>
-                    <span th:text="#{orderList.orderTime}"></span>
+                    <span th:text="#{orderList.orderTime}">주문시간:</span>
                     <span th:text="${#temporals.format(order.regDate, 'yyyy-MM-dd HH:mm')}"></span>
                 </small>
-
             </div>
         </div>
 
-        <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'"></button>
+        <button class="back-to-list-btn" th:text="#{btn.backToList}" onclick="window.location.href='/roommenu/orderpage'">목록으로 돌아가기</button>
 
-        <!-- 주문 내역이 있을 때만 페이지네이션 출력 -->
-        <nav th:if="${!orderList.isEmpty()}">
+        <nav th:if="${!orderList.isEmpty() and totalPages > 1}">
             <ul class="pagination justify-content-center align-items-center mt-3"
-                th:with="start=${T(java.lang.Math).max(1, currentPage - 1)},
-                end=${T(java.lang.Math).min(totalPages, currentPage + 1)}"
-                th:if="${totalPages > 1}">
-
-                <!-- 처음 -->
+                th:with="start=${T(java.lang.Math).max(1, currentPage - 2)},
+                         end=${T(java.lang.Math).min(totalPages, currentPage + 2)}">
                 <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                     <a class="page-link" th:href="@{/roommenu/orderList(page=0)}">&laquo;</a>
                 </li>
-
-                <!-- 중앙 페이징 (pageIndex는 반드시 with로 추출해야 안전) -->
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${currentPage - 2 < 0 ? 0 : currentPage - 2})}">&lt;</a>
+                </li>
                 <li class="page-item"
                     th:each="i : ${#numbers.sequence(start, end)}"
                     th:with="pageIndex=${i - 1}"
@@ -206,36 +200,159 @@
                        th:href="@{/roommenu/orderList(page=${pageIndex})}"
                        th:text="${i}"></a>
                 </li>
-
-                <!-- 마지막 -->
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/roommenu/orderList(page=${currentPage >= totalPages ? totalPages -1 : currentPage})}">&gt;</a>
+                </li>
                 <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                     <a class="page-link" th:href="@{/roommenu/orderList(page=${totalPages - 1})}">&raquo;</a>
                 </li>
             </ul>
         </nav>
+    </div> <div class="modal fade" id="reorderConfirmModal" tabindex="-1" aria-labelledby="reorderConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reorderConfirmModalLabel" >재주문 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="reorderConfirmModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" id="confirmReorderActionBtn" >확인</button>
+            </div>
+        </div>
     </div>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    console.log("HTML 하단 스크립트 블록 실행 시작"); // ★ 로그 추가 1
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        console.log("주문 내역 페이지 스크립트 블록 실행 시작 (모바일 최적화)");
 
-    $(document).ready(function() {
-
-        const csrfToken = $("meta[name='_csrf']").attr("content");
-        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
-
-        $(document).on('click', '.reorder-btn', function() {
-            const orderNum = $(this).data('order-num');
-
-            if (!orderNum) {
-                alert("주문번호를 찾을 수 없습니다. HTML의 data-order-num 속성을 확인해주세요.");
+        /**
+         * 페이지 상단에 Toast 알림을 표시합니다.
+         */
+        function showNotification(message, type = 'info', delay = 3000) {
+            const notificationArea = document.getElementById('notificationArea');
+            // Bootstrap JS 로드 여부 및 notificationArea 존재 여부 확인
+            if (!notificationArea || typeof bootstrap === 'undefined' || !bootstrap.Toast) {
+                console.warn("Toast 알림 초기화 불가: 알림 영역 또는 Bootstrap JS(Toast)를 찾을 수 없습니다. 메시지:", message);
+                console.log(`[${type.toUpperCase()}] ${message}`); // 콘솔에라도 표시
+                // 간단한 대체 알림
+                const fallbackAlert = document.createElement('div');
+                fallbackAlert.textContent = message;
+                fallbackAlert.style.cssText = `
+                position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+                padding: 10px 15px; background-color: ${type === 'error' ? '#dc3545' : (type === 'success' ? '#198754' : '#0dcaf0')};
+                color: white; border-radius: 5px; z-index: 2000; font-size: 0.9rem;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);`;
+                document.body.appendChild(fallbackAlert);
+                setTimeout(() => { fallbackAlert.remove(); }, delay);
                 return;
             }
 
-            if (confirm("주문번호 " + orderNum + "의 상품들을 장바구니에 담으시겠습니까?")) {
-                console.log("[이벤트 핸들러 내부] Ajax 요청 준비...");
+            const toastId = 'toast-' + Date.now();
+            let toastHeaderClass = '';
+            let toastIconHtml = '';
+
+            switch (type.toLowerCase()) {
+                case 'success':
+                    toastHeaderClass = 'bg-success text-white';
+                    toastIconHtml = '<i class="bi bi-check-circle-fill me-2"></i>'; // 아이콘 색상 클래스 제거, 헤더에서 이미 색상 처리
+                    break;
+                case 'error':
+                    toastHeaderClass = 'bg-danger text-white';
+                    toastIconHtml = '<i class="bi bi-x-octagon-fill me-2"></i>';
+                    break;
+                case 'warning':
+                    toastHeaderClass = 'bg-warning text-dark';
+                    toastIconHtml = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+                    break;
+                default: // info
+                    toastHeaderClass = 'bg-info text-white';
+                    toastIconHtml = '<i class="bi bi-info-circle-fill me-2"></i>';
+                    break;
+            }
+
+            const toastHtml = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${delay}">
+              <div class="toast-header ${toastHeaderClass}">
+                ${toastIconHtml} <strong class="me-auto">알림</strong>
+                <button type="button" class="btn-close ${toastHeaderClass.includes('text-white') ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body d-flex align-items-center">
+                ${toastIconHtml} <span class="ms-2">${message}</span>
+              </div>
+            </div>
+        `;
+            notificationArea.insertAdjacentHTML('beforeend', toastHtml);
+
+            const toastElement = document.getElementById(toastId);
+            const toastInstance = new bootstrap.Toast(toastElement);
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastInstance.dispose();
+                toastElement.remove();
+            });
+            toastInstance.show();
+        }
+
+        $(document).ready(function() {
+            console.log("jQuery document.ready 실행: 주문 내역 페이지 (모바일)");
+
+            const csrfToken = $("meta[name='_csrf']").attr("content");
+            const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            let confirmModalElement = document.getElementById('reorderConfirmModal');
+            let confirmModalInstance = null;
+
+            if (confirmModalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                confirmModalInstance = new bootstrap.Modal(confirmModalElement);
+                console.log("Bootstrap Modal 초기화 성공.");
+            } else {
+                if (!confirmModalElement) {
+                    console.error("Bootstrap Modal 초기화 불가: 모달 DOM 요소(#reorderConfirmModal)를 찾을 수 없습니다.");
+                }
+                // 이 콘솔 메시지가 계속 보인다면 Bootstrap JS가 제대로 로드되지 않았거나, bootstrap 객체가 전역 범위에 없는 것입니다.
+                if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+                    console.error("Bootstrap Modal 초기화 불가: Bootstrap JS(Modal) 컴포넌트를 찾을 수 없습니다. (Bootstrap JS 로드 순서 및 실제 로드 여부 확인 필요)");
+                }
+            }
+
+            let currentOrderNumForReorder = null;
+
+            $(document).on('click', '.reorder-btn', function() {
+                const orderNum = $(this).data('order-num');
+                currentOrderNumForReorder = orderNum;
+
+                if (!orderNum) {
+                    showNotification("주문번호를 찾을 수 없습니다.", 'error');
+                    return;
+                }
+
+                if (confirmModalInstance) {
+                    const confirmMessage = `주문번호 ${orderNum}의 상품들을 장바구니에 담으시겠습니까?`;
+                    $('#reorderConfirmModalBody').text(confirmMessage);
+                    confirmModalInstance.show();
+                } else {
+                    showNotification("확인 창을 표시할 수 없습니다. 페이지 설정을 확인해주세요.", "warning");
+                }
+            });
+
+            $('#confirmReorderActionBtn').on('click', function() {
+                if (currentOrderNumForReorder && confirmModalInstance) {
+                    performReorderAjax(currentOrderNumForReorder);
+                    confirmModalInstance.hide();
+                } else {
+                    showNotification("재주문 처리 중 내부 오류가 발생했습니다.", "error");
+                }
+            });
+
+            function performReorderAjax(orderNum) {
+                // ... (AJAX 함수 내용은 이전 답변과 동일) ...
+                console.log(`[AJAX] 주문번호 ${orderNum} 재주문 요청`);
                 $.ajax({
-                    // ... (Ajax 설정은 이전과 동일) ...
                     url: '/api/reorder/' + orderNum,
                     type: 'POST',
                     beforeSend: function(xhr) {
@@ -244,24 +361,40 @@
                         }
                     },
                     success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
+                        if (response && response.success) {
+                            showNotification(response.message || "상품이 장바구니에 추가되었습니다.", 'success');
                             window.location.href = '/roommenu/cartlist';
                         } else {
-                            alert("재주문 실패: " + response.message);
+                            showNotification(response.message || "재주문에 실패했습니다. 다시 시도해주세요.", 'error');
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error("[Ajax] 재주문 요청 오류. Status: " + status + ", Error: " + error + ", ResponseText:", xhr.responseText);
-                        let errorMessage = "재주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                        console.error(`[AJAX] 재주문 오류: ${status}, ${error}`, xhr.responseText);
+                        let errorMessage = "재주문 처리 중 오류가 발생했습니다.";
                         if(xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorObj = JSON.parse(xhr.responseText);
+                                if (errorObj && (errorObj.message || errorObj.error)) {
+                                    errorMessage = errorObj.message || errorObj.error;
+                                } else if (xhr.responseText.length < 200) {
+                                    errorMessage = xhr.responseText;
+                                }
+                            } catch (e) {
+                                if (xhr.responseText.length < 200) {
+                                    errorMessage = xhr.responseText;
+                                }
+                            }
                         }
-                        alert(errorMessage);
+                        showNotification(errorMessage, 'error');
                     }
                 });
             }
         });
-    });
+        /*]]>*/
     </script>
-</div>
+</div> </body>
+</html>
