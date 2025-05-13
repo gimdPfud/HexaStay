@@ -25,11 +25,9 @@ public class CustomMemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
-        log.info("로그인 시도 - 이메일: {}", memberEmail);
         
         Member member = memberRepository.findByMemberEmail(memberEmail);
         if (member == null) {
-            log.error("로그인 실패 - 존재하지 않는 이메일: {}", memberEmail);
             throw new UsernameNotFoundException("존재하지 않는 이메일입니다: " + memberEmail);
         }
         
@@ -40,8 +38,6 @@ public class CustomMemberDetailsService implements UserDetailsService {
             role = "USER";  // 기본 권한 설정
         }
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-        
-        log.info("로그인 성공 - 사용자: {}, 권한: {}", memberEmail, authorities);
         
         return new CustomMemberDetails(member, authorities);
     }

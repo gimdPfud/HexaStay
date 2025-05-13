@@ -38,8 +38,7 @@ public class MemberController {
     }
 
     @GetMapping("/main")
-    public String main(Principal principal) {
-        log.info(principal.getName());
+    public String main() {
         return "/member/main";
     }
 
@@ -59,7 +58,6 @@ public class MemberController {
     //멤버 테이블 삭제 버튼
     @GetMapping("/delete")
     public String delteMember(Long memberNum) {
-        log.info("member Controller에 도착 했지 :" + memberNum);
 
         memberService.memberDelet(memberNum);
 
@@ -85,7 +83,6 @@ public class MemberController {
                                       @PageableDefault(page=1) Pageable pageable
 
     ) {
-        log.info("Getmapping 에 진입 했니 ");
 
         /*if (page < 0) {
             page = 0;  // 음수 방지
@@ -107,7 +104,6 @@ public class MemberController {
     public String inputMemberGetPost(MemberDTO memberDTO,
                                          Model model)
     {
-        log.info("호텔룸 등록 페이지에 들어 왔니:memberDTO를 가져와라 " + memberDTO);
 
         //view 보낸 member 등록을 저장
         memberService.memberinsert(memberDTO);
