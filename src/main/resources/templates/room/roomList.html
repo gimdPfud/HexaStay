@@ -198,13 +198,13 @@
                     <tbody>
                     <tr th:each="room, stat : ${rooms.content}">
                         <!--최종에는 이 코드로 변경-->
-                        <!--<td class="text-center" th:text="${rooms.pageable.offset + stat.index + 1}">11</td>-->
+                        <td class="text-center" th:text="${rooms.pageable.offset + stat.index + 1}">11</td>
 
                         <!--임시-->
-                        <td class="text-center">
-                            <span th:text="${stat.index + 1}">1</span>
-                            <small class="text-muted" th:text="${room.roomNum}"> (11)</small>
-                        </td>
+<!--                        <td class="text-center">-->
+<!--                            <span th:text="${stat.index + 1}">1</span>-->
+<!--                            <small class="text-muted" th:text="${room.roomNum}"> (11)</small>-->
+<!--                        </td>-->
 
                         <td class="text-center text-truncate">
                             <a href="javascript:void(0);"

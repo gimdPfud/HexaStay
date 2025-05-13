@@ -125,9 +125,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             if (hotelRoom.getMember() != null) {
                 MemberDTO memberDTO = modelMapper.map(hotelRoom.getMember(), MemberDTO.class);
                 hotelRoomDTO.setMemberDTO(memberDTO);
-                log.info("매핑된 멤버 정보: {}", memberDTO);
-            } else {
-                log.info("회원 정보 없음 - 호텔룸 번호: {}", hotelRoom.getHotelRoomNum());
             }
 
             return hotelRoomDTO;
@@ -144,7 +141,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     public HotelRoomDTO HotelRoomByName(String hotelRoomName) {
 
         HotelRoom hotelRoom = hotelRoomRepository.findByHotelRoomName(hotelRoomName).orElseThrow();
+
         HotelRoomDTO hotelRoomDTO = modelMapper.map(hotelRoom, HotelRoomDTO.class);
+
         return hotelRoomDTO;
     }
 
@@ -155,7 +154,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     // 1. 호텔방 등록 (이미지 + QR 코드까지 함께 등록하는 메서드)
     @Override
     public void hotelroomInsert(HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
-        log.info("HotelRoom Service 진입 했습니다."); // 이 메서드가 실행되었다는 로그 출력
 
         // DTO → Entity로 바꿔주는 코드 (HotelRoomDTO → HotelRoom)
         HotelRoom hotelRoom = modelMapper.map(hotelRoomDTO, HotelRoom.class);
@@ -169,11 +167,10 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 일단 호텔방 정보를 DB에 저장 (PK 값 생김)
         hotelRoom = hotelRoomRepository.save(hotelRoom);
 
-        log.info("호텔룸 정보 저장 완료: {}", hotelRoomDTO.getHotelRoomProfile());
 
         // 만약 이미지 파일이 있다면, 저장 처리를 시작함
         if (hotelRoomDTO.getHotelRoomProfile() != null && !hotelRoomDTO.getHotelRoomProfile().isEmpty()) {
-            log.info("이미지 파일 처리 시작: {}", hotelRoomDTO.getHotelRoomProfile());
+
 
             // 이미지 파일 이름 설정 (ex. 방이름_번호.png)
             String fileOriginalName = hotelRoomDTO.getHotelRoomProfile().getOriginalFilename();
@@ -199,8 +196,6 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 이미지 경로를 실제 Entity에도 넣어주기
         hotelRoom.setHotelRoomProfileMeta(hotelRoomDTO.getHotelRoomProfileMeta());
 
-        log.info(hotelRoom.getHotelRoomNum() + "몇번의 호텔룸 pk 가 들어 오고 있는거야 ");
-
 
         try {
             Long roomNum = hotelRoom.getHotelRoomNum();
@@ -208,9 +203,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                 throw new IllegalStateException("호텔룸 번호가 null입니다. QR 코드 생성 불가.");
             }
 
-            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://wooriproject.iptime.org:9002" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
-            log.info("QR 인코딩용 최종 경로: {}", qrText);
+
 
             //QR  메소드를 활용 해서 Web 인코딩 경로 만 Service 에서만 지정 파라미터를 Qrcode 생성 메소드에 추가 하기
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName());
@@ -218,7 +213,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             hotelRoom.setHotelRoomQr(qrPath);  // ✅ 이미 /qrfile/파일명.png 형식
             hotelRoomRepository.save(hotelRoom);
 
-            log.info("QR 코드 생성 완료 및 저장: {}", qrPath);
+
 
         } catch (Exception e) {
             throw new RuntimeException("QR 코드 생성 중 오류 발생: " + e.getMessage(), e);
@@ -277,7 +272,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     * */
     @Override
     public void hotelroomUpdate(Long hotelRoomNum, HotelRoomDTO hotelRoomDTO,Long companyNum) throws IOException {
-        log.info("HotelRoom 수정 Service 진입");
+
 
         // 1. 기존 HotelRoom 조회
         HotelRoom hotelRoom = hotelRoomRepository.findById(hotelRoomNum)
@@ -324,9 +319,9 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                         existingMeta.startsWith("/") ? existingMeta.substring(1) : existingMeta);
                 try {
                     Files.deleteIfExists(deletePath);
-                    log.info("기존 이미지 파일 삭제 완료: {}", deletePath);
+
                 } catch (IOException e) {
-                    log.warn("기존 이미지 파일 삭제 실패: {}", e.getMessage());
+
                 }
             }
 
@@ -359,13 +354,13 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. QR 코드 재생성 (service 사용)
         try {
-            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://wooriproject.iptime.org:9002"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             /*QR 생성 모듈화 클래스 */
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
 
             hotelRoom.setHotelRoomQr(qrPath); // 새 QR 경로 저장
-            log.info("새 QR 코드 생성 완료: {}", qrPath);
+
 
         } catch (Exception e) {
             throw new RuntimeException("QR 코드 생성 중 오류: " + e.getMessage(), e);
@@ -373,7 +368,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. 저장
         hotelRoomRepository.save(hotelRoom);
-        log.info("호텔룸 정보 수정 완료: {}", hotelRoom.getHotelRoomNum());
+
     }
 
 
@@ -391,7 +386,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
     //6.호텔룸 조회 - princpal을 활용한 서지스 로직
     @Override
     public List<HotelRoom> listCompany(Long companyNUm) {
-        log.info(companyNUm.toString() + "company  num 을 가지고 왔지 ");
+
 
         List<HotelRoom> hotelRoomList =
         hotelRoomRepository.findByCompany_CompanyNum(companyNUm);
