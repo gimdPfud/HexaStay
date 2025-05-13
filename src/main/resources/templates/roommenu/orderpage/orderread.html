@@ -186,6 +186,15 @@
         .toast-container {
             z-index: 1100 !important;
         }
+
+        .toast-container .toast {
+            position: fixed;
+            top: 50%; /* 화면 세로 중앙 */
+            left: 50%; /* 화면 가로 중앙 */
+            transform: translate(-50%, -50%); /* 정확히 가운데 정렬 */
+            z-index: 1150;
+        }
+
         /* 옵션 선택 영역 패딩 */
         .options-section {
             padding: 0 10px; /* 좌우 패딩 추가 */

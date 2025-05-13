@@ -39,18 +39,21 @@
 <div layout:fragment="content">
 
     <div class="survey-form-container">
-        <h2 class="mb-4" th:text="${survey != null ? '설문조사 수정' : '새 설문조사 작성'}">설문조사 작성</h2>
-        
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="fw-bold w-100 text-center mb-4">설문조사 작성</h2>
+        </div>
+
         <form th:action="@{/survey/save}" th:object="${survey}" method="post">
             <input type="hidden" th:field="*{surveyNum}" />
             
             <div class="form-group">
-                <label for="surveyTitle" class="form-label">설문 제목</label>
+                <label for="surveyTitle" class="fw-bold text-start">설문 제목</label>
                 <input type="text" class="form-control" id="surveyTitle" th:field="*{surveyTitle}" required>
             </div>
 
             <div class="form-group">
-                <label for="surveyContent" class="form-label">인사말</label>
+                <label for="surveyContent" class="fw-bold text-start">인사말</label>
                 <textarea class="form-control" id="surveyContent" th:field="*{surveyContent}"></textarea>
             </div>
 
