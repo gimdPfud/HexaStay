@@ -398,7 +398,18 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDTO adminFindEmail(String email) {
         Admin admin = adminRepository.findByAdminEmail(email);
-        return admin != null ? modelMapper.map(admin, AdminDTO.class) : null;
+        if(admin==null){
+            return null;
+        } else if (admin.getCompany()!=null) {
+            return modelMapper.map(admin,AdminDTO.class);
+        } else if (admin.getStore()!=null) {
+            AdminDTO adminDTO = modelMapper.map(admin,AdminDTO.class);
+            adminDTO.setStoreNum(admin.getStore().getStoreNum());
+            adminDTO.setStoreName(admin.getStore().getStoreName());
+            return adminDTO;
+        }else {
+            return null;
+        }
     }
 
     @Override
