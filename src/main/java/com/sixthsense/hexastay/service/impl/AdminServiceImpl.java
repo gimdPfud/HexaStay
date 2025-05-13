@@ -133,7 +133,6 @@ public class AdminServiceImpl implements AdminService {
         adminDTO.setAdminEmployeeNum(employeeNum);
 
         if (adminDTO.getAdminProfile() != null && !adminDTO.getAdminProfile().isEmpty()) {
-            log.info("프로필 사진 업로드 시작");
             String fileOriginalName = adminDTO.getAdminProfile().getOriginalFilename();
             String fileFirstName = adminDTO.getAdminEmployeeNum() + "_" + adminDTO.getAdminName();
             String fileSubName = fileOriginalName.substring(fileOriginalName.lastIndexOf("."));
@@ -142,7 +141,6 @@ public class AdminServiceImpl implements AdminService {
 
             // 프로필 메타 경로 설정
             String profileMetaPath = "/profile/" + fileName;
-            log.info("설정된 프로필 메타 경로: {}", profileMetaPath);
 
             // 파일 저장
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
@@ -150,12 +148,10 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectories(uploadPath);
             }
             Path filePath = uploadPath.resolve(fileName);
-            log.info("프로필 사진 저장 경로: {}", filePath);
             adminDTO.getAdminProfile().transferTo(filePath.toFile());
 
             // Admin 엔티티 생성 전에 메타 경로 설정
             adminDTO.setAdminProfileMeta(profileMetaPath);
-            log.info("프로필 사진 업로드 완료");
         }
 
 
@@ -174,9 +170,7 @@ public class AdminServiceImpl implements AdminService {
 
     //가입대기 리스트
     public List<AdminDTO> getWaitAdminList() {
-        log.info("=== getWaitAdminList 시작 ===");
         List<Admin> adminList = adminRepository.findByAdminActive("INACTIVE");
-        log.info("INACTIVE 상태의 회원 수: {}", adminList.size());
         
         if (adminList.isEmpty()) {
             log.warn("INACTIVE 상태의 회원이 없습니다.");
@@ -196,10 +190,7 @@ public class AdminServiceImpl implements AdminService {
         }
         
         String role = currentAdmin.getAdminRole().toUpperCase(); // 대문자로 변환
-        log.info("현재 관리자의 역할: {}", role);
-        log.info("현재 관리자의 회사: {}", currentAdmin.getCompany() != null ? currentAdmin.getCompany().getCompanyNum() : "없음");
-        log.info("현재 관리자의 스토어: {}", currentAdmin.getStore() != null ? currentAdmin.getStore().getStoreNum() : "없음");
-        
+
         // 계층별 조회 권한 설정
         List<String> allowedRoles = new ArrayList<>();
         switch (role) {
@@ -218,7 +209,6 @@ public class AdminServiceImpl implements AdminService {
                 log.warn("권한이 없는 역할입니다: {}", role);
                 return adminDTOList;
         }
-        log.info("허용된 역할 목록: {}", allowedRoles);
         
         // 현재 관리자의 소속 회사/스토어에 속한 관리자만 필터링
         for (Admin admin : adminList) {
@@ -289,7 +279,6 @@ public class AdminServiceImpl implements AdminService {
 
             // 프로필 메타 경로 설정
             String profileMetaPath = "/profile/" + fileName;
-            log.info("새 프로필 메타 경로: {}", profileMetaPath);
             
             // 파일 저장
             Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
@@ -297,11 +286,9 @@ public class AdminServiceImpl implements AdminService {
                 Files.createDirectories(uploadPath);
             }
             Path filePath = uploadPath.resolve(fileName);
-            log.info("새 프로필 사진 저장 경로: {}", filePath);
             
             adminDTO.getAdminProfile().transferTo(filePath.toFile());
             admin.setAdminProfileMeta(profileMetaPath);
-            log.info("새 프로필 사진 업데이트 완료");
         }
 
         // 나머지 필드 업데이트
@@ -312,7 +299,11 @@ public class AdminServiceImpl implements AdminService {
         admin.setAdminRole(adminDTO.getAdminRole());
         
         // 이메일과 주민번호 업데이트 (슈퍼어드민인 경우)
-        if ("SUPERADMIN".equalsIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority())) {
+        String currentAdminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Admin currentAdmin = adminRepository.findByAdminEmail(currentAdminEmail);
+        
+        if (currentAdmin != null && "SUPERADMIN".equalsIgnoreCase(currentAdmin.getAdminRole())) {
+            log.info("슈퍼어드민 권한으로 추가 정보 업데이트");
             if (adminDTO.getAdminEmail() != null) {
                 log.info("이메일 업데이트: {} -> {}", admin.getAdminEmail(), adminDTO.getAdminEmail());
                 admin.setAdminEmail(adminDTO.getAdminEmail());
@@ -324,7 +315,6 @@ public class AdminServiceImpl implements AdminService {
         }
 
         adminRepository.save(admin);
-        log.info("관리자 정보 업데이트 완료: {}", admin.getAdminNum());
     }
 
 
@@ -372,7 +362,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<StoreDTO> insertStoreList(Long branchFacilityNum) {
         List<Store> storeList = storeRepository.findByCompanyNum(branchFacilityNum);
-        log.info(storeList.stream().toList());
         return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
     }
 
