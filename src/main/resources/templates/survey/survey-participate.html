@@ -147,11 +147,12 @@
         <h1 th:text="${survey.surveyTitle}">설문조사</h1>
     </div>
 
-    <form th:action="@{/survey/submit}" method="post">
+    <form th:action="@{/guest-survey/submit}" method="post">
         <input type="hidden" name="survey.surveyNum" th:value="${survey.surveyNum}">
         <input type="hidden" name="memberEmail" th:value="${memberEmail}">
         <input type="hidden" name="roomNum" th:value="${roomNum}">
         <input type="hidden" name="memberNum" th:value="${memberNum}">
+        <input type="hidden" name="checkOutDate" th:value="${checkOutDate}" th:if="${checkOutDate != null}">
 
         <div class="content">
             <div class="greeting">

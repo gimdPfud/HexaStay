@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,8 @@ public interface SurveyService {
     Survey getActiveSurvey();
     SurveyResult saveSurveyResult(SurveyResult surveyResult);
     boolean hasParticipated(Long surveyId, String memberEmail);
+    // 체크아웃 날짜와 방번호를 포함한 설문 참여 여부 확인 (동일 고객이 여러번 숙박하는 경우 구분)
+    boolean hasParticipatedWithCheckOutDate(String memberEmail, Long roomNum, LocalDate checkOutDate);
     void saveSurveyResult(SurveyResultDTO surveyResultDTO, String memberEmail, Long roomNum);
     
     // 회사별 설문조사 목록 조회

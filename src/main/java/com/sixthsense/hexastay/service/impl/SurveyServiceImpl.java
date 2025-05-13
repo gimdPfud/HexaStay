@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,11 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public boolean hasParticipated(Long surveyId, String memberEmail) {
         return surveyResultRepository.existsBySurvey_SurveyNumAndMemberEmail(surveyId, memberEmail);
+    }
+
+    @Override
+    public boolean hasParticipatedWithCheckOutDate(String memberEmail, Long roomNum, LocalDate checkOutDate) {
+        return surveyResultRepository.existsByMemberEmailAndRoomNumAndCheckOutDate(memberEmail, roomNum, checkOutDate);
     }
 
     @Override

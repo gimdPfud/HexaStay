@@ -50,8 +50,10 @@ public class MemberSecurityConfig {
             .authenticationManager(authManager)
             .userDetailsService(memberDetailsService)
             .authorizeHttpRequests(authz -> authz
+                    .requestMatchers("/guest-survey/**").permitAll()
                 .anyRequest().permitAll()
             )
+
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .maximumSessions(1)
