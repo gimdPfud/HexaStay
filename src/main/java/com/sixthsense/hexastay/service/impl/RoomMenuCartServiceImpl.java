@@ -113,24 +113,36 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         }
         log.info("장바구니 찾음 또는 생성됨. ID: {}", roomMenuCart.getRoomMenuCartNum());
 
-        // 3. 메뉴 정보 조회
-        RoomMenu roomMenu =
-                roomMenuRepository.findById(roomMenuCartItemDTO.getRoomMenuCartItemNum())
-                        .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + roomMenuCartItemDTO.getRoomMenuCartItemNum()));
-        log.info("메뉴 찾음: {}", roomMenu.getRoomMenuName());
 
-        Long menuIdFromDto = roomMenuCartItemDTO.getRoomMenuCartItemNum(); //
-        if (menuIdFromDto == null) throw new IllegalArgumentException("상품 ID가 DTO에 없습니다.");
+        // ★★★ DTO에서 상품 ID를 가져옵니다. (RoomMenuCartItemDTO에 getRoomMenuNum()이 상품 ID를 반환하도록 구현되어 있어야 함) ★★★
+        Long productId = roomMenuCartItemDTO.getRoomMenuNum();
+        if (productId == null) {
+            log.error("DTO에서 상품 ID(roomMenuNum)를 가져오지 못했습니다. DTO 필드 매핑을 확인하세요. DTO: {}", roomMenuCartItemDTO.toString()); // DTO 내용 로깅
+            throw new IllegalArgumentException("상품 ID(roomMenuNum)가 요청에 포함되지 않았거나 DTO에 매핑되지 않았습니다.");
+        }
+        log.info("DTO로부터 상품 ID {} 가져옴", productId);
 
-        RoomMenu roomMenuA = roomMenuRepository.findById(menuIdFromDto)
-                .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + menuIdFromDto));
-        log.info("메뉴 찾음: {}", roomMenuA.getRoomMenuName());
+        // 3. 메뉴 정보 조회 (★★★ productId 변수 사용 ★★★)
+        RoomMenu roomMenu = roomMenuRepository.findById(productId) // <<< 수정된 부분: productId 사용
+                .orElseThrow(() -> {
+                    log.error("메뉴를 찾을 수 없습니다. 조회 시도 ID: {}", productId);
+                    return new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + productId);
+                });
+        log.info("메뉴 찾음: {}, ID: {}", roomMenu.getRoomMenuName(), roomMenu.getRoomMenuNum());
 
-        List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions(); // DTO에서 선택된 옵션 목록 가져옴
 
-        // --- RoomMenuCartItem의 옵션 요약 정보 설정 (새 아이템용) ---
+        // --- 아래 중복된 메뉴 조회 로직은 제거하거나 roomMenu 변수를 재활용합니다. ---
+        // Long menuIdFromDto = roomMenuCartItemDTO.getRoomMenuCartItemNum();
+        // if (menuIdFromDto == null) throw new IllegalArgumentException("상품 ID가 DTO에 없습니다.");
+        // RoomMenu roomMenuA = roomMenuRepository.findById(menuIdFromDto)
+        //         .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다. ID: " + menuIdFromDto));
+        // log.info("메뉴 찾음: {}", roomMenuA.getRoomMenuName());
+
+
+        List<RoomMenuCartItemOptionDTO> optionDTOList = roomMenuCartItemDTO.getSelectedOptions();
+
         StringBuilder selectedOptionName = new StringBuilder();
-        int totalSelectedOptionPrice = 0; // 선택된 옵션들의 총 가격 (개당 기준)
+        int totalSelectedOptionPrice = 0;
 
         if (optionDTOList != null && !optionDTOList.isEmpty()) {
             for (int i = 0; i < optionDTOList.size(); i++) {
@@ -147,56 +159,46 @@ public class RoomMenuCartServiceImpl implements RoomMenuCartService {
         } else {
             log.info("선택된 옵션이 없습니다.");
         }
-        // --- 옵션 요약 정보 설정 끝 ---
 
-        log.info("새 아이템을 장바구니에 추가합니다."); // 이 로그는 항상 실행
-        RoomMenuCartItem insertCartItem = new RoomMenuCartItem(); // 항상 새 아이템 생성
-        insertCartItem.setRoomMenuCart(roomMenuCart); // 장바구니 연결
-        insertCartItem.setRoomMenu(roomMenu); // 메뉴 연결
-        insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount()); // 초기 수량 설정
+        log.info("새 아이템을 장바구니에 추가합니다. 상품: {}, 수량: {}", roomMenu.getRoomMenuName(), roomMenuCartItemDTO.getRoomMenuCartItemAmount());
+        RoomMenuCartItem insertCartItem = new RoomMenuCartItem();
+        insertCartItem.setRoomMenuCart(roomMenuCart);
+        insertCartItem.setRoomMenu(roomMenu); // 올바르게 조회된 roomMenu 사용
+        insertCartItem.setRoomMenuCartItemAmount(roomMenuCartItemDTO.getRoomMenuCartItemAmount());
 
-        // RoomMenuCartItem에 옵션 요약 정보 설정
         insertCartItem.setRoomMenuSelectOptionName(selectedOptionName.toString());
         insertCartItem.setRoomMenuSelectOptionPrice(totalSelectedOptionPrice);
 
-        // 최종 가격 계산 (기본가 + 옵션 가격 합산) * 수량
         int finalItemTotalPrice = (roomMenu.getRoomMenuPrice() + totalSelectedOptionPrice) * roomMenuCartItemDTO.getRoomMenuCartItemAmount();
-        insertCartItem.setRoomMenuCartItemPrice(finalItemTotalPrice); // RoomMenuCartItemPrice 필드에 최종 가격 설정
+        insertCartItem.setRoomMenuCartItemPrice(finalItemTotalPrice);
 
-
-        // 아이템 저장 (RoomMenuCartItem 엔티티를 먼저 저장하여 ID 생성)
         RoomMenuCartItem savedCartItem = roomMenuCartItemRepository.save(insertCartItem);
         log.info("새 장바구니 아이템 저장 완료. ID: {}", savedCartItem.getRoomMenuCartItemNum());
 
-        // RoomMenuCartItemOption 엔티티 저장 (CartItem 저장 후)
         if (optionDTOList != null && !optionDTOList.isEmpty()) {
+            // ... (옵션 저장 로직은 이전과 동일하게 유지, 단, optionDTO.getRoomMenuOptionNum()이 null이 아님을 위에서 확인했거나 여기서도 확인) ...
             log.info("새 아이템에 대한 RoomMenuCartItemOption {}개를 저장합니다.", optionDTOList.size());
             for (RoomMenuCartItemOptionDTO optionDTO : optionDTOList) {
-                // RoomMenuOption을 다시 조회하여 이름/가격 일관성 확보 (또는 DTO 정보 사용)
-                RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRoomMenuCartItemOptionNum())
+                RoomMenuOption menuOption = roomMenuOptionRepository.findById(optionDTO.getRoomMenuCartItemOptionNum()) // 이 ID도 DTO에서 잘 오는지 확인
                         .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다. ID: " + optionDTO.getRoomMenuCartItemOptionNum()));
 
-                // 3.  이 옵션이 해당 상품(roomMenu)에 속하는지 검증
                 if (!menuOption.getRoomMenu().getRoomMenuNum().equals(roomMenu.getRoomMenuNum())) {
                     throw new IllegalArgumentException("옵션 '" + menuOption.getRoomMenuOptionName() + "'는 상품 '" + roomMenu.getRoomMenuName() + "'의 옵션이 아닙니다.");
                 }
 
                 RoomMenuCartItemOption option = new RoomMenuCartItemOption();
-                option.setRoomMenuCartItem(savedCartItem); // 저장된 CartItem 참조 설정
+                option.setRoomMenuCartItem(savedCartItem);
                 option.setRoomMenuCartItemOptionName(menuOption.getRoomMenuOptionName());
-                option.setRoomMenuOption(menuOption); // 메뉴의 옵션 차감을 위해서 필요한 필드
-                option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice()); // 옵션 개당 가격
-                option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount()); // 해당 옵션의 선택 수량
-
-
-                roomMenuCartItemOptionRepository.save(option); // 옵션 엔티티 저장
-
-
+                option.setRoomMenuOption(menuOption);
+                option.setRoomMenuCartItemOptionPrice(menuOption.getRoomMenuOptionPrice());
+                option.setRoomMenuCartItemOptionAmount(optionDTO.getRoomMenuCartItemOptionAmount() != null ? optionDTO.getRoomMenuCartItemOptionAmount() : 1); // 옵션 수량 null 체크
+                roomMenuCartItemOptionRepository.save(option);
             }
             log.info("RoomMenuCartItemOption 저장 완료.");
         }
 
-        return savedCartItem.getRoomMenuCartItemNum(); // 새로 저장된 아이템의 ID 반환
+        return savedCartItem.getRoomMenuCartItemNum();
+
     }
 
     /**************************************************
