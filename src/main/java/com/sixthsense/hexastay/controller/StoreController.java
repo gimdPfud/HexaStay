@@ -87,10 +87,6 @@ public class StoreController {
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) List<Long> companyNum,
                        @RequestParam(required = false) String keyword){
-        log.info("겟겟겟리스트");
-        if(companyNum!=null){
-            log.info(companyNum.toString());
-        }
 
         if (principal == null) {
             return "redirect:/admin/login";
@@ -172,7 +168,7 @@ public class StoreController {
 
     @GetMapping("/read")
     public String read(Long idid, Principal principal, Model model, Locale locale) {
-        log.info("Admin store read request for idid: {}, locale: {}", idid, locale);
+//        log.info("Admin store read request for idid: {}, locale: {}", idid, locale);
 
         if (principal == null) {
             return "redirect:/admin/login";
@@ -188,7 +184,7 @@ public class StoreController {
             model.addAttribute("currentLang", locale.getLanguage());
             return "store/read";
         } else {
-            log.info("Admin {} attempted to access unauthorized store {}", admin.getAdminEmail(), idid); // 로그 개선
+//            log.info("Admin {} attempted to access unauthorized store {}", admin.getAdminEmail(), idid); // 로그 개선
             return "redirect:/admin/logout"; // 또는 접근 거부 페이지
         }
     }
@@ -216,7 +212,7 @@ public class StoreController {
 
     @PostMapping("/modify")
     public String modify(@Valid StoreDTO storeDTO, BindingResult bindingResult, RedirectAttributes model){
-        log.info(storeDTO.toString());
+//        log.info(storeDTO.toString());
         if(bindingResult.hasErrors()){
             log.info("유효성체크");
             bindingResult.getAllErrors().forEach(log::info);

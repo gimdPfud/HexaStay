@@ -13,12 +13,14 @@ import com.sixthsense.hexastay.service.OrderstoreService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.ZzService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -39,9 +41,13 @@ public class StoreCartController {
     /*1. 장바구니에 담기 (등록)*/
     @ResponseBody
     @PostMapping("/insert")
-    public ResponseEntity cartInsert(StorecartitemDTO dto, Principal principal, HttpSession session){
-        /*todo DTO 유효성 확인*/
+    public ResponseEntity cartInsert(@Valid StorecartitemDTO dto, BindingResult bindingResult, Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if(bindingResult.hasErrors()){
+            log.info("유효성체크");
+            bindingResult.getAllErrors().forEach(log::info);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             int result = storecartService.addCart(dto, (Long) session.getAttribute("roomNum"));
             HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -62,7 +68,7 @@ public class StoreCartController {
     /*2. 장바구니 보기 (목록)*/
     @GetMapping("/list")
     public String cartList(Model model, Principal principal, HttpSession session, Locale locale) {
-        log.info("카트리스트 다국어 서비스 진입 : "+locale);
+//        log.info("카트리스트 다국어 서비스 진입 : "+locale);
         if(principal == null){
             // 기존 로직: 비로그인 시 QR 카메라 페이지로
             return "sample/qrcamera";
@@ -102,7 +108,7 @@ public class StoreCartController {
         model.addAttribute("list", list);
         model.addAttribute("totalPrice", totalPrice[0]);
         model.addAttribute("currentLang", locale.getLanguage());
-        log.info("패싱될 다국어 언어 :: {}", locale.getLanguage());
+//        log.info("패싱될 다국어 언어 :: {}", locale.getLanguage());
 
         return "mobilestore/cart/list";
     }
@@ -132,11 +138,15 @@ public class StoreCartController {
     }
     /*5. 장바구니 비우기*/
     @PostMapping("/clear")
-    public ResponseEntity cartClear(StorecartitemDTO dto, Principal principal, HttpSession session){
+    public ResponseEntity cartClear(@Valid StorecartitemDTO dto,BindingResult bindingResult, Principal principal, HttpSession session){
         if(principal == null){return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
+        if(bindingResult.hasErrors()){
+            bindingResult.getAllErrors().forEach(log::info);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             storecartService.clearCartItems((Long) session.getAttribute("roomNum"));
-            cartInsert(dto, principal, session);//저 위에 있는 등록 맞음 ^_^ ;;
+            cartInsert(dto, bindingResult, principal, session);//저 위에 있는 등록 맞음 ^_^ ;;
             return new ResponseEntity<>(HttpStatus.OK);
         }catch (Exception e){
             log.info("장바구니를 비울 수 없습니다.");

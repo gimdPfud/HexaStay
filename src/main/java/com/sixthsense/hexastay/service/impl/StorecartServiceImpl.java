@@ -38,8 +38,8 @@ public class StorecartServiceImpl implements StorecartService {
 
         @Override
     public int addCart(StorecartitemDTO dto, Long roomNum) {
-        log.info(dto.toString());
-        log.info(dto.getOptionPrice());
+//        log.info(dto.toString());
+//        log.info(dto.getOptionPrice());
 //        log.info(dto.getStorecartitemCount());
 
         //1. 메뉴 조회

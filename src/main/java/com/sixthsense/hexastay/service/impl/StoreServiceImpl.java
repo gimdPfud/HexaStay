@@ -150,7 +150,7 @@ public class StoreServiceImpl implements StoreService {
         store.setStoreWtmX(storeDTO.getStoreWtmX());
         store.setStoreWtmY(storeDTO.getStoreWtmY());
         store.setStoreCategory(storeDTO.getStoreCategory());
-        store.setStorePassword(storeDTO.getStorePassword());
+//        store.setStorePassword(storeDTO.getStorePassword());
         return store.getStoreNum();
     }
 

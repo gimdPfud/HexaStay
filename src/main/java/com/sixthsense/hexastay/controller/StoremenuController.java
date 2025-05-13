@@ -99,7 +99,7 @@ public class StoremenuController {
      * */
     @GetMapping("/insert/{id}")
     public String insertGet(@PathVariable Long id, Model model){
-        log.info("등록 : "+id);
+//        log.info("등록 : "+id);
         model.addAttribute("storeNum",id);
         return "storemenu/insert";
     }
@@ -153,7 +153,7 @@ public class StoremenuController {
 
     @GetMapping("/read/{id}")
     public String read(@PathVariable Long id, Model model, Locale locale){
-        log.info("메뉴상세보기 메뉴Num: "+id);
+//        log.info("메뉴상세보기 메뉴Num: "+id);
         StoremenuDTO data = storemenuService.read(id, locale);
         model.addAttribute("data",data);
         return "storemenu/read";

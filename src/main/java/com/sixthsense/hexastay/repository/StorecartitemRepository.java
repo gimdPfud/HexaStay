@@ -18,7 +18,7 @@ import java.util.List;
 public interface StorecartitemRepository extends JpaRepository<Storecartitem, Long> {
 
     //장바구니에 상품이 있는지 확인하기.
-    Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNum(Long cartNum, Long menuNum);
+//    Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNum(Long cartNum, Long menuNum);
     Storecartitem findByStorecart_StorecartNumAndStoremenu_StoremenuNumAndStoremenuOptions(Long storecartNum, Long storemenuNum, String storemenuOptions);
 
     //장바구니의 아무 아이템 가져오기

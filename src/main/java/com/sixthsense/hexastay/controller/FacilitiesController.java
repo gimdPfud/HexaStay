@@ -91,7 +91,7 @@ public class FacilitiesController {
     }
     @PostMapping("/facility/modify")
     public String fsmodifyPost(FacilitiesDTO dto, Model model){
-        log.info(dto.toString());
+//        log.info(dto.toString());
         try {
             Long num = fsService.modify(dto);
             return "redirect:/facility/read/"+num;

@@ -64,7 +64,7 @@ public class StoreOrderController {
         }
         int result = orderstoreService.insert(cartitemidList, roomNum, orderstoreMessage);
         if (result==1) {
-            log.info("정상주문되었습니다.");
+//            log.info("정상주문되었습니다.");
             storecartService.clearCartItems(roomNum);
             return new ResponseEntity<>(HttpStatus.OK);
         } else if (result ==2) {
@@ -80,7 +80,7 @@ public class StoreOrderController {
     public String clientOrderList(Model model, HttpSession session,
                                   @PageableDefault(sort = "orderstoreNum", direction = Sort.Direction.DESC) Pageable pageable,
                                   Principal principal, Locale locale){
-        log.info("오더리스트 다국어 서비스 진입: {}", locale);
+//        log.info("오더리스트 다국어 서비스 진입: {}", locale);
         if (principal == null) {
             return "sample/qrcamera";
         }
@@ -110,13 +110,13 @@ public class StoreOrderController {
                                         if (optionInfos.size() == 3) {
                                             return optionInfos.get(1) + " (" + optionInfos.get(2) + " " + "원" + ")";
                                         } else {
-                                            log.warn("유효성검사가 올바르지 않음. {}: {}", dto.getOrderstoreitemNum(), option);
+//                                            log.warn("유효성검사가 올바르지 않음. {}: {}", dto.getOrderstoreitemNum(), option);
                                             return option;
                                         }
                                     }).toList();
                             optionMap.put(dto.getOrderstoreitemNum(), options);
                         } catch (Exception e) {
-                            log.error("패싱 오류, 멤버 Num을 찾을 수 없음.", dto.getOrderstoreitemNum(), e.getMessage());
+                            log.error("패싱 오류, 멤버 Num을 찾을 수 없음. {} {}", dto.getOrderstoreitemNum(), e.getMessage());
                         }
                     }
                 });
@@ -176,9 +176,9 @@ public class StoreOrderController {
             });
         });
 
-        log.info("스토어넘버 넘어왔니? "+storeNum);
-        log.info("서비스에서 찾아옴? "+list.size());
-        list.forEach(log::info);
+//        log.info("스토어넘버 넘어왔니? "+storeNum);
+//        log.info("서비스에서 찾아옴? "+list.size());
+//        list.forEach(log::info);
 
         model.addAttribute("list",list);
         model.addAttribute("storeList",storelist);

@@ -68,9 +68,9 @@ public class StoreClientController {
         model.addAttribute("list", storeDTOPage.getContent());
         model.addAttribute("번역상황", locale.getLanguage());
 
-        log.info("type : "+type);
-        log.info("keyword : "+keyword);
-        log.info("보여질 언어: {}", locale.getLanguage());
+//        log.info("type : "+type);
+//        log.info("keyword : "+keyword);
+//        log.info("보여질 언어: {}", locale.getLanguage());
 
         return "mobilestore/list";
     }
@@ -85,8 +85,8 @@ public class StoreClientController {
         model.addAttribute("data", storeDTO);
         model.addAttribute("currentLang", locale.getLanguage());
 
-        log.info("읽을 매장의 번호: {}, 번역될 언어: {}", storeNum, locale);
-        log.info("Passing language code to view: {}", locale.getLanguage());
+//        log.info("읽을 매장의 번호: {}, 번역될 언어: {}", storeNum, locale);
+//        log.info("Passing language code to view: {}", locale.getLanguage());
 
         return "mobilestore/read";
     }
@@ -109,7 +109,7 @@ public class StoreClientController {
 @GetMapping("/menu/read/{storemenuNum}")
 public String menuRead(@PathVariable Long storemenuNum, Model model, Locale locale) {
     StoremenuDTO storemenuDTO = storemenuService.read(storemenuNum, locale);
-    log.info(storemenuDTO);
+//    log.info(storemenuDTO);
     model.addAttribute("data", storemenuDTO);
     model.addAttribute("currentLang", locale.getLanguage());
 
@@ -140,7 +140,7 @@ public String menuRead(@PathVariable Long storemenuNum, Model model, Locale loca
                                    HttpSession session){
         if(principal==null){return new ResponseEntity(HttpStatus.UNAUTHORIZED);}
         try {
-            log.info("세션에 저장된 roomNum : " + session.getAttribute("roomNum"));
+//            log.info("세션에 저장된 roomNum : " + session.getAttribute("roomNum"));
 
             Long likes = storeService.getStoreLikeCount(storeNum);
             boolean check = storeService.isLiked(storeNum, zzService.sessionToMember(session));
