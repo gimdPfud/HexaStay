@@ -30,7 +30,7 @@ public interface StoreService {
 
     /*목록 : 전부 가져오기*/
     List<StoreDTO> getAllList(AdminDTO adminDTO);
-    Map<Long, String> getCompanyMap();
+    Map<Long, String> getCompanyMap(AdminDTO adminDTO);
     List<Long> getCompanyNums(AdminDTO adminDTO);
     /*목록
     * 활성화된 외부업체만 목록으로 보여주기

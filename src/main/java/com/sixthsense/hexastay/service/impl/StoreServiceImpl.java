@@ -177,13 +177,17 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Map<Long, String> getCompanyMap() {
+    public Map<Long, String> getCompanyMap(AdminDTO adminDTO) {
         List<Store> storeList = storeRepository.findAll("alive");
         storeList.forEach(this::checkAndUpdateOrphanStatus);
         storeList = storeRepository.findAll("alive");
+
+        List<Long> comNums = getCompanyNums(adminDTO);
+
         Map<Long, String> maps = storeList.stream()
                 .map(Store::getCompany)
                 .filter(company -> company != null && company.getCompanyNum() != null && company.getCompanyName() != null)
+                .filter(comp-> comNums.contains(comp.getCompanyNum()))
                 .collect(Collectors.toMap(
                         Company::getCompanyNum,
                         Company::getCompanyName,
@@ -195,11 +199,11 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<Long> getCompanyNums(AdminDTO adminDTO) {
-        log.info(adminDTO);
-
+//        log.info(adminDTO);
         String role = adminDTO.getAdminRole().toUpperCase();
-        List<Long> result = null;
+        List<Long> result = new ArrayList<>();
         if(role.equals("SUPERADMIN")){
+            companyRepository.findAll().forEach(comp->result.add(comp.getCompanyNum()));
             return result;
         } else if (Arrays.asList("EXEC","HEAD","CREW").contains(role)) {
             Long parentCom = adminDTO.getCompanyNum();
@@ -208,6 +212,8 @@ public class StoreServiceImpl implements StoreService {
             companies.forEach(comp-> result.add(comp.getCompanyNum()));
             return result;
         }else if(Arrays.asList("GM","SV","AGENT").contains(role)){
+//            log.info(adminDTO);
+//            log.info(adminDTO.getCompanyNum());
             result.add(adminDTO.getCompanyNum());
             return result;
         }else {

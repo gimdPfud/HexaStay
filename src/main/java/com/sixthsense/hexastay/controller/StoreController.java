@@ -79,7 +79,7 @@ public class StoreController {
     }
 
 
-    /*todo post 없애고 get으로만???
+    /* post 없애고 get으로만???
     *   맨 처음 get에서도 로그인한 사람의 companyNum으로 store목록을 보여줘야 함
     *   그래서 굳이 get post 둘 다 하지 말고.. 그냥 get한번에만 하는걸로... post는 하지말어?*/
     @GetMapping("/list")
@@ -103,7 +103,7 @@ public class StoreController {
             return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
         }
 
-        //todo 프린시펄로 companyNum
+        // 프린시펄로 companyNum
         // admin마다 볼 수 있는 업체가 달라야함
         // 사장님 : 내가게만
         // 지사 : 본인 소속 업체만
@@ -120,7 +120,7 @@ public class StoreController {
         Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable, "deleted");
         model.addAttribute("deletedList",listA);
 //        model.addAttribute("companyList",companyService.getBnFList());
-        model.addAttribute("companyMap", storeService.getCompanyMap());
+        model.addAttribute("companyMap", storeService.getCompanyMap(adminDTO));
         model.addAttribute("searchType",searchType);
         model.addAttribute("chosenCompany",companyNum);
         model.addAttribute("keyword",keyword);
