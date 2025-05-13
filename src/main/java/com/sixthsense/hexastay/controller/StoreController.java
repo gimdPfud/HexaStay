@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -87,7 +88,6 @@ public class StoreController {
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) List<Long> companyNum,
                        @RequestParam(required = false) String keyword){
-
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -95,7 +95,8 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        if (adminDTO.getStoreNum()!=null){
+        if (Arrays.asList("MGR","SUBMGR","STAFF").contains(adminDTO.getAdminRole().toUpperCase())){
+            log.info("스토어소속{}",adminDTO);
             return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
         }
 
