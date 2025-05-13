@@ -47,13 +47,6 @@ public class CompanyController {
         Long adminNum = adminService.adminFindEmail(email).getAdminNum();
         Long companyNum = adminService.adminFindEmail(email).getCompanyNum();
 
-        log.info("====== 조직 조회 요청 =======");
-        log.info("조직 타입(choice): [" + choice + "]");
-        log.info("검색 조건(select): [" + select + "]");
-        log.info("검색 키워드(keyword): [" + keyword + "]");
-        log.info("페이지 정보: page=" + pageable.getPageNumber() + ", size=" + pageable.getPageSize());
-        log.info("현재 로그인 유저: " + email + ", 관리자번호: " + adminNum + ", 소속조직번호: " + companyNum);
-
         if (choice == null) {
             choice = "";
         }
@@ -68,12 +61,10 @@ public class CompanyController {
 
         // 키워드가 빈 문자열이고 검색 조건이 있는 경우 검색 조건 초기화
         if (keyword.trim().isEmpty() && !select.equals("전체")) {
-            log.info("검색어 없이 검색 조건만 선택된 경우 - 검색 조건 초기화");
             select = "전체";
         }
 
         Page<CompanyDTO> companyDTOS = companyService.companySearchList(select, choice, keyword, companyNum, adminNum, pageable);
-        log.info("검색 결과 수: " + companyDTOS.getTotalElements());
 
         model.addAttribute("companyDTOS", companyDTOS);
         model.addAttribute("choice", choice);
@@ -104,7 +95,6 @@ public class CompanyController {
         CompanyDTO companyDTO = companyService.companyRead(companyNum);
 
         if (companyDTO == null) {
-            log.info("companyDTO가 null인 pk : " + companyNum);
             return "redirect:/company/list";
         }
         model.addAttribute("companyDTO", companyDTO);
@@ -149,12 +139,9 @@ public class CompanyController {
     @GetMapping("/{companyNum}/admins")
     @ResponseBody
     public ResponseEntity<List<AdminDTO>> getAdminsByCompany(@PathVariable Long companyNum) {
-        log.info("직원 조회 요청 : " + companyNum);
         List<AdminDTO> admins = companyService.getCompanyAdmins(companyNum);
         return ResponseEntity.ok(admins);
     }
-
-
 
 
 

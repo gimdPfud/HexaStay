@@ -52,8 +52,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     List<Company> findByCompanyTypeAndCompanyParent(String companyType, Long companyParent);
 
     //활성화 비활성화 상태 조회
-    List<Company> findByCompanyStatus(String companyStatus);
-    List<Company> findByCompanyNumAndCompanyType(Long companyNum, String companyType);
     List<Company> findByCompanyParent(Long companyParent);
     List<Company> findByCompanyNum(Long companyNum);
 
