@@ -274,7 +274,7 @@
             console.log("Branch/Facility changed:", { companyNum, adminChoice: adminChoice.value });
 
             // 스토어 선택 시에만 실행
-            if ((adminChoice.value === "스토어" || adminChoice.value === "지점" || adminChoice.value === "외부시설") && companyNum) {
+            if ((adminChoice === "스토어" || adminChoice === "지점" || adminChoice === "외부시설") && companyNum) {
                 console.log("Fetching store list for:", companyNum);
 
                 fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)

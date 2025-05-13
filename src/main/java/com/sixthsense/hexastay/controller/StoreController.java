@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,6 +53,11 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
+        if (Arrays.asList("MGR","SUBMGR","STAFF").contains(adminDTO.getAdminRole().toUpperCase())){
+            log.warn("스토어소속 insert 접근 {}",adminDTO);
+            log.warn("수정으로 반환합니다.");
+            return "redirect:/admin/store/modify/"+adminDTO.getStoreNum();
+        }
 //        log.info(adminDTO);
 //        // 소속된 회사 없음
 //        if (adminDTO.getCompanyNum() == null) {
@@ -63,7 +69,7 @@ public class StoreController {
 //                return "redirect:/admin/logout";
 //            }
 //        }
-        model.addAttribute("companyList",companyService.getBnFList());
+//        model.addAttribute("companyList",companyService.getBnFList());
         return "store/insert";
     }
 
@@ -87,7 +93,6 @@ public class StoreController {
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) List<Long> companyNum,
                        @RequestParam(required = false) String keyword){
-
         if (principal == null) {
             return "redirect:/admin/login";
         }
@@ -95,7 +100,8 @@ public class StoreController {
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
-        if (adminDTO.getStoreNum()!=null){
+        if (Arrays.asList("MGR","SUBMGR","STAFF").contains(adminDTO.getAdminRole().toUpperCase())){
+            log.info("스토어소속{}",adminDTO);
             return "redirect:/admin/store/read?idid="+adminDTO.getStoreNum();
         }
 
