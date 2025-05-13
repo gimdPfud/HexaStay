@@ -603,49 +603,36 @@
             }
         });
 
-        // --- Mobile Easter Egg START ---
-        let popularButtonTapCount = 0;
-        let popularButtonLastTapTime = 0;
-        const MOBILE_TAP_THRESHOLD = 7; // 7번 탭하면 발동
-        const MOBILE_TAP_TIMEOUT = 500; // 0.5초 이내 연속 탭만 유효
+        // --- Mobile Easter Egg for Like Icons START ---
+        // --- Like Button Easter Egg START ---
 
-        // DOMContentLoaded 이벤트가 발생한 후에 버튼에 이벤트 리스너를 추가합니다.
-        document.addEventListener('DOMContentLoaded', function() {
-            // ... (기존 DOMContentLoaded 내용들: like-section, tabs, search-disable 등) ...
+        let likeIconTapCount = 0;
+        let likeIconLastTapTime = 0;
+        const LIKE_ICON_TAP_THRESHOLD = 5; // 5번 탭하면 발동
+        const LIKE_ICON_TAP_TIMEOUT = 500; // 0.5초 이내 연속 탭만 유효
 
-            const popularButtonForMobileKonami = document.querySelector('.tabs .btn-custom'); // '인기순' 버튼
-            if (popularButtonForMobileKonami) {
-                popularButtonForMobileKonami.addEventListener('click', function(event) {
-                    // 이스터에그 감지를 위해 기본 페이지 이동을 막지 않습니다.
-                    // 만약 이스터에그 발동 시 페이지 이동을 막고 싶다면 아래 주석 해제
-                    // event.preventDefault();
+        document.querySelectorAll('.like-icon').forEach(function (likeIcon) {
+            likeIcon.addEventListener('click', function (event) {
+                const currentTime = new Date().getTime();
 
-                    const currentTime = new Date().getTime();
+                if ((currentTime - likeIconLastTapTime) < LIKE_ICON_TAP_TIMEOUT) {
+                    likeIconTapCount++;
+                } else {
+                    likeIconTapCount = 1;
+                }
 
-                    if ((currentTime - popularButtonLastTapTime) < MOBILE_TAP_TIMEOUT) {
-                        popularButtonTapCount++;
-                    } else {
-                        // 시간이 초과되었거나 첫 탭인 경우
-                        popularButtonTapCount = 1;
-                    }
-                    popularButtonLastTapTime = currentTime;
-                    console.log('Popular button tapped. Count:', popularButtonTapCount);
+                likeIconLastTapTime = currentTime;
 
+                console.log('Like icon tapped. Count:', likeIconTapCount);
 
-                    if (popularButtonTapCount >= MOBILE_TAP_THRESHOLD) {
-                        console.log("모바일 이스터에그 발동 (버튼 탭)!");
-                        triggerKonamiAction(); // 기존 코나미 액션(벚꽃 포함) 실행
-                        popularButtonTapCount = 0; // 성공 후 카운트 리셋
-                        // 이스터에그 발동 시 페이지 이동을 확실히 막고 싶다면 여기서도 preventDefault 가능
-                        // 다만, 사용자가 의도한 '인기순' 정렬 기능은 막히게 됨
-                        // event.preventDefault();
-                    }
-                });
-            } else {
-                console.warn("'인기순' 버튼을 모바일 이스터에그용으로 찾지 못했습니다.");
-            }
+                if (likeIconTapCount >= LIKE_ICON_TAP_THRESHOLD) {
+                    console.log("좋아요 아이콘 이스터에그 발동!");
+                    triggerKonamiAction();
+                    likeIconTapCount = 0;
+                }
+            });
         });
-        // --- Mobile Easter Egg END ---
+        // --- Mobile Easter Egg for Like Icons END ---
 
 
         // --- Konami Code Easter Egg START ---
