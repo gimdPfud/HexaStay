@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
-    @Query("select a from HotelRoom a")
-    public Page<HotelRoom> findAll(Pageable pageable);
+
 
     //정렬 조건 추가 레퍼지토리
     @Query("SELECT h FROM HotelRoom h ORDER BY h.hotelRoomNum DESC, h.createDate DESC")
@@ -32,11 +31,6 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
     @Query("SELECT h FROM HotelRoom h WHERE h.hotelRoomName LIKE %:keyword% ORDER BY h.hotelRoomNum DESC")
     List<HotelRoom> searchByName(@Param("keyword") String keyword);
 
-
-
-    // 방 타입을 기준으로 가장 최신의 HotelRoom 가져오기
-    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotelRoomType = :roomType ORDER BY hr.hotelRoomNum DESC LIMIT 1")
-    Optional<HotelRoom> findLatestRoomByType(@Param("roomType") String roomType);
 
     //호텔 방이름을 기준으로 하는 검색 조건
     @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotelRoomName = :hotelRoomName ORDER BY hr.hotelRoomNum DESC")

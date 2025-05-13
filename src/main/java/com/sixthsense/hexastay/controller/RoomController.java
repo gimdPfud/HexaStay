@@ -10,7 +10,6 @@ import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.HotelRoomService;
 import com.sixthsense.hexastay.service.MemberService;
 import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
-import com.sixthsense.hexastay.service.impl.RoomServiceTest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +42,6 @@ public class RoomController {
     private final RoomServiceImpl roomServiceimpl;
 
     //test용 서비스
-    private final RoomServiceTest roomServiceTest;
-
     private final HotelRoomService hotelRoomService;
 
     private final MemberService memberService;
@@ -345,7 +342,7 @@ public class RoomController {
                                         RedirectAttributes redirectAttributes,
                                         HttpSession session) {
         try {
-            Room room = roomServiceTest.readRoomByCheckinPassword(roomPassword);
+            Room room = roomServiceimpl.readRoomByCheckinPassword(roomPassword);
 
             /*qr 패스워드 로그인시 session 에 보내주는 키 필수 요소*/
             session.setAttribute("roomNum", room.getRoomNum());

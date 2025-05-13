@@ -104,6 +104,7 @@
     </div>
 
     <script th:inline="javascript">
+
         function deleteSurvey(id) {
             if (confirm('정말로 이 설문조사를 삭제하시겠습니까?')) {
                 fetch(`/survey/delete/${id}`, {

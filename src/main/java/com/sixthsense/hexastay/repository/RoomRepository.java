@@ -90,9 +90,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findCheckinRoomsByHotelRoomNum(@Param("hotelRoomNum") Long hotelRoomNum);
 
 
-    //hotelRoomStatus 즉 value = checkin , value = checkout 상태에 따라 보여주는 Repository
-    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomStatus = :status")
-    Page<Room> findByHotelRoomStatus(@Param("status") String status, Pageable pageable);
 
     //qr/{hotelRoomNum}들어 갈때 쓰는 로직 - hotelroom status = 'checkin' 상태에서만 패스워드로 접속 가능
     @Query("SELECT r FROM Room r WHERE r.roomPassword = :roomPassword AND r.hotelRoom.hotelRoomStatus = 'checkin'")
@@ -112,20 +109,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("UPDATE Room r SET r.hotelRoom.hotelRoomNum = :hotelRoomNum WHERE r.roomNum = :roomNum")
     void updateHotelRoomFk(@Param("roomNum") Long roomNum, @Param("newHotelRoomNum") Long hotelRoomNum);
 
-    /****추후에 쓸 메소드****/
-    //최신순으로 정렬 하는 repository리 로직
-    @Query("SELECT r FROM Room r WHERE r.hotelRoom.hotelRoomNum = :hotelRoomNum ORDER BY r.createDate DESC")
-    List<Room> findByHotelRoomNumDesc(@Param("hotelRoomNum") Long hotelRoomNum);
-
-
-    //member를 조회하고, 시간을 조회하면서, room이 활성화가 되 있는 것을 빼오는 매소드.
-    @Query("SELECT r FROM Room r " +
-            "WHERE r.member = :member " +
-            "AND r.checkInDate IS NOT NULL AND r.checkInDate <= :currentTime " +
-            "AND r.checkOutDate IS NOT NULL AND r.checkOutDate > :currentTime")
-    Optional<Room> findActiveRoomForMemberAtTime(@Param("member") Member member, @Param("currentTime") LocalDateTime currentTime);
-
-    /****추후에 쓸 메소드****/
 
 
     /*****매출 정산용 메소드******/

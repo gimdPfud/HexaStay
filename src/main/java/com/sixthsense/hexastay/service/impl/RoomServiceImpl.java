@@ -215,7 +215,7 @@ public class RoomServiceImpl {
     }
 
 
-    //Room 페이지에 있는 정보를 가져 List 메서드
+    //Room 페이지에 있는 정보를 가져 List 메서드 - 특정 정보만 가져 오는 리스트
     public Page<RoomDTO> getRooms(Long companyNum, Pageable pageable) {
         Page<Room> rooms = roomRepository.findByHotelRoom_Company_CompanyNum(companyNum, pageable);
 
@@ -379,6 +379,52 @@ public class RoomServiceImpl {
         // 14. 최종적으로 찾은 룸을 반환한다
         return matchedRoom;
     }
+
+
+    //todo : hotelRoomStatus 가 "checkin" 상태에서만 roompassword 가 일치 하면 접속이 가능
+    public Room readRoomByCheckinPassword(String roomPassword) {
+
+        // 1. 호텔룸 번호로 연결된 룸 리스트 조회
+        Room matchedRoom = roomRepository.findCheckinRoomByPassword(roomPassword)
+                .orElseThrow(() -> new IllegalArgumentException("체크인 상태의 룸 중에서 비밀번호가 일치하는 룸이 없습니다."));
+
+        // ✅ 2. 추가 검증: 호텔룸 상태가 체크인인지 확인
+        String hotelRoomStatus = matchedRoom.getHotelRoom().getHotelRoomStatus();
+        if (!"checkin".equalsIgnoreCase(hotelRoomStatus)) {
+            throw new IllegalStateException("이미 체크아웃된 객실입니다. 접속할 수 없습니다.");
+        }
+
+
+        // 4. 연결된 회원 정보로 권한 설정
+        Member member = matchedRoom.getMember();
+        String role = (member.getMemberRole() == null || member.getMemberRole().isBlank()) ? "USER" : member.getMemberRole();
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+        // 5. CustomMemberDetails 생성
+        CustomMemberDetails customMemberDetails = new CustomMemberDetails(member, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                customMemberDetails,
+                member.getMemberPassword(),
+                authorities
+        );
+
+        // 6. SecurityContext 설정
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        // 7. 세션에도 저장
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest()
+                .getSession();
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+
+        log.info("✅ 로그인 완료 - 이메일: {}, 룸 번호: {}", member.getMemberEmail(), matchedRoom.getRoomNum());
+
+        // 8. 최종적으로 찾은 룸 반환
+        return matchedRoom;
+    }
+
 
     //roomlist 검색용 서비스 조건 : member 의 이름과 이메일 기준
     //todo: room/roomlist.html - 검색 의 적용
