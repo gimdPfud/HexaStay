@@ -142,46 +142,38 @@
             border-radius: 6px;
         }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 999;
+        /* 옵션 변경 모달 추가 스타일 */
+        /* 옵션 변경 모달 추가 스타일 */
+        .modal-header .btn-close { /* 부트스트랩 5 닫기 버튼 스타일 기본 적용 */
+            padding: 0.5rem 0.5rem;
+            margin: -0.5rem -0.5rem -0.5rem auto;
         }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
+        .modal-body {
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #007bff #f8f9fa; /* Firefox */
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f8f9fa;
             border-radius: 10px;
-            width: 80%;
-            max-width: 300px;
-            text-align: center;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 10px;
+            border: 2px solid #f8f9fa;
+        }
+        .modal-option-item .form-check-input {
+            margin-top: 0.3rem; /* 체크박스 세로 정렬 미세 조정 */
+        }
+        .modal-option-item .input-group .btn {
+            font-weight: bold;
         }
 
-        .modal-content h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .modal-buttons button {
-            margin: 0 5px;
-            padding: 6px 12px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .food-item:hover {
-            background-color: transparent; /* 호버 시 배경색을 투명으로 설정 */
+        /* Toast 알림을 위한 z-index 조정 (모달보다 위에 표시되도록) */
+        .toast-container {
+            z-index: 1100 !important; /* 부트스트랩 모달 z-index(1050)보다 높게 설정 */
         }
 
     </style>
@@ -201,7 +193,11 @@
 * 수정일    : 2025-04-13
 *
 -------------------------------------------------------------->
+
 <div layout:fragment="contentorderA">
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="notificationArea">
+    </div>
+
     <div class="container">
 
         <div th:if="${isCartEmpty}" style="text-align: center; padding: 50px;">
@@ -314,18 +310,22 @@
 
 
             <!-- 옵션 변경 모달 -->
-            <div id="optionChangeModal" class="modal-overlay">
-                <div class="modal-content">
-                    <h3 id="optionModalProductTitle">상품명 - 옵션 변경</h3>
-                    <div id="optionModalBody" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; text-align: left;">
-                        <!-- 여기에 사용 가능한 옵션들이 동적으로 채워짐 -->
+            <div id="optionChangeModal" class="modal-overlay" style="align-items: center; justify-content: center; z-index: 1050;">
+                <div class="modal-content shadow-lg" style="max-width: 380px; border-radius: 0.5rem; background-color: #fff;">
+                    <div class="modal-header" style="padding: 1rem 1rem 0.5rem 1rem; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; background-color: #f8f9fa; border-top-left-radius: calc(0.5rem - 1px); border-top-right-radius: calc(0.5rem - 1px);">
+                        <h5 class="modal-title" id="optionModalProductTitle" style="font-size: 1.15rem; margin-bottom: 0; color: #333; font-weight: 600;">상품명 - 옵션 변경</h5>
+                        <button type="button" class="btn-close" onclick="closeOptionModal()" aria-label="Close" style="background: transparent; border: 0; font-size: 1.2rem; padding: 0.5rem; margin: -0.5rem -0.5rem -0.5rem auto; cursor:pointer;"></button>
                     </div>
-                    <div id="optionModalSelectedSummary" style="margin-bottom: 15px; font-weight: bold;">
-                        총 추가금액: <span id="modalSelectedOptionTotalPrice">0</span>원
+                    <div class="modal-body" id="optionModalBody" style="max-height: calc(70vh - 150px); overflow-y: auto; padding: 1rem; text-align: left; font-size: 0.9rem;">
                     </div>
-                    <div class="modal-buttons">
-                        <button id="saveOptionChangesBtn" class="mini-btn" style="background-color: #007bff; color:white;">변경 저장</button>
-                        <button type="button" onclick="closeOptionModal()" class="mini-btn" style="background-color: #6c757d; color:white;">취소</button>
+                    <div class="modal-footer" style="padding: 0.75rem 1rem; border-top: 1px solid #dee2e6; background-color: #f8f9fa; display:flex; justify-content: space-between; align-items: center; border-bottom-left-radius: calc(0.5rem - 1px); border-bottom-right-radius: calc(0.5rem - 1px);">
+                        <div id="optionModalSelectedSummary" style="font-weight: bold; font-size:0.9rem; color: #495057;">
+                            총 추가금액: <span id="modalSelectedOptionTotalPrice" style="color: #007bff; font-size: 1rem;">0</span><span th:text="#{item.currency}"></span>
+                        </div>
+                        <div class="modal-buttons-footer">
+                            <button type="button" onclick="closeOptionModal()" class="btn btn-sm btn-outline-secondary" style="min-width: 70px; font-weight: 500;">취소</button>
+                            <button id="saveOptionChangesBtn" class="btn btn-sm btn-primary" style="min-width: 90px; font-weight: 500;">변경 저장</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -334,6 +334,7 @@
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
         const currentUserEmail = /*[[${#authentication.principal.username}]]*/ 'guest@example.com';
@@ -344,6 +345,69 @@
         const cartDetailPageData = /*[[${cartDetailDTOList}]]*/ null;
         const jsCartDetailDTOList = cartDetailPageData ? cartDetailPageData.content : [];
         const currencySymbol = /*[[#{item.currency}]]*/ '원';
+
+        function showNotification(message, type = 'info', delay = 5000) {
+            console.log("DOM Ready. Checking for notificationArea:", document.getElementById('notificationArea')); // 확인용 로그 추가
+            const notificationArea = document.getElementById('notificationArea');
+            if (!notificationArea) {
+                console.error("알림 영역(#notificationArea)을 찾을 수 없습니다.");
+                // 비상 대체: console에라도 표시
+                console.log(`[${type.toUpperCase()}] ${message}`);
+                return;
+            }
+
+            const toastId = 'toast-' + Date.now(); // 고유 ID 생성
+            let toastBgClass = 'bg-info text-dark'; // 기본 배경/텍스트 색상
+            let toastIconHtml = '<i class="bi bi-info-circle-fill me-2"></i>'; // 기본 아이콘
+
+            switch (type.toLowerCase()) {
+                case 'success':
+                    toastBgClass = 'bg-success text-white'; // 성공: 녹색 배경, 흰색 텍스트
+                    toastIconHtml = '<i class="bi bi-check-circle-fill me-2"></i>'; // 성공 아이콘
+                    break;
+                case 'error':
+                    toastBgClass = 'bg-danger text-white'; // 오류: 빨간 배경, 흰색 텍스트
+                    toastIconHtml = '<i class="bi bi-exclamation-triangle-fill me-2"></i>'; // 오류 아이콘
+                    break;
+                case 'warning':
+                    toastBgClass = 'bg-warning text-dark'; // 경고: 노란 배경, 어두운 텍스트
+                    toastIconHtml = '<i class="bi bi-exclamation-triangle-fill me-2"></i>'; // 경고 아이콘 (오류와 동일 아이콘 사용 예시)
+                    break;
+                // 'info'는 기본값 사용
+            }
+
+            // Toast HTML 구조 생성
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center ${toastBgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${delay}">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${toastIconHtml}
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close me-2 m-auto ${toastBgClass.includes('text-white') ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            // Toast HTML을 알림 영역에 추가
+            notificationArea.insertAdjacentHTML('beforeend', toastHtml);
+
+            // 새로 추가된 Toast 요소에 대한 Bootstrap Toast 인스턴스 생성 및 표시
+            const toastElement = document.getElementById(toastId);
+            if (toastElement) {
+                const toastInstance = new bootstrap.Toast(toastElement);
+
+                // Toast가 완전히 숨겨진 후 DOM에서 제거 (메모리 관리)
+                toastElement.addEventListener('hidden.bs.toast', function () {
+                    toastInstance.dispose(); // 부트스트랩 인스턴스 정리
+                    toastElement.remove(); // HTML 요소 제거
+                });
+
+                toastInstance.show(); // Toast 표시
+            } else {
+                console.error(`ID가 ${toastId}인 Toast 요소를 찾을 수 없습니다.`);
+            }
+        }
 
         function closeOptionModal() {
             const modal = document.getElementById('optionChangeModal');
@@ -361,6 +425,7 @@
             currentEditingProductId = productId;
             let localCurrentCartItemOptions = [];
 
+            // ... (모달 요소 가져오기 및 초기화 코드) ...
             const modal = document.getElementById('optionChangeModal');
             const modalTitle = document.getElementById('optionModalProductTitle');
             const optionsContainer = document.getElementById('optionModalBody');
@@ -368,6 +433,8 @@
 
             if (!modal || !modalTitle || !optionsContainer || !selectedOptionTotalPriceEl) {
                 console.error("옵션 변경 모달의 필수 요소 중 일부를 찾을 수 없습니다.");
+                // 사용자에게 알림 (alert 대신 showNotification 사용 고려 가능)
+                showNotification("옵션 변경 창을 여는 중 문제가 발생했습니다.", 'error');
                 return;
             }
 
@@ -375,20 +442,28 @@
             selectedOptionTotalPriceEl.textContent = '0';
             modal.style.display = 'flex';
 
+
             try {
+                console.log(`상품 ID ${productId}의 옵션 목록을 서버에 요청합니다.`);
                 const availableOptionsResponse = await fetch(`/roommenu/api/products/${productId}/options`);
                 if (!availableOptionsResponse.ok) {
                     const errorData = await availableOptionsResponse.json().catch(() => ({ error: '서버 응답 형식이 올바르지 않거나, 옵션 조회에 실패했습니다.' }));
-                    throw new Error(errorData.error || `사용 가능한 옵션 목록을 불러오는데 실패했습니다. (상태: ${availableOptionsResponse.status})`);
+                    console.error("옵션 목록 API 호출 실패:", errorData);
+                    // 오류 발생 시 사용자 알림 (기존 throw Error 대신)
+                    showNotification(errorData.error || `사용 가능한 옵션 목록을 불러오는데 실패했습니다. (상태: ${availableOptionsResponse.status})`, 'error');
+                    optionsContainer.innerHTML = `<p class="text-danger">옵션 정보를 불러오는데 실패했습니다: ${errorData.error || `Status ${availableOptionsResponse.status}`}</p>`; // 모달 내부에 메시지 표시 유지 가능
+                    return; // 오류 발생 시 함수 종료
                 }
                 const availableOptions = await availableOptionsResponse.json();
+                console.log("서버로부터 받은 사용 가능한 옵션 목록:", availableOptions);
 
                 const currentCartItemDTO = jsCartDetailDTOList.find(dto => dto.roomMenuCartDetailNum == cartItemId);
                 localCurrentCartItemOptions = currentCartItemDTO ? (currentCartItemDTO.optionList || []) : [];
+                console.log("현재 장바구니 아이템에 선택된 옵션 목록:", localCurrentCartItemOptions);
 
                 const productName = currentCartItemDTO ? currentCartItemDTO.roomMenuCartDetailMenuItemName : '상품';
                 modalTitle.textContent = `${productName} - 옵션 변경`;
-                optionsContainer.innerHTML = '';
+                optionsContainer.innerHTML = ''; // 로딩 메시지 제거
 
                 if (!availableOptions || availableOptions.length === 0) {
                     optionsContainer.innerHTML = '<p class="text-center text-muted">선택 가능한 추가 옵션이 없습니다.</p>';
@@ -396,30 +471,33 @@
                     return;
                 }
 
+                // --- 옵션 렌더링 및 이벤트 리스너 설정 (내부의 alert 제거) ---
                 availableOptions.forEach(option => {
                     const selectedOpt = localCurrentCartItemOptions.find(co => co.roomMenuOptionNum === option.roomMenuOptionNum);
                     const currentQuantity = selectedOpt ? selectedOpt.roomMenuCartItemOptionAmount : 0;
 
                     const optionDiv = document.createElement('div');
                     optionDiv.className = 'modal-option-item d-flex justify-content-between align-items-center mb-2';
+                    // ... (innerHTML 설정 부분은 동일) ...
                     optionDiv.innerHTML = `
-                    <div class="form-check flex-grow-1 me-2">
-                        <input class="form-check-input option-checkbox" type="checkbox" value="${option.roomMenuOptionNum}"
-                               id="modal-opt-${option.roomMenuOptionNum}" data-price="${option.roomMenuOptionPrice}"
-                               ${currentQuantity > 0 ? 'checked' : ''}>
-                        <label class="form-check-label" for="modal-opt-${option.roomMenuOptionNum}" style="font-size:0.9rem;">
-                            ${option.roomMenuOptionName} (+${option.roomMenuOptionPrice != null ? option.roomMenuOptionPrice.toLocaleString() : 0}${currencySymbol})
-                        </label>
-                    </div>
-                    <div class="input-group input-group-sm" style="width: 120px; display: ${currentQuantity > 0 ? 'flex' : 'none'};">
-                        <button class="btn btn-outline-secondary option-qty-decrease" type="button">-</button>
-                        <input type="number" class="form-control option-quantity-input text-center"
-                               value="${currentQuantity}" min="0" max="${option.roomMenuOptionAmount}" data-option-id="${option.roomMenuOptionNum}" readonly>
-                        <button class="btn btn-outline-secondary option-qty-increase" type="button">+</button>
-                    </div>
-                    <small class="text-muted ms-2" style="font-size:0.8rem; min-width: 60px;">(재고: ${option.roomMenuOptionAmount != null ? option.roomMenuOptionAmount : 'N/A'})</small>
-                `;
+                        <div class="form-check flex-grow-1 me-2">
+                            <input class="form-check-input option-checkbox" type="checkbox" value="${option.roomMenuOptionNum}"
+                                   id="modal-opt-${option.roomMenuOptionNum}" data-price="${option.roomMenuOptionPrice}"
+                                   ${currentQuantity > 0 ? 'checked' : ''}>
+                            <label class="form-check-label" for="modal-opt-${option.roomMenuOptionNum}" style="font-size:0.9rem;">
+                                ${option.roomMenuOptionName} (+${option.roomMenuOptionPrice != null ? option.roomMenuOptionPrice.toLocaleString() : 0}${currencySymbol})
+                            </label>
+                        </div>
+                        <div class="input-group input-group-sm" style="width: 120px; display: ${currentQuantity > 0 ? 'flex' : 'none'};">
+                            <button class="btn btn-outline-secondary option-qty-decrease" type="button">-</button>
+                            <input type="number" class="form-control option-quantity-input text-center"
+                                   value="${currentQuantity}" min="0" max="${option.roomMenuOptionAmount}" data-option-id="${option.roomMenuOptionNum}" readonly>
+                            <button class="btn btn-outline-secondary option-qty-increase" type="button">+</button>
+                        </div>
+                        <small class="text-muted ms-2" style="font-size:0.8rem; min-width: 60px;">(재고: ${option.roomMenuOptionAmount != null ? option.roomMenuOptionAmount : 'N/A'})</small>
+                    `;
                     optionsContainer.appendChild(optionDiv);
+
 
                     const checkbox = optionDiv.querySelector('.option-checkbox');
                     const quantityControlDiv = optionDiv.querySelector('.input-group');
@@ -427,70 +505,114 @@
                     const decreaseBtn = optionDiv.querySelector('.option-qty-decrease');
                     const increaseBtn = optionDiv.querySelector('.option-qty-increase');
 
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            quantityControlDiv.style.display = 'flex';
-                            if (parseInt(quantityInput.value) < 1) quantityInput.value = 1;
-                        } else {
-                            quantityControlDiv.style.display = 'none';
-                            quantityInput.value = 0;
-                        }
-                        updateModalSelectedOptionTotalPriceUI();
-                    });
-
-                    quantityInput.addEventListener('input', function() {
-                        let val = parseInt(this.value);
-                        const min = parseInt(this.min);
-                        const max = parseInt(this.max);
-                        if (isNaN(val)) val = min;
-                        if (val < min) val = min;
-                        if (val > max) val = max;
-                        this.value = val;
-
-                        if (val <= 0 && checkbox.checked) {
-                            checkbox.checked = false;
-                            quantityControlDiv.style.display = 'none';
-                        } else if (val > 0 && !checkbox.checked) {
-                            checkbox.checked = true;
-                            quantityControlDiv.style.display = 'flex';
-                        }
-                        updateModalSelectedOptionTotalPriceUI();
-                    });
-
-                    decreaseBtn.addEventListener('click', function() {
-                        let qty = parseInt(quantityInput.value);
-                        if (qty > 1) {
-                            quantityInput.value = qty - 1;
-                        } else {
-                            quantityInput.value = 0;
-                            checkbox.checked = false;
-                            quantityControlDiv.style.display = 'none';
-                        }
-                        updateModalSelectedOptionTotalPriceUI();
-                    });
-
-                    increaseBtn.addEventListener('click', function() {
-                        let qty = parseInt(quantityInput.value);
-                        const maxQty = parseInt(quantityInput.max);
-                        if (qty < maxQty) {
-                            quantityInput.value = qty + 1;
-                            if (!checkbox.checked) {
-                                checkbox.checked = true;
+                    // 체크박스 변경 이벤트
+                    if (checkbox && quantityControlDiv && quantityInput) {
+                        checkbox.addEventListener('change', function() {
+                            // ... (기존 로직 유지) ...
+                            if (this.checked) {
                                 quantityControlDiv.style.display = 'flex';
+                                if (parseInt(quantityInput.value) < 1) quantityInput.value = 1;
+                            } else {
+                                quantityControlDiv.style.display = 'none';
+                                quantityInput.value = 0;
                             }
-                        } else {
-                            alert(`최대 선택 가능 수량은 ${maxQty}개 입니다.`);
-                        }
-                        updateModalSelectedOptionTotalPriceUI();
-                    });
+                            updateModalSelectedOptionTotalPriceUI();
+                        });
+                    }
+
+                    // 수량 입력 변경 이벤트 (직접 입력 시) - 최대 수량 초과 alert 제거
+                    if (quantityInput) {
+                        quantityInput.addEventListener('input', function() {
+                            let val = parseInt(this.value);
+                            const min = parseInt(this.min) || 0; // min 값 파싱, 없으면 0
+                            const max = parseInt(this.max); // max 값 파싱
+
+                            if (isNaN(val)) val = min;
+                            if (val < min) val = min;
+
+                            // max 값이 유효한 숫자인 경우에만 체크
+                            if (!isNaN(max) && val > max) {
+                                // alert(`최대 선택 가능 수량은 ${max}개 입니다.`); // alert 제거
+                                console.warn(`최대 선택 가능 수량(${max}개) 초과 시도: ${val}`);
+                                showNotification(`최대 ${max}개까지만 선택 가능합니다.`, 'warning', 3000); // 짧은 경고 알림
+                                val = max; // 최댓값으로 설정
+                            }
+                            this.value = val; // 계산된 값으로 input 업데이트
+
+                            // 체크박스 및 수량 표시 동기화
+                            if (checkbox && quantityControlDiv) {
+                                if (val <= 0 && checkbox.checked) {
+                                    checkbox.checked = false;
+                                    quantityControlDiv.style.display = 'none';
+                                } else if (val > 0 && !checkbox.checked) {
+                                    checkbox.checked = true;
+                                    quantityControlDiv.style.display = 'flex';
+                                }
+                            }
+                            updateModalSelectedOptionTotalPriceUI(); // 총액 업데이트
+                        });
+                    }
+
+
+                    // 감소 버튼 클릭 이벤트
+                    if (decreaseBtn && quantityInput && checkbox && quantityControlDiv) {
+                        decreaseBtn.addEventListener('click', function() {
+                            // ... (기존 로직 유지) ...
+                            let qty = parseInt(quantityInput.value);
+                            if (qty > 1) {
+                                quantityInput.value = qty - 1;
+                            } else {
+                                quantityInput.value = 0;
+                                checkbox.checked = false;
+                                quantityControlDiv.style.display = 'none';
+                            }
+                            updateModalSelectedOptionTotalPriceUI();
+                        });
+                    }
+
+                    // 증가 버튼 클릭 이벤트 - 최대 수량 초과 alert 제거
+                    if (increaseBtn && quantityInput && checkbox && quantityControlDiv) {
+                        increaseBtn.addEventListener('click', function() {
+                            let qty = parseInt(quantityInput.value);
+                            const maxQty = parseInt(quantityInput.max);
+
+                            // maxQty가 유효한 숫자인 경우에만 비교
+                            if (!isNaN(maxQty)) {
+                                if (qty < maxQty) {
+                                    quantityInput.value = qty + 1;
+                                    if (!checkbox.checked) {
+                                        checkbox.checked = true;
+                                        quantityControlDiv.style.display = 'flex';
+                                    }
+                                } else {
+                                    // alert(`최대 선택 가능 수량은 ${maxQty}개 입니다.`); // alert 제거
+                                    console.warn(`최대 선택 가능 수량(${maxQty}개) 도달`);
+                                    showNotification(`최대 ${maxQty}개까지만 선택 가능합니다.`, 'warning', 3000);
+                                }
+                            } else {
+                                // maxQty가 숫자가 아니면 (재고 정보가 없거나 잘못된 경우) 제한 없이 증가 (혹은 다른 정책 적용)
+                                quantityInput.value = qty + 1;
+                                if (!checkbox.checked) {
+                                    checkbox.checked = true;
+                                    quantityControlDiv.style.display = 'flex';
+                                }
+                                console.warn(`옵션 ${option.roomMenuOptionName}의 최대 수량 정보(max)가 유효하지 않습니다.`);
+                            }
+                            updateModalSelectedOptionTotalPriceUI();
+                        });
+                    }
                 });
-                updateModalSelectedOptionTotalPriceUI();
+                updateModalSelectedOptionTotalPriceUI(); // 모든 옵션 처리 후 총액 업데이트
+
             } catch (error) {
                 console.error("옵션 변경 모달 생성 중 오류:", error);
                 optionsContainer.innerHTML = `<p class="text-danger">옵션 정보를 불러오는데 실패했습니다: ${error.message}</p>`;
+                showNotification(`옵션 정보를 불러오는 중 오류 발생: ${error.message}`, 'error'); // 오류 알림
             }
         }
 
+
+        // --- 기존 updateModalSelectedOptionTotalPriceUI 함수 유지 ---
         function updateModalSelectedOptionTotalPriceUI() {
             const optionsContainer = document.getElementById('optionModalBody');
             const totalPriceEl = document.getElementById('modalSelectedOptionTotalPrice');
@@ -500,7 +622,8 @@
             optionsContainer.querySelectorAll('.modal-option-item').forEach(itemDiv => {
                 const checkbox = itemDiv.querySelector('.option-checkbox');
                 const quantityInput = itemDiv.querySelector('.option-quantity-input');
-                if (checkbox.checked) {
+                // 체크되어 있고, 수량이 0보다 큰 경우만 계산
+                if (checkbox && checkbox.checked && quantityInput) {
                     const price = parseFloat(checkbox.dataset.price);
                     const quantity = parseInt(quantityInput.value);
                     if (!isNaN(price) && !isNaN(quantity) && quantity > 0) {
@@ -511,12 +634,15 @@
             totalPriceEl.textContent = totalOptionPrice.toLocaleString();
         }
 
+        // --- 기존 saveChangedOptions 함수 (alert 수정) ---
         async function saveChangedOptions() {
             if (!currentEditingCartItemId) {
-                alert("오류: 변경할 장바구니 아이템 정보가 없습니다.");
+                // alert("오류: 변경할 장바구니 아이템 정보가 없습니다."); // alert 제거
+                showNotification("변경할 장바구니 아이템 정보가 없습니다.", 'error');
                 return;
             }
 
+            // ... (selectedOptionUpdates 생성 로직 유지) ...
             const selectedOptionUpdates = [];
             document.querySelectorAll('#optionModalBody .modal-option-item').forEach(itemDiv => {
                 const checkbox = itemDiv.querySelector('.option-checkbox');
@@ -524,17 +650,20 @@
                 const optionId = parseInt(checkbox.value);
                 let quantity = 0;
 
-                if (checkbox.checked) {
+                if (checkbox.checked && quantityInput) { // quantityInput도 있는지 확인
                     quantity = parseInt(quantityInput.value);
-                }
-
-                if (quantity > 0) {
-                    selectedOptionUpdates.push({
-                        roomMenuOptionNum: optionId,
-                        roomMenuCartItemOptionAmount: quantity
-                    });
+                    // 수량이 0보다 큰 경우에만 추가
+                    if (quantity > 0 && !isNaN(optionId)) {
+                        selectedOptionUpdates.push({
+                            roomMenuOptionNum: optionId,
+                            roomMenuCartItemOptionAmount: quantity
+                        });
+                    }
+                } else if (!checkbox.checked && quantityInput){ // 체크 해제된 경우 (수량이 0이 됨), 명시적으로 0으로 보내거나 제외할 수 있음. 여기서는 제외.
+                    // 필요하다면 quantity: 0 으로 보내는 로직 추가 가능
                 }
             });
+
 
             console.log("서버로 전송할 옵션 업데이트 정보:", JSON.stringify(selectedOptionUpdates));
 
@@ -552,24 +681,29 @@
                 const response = await fetch(finalUrl, {
                     method: 'PUT',
                     headers: headers,
-                    body: JSON.stringify(selectedOptionUpdates)
+                    body: JSON.stringify(selectedOptionUpdates) // 항상 배열 형태로 보냄 (빈 배열 포함)
                 });
 
                 const responseData = await response.json();
                 if (response.ok) {
-                    alert(responseData.message || '옵션이 성공적으로 변경되었습니다.');
+                    // alert(responseData.message || '옵션이 성공적으로 변경되었습니다.'); // alert 제거
+                    showNotification(responseData.message || '옵션이 성공적으로 변경되었습니다.', 'success');
                     closeOptionModal();
-                    location.reload();
+                    location.reload(); // 페이지 새로고침으로 변경사항 반영
                 } else {
+                    // 서버에서 구체적인 오류 메시지를 보내는 경우 활용
                     throw new Error(responseData.error || responseData.message || `옵션 변경에 실패했습니다. (상태: ${response.status})`);
                 }
             } catch (error) {
                 console.error('옵션 변경 저장 실패:', error);
-                alert(`❌ 옵션 변경 실패: ${error.message}`);
+                // alert(`❌ 옵션 변경 실패: ${error.message}`); // alert 제거
+                showNotification(`옵션 변경 실패: ${error.message}`, 'error');
             }
         }
 
+        // --- 기존 updateFinalTotal 함수 유지 ---
         function updateFinalTotal() {
+            // ... (함수 내용은 변경 없음) ...
             let grandTotal = 0;
             console.warn("----- updateFinalTotal 함수 실행 시작 -----");
 
@@ -592,9 +726,8 @@
 
                     if (isNaN(itemTotal)) {
                         console.error(`아이템 [${itemNumberForLog}] (${itemName}): 가격 "${rawText}" (추출: "${numericString}")을 숫자로 변환하는데 실패 (NaN). 합산에서 0으로 처리합니다.`);
-                        // grandTotal에 0을 더하거나 아무것도 하지 않음 (기본값 0 유지)
                     } else {
-                        grandTotal += itemTotal; // ★★★ grandTotal 합산은 한 번만 수행 ★★★
+                        grandTotal += itemTotal;
                         console.log(`아이템 [${itemNumberForLog}] (${itemName}): 파싱된 itemTotal = ${itemTotal}, 현재까지 grandTotal = ${grandTotal}`);
                     }
                 } else {
@@ -607,25 +740,24 @@
             const finalTotalEl = document.getElementById('finalAmount');
             const discountEl = document.getElementById('discountAmount');
 
+            // 최종 금액 업데이트 (쿠폰 적용 여부 고려)
             if (finalTotalEl) {
-                if (couponFinalTotal !== null && !isNaN(couponFinalTotal)) {
-                    finalTotalEl.innerHTML = `: ${couponFinalTotal.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
-                } else {
-                    finalTotalEl.innerHTML = `: ${grandTotal.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
-                }
+                const displayTotal = (couponFinalTotal !== null && !isNaN(couponFinalTotal)) ? couponFinalTotal : grandTotal;
+                // #numbers.formatDecimal과 유사하게 포맷팅 (JS toLocaleString 사용)
+                finalTotalEl.innerHTML = `${displayTotal.toLocaleString()}<span class="currency"> ${currencySymbol}</span>`;
             }
 
+            // 할인 금액 업데이트
             if (discountEl) {
-                if (couponFinalTotal !== null && !isNaN(couponFinalTotal)) {
-                    const discountAmount = grandTotal - couponFinalTotal;
-                    discountEl.innerHTML = `${discountAmount.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
-                } else {
-                    discountEl.innerHTML = `0<span class="currency">${currencySymbol}</span>`;
-                }
+                const discountAmount = (couponFinalTotal !== null && !isNaN(couponFinalTotal)) ? (grandTotal - couponFinalTotal) : 0;
+                // 할인 금액이 0보다 클 때만 표시, 아니면 0으로 표시
+                discountEl.innerHTML = `${discountAmount > 0 ? discountAmount.toLocaleString() : '0'}<span class="currency"> ${currencySymbol}</span>`;
             }
             console.warn("----- updateFinalTotal 함수 실행 완료 -----");
+
         }
 
+        // --- 기존 updateQuantity 함수 (alert 수정) ---
         function updateQuantity(itemId, quantity) {
             const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
             const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
@@ -638,41 +770,66 @@
                 method: 'PUT',
                 headers: headers
             })
-                .then(response => {
+                .then(async response => { // async 추가하여 response.json()을 await으로 처리
                     if (response.ok) {
                         console.log('수량 변경 성공');
+
                         location.reload();
                     } else {
-                        response.text().then(text => {
-                            alert(`❌ 수량 변경 실패: ${text || '서버 오류'}`);
-                        });
+                        // 실패 시 서버 응답 본문(JSON)에서 오류 메시지 추출 시도
+                        let errorMsg = `수량 변경에 실패했습니다. (상태: ${response.status})`;
+                        try {
+                            // ★★★ 서버에서 JSON 형태 {"error": "메시지"} 로 보내준다고 가정 ★★★
+                            const errorData = await response.json();
+                            if (errorData && errorData.error) {
+                                errorMsg = errorData.error;
+                            } else {
+                                // JSON 파싱은 성공했으나 error 필드가 없는 경우, 텍스트로 다시 시도
+                                const text = await response.text();
+                                errorMsg = text || errorMsg;
+                            }
+                        } catch (e) {
+                            // JSON 파싱 실패 시, 텍스트로 오류 메시지 추출 시도
+                            try {
+                                const text = await response.text(); // 이미 읽으려 시도했을 수 있으므로 주의
+                                errorMsg = text || errorMsg;
+                            } catch (e2) {
+
+                            }
+                        }
+                        throw new Error(errorMsg);
                     }
                 })
                 .catch(error => {
                     console.error('수량 변경 중 에러 발생:', error);
-                    alert('❌ 수량 변경 중 오류가 발생했습니다.');
+                    showNotification(`수량 변경 실패: ${error.message}`, 'error');
                 });
         }
 
+        // --- 기존 goToOrderPage 함수 유지 ---
         function goToOrderPage() {
             window.location.href = '/roommenu/orderpage';
         }
 
+        // --- 기존 processPayment 함수 (alert 수정) ---
         function processPayment() {
+            // ... (기존 가격 및 요청 메시지 추출 로직 유지) ...
             const requestMessage = document.getElementById('request-input').value;
             let finalAmountText = "0";
             const finalAmountSpan = document.getElementById('finalAmount');
 
-            if (finalAmountSpan && finalAmountSpan.textContent.includes(currencySymbol)) {
-                const match = finalAmountSpan.textContent.match(/:\s*([\d,]+)/); // '원' 제외하고 숫자와 콤마만 추출
-                if (match && match[1]) {
-                    finalAmountText = match[1];
-                } else {
-                    finalAmountText = finalAmountSpan.textContent.replace(/[^\d,]/g, '');
-                }
+            if (finalAmountSpan) {
+                // '원' 및 통화 기호, 공백, 콤마 제거하고 숫자만 추출
+                finalAmountText = finalAmountSpan.textContent.replace(/[^\d]/g, '');
             }
-            const tossprice = parseInt(finalAmountText.replace(/,/g, ''), 10) || 0; // 콤마만 제거
+            const tossprice = parseInt(finalAmountText, 10) || 0; // 안전하게 파싱, 실패 시 0
             console.log("Final price for Toss payment:", tossprice);
+
+            if (tossprice <= 0) {
+                showNotification("결제할 금액이 없습니다.", 'warning');
+                return; // 결제 금액이 0 이하면 진행 중단
+            }
+
 
             const selectedCouponNum = document.getElementById('couponSelect').value;
             const formData = new URLSearchParams();
@@ -680,17 +837,22 @@
             if (selectedCouponNum) {
                 formData.append('couponNum', selectedCouponNum);
             }
+            // 할인된 최종 금액이 있다면 함께 전송
             if (couponFinalTotal !== null) {
                 formData.append('discountedTotalPrice', couponFinalTotal);
             }
-            formData.append('finalOrderPrice', tossprice);
+            formData.append('finalOrderPrice', tossprice); // 최종 결제 금액 전송
 
             const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
             const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
-            const headers = { "Content-Type": "application/x-www-form-urlencoded" }; // POST는 form-urlencoded 유지
+            const headers = { "Content-Type": "application/x-www-form-urlencoded" };
             if (csrfToken && csrfHeader) {
                 headers[csrfHeader] = csrfToken;
             }
+
+            // 결제 버튼 비활성화 (중복 클릭 방지) - 옵션
+            const payButton = document.querySelector('.add-to-cart-btn');
+            if(payButton) payButton.disabled = true;
 
             fetch("/roommenu/cart", {
                 method: "POST",
@@ -699,62 +861,100 @@
             })
                 .then(res => {
                     if (!res.ok) {
-                        return res.text().then(text => { throw new Error(`주문 처리 실패: ${res.status} - ${text}`); });
+                        // 서버에서 JSON 형태의 오류 메시지를 보낼 경우 대비
+                        return res.text().then(text => {
+                            let errorMsg = `주문 처리 실패: ${res.status}`;
+                            try {
+                                const errJson = JSON.parse(text);
+                                errorMsg = errJson.message || errJson.error || text;
+                            } catch (e) {
+                                errorMsg = text || errorMsg; // JSON 파싱 실패 시 원본 텍스트 사용
+                            }
+                            throw new Error(errorMsg);
+                        });
                     }
-                    return res.text();
+                    return res.text(); // 성공 시 결과 텍스트 받기 (예: 주문 번호 등)
                 })
                 .then(orderResult => {
                     console.log("Order creation successful:", orderResult);
-                    alert("결제 페이지로 이동합니다!");
+                    // alert("결제 페이지로 이동합니다!"); // alert 제거
+                    showNotification("결제 페이지로 이동합니다.", 'info');
+
+                    // 토스 결제 페이지 URL 생성 및 팝업 시도
                     const url = `/payment?tossprice=${tossprice}`;
                     const popup = window.open(url, "_blank", "width=600,height=800");
-                    if (!popup) {
-                        alert("팝업 차단 기능을 해제해주세요.");
+
+                    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
+                        // alert("팝업 차단 기능을 해제해주세요."); // alert 제거
+                        showNotification("팝업이 차단되었습니다. 팝업 차단 기능을 해제하고 다시 시도해주세요.", 'warning', 7000); // 7초간 경고
+                        // 결제 버튼 다시 활성화
+                        if(payButton) payButton.disabled = false;
+                    } else {
+                        // 팝업 성공 시 로딩 페이지로 리디렉션
+                        window.location.href = "/tossloading"; // 또는 주문 완료 페이지 등
                     }
-                    window.location.href = "/tossloading";
                 })
                 .catch(err => {
-                    console.error("결제 중 오류 발생:", err);
-                    alert("❌ 결제 중 오류 발생: " + err.message);
+                    console.error("결제 처리 중 오류 발생:", err);
+                    // alert("❌ 결제 중 오류 발생: " + err.message); // alert 제거
+                    showNotification(`결제 처리 중 오류 발생: ${err.message}`, 'error');
+                    // 결제 버튼 다시 활성화
+                    if(payButton) payButton.disabled = false;
                 });
         }
 
-        // DOMContentLoaded 이벤트 리스너 (하나로 통합)
+        // DOMContentLoaded 이벤트 리스너 (alert 수정 및 통합된 로직)
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("DOMContentLoaded 이벤트 리스너 실행 (통합)");
+            console.log("DOMContentLoaded 이벤트 리스너 실행 (통합 및 알림 수정)");
 
+            // 쿠폰 선택 이벤트 리스너
             const couponSelect = document.getElementById('couponSelect');
             if (couponSelect) {
                 couponSelect.addEventListener('change', function () {
                     const couponNum = this.value;
-                    if (couponNum === "") {
-                        document.getElementById('discountAmount').innerHTML = `0<span class="currency">${currencySymbol}</span>`;
-                        couponFinalTotal = null;
-                        updateFinalTotal();
+                    const discountAmountEl = document.getElementById('discountAmount');
+
+                    if (couponNum === "") { // 쿠폰 선택 안 함
+                        if (discountAmountEl) discountAmountEl.innerHTML = `0<span class="currency">${currencySymbol}</span>`;
+                        couponFinalTotal = null; // 할인 정보 초기화
+                        updateFinalTotal(); // 총액 다시 계산
                         return;
                     }
+
+                    // 서버에 쿠폰 적용 요청
                     fetch(`/roommenu/coupon/apply?email=${encodeURIComponent(currentUserEmail)}&couponNum=${encodeURIComponent(couponNum)}`)
                         .then(response => {
                             if (!response.ok) {
-                                return response.json().then(err => { throw new Error(err.error || `쿠폰 적용 중 서버 오류 (${response.status})`); });
+                                // 오류 응답 처리 (JSON 파싱 시도)
+                                return response.json().then(err => {
+                                    throw new Error(err.error || `쿠폰 적용 중 서버 오류 (${response.status})`);
+                                });
                             }
-                            return response.json();
+                            return response.json(); // 성공 시 JSON 파싱
                         })
-                        .then(data => {
-                            document.getElementById('discountAmount').innerHTML = `${data.discount.toLocaleString()}<span class="currency">${currencySymbol}</span>`;
-                            couponFinalTotal = data.finalTotal;
-                            updateFinalTotal();
+                        .then(data => { // 쿠폰 적용 성공
+                            if (discountAmountEl) {
+                                discountAmountEl.innerHTML = `${data.discount.toLocaleString()}<span class="currency"> ${currencySymbol}</span>`;
+                            }
+                            couponFinalTotal = data.finalTotal; // 할인 적용된 최종 금액 저장
+                            updateFinalTotal(); // 총액 업데이트
+                            showNotification('쿠폰이 적용되었습니다.', 'success');
                         })
-                        .catch(error => {
+                        .catch(error => { // 쿠폰 적용 실패 또는 네트워크 오류
                             console.error("쿠폰 적용 실패:", error);
-                            alert("❌ 쿠폰 적용에 실패했습니다: " + error.message);
-                            document.getElementById('discountAmount').innerHTML = `0<span class="currency">${currencySymbol}</span>`;
-                            couponFinalTotal = null;
-                            updateFinalTotal();
+                            // alert("❌ 쿠폰 적용에 실패했습니다: " + error.message); // alert 제거
+                            showNotification(`쿠폰 적용 실패: ${error.message}`, 'error');
+                            if (discountAmountEl) { // 할인 표시 초기화
+                                discountAmountEl.innerHTML = `0<span class="currency">${currencySymbol}</span>`;
+                            }
+                            couponFinalTotal = null; // 할인 정보 초기화
+                            this.value = ""; // select 선택 해제
+                            updateFinalTotal(); // 총액 다시 계산
                         });
                 });
             }
 
+            // 각 음식 아이템에 대한 수량 조절 및 가격 업데이트 로직
             document.querySelectorAll('.food-item').forEach(item => {
                 const decreaseBtn = item.querySelector('.decrease');
                 const increaseBtn = item.querySelector('.increase');
@@ -763,54 +963,92 @@
                 const itemId = item.getAttribute('data-item-id');
                 let pricePerItem = 0;
 
-                if(input && itemTotalSpan) {
+                const cartItemData = jsCartDetailDTOList.find(dto => dto.roomMenuCartDetailNum == itemId);
+                const availableStock = cartItemData ? cartItemData.availableStock : Infinity; // 재고 정보 없으면 무한대로 가정(기존 방식 유지)// 개당 가격 (옵션 포함)
+
+
+
+                // 초기 개당 가격 계산 (서버에서 내려온 DTO의 roomMenuCartItemPrice 사용)
+                if (input && itemTotalSpan) {
                     const initialQuantity = parseInt(input.value, 10) || 1;
                     const rawTotalText = itemTotalSpan.textContent;
                     const numericTotalString = rawTotalText.replace(/[^\d]/g, '');
-                    const initialItemTotal = parseInt(numericTotalString, 10) || 0;
-                    pricePerItem = initialQuantity > 0 ? initialItemTotal / initialQuantity : 0;
-                    if (isNaN(pricePerItem) || !isFinite(pricePerItem)) {
-                        console.warn(`아이템 ID ${itemId}의 pricePerItem 계산 실패. initialItemTotal=${initialItemTotal}, initialQuantity=${initialQuantity}`);
-                        pricePerItem = 0;
+                    const initialItemTotalFromServer = parseInt(numericTotalString, 10) || 0; // 서버에서 계산된 아이템 총 가격
+
+                    if (initialQuantity > 0) {
+                        // ★ 서버에서 계산된 아이템 총 가격을 기준으로 개당 가격을 추정 ★
+                        pricePerItem = initialItemTotalFromServer / initialQuantity;
                     }
+
+                    if (isNaN(pricePerItem) || !isFinite(pricePerItem)) {
+                        console.warn(`아이템 ID ${itemId}의 pricePerItem 계산 실패. initialItemTotalFromServer=${initialItemTotalFromServer}, initialQuantity=${initialQuantity}. pricePerItem을 0으로 설정합니다.`);
+                        pricePerItem = 0; // 계산 실패 시 0으로 설정
+                    }
+                    console.log(`아이템 ID ${itemId}: 초기 수량=${initialQuantity}, 서버 총액=${initialItemTotalFromServer}, 계산된 개당 가격=${pricePerItem}`);
                 }
 
-                if(decreaseBtn && input && itemTotalSpan) {
+                // 감소 버튼 이벤트
+                if (decreaseBtn && input && itemTotalSpan) {
                     decreaseBtn.addEventListener('click', () => {
                         let quantity = parseInt(input.value, 10);
                         if (quantity > 1) {
                             quantity--;
                             input.value = quantity;
-                            itemTotalSpan.textContent = (pricePerItem * quantity).toLocaleString();
-                            updateFinalTotal(); // 화면상 총액 먼저 업데이트
-                            updateQuantity(itemId, quantity); // 그 후 서버 업데이트 및 새로고침
+                            // 계산된 개당 가격으로 화면 업데이트 (주의: 실제 정확한 금액은 서버 업데이트 후 새로고침으로 반영됨)
+                            if (pricePerItem > 0) {
+                                itemTotalSpan.textContent = (pricePerItem * quantity).toLocaleString();
+                            }
+                            updateFinalTotal(); // 화면상 총액 즉시 업데이트
+                            updateQuantity(itemId, quantity); // 서버에 수량 변경 요청
+                        } else {
+                            showNotification("최소 수량은 1개입니다.", 'warning', 2000); // 최소 수량 알림
                         }
                     });
                 }
 
-                if(increaseBtn && input && itemTotalSpan) {
+                // 증가 버튼 이벤트 수정
+                if (increaseBtn && input && itemTotalSpan) {
                     increaseBtn.addEventListener('click', () => {
-                        let quantity = parseInt(input.value, 10);
-                        quantity++;
-                        input.value = quantity;
-                        // 서버에서 재고 체크를 한다고 가정하고, 여기서는 일단 수량 증가 허용
-                        itemTotalSpan.textContent = (pricePerItem * quantity).toLocaleString();
-                        updateFinalTotal(); // 화면상 총액 먼저 업데이트
-                        updateQuantity(itemId, quantity); // 그 후 서버 업데이트 및 새로고침
+                        let currentQuantity = parseInt(input.value, 10);
+                        let newQuantity = currentQuantity + 1;
+
+                        // ★★★ 재고 확인 로직 추가 ★★★
+                        if (newQuantity > availableStock) {
+                            // 재고 초과 시 알림 표시하고 함수 종료 (서버 요청 안 함)
+                            showNotification(`재고가 부족합니다. (최대 ${availableStock}개)`, 'warning', 3000);
+                            return;
+                        }
+
+                        // 재고 내라면 기존 로직 수행
+                        input.value = newQuantity;
+                        if (pricePerItem > 0) {
+                            itemTotalSpan.textContent = (pricePerItem * newQuantity).toLocaleString();
+                        }
+                        updateFinalTotal(); // 화면상 총액 즉시 업데이트
+                        updateQuantity(itemId, newQuantity); // 서버에 수량 변경 요청
                     });
                 }
-            });
+            })
 
+
+            // 삭제 버튼 이벤트 리스너 (jQuery AJAX 유지, alert 수정)
             document.querySelectorAll('.delete-btn').forEach(button => {
                 button.addEventListener('click', function () {
                     const itemElement = this.closest('.food-item');
                     const itemId = itemElement.getAttribute('data-item-id');
-                    if (!confirm("정말 삭제하시겠습니까?")) return;
 
-                    $.ajax({ // 삭제는 jQuery Ajax 유지 (CSRF 토큰 처리 간편)
+                    // confirm 대신 커스텀 모달이나 다른 UI 사용을 고려할 수 있으나, 일단 유지
+                    if (!confirm("정말 삭제하시겠습니까?")) {
+                        return; // 사용자가 취소하면 아무것도 안 함
+                    }
+
+                    // 삭제 버튼 비활성화 (중복 클릭 방지)
+                    this.disabled = true;
+
+                    $.ajax({
                         url: `/roommenu/roomMenuCartItemDelete/${itemId}`,
                         type: 'DELETE',
-                        beforeSend: function(xhr) {
+                        beforeSend: function (xhr) {
                             const csrfToken = $("meta[name='_csrf']").attr("content");
                             const csrfHeader = $("meta[name='_csrf_header']").attr("content");
                             if (csrfToken && csrfHeader) {
@@ -818,51 +1056,113 @@
                             }
                         },
                         success: () => {
-                            itemElement.remove();
-                            updateFinalTotal();
+                            showNotification('아이템이 삭제되었습니다.', 'success');
+                            itemElement.remove(); // 화면에서 아이템 제거
+                            updateFinalTotal(); // 총 금액 업데이트
+
+                            // 장바구니가 비었는지 확인하고 메시지 표시
                             if (document.querySelectorAll('.food-item').length === 0) {
-                                const containerDiv = document.querySelector('#cart-items-wrapper').closest('.container');
+                                const containerDiv = document.querySelector('#cart-items-wrapper')?.closest('.container'); // #cart-items-wrapper를 감싸는 .container 찾기
                                 if (containerDiv) {
-                                    containerDiv.innerHTML = `<div style="text-align:center; padding:50px; color:#888;">🛒 장바구니에 아이템이 존재하지 않습니다.</div>`;
+                                    // 기존 내용 지우고 빈 메시지 표시
+                                    const cartWrapper = document.getElementById('cart-items-wrapper');
+                                    const couponBox = document.querySelector('.coupon-select-box');
+                                    const requestSection = document.querySelector('.request-section');
+                                    const pricingSection = document.querySelector('.pricing-section');
+                                    const paymentButton = document.querySelector('.add-to-cart-btn');
+                                    const backButton = document.querySelector('.back-btn');
+
+                                    if (cartWrapper) cartWrapper.remove();
+                                    if (couponBox) couponBox.remove();
+                                    if (requestSection) requestSection.remove();
+                                    if (pricingSection) pricingSection.remove();
+                                    if (paymentButton) paymentButton.remove();
+                                    if (backButton) backButton.remove(); // 뒤로가기 버튼도 제거할지 결정
+
+                                    // 장바구니 비었음 메시지 추가 (th:if 로직과 유사하게)
+                                    const emptyMessageDiv = document.createElement('div');
+                                    emptyMessageDiv.style.textAlign = 'center';
+                                    emptyMessageDiv.style.padding = '50px';
+                                    emptyMessageDiv.style.color = '#888';
+                                    emptyMessageDiv.textContent = /*[[#{cart.emptyMessage}]]*/ '장바구니가 비어 있습니다.'; // Thymeleaf 메시지 사용 (JS 렌더링 시 대체 텍스트)
+                                    containerDiv.appendChild(emptyMessageDiv);
+
+                                    // 필요하다면 뒤로가기 버튼만 다시 추가
+                                    if (!backButton) { // backButton이 위에서 제거되지 않았다면 추가하지 않음
+                                        const newBackButton = document.createElement('button');
+                                        newBackButton.className = 'btn back-btn';
+                                        newBackButton.textContent = /*[[#{cart.back}]]*/ '메뉴로 돌아가기';
+                                        newBackButton.style = "width: 100%; padding: 12px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; background-color: #ddd; color: black;";
+                                        newBackButton.onclick = goToOrderPage;
+                                        containerDiv.appendChild(newBackButton);
+                                    }
                                 }
                             }
                         },
                         error: (xhr, status, error) => {
                             console.error("삭제 실패:", status, error, xhr.responseText);
-                            alert("❌ 삭제 실패: " + (xhr.responseText || "서버 오류"));
+                            let errorMsg = "아이템 삭제에 실패했습니다.";
+                            if (xhr.responseText) {
+                                try { // JSON 오류 메시지 파싱 시도
+                                    const errJson = JSON.parse(xhr.responseText);
+                                    errorMsg = errJson.message || errJson.error || xhr.responseText;
+                                } catch (e) {
+                                    errorMsg = xhr.responseText;
+                                } // 파싱 실패 시 원본 사용
+                            }
+                            // alert("❌ 삭제 실패: " + errorMsg); // alert 제거
+                            showNotification(`삭제 실패: ${errorMsg}`, 'error');
+                            this.disabled = false; // 실패 시 버튼 다시 활성화
                         }
                     });
                 });
             });
 
+            // 옵션 변경 버튼 이벤트 리스너
             document.querySelectorAll('.change-options-btn').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const cartItemId = this.dataset.cartItemId;
                     const productId = this.dataset.productId;
-                    openOptionChangeModal(cartItemId, productId);
+                    if (cartItemId && productId) {
+                        openOptionChangeModal(cartItemId, productId);
+                    } else {
+                        console.error("옵션 변경 버튼에 cartItemId 또는 productId 데이터가 없습니다.");
+                        showNotification("옵션 변경 정보를 불러올 수 없습니다.", "error");
+                    }
                 });
             });
 
+            // 옵션 변경 저장 버튼 이벤트 리스너
             const saveOptionBtn = document.getElementById('saveOptionChangesBtn');
             if (saveOptionBtn) {
                 saveOptionBtn.addEventListener('click', saveChangedOptions);
             }
 
+            // 요청사항 로컬 스토리지 연동
             const requestInput = document.getElementById('request-input');
             if (requestInput) {
                 const savedRequestMessage = localStorage.getItem('roomMenuRequestMessage');
                 if (savedRequestMessage) {
                     requestInput.value = savedRequestMessage;
                 }
-                requestInput.addEventListener('input', function() {
+                requestInput.addEventListener('input', function () {
                     localStorage.setItem('roomMenuRequestMessage', this.value);
                 });
             }
 
             // 페이지 로드 시 초기 총 금액 계산 및 표시
             updateFinalTotal();
+
+            // 페이지 로드 시 혹시 URL 파라미터 등으로 전달된 메시지가 있다면 표시 (예시)
+            const urlParams = new URLSearchParams(window.location.search);
+            const notificationMsg = urlParams.get('notificationMsg');
+            const notificationType = urlParams.get('notificationType') || 'info'; // 기본값 info
+            if (notificationMsg) {
+                showNotification(decodeURIComponent(notificationMsg), notificationType);
+                // URL에서 파라미터 제거 (새로고침 시 다시 표시되지 않도록)
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         });
-        /*]]>*/
     </script>
 </div>
 </body>
