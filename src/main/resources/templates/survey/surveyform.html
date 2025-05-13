@@ -13,22 +13,31 @@
             margin: 0 auto;
             padding: 20px;
         }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
+
         .ck-editor__editable {
             min-height: 150px;
         }
+
         .btn-group {
             margin-top: 20px;
             display: flex;
             gap: 10px;
             justify-content: flex-end;
         }
+
+        .survey-form-container .form-label,
+        .survey-form-container .form-control {
+            font-weight: 300; /* 얇게 */
+        }
     </style>
 </head>
-<body>
+<body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
+
     <div class="survey-form-container">
         <h2 class="mb-4" th:text="${survey != null ? '설문조사 수정' : '새 설문조사 작성'}">설문조사 작성</h2>
         
