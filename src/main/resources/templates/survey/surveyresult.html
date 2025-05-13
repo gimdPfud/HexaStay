@@ -6,34 +6,36 @@
 <head>
     <meta charset="UTF-8">
     <title>설문조사 결과</title>
-
-
-</head>
-<body>
-<div layout:fragment="content">
-<div class="result-container">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-
     <style>
         body { background: #f8f9fa; font-family: 'Noto Sans KR', sans-serif; }
-        .result-container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+        .result-container { max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
         .result-title { color: #1D6F42; font-weight: 700; margin-bottom: 24px; }
         .stat-table th, .stat-table td { text-align: center; }
         .stat-table th { background: #f1f3f5; }
         .stat-table { margin-bottom: 32px; }
         .participant-table th, .participant-table td { text-align: center; }
         .participant-table th { background: #e9ecef; }
-        .participant-table { font-size: 0.97rem; }
+        .participant-table { font-size: 0.85rem; }
         .no-data { color: #888; text-align: center; padding: 40px 0; }
+        td, th {
+            vertical-align: middle;
+        }
+        .modal-dialog {
+            margin-top: 150px;
+        }
     </style>
+</head>
+<body style="background-color: #f8f9fa;">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<div layout:fragment="content">
+<div class="result-container">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
 
-    <h2 class="result-title" th:text="${survey.surveyTitle}">설문조사 제목</h2>
-    <div class="mb-4">
-        <strong>설문 설명:</strong> <span th:utext="${survey.surveyContent}">설문 설명</span>
-    </div>
+    <h2 class="result-title">설문조사 결과</h2>
     <div class="mb-4">
         <strong>참여 인원:</strong> <span th:text="${participantCount}">0</span>명
     </div>
@@ -47,13 +49,13 @@
     <table class="table table-bordered stat-table">
         <thead>
         <tr>
-            <th>전체 평균</th>
-            <th>청결도</th>
-            <th>직원 친절도</th>
-            <th>체크인/아웃</th>
-            <th>시설</th>
-            <th>음식</th>
-            <th>가성비</th>
+            <th style="width: 30%">전체 평균</th>
+            <th style="width: 11%">청결도</th>
+            <th style="width: 11%">직원 친절도</th>
+            <th style="width: 11%">체크인/아웃</th>
+            <th style="width: 11%">시설</th>
+            <th style="width: 11%">음식</th>
+            <th style="width: 11%">가성비</th>
         </tr>
         </thead>
         <tbody>
@@ -69,23 +71,23 @@
         </tbody>
     </table>
 
-    <h4 class="mt-5 mb-3">참여자 리스트</h4>
+    <h5 class="mt-5 mb-3">참여자 리스트</h5>
     <div th:if="${#lists.isEmpty(responses)}" class="no-data">
         참여자가 없습니다.
     </div>
     <table class="table table-striped table-bordered participant-table" th:if="${!#lists.isEmpty(responses)}">
         <thead>
         <tr>
-            <th>이름(이메일)</th>
-            <th>객실명</th>
-            <th>청결도</th>
-            <th>직원</th>
-            <th>체크인/아웃</th>
-            <th>시설</th>
-            <th>음식</th>
-            <th>가성비</th>
-            <th>코멘트</th>
-            <th>제출일</th>
+            <th style="width: 15%">이름(이메일)</th>
+            <th style="width: 13%">객실명</th>
+            <th style="width: 8%">청결도</th>
+            <th style="width: 9%">직원 친절도</th>
+            <th style="width: 9%">체크인/아웃</th>
+            <th style="width: 8%">시설</th>
+            <th style="width: 8%">음식</th>
+            <th style="width: 8%">가성비</th>
+            <th style="width: 8%">comment</th>
+            <th style="width: 15%">제출일</th>
         </tr>
         </thead>
         <tbody>
@@ -98,11 +100,35 @@
             <td th:text="${r.surveyResultFacility}">0</td>
             <td th:text="${r.surveyResultFood}">0</td>
             <td th:text="${r.surveyResultValue}">0</td>
-            <td th:text="${r.surveyResultComment}">-</td>
+            <td>
+                <button class="btn btn-outline-primary btn-sm"
+                        th:attr="data-comment=${r.surveyResultComment}"
+                        onclick="openCommentModal(this)">
+                    보기
+                </button>
+            </td>
             <td th:text="${#temporals.format(r.surveyResultSubmittedAt, 'yyyy-MM-dd HH:mm')}">-</td>
         </tr>
         </tbody>
     </table>
+
+    <!-- Comment Modal -->
+    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">참여자 코멘트</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body" id="commentModalBody">
+                    <!-- 내용이 여기 들어감 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script th:inline="javascript">
@@ -212,7 +238,7 @@
             // 값 확인
             console.log('셀 값 확인:',
                 '청결도:', cells[2].textContent,
-                '직원:', cells[3].textContent,
+                '직원 친절도:', cells[3].textContent,
                 '체크인/아웃:', cells[4].textContent,
                 '시설:', cells[5].textContent,
                 '음식:', cells[6].textContent,
@@ -228,7 +254,7 @@
             
             console.log('파싱된 값:',
                 '청결도:', cleanliness, 
-                '직원:', staff, 
+                '직원 친절도:', staff,
                 '체크인/아웃:', checkInOut, 
                 '시설:', facility, 
                 '음식:', food, 
@@ -263,7 +289,7 @@
         
         console.log('유효 데이터 카운트:', 
             '청결도:', validCountCleanliness, 
-            '직원:', validCountStaff, 
+            '직원 친절도:', validCountStaff,
             '체크인/아웃:', validCountCheckInOut, 
             '시설:', validCountFacility, 
             '음식:', validCountFood, 
@@ -272,7 +298,7 @@
         
         console.log('합계:', 
             '청결도:', totalCleanliness, 
-            '직원:', totalStaff, 
+            '직원 친절도:', totalStaff,
             '체크인/아웃:', totalCheckInOut, 
             '시설:', totalFacility, 
             '음식:', totalFood, 
@@ -289,7 +315,7 @@
         
         console.log('계산된 평균:', 
             '청결도:', avgCleanliness, 
-            '직원:', avgStaff, 
+            '직원 친절도:', avgStaff,
             '체크인/아웃:', avgCheckInOut, 
             '시설:', avgFacility, 
             '음식:', avgFood, 
@@ -332,6 +358,14 @@
             avgFood: avgFood.toFixed(2),
             avgValue: avgValue.toFixed(2)
         });
+    }
+
+    function openCommentModal(button) {
+        const comment = button.getAttribute('data-comment');
+        const modalBody = document.getElementById('commentModalBody');
+        modalBody.textContent = comment && comment.trim() !== '' ? comment : '내용이 없습니다.';
+        const modal = new bootstrap.Modal(document.getElementById('commentModal'));
+        modal.show();
     }
 </script>
 
