@@ -79,11 +79,26 @@ public class StoreController {
     }
 
 
+    /*todo post 없애고 get으로만???
+    *   맨 처음 get에서도 로그인한 사람의 companyNum으로 store목록을 보여줘야 함
+    *   그래서 굳이 get post 둘 다 하지 말고.. 그냥 get한번에만 하는걸로... post는 하지말어?*/
     @GetMapping("/list")
-    public String list(Pageable pageable, Model model,
+    public String list(Pageable pageable, Model model, Principal principal,
                        @RequestParam(required = false) String searchType,
                        @RequestParam(required = false) Long companyNum,
                        @RequestParam(required = false) String keyword){
+        if (principal == null) {
+            return "redirect:/admin/login";
+        }
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        if (adminDTO == null) {
+            return "redirect:/admin/logout";
+        }
+
+        //todo 프린시펄로 companyNum
+
+
+
         Page<StoreDTO> list = storeService.searchlist(companyNum, searchType, keyword, pageable, "alive", "closed");
         model.addAttribute("list",list);
         Page<StoreDTO> listA = storeService.searchlist(companyNum, searchType, keyword, pageable, "deleted");
@@ -104,13 +119,13 @@ public class StoreController {
 //        log.info("chosenCompany : " + chosenCompany);
 //        log.info("keyword : " + keyword);
 //        log.info("pageable : " + pageable.toString());
-        if (principal == null) {
-            return "redirect:/admin/login";
-        }
-        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-        if (adminDTO == null) {
-            return "redirect:/admin/logout";
-        }
+//        if (principal == null) {
+//            return "redirect:/admin/login";
+//        }
+//        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+//        if (adminDTO == null) {
+//            return "redirect:/admin/logout";
+//        }
 // 소속된 회사 없음
 //        if (adminDTO.getCompanyNum() == null) {
 //            if (adminDTO.getStoreNum() != null) {
