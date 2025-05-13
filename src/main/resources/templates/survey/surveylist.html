@@ -35,12 +35,6 @@
             cursor: default;
         }
 
-        /* ✅ 카드에 hover 시 h5도 동시에 색상 변화 */
-        .survey-card:hover h5 {
-            color: #0d6efd;
-            text-decoration: underline;
-        }
-
     </style>
 
 </head>
@@ -59,9 +53,9 @@
         </div>
 
         <div class="row gy-4 gx-4">
-            <div class="col-12 col-sm-6 col-lg-3" th:each="survey, stat : ${surveys}">
+            <div class="col-12 col-sm-6 col-lg-3" th:each="survey : ${surveys}">
                 <div class="card h-100 shadow-sm border-0"
-                     th:classappend="(${stat.index} % 2 == 0) ? 'bg-secondary bg-opacity-10' : 'bg-primary bg-opacity-10'">
+                     th:classappend="(${survey.surveyIsActive}) ? 'bg-primary bg-opacity-10':'bg-secondary bg-opacity-10'">
 
                     <!-- 카드 헤더 -->
                     <div class="card-header d-flex justify-content-between align-items-center border-bottom-0 bg-transparent">
