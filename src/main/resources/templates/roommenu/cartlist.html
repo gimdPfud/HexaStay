@@ -825,10 +825,6 @@
             const tossprice = parseInt(finalAmountText, 10) || 0; // 안전하게 파싱, 실패 시 0
             console.log("Final price for Toss payment:", tossprice);
 
-            if (tossprice <= 0) {
-                showNotification("결제할 금액이 없습니다.", 'warning');
-                return; // 결제 금액이 0 이하면 진행 중단
-            }
 
 
             const selectedCouponNum = document.getElementById('couponSelect').value;
