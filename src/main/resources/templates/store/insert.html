@@ -249,16 +249,13 @@
                                 <ul class="pagination justify-content-center">
                                     <li class="${data.number === 0 ? 'page-item disabled':'page-item'}">
                                         <button class="page-link" data-page="0" onclick="changePage(this)">처음</button>
-                                    </li>
-                                    <li class="${!data.hasPrevious ? 'disabled page-item':'page-item'}">
-                                        <a class="page-link" data-page="${data.number - 1}" onclick="changePage(this)">이전</a>
                                     </li>`
 
             let startnum = data.number - 2 > 0 ? data.number - 2 : 0;
             let endnum = data.number + 3 < data.totalPages - 1 ? data.number + 3 : data.totalPages - 1;
 
             let endsecond = "";
-            for (let pageNum = startnum; pageNum<endnum; pageNum++ ){
+            for (let pageNum = startnum; pageNum<=endnum; pageNum++ ){
                 endsecond += `
                                     <li class="page-item"
                                         class="${pageNum === data.number ? 'active page-item':'page-item'}">
@@ -267,9 +264,6 @@
             }
 
             let endthird = `
-                                <li class="${!data.hasNext ? 'disabled page-item':'page-item'}">
-                                    <button class="page-link" data-page="${data.number + 1}" onclick="changePage(this)">다음</button>
-                                </li>
                                 <li class="${(data.number === data.totalPages - 1) ? 'page-item disabled':'page-item'}">
                                     <button class="page-link" data-page="${data.totalPages - 1}" onclick="changePage(this)">마지막</button>
                                 </li>
