@@ -62,11 +62,6 @@
       </div>
     </form>
 
-    <!-- 검색 결과가 없을 때 메시지 -->
-    <div class="alert alert-info mt-3" th:if="${companyDTOS != null && companyDTOS.empty && (keyword != null && !keyword.isEmpty())}" role="alert">
-      '<span th:text="${keyword}"></span>' 에 대한 검색 결과가 없습니다.
-    </div>
-
     <div class="row mt-4">
       <div class="col-12">
         <table class="table table-bordered text-company mb-0">
@@ -83,6 +78,16 @@
           </thead>
 
           <tbody>
+          <tr th:if="${companyDTOS == null or companyDTOS.empty}">
+            <td colspan="7" class="text-center text-muted py-4">
+            <span th:if="${keyword != null && !keyword.isEmpty()}"
+                  th:text="'\'' + ${keyword} + '\' 에 대한 검색 결과가 없습니다.'">검색 결과 없음</span>
+              <span th:unless="${keyword != null && !keyword.isEmpty()}">
+              등록된 조직이 없습니다.
+            </span>
+            </td>
+          </tr>
+
           <tr th:each="item : ${companyDTOS.content}" class="text-center">
 
             <td>
