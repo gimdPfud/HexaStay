@@ -85,11 +85,11 @@
                         </div>
                         <div class="col-auto">-</div>
                         <div class="col">
-                            <input type="number" id="storePhonetwo" class="form-control">
+                            <input type="number" id="storePhonetwo" oninput="limitLength(this, 4)" class="form-control">
                         </div>
                         <div class="col-auto">-</div>
                         <div class="col">
-                            <input type="number" id="storePhonethree" class="form-control">
+                            <input type="number" id="storePhonethree" oninput="limitLength(this, 4)" class="form-control">
                         </div>
                         <input hidden name="storePhone" id="storePhone">
                     </div>
@@ -198,6 +198,12 @@
                     listCompanys(data)
                 })
         })
+
+        function limitLength(el, maxLength) {
+            if (el.value.length > maxLength) {
+                el.value = el.value.slice(0, maxLength);
+            }
+        }
 
         function searchCompanys(button) {
             const formData = new FormData(button.form);
