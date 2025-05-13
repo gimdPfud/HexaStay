@@ -55,7 +55,7 @@
         <h2 class="fw-bold mb-4 text-center">요식업체 목록</h2>
 
         <!-- 검색 조건 및 등록 버튼 -->
-        <form class="row g-3 align-items-end" action="/admin/store/list" method="post">
+        <form class="row g-3 align-items-end" action="/admin/store/list" method="get">
             <div class="col-md-3">
                 <select class="form-select" name="chosenCompany">
                     <option th:each="data : ${companyMap}"
@@ -214,96 +214,6 @@
             </div>
         </div>
     </div>
-
-        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=86099e0ef2896853401ec861fd5ea35b&libraries=services"></script>
-        <script>
-            //주소-좌표 변환 객체를 생성
-            var geocoder = new daum.maps.services.Geocoder();
-
-            function insertAddress() {
-                new daum.Postcode({
-                    oncomplete: function(data) {
-                        var addr = data.address; // 최종 주소 변수
-                        // 주소 정보를 해당 필드에 넣는다.
-                        document.getElementById("storeAddress").value = addr;
-                    }
-                }).open();
-            }
-
-            function formSubmitHandler(button) {
-                let storeAddress = document.getElementById("storeAddress").value;
-                if(storeAddress&&storeAddress.trim().length>0){
-                    // 주소로 상세 정보를 검색
-                    geocoder.addressSearch(storeAddress, function(results, status) {
-                        // 정상적으로 검색이 완료됐으면
-                        if (status === daum.maps.services.Status.OK) {
-                            var result = results[0];
-                            document.getElementById("storeLatitude").value=result.y;
-                            document.getElementById("storeLongitude").value=result.x;
-                            fetch(`https://dapi.kakao.com/v2/local/geo/transcoord.json?x=${result.x}&y=${result.y}&output_coord=WTM`, {
-                                headers: {
-                                    Authorization: 'KakaoAK 7cb5773218158eba334d7c0a3f26cd9d'
-                                }
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    document.getElementById("storeWtmX").value = data.documents[0].x;
-                                    document.getElementById("storeWtmY").value = data.documents[0].y;
-                                    button.closest("form").submit();
-                                })
-                                .catch(error=>{
-                                    console.error(error);
-                                    alert("좌표 변환 중 오류")
-                                })
-                        } else {
-                            alert("주소를 다시 확인해주세요.")
-                        }
-                    });
-                }
-                return false;
-            }
-        </script>
-        <script>
-            // 프로필 사진
-
-            document.getElementById('adminProfile').addEventListener('change', function () {
-                const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-                const filePath = this.value;
-                const errorMessage = document.getElementById('fileError');
-                const previewImage = document.getElementById('pictureTemp');
-                const file = this.files[0];
-
-                if (!allowedExtensions.exec(filePath)) {
-                    this.value = '';
-                    errorMessage.classList.remove('d-none');
-                    previewImage.classList.add('d-none');
-                } else {
-                    errorMessage.classList.add('d-none');
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            previewImage.src = e.target.result;
-                            previewImage.classList.remove('d-none');
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                }
-            });
-
-
-            document.getElementById('PictureBtn').addEventListener('click', function () {
-                document.getElementById('adminProfile').click();
-            });
-
-
-            document.getElementById('adminProfile').addEventListener('change', function () {
-                let fileName = this.files.length > 0 ? this.files[0].name : "사진이 선택되지 않았습니다.";
-                document.querySelector('.file-name').textContent = fileName;
-            });
-
-        </script>
 
     </div>
 </body>
