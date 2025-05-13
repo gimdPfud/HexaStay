@@ -124,55 +124,12 @@ public class SurveyController {
 
         List<SurveyResult> responses = surveyService.getSurveyResults(id);
 
-        // 통계 데이터 계산
+        // 참여자 수만 계산
         int participantCount = responses.size();
-        double averageRating = responses.stream()
-                .mapToDouble(r -> (r.getSurveyResultCleanliness() + r.getSurveyResultStaff() +
-                        r.getSurveyResultCheckInOut() + r.getSurveyResultFacility() +
-                        r.getSurveyResultFood() + r.getSurveyResultValue()) / 6.0)
-                .average()
-                .orElse(0.0);
-
-        double cleanlinessAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultCleanliness)
-                .average()
-                .orElse(0.0);
-
-        double staffAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultStaff)
-                .average()
-                .orElse(0.0);
-
-        double checkInOutAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultCheckInOut)
-                .average()
-                .orElse(0.0);
-
-        double facilityAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultFacility)
-                .average()
-                .orElse(0.0);
-
-        double foodAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultFood)
-                .average()
-                .orElse(0.0);
-
-        double valueAvg = responses.stream()
-                .mapToDouble(SurveyResult::getSurveyResultValue)
-                .average()
-                .orElse(0.0);
 
         model.addAttribute("survey", survey);
         model.addAttribute("responses", responses);
         model.addAttribute("participantCount", participantCount);
-        model.addAttribute("averageRating", averageRating);
-        model.addAttribute("cleanlinessAvg", cleanlinessAvg);
-        model.addAttribute("staffAvg", staffAvg);
-        model.addAttribute("checkInOutAvg", checkInOutAvg);
-        model.addAttribute("facilityAvg", facilityAvg);
-        model.addAttribute("foodAvg", foodAvg);
-        model.addAttribute("valueAvg", valueAvg);
 
         return "survey/surveyresult";
     }

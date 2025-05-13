@@ -36,12 +36,12 @@
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
-                    <input type="email" th:field="*{adminEmail}" class="form-control" readonly>
+                    <input type="email" th:field="*{adminEmail}" class="form-control" th:readonly="${adminRole != 'SUPERADMIN'}">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이름</label>
-                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'">
+                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" th:readonly="${adminRole != 'SUPERADMIN' && adminEmail != adminDTO.adminEmail}">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
                 </div>
 
@@ -49,11 +49,15 @@
                     <label class="form-label">주민등록번호</label>
                     <div class="row g-2">
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly text-center" maxlength="6" th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" readonly>
+                            <input type="text" id="adminResidentNumPartOne" class="form-control numberOnly text-center" maxlength="6" 
+                                   th:value="${adminDTO.adminResidentNum != null ? #strings.substring(adminDTO.adminResidentNum, 0, 6) : ''}" 
+                                   th:readonly="${adminRole != 'SUPERADMIN'}">
                         </div>
                         <div class="col-auto d-flex align-items-center">-</div>
                         <div class="col">
-                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly text-center" maxlength="7" th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6) : ''}" readonly>
+                            <input type="text" id="adminResidentNumPartTwo" class="form-control numberOnly text-center" maxlength="7" 
+                                   th:value="${adminDTO.adminResidentNum != null and #strings.length(adminDTO.adminResidentNum) > 6 ? #strings.substring(adminDTO.adminResidentNum, 6) : ''}" 
+                                   th:readonly="${adminRole != 'SUPERADMIN'}">
                         </div>
                     </div>
                 </div>
@@ -209,7 +213,6 @@
 
             // 필수 입력 필드 검사
             const requiredFields = {
-                'adminName': '이름',
                 'adminAddressOne': '우편번호',
                 'adminAddressTwo': '기본주소',
                 'adminAddressThree': '상세주소',
@@ -218,6 +221,14 @@
                 'adminPhonePartThree': '연락처 뒷자리',
                 'adminPosition': '직책'
             };
+            
+            // 슈퍼어드민이거나 본인 계정인 경우 이름 필드도 필수 체크
+            const adminRole = document.getElementById('adminRole').value;
+            const isSuperAdmin = adminRole === 'SUPERADMIN';
+            
+            if (isSuperAdmin) {
+                requiredFields['adminName'] = '이름';
+            }
 
             let isValid = true;
             for (const [fieldId, fieldName] of Object.entries(requiredFields)) {

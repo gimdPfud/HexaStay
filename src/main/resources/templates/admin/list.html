@@ -96,6 +96,35 @@
                 </table>
             </div>
         </div>
+        
+        <!-- 페이징 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center" th:if="${list.totalPages > 0}">
+                        <!-- 이전 페이지 -->
+                        <li class="page-item" th:classappend="${list.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/list(page=${list.number - 1}, type=${type}, keyword=${keyword})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 페이지 번호 -->
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, list.totalPages - 1)}" 
+                            th:classappend="${list.number == i} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/list(page=${i}, type=${type}, keyword=${keyword})}" th:text="${i + 1}"></a>
+                        </li>
+                        
+                        <!-- 다음 페이지 -->
+                        <li class="page-item" th:classappend="${list.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/list(page=${list.number + 1}, type=${type}, keyword=${keyword})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
 

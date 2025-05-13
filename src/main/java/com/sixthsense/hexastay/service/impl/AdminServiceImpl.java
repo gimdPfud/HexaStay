@@ -70,7 +70,10 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findByAdminEmail(email);
         Page<Admin> adminList = null;
 
-        if (admin.getCompany() != null) {
+        // SUPERADMIN인 경우 모든 직원 목록을 볼 수 있음
+        if (admin.getAdminRole().equals("SUPERADMIN")) {
+            adminList = adminRepository.findAll(pageable);
+        } else if (admin.getCompany() != null) {
             Long companyNum = admin.getCompany().getCompanyNum();
             adminList = adminRepository.findByCompany_CompanyNum(companyNum, pageable);
         } else if (admin.getStore() != null) {
@@ -99,7 +102,17 @@ public class AdminServiceImpl implements AdminService {
             }
 
             Page<Admin> adminList;
-            if (admin.getCompany() != null) {
+            
+            // SUPERADMIN인 경우 모든 직원을 대상으로 검색
+            if (admin.getAdminRole().equals("SUPERADMIN")) {
+                // 검색 조건이 없으면 전체 조회
+                if (type == null || type.isEmpty() || keyword == null || keyword.isEmpty()) {
+                    adminList = adminRepository.findAll(pageable);
+                } else {
+                    // 전체 직원 대상 검색 쿼리 실행
+                    adminList = adminRepository.searchAllAdmins(type, keyword, pageable);
+                }
+            } else if (admin.getCompany() != null) {
                 Long companyNum = admin.getCompany().getCompanyNum();
                 adminList = adminRepository.listPageAdminSearch(companyNum, type, keyword, pageable);
             } else if (admin.getStore() != null) {
@@ -109,7 +122,16 @@ public class AdminServiceImpl implements AdminService {
                 throw new IllegalStateException("Admin has no company or store");
             }
 
-            return adminList.map(adminOne -> modelMapper.map(adminOne, AdminDTO.class));
+            return adminList.map(adminOne -> {
+                AdminDTO dto = modelMapper.map(adminOne, AdminDTO.class);
+                if (adminOne.getCompany() != null) {
+                    dto.setCompanyName(adminOne.getCompany().getCompanyName());
+                }
+                if (adminOne.getStore() != null) {
+                    dto.setStoreName(adminOne.getStore().getStoreName());
+                }
+                return dto;
+            });
         } catch (Exception e) {
             log.error("Error in listAdminSearch: ", e);
             throw e;
@@ -321,25 +343,39 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // 나머지 필드 업데이트
-        admin.setAdminName(adminDTO.getAdminName());
         admin.setAdminAddress(adminDTO.getAdminAddress());
         admin.setAdminPhone(adminDTO.getAdminPhone());
         admin.setAdminPosition(adminDTO.getAdminPosition());
         admin.setAdminRole(adminDTO.getAdminRole());
         
-        // 이메일과 주민번호 업데이트 (슈퍼어드민인 경우)
+        // 이메일, 이름, 주민번호 업데이트 (슈퍼어드민인 경우)
         String currentAdminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Admin currentAdmin = adminRepository.findByAdminEmail(currentAdminEmail);
         
         if (currentAdmin != null && "SUPERADMIN".equalsIgnoreCase(currentAdmin.getAdminRole())) {
             log.info("슈퍼어드민 권한으로 추가 정보 업데이트");
+            
+            // 이메일 업데이트
             if (adminDTO.getAdminEmail() != null) {
                 log.info("이메일 업데이트: {} -> {}", admin.getAdminEmail(), adminDTO.getAdminEmail());
                 admin.setAdminEmail(adminDTO.getAdminEmail());
             }
+            
+            // 이름 업데이트
+            if (adminDTO.getAdminName() != null) {
+                log.info("이름 업데이트: {} -> {}", admin.getAdminName(), adminDTO.getAdminName());
+                admin.setAdminName(adminDTO.getAdminName());
+            }
+            
+            // 주민번호 업데이트
             if (adminDTO.getAdminResidentNum() != null) {
                 log.info("주민번호 업데이트");
                 admin.setAdminResidentNum(adminDTO.getAdminResidentNum());
+            }
+        } else {
+            // 슈퍼어드민이 아닌 경우 본인의 이름만 수정 가능
+            if (admin.getAdminEmail().equals(currentAdminEmail)) {
+                admin.setAdminName(adminDTO.getAdminName());
             }
         }
 

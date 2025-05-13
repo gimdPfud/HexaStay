@@ -81,4 +81,16 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
         String adminEmployeeNum, 
         String adminResidentNum
     );
+    
+    // 슈퍼어드민용 전체 직원 검색
+    @Query("SELECT a FROM Admin a " +
+           "WHERE (" +
+           "(:type = 'adminName' AND a.adminName LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminEmployeeNum' AND a.adminEmployeeNum LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminRole' AND a.adminRole LIKE CONCAT('%', :keyword, '%')) OR " +
+           "(:type = 'adminPosition' AND a.adminPosition LIKE CONCAT('%', :keyword, '%'))" +
+           ")")
+    Page<Admin> searchAllAdmins(@Param("type") String type,
+                               @Param("keyword") String keyword,
+                               Pageable pageable);
 }

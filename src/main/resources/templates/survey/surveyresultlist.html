@@ -6,6 +6,14 @@
 <head>
     <meta charset="UTF-8">
     <title>설문조사 결과</title>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         .search-container {
             background: #fff;
@@ -92,9 +100,8 @@
             margin-bottom: 15px;
         }
     </style>
-</head>
-<body>
-<div layout:fragment="content">
+
+
     <div class="container-fluid">
         <h2 class="fw-bold mb-4">설문조사 결과 (월별)</h2>
 
@@ -112,6 +119,11 @@
                     </select>
                     <button type="submit" class="btn btn-primary">조회</button>
                 </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <button id="excelDownloadBtn" class="btn btn-success">
+                    <i class="bi bi-file-earmark-excel me-1"></i> 결과 엑셀 다운로드
+                </button>
             </div>
         </div>
 
@@ -162,7 +174,67 @@ document.addEventListener('DOMContentLoaded', function() {
         
         window.location.href = url;
     });
+    
+    // 엑셀 다운로드 버튼 이벤트 설정
+    document.getElementById('excelDownloadBtn').addEventListener('click', downloadExcel);
 });
+
+function downloadExcel() {
+    // 현재 필터링된 결과 기준으로 파일명 설정
+    const year = document.getElementById('yearSelect').value || 'ALL';
+    const month = document.getElementById('monthSelect').value || 'ALL';
+    const fileName = `설문조사_월별결과_${year}_${month}.xlsx`;
+    
+    // 엑셀 워크북 생성
+    const wb = XLSX.utils.book_new();
+    
+    // 테이블 데이터 추출
+    const table = document.querySelector('.table');
+    if (!table) {
+        alert('다운로드할 데이터가 없습니다.');
+        return;
+    }
+    
+    // 테이블 헤더 추출
+    const headerRow = [];
+    const headerCells = table.querySelectorAll('thead th');
+    headerCells.forEach(cell => {
+        headerRow.push(cell.textContent.trim());
+    });
+    
+    // 테이블 데이터 추출
+    const data = [headerRow];
+    const rows = table.querySelectorAll('tbody tr');
+    
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        // 데이터가 없는 경우
+        alert('다운로드할 데이터가 없습니다.');
+        return;
+    }
+    
+    rows.forEach(row => {
+        if (!row.querySelector('td[colspan]')) { // "데이터 없음" 행 제외
+            const rowData = [];
+            const cells = row.querySelectorAll('td');
+            cells.forEach(cell => {
+                rowData.push(cell.textContent.trim());
+            });
+            data.push(rowData);
+        }
+    });
+    
+    // 워크시트 생성 및 추가
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, '월별 설문 결과');
+    
+    // 열 너비 설정
+    ws['!cols'] = [{wch: 10}, {wch: 10}, {wch: 10}];
+    
+    // 엑셀 파일 다운로드
+    XLSX.writeFile(wb, fileName);
+    
+    console.log('엑셀 파일 다운로드:', fileName);
+}
 </script>
 </body>
 </html> 
