@@ -299,12 +299,17 @@ public class AdminServiceImpl implements AdminService {
         admin.setAdminRole(adminDTO.getAdminRole());
         
         // 이메일과 주민번호 업데이트 (슈퍼어드민인 경우)
-        if ("SUPERADMIN".equalsIgnoreCase(SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority())) {
+        String currentAdminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Admin currentAdmin = adminRepository.findByAdminEmail(currentAdminEmail);
+        
+        if (currentAdmin != null && "SUPERADMIN".equalsIgnoreCase(currentAdmin.getAdminRole())) {
+            log.info("슈퍼어드민 권한으로 추가 정보 업데이트");
             if (adminDTO.getAdminEmail() != null) {
                 log.info("이메일 업데이트: {} -> {}", admin.getAdminEmail(), adminDTO.getAdminEmail());
                 admin.setAdminEmail(adminDTO.getAdminEmail());
             }
             if (adminDTO.getAdminResidentNum() != null) {
+                log.info("주민번호 업데이트");
                 admin.setAdminResidentNum(adminDTO.getAdminResidentNum());
             }
         }
