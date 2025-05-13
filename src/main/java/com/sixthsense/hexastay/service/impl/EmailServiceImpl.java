@@ -116,9 +116,15 @@ public class EmailServiceImpl implements EmailService {
                 activeSurvey = surveyService.getActiveSurvey(); // 회사 정보가 없는 경우 기본 설문 사용
             }
             
+            // 활성화된 설문조사가 없는 경우 기본 템플릿 생성
             if (activeSurvey == null) {
-                log.error("활성화된 설문조사가 없습니다.");
-                return;
+                log.warn("활성화된 설문조사가 없습니다. 기본 템플릿을 사용합니다.");
+                activeSurvey = new Survey();
+                activeSurvey.setSurveyNum(1L); // 기본 ID
+                activeSurvey.setSurveyTitle(subject != null && !subject.isEmpty() ? subject : "고객님의 소중한 의견을 기다립니다.");
+                activeSurvey.setSurveyContent(content != null && !content.isEmpty() ? content : 
+                    "더 나은 서비스를 제공하기 위해 고객님의 의견을 듣고자 합니다.\n간단한 설문에 참여해 주시면 큰 도움이 됩니다. 소요 시간은 약 1분입니다.");
+                activeSurvey.setSurveyIsActive(true);
             }
             
             // 회원 정보는 이미 room 객체에 있으므로 다시 조회할 필요 없음
@@ -139,6 +145,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("surveyTitle", activeSurvey.getSurveyTitle());
             context.setVariable("surveyContent", activeSurvey.getSurveyContent());
             context.setVariable("baseUrl", "http://wooriproject.iptime.org:9002");
+            context.setVariable("room", room);
 
             String emailContent = templateEngine.process("survey/surveytemplate", context);
 
