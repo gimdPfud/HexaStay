@@ -6,27 +6,22 @@
 <head>
     <meta charset="UTF-8">
     <title>설문조사 결과</title>
-
-</head>
-<body>
-<div layout:fragment="content">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
-        .search-container {
+        .result-container {
+            max-width: 1100px;
+            margin: 40px auto;
             background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px;
         }
+
         .date-range-form {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .date-range-form input[type="month"] {
             width: 150px;
             padding: 8px;
@@ -34,6 +29,7 @@
             border-radius: 8px;
             font-size: 0.9rem;
         }
+
         .date-range-form button {
             padding: 8px 20px;
             border: none;
@@ -43,72 +39,96 @@
             font-weight: 500;
             transition: all 0.3s;
         }
+
         .date-range-form button:hover {
             background: #145a35;
         }
+
         .survey-list {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             overflow: hidden;
         }
+
         .survey-item {
             padding: 20px;
             border-bottom: 1px solid #e9ecef;
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .survey-item:last-child {
             border-bottom: none;
         }
+
         .survey-item:hover {
             background: #f8f9fa;
         }
+
         .survey-date {
             font-size: 0.9rem;
             color: #6c757d;
             margin-bottom: 5px;
         }
+
         .survey-title {
             font-size: 1.1rem;
             font-weight: 600;
             color: #1D6F42;
             margin-bottom: 10px;
         }
+
         .survey-stats {
             display: flex;
             gap: 20px;
             font-size: 0.9rem;
             color: #495057;
         }
+
         .stat-item {
             display: flex;
             align-items: center;
             gap: 5px;
         }
+
         .stat-item i {
             color: #1D6F42;
         }
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: #6c757d;
         }
+
         .empty-state i {
             font-size: 3rem;
             color: #dee2e6;
             margin-bottom: 15px;
         }
+
+        .table-center th,
+        .table-center td {
+            text-align: center;
+            vertical-align: middle;
+        }
     </style>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
-    <div class="container-fluid">
+    <div class="result-container">
         <h2 class="fw-bold mb-4">설문조사 결과 (월별)</h2>
 
         <!-- 연도/월 선택 필터 -->
         <div class="row mb-4">
             <div class="col-md-6">
-                <form id="filterForm" class="d-flex gap-2">
+                <form id="filterForm" class="d-flex gap-3">
                     <select id="yearSelect" class="form-select" style="width: auto;">
                         <option value="">모든 연도</option>
                         <option th:each="year : ${years}" th:value="${year}" th:text="${year}" th:selected="${selectedYear == year}">2024</option>
@@ -120,123 +140,61 @@
                     <button type="submit" class="btn btn-primary">조회</button>
                 </form>
             </div>
-            <div class="col-md-6 text-end">
-                <button id="excelDownloadBtn" class="btn btn-success">
-                    <i class="bi bi-file-earmark-excel me-1"></i> 결과 엑셀 다운로드
-                </button>
-            </div>
         </div>
 
         <!-- 설문조사 결과 테이블 -->
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover table-center">
             <thead>
-                <tr>
-                    <th style="width: 20%">연도</th>
-                    <th style="width: 10%">월</th>
-                    <th style="width: 50%">응답 수</th>
-                </tr>
+            <tr>
+                <th style="width: 25%">연도</th>
+                <th style="width: 25%">월</th>
+                <th style="width: 50%">응답 수</th>
+            </tr>
             </thead>
             <tbody>
-                <!-- 아래 부분은 컨트롤러 변수에 맞게 수정 (surveyResults 또는 surveys 등) -->
-                <tr th:each="result : ${surveyResults}" th:onclick="'location.href=\'/survey/results/month/' + ${result.year} + '-' + ${result.month} + '\''" style="cursor:pointer;">
-                    <td th:text="${result.year}">2024</td>
-                    <td th:text="${result.month}">03</td>
-                    <td th:text="${result.count}">0</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(surveyResults)}">
-                    <td colspan="3" class="text-center">
-                        <p>설문 응답이 없습니다.</p>
-                        <small>참고: 컨트롤러에서 'surveyResults' 변수로 데이터를 전달해야 합니다.</small>
-                    </td>
-                </tr>
+            <!-- 아래 부분은 컨트롤러 변수에 맞게 수정 (surveyResults 또는 surveys 등) -->
+            <tr th:each="result : ${surveyResults}" th:onclick="'location.href=\'/survey/results/month/' + ${result.year} + '-' + ${result.month} + '\''" style="cursor:pointer;">
+                <td th:text="${result.year}">2024</td>
+                <td th:text="${result.month}">03</td>
+                <td th:text="${result.count}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(surveyResults)}">
+                <td colspan="3" class="text-center">
+                    <p>설문 응답이 없습니다.</p>
+                    <small>참고: 컨트롤러에서 'surveyResults' 변수로 데이터를 전달해야 합니다.</small>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
-</div>
 
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // 필터 폼 제출 처리
-        document.getElementById('filterForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const year = document.getElementById('yearSelect').value;
-            const month = document.getElementById('monthSelect').value;
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // 필터 폼 제출 처리
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const year = document.getElementById('yearSelect').value;
+                const month = document.getElementById('monthSelect').value;
 
-            let url = '/survey/results';
-            if (year) {
-                url += '?year=' + year;
-                if (month) {
-                    url += '&month=' + month;
+                let url = '/survey/results';
+                if (year) {
+                    url += '?year=' + year;
+                    if (month) {
+                        url += '&month=' + month;
+                    }
+                } else if (month) {
+                    url += '?month=' + month;
                 }
-            } else if (month) {
-                url += '?month=' + month;
-            }
 
-            window.location.href = url;
-        });
-
-        // 엑셀 다운로드 버튼 이벤트 설정
-        document.getElementById('excelDownloadBtn').addEventListener('click', downloadExcel);
-    });
-
-    function downloadExcel() {
-        // 현재 필터링된 결과 기준으로 파일명 설정
-        const year = document.getElementById('yearSelect').value || 'ALL';
-        const month = document.getElementById('monthSelect').value || 'ALL';
-        const fileName = `설문조사_월별결과_${year}_${month}.xlsx`;
-
-        // 엑셀 워크북 생성
-        const wb = XLSX.utils.book_new();
-
-        // 테이블 데이터 추출
-        const table = document.querySelector('.table');
-
-        // 기본 헤더
-        const headerRow = ['연도', '월', '응답 수'];
-
-        // 기본 데이터 - 빈 경우에도 최소한의 정보를 제공
-        const data = [headerRow];
-
-        if (table) {
-            // 테이블 데이터 추출
-            const rows = table.querySelectorAll('tbody tr');
-
-            let hasData = false;
-
-            rows.forEach(row => {
-                if (!row.querySelector('td[colspan]')) { // "데이터 없음" 행 제외
-                    hasData = true;
-                    const rowData = [];
-                    const cells = row.querySelectorAll('td');
-                    cells.forEach(cell => {
-                        rowData.push(cell.textContent.trim());
-                    });
-                    data.push(rowData);
-                }
+                window.location.href = url;
             });
 
-            if (!hasData) {
-                // 데이터가 없는 경우 기본 정보 추가
-                data.push([year || '-', month || '-', '0']);
-            }
-        } else {
-            // 테이블이 없는 경우 기본 정보 추가
-            data.push([year || '-', month || '-', '0']);
-        }
+        });
 
-        // 워크시트 생성 및 추가
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        XLSX.utils.book_append_sheet(wb, ws, '월별 설문 결과');
+    </script>
 
-        // 열 너비 설정
-        ws['!cols'] = [{wch: 10}, {wch: 10}, {wch: 10}];
+</div>
 
-        // 엑셀 파일 다운로드
-        XLSX.writeFile(wb, fileName);
 
-        console.log('엑셀 파일 다운로드:', fileName);
-
-    }
-</script>
 </body>
 </html> 

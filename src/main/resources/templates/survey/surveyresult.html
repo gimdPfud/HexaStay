@@ -20,20 +20,29 @@
         td, th {
             vertical-align: middle;
         }
+
+        .comment-preview {
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px; /* 필요 시 조절 */
+            display: inline-block;
+        }
+
         .modal-dialog {
-            margin-top: 150px;
+            margin-top: 120px;
         }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<div layout:fragment="content">
 <div class="result-container">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-
 
     <h2 class="result-title">설문조사 결과</h2>
     <div class="mb-4">
@@ -86,7 +95,7 @@
             <th style="width: 8%">시설</th>
             <th style="width: 8%">음식</th>
             <th style="width: 8%">가성비</th>
-            <th style="width: 8%">comment</th>
+            <th style="width: 8%">코멘트</th>
             <th style="width: 15%">제출일</th>
         </tr>
         </thead>
@@ -101,11 +110,11 @@
             <td th:text="${r.surveyResultFood}">0</td>
             <td th:text="${r.surveyResultValue}">0</td>
             <td>
-                <button class="btn btn-outline-primary btn-sm"
-                        th:attr="data-comment=${r.surveyResultComment}"
-                        onclick="openCommentModal(this)">
-                    보기
-                </button>
+                <div class="comment-preview" role="button"
+                     th:attr="data-comment=${r.surveyResultComment}"
+                     onclick="openCommentModal(this)">
+                    [[${#strings.length(r.surveyResultComment) > 20} ? ${#strings.substring(r.surveyResultComment, 0, 20)} + '...' : ${r.surveyResultComment}]]
+                </div>
             </td>
             <td th:text="${#temporals.format(r.surveyResultSubmittedAt, 'yyyy-MM-dd HH:mm')}">-</td>
         </tr>
@@ -189,9 +198,14 @@
                 rows.forEach(row => {
                     const dataRow = [];
                     const cells = row.querySelectorAll('td');
-                    cells.forEach(cell => {
-                        dataRow.push(cell.textContent);
-                    });
+                        cells.forEach((cell, index) => {
+                            if (index === 8) { // 코멘트 컬럼인 경우
+                                const commentElement = cell.querySelector('.comment-preview');
+                                dataRow.push(commentElement ? commentElement.getAttribute('data-comment') : '');
+                            } else {
+                                dataRow.push(cell.textContent);
+                            }
+                        });
                     detailsData.push(dataRow);
                 });
 
@@ -360,10 +374,9 @@
             });
         }
 
-        function openCommentModal(button) {
-            const comment = button.getAttribute('data-comment');
-            const modalBody = document.getElementById('commentModalBody');
-            modalBody.textContent = comment && comment.trim() !== '' ? comment : '내용이 없습니다.';
+        function openCommentModal(element) {
+            const comment = element.getAttribute('data-comment') || '코멘트가 없습니다.';
+            document.getElementById('commentModalBody').textContent = comment;
             const modal = new bootstrap.Modal(document.getElementById('commentModal'));
             modal.show();
         }
