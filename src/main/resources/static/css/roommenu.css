@@ -1,7 +1,7 @@
 .flag {
     width: 24px;
     height: 18px;
-    background-image: url('flags.png'); /* ✅ 상대경로 */
+    background-image: url('../../../../../roommenu/flags.png'); /* ✅ 상대경로 */
     background-repeat: no-repeat;
     display: inline-block;
     cursor: pointer;
