@@ -1,23 +1,18 @@
 package com.sixthsense.hexastay.config.Security;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Configuration
 public class AdminSecurityConfig {
@@ -37,7 +32,13 @@ public class AdminSecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
 
         AuthenticationManager authManager = new ProviderManager(provider);
-
+        http
+                // 세션 관리 설정
+                .sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // 세션을 필요한 경우에만 생성
+                        //.maximumSessions(3)  // 한 사용자당 최대 세션 수 설정
+                        //.maxSessionsPreventsLogin(true)  // 최대 세션 수 초과 시 로그인 방지
+               );
         http
                 .securityMatcher("/admin/**",
                         "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
@@ -52,7 +53,7 @@ public class AdminSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login", "/admin/encrypt-admin-password", "/admin/create-admin",
                                 "/admin/updateidentity", "/admin/passwordcode", "/admin/resetpassword").permitAll()
-                        .requestMatchers("/ws-order-alert/**", "/adminreset/**").permitAll()
+                        .requestMatchers(("/ws-order-alert/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

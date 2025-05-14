@@ -10,8 +10,6 @@ package com.sixthsense.hexastay.repository;
 import com.sixthsense.hexastay.entity.Facilities;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface FacilitiesRepository extends JpaRepository<Facilities, Long> {
 
 //    List<Facilities> findByCompany_CompanyNum(Long companyNum);

@@ -1,7 +1,9 @@
 package com.sixthsense.hexastay.repository;
+
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuLike;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 
 /***********************************************

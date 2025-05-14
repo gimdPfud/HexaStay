@@ -24,8 +24,8 @@ public class NoticeDTO {
 
     private LocalDateTime modifyDate; // 수정일자
 
-//    private Integer noticeView; // 조회수
+    private Integer noticeView; // 조회수
 
-//    private Long memberNum; // 관리자
+    private Long memberNum; // 관리자
 
 }

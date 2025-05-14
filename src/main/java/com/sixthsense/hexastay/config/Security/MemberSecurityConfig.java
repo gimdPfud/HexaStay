@@ -1,7 +1,5 @@
 package com.sixthsense.hexastay.config.Security;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,12 +8,10 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 public class MemberSecurityConfig {
@@ -39,15 +35,20 @@ public class MemberSecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
 
         AuthenticationManager authManager = new ProviderManager(provider);
-
+        http
+                // 세션 관리 설정
+                .sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // 세션을 필요한 경우에만 생성
+                        //.maximumSessions(3)  // 한 사용자당 최대 세션 수 설정
+                        //.maxSessionsPreventsLogin(true)  // 최대 세션 수 초과 시 로그인 방지
+                );
         http
             .securityMatcher("/main/**", "/member/**", "/branch/**", "/center/**",
                     "/facility/**", "/faq/**", "/hotelroom/**", "/maechulroom/**",
                     "/notice/**", "/review/**", "/room/**", "/roommenu/**",
                     "/roomMenu/**","/qr/**,","/fs/**",
                     "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**,",
-                    "/ws-order-alert/**", "/cart/**", "/roomcare/**", "/api/reorder/**, ",
-                    "/api/**")
+                    "/ws-order-alert/**", "/cart/**", "/roomcare/**", "/api/reorder/**, ", "/api/**")
             .authenticationManager(authManager)
             .userDetailsService(memberDetailsService)
             .authorizeHttpRequests(authz -> authz

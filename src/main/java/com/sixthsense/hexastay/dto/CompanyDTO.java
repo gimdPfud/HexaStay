@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.enums.AdminRole;
 import com.sixthsense.hexastay.enums.CompanyType;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;

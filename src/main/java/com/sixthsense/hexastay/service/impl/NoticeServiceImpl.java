@@ -1,9 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
+
 import com.sixthsense.hexastay.dto.NoticeDTO;
-import com.sixthsense.hexastay.entity.Notice;
 import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.repository.NoticeRepository;
+import com.sixthsense.hexastay.entity.Notice;
 import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.NoticeRepository;
 import com.sixthsense.hexastay.service.NoticeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -25,27 +26,26 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
     private final NoticeRepository noticeRepository;
-//    private final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     @Override
     public void noticeInsert(NoticeDTO noticeDTO) {
         // 임시 작성자 지정 (하드코딩된 값)
-//        noticeDTO.setNoticeWriter("spit착맨"); // : 로그인 사용자로 대체 예정
-//        noticeDTO.setMemberNum(1L);           // : 실제 로그인한 멤버 ID로 대체 예정
-        //작성자 삭제
+//        noticeDTO.setNoticeWriter("spit착맨"); // TODO: 로그인 사용자로 대체 예정
+//        noticeDTO.setMemberNum(1L);           // TODO: 실제 로그인한 멤버 ID로 대체 예정
 
         // (1) 여기서 멤버 조회 및 예외 처리
-//        Member memberOpt = memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
+        Member memberOpt = memberRepository.findById(noticeDTO.getMemberNum()).orElseThrow(EntityNotFoundException::new);
 
         // (2) DTO → Entity 변환
         Notice notice = modelMapper.map(noticeDTO, Notice.class);
-//        notice.setNoticeView(1);
-//        notice.setMember(memberOpt); // (중요)
+        notice.setNoticeView(1);
+        notice.setMember(memberOpt); // (중요)
 
         // (3) 저장 및 로깅
         log.info("Notice 저장 전: {}", notice.toString());
         noticeRepository.save(notice); // 중복 저장 제거
-//        log.info("Notice 저장 완료. 작성자 ID: {}", memberOpt.getMemberNum()               );
+        log.info("Notice 저장 완료. 작성자 ID: {}", memberOpt.getMemberNum()               );
     }
     //목록
     @Override
@@ -89,13 +89,11 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void noticeModify(NoticeDTO noticeDTO) {
         //기존 데이터를 조회를해서
-        Notice search = noticeRepository.findById(noticeDTO.getNoticeNum()).orElseThrow(EntityNotFoundException::new);
+        Optional<Notice> search = noticeRepository.findById(noticeDTO.getNoticeNum());
         //변환
-//        Notice notice = modelMapper.map(noticeDTO, Notice.class);
-        search.setNoticeTitle(noticeDTO.getNoticeTitle());
-        search.setNoticeContent(noticeDTO.getNoticeContent());
+        Notice notice = modelMapper.map(noticeDTO, Notice.class);
         //SQL 처리
-//        noticeRepository.save(notice);
+        noticeRepository.save(notice);
     }
 
     //삭제

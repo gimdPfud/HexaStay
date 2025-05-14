@@ -4,7 +4,6 @@ import com.sixthsense.hexastay.dto.NotificationPayloadDTO;
 import com.sixthsense.hexastay.entity.RoomMenuOrder;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import com.sixthsense.hexastay.repository.RoomMenuOrderRepository;
-import com.sixthsense.hexastay.service.RoomMenuOrderService;
 import groovy.util.logging.Log4j2;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

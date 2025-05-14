@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.dto;
-import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import lombok.*;
 

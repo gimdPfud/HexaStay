@@ -1,10 +1,11 @@
 package com.sixthsense.hexastay.dto;
-import com.sixthsense.hexastay.entity.HotelRoom;
+
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

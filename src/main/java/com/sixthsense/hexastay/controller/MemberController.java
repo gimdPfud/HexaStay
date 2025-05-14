@@ -15,8 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -29,29 +27,29 @@ public class MemberController {
 
     @GetMapping("/login")
     public String login() {
-        return "/member/login";
+        return "member/login";
     }
 
     @PostMapping("/login")
     public String loginPost() {
-        return "/member/login";
+        return "member/login";
     }
 
     @GetMapping("/main")
     public String main() {
-        return "/member/main";
+        return "member/main";
     }
 
     @GetMapping("/signup")
     public String signup() {
-        return "/member/signup";
+        return "member/signup";
     }
 
     @PostMapping("/signup")
     public String signupPost(MemberDTO memberDTO) {
         memberDTO.setMemberPassword(passwordEncoder.encode(memberDTO.getMemberPassword()));
         memberService.memberinsert(memberDTO);
-        return "/member/signup";
+        return "member/signup";
     }
 
 

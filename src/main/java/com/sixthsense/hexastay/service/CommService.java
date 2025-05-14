@@ -2,7 +2,6 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.CommentDTO;
 import com.sixthsense.hexastay.dto.CommentViewDTO;
-import com.sixthsense.hexastay.dto.CommentDTO;
 import org.springframework.data.domain.Page;
 
 public interface CommService {

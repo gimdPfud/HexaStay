@@ -10,12 +10,13 @@ package com.sixthsense.hexastay.controller;
  * 입출력 변수 설계 : 김윤겸
  **************************************************/
 
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.repository.RoomMenuOrderItemRepository;
 import com.sixthsense.hexastay.repository.RoomMenuRepository;
-import com.sixthsense.hexastay.service.*;
+import com.sixthsense.hexastay.service.RoomMenuCartService;
+import com.sixthsense.hexastay.service.RoomMenuOptionService;
+import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,11 +25,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -369,7 +373,7 @@ public class RoomMenuController {
         model.addAttribute("category", category);
         model.addAttribute("totalCartItemCount", totalCartItemCount);
         model.addAllAttributes(pageInfo);
-        return "/roommenu/orderpage";
+        return "roommenu/orderpage";
 
     }
 

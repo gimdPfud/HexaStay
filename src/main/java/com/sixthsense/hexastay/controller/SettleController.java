@@ -1,8 +1,7 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.*;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Salaries;
+import com.sixthsense.hexastay.dto.OrderstoreDTO;
+import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.service.*;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.data.web.PageableDefault;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -59,7 +58,7 @@ public class SettleController {
         }
 
         model.addAttribute("roomDTOList", roomDTOList);
-        return "/settle/chart";
+        return "settle/chart";
     }
 
     @GetMapping("/chart/load-more")
@@ -120,6 +119,6 @@ public class SettleController {
         }
 
         model.addAttribute("storeDTOList", orderstoreDTOList);
-        return "/settle/chartstore";
+        return "settle/chartstore";
     }
 }

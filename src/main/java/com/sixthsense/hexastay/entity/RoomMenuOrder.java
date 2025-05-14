@@ -1,4 +1,5 @@
 package com.sixthsense.hexastay.entity;
+
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import com.sixthsense.hexastay.enums.RoomMenuOrderStatus;
 import jakarta.persistence.*;
@@ -6,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

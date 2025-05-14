@@ -40,7 +40,7 @@ public class QrCodeGeneratorService {
             String fileName = fileBaseName + "_qr.png";
 
             // 3. 이미지가 저장될 폴더 만들기 (폴더 이름: qrfile)
-            Path createPath = Paths.get(System.getProperty("user.dir"), "qrfile");
+            Path createPath = Paths.get("c:/data/hexastay", "qrfile");
 
             // 4. 저장될 파일의 전체 경로 만들기
             Path uploadPath = createPath.resolve(fileName);

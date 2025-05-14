@@ -8,7 +8,6 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.HotelRoom;
-import com.sixthsense.hexastay.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

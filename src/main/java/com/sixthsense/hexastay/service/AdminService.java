@@ -1,10 +1,11 @@
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.CompanyDTO;
+import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.util.List;

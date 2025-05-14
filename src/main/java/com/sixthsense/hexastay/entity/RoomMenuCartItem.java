@@ -1,6 +1,8 @@
 package com.sixthsense.hexastay.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.List;
 
 /**************************************************

@@ -1,4 +1,5 @@
 package com.sixthsense.hexastay.service.impl;
+
 import com.sixthsense.hexastay.dto.CouponDTO;
 import com.sixthsense.hexastay.entity.Coupon;
 import com.sixthsense.hexastay.entity.Member;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

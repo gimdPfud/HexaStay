@@ -1,7 +1,6 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.MemberDTO;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

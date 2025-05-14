@@ -9,8 +9,13 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.*;
-import com.sixthsense.hexastay.repository.*;
+import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.entity.Member;
+import com.sixthsense.hexastay.entity.Store;
+import com.sixthsense.hexastay.entity.StoreLike;
+import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.StoreLikeRepository;
+import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.ZzService;
@@ -19,9 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +80,7 @@ public class StoreServiceImpl implements StoreService {
             storeDTO.setStoreProfileMeta("/store/"+fileName);
 
             //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/"+fileName);
+            Path uploadPath = Paths.get("c:/data/hexastay","store/"+fileName);
             Path createPath = Paths.get(System.getProperty("user.dir" ),"store/");
             if(!Files.exists(createPath)){
                 Files.createDirectory(createPath);
@@ -122,7 +125,7 @@ public class StoreServiceImpl implements StoreService {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
         if(storeDTO.getStoreProfile()!=null && !storeDTO.getStoreProfile().isEmpty()) {//이미지 새로 넣었고
             if (store.getStoreProfileMeta()!=null  && !store.getStoreProfileMeta().isEmpty()) {//기존 이미지가 있다면
-                Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta().substring(1));
+                Path filePath = Paths.get("c:/data/hexastay", store.getStoreProfileMeta().substring(1));
                 Files.deleteIfExists(filePath);//삭제
             }
             /*이미지 등록 절차...*/
@@ -132,8 +135,8 @@ public class StoreServiceImpl implements StoreService {
             String fileName = fileFirstName + fileSubName;
 
             storeDTO.setStoreProfileMeta("/store/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "store/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "store/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }

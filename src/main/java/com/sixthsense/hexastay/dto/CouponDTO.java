@@ -1,12 +1,7 @@
 package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Coupon;
-import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.enums.CouponType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.time.LocalDate;
