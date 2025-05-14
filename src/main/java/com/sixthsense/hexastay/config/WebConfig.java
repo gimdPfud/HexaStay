@@ -70,36 +70,36 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**"); // 모든 맵핑명에 적용
     }
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함
-        registry.addResourceHandler("/profile/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/profile/");
-
-        registry.addResourceHandler("/store/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/store/");
-
-
-        registry.addResourceHandler("/company/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/company/");
-
-        registry.addResourceHandler("/roommenu/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/roommenu/");
-
-        registry.addResourceHandler("/hotelroom/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
-
-        registry.addResourceHandler("/qrfile/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qrfile/");
-
-        registry.addResourceHandler("/erd/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/erd/");
-
-        registry.addResourceHandler("/register-hotelroom/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/register-hotelroom/");
-
-        registry.addResourceHandler("/hotelRoomsByMember/**")
-                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
-
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함
+//        registry.addResourceHandler("/profile/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/profile/");
+//
+//        registry.addResourceHandler("/store/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/store/");
+//
+//
+//        registry.addResourceHandler("/company/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/company/");
+//
+//        registry.addResourceHandler("/roommenu/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/roommenu/");
+//
+//        registry.addResourceHandler("/hotelroom/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
+//
+//        registry.addResourceHandler("/qrfile/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qrfile/");
+//
+//        registry.addResourceHandler("/erd/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/erd/");
+//
+//        registry.addResourceHandler("/register-hotelroom/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/register-hotelroom/");
+//
+//        registry.addResourceHandler("/hotelRoomsByMember/**")
+//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
+//
+//    }
 }
