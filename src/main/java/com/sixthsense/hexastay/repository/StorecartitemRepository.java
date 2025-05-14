@@ -8,7 +8,6 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
-import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Storecartitem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

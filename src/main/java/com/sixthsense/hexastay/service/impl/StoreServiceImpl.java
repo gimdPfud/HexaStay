@@ -19,9 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class StoreServiceImpl implements StoreService {
-//    private final RoomRepository roomRepository;
+    //    private final RoomRepository roomRepository;
 //    private final HotelRoomRepository hotelRoomRepository;
 //    private final MemberRepository memberRepository;
 //    private final CompanyService companyService;
@@ -77,8 +75,8 @@ public class StoreServiceImpl implements StoreService {
             storeDTO.setStoreProfileMeta("/store/"+fileName);
 
             //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/"+fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/");
+            Path uploadPath = Paths.get("c:/data/hexastay","store/"+fileName);
+            Path createPath = Paths.get("c:/data/hexastay","store/");
             if(!Files.exists(createPath)){
                 Files.createDirectory(createPath);
             }
@@ -122,7 +120,7 @@ public class StoreServiceImpl implements StoreService {
         Store store = storeRepository.findById(storeDTO.getStoreNum()).orElseThrow(EntityNotFoundException::new);
         if(storeDTO.getStoreProfile()!=null && !storeDTO.getStoreProfile().isEmpty()) {//이미지 새로 넣었고
             if (store.getStoreProfileMeta()!=null  && !store.getStoreProfileMeta().isEmpty()) {//기존 이미지가 있다면
-                Path filePath = Paths.get(System.getProperty("user.dir"), store.getStoreProfileMeta().substring(1));
+                Path filePath = Paths.get("c:/data/hexastay", store.getStoreProfileMeta().substring(1));
                 Files.deleteIfExists(filePath);//삭제
             }
             /*이미지 등록 절차...*/
@@ -132,8 +130,8 @@ public class StoreServiceImpl implements StoreService {
             String fileName = fileFirstName + fileSubName;
 
             storeDTO.setStoreProfileMeta("/store/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "store/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "store/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -222,7 +220,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
 
-//    /*
+    //    /*
 //     * 메소드명 : list
 //     * 인수 값 : String status, Pageable
 //     * 리턴 값 : Page<StoreDTO>
@@ -356,7 +354,7 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
-        List<String> possibleRoles = Arrays.asList("SUPERADMIN","EXEC","HEAD","SV","PARTNER");
+        List<String> possibleRoles = Arrays.asList("SUPERADMIN","EXEC","HEAD","SV","PARTNER","GM");
         //상위 관리자라면 무조건 참.
         if(possibleRoles.contains(adminDTO.getAdminRole())){
             return true;

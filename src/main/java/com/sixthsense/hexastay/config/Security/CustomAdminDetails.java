@@ -4,11 +4,11 @@ import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.enums.AdminRole;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.Principal;
 import java.util.Collection;

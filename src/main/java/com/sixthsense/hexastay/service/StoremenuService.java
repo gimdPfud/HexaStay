@@ -8,7 +8,6 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.StoremenuDTO;
-import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,8 +1,14 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.dto.*;
-import com.sixthsense.hexastay.entity.*;
-import com.sixthsense.hexastay.repository.*;
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.CompanyDTO;
+import com.sixthsense.hexastay.dto.StoreDTO;
+import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.entity.Store;
+import com.sixthsense.hexastay.repository.AdminRepository;
+import com.sixthsense.hexastay.repository.CompanyRepository;
+import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,18 +19,15 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,7 +168,7 @@ public class AdminServiceImpl implements AdminService {
             String profileMetaPath = "/profile/" + fileName;
 
             // 파일 저장
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
+            Path uploadPath = Paths.get("c:/data/hexastay", "profile");
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -286,7 +289,7 @@ public class AdminServiceImpl implements AdminService {
             // 기존 사진이 있으면 삭제
             if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
                 try {
-                    Path oldFilePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
+                    Path oldFilePath = Paths.get("c:/data/hexastay", admin.getAdminProfileMeta().substring(1));
                     log.info("기존 프로필 사진 삭제 시도: {}", oldFilePath);
                     
                     // 파일 존재 여부 확인
@@ -325,7 +328,7 @@ public class AdminServiceImpl implements AdminService {
             log.info("새 프로필 메타 경로: {}", profileMetaPath);
             
             // 파일 저장
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "profile");
+            Path uploadPath = Paths.get("c:/data/hexastay", "profile");
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -389,7 +392,7 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findById(adminNum).orElseThrow(() -> new NoSuchElementException("해당 직원이 없습니다."));
 
         if (admin.getAdminProfileMeta() != null && !admin.getAdminProfileMeta().isEmpty()) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), admin.getAdminProfileMeta().substring(1));
+            Path filePath = Paths.get("c:/data/hexastay", admin.getAdminProfileMeta().substring(1));
             Files.deleteIfExists(filePath);
         }
         adminRepository.deleteById(adminNum);
@@ -398,6 +401,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDTO adminFindEmail(String email) {
         Admin admin = adminRepository.findByAdminEmail(email);
+        //관리자 식별 없음
         if(admin==null){
             return null;
         } else if (admin.getCompany()!=null || admin.getAdminRole().toUpperCase().equals("SUPERADMIN")) {
@@ -480,6 +484,70 @@ public class AdminServiceImpl implements AdminService {
         // 3. 새 비밀번호로 업데이트
         admin.setAdminPassword(passwordEncoder.encode(newPassword));
         adminRepository.save(admin);
+    }
+
+    @Override
+    public Page<AdminDTO> getAllWaitAdminList(Pageable pageable) {
+        log.info("=== getAllWaitAdminList 시작 (슈퍼어드민용) ===");
+        Page<Admin> adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+        
+        return adminPage.map(admin -> {
+            AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+            if (admin.getCompany() != null) {
+                dto.setCompanyName(admin.getCompany().getCompanyName());
+            }
+            if (admin.getStore() != null) {
+                dto.setStoreName(admin.getStore().getStoreName());
+            }
+            return dto;
+        });
+    }
+    
+    @Override
+    public Page<AdminDTO> searchWaitAdminList(String select, String choice, String keyword, Pageable pageable) {
+        log.info("=== searchWaitAdminList 시작 (슈퍼어드민용) ===");
+        log.info("검색 조건: 소속={}, 검색필드={}, 키워드={}", select, choice, keyword);
+        
+        Page<Admin> adminPage;
+        
+        // 소속 필터링
+        if (select != null && !select.isEmpty() && !select.equals("소속") && !select.equals("전체")) {
+            // 회사 유형 별 검색
+            adminPage = adminRepository.findByAdminActiveAndCompany_CompanyType("INACTIVE", select, pageable);
+        } else {
+            // 검색 조건에 따라 검색
+            if (choice != null && !choice.isEmpty() && !choice.equals("검색 조건") && 
+                keyword != null && !keyword.isEmpty()) {
+                
+                switch (choice) {
+                    case "사번":
+                        adminPage = adminRepository.findByAdminActiveAndAdminEmployeeNumContaining("INACTIVE", keyword, pageable);
+                        break;
+                    case "직책":
+                        adminPage = adminRepository.findByAdminActiveAndAdminPositionContaining("INACTIVE", keyword, pageable);
+                        break;
+                    case "이름":
+                        adminPage = adminRepository.findByAdminActiveAndAdminNameContaining("INACTIVE", keyword, pageable);
+                        break;
+                    default:
+                        adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+                }
+            } else {
+                // 검색 조건이 없는 경우 모든 비활성 계정 표시
+                adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+            }
+        }
+        
+        return adminPage.map(admin -> {
+            AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+            if (admin.getCompany() != null) {
+                dto.setCompanyName(admin.getCompany().getCompanyName());
+            }
+            if (admin.getStore() != null) {
+                dto.setStoreName(admin.getStore().getStoreName());
+            }
+            return dto;
+        });
     }
 
 }

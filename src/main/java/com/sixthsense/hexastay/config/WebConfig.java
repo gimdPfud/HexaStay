@@ -1,4 +1,5 @@
 package com.sixthsense.hexastay.config;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
 import java.util.Locale;
 
 /**************************************************
@@ -72,44 +74,33 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String baseDir = System.getProperty("user.dir"); //c:/data/hexastay
-//        String baseDir = "///c:/data/hexastay";
-        String hexaPath = "file:" + baseDir;
+        // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함
+        registry.addResourceHandler("/profile/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/profile/");
 
-        registry.addResourceHandler("/**")
-                .addResourceLocations(hexaPath)
-                .addResourceLocations("classpath:/templates/");
+        registry.addResourceHandler("/store/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/store/");
+
+        registry.addResourceHandler("/company/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/company/");
+
+        registry.addResourceHandler("/roommenu/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/roommenu/");
+
+        registry.addResourceHandler("/hotelroom/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/hotelroom/");
+
+        registry.addResourceHandler("/qrfile/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/qrfile/");
+
+        registry.addResourceHandler("/erd/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/erd/");
+
+        registry.addResourceHandler("/register-hotelroom/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/register-hotelroom/");
+
+        registry.addResourceHandler("/hotelRoomsByMember/**")
+                .addResourceLocations("file:///" + "c:/data/hexastay/hotelroom/");
+
     }
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함
-//        registry.addResourceHandler("/profile/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/profile/");
-//
-//        registry.addResourceHandler("/store/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/store/");
-//
-//
-//        registry.addResourceHandler("/company/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/company/");
-//
-//        registry.addResourceHandler("/roommenu/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/roommenu/");
-//
-//        registry.addResourceHandler("/hotelroom/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
-//
-//        registry.addResourceHandler("/qrfile/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/qrfile/");
-//
-//        registry.addResourceHandler("/erd/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/erd/");
-//
-//        registry.addResourceHandler("/register-hotelroom/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/register-hotelroom/");
-//
-//        registry.addResourceHandler("/hotelRoomsByMember/**")
-//                .addResourceLocations("file:///" + System.getProperty("user.dir") + "/hotelroom/");
-//
-//    }
 }

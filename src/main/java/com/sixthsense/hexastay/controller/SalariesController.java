@@ -1,12 +1,10 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.SalariesDTO;
 import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Salaries;
 import com.sixthsense.hexastay.repository.AdminRepository;
-import com.sixthsense.hexastay.repository.HotelRoomRepository;
-import com.sixthsense.hexastay.service.*;
+import com.sixthsense.hexastay.service.SalariesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -17,12 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.time.YearMonth;
-import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,7 +39,7 @@ public class SalariesController {
         Admin admin = adminRepository.findByAdminEmail(principal.getName());
         if (admin == null) {
             model.addAttribute("error", "직원 정보를 찾을 수 없습니다.");
-            return "/salaries/list";
+            return "salaries/list";
         }
 
         // 월별 필터링 적용
@@ -67,7 +62,7 @@ public class SalariesController {
         }
         
         model.addAttribute("salList", salariesList);
-        return "/salaries/list";
+        return "salaries/list";
     }
 
     @GetMapping("/insert")

@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,7 +1,9 @@
 package com.sixthsense.hexastay.service;
+
 import com.sixthsense.hexastay.dto.NoticeDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.security.Principal;
 
 public interface NoticeService {

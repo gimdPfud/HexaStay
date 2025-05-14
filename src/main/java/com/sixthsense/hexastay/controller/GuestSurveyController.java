@@ -33,15 +33,37 @@ public class GuestSurveyController {
                                   @RequestParam Long roomNum,
                                   @RequestParam(required = false) String checkOutDateStr,
                                   Model model) {
-        Survey survey = surveyService.getSurveyById(id);
-        if (survey == null) {
-            return "redirect:/guest-survey/error";
-        }
-        
+        // ID 없이 room 정보만으로 처리하는 새 메서드로 포워딩
+        return participateSurveyWithoutId(memberEmail, roomNum, checkOutDateStr, model);
+    }
+    
+    @GetMapping("/participate")
+    public String participateSurveyWithoutId(@RequestParam String memberEmail,
+                                  @RequestParam Long roomNum,
+                                  @RequestParam(required = false) String checkOutDateStr,
+                                  Model model) {
         // 객실 정보 조회
         Room room = roomRepository.findById(roomNum).orElse(null);
         if (room == null) {
             return "redirect:/guest-survey/error";
+        }
+        
+        // 기본 설문조사 객체 생성
+        Survey survey = new Survey();
+        survey.setSurveyNum(0L); // 임시 ID
+        survey.setSurveyTitle("고객님의 소중한 의견을 기다립니다");
+        survey.setSurveyContent("더 나은 서비스를 제공하기 위해 고객님의 의견을 듣고자 합니다.\n간단한 설문에 참여해 주시면 큰 도움이 됩니다. 소요 시간은 약 1분입니다.");
+        survey.setSurveyIsActive(true);
+        
+        // 회사에 활성화된 설문조사가 있으면 정보 가져오기
+        if (room.getHotelRoom() != null && room.getHotelRoom().getCompany() != null) {
+            Long companyNum = room.getHotelRoom().getCompany().getCompanyNum();
+            Survey activeSurvey = surveyService.getActiveSurveyByCompany(companyNum);
+            if (activeSurvey != null) {
+                survey.setSurveyTitle(activeSurvey.getSurveyTitle());
+                survey.setSurveyContent(activeSurvey.getSurveyContent());
+                survey.setSurveyNum(activeSurvey.getSurveyNum());
+            }
         }
         
         // 체크아웃 날짜 파싱
@@ -65,8 +87,8 @@ public class GuestSurveyController {
             // 체크아웃 날짜가 있는 경우 더 정확한 검사
             hasParticipated = surveyService.hasParticipatedWithCheckOutDate(memberEmail, roomNum, checkOutDate);
         } else {
-            // 체크아웃 날짜가 없는 경우 기존 방식으로 검사
-            hasParticipated = surveyService.hasParticipated(id, memberEmail);
+            // 체크아웃 날짜가 없는 경우 기존 방식으로 검사 (survey ID 불필요)
+            hasParticipated = false;
         }
         
         if (hasParticipated) {

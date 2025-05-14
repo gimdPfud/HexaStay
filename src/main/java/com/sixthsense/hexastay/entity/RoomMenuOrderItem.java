@@ -1,7 +1,11 @@
 package com.sixthsense.hexastay.entity;
+
 import com.sixthsense.hexastay.entity.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**************************************************
  * 클래스명 : RoomMenuOrderItem

@@ -1,12 +1,6 @@
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.entity.Survey;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 public class SurveyDTO {
 

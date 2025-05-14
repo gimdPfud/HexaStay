@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
 import jakarta.transaction.Transactional;

@@ -1,8 +1,6 @@
 package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.CouponDTO;
-import com.sixthsense.hexastay.entity.Coupon;
 import com.sixthsense.hexastay.enums.CouponType;
-import com.sixthsense.hexastay.repository.CouponRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.service.CouponService;
 import lombok.RequiredArgsConstructor;

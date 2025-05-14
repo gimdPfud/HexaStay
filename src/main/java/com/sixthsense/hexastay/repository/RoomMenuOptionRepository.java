@@ -1,10 +1,7 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuCartItem;
-import com.sixthsense.hexastay.entity.RoomMenuCartItemOption;
 import com.sixthsense.hexastay.entity.RoomMenuOption;
-import org.apache.poi.sl.draw.geom.GuideIf;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

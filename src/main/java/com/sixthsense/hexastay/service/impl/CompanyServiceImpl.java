@@ -3,13 +3,10 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
-
 import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
-
 import com.sixthsense.hexastay.repository.CompanyRepository;
-
 import com.sixthsense.hexastay.service.CompanyService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -17,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,8 +49,8 @@ public class CompanyServiceImpl implements CompanyService {
             String fileName = fileFirstName + fileSubName;
 
             companyDTO.setCompanyPictureMeta("/company/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "company/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "company/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "company/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -192,7 +188,7 @@ public class CompanyServiceImpl implements CompanyService {
             Company companyOri = companyRepository.findById(companyDTO.getCompanyNum()).orElseThrow();
 
             if (companyOri.getCompanyPictureMeta() != null && !companyOri.getCompanyPictureMeta().isEmpty()) {
-                Path filePath = Paths.get(System.getProperty("user.dir"), companyOri.getCompanyPictureMeta().substring(1));
+                Path filePath = Paths.get("c:/data/hexastay", companyOri.getCompanyPictureMeta().substring(1));
                 Files.deleteIfExists(filePath);
             }
 
@@ -202,8 +198,8 @@ public class CompanyServiceImpl implements CompanyService {
             String fileName = fileFirstName + fileSubName;
 
             companyDTO.setCompanyPictureMeta("/company/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "company/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "company/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "company/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "company/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }

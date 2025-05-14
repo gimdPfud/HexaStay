@@ -11,7 +11,6 @@ package com.sixthsense.hexastay.controller;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
 import com.sixthsense.hexastay.repository.AdminRepository;
-import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
 import com.sixthsense.hexastay.service.ZzService;

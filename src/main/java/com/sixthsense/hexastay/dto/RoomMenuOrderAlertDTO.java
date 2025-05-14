@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.dto;
 
-import com.sixthsense.hexastay.entity.base.BaseEntity;
 import lombok.*;
 
 @Getter

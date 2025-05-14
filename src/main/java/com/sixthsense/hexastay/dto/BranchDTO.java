@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 

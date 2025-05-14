@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.service.RoomMenuCartService;
 import com.sixthsense.hexastay.service.StorecartService;
 import com.sixthsense.hexastay.service.ZzService;

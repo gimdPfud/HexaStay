@@ -1,9 +1,6 @@
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
-import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
-import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

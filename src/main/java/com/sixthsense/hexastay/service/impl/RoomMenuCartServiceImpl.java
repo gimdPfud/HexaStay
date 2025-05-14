@@ -1,4 +1,5 @@
 package com.sixthsense.hexastay.service.impl;
+
 import com.sixthsense.hexastay.dto.*;
 import com.sixthsense.hexastay.entity.*;
 import com.sixthsense.hexastay.repository.*;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;

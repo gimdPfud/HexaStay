@@ -1,12 +1,10 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.sixthsense.hexastay.entity.Survey;
-import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.entity.HotelRoom;
-import com.sixthsense.hexastay.repository.RoomRepository;
-import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
+import com.sixthsense.hexastay.repository.MemberRepository;
+import com.sixthsense.hexastay.repository.RoomRepository;
 import com.sixthsense.hexastay.service.EmailService;
 import com.sixthsense.hexastay.service.SurveyService;
 import jakarta.mail.MessagingException;
@@ -19,15 +17,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
         mailSender.setUsername("welstorypark@gmail.com");
         mailSender.setPassword("xkurhrjcqgyabgbk");
 
-        java.util.Properties props = mailSender.getJavaMailProperties();
+        Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");

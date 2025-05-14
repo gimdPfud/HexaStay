@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.Orderstore;
 import com.sixthsense.hexastay.entity.Orderstoreitem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

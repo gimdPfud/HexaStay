@@ -1,8 +1,10 @@
 package com.sixthsense.hexastay.dto;
 
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile; // MultipartFile은 요청 시에만 사용하는 것이 일반적입니다.
-// 응답 DTO에는 파일 경로(String)를 담는 것이 좋습니다.
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.List;
 
 @Getter

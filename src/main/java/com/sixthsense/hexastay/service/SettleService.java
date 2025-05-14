@@ -1,13 +1,11 @@
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.*;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Salaries;
+import com.sixthsense.hexastay.dto.OrderstoreDTO;
+import com.sixthsense.hexastay.dto.RoomDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface SettleService {

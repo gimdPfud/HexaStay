@@ -2,7 +2,6 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.ErdDTO;
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Erd;
 import com.sixthsense.hexastay.repository.ErdRepository;
 import com.sixthsense.hexastay.service.ErdService;
@@ -37,8 +36,8 @@ public class ErdServiceImpl implements ErdService {
             String fileName = fileFirstName + fileSubName;
 
             erdDTO.setErdPictureMeta("/erd/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "erd/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "erd/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "erd/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "erd/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -90,8 +89,8 @@ public class ErdServiceImpl implements ErdService {
             String fileName = fileFirstName + fileSubName;
 
             erdDTO.setErdPictureMeta("/erd/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "erd/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "erd/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "erd/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "erd/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }

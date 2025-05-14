@@ -1,23 +1,23 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
-import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.CompanyDTO;
+import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.EmailService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -57,7 +56,7 @@ public class AdminController {
     @ResponseBody
     public String checkSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+        System.out.println(authentication.getPrincipal());
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             return "세션 없음 (비인증 상태)";
         }
@@ -74,7 +73,7 @@ public class AdminController {
 
     @GetMapping("/login")
     public String adminLogin () {
-        return "/admin/login";
+        return "admin/login";
     }
 
     @PostMapping("/login")
@@ -85,7 +84,7 @@ public class AdminController {
 
     @GetMapping("/main")
     public String adminMain (Model model) {
-        return "/admin/main";
+        return "admin/main";
     }
 
 
@@ -239,16 +238,60 @@ public class AdminController {
 
     //승인
     @GetMapping("/approve")
-    public String approve(Model model) {
+    public String approve(Model model, Pageable pageable, Principal principal) {
         log.info("=== 회원 승인 페이지 접근 ===");
-        List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
-        log.info("승인 대기 중인 회원 수: {}", adminDTOList.size());
-        model.addAttribute("adminDTOList", adminDTOList);
+        
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        Page<AdminDTO> adminDTOPage;
+        
+        if ("SUPERADMIN".equals(adminDTO.getAdminRole())) {
+            // 슈퍼어드민은 모든 승인 대기 회원을 볼 수 있도록 함
+            adminDTOPage = adminService.getAllWaitAdminList(pageable);
+        } else {
+            // 다른 관리자는 기존 로직 사용
+            List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
+            // 페이징 대응을 위한 임시 처리
+            adminDTOPage = new PageImpl<>(adminDTOList, pageable, adminDTOList.size());
+        }
+        
+        log.info("승인 대기 중인 회원 수: {}", adminDTOPage.getTotalElements());
+        model.addAttribute("adminDTOList", adminDTOPage.getContent());
+        model.addAttribute("page", adminDTOPage);
         return "admin/approve";
     }
 
-    //승인 포스트
+    //승인 검색 처리
     @PostMapping("/approve")
+    public String approveSearch(Model model, Pageable pageable, Principal principal,
+                                @RequestParam(required = false) String select,
+                                @RequestParam(required = false) String choice,
+                                @RequestParam(required = false) String keyword) {
+        log.info("=== 회원 승인 페이지 검색 처리 ===");
+        log.info("검색 조건: 소속={}, 검색필드={}, 키워드={}", select, choice, keyword);
+        
+        AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+        Page<AdminDTO> adminDTOPage;
+        
+        if ("SUPERADMIN".equals(adminDTO.getAdminRole())) {
+            // 슈퍼어드민은 검색 조건에 따라 모든 승인 대기 회원을 필터링
+            adminDTOPage = adminService.searchWaitAdminList(select, choice, keyword, pageable);
+        } else {
+            // 다른 관리자는 기존 로직 사용
+            List<AdminDTO> adminDTOList = adminService.getWaitAdminList();
+            // 페이징 대응을 위한 임시 처리
+            adminDTOPage = new PageImpl<>(adminDTOList, pageable, adminDTOList.size());
+        }
+        
+        model.addAttribute("adminDTOList", adminDTOPage.getContent());
+        model.addAttribute("page", adminDTOPage);
+        model.addAttribute("select", select);
+        model.addAttribute("choice", choice);
+        model.addAttribute("keyword", keyword);
+        return "admin/approve";
+    }
+
+    //승인 포스트 (개별 승인 처리)
+    @PostMapping("/approve/action")
     public ResponseEntity<Void> approve(@RequestParam Long adminNum) {
         adminService.setAdminActive(adminNum);
         return ResponseEntity.ok().build();
