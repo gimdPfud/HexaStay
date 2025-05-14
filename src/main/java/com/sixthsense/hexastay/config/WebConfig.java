@@ -70,6 +70,16 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**"); // 모든 맵핑명에 적용
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String baseDir = System.getProperty("user.dir"); //c:/data/hexastay
+//        String baseDir = "///c:/data/hexastay";
+        String hexaPath = "file:" + baseDir;
+
+        registry.addResourceHandler("/**")
+                .addResourceLocations(hexaPath)
+                .addResourceLocations("classpath:/templates/");
+    }
 //    @Override
 //    public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //        // Windows 경로 주의: file:/// 또는 file:C:/... 이렇게 해줘야 함

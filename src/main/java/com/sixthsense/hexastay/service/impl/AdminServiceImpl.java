@@ -400,7 +400,7 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findByAdminEmail(email);
         if(admin==null){
             return null;
-        } else if (admin.getCompany()!=null) {
+        } else if (admin.getCompany()!=null || admin.getAdminRole().toUpperCase().equals("SUPERADMIN")) {
             return modelMapper.map(admin,AdminDTO.class);
         } else if (admin.getStore()!=null) {
             AdminDTO adminDTO = modelMapper.map(admin,AdminDTO.class);
