@@ -27,10 +27,10 @@ public class Notice extends BaseEntity {
 //    @Column(name = "noticeWriter", nullable = false, length = 20)
 //    private String noticeWriter; // 작성자
 
-    @Column(name = "noticeView", nullable = false, columnDefinition = "INT default 0")
-    private Integer noticeView; // 조회수
-    //가져오기
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member")
-    private Member member;
+//    @Column(name = "noticeView", nullable = false, columnDefinition = "INT default 0")
+//    private Integer noticeView; // 조회수
+//    가져오기
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member")
+//    private Member member;
 }
