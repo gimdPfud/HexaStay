@@ -9,13 +9,8 @@ package com.sixthsense.hexastay.service.impl;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.entity.Store;
-import com.sixthsense.hexastay.entity.StoreLike;
-import com.sixthsense.hexastay.repository.CompanyRepository;
-import com.sixthsense.hexastay.repository.StoreLikeRepository;
-import com.sixthsense.hexastay.repository.StoreRepository;
+import com.sixthsense.hexastay.entity.*;
+import com.sixthsense.hexastay.repository.*;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.StoreService;
 import com.sixthsense.hexastay.service.ZzService;
@@ -40,7 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class StoreServiceImpl implements StoreService {
-//    private final RoomRepository roomRepository;
+    //    private final RoomRepository roomRepository;
 //    private final HotelRoomRepository hotelRoomRepository;
 //    private final MemberRepository memberRepository;
 //    private final CompanyService companyService;
@@ -81,7 +76,7 @@ public class StoreServiceImpl implements StoreService {
 
             //지금까지 만든 경로로 파일을 저장한다. (저장할 폴더가 없다면 생성)
             Path uploadPath = Paths.get("c:/data/hexastay","store/"+fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir" ),"store/");
+            Path createPath = Paths.get("c:/data/hexastay","store/");
             if(!Files.exists(createPath)){
                 Files.createDirectory(createPath);
             }
@@ -225,7 +220,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
 
-//    /*
+    //    /*
 //     * 메소드명 : list
 //     * 인수 값 : String status, Pageable
 //     * 리턴 값 : Page<StoreDTO>
@@ -359,7 +354,7 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public boolean validStoreAdmin(AdminDTO adminDTO, StoreDTO storeDTO) {
-        List<String> possibleRoles = Arrays.asList("SUPERADMIN","EXEC","HEAD","SV","PARTNER");
+        List<String> possibleRoles = Arrays.asList("SUPERADMIN","EXEC","HEAD","SV","PARTNER","GM");
         //상위 관리자라면 무조건 참.
         if(possibleRoles.contains(adminDTO.getAdminRole())){
             return true;
