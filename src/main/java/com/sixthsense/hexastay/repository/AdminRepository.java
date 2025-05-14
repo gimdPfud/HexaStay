@@ -78,7 +78,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
     Admin findByAdminEmail(String adminEmail);
 
     // 월급 작성 직원 목록
-    @Query("SELECT a FROM Admin a WHERE a.company.companyNum = :companyNum AND a.adminRole NOT IN ('exec', 'gm')")
+    @Query("SELECT a FROM Admin a WHERE a.company.companyNum = :companyNum")
     List<Admin> findBySalariesCompany(@Param("companyNum") Long companyNum);
 
     @Query("SELECT a FROM Admin a WHERE a.store.storeNum = :storeNum AND a.adminRole <> :excludedRole")

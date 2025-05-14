@@ -21,7 +21,7 @@
             <p style="font-size:15px;" th:utext="${surveyContent}">고객님의 소중한 의견을 들려주시면 더 나은 서비스 제공을 위해 노력하겠습니다.</p>
             <div style="height:1px;background-color:#dddddd;margin:20px 0;"></div>
             <div style="text-align:center;">
-                <a th:href="${baseUrl} + '/guest-survey/participate/' + ${survey.surveyNum} + '?memberEmail=' + ${memberEmail} + '&roomNum=' + ${roomNum} + '&memberName=' + ${memberName} + (${room != null && room.checkOutDate != null} ? '&checkOutDateStr=' + ${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')} : '')"
+                <a th:href="${baseUrl} + '/guest-survey/participate?memberEmail=' + ${memberEmail} + '&roomNum=' + ${roomNum} + '&memberName=' + ${memberName} + (${room != null && room.checkOutDate != null} ? '&checkOutDateStr=' + ${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')} : '')"
                    style="display:inline-block;background-color:#1D6F42;color:#ffffff;padding:12px 25px;text-decoration:none;font-weight:bold;font-size:15px;margin:20px 0;text-align:center;border:1px solid #1D6F42;">
                     설문조사 참여하기
                 </a>
