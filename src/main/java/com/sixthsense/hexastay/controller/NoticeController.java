@@ -1,10 +1,14 @@
 package com.sixthsense.hexastay.controller;
+import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.NoticeDTO;
+import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,7 @@ import java.security.Principal;
 @RequestMapping("/notice")
 public class NoticeController {
     private final NoticeService noticeService;
+    private final AdminService adminService;
     // 공지사항 목록
     @GetMapping("/list") // (수정)
     public String list(
@@ -25,6 +30,9 @@ public class NoticeController {
             Model model, Principal principal) {
         log.info("공지사항 목록 진입");
 
+        if(principal==null){
+            return "redirect:/admin/login";
+        }
         // 서비스 연동
         Page<NoticeDTO> listDTOS = noticeService.noticeList(pageable, principal, type, keyword);
 
@@ -39,18 +47,27 @@ public class NoticeController {
     //등록페이지
     @GetMapping("/insert") // (수정)
     public String insert(Model model, Principal principal) {
-        log.info("공지사항 작성 페이지");
-
-        if (principal != null) {
-            model.addAttribute("memberNum", 1); // (수정)
+//        log.info("공지사항 작성 페이지");
+        if(principal==null){
+            return "redirect:/admin/login";
+        } else {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if(adminDTO==null){
+                return "redirect:/admin/logout";
+            }else {
+                if(adminDTO.getAdminRole().toUpperCase().equals("SUPERADMIN")){
+                    return "notice/insert";
+                }else{
+                    return "redirect:/notice/list"; // (수정)
+                }
+            }
         }
-
-        return "notice/insert"; // (수정)
     }
     // 공지사항 등록 처리
     @PostMapping("/insert") // (수정)
-    public String insertPost(NoticeDTO noticeDTO,Principal principal) {
+    public String insertPost(NoticeDTO noticeDTO) {
         log.info("공지사항 등록 요청: " + noticeDTO);
+
         try {
             noticeService.noticeInsert(noticeDTO);
         } catch(Exception e) {
@@ -71,17 +88,31 @@ public class NoticeController {
         return "notice/read";
     }
     @GetMapping("/modify/{noticeNum}")
-    public String modify(@PathVariable(name = "noticeNum") Long noticeNum, Model model){
-        log.info("수정 진입");
+    public String modify(@PathVariable(name = "noticeNum") Long noticeNum, Model model, Principal principal){
+//        log.info("수정 진입");
         //서비스처리
-        NoticeDTO noticeDTO = noticeService.noticeRead(noticeNum);
-        model.addAttribute("noticedata", noticeDTO);
-        return "notice/modify";
+        if(principal==null){
+            return "redirect:/admin/login";
+        } else {
+            AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
+            if(adminDTO==null){
+                return "redirect:/admin/logout";
+            }else {
+                if(adminDTO.getAdminRole().toUpperCase().equals("SUPERADMIN")){
+                    NoticeDTO noticeDTO = noticeService.noticeRead(noticeNum);
+                    model.addAttribute("noticedata", noticeDTO);
+                    return "notice/modify";
+                }else{
+                    return "redirect:/notice/list"; // (수정)
+                }
+            }
+        }
+
     }
     @PostMapping("/modify") // (수정)
-    public String modifyPost(NoticeDTO noticeDTO,Principal principal) {
+    public String modifyPost(NoticeDTO noticeDTO) {
         noticeService.noticeModify(noticeDTO);
-        log.info("수정완료" + noticeDTO);
+//        log.info("수정완료" + noticeDTO);
         return "redirect:/notice/read/" + noticeDTO.getNoticeNum();
     }
     @GetMapping("/delete/{noticeNum}") // ✅ (추가)

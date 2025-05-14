@@ -72,35 +72,46 @@
           </tr>
           </tbody>
         </table>
-
       </div>
     </div>
   </div>
-    <!-- 페이징 -->
-  <nav>
+  <!-- 페이징 -->
+  <nav th:if="${list.totalPages > 1}">
     <ul class="pagination justify-content-center align-items-center mt-3">
-      <!-- 첫 페이지 이동 -->
+
+      <!-- 처음 -->
       <li class="page-item" th:classappend="${list.number == 0} ? 'disabled'">
-        <a class="page-link" th:href="@{/notice/list?page=0}">&laquo;</a>
+        <a class="page-link" th:href="@{/notice/list?page=0}">&laquo; 처음</a>
       </li>
-      <!-- 이전 페이지 이동 -->
+
+      <!-- 이전 -->
       <li class="page-item" th:classappend="${!list.hasPrevious()} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page={prev}(prev=${list.number - 1})}">이전</a>
       </li>
-      <!-- 페이지 번호 -->
-      <li class="page-item" th:each="pageNum : ${#numbers.sequence(
-                (list.number - 4 > 0 ? list.number - 4 : 0),
-                (list.number + 4 < list.totalPages - 1 ? list.number + 4 : list.totalPages - 1))}"
-          th:classappend="${pageNum == list.number} ? 'active'">
-        <a class="page-link" th:href="@{/notice/list?page={p}(p=${pageNum})}" th:text="${pageNum + 1}"></a>
-      </li>
-      <!-- 다음 페이지 이동 -->
+
+      <!-- 중앙 3개 페이지 번호만 출력 -->
+      <th:block th:with="
+        startPage=${T(java.lang.Math).max(0, list.number - 1)},
+        endPage=${T(java.lang.Math).min(list.totalPages - 1, list.number + 1)}">
+
+        <li class="page-item"
+            th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+            th:classappend="${pageNum == list.number} ? 'active'">
+          <a class="page-link"
+             th:href="@{/notice/list?page={p}(p=${pageNum})}"
+             th:text="${pageNum + 1}">1</a>
+        </li>
+      </th:block>
+
+      <!-- 다음 -->
       <li class="page-item" th:classappend="${!list.hasNext()} ? 'disabled'">
         <a class="page-link" th:href="@{/notice/list?page={next}(next=${list.number + 1})}">다음</a>
       </li>
-      <!-- 마지막 페이지 이동 -->
+
+      <!-- 마지막 -->
       <li class="page-item" th:classappend="${list.number == list.totalPages - 1} ? 'disabled'">
-        <a class="page-link" th:href="@{/notice/list?page={last}(last=${list.totalPages - 1})}">&raquo;</a>
+        <a class="page-link"
+           th:href="@{/notice/list?page={last}(last=${list.totalPages - 1})}">마지막 &raquo;</a>
       </li>
     </ul>
   </nav>
