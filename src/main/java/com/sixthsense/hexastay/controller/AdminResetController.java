@@ -51,4 +51,9 @@ public class AdminResetController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "어드민 계정 재설정 중 오류가 발생했습니다."));
         }
     }
+
+    @GetMapping("/")
+    public String index () {
+        return "redirect:/admin/main";
+    }
 }
