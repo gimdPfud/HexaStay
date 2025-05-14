@@ -58,14 +58,14 @@
                     </div>
                 </div>
             </div><!--제목끝-->
-            <div class="mb-3">
-                <label class="form-label">등록일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">수정일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">등록일자</label>-->
+<!--                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>-->
+<!--            </div>-->
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">수정일자</label>-->
+<!--                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>-->
+<!--            </div>-->
 
             <div class="d-flex justify-content-center gap-3">
                 <a th:href="@{'/admin/store/read?idid='+${data.storeNum}}" class="btn btn-secondary">목록</a>

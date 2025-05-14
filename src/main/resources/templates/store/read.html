@@ -55,14 +55,14 @@
                 <input type="text" id="storeAddressDetail" class="form-control mt-2" placeholder="상세 주소입니다." readonly>
                 <input readonly type="hidden" id="storeAddress" th:value="${data.storeAddress}" name="storeAddress"/>
             </div>
-            <div class="mb-3">
-                <label class="form-label">등록일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">수정일자</label>
-                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>
-            </div>
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">등록일자</label>-->
+<!--                <input type="text" class="form-control" th:value="${#temporals.format(data.createDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>-->
+<!--            </div>-->
+<!--            <div class="mb-3">-->
+<!--                <label class="form-label">수정일자</label>-->
+<!--                <input type="text" class="form-control" th:value="${#temporals.format(data.modifyDate, 'yyyy-MM-dd HH:mm:ss')}" readonly>-->
+<!--            </div>-->
             <div class="d-flex justify-content-center gap-3">
                 <a href="/admin/store/list" class="btn btn-secondary">목록</a>
                 <a th:href="@{'/admin/store/modify/'+${data.storeNum}}" class="btn btn-success">수정</a>
