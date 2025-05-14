@@ -154,7 +154,10 @@ public class SalariesServiceImpl implements SalariesService {
     @Override
     public void postSalaries(SalariesDTO salariesDTO) {
         Salaries salaries = modelMapper.map(salariesDTO, Salaries.class);
-        salaries.setAdmin(adminRepository.findByAdminNum(salaries.getAdmin().getAdminNum()));
+
+        Admin admin = adminRepository.findByAdminNum(salariesDTO.getAdminDTO().getAdminNum());
+        salaries.setAdmin(admin);
+        
         salariesRepository.save(salaries);
     }
 }
