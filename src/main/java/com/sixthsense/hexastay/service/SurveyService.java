@@ -7,20 +7,12 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.AdminDTO;
-import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.dto.SurveyResultDTO;
-import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public interface SurveyService {
     Survey getSurveyById(Long id);

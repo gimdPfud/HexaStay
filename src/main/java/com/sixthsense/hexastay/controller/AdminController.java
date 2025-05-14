@@ -1,23 +1,22 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.config.Security.CustomAdminDetails;
-import com.sixthsense.hexastay.dto.*;
+import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.CompanyDTO;
+import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.EmailService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -57,7 +55,7 @@ public class AdminController {
     @ResponseBody
     public String checkSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+        System.out.println(authentication.getPrincipal());
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             return "세션 없음 (비인증 상태)";
         }
@@ -74,7 +72,7 @@ public class AdminController {
 
     @GetMapping("/login")
     public String adminLogin () {
-        return "/admin/login";
+        return "admin/login";
     }
 
     @PostMapping("/login")
@@ -85,7 +83,7 @@ public class AdminController {
 
     @GetMapping("/main")
     public String adminMain (Model model) {
-        return "/admin/main";
+        return "admin/main";
     }
 
 

@@ -1,20 +1,12 @@
 package com.sixthsense.hexastay.service.impl;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
 import com.sixthsense.hexastay.dto.SettleDTO;
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.HotelRoom;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
@@ -23,26 +15,22 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -182,8 +170,8 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             hotelRoomDTO.setHotelRoomProfileMeta("/hotelroom/" + fileName);
 
             // 이미지 파일을 저장할 경로 지정
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "hotelroom/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "hotelroom/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "hotelroom/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "hotelroom/");
 
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath); // 폴더 없으면 새로 만들기
@@ -203,14 +191,14 @@ public class HotelRoomServiceImpl implements HotelRoomService {
                 throw new IllegalStateException("호텔룸 번호가 null입니다. QR 코드 생성 불가.");
             }
 
-            String qrText = "http://wooriproject.iptime.org:9002" + "qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://wooriproject.iptime.org:9002" + "/qr/" + hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
 
 
             //QR  메소드를 활용 해서 Web 인코딩 경로 만 Service 에서만 지정 파라미터를 Qrcode 생성 메소드에 추가 하기
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName());
 
-            hotelRoom.setHotelRoomQr(qrPath);  // ✅ 이미 /qrfile/파일명.png 형식
+            hotelRoom.setHotelRoomQr(qrPath.startsWith("/") ? qrPath : "/"+qrPath); // 새 QR 경로 저장
             hotelRoomRepository.save(hotelRoom);
 
 
@@ -315,7 +303,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             // ✅ 기존 파일 삭제
             String existingMeta = hotelRoom.getHotelRoomProfileMeta();
             if (existingMeta != null) {
-                Path deletePath = Paths.get(System.getProperty("user.dir"),
+                Path deletePath = Paths.get("c:/data/hexastay",
                         existingMeta.startsWith("/") ? existingMeta.substring(1) : existingMeta);
                 try {
                     Files.deleteIfExists(deletePath);
@@ -329,7 +317,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
             String ext = newProfileFile.getOriginalFilename()
                     .substring(newProfileFile.getOriginalFilename().lastIndexOf("."));
             String fileName = hotelRoomDTO.getHotelRoomName() + "_" + hotelRoomNum + ext;
-            Path savePath = Paths.get(System.getProperty("user.dir"), "hotelroom", fileName);
+            Path savePath = Paths.get("c:/data/hexastay", "hotelroom", fileName);
 
             Files.createDirectories(savePath.getParent());
             newProfileFile.transferTo(savePath.toFile());
@@ -343,7 +331,7 @@ public class HotelRoomServiceImpl implements HotelRoomService {
         // 6. 기존 QR 파일 삭제
         String oldQrFile = hotelRoom.getHotelRoomQr();
         if (oldQrFile != null) {
-            Path oldQrPath = Paths.get(System.getProperty("user.dir"), oldQrFile.startsWith("/") ? oldQrFile.substring(1) : oldQrFile);
+            Path oldQrPath = Paths.get("c:/data/hexastay", oldQrFile.startsWith("/") ? oldQrFile.substring(1) : oldQrFile);
             try {
                 Files.deleteIfExists(oldQrPath);
                 log.info("기존 QR 코드 삭제 완료: {}", oldQrPath);
@@ -354,12 +342,12 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
         // 7. QR 코드 재생성 (service 사용)
         try {
-            String qrText = "http://c3d3-116-33-138-85.ngrok-free.app/"+"qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
+            String qrText = "http://wooriproject.iptime.org:9002"+"/qr/"+hotelRoom.getHotelRoomNum(); // ← 여기서 인코딩 URL 조립
 
             /*QR 생성 모듈화 클래스 */
             String qrPath = qrCodeGeneratorService.generateQrCode(qrText, hotelRoom.getHotelRoomName()); // QR 생성
 
-            hotelRoom.setHotelRoomQr(qrPath); // 새 QR 경로 저장
+            hotelRoom.setHotelRoomQr(qrPath.startsWith("/") ? qrPath : "/"+qrPath); // 새 QR 경로 저장
             log.info("새 QR 코드 생성 완료: {}", qrPath);
 
         } catch (Exception e) {

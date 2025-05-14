@@ -3,7 +3,6 @@ package com.sixthsense.hexastay.service.impl;
 import com.sixthsense.hexastay.dto.UploadFileDTO;
 import com.sixthsense.hexastay.entity.UploadFile;
 import com.sixthsense.hexastay.repository.FileRepository;
-import com.sixthsense.hexastay.entity.UploadFile;
 import com.sixthsense.hexastay.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -32,7 +31,7 @@ public class FileServiceImpl implements FileService {
 
     public List<UploadFile> saveFile(UploadFile uploadFile, MultipartFile[] files) throws IOException {
 
-        String filePath = System.getProperty("user.dir") + "/file/";
+        String filePath = "c:/data/hexastay" + "/file/";
 
         List<UploadFile> savedFiles = new ArrayList<>();
 
@@ -119,7 +118,7 @@ public class FileServiceImpl implements FileService {
     public ResponseEntity<Void> DeleteFileList(List<Long> files) throws IOException {
         List<UploadFile> deletefiles = fileRepository.findAllById(files);
         for (UploadFile file : deletefiles) {
-            Path filePath = Paths.get(System.getProperty("user.dir"), file.getFilePath(), file.getFileName());
+            Path filePath = Paths.get("c:/data/hexastay", file.getFilePath(), file.getFileName());
             Files.deleteIfExists(filePath);
         }
         fileRepository.deleteAll(deletefiles);

@@ -7,26 +7,17 @@
  * ***********************************************/
 package com.sixthsense.hexastay.service;
 
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
-import com.sixthsense.hexastay.repository.MemberRepository;
 import com.sixthsense.hexastay.repository.RoomRepository;
-import com.sixthsense.hexastay.service.impl.RoomServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor

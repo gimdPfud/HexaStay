@@ -2,10 +2,8 @@ package com.sixthsense.hexastay.entity;
 
 
 import com.sixthsense.hexastay.entity.base.BaseEntity;
-
 import jakarta.persistence.*;
 import lombok.*;
-
 
 import java.time.LocalDateTime;
 

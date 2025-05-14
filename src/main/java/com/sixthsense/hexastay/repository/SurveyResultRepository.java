@@ -1,6 +1,5 @@
 package com.sixthsense.hexastay.repository;
 
-import com.sixthsense.hexastay.entity.Survey;
 import com.sixthsense.hexastay.entity.SurveyResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

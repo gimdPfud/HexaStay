@@ -9,7 +9,6 @@ package com.sixthsense.hexastay.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

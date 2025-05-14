@@ -1,5 +1,4 @@
 package com.sixthsense.hexastay.dto;
-import com.sixthsense.hexastay.entity.RoomMenu;
 import lombok.*;
 
 import java.util.Objects;

@@ -9,10 +9,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Hashtable;
 
 @Service
@@ -37,7 +35,7 @@ public class QrCodeServiceimpl {
             outputFile.getParentFile().mkdirs();
 
             // QR 코드 이미지를 파일로 저장
-            com.google.zxing.client.j2se.MatrixToImageWriter.writeToFile(bitMatrix, "PNG", outputFile);
+            MatrixToImageWriter.writeToFile(bitMatrix, "PNG", outputFile);
         } catch (Exception e) {
             throw new IOException("QR 코드 생성 중 오류 발생: " + e.getMessage(), e);
         }

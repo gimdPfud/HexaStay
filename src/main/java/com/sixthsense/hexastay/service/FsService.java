@@ -8,8 +8,8 @@
 package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
-import com.sixthsense.hexastay.dto.FacilitiesDTO;
 import com.sixthsense.hexastay.dto.FacViewDTO;
+import com.sixthsense.hexastay.dto.FacilitiesDTO;
 import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.entity.Facilities;
 import com.sixthsense.hexastay.repository.CompanyRepository;

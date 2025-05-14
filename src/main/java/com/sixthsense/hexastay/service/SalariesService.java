@@ -2,7 +2,6 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.SalariesDTO;
-import com.sixthsense.hexastay.entity.Salaries;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

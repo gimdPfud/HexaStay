@@ -2,7 +2,6 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.HotelRoomDTO;
 import com.sixthsense.hexastay.dto.MemberDTO;
-
 import com.sixthsense.hexastay.dto.RoomDTO;
 import com.sixthsense.hexastay.entity.Room;
 import com.sixthsense.hexastay.repository.AdminRepository;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,8 +28,6 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.sixthsense.hexastay.entity.QRoom.room;
 
 @Controller
 @RequiredArgsConstructor

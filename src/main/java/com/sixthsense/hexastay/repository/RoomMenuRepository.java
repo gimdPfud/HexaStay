@@ -21,11 +21,8 @@ import com.sixthsense.hexastay.entity.RoomMenu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
     // 이름으로 검색 (다국어 지원 안 하거나 개발팀 승인된 메뉴만, 페이징)

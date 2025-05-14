@@ -8,7 +8,6 @@
 package com.sixthsense.hexastay.dto;
 
 
-import com.sixthsense.hexastay.entity.StoremenuOption;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

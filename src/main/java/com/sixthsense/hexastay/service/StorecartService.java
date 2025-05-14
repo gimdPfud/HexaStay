@@ -10,7 +10,6 @@ package com.sixthsense.hexastay.service;
 import com.sixthsense.hexastay.dto.StorecartitemDTO;
 import com.sixthsense.hexastay.dto.StorecartitemViewDTO;
 
-import java.security.Principal;
 import java.util.List;
 
 public interface StorecartService {

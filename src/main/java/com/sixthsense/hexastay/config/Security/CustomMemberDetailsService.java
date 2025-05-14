@@ -1,8 +1,6 @@
 package com.sixthsense.hexastay.config.Security;
 
-import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.entity.Member;
-import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

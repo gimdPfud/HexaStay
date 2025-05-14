@@ -17,8 +17,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +68,7 @@ public class StoremenuServiceImpl implements StoremenuService {
             String fileName = fileFirstName + fileSubName;
 
             storemenuDTO.setStoremenuImgMeta("/store/menu/"+fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"),"store/menu/"+fileName);
+            Path uploadPath = Paths.get("c:/data/hexastay","store/menu/"+fileName);
             Path createPath = Paths.get(System.getProperty("user.dir" ),"store/menu/");
             if(!Files.exists(createPath)){
                 Files.createDirectory(createPath);
@@ -120,7 +118,7 @@ public class StoremenuServiceImpl implements StoremenuService {
         Storemenu entity = storemenuRepository.findById(storemenuDTO.getStoremenuNum()).orElseThrow(EntityNotFoundException::new);
         if(storemenuDTO.getStoremenuImg()!=null&&!storemenuDTO.getStoremenuImg().isEmpty()) {
             if (entity.getStoremenuImgMeta()!=null&&!entity.getStoremenuImgMeta().isEmpty()) {
-                Path filePath = Paths.get(System.getProperty("user.dir"), entity.getStoremenuImgMeta());
+                Path filePath = Paths.get("c:/data/hexastay", entity.getStoremenuImgMeta());
                 Files.deleteIfExists(filePath);
             }
             /*이미지 등록 절차...*/
@@ -130,8 +128,8 @@ public class StoremenuServiceImpl implements StoremenuService {
             String fileName = fileFirstName + fileSubName;
 
             storemenuDTO.setStoremenuImgMeta("/store/menu/" + fileName);
-            Path uploadPath = Paths.get(System.getProperty("user.dir"), "store/menu/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            Path uploadPath = Paths.get("c:/data/hexastay", "store/menu/" + fileName);
+            Path createPath = Paths.get("c:/data/hexastay", "store/menu/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }

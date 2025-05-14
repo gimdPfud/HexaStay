@@ -7,7 +7,6 @@
  * ***********************************************/
 package com.sixthsense.hexastay.entity;
 
-import com.sixthsense.hexastay.dto.StoremenuOptionDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

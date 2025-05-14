@@ -2,11 +2,7 @@ package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Member;
 import com.sixthsense.hexastay.entity.Room;
-import com.sixthsense.hexastay.entity.RoomMenu;
-import com.sixthsense.hexastay.entity.RoomMenuCart;
-import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
 /***************************************************
  *

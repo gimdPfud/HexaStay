@@ -2,17 +2,14 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.ErdDTO;
-import com.sixthsense.hexastay.repository.ErdRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.ErdService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,12 +30,12 @@ public class ErdController {
 
         Page<ErdDTO> erdList = erdService.getErdList(adminDTO, pageable);
         model.addAttribute("erd", erdList);
-        return "/erd/list";
+        return "erd/list";
     }
 
     @GetMapping("/insert")
     public String insertForm() {
-        return "/erd/insert";
+        return "erd/insert";
     }
 
     @PostMapping("/insert")
@@ -59,14 +56,14 @@ public class ErdController {
     @GetMapping("/update/{erdNum}")
     public String updateForm(@PathVariable("erdNum")Long erdNum, Model model) {
         model.addAttribute("erd", erdService.getErd(erdNum));
-        return "/erd/update";
+        return "erd/update";
     }
 
 
     @PostMapping("/update/{erdNum}")
     public String updatePost(ErdDTO erdDto) throws IOException {
         erdService.insert(erdDto);
-            return "/erd/update";
+            return "erd/update";
     }
 
     @PostMapping("/delete")

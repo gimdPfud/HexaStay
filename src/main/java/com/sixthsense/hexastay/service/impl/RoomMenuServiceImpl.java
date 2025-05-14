@@ -1,9 +1,14 @@
 package com.sixthsense.hexastay.service.impl;
-import com.sixthsense.hexastay.dto.HotelRoomDTO;
+
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.dto.RoomMenuOptionDTO;
-import com.sixthsense.hexastay.entity.*;
-import com.sixthsense.hexastay.repository.*;
+import com.sixthsense.hexastay.entity.RoomMenu;
+import com.sixthsense.hexastay.entity.RoomMenuOption;
+import com.sixthsense.hexastay.entity.RoomMenuTranslation;
+import com.sixthsense.hexastay.repository.RoomMenuLikeRepository;
+import com.sixthsense.hexastay.repository.RoomMenuOptionRepository;
+import com.sixthsense.hexastay.repository.RoomMenuRepository;
+import com.sixthsense.hexastay.repository.RoomMenuTranslationRepository;
 import com.sixthsense.hexastay.service.RoomMenuService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -15,13 +20,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**************************************************
@@ -107,8 +115,8 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                 log.info("파일" + roomMenuDTO.getRoomMenuImage().getOriginalFilename());
 
                 // 5. 저장할 경로 설정
-                Path uploadPath = Paths.get(System.getProperty("user.dir"), "roommenu/" + fileName);
-                Path createPath = Paths.get(System.getProperty("user.dir"), "roommenu/");
+                Path uploadPath = Paths.get("c:/data/hexastay", "roommenu/" + fileName);
+                Path createPath = Paths.get("c:/data/hexastay", "roommenu/");
                 // 저장할 디렉토리가 없으면 생성
                 if (!Files.exists(createPath)) {
                     Files.createDirectories(createPath);
@@ -347,7 +355,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
 
                 // 기존 파일 삭제
                 if (oldImageMeta != null && !oldImageMeta.isEmpty()) {
-                    Path oldFilePath = Paths.get(System.getProperty("user.dir"), oldImageMeta);
+                    Path oldFilePath = Paths.get("c:/data/hexastay", oldImageMeta);
                     File oldFile = oldFilePath.toFile();
                     if (oldFile.exists()) {
                         oldFile.delete();
@@ -363,7 +371,7 @@ public class RoomMenuServiceImpl implements RoomMenuService {
                     String fileName = fileFirstName + fileSubName;
 
                     // 저장 경로
-                    Path saveDirPath = Paths.get(System.getProperty("user.dir"), "roommenu/");
+                    Path saveDirPath = Paths.get("c:/data/hexastay", "roommenu/");
                     Path saveFilePath = saveDirPath.resolve(fileName);
 
                     // 디렉토리가 없으면 생성
