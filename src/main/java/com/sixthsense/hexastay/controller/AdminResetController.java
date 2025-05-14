@@ -18,6 +18,7 @@ import java.util.Map;
 @Log4j2
 public class AdminResetController {
 
+    private final AdminService adminService;
     private final AdminRepository adminRepository;
 
     @GetMapping("/adminreset")
@@ -28,9 +29,10 @@ public class AdminResetController {
     @PostMapping("/adminreset")
     @ResponseBody
     public ResponseEntity<?> resetAdminAccount() {
-        try {
-            Admin admin = adminRepository.findById(1L).orElse(new Admin());
-            admin.setAdminNum(1L);
+        Admin admin = adminRepository.findByAdminEmail("admin@admin");
+        if (admin == null) {
+            admin = new Admin();
+            }
             admin.setCompany(null);
             admin.setAdminActive("ACTIVE");
             admin.setAdminAddress("00000" + "\u00A0" +"테스트 주소" + "\u00A0" + "테스트 상세주소");
@@ -46,10 +48,7 @@ public class AdminResetController {
             adminRepository.save(admin);
 
             return ResponseEntity.ok(Map.of("success", true, "message", "어드민 계정이 재설정되었습니다."));
-        } catch (Exception e) {
-            log.error("어드민 재설정 중 오류 발생: ", e);
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "어드민 계정 재설정 중 오류가 발생했습니다."));
-        }
+
     }
 
     @GetMapping("/")

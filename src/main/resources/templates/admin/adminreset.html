@@ -78,82 +78,82 @@
     </style>
 </head>
 <body>
-    <div id="passwordFormContainer" class="password-form">
-        <h2>비밀번호 입력</h2>
-        <div id="passwordAlert" class="alert" style="display: none;"></div>
-        <input type="password" id="passwordInput" class="password-input" placeholder="비밀번호를 입력하세요" />
-        <button id="submitBtn" class="submit-btn">확인</button>
-    </div>
+<div id="passwordFormContainer" class="password-form">
+    <h2>비밀번호 입력</h2>
+    <div id="passwordAlert" class="alert" style="display: none;"></div>
+    <input type="password" id="passwordInput" class="password-input" placeholder="비밀번호를 입력하세요" />
+    <button id="submitBtn" class="submit-btn">확인</button>
+</div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordFormContainer = document.getElementById('passwordFormContainer');
-            const passwordInput = document.getElementById('passwordInput');
-            const submitBtn = document.getElementById('submitBtn');
-            const passwordAlert = document.getElementById('passwordAlert');
-            
-            let secretSequence = [];
-            let isPasswordCorrect = false;
-            
-            submitBtn.addEventListener('click', function() {
-                const password = passwordInput.value;
-                
-                if (password === '12345678') {
-                    isPasswordCorrect = true;
-                    passwordFormContainer.style.display = 'none';
-                    document.body.focus();
-                } else {
-                    passwordAlert.textContent = '비밀번호가 올바르지 않습니다.';
-                    passwordAlert.style.display = 'block';
-                    passwordInput.value = '';
-                }
-            });
-            
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    submitBtn.click();
-                }
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (!isPasswordCorrect) return;
-                
-                if (e.keyCode === 38 || e.keyCode === 40) {
-                    secretSequence.push(e.keyCode);
-                    checkSequence();
-                }
-            });
-            
-            function checkSequence() {
-                const targetSequence = [38, 38, 38, 40, 40, 40, 38, 38, 38, 38, 38, 38, 38];
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordFormContainer = document.getElementById('passwordFormContainer');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const passwordAlert = document.getElementById('passwordAlert');
 
-                if (secretSequence.length > targetSequence.length) {
-                    secretSequence = secretSequence.slice(-targetSequence.length);
-                }
-                
-                if (secretSequence.length === targetSequence.length) {
-                    let isMatch = true;
-                    for (let i = 0; i < targetSequence.length; i++) {
-                        if (secretSequence[i] !== targetSequence[i]) {
-                            isMatch = false;
-                            break;
-                        }
+        let secretSequence = [];
+        let isPasswordCorrect = false;
+
+        submitBtn.addEventListener('click', function() {
+            const password = passwordInput.value;
+
+            if (password === '12345678') {
+                isPasswordCorrect = true;
+                passwordFormContainer.style.display = 'none';
+                document.body.focus();
+            } else {
+                passwordAlert.textContent = '비밀번호가 올바르지 않습니다.';
+                passwordAlert.style.display = 'block';
+                passwordInput.value = '';
+            }
+        });
+
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (!isPasswordCorrect) return;
+
+            if (e.keyCode === 38 || e.keyCode === 40) {
+                secretSequence.push(e.keyCode);
+                checkSequence();
+            }
+        });
+
+        function checkSequence() {
+            const targetSequence = [38, 38, 38, 40, 40, 40, 38, 38, 38, 38, 38, 38, 38];
+
+            if (secretSequence.length > targetSequence.length) {
+                secretSequence = secretSequence.slice(-targetSequence.length);
+            }
+
+            if (secretSequence.length === targetSequence.length) {
+                let isMatch = true;
+                for (let i = 0; i < targetSequence.length; i++) {
+                    if (secretSequence[i] !== targetSequence[i]) {
+                        isMatch = false;
+                        break;
                     }
-                    
-                    if (isMatch) {
-                        resetAdminAccount();
-                    }
+                }
+
+                if (isMatch) {
+                    resetAdminAccount();
                 }
             }
-            
-            function resetAdminAccount() {
-                fetch('/admin/adminreset', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+        }
+
+        function resetAdminAccount() {
+            fetch('/adminreset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -168,8 +168,8 @@
                 .catch(error => {
                     console.error('오류:', error);
                 });
-            }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html> 
