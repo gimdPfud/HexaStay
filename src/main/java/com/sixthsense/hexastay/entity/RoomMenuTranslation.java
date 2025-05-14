@@ -40,4 +40,8 @@ public class RoomMenuTranslation {
     @JoinColumn(name = "room_menu_id")  // 이걸로 바꿈
     private RoomMenu roomMenu;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_menu_id")  // 이걸로 바꿈
+    private Storemenu storemenu;
+
 }
