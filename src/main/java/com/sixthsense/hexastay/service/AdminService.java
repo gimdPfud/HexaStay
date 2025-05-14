@@ -26,6 +26,12 @@ public interface AdminService {
     // 가입자 대기 리스트
     List<AdminDTO> getWaitAdminList();
 
+    // 슈퍼어드민용 모든 가입자 대기 리스트 (페이징)
+    Page<AdminDTO> getAllWaitAdminList(Pageable pageable);
+    
+    // 슈퍼어드민용 가입자 대기 리스트 검색 기능
+    Page<AdminDTO> searchWaitAdminList(String select, String choice, String keyword, Pageable pageable);
+
     //가입승인
     void setAdminActive(Long adminNum);
 

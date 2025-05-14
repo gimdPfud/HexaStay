@@ -10,7 +10,10 @@
         .table td {
             vertical-align: middle;
         }
-
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body style="background-color: #f8f9fa;">
@@ -25,20 +28,20 @@
             <div class="col-md-3" style="width: 15%">
                 <select name="select" class="form-select">
                     <option selected>소속</option>
-                    <option>전체</option>
-                    <option>본사</option>
-                    <option>지사</option>
-                    <option>지점</option>
-                    <option>스토어</option>
+                    <option th:selected="${select == '전체'}">전체</option>
+                    <option th:selected="${select == '본사'}">본사</option>
+                    <option th:selected="${select == '지사'}">지사</option>
+                    <option th:selected="${select == '지점'}">지점</option>
+                    <option th:selected="${select == '스토어'}">스토어</option>
                 </select>
             </div>
 
             <div class="col-md-3 " style="width: 15%">
                 <select name="choice" class="form-select">
                     <option selected>검색 조건</option>
-                    <option>사번</option>
-                    <option>직책</option>
-                    <option>이름</option>
+                    <option th:selected="${choice == '사번'}">사번</option>
+                    <option th:selected="${choice == '직책'}">직책</option>
+                    <option th:selected="${choice == '이름'}">이름</option>
                 </select>
             </div>
 
@@ -93,6 +96,28 @@
                     </tr>
                     </tbody>
                 </table>
+                
+                <!-- 페이징 -->
+                <div th:if="${page != null && page.totalPages > 0}" class="pagination">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/approve(page=${page.number - 1})}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" 
+                                th:classappend="${page.number == i ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/admin/approve(page=${i})}" th:text="${i + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/approve(page=${page.number + 1})}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </div>
@@ -104,7 +129,7 @@
                     const adminNum = this.dataset.adminNum;
                     console.log(adminNum);
 
-                    fetch('/admin/approve?adminNum=' + adminNum, {
+                    fetch('/admin/approve/action?adminNum=' + adminNum, {
                         method: 'POST',
                     })
                         .then(() => {

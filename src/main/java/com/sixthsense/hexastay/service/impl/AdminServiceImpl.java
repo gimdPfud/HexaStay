@@ -486,4 +486,68 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
+    @Override
+    public Page<AdminDTO> getAllWaitAdminList(Pageable pageable) {
+        log.info("=== getAllWaitAdminList 시작 (슈퍼어드민용) ===");
+        Page<Admin> adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+        
+        return adminPage.map(admin -> {
+            AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+            if (admin.getCompany() != null) {
+                dto.setCompanyName(admin.getCompany().getCompanyName());
+            }
+            if (admin.getStore() != null) {
+                dto.setStoreName(admin.getStore().getStoreName());
+            }
+            return dto;
+        });
+    }
+    
+    @Override
+    public Page<AdminDTO> searchWaitAdminList(String select, String choice, String keyword, Pageable pageable) {
+        log.info("=== searchWaitAdminList 시작 (슈퍼어드민용) ===");
+        log.info("검색 조건: 소속={}, 검색필드={}, 키워드={}", select, choice, keyword);
+        
+        Page<Admin> adminPage;
+        
+        // 소속 필터링
+        if (select != null && !select.isEmpty() && !select.equals("소속") && !select.equals("전체")) {
+            // 회사 유형 별 검색
+            adminPage = adminRepository.findByAdminActiveAndCompany_CompanyType("INACTIVE", select, pageable);
+        } else {
+            // 검색 조건에 따라 검색
+            if (choice != null && !choice.isEmpty() && !choice.equals("검색 조건") && 
+                keyword != null && !keyword.isEmpty()) {
+                
+                switch (choice) {
+                    case "사번":
+                        adminPage = adminRepository.findByAdminActiveAndAdminEmployeeNumContaining("INACTIVE", keyword, pageable);
+                        break;
+                    case "직책":
+                        adminPage = adminRepository.findByAdminActiveAndAdminPositionContaining("INACTIVE", keyword, pageable);
+                        break;
+                    case "이름":
+                        adminPage = adminRepository.findByAdminActiveAndAdminNameContaining("INACTIVE", keyword, pageable);
+                        break;
+                    default:
+                        adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+                }
+            } else {
+                // 검색 조건이 없는 경우 모든 비활성 계정 표시
+                adminPage = adminRepository.findByAdminActive("INACTIVE", pageable);
+            }
+        }
+        
+        return adminPage.map(admin -> {
+            AdminDTO dto = modelMapper.map(admin, AdminDTO.class);
+            if (admin.getCompany() != null) {
+                dto.setCompanyName(admin.getCompany().getCompanyName());
+            }
+            if (admin.getStore() != null) {
+                dto.setStoreName(admin.getStore().getStoreName());
+            }
+            return dto;
+        });
+    }
+
 }

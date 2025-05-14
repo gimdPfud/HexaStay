@@ -10,22 +10,28 @@
         <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'', ''MGR'')')}" href="/admin/insert">- 회원 등록</a>
     </div>
 
-    <button onclick="toggleMenu('roomList')"><strong>객실 관리</strong></button>
-    <div id="roomList" class="submenu">
+    <!-- 객실 관리 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
+            onclick="toggleMenu('roomList')"><strong>객실 관리</strong></button>
+    <div id="roomList" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/admin/hotelroom/list">- 객실 목록 </a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/admin/hotelroom/input">- 객실 등록 </a>
+        <a th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" href="/admin/hotelroom/input">- 객실 등록 </a>
     </div>
 
-    <button onclick="toggleMenu('roomBook')"><strong>객실 예약</strong></button>
-    <div id="roomBook" class="submenu">
+    <!-- 객실 예약 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
+            onclick="toggleMenu('roomBook')"><strong>객실 예약</strong></button>
+    <div id="roomBook" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/roomlist">- 객실 예약 목록</a>
         <a href="/member-insertroom">- 객실 예약 등록</a>
     </div>
 
-    <button onclick="toggleMenu('roomService')"><strong>객실 서비스</strong></button>
-    <div id="roomService" class="submenu">
+    <!-- 객실 서비스 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
+            onclick="toggleMenu('roomService')"><strong>객실 서비스</strong></button>
+    <div id="roomService" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/roommenu/list">- 객실 서비스 목록</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/roommenu/insert">- 객실 서비스 등록</a>
+        <a th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" href="/roommenu/insert">- 객실 서비스 등록</a>
         <a href="/roommenu/adminOrderList">- 객실 주문 내역</a>
     </div>
 
@@ -50,15 +56,19 @@
         <a href="/salaries/list">- 급여 조회</a>
     </div>
 
-    <button th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" onclick='location.href="/roommenu/dev/translation"'><strong>번역 승인 관리</strong></button>
+    <!-- 번역 승인 관리 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" 
+            onclick='location.href="/roommenu/dev/translation"'><strong>번역 승인 관리</strong></button>
 
     <button onclick="toggleMenu('notice')"><strong>공지사항</strong></button>
     <div id="notice" class="submenu">
         <a href="/notice/list">- 공지사항</a>
     </div>
 
-    <button onclick="toggleMenu('survey')"><strong>설문조사</strong></button>
-    <div id="survey" class="submenu">
+    <!-- 설문조사 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
+            onclick="toggleMenu('survey')"><strong>설문조사</strong></button>
+    <div id="survey" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/survey/list">- 설문조사 목록</a>
         <a href="/survey/form">- 설문조사 작성</a>
         <a href="/survey/results">- 설문조사 결과</a>
