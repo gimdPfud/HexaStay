@@ -2,6 +2,7 @@ package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.entity.RoomMenuTranslation;
+import com.sixthsense.hexastay.entity.Storemenu;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class RoomMenuTranslationDTO {
     private String roomMenuTransLationContent;
     private String roomMenuTransLationCategory;
     private RoomMenu roomMenu;
+    private Storemenu storemenu;
 
     public static RoomMenuTranslationDTO fromEntity(RoomMenuTranslation entity) {
         RoomMenuTranslationDTO dto = new RoomMenuTranslationDTO();

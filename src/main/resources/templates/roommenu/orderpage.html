@@ -606,39 +606,26 @@
             }
         });
 
-        // --- Mobile Easter Egg for Like Icons START ---
-        // --- Like Button Easter Egg START ---
-
         let likeIconTapCount = 0;
         let likeIconLastTapTime = 0;
-        const LIKE_ICON_TAP_THRESHOLD = 5; // 5번 탭하면 발동
-        const LIKE_ICON_TAP_TIMEOUT = 500; // 0.5초 이내 연속 탭만 유효
+        const LIKE_ICON_TAP_THRESHOLD = 5;
+        const LIKE_ICON_TAP_TIMEOUT = 500;
 
         document.querySelectorAll('.like-icon').forEach(function (likeIcon) {
             likeIcon.addEventListener('click', function (event) {
                 const currentTime = new Date().getTime();
-
                 if ((currentTime - likeIconLastTapTime) < LIKE_ICON_TAP_TIMEOUT) {
                     likeIconTapCount++;
                 } else {
                     likeIconTapCount = 1;
                 }
-
                 likeIconLastTapTime = currentTime;
-
-                console.log('Like icon tapped. Count:', likeIconTapCount);
-
                 if (likeIconTapCount >= LIKE_ICON_TAP_THRESHOLD) {
-                    console.log("좋아요 아이콘 이스터에그 발동!");
                     triggerKonamiAction();
                     likeIconTapCount = 0;
                 }
             });
         });
-        // --- Mobile Easter Egg for Like Icons END ---
-
-
-        // --- Konami Code Easter Egg START ---
 
         const konamiCodeSequence = [
             'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
@@ -650,7 +637,6 @@
         let sakuraIntervalId = null;
         let activeSakuraPetals = [];
 
-        // 원래 createSakuraPetal 함수 사용, 애니메이션 관련 코드만 주석 처리
         function createSakuraPetal() {
             const sakuraContainer = document.getElementById('sakuraContainer');
             if (!sakuraContainer || sakuraContainer.style.display !== 'block') {
@@ -666,49 +652,39 @@
             petal.style.left = `${Math.random() * 100}vw`;
             petal.style.opacity = `${Math.random() * 0.3 + 0.6}`;
 
-            // === 애니메이션 관련 스타일 다시 활성화 START ===
             const fallDuration = Math.random() * 8 + 7;
             const swayDuration = Math.random() * 4 + 3;
             const animationStartOffset = Math.random() * fallDuration;
             petal.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
-            petal.style.animationDelay = `-<span class="math-inline">\{animationStartOffset\}s, \-</span>{Math.random() * swayDuration}s`;
-            requestAnimationFrame(() => { // 중요: 애니메이션 시작!
+            petal.style.animationDelay = `-${animationStartOffset}s, -${Math.random() * swayDuration}s`;
+            requestAnimationFrame(() => {
                 petal.style.animationPlayState = 'running';
             });
-            // === 애니메이션 관련 스타일 다시 활성화 END ===
 
             if (Math.random() > 0.5) {
-                petal.style.borderRadius = '0 70% 0 70% / 0 60% 0 80%'; // JS에서 직접 설정하는 border-radius (CSS 클래스보다 우선)
+                petal.style.borderRadius = '0 70% 0 70% / 0 60% 0 80%';
             }
             if (Math.random() > 0.6) {
                 petal.style.backgroundColor = '#FFC0CB';
             } else if (Math.random() > 0.8) {
                 petal.style.backgroundColor = '#FFF0F5';
             }
-            // CSS 클래스의 background-color, border-radius가 기본으로 적용되고, 위 조건에 맞으면 JS 스타일로 덮어써짐
 
-            console.log(`애니메이션 없는 꽃잎 생성 (클래스 기반): left=<span class="math-inline">\{petal\.style\.left\}, size\=</span>{size}px`);
             sakuraContainer.appendChild(petal);
             activeSakuraPetals.push(petal);
-
-            // 애니메이션이 없으므로, CSS의 top: -50px 때문에 화면 상단 바깥에 위치할 것임.
-            // 테스트를 위해 임시로 top 위치를 화면 안으로 설정하여 고정된 꽃잎 확인:
-            petal.style.top = `${Math.random() * 70 + 15}vh`; // 화면 높이의 15% ~ 85% 사이에 랜덤으로 표시
+            petal.style.top = `${Math.random() * 70 + 15}vh`;
 
             setTimeout(() => {
                 if (petal.parentElement) {
                     petal.remove();
                 }
                 activeSakuraPetals = activeSakuraPetals.filter(p => p !== petal);
-            }, 20000); // 20초 후 제거 (테스트용)
+            }, 20000);
         }
 
-        // startSakuraEffect 함수 (원래대로 setInterval 및 createSakuraPetal 사용)
         function startSakuraEffect(durationSeconds = 15) {
-            console.log('startSakuraEffect 호출됨 (애니메이션 없는 여러 꽃잎 테스트 - 클래스 기반)');
             let sakuraContainer = document.getElementById('sakuraContainer');
             if (!sakuraContainer) {
-                console.log('벚꽃 컨테이너 없음, 새로 생성합니다.');
                 sakuraContainer = document.createElement('div');
                 sakuraContainer.id = 'sakuraContainer';
                 sakuraContainer.classList.add('sakura-container');
@@ -717,65 +693,63 @@
             sakuraContainer.style.display = 'block';
             sakuraContainer.style.pointerEvents = 'none';
             sakuraContainer.style.zIndex = '99999';
-            console.log('벚꽃 컨테이너 display를 block으로 설정.');
 
             if (sakuraIntervalId) clearInterval(sakuraIntervalId);
             activeSakuraPetals.forEach(p => { if(p.parentElement) p.remove(); });
             activeSakuraPetals = [];
-            console.log('기존 벚꽃잎 정리 완료.');
 
-            sakuraIntervalId = setInterval(createSakuraPetal, 300); // 0.3초마다 애니메이션 없는 꽃잎 생성
-            console.log('애니메이션 없는 꽃잎(클래스 기반) 생성 인터벌 시작됨. ID:', sakuraIntervalId);
+            sakuraIntervalId = setInterval(createSakuraPetal, 300);
 
             setTimeout(() => {
                 stopSakuraEffect();
             }, durationSeconds * 1000);
         }
 
-        // 벚꽃 효과 중지 함수
         function stopSakuraEffect() {
-            console.log('stopSakuraEffect 호출됨');
             if (sakuraIntervalId) {
                 clearInterval(sakuraIntervalId);
                 sakuraIntervalId = null;
-                console.log('벚꽃잎 생성 인터벌 중지됨.');
             }
-
-            // 약 5초 후 컨테이너 숨김 (남은 꽃잎들이 자연스럽게 떨어질 시간)
             setTimeout(() => {
                 const sakuraContainer = document.getElementById('sakuraContainer');
                 if (sakuraContainer) {
                     sakuraContainer.style.display = 'none';
-                    console.log('벚꽃 컨테이너 display를 none으로 설정.');
                 }
-                // 남아있는 꽃잎 DOM 요소들 강제 클리어 (선택사항, 이미 개별 타이머로 제거됨)
-                // activeSakuraPetals.forEach(p => { if(p.parentElement) p.remove(); });
-                // activeSakuraPetals = [];
             }, 5000);
         }
 
         function triggerKonamiAction() {
-            console.log("코나미 코드 발동! triggerKonamiAction 호출됨");
-
-            startSakuraEffect(20); // 20초 동안 벚꽃이 흩날립니다.
+            startSakuraEffect(20);
 
             const foodListItems = document.querySelectorAll('.food-list .food-item');
             if (foodListItems.length === 0) {
-                showNotification('코나미 코드! …하지만 메뉴가 없네요? 😮🌸', 'warning');
+                showNotification('코나미 코드! …하지만 메뉴가 없네요? 😮🌸', 'warning', 3000);
                 return;
             }
-            // ... (이하 아이템 선택 및 하이라이트 로직은 동일) ...
-            const availableItems = Array.from(foodListItems).filter(item => !item.classList.contains('sold-out'));
+
+            let eligibleItems = Array.from(foodListItems).filter(item => {
+                if (item.classList.contains('sold-out')) {
+                    return false;
+                }
+                const categoryBadge = item.querySelector('a .menu-badge');
+                if (categoryBadge && categoryBadge.textContent.trim() === '룸케어') {
+                    return false;
+                }
+                return true;
+            });
+
             let selectedItem;
-            if (availableItems.length > 0) {
-                selectedItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+
+            if (eligibleItems.length > 0) {
+                selectedItem = eligibleItems[Math.floor(Math.random() * eligibleItems.length)];
             } else {
-                selectedItem = foodListItems[Math.floor(Math.random() * foodListItems.length)];
+                showNotification('코나미! 오늘은 특별히 추천할 만한 메뉴가 없네요. 🌸', 'info', 3000);
+                return;
             }
 
             if (selectedItem) {
                 const itemNameElement = selectedItem.querySelector('.menu-name');
-                const itemName = itemNameElement ? itemNameElement.textContent : '선택된 아이템';
+                const itemName = itemNameElement ? itemNameElement.textContent.trim() : '선택된 아이템';
                 const cardElement = selectedItem.querySelector('.div-card');
 
                 selectedItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -784,10 +758,9 @@
                     const originalBoxShadow = cardElement.style.boxShadow;
                     cardElement.style.transform = 'scale(1.03)';
                     cardElement.style.boxShadow = '0 0 20px 5px #FFD700';
-
                     setTimeout(() => {
                         cardElement.style.transform = 'scale(1)';
-                        cardElement.style.boxShadow = originalBoxShadow;
+                        cardElement.style.boxShadow = originalBoxShadow || '';
                     }, 2500);
                 }
                 showNotification(`코나미! 오늘의 추천: ${itemName}! ✨🌸`, 'success', 3000);
@@ -802,8 +775,6 @@
             }
 
             const key = (event.key.toLowerCase() === 'b') ? 'b' : (event.key.toLowerCase() === 'a') ? 'a' : event.key;
-            // 키보드 'B', 'A' 를 소문자로 일관되게 처리
-
             userInput.push(key);
             clearTimeout(konamiTimeoutId);
 
@@ -819,7 +790,6 @@
 
             if (userInput.length === konamiCodeSequence.length) {
                 event.preventDefault();
-                console.log("코나미 키 시퀀스 매치됨!");
                 triggerKonamiAction();
                 userInput = [];
             } else {
