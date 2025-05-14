@@ -115,12 +115,12 @@ public class FacilitiesController {
 
     @GetMapping("/fs/list")
     public String fslistClient(Principal principal, Pageable pageable, Model model, HttpSession session){
-//        log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
+        log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
         if(principal==null){
             return "redirect:/cart/qr";}
         Long companyNum = 0L;
-        Long adminNum = adminRepository.findAll().getLast().getAdminNum();
-        //fixme 고객용 시설조회 시 제일 마지막에 등록 된 admin을 가져옵니다
+        Long adminNum = 1L;
+        //고객용 시설조회 시 슈퍼어드민 번호 1번을 가져옵니다
         try {
             companyNum = zzService.sessionToCompany(session).getCompanyNum();
             log.info("컴퍼니넘 : "+companyNum);
