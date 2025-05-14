@@ -47,7 +47,7 @@ public class MemberSecurityConfig {
                     "/roomMenu/**","/qr/**,","/fs/**",
                     "/sample/**", "/sidebar/**", "/store/**", "/layouts/**", "/toss/**,",
                     "/ws-order-alert/**", "/cart/**", "/roomcare/**", "/api/reorder/**, ",
-                    "/api/**", "/adminreset")
+                    "/api/**")
             .authenticationManager(authManager)
             .userDetailsService(memberDetailsService)
             .authorizeHttpRequests(authz -> authz

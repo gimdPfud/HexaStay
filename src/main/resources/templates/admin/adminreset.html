@@ -14,7 +14,9 @@
         html, body {
             height: 100%;
             font-family: 'Open Sans', sans-serif;
-            background: #f4f6f9;
+            background: url("/background/anonymous-background.jpg") no-repeat;
+            background-size: cover;
+            background-position: center;
         }
 
         body {
@@ -68,16 +70,6 @@
             color: white;
         }
 
-        .face {
-            display: none;
-            font-size: 150px;
-            text-align: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
         .alert {
             color: #d9534f;
             margin-bottom: 1rem;
@@ -93,7 +85,6 @@
         <button id="submitBtn" class="submit-btn">확인</button>
     </div>
 
-    <div id="faceContainer" class="face">^-^</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -101,7 +92,6 @@
             const passwordInput = document.getElementById('passwordInput');
             const submitBtn = document.getElementById('submitBtn');
             const passwordAlert = document.getElementById('passwordAlert');
-            const faceContainer = document.getElementById('faceContainer');
             
             let secretSequence = [];
             let isPasswordCorrect = false;
@@ -112,7 +102,6 @@
                 if (password === '12345678') {
                     isPasswordCorrect = true;
                     passwordFormContainer.style.display = 'none';
-                    faceContainer.style.display = 'block';
                     document.body.focus();
                 } else {
                     passwordAlert.textContent = '비밀번호가 올바르지 않습니다.';
@@ -153,7 +142,6 @@
                     }
                     
                     if (isMatch) {
-                        faceContainer.textContent = 'ㅡ_ㅡ 어드민 계정 재설정.';
                         resetAdminAccount();
                     }
                 }
@@ -170,6 +158,9 @@
                 .then(data => {
                     if (data.success) {
                         console.log('어드민 계정이 재설정되었습니다.');
+                        document.body.style.background = 'url("/background/dark-background-axdtnl6y1t2pbcst.jpg") no-repeat';
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundPosition = 'center';
                     } else {
                         console.error('오류:', data.message);
                     }
