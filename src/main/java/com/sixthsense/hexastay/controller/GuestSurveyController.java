@@ -33,9 +33,18 @@ public class GuestSurveyController {
                                   @RequestParam Long roomNum,
                                   @RequestParam(required = false) String checkOutDateStr,
                                   Model model) {
-        Survey survey = surveyService.getSurveyById(id);
-        if (survey == null) {
-            return "redirect:/guest-survey/error";
+        // 설문조사 조회 시도
+        Survey survey = null;
+        try {
+            survey = surveyService.getSurveyById(id);
+        } catch (Exception e) {
+            // 설문조사를 찾지 못하면 기본 설문조사 객체 생성
+            log.warn("설문조사 ID {}를 찾을 수 없습니다. 기본 설문조사를 사용합니다.", id);
+            survey = new Survey();
+            survey.setSurveyNum(id);
+            survey.setSurveyTitle("고객님의 소중한 의견을 기다립니다");
+            survey.setSurveyContent("더 나은 서비스를 제공하기 위해 고객님의 의견을 듣고자 합니다.\n간단한 설문에 참여해 주시면 큰 도움이 됩니다. 소요 시간은 약 1분입니다.");
+            survey.setSurveyIsActive(true);
         }
         
         // 객실 정보 조회
