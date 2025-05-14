@@ -86,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
         
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(content, true); // HTML 형식으로 설정
+        helper.setText(content, true);
         
         getHardcodedMailSender().send(message);
     }
@@ -95,8 +95,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendSurveyEmail(String subject, String content, String memberEmail, String memberName, String roomName, Long roomNum, Room room) {
         try {
             Context context = new Context();
-            
-            // 객실의 회사 정보를 가져와서 해당 회사의 활성화된 설문조사 조회
+
             Long companyNum = null;
             if (room.getHotelRoom() != null && room.getHotelRoom().getCompany() != null) {
                 companyNum = room.getHotelRoom().getCompany().getCompanyNum();
@@ -106,23 +105,19 @@ public class EmailServiceImpl implements EmailService {
             if (companyNum != null) {
                 activeSurvey = surveyService.getActiveSurveyByCompany(companyNum);
             } else {
-                activeSurvey = surveyService.getActiveSurvey(); // 회사 정보가 없는 경우 기본 설문 사용
+                activeSurvey = surveyService.getActiveSurvey();
             }
-            
-            // 활성화된 설문조사가 없는 경우 기본 템플릿 생성
+
             if (activeSurvey == null) {
-                log.warn("활성화된 설문조사가 없습니다. 기본 템플릿을 사용합니다.");
                 activeSurvey = new Survey();
-                activeSurvey.setSurveyNum(1L); // 기본 ID
+                activeSurvey.setSurveyNum(1L);
                 activeSurvey.setSurveyTitle(subject != null && !subject.isEmpty() ? subject : "고객님의 소중한 의견을 기다립니다.");
                 activeSurvey.setSurveyContent(content != null && !content.isEmpty() ? content : 
                     "더 나은 서비스를 제공하기 위해 고객님의 의견을 듣고자 합니다.\n간단한 설문에 참여해 주시면 큰 도움이 됩니다. 소요 시간은 약 1분입니다.");
                 activeSurvey.setSurveyIsActive(true);
             }
-            
-            // 회원 정보는 이미 room 객체에 있으므로 다시 조회할 필요 없음
-            // 회사명 가져오기
-            String companyName = "헥사스테이"; // 기본값
+
+            String companyName = "헥사스테이";
             if (room.getHotelRoom() != null && 
                 room.getHotelRoom().getCompany() != null &&
                 room.getHotelRoom().getCompany().getCompanyName() != null) {
@@ -151,10 +146,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(emailContent, true);
             
             getHardcodedMailSender().send(message);
-            log.info("설문조사 이메일 전송 완료: {} ({}) - 방: {} ({}), 회사: {}", 
-                    memberName, memberEmail, roomName, roomNum, companyName);
         } catch (Exception e) {
-            log.error("설문조사 이메일 발송 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("이메일 발송 실패", e);
         }
     }
