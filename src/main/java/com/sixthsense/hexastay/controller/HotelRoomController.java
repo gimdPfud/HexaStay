@@ -127,7 +127,7 @@ public class HotelRoomController {
         log.info("✅ hotelRoomList Controller 호출됨");
 
         Pageable pageable = PageRequest.of(page, 9,
-                Sort.by(Sort.Order.desc("hotelRoomNum"), Sort.Order.desc("createDate"))
+                Sort.by("hotelRoomNum").descending()
         );
         //페이지 사이즈 체크 로그
         log.info("pageable : page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());

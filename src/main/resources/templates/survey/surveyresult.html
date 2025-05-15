@@ -203,9 +203,8 @@
 
         function downloadExcel() {
             // 설문조사 제목 가져오기
-            const surveyTitle = document.querySelector('.result-title').textContent;
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const fileName = `${surveyTitle}_설문결과_${timestamp}.xlsx`;
+            const fileName = `설문결과_${timestamp}.xlsx`;
 
             // 엑셀 워크북 생성
             const wb = XLSX.utils.book_new();
@@ -214,8 +213,7 @@
             const summaryData = [
                 ['설문조사 결과 요약'],
                 [''],
-                ['설문 제목', surveyTitle],
-                ['참여 인원', document.querySelector('.mb-4 span').textContent],
+                ['참여 인원', document.querySelector('.participant-count').textContent],
                 [''],
                 ['구분', '평균 점수'],
                 ['전체 평균', document.getElementById('avgTotal').textContent],
@@ -249,14 +247,18 @@
                 rows.forEach(row => {
                     const dataRow = [];
                     const cells = row.querySelectorAll('td');
-                        cells.forEach((cell, index) => {
-                            if (index === 8) { // 코멘트 컬럼인 경우
-                                const commentElement = cell.querySelector('.comment-preview');
-                                dataRow.push(commentElement ? commentElement.getAttribute('data-comment') : '');
+                    cells.forEach((cell, index) => {
+                        if (index === 8) { // 코멘트 컬럼
+                            const commentElement = cell.querySelector('.comment-preview');
+                            if (commentElement && commentElement.hasAttribute('data-comment')) {
+                                dataRow.push(commentElement.getAttribute('data-comment'));
                             } else {
-                                dataRow.push(cell.textContent);
+                                dataRow.push('');
                             }
-                        });
+                        } else {
+                            dataRow.push(cell.textContent.trim());
+                        }
+                    });
                     detailsData.push(dataRow);
                 });
 
