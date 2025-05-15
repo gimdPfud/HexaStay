@@ -24,11 +24,11 @@ public interface StoremenuService {
     Long modify(StoremenuDTO storemenuDTO) throws IOException;
 
     /*목록*/
-    List<StoremenuDTO> list(Long storeNum, String status);
+    List<StoremenuDTO> list(Long storeNum, String status, Locale locale);
     /*목록2 페이징없는 모든 목록*/
-    List<StoremenuDTO> list(Long storeNum);
+    List<StoremenuDTO> list(Long storeNum, Locale locale);
     /*목록3 카테고리별 목록*/
-    List<StoremenuDTO> list(Long storeNum, String category, String status);
+    List<StoremenuDTO> list(Long storeNum, String category, String status, Locale locale);
 
     /*삭제인척 하는 활성화->비활성화*/
     Long delete(Long pk);

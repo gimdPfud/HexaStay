@@ -61,4 +61,10 @@ public class StoremenuDTO {
     private String storemenuImgMeta; //가게 사진정보
 
     private List<StoremenuOptionDTO> storemenuOptionDTOList = new ArrayList<>(); //옵션 리스트
+
+    // 카테고리 점검
+    private String storemenuOriginalCategoryKey; // 예: "main", "side" (필터링 및 내부 로직용)
+    private String storemenuCategoryDisplay;     // 예: "메인", "Main", "主菜" (화면 표시용)
+
+
 }

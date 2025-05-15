@@ -45,6 +45,71 @@ public class StoreServiceImpl implements StoreService {
     private final CompanyRepository companyRepository;
     private final CompanyService companyService;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final StoreTranslationRepository storeTranslationRepository;
+
+    /* 헬퍼 메소드 */
+
+    private boolean isValidTranslationString(String value) {
+        return value != null && !value.isEmpty();
+    }
+
+    private StoreDTO convertToStoreDTOWithTranslation(Store storeEntity, Locale locale) {
+        if (storeEntity == null) {
+            log.warn("convertToStoreDTOWithTranslation: storeEntity is null.");
+            return null; // 또는 예외를 던지거나, 빈 StoreDTO 반환
+        }
+        log.debug("Converting Store ID: {} to StoreDTO for locale: {}", storeEntity.getStoreNum(), locale.toLanguageTag());
+
+        // 1. Store 엔티티의 기본 정보(한국어)를 StoreDTO로 매핑
+        StoreDTO storeDTO = modelMapper.map(storeEntity, StoreDTO.class);
+        // modelMapper가 companyName을 매핑하지 않는다면 수동 설정
+        if (storeEntity.getCompany() != null) {
+            storeDTO.setCompanyName(storeEntity.getCompany().getCompanyName());
+        }
+
+
+        String targetLocale = locale.getLanguage();
+
+        // 2. 기본 언어(한국어)가 아닌 경우 번역 적용 시도
+        if (!"ko".equals(targetLocale) && targetLocale != null && !targetLocale.isEmpty()) {
+            log.debug("Attempting translation for Store ID: {}, locale: {}", storeEntity.getStoreNum(), targetLocale);
+            try {
+                Optional<StoreTranslation> translationOpt = storeTranslationRepository
+                        .findByStore_StoreNumAndLocale(storeEntity.getStoreNum(), targetLocale);
+
+                if (translationOpt.isPresent()) {
+                    StoreTranslation translation = translationOpt.get();
+                    log.info("Translation FOUND for Store ID {}: Name='{}', Category='{}'",
+                            storeEntity.getStoreNum(),
+                            translation.getStoreName(),
+                            translation.getStoreCategory());
+
+                    // 번역된 값으로 StoreDTO 필드 덮어쓰기
+                    if (isValidTranslationString(translation.getStoreName())) {
+                        storeDTO.setStoreName(translation.getStoreName());
+                    }
+                    if (isValidTranslationString(translation.getStoreCategory())) {
+                        storeDTO.setStoreCategory(translation.getStoreCategory());
+                    }
+                    // 주소 등 다른 필드도 번역한다면 여기에 추가
+                    // if (isValidTranslationString(translation.getStoreAddress())) {
+                    //     storeDTO.setStoreAddress(translation.getStoreAddress());
+                    // }
+                } else {
+                    log.warn("No translation found for Store ID: {} and locale: {}. Using default (Korean) values.",
+                            storeEntity.getStoreNum(), targetLocale);
+                    // 기본값(한국어)은 이미 modelMapper.map을 통해 storeDTO에 설정되어 있음
+                }
+            } catch (Exception e) {
+                log.error("Error applying translation for Store ID: {}. Using default (Korean) values.",
+                        storeEntity.getStoreNum(), e);
+                // 예외 발생 시에도 DTO는 한국어 기본값을 유지
+            }
+        } else {
+            log.debug("Locale is Korean or invalid for Store ID: {}. Using default (Korean) values.", storeEntity.getStoreNum());
+        }
+        return storeDTO;
+    }
 
     /*
      * 메소드명 : insert
@@ -98,12 +163,47 @@ public class StoreServiceImpl implements StoreService {
      * */
     @Override
     public StoreDTO read(Long pk, Locale locale) { //
-        log.info("다국어 서비스 진입 읽을 pk의 번호 : {}, 번역된 언어: {}", pk, locale); //
+        log.info("스토어 상세정보 다국어 서비스 진입 - 스토어 ID: {}, 요청 locale: {}", pk, locale.getLanguage());
 
         Store store = storeRepository.findById(pk)
-                .orElseThrow(() -> new EntityNotFoundException("스토어의 pk를 찾을 수 없습니다아아아~: " + pk));
+                .orElseThrow(() -> {
+                    log.error("스토어를 찾을 수 없습니다. ID: {}", pk);
+                    return new EntityNotFoundException("요청하신 스토어 정보를 찾을 수 없습니다. ID: " + pk);
+                });
 
+        // 1. Store 엔티티의 기본 정보(한국어)를 StoreDTO로 매핑
         StoreDTO storeDTO = modelMapper.map(store, StoreDTO.class);
+
+        String targetLocale = locale.getLanguage();
+
+        // 2. 기본 언어(한국어)가 아닌 경우 번역 적용 시도
+        if (!"ko".equals(targetLocale) && targetLocale != null && !targetLocale.isEmpty()) {
+            Optional<StoreTranslation> translationOpt =
+                    storeTranslationRepository.findByStore_StoreNumAndLocale(pk, targetLocale);
+
+            if (translationOpt.isPresent()) {
+                StoreTranslation translation = translationOpt.get();
+                log.info("스토어 ID {}에 대한 '{}' 번역 찾음: {}", pk, targetLocale, translation.getStoreName());
+
+                // 번역된 값으로 StoreDTO 필드 덮어쓰기
+                if (translation.getStoreName() != null && !translation.getStoreName().isEmpty()) {
+                    storeDTO.setStoreName(translation.getStoreName());
+                }
+                if (translation.getStoreCategory() != null && !translation.getStoreCategory().isEmpty()) {
+                    storeDTO.setStoreCategory(translation.getStoreCategory());
+                }
+
+                 if (translation.getStoreAddress() != null && !translation.getStoreAddress().isEmpty()) {
+                     storeDTO.setStoreAddress(translation.getStoreAddress());
+                 }
+
+            } else {
+                log.warn("스토어 ID {}에 대한 '{}' 번역 정보 없음. 기본값(한국어) 사용.", pk, targetLocale);
+
+            }
+        } else {
+            log.info("스토어 ID {}에 대한 한국어 값 사용 (또는 locale 정보 없음).", pk);
+        }
 
         return storeDTO;
     }
@@ -307,19 +407,25 @@ public class StoreServiceImpl implements StoreService {
 //    }
     @Override
     public Page<StoreDTO> clientlist(Long hotelroomNum, String type, String keyword, Pageable pageable, Locale locale) {
-        log.info("다국어 서비스 진입 - {}", locale); //
+        log.info("StoreService: clientlist 다국어 서비스 진입 - hotelroomNum: {}, type: {}, keyword: {}, locale: {}",
+                hotelroomNum, type, keyword, locale.toLanguageTag());
 
         Long companyNum = zzService.hotelroomNumToCompany(hotelroomNum).getCompanyNum();
-        Page<Store> storeList = storeRepository.storeTypeSearch(companyNum, type, keyword, pageable);
+        Page<Store> storeEntityPage = storeRepository.storeTypeSearch(companyNum, type, keyword, pageable);
 
-        Page<StoreDTO> list = storeList.map(data -> {
-            StoreDTO storeDTO = modelMapper.map(data, StoreDTO.class);
-            storeDTO.setCompanyName(data.getCompany().getCompanyName());
+        if (storeEntityPage.isEmpty()) {
+            log.info("No stores found for companyNum: {}, type: {}, keyword: {}", companyNum, type, keyword);
+            return Page.empty(pageable); // 빈 페이지 반환
+        }
 
+        // Store 엔티티를 StoreDTO로 매핑하면서 번역 적용
+        Page<StoreDTO> storeDtoPage = storeEntityPage.map(storeEntity ->
+                convertToStoreDTOWithTranslation(storeEntity, locale) // ★★★ 헬퍼 메소드 사용 ★★★
+        );
 
-            return storeDTO;
-        });
-        return list;
+        log.info("Returning Page of {} StoreDTOs for companyNum: {} (Locale: {})",
+                storeDtoPage.getNumberOfElements(), companyNum, locale.toLanguageTag());
+        return storeDtoPage;
     }
 
 
