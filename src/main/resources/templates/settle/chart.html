@@ -373,11 +373,11 @@
             // 현재 날짜 기준으로 당월 1일과 당일 설정
             const today = new Date();
             const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            
+
             // 날짜 입력 필드에 기본값 설정
             document.getElementById('startDate').value = formatDateForInput(firstDayOfMonth);
             document.getElementById('endDate').value = formatDateForInput(today);
-            
+
             let startDate = document.getElementById('startDate').value;
             let endDate = document.getElementById('endDate').value;
 
@@ -571,7 +571,7 @@
             function updateStats() {
                 const totalSales = filteredData.reduce((sum, room) => sum + calculatePrice(room), 0);
                 const totalSettlement = filteredData.reduce((sum, room) => sum + calculateFinal(room), 0);
-                
+
                 // 총 숙박 일수 계산
                 const totalNights = filteredData.reduce((sum, room) => {
                     const checkIn = new Date(room.checkInDate);
@@ -579,7 +579,7 @@
                     const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
                     return sum + nights;
                 }, 0);
-                
+
                 // 객실 평균 요금 계산 (총 매출액 / 총 숙박 일수)
                 const averagePrice = totalNights > 0 ? totalSales / totalNights : 0;
                 const totalReservations = filteredData.length;
@@ -607,6 +607,26 @@
                     window.mixedChart.destroy();
                 }
 
+                // 월별로 다른 색상 적용
+                const colorPalette = [
+                    'rgba(54, 162, 235, 0.7)',   // 파란색
+                    'rgba(255, 99, 132, 0.7)',   // 분홍색
+                    'rgba(255, 159, 64, 0.7)',   // 주황색
+                    'rgba(75, 192, 192, 0.7)',   // 청록색
+                    'rgba(153, 102, 255, 0.7)',  // 보라색
+                    'rgba(255, 205, 86, 0.7)',   // 노란색
+                    'rgba(201, 203, 207, 0.7)',  // 회색
+                    'rgba(255, 99, 71, 0.7)',    // 토마토색
+                    'rgba(50, 205, 50, 0.7)',    // 라임색
+                    'rgba(138, 43, 226, 0.7)'    // 블루바이올렛
+                ];
+
+                // 날짜에서 월 추출하여 색상 매핑
+                const backgroundColors = data.labels.map(date => {
+                    const month = new Date(date).getMonth();
+                    return colorPalette[month % colorPalette.length];
+                });
+
                 window.mixedChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -615,7 +635,7 @@
                             {
                                 type: 'bar',
                                 label: '매출 금액',
-                                backgroundColor: 'rgba(29, 111, 66, 0.7)',
+                                backgroundColor: backgroundColors,
                                 data: data.sales,
                                 borderRadius: 8,
                                 borderWidth: 0
@@ -737,6 +757,25 @@
                     window.roomSalesChart.destroy();
                 }
 
+                // 다양한 색상 배열 정의
+                const colorPalette = [
+                    'rgba(54, 162, 235, 0.7)',   // 파란색
+                    'rgba(255, 99, 132, 0.7)',   // 분홍색
+                    'rgba(255, 159, 64, 0.7)',   // 주황색
+                    'rgba(75, 192, 192, 0.7)',   // 청록색
+                    'rgba(153, 102, 255, 0.7)',  // 보라색
+                    'rgba(255, 205, 86, 0.7)',   // 노란색
+                    'rgba(201, 203, 207, 0.7)',  // 회색
+                    'rgba(255, 99, 71, 0.7)',    // 토마토색
+                    'rgba(50, 205, 50, 0.7)',    // 라임색
+                    'rgba(138, 43, 226, 0.7)'    // 블루바이올렛
+                ];
+
+                // 각 객실별로 다른 색상 적용
+                const backgroundColors = data.labels.map((_, index) =>
+                    colorPalette[index % colorPalette.length]
+                );
+
                 window.roomSalesChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -744,7 +783,7 @@
                         datasets: [{
                             label: '객실별 매출',
                             data: data.sales,
-                            backgroundColor: 'rgba(29, 111, 66, 0.7)',
+                            backgroundColor: backgroundColors,
                             borderRadius: 8,
                             borderWidth: 0
                         }]
@@ -791,6 +830,11 @@
                     window.growthChart.destroy();
                 }
 
+                // 그라데이션 배경색 생성
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(54, 162, 235, 0.6)');
+                gradient.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
+
                 window.growthChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -798,8 +842,8 @@
                         datasets: [{
                             label: '매출 성장률',
                             data: data.growth,
-                            borderColor: 'rgba(29, 111, 66, 1)',
-                            backgroundColor: 'rgba(29, 111, 66, 0.1)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: gradient,
                             fill: true,
                             tension: 0.4
                         }]
