@@ -43,13 +43,13 @@
 
     <button onclick='location.href="/admin/store/order/list"'><strong>요식업체 주문 내역</strong></button>
 
-    <button onclick="toggleMenu('erd')"><strong>자재 관리</strong></button>
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}" onclick="toggleMenu('erd')"><strong>자재 관리</strong></button>
     <div id="erd" class="submenu">
         <a href="/erd/list">- 자재관리 목록</a>
         <a href="/erd/insert">- 자재관리 등록</a>
     </div>
 
-    <button onclick="toggleMenu('settle')"><strong>매출 관리</strong></button>
+    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}" onclick="toggleMenu('settle')"><strong>매출 관리</strong></button>
     <div id="settle" class="submenu">
         <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/settle/chart">- 재무 정산</a>
         <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/salaries/insert">- 급여 등록</a>
