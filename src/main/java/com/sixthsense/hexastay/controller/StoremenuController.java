@@ -108,7 +108,7 @@ public class StoremenuController {
 
 
     @ResponseBody
-    @GetMapping("/listGet/{id}") // 경로를 명확히 하기 위해 수정 (예시)
+    @GetMapping("/list/{id}")
     public ResponseEntity<?> listGet(@PathVariable Long id, Locale locale) { // Locale 파라미터 추가
         /*storeNum으로 Menu 가져오기...*/
         List<StoremenuDTO> menulist = storemenuService.list(id, "alive", locale); // locale 전달

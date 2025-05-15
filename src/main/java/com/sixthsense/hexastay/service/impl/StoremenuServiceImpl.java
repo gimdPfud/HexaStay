@@ -32,8 +32,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.springframework.boot.context.properties.source.ConfigurationPropertyName.isValid;
-
 @RequiredArgsConstructor
 @Service
 @Log4j2
@@ -76,7 +74,7 @@ public class StoremenuServiceImpl implements StoremenuService {
 
             storemenuDTO.setStoremenuImgMeta("/store/menu/" + fileName);
             Path uploadPath = Paths.get("c:/data/hexastay", "store/menu/" + fileName);
-            Path createPath = Paths.get(System.getProperty("user.dir"), "store/menu/");
+            Path createPath = Paths.get("c:/data/hexastay", "store/menu/");
             if (!Files.exists(createPath)) {
                 Files.createDirectory(createPath);
             }
@@ -190,12 +188,12 @@ public class StoremenuServiceImpl implements StoremenuService {
         menuDTO.setStoremenuOriginalCategoryKey(originalCategoryKey);
         menuDTO.setStoremenuCategoryDisplay(getKoreanDisplayForCategoryKey(originalCategoryKey));
 
-        log.info("[CONVERT PRE-TRANSLATION] Item ID: {}, Locale: {}, DTO Name: '{}', DTO OrigKey: '{}', DTO DisplayCat: '{}'",
-                storemenuEntity.getStoremenuNum(), targetLocale, menuDTO.getStoremenuName(),
-                menuDTO.getStoremenuOriginalCategoryKey(), menuDTO.getStoremenuCategoryDisplay());
+//        log.info("[CONVERT PRE-TRANSLATION] Item ID: {}, Locale: {}, DTO Name: '{}', DTO OrigKey: '{}', DTO DisplayCat: '{}'",
+//                storemenuEntity.getStoremenuNum(), targetLocale, menuDTO.getStoremenuName(),
+//                menuDTO.getStoremenuOriginalCategoryKey(), menuDTO.getStoremenuCategoryDisplay());
 
         if (!"ko".equals(targetLocale) && targetLocale != null && !targetLocale.isEmpty()) {
-            log.info("[CONVERT TRANSLATION-BLOCK] Item ID: {}, Attempting translation for locale: {}", storemenuEntity.getStoremenuNum(), targetLocale);
+//            log.info("[CONVERT TRANSLATION-BLOCK] Item ID: {}, Attempting translation for locale: {}", storemenuEntity.getStoremenuNum(), targetLocale);
             try {
                 Optional<StoreMenuTranslation> translationOpt = storeMenuTranslationRepository
                         .findByStoreMenu_StoremenuNumAndLocale(storemenuEntity.getStoremenuNum(), targetLocale);
@@ -206,27 +204,27 @@ public class StoremenuServiceImpl implements StoremenuService {
                     String transContent = translation.getStoreMenuTranslationContent();
                     String transCategory = translation.getStoreMenuTranslationCategory();
 
-                    log.info("[CONVERT TRANSLATION-FOUND] Item ID: {}, Locale: {}, DB Name: '{}', DB Content: '{}', DB Category: '{}'",
-                            storemenuEntity.getStoremenuNum(), targetLocale,
-                            transName, transContent, transCategory);
+//                    log.info("[CONVERT TRANSLATION-FOUND] Item ID: {}, Locale: {}, DB Name: '{}', DB Content: '{}', DB Category: '{}'",
+//                            storemenuEntity.getStoremenuNum(), targetLocale,
+//                            transName, transContent, transCategory);
 
                     // isValid 함수 대신 직접 null 및 empty 체크 후 설정
                     if (transName != null && !transName.isEmpty()) {
-                        log.info("[CONVERT SET-NAME] Item ID: {}, Setting name to: '{}'", storemenuEntity.getStoremenuNum(), transName);
+//                        log.info("[CONVERT SET-NAME] Item ID: {}, Setting name to: '{}'", storemenuEntity.getStoremenuNum(), transName);
                         menuDTO.setStoremenuName(transName);
                     } else {
                         log.warn("[CONVERT SET-NAME-SKIPPED] Item ID: {}, transName is null or empty. DTO Name remains: '{}'", storemenuEntity.getStoremenuNum(), menuDTO.getStoremenuName());
                     }
 
                     if (transContent != null && !transContent.isEmpty()) {
-                        log.info("[CONVERT SET-CONTENT] Item ID: {}, Setting content to: '{}'", storemenuEntity.getStoremenuNum(), transContent);
+//                        log.info("[CONVERT SET-CONTENT] Item ID: {}, Setting content to: '{}'", storemenuEntity.getStoremenuNum(), transContent);
                         menuDTO.setStoremenuContent(transContent);
                     } else {
                         log.warn("[CONVERT SET-CONTENT-SKIPPED] Item ID: {}, transContent is null or empty. DTO Content remains: '{}'", storemenuEntity.getStoremenuNum(), menuDTO.getStoremenuContent());
                     }
 
                     if (transCategory != null && !transCategory.isEmpty()) {
-                        log.info("[CONVERT SET-CATEGORYDISPLAY] Item ID: {}, Setting categoryDisplay to: '{}'", storemenuEntity.getStoremenuNum(), transCategory);
+//                        log.info("[CONVERT SET-CATEGORYDISPLAY] Item ID: {}, Setting categoryDisplay to: '{}'", storemenuEntity.getStoremenuNum(), transCategory);
                         menuDTO.setStoremenuCategoryDisplay(transCategory);
                     } else {
                         log.warn("[CONVERT SET-CATEGORYDISPLAY-SKIPPED] Item ID: {}, transCategory is null or empty. DTO CategoryDisplay remains: '{}'", storemenuEntity.getStoremenuNum(), menuDTO.getStoremenuCategoryDisplay());
@@ -238,9 +236,9 @@ public class StoremenuServiceImpl implements StoremenuService {
             }
         }
 
-        log.info("[CONVERT FINAL-DTO] Item ID: {}, Final DTO: Name='{}', OrigKey='{}', DisplayCat='{}', Content='{}'",
-                storemenuEntity.getStoremenuNum(), menuDTO.getStoremenuName(),
-                menuDTO.getStoremenuOriginalCategoryKey(), menuDTO.getStoremenuCategoryDisplay(), menuDTO.getStoremenuContent());
+//        log.info("[CONVERT FINAL-DTO] Item ID: {}, Final DTO: Name='{}', OrigKey='{}', DisplayCat='{}', Content='{}'",
+//                storemenuEntity.getStoremenuNum(), menuDTO.getStoremenuName(),
+//                menuDTO.getStoremenuOriginalCategoryKey(), menuDTO.getStoremenuCategoryDisplay(), menuDTO.getStoremenuContent());
 
 
 
@@ -275,7 +273,7 @@ public class StoremenuServiceImpl implements StoremenuService {
 
     @Override
     public List<StoremenuDTO> list(Long storeNum, String status, Locale locale) {
-        log.info("list(storeNum, status, locale) 호출 - storeNum: {}, status: {}, locale: {}", storeNum, status, locale.toLanguageTag());
+//        log.info("list(storeNum, status, locale) 호출 - storeNum: {}, status: {}, locale: {}", storeNum, status, locale.toLanguageTag());
         List<Storemenu> storemenuList = storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum, status);
         if (storemenuList.isEmpty()) return Collections.emptyList();
         return storemenuList.stream()
@@ -285,7 +283,7 @@ public class StoremenuServiceImpl implements StoremenuService {
 
     @Override
     public List<StoremenuDTO> list(Long storeNum, Locale locale) {
-        log.info("list(storeNum, locale) 호출 - storeNum: {}, locale: {}", storeNum, locale.toLanguageTag());
+//        log.info("list(storeNum, locale) 호출 - storeNum: {}, locale: {}", storeNum, locale.toLanguageTag());
 
         List<Storemenu> storemenuList = storemenuRepository.findByStoreStoreNumAndStoremenuStatus(storeNum, "alive");
 
@@ -297,7 +295,7 @@ public class StoremenuServiceImpl implements StoremenuService {
 
     @Override
     public List<StoremenuDTO> list(Long storeNum, String category, String status, Locale locale) {
-        log.info("list(storeNum, category, status, locale) 호출 - storeNum: {}, category: {}, status: {}, locale: {}", storeNum, category, status, locale.toLanguageTag());
+//        log.info("list(storeNum, category, status, locale) 호출 - storeNum: {}, category: {}, status: {}, locale: {}", storeNum, category, status, locale.toLanguageTag());
         List<Storemenu> storemenuList = storemenuRepository.findCateg(storeNum, category, status);
         if (storemenuList.isEmpty()) return Collections.emptyList();
         return storemenuList.stream()
