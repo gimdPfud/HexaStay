@@ -337,6 +337,12 @@ public class RoomController {
                                         @PathVariable("hotelRoomNum") Long hotelRoomNum,
                                         RedirectAttributes redirectAttributes,
                                         HttpSession session) {
+
+        if (roomPassword == null || roomPassword.length() != 4) {
+            redirectAttributes.addFlashAttribute("error", "비밀번호가 유효하지 않습니다.");
+            return "redirect:/qr/" + hotelRoomNum;
+        }
+
         try {
             Room room = roomServiceimpl.readRoomByCheckinPassword(roomPassword);
 
@@ -356,8 +362,13 @@ public class RoomController {
     @GetMapping("/qr/validate")
     @ResponseBody
     public Map<String, Object> validateRoomPassword(
-            @RequestParam Long hotelRoomNum,
-            @RequestParam String roomPassword) {
+            @RequestParam(required = true) Long hotelRoomNum,
+            @RequestParam(required = true) String roomPassword) {
+
+        // ✅ 파리미터값 사전 검증
+        if (hotelRoomNum == null || hotelRoomNum <= 0 || roomPassword == null || !roomPassword.matches("\\d{4}")) {
+            return Map.of("valid", false, "reason", "invalid_request");
+        }
 
         List<Room> rooms = roomRepository.findByHotelRoomNum(hotelRoomNum);
 
