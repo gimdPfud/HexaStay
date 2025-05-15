@@ -272,12 +272,17 @@ public class RoomMenuOrderController {
 
         // String → AdminRole enum으로 변환
         boolean isAdminRole = false;
-        try {
-            AdminRole userRole = AdminRole.valueOf(member.getMemberRole().toUpperCase());
-            isAdminRole = Arrays.stream(AdminRole.values())
-                    .anyMatch(role -> role == userRole);
-        } catch (IllegalArgumentException e) {
-            isAdminRole = false;
+
+        if (member.getMemberRole() != null) {
+            try {
+                AdminRole userRole = AdminRole.valueOf(member.getMemberRole().toUpperCase());
+                isAdminRole = Arrays.stream(AdminRole.values())
+                        .anyMatch(role -> role == userRole);
+            } catch (IllegalArgumentException e) {
+                log.warn("관리자 역할 변환 실패: 유효하지 않은 역할 값 - {}", member.getMemberRole());
+            }
+        } else {
+            log.warn("member.getMemberRole()가 null입니다. 사용자 이메일: {}", member.getMemberEmail());
         }
 
         // 한 페이지당 10건, 최신순 정렬 기준. 페이지 번호 0부터 시작.
