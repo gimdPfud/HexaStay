@@ -134,11 +134,12 @@
         <input type="hidden" id="storeLongitude" name="storeLongitude" th:value="${data.storeLongitude}" readonly>
 
         <ul class="nav nav-underline category-bar justify-content-around border-bottom" id="categoryTabs">
-            <li class="nav-item"><a class="nav-link" href="#메인" th:text="#{storeRead.category.main}"></a></li>
-            <li class="nav-item"><a class="nav-link" href="#사이드" th:text="#{storeRead.category.side}"></a></li>
-            <li class="nav-item"><a class="nav-link" href="#음료" th:text="#{storeRead.category.beverage}"></a></li>
-            <li class="nav-item"><a class="nav-link" href="#추가" th:text="#{storeRead.category.extra}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#main" th:text="#{storeRead.category.main}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#side" th:text="#{storeRead.category.side}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#drink" th:text="#{storeRead.category.beverage}"></a></li>
+            <li class="nav-item"><a class="nav-link" href="#plus" th:text="#{storeRead.category.extra}"></a></li>
         </ul>
+
 
         <div class="menu-list mt-3" id="menuList"></div>
     </div>
@@ -178,60 +179,66 @@
                 });
         });
 
-        const categories = {
-            main : "메인",
-            side : "사이드",
-            drink : "음료",
-            plus : "추가"
+        const categoriesForDisplay = {
+            main : /*[[#{storeRead.category.main}]]*/ "메인",
+            side : /*[[#{storeRead.category.side}]]*/ "사이드",
+            drink : /*[[#{storeRead.category.beverage}]]*/ "음료",
+            plus : /*[[#{storeRead.category.extra}]]*/ "추가"
         };
-        function renderMenuSections(list) {
-            let html = '';
 
-            Object.entries(categories).forEach(([categoryKey, categoryValue]) => {
-                const filtered = list.filter(item => item.storemenuCategory === categoryKey);
+        function renderMenuSections(list) { // list는 StoremenuDTO 객체들의 배열
+            let html = '';
+            if (!list || list.length === 0) {
+                menuListEl.innerHTML = `<p class="text-center text-muted mt-4">이 스토어에 현재 표시할 메뉴가 없습니다.</p>`;
+                return;
+            }
+
+            Object.entries(categoriesForDisplay).forEach(([categoryKey, categoryDisplayValue]) => {
+                // ★★★ 필터링 시 storemenuOriginalCategoryKey 사용 ★★★
+                const filtered = list.filter(item => item.storemenuOriginalCategoryKey === categoryKey);
 
                 if (filtered.length > 0) {
-                    html += `<ul class="card-list" id="${categoryValue}">
-                                <h5 class="mt-4 mb-2">${categoryValue}</h5>`;
+                    // 섹션 제목은 현재 로케일에 맞는 categoryDisplayValue 사용
+                    html += `<ul class="card-list" id="${categoryKey}"> <h5 class="mt-4 mb-2">${categoryDisplayValue}</h5>`;
 
                     filtered.forEach(item => {
-                        // ✅ JS로 직접 카테고리 한글 변환
-                        const korCategory = categories[item.storemenuCategory] || '기타';
                         const image = item.storemenuImgMeta ? item.storemenuImgMeta : '/store/menu/default.png';
+                        // ★★★ 화면 표시(배지)에는 storemenuCategoryDisplay 사용 ★★★
+                        const categoryBadgeText = item.storemenuCategoryDisplay || item.storemenuOriginalCategoryKey; // 혹시 모를 fallback
 
+                        // ... (품절 처리 HTML은 동일) ...
                         if(item.storemenuStatus === 'soldout'){
-                            console.log("솔드아웃!!!")
                             html += `<li class="sold-out">
-                            <div class="div-card" style="display: block; width: 100%;" class="sold-out-item">
-                                <div class="inner-wrapper">
-                                    <div class="d-flex justify-content-start align-items-center">
-                                        <div class="menu-image-container">
-                                            <img src="${image}" class="menu-image">
-                                        </div>
-                                        <div class="text-info">
-                                            <span class="menu-badge">품절</span>
-                                            <p class="menu-name">${item.storemenuName}</p>
-                                            <p class="menu-content">${item.storemenuContent}</p>
-                                            <p class="price-box">${item.storemenuPrice} 원</p>
-                                        </div>
-                                    </div>
+                    <div class="div-card sold-out-item">
+                        <div class="inner-wrapper">
+                            <div class="d-flex justify-content-start align-items-center">
+                                <div class="menu-image-container">
+                                    <img src="${image}" class="menu-image">
                                 </div>
-                            </div></li>`;
-                        } else if (item.storemenuStatus==='alive'){
-                            console.log("솔드아웃 아니지롱")
+                                <div class="text-info">
+                                    <span class="menu-badge">품절</span>
+                                    <p class="menu-name">${item.storemenuName}</p>
+                                    <p class="menu-content">${item.storemenuContent}</p>
+                                    <p class="price-box" >${item.storemenuPrice.toLocaleString()} 원</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div></li>`;
+                        } else if (item.storemenuStatus === 'alive'){
                             html += `<li>
                         <a href="/member/store/menu/read/${item.storemenuNum}" class="text-decoration-none">
-                            <div class="div-card" style="display: block; width: 100%;">
+                            <div class="div-card">
                                 <div class="inner-wrapper">
                                     <div class="d-flex justify-content-start align-items-center">
                                         <div class="menu-image-container">
                                             <img src="${image}" class="menu-image">
                                         </div>
                                         <div class="text-info">
-                                            <span class="menu-badge">${korCategory}</span>
+                                            <span class="menu-badge">${categoryBadgeText}</span>
                                             <p class="menu-name">${item.storemenuName}</p>
                                             <p class="menu-content">${item.storemenuContent}</p>
-                                            <p class="price-box">${item.storemenuPrice} 원</p>
+                                            <p class="price-box">${item.storemenuPrice.toLocaleString()} 원</p>
                                         </div>
                                     </div>
                                 </div>
@@ -239,27 +246,28 @@
                         </a></li>`;
                         }
                     });
-
-                    html += `</ul>`; // category section 끝
-
+                    html += `</ul>`;
                 }
             });
-
             menuListEl.innerHTML = html;
         }
 
         // 카테고리 탭 클릭 시 부드러운 스크롤 이동
         document.addEventListener('DOMContentLoaded', () => {
+            // 카테고리 탭 클릭 시 부드러운 스크롤 이동
             document.querySelectorAll('#categoryTabs a').forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
                     const targetId = this.getAttribute('href').substring(1);
                     const target = document.getElementById(targetId);
                     if (target) {
-                        window.scrollTo({
-                            top: target.offsetTop - 70,
-                            behavior: 'smooth'
-                        });
+                        // DOM 렌더링 완료 후 스크롤이 정확하게 되도록 setTimeout 사용
+                        setTimeout(() => {
+                            window.scrollTo({
+                                top: target.offsetTop - 70, // 상단 여백 보정
+                                behavior: 'smooth'
+                            });
+                        }, 50); // 짧은 지연 시간으로 안정성 확보
                     }
                 });
             });

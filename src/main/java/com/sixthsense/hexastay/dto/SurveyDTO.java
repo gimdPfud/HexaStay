@@ -1,6 +1,13 @@
 package com.sixthsense.hexastay.dto;
 
 import com.sixthsense.hexastay.entity.Room;
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class SurveyDTO {
 

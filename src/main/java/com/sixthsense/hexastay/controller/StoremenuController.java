@@ -108,36 +108,36 @@ public class StoremenuController {
 
 
     @ResponseBody
-    @GetMapping("/list/{id}")
-    public ResponseEntity listGet(@PathVariable Long id){
+    @GetMapping("/listGet/{id}") // 경로를 명확히 하기 위해 수정 (예시)
+    public ResponseEntity<?> listGet(@PathVariable Long id, Locale locale) { // Locale 파라미터 추가
         /*storeNum으로 Menu 가져오기...*/
-        List<StoremenuDTO> menulist = storemenuService.list(id,"alive");
-        if(menulist.isEmpty()){
-            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
-        }else{
+        List<StoremenuDTO> menulist = storemenuService.list(id, "alive", locale); // locale 전달
+        if (menulist == null || menulist.isEmpty()) { // null 체크 추가
+            return new ResponseEntity<>("메뉴 목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        } else {
             return new ResponseEntity<>(menulist, HttpStatus.OK);
         }
     }
 
     @ResponseBody
     @GetMapping("/list/deleted/{id}")
-    public ResponseEntity deletedlistGet(@PathVariable Long id){
+    public ResponseEntity<?> deletedlistGet(@PathVariable Long id, Locale locale) { // Locale 파라미터 추가
         /*storeNum으로 Menu 가져오기...*/
-        List<StoremenuDTO> menulist = storemenuService.list(id,"deleted");
-        if(menulist.isEmpty()){
-            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
-        }else{
+        List<StoremenuDTO> menulist = storemenuService.list(id, "deleted", locale); // locale 전달
+        if (menulist == null || menulist.isEmpty()) { // null 체크 추가
+            return new ResponseEntity<>("삭제된 메뉴 목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        } else {
             return new ResponseEntity<>(menulist, HttpStatus.OK);
         }
     }
     @ResponseBody
     @GetMapping("/list/soldout/{id}")
-    public ResponseEntity soldoutlistGet(@PathVariable Long id){
+    public ResponseEntity<?> soldoutlistGet(@PathVariable Long id, Locale locale) { // Locale 파라미터 추가
         /*storeNum으로 Menu 가져오기...*/
-        List<StoremenuDTO> menulist = storemenuService.list(id,"soldout");
-        if(menulist.isEmpty()){
-            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
-        }else{
+        List<StoremenuDTO> menulist = storemenuService.list(id, "soldout", locale); // locale 전달
+        if (menulist == null || menulist.isEmpty()) { // null 체크 추가
+            return new ResponseEntity<>("품절된 메뉴 목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        } else {
             return new ResponseEntity<>(menulist, HttpStatus.OK);
         }
     }

@@ -94,12 +94,17 @@ public class StoreClientController {
 /* 3. 스토어메뉴 목록 보기 (rest)
         get. */
     @ResponseBody
-    @GetMapping("/menu/list/{storeNum}")
-    public ResponseEntity menulist(@PathVariable Long storeNum){
-        List<StoremenuDTO> storemenuDTOList = storemenuService.list(storeNum);
-        if(storemenuDTOList.isEmpty()){
-            return new ResponseEntity<>("목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
-        }else {
+    @GetMapping("/menu/list/{storeNum}") // 기존 엔드포인트 유지
+    public ResponseEntity<?> menulist(@PathVariable Long storeNum, Locale locale) { // Locale 파라미터 추가
+        log.info("메뉴 목록 요청 - 스토어 ID: {}, 요청 Locale: {}", storeNum, locale.toLanguageTag());
+
+        List<StoremenuDTO> storemenuDTOList = storemenuService.list(storeNum, locale); // locale 전달
+
+        if (storemenuDTOList == null || storemenuDTOList.isEmpty()) { // null 체크 추가
+            log.warn("스토어 ID {}에 대한 메뉴 목록을 찾을 수 없거나 비어있습니다.", storeNum);
+            return new ResponseEntity<>("해당 스토어의 메뉴 목록을 불러올 수 없습니다.", HttpStatus.NOT_FOUND);
+        } else {
+            log.info("스토어 ID {}에 대한 메뉴 목록 {}개 반환 ({} 번역 적용)", storeNum, storemenuDTOList.size(), locale.toLanguageTag());
             return new ResponseEntity<>(storemenuDTOList, HttpStatus.OK);
         }
     }
