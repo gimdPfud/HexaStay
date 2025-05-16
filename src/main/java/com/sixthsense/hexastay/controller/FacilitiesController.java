@@ -10,6 +10,7 @@ package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.FacilitiesDTO;
+import com.sixthsense.hexastay.entity.Company;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.FsService;
@@ -118,17 +119,24 @@ public class FacilitiesController {
         log.info("현재 로그인한 사용자: " + (principal != null ? principal.getName() : "없음"));
         if(principal==null){
             return "redirect:/cart/qr";}
+        log.info("지금 로그인한 맴버 : " + principal.getName());
         Long companyNum = 0L;
         Long adminNum = 1L;
         //고객용 시설조회 시 슈퍼어드민 번호 1번을 가져옵니다
         try {
-            companyNum = zzService.sessionToCompany(session).getCompanyNum();
+            Company userCompany = zzService.sessionToCompany(session);
+            companyNum = userCompany.getCompanyNum();
             log.info("컴퍼니넘 : "+companyNum);
+            
+            // 현재 호텔 주소를 모델에 추가
+            model.addAttribute("hotelAddress", userCompany.getCompanyAddress());
+            log.info("호텔 주소: " + userCompany.getCompanyAddress());
+            
         } catch (Exception e){
             log.info("오류발생");
             return "redirect:/main";
         }
-        Page< CompanyDTO> list = companyService.companySearchList(null,"facility",null, companyNum, adminNum, pageable);
+        Page<CompanyDTO> list = companyService.companySearchList(null,"facility",null, companyNum, adminNum, pageable);
         model.addAttribute("list",list);
         return "facilities/mobile/list";
     }
