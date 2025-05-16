@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createNotificationItemHTML(notification) {
         const timeValue = notification.createDate || notification.orderTimestamp; // API(createDate) 또는 WS(orderTimestamp)
         const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short'}) : '시간 정보 없음';
-        const message = `<strong>${notification.memberEmail || '알 수 없음'}</strong>님이 주문<br><span class="text-primary">(${notification.totalPrice ? notification.totalPrice.toLocaleString('ko-KR') : '?'}원 / ${notification.hotelRoomName || '객실 정보 없음'})</span>`;
+        const message = `<strong><span class="math-inline">\{notification\.memberEmail \|\| '알 수 없음'\}</strong\>님이 주문<br\><span class\="text\-primary"\>\(</span>{notification.totalPrice != null ? notification.totalPrice.toLocaleString('ko-KR') : '?'}원 / ${notification.hotelRoomName || '객실 정보 없음'})</span>`;
         const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
         const itemClass = notification.isRead ? 'read' : 'unread';
         return `<li class="${itemClass}"><a class="dropdown-item notification-item" href="${link}" data-notification-id="${notification.notificationId}"><div class="small text-muted">${timeString}</div><div>${message}</div></a></li>`;
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- WebSocket 연결 및 처리 (항상 실행 시도) ---
     function connectWebSocket() {
         console.log("WebSocket 연결 시도...");
-        /*const socket = new SockJS("/ws-order-alert"); /!*todo : 지우지마!!*!/*/
+/*        const socket = new SockJS("/ws-order-alert"); /!*todo : 지우지마!!*!/*/
         const ngrokBaseUrl = 'wss://wooriproject.iptime.org.9002'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
         const socket = new SockJS('https://wooriproject.iptime.org.9002/ws-order-alert');
         const stompClient = Stomp.over(socket);
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 룸 서비스 주문 알림</h6>
                         <div style="margin-bottom: 5px;">
                             주문자 : <strong>${orderData.memberEmail || '정보 없음'}</strong><br>
-                            총 금액 : <strong>${orderData.totalPrice ? orderData.totalPrice.toLocaleString('ko-KR') : '?'}원</strong><br>
+                           총 금액 : <strong>${orderData.totalPrice != null ? orderData.totalPrice.toLocaleString('ko-KR') : '?'}원</strong><br>
                             주문 객실 : <strong>${orderData.hotelRoomName || '정보 없음'}</strong>  </div>
                         <hr style="margin: 10px 0;">
                         <p style="text-align: center; font-size: 0.9em;">
