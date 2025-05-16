@@ -7,14 +7,13 @@
     <title>시설 상세</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
         /* 기존 CSS */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f9f9f9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Spoqa Han Sans Neo', Arial, sans-serif; } /* Spoqa Han Sans Neo 우선 적용 */
+        body { background-color: #f8f9fa; /* 약간 더 밝은 배경 */ } /* 전체 페이지 배경색 변경 */
         .container { width: 100%; max-width: 400px; margin: 0 auto; background: white; padding: 10px; }
 
         .search-container { padding: 0.2rem; background-color: white; margin-bottom: 10px; }
@@ -27,7 +26,7 @@
             flex: 1; height: 40px; font-size: 1rem;
             border-radius: 6px; border: 1px solid #ced4da; padding: 0 0.75rem;
         }
-        .search-box button {
+        .search-box button { /* 검색 버튼은 기존 스타일 유지 또는 필요시 수정 */
             height: 40px; padding: 0 1rem; font-size: 1rem;
             border-radius: 6px; background-color: #d0e8ff;
             border: 1px solid #90c6f7; color: #0d6efd; font-weight: 500;
@@ -37,7 +36,7 @@
             gap: 10px; padding: 10px 0; margin-bottom: 10px;
         }
         .tabs::-webkit-scrollbar { display: none; }
-        .btn-custom {
+        .btn-custom { /* 이 버튼은 AI 추천 버튼이 아니므로, 필요시 별도 스타일링 */
             background-color: transparent; color: #ff6b6b;
             border: 2px solid #ff6b6b; border-radius: 12px;
             padding: 8px 16px; font-size: 12px; font-weight: normal;
@@ -53,7 +52,7 @@
         .card-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
         .d-flex { display: flex; gap: 15px; }
 
-        .facility-card {
+        .facility-card { /* 페이지 내 다른 facility-card 와 구분 필요 시 클래스명 변경 */
             height: 160px;
         }
 
@@ -74,7 +73,7 @@
             width: 100%;
             margin-top: 25px;
         }
-        .facility-card {
+        .facility-card { /* 페이지 내 다른 facility-card 와 구분 필요 시 클래스명 변경 */
             height: 160px;
             display: flex;
             flex-direction: column;
@@ -96,7 +95,7 @@
             padding: 4px;
             text-align: center;
         }
-        .card-title {
+        .card-title { /* 페이지 내 다른 card-title 과 구분 필요 시 클래스명 변경 */
             font-size: 13px;
             margin: 0;
             line-height: 1.2;
@@ -107,145 +106,192 @@
             text-overflow: ellipsis;
         }
 
-        /* AI 추천 모달 스타일 (수정됨) */
+        /* --- AI 추천 모달 스타일 시작 --- */
         .modal-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
+            background-color: rgba(0, 0, 0, 0.55); /* 배경 어둡게 */
+            display: none; /* JS로 제어 */
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 1050; /* 부트스트랩 모달보다 높게 */
         }
 
         .ai-modal {
-            background-color: #fff;
-            border-radius: 15px;
-            width: 414px; /* 가로 길이 고정 */
-            max-width: 90%; /* 필요에 따라 조정 */
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 20px; /* 내부 여백 줄임 */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 20px; /* 더 둥글게 */
+            width: clamp(320px, 90vw, 420px); /* 반응형 너비, 최대 너비 약간 조정 */
+            max-height: 85vh;
+            display: flex; /* 내부 컨텐츠 정렬 위해 flex 사용 */
+            flex-direction: column; /* 수직 정렬 */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* 그림자 강조 */
+            overflow: hidden; /* 내부 컨텐츠가 넘칠 경우를 대비 */
         }
 
         .ai-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 16px 20px; /* 여백 조정 */
+            border-bottom: 1px solid #e9ecef; /* 연한 구분선 */
         }
 
         .ai-modal-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #00acc1;
+            font-size: 1.1rem; /* 약간 크게 */
+            font-weight: 600; /* 약간 굵게 */
+            color: #212529; /* 진한 회색 */
         }
 
         .ai-modal-close {
-            background: none;
+            background: transparent;
             border: none;
-            font-size: 24px;
+            font-size: 1.6rem; /* 아이콘 크기 */
+            font-weight: 300; /* X 아이콘 가늘게 */
+            color: #6c757d; /* 연한 회색 */
             cursor: pointer;
-            color: #777;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
+            padding: 0.5rem; /* 클릭 영역 확보 */
+            line-height: 1;
+            opacity: 0.8;
         }
-
         .ai-modal-close:hover {
+            color: #000000; /* 더 진하게 */
             opacity: 1;
         }
 
-        .ai-loading {
-            text-align: center;
-            padding: 20px;
-            color: #777;
+        .ai-modal-content { /* 모달 내용 영역 */
+            padding: 0px 20px 20px 20px; /* 상단 패딩은 헤더에서, 나머지는 여기서 */
+            overflow-y: auto; /* 내용 많을 시 스크롤 */
+            flex-grow: 1; /* 모달창 내에서 남은 공간 차지 */
         }
+        /* 스크롤바 스타일 (웹킷 브라우저용) */
+        .ai-modal-content::-webkit-scrollbar { width: 6px; }
+        .ai-modal-content::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .ai-modal-content::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
+        .ai-modal-content::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
+
+
+        .ai-loading, /* 초기 로딩 */
+        .ai-response-loading { /* 답변 생성 중 로딩 */
+            text-align: center;
+            padding: 25px 15px;
+            color: #6c757d; /* 연한 회색 텍스트 */
+            font-size: 0.9rem;
+        }
+        .ai-loading p,
+        .ai-response-loading p {
+            margin-bottom: 12px;
+        }
+        /* 부트스트랩 스피너 색상 변경 */
+        .ai-loading .spinner-border,
+        .ai-response-loading .spinner-border {
+            width: 2rem;
+            height: 2rem;
+            color: #007bff; /* 포인트 색상 (파랑) */
+        }
+
 
         .ai-recommendations {
-            margin-top: 15px;
+            margin-top: 15px; /* 첫 로딩 후 추천 목록 상단 여백 */
         }
-
         .ai-recommendations ul {
             list-style: none;
             padding: 0;
         }
-
-        .ai-recommendations li {
-            margin-bottom: 15px;
-            padding: 12px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eee;
+        .ai-recommendations li { /* 추천 아이템 카드 */
+            margin-bottom: 18px;
+            padding: 15px;
+            background-color: #f8f9fa; /* 카드 배경색 */
+            border-radius: 12px; /* 카드 모서리 둥글게 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e9ecef;
         }
-
-        .ai-recommendations strong {
-            color: #00897b;
-            font-size: 15px;
-            margin-bottom: 3px;
+        .ai-recommendations strong { /* 카드 제목 */
+            color: #007bff; /* 포인트 색상 */
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
             display: block;
         }
-
-        .ai-recommendations p {
-            line-height: 1.5;
-            color: #555;
-            font-size: 13px;
+        .ai-recommendations p { /* 카드 내용 */
+            line-height: 1.6;
+            color: #495057; /* 약간 더 진한 회색 */
+            font-size: 0.875rem;
+            margin-bottom: 0; /* p 태그 기본 마진 제거 */
+        }
+        .ai-recommendations p br { /* br 태그 간격 조정 */
+            content: "";
+            display: block;
+            margin-bottom: 0.3rem;
         }
 
-        /* 추가된 질문 입력 영역 스타일 */
+
+        .ai-response-area { /* AI 답변 표시 영역 */
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9f5ff; /* 연한 하늘색 배경 */
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap; /* 줄바꿈 및 공백 유지 */
+            border: 1px solid #cce7ff;
+        }
+
+
+        /* 질문 입력 영역 스타일 (칭찬받은 스타일 적용) */
         .ai-question-area {
-            margin-top: 20px;
+            margin-top: 20px; /* 답변 영역과 간격 */
             padding-top: 15px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #e9ecef; /* 연한 구분선 */
+            display: flex; /* 내부 요소 가로 정렬 */
+            align-items: flex-end; /* 하단 정렬 (여러 줄 입력 시 버튼 위치) */
+            gap: 10px; /* 입력창과 버튼 사이 간격 */
         }
-
         .ai-question-area textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            line-height: 1.4;
-            resize: vertical;
+            flex-grow: 1; /* 가능한 많은 너비 차지 */
+            padding: 10px 15px; /* 내부 여백 */
+            border: 1px solid #ced4da; /* 테두리 */
+            border-radius: 20px; /* 둥근 테두리 (캡슐 모양) */
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none; /* 사용자가 크기 조절 못하게 */
+            min-height: 44px; /* 최소 높이 */
+            max-height: 120px; /* 최대 높이 (스크롤 생성) */
+            overflow-y: auto; /* 내용 많을 시 자동 스크롤 */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .ai-question-area button {
-            background-color: #00acc1;
+        .ai-question-area textarea:focus {
+            border-color: #007bff; /* 포커스 시 테두리 색상 */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* 포커스 시 외부 그림자 */
+            outline: none;
+        }
+        .ai-question-area button { /* AI 답변 받기 버튼 */
+            background-color: #007bff; /* 포인트 색상 */
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
-            font-size: 14px;
+            border-radius: 50%; /* 원형 버튼 */
+            width: 44px; /* 너비 */
+            height: 44px; /* 높이 */
+            font-size: 1.2rem; /* 아이콘 크기 */
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            flex-shrink: 0; /* 크기 고정 */
         }
-
         .ai-question-area button:hover {
-            background-color: #008997;
+            background-color: #0056b3; /* 호버 시 약간 어둡게 */
+        }
+        .ai-question-area button i { /* 버튼 내 아이콘 */
+            pointer-events: none; /* 아이콘 클릭이 버튼 이벤트 방해 안하도록 */
         }
 
-        .ai-response-area {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .ai-response-loading {
-            text-align: center;
-            padding: 10px;
-            color: #777;
-        }
+        /* --- AI 추천 모달 스타일 끝 --- */
     </style>
 </head>
 <body>
@@ -264,36 +310,39 @@
     <div class="modal-backdrop" id="aiModalBackdrop">
         <div class="ai-modal">
             <div class="ai-modal-header">
-                <div class="ai-modal-title">주변 추천 장소</div>
-                <button class="ai-modal-close" onclick="closeAIModal()">&times;</button>
+                <div class="ai-modal-title">AI 주변 추천</div>
+                <button class="ai-modal-close" onclick="closeAIModal()" aria-label="Close">&times;</button>
             </div>
             <div class="ai-modal-content">
                 <div class="ai-loading" id="aiLoading">
                     <p>AI가 주변 장소를 추천하고 있습니다...</p>
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
                 <div class="ai-recommendations" id="aiRecommendations"></div>
-                <div id="aiResponseArea" class="ai-response-area" style="display:none;"></div>
-                <div class="ai-question-area">
-                    <textarea id="aiQuestionInput" placeholder="더 궁금한 것을 물어보세요!"></textarea>
-                    <button onclick="sendQuestionToAI()">AI 답변 받기</button>
-                    <div id="aiResponseLoading" class="ai-response-loading" style="display:none;">
-                        <p>AI가 답변을 생성 중입니다...</p>
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+
+                <div id="aiResponseLoading" class="ai-response-loading" style="display:none;">
+                    <p>AI가 답변을 생성 중입니다...</p>
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            </div>
+                <div id="aiResponseArea" class="ai-response-area" style="display:none;"></div>
 
+                <div class="ai-question-area">
+                    <textarea id="aiQuestionInput" placeholder="더 궁금한 것을 물어보세요!" rows="1"></textarea>
+                    <button onclick="sendQuestionToAI()" title="AI 답변 받기">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="tabs">
         <button type="button" onclick="filterByLikes()" class="btn-custom">
-            ❤️ <span>인기순</span>
+            <span>인기순</span>
         </button>
         <div class="tab" onclick="filterByCategory('관광지')">관광지</div>
         <div class="tab" onclick="filterByCategory('식당')">식당</div>
@@ -335,17 +384,18 @@
 </div>
 
 <script th:inline="javascript">
-
+    // <!CDATA[
     const currentAddress = /*[[${hotelAddress}]]*/ "인천광역시";
-    const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g";
+    const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g"; // 중요: 실제 API 키로 교체하세요!
     let conversationHistory = [];
 
     function showAIModal() {
         document.getElementById('aiModalBackdrop').style.display = 'flex';
-        document.getElementById('aiLoading').style.display = 'block';
+        document.getElementById('aiLoading').style.display = 'block'; // block 또는 flex (CSS에 따라)
         document.getElementById('aiRecommendations').innerHTML = '';
         document.getElementById('aiResponseArea').style.display = 'none';
         document.getElementById('aiResponseLoading').style.display = 'none';
+        document.getElementById('aiQuestionInput').value = ''; // 입력창 초기화
         conversationHistory = [];
         fetchInitialRecommendations();
     }
@@ -356,7 +406,8 @@
 
     async function fetchInitialRecommendations() {
         try {
-            const prompt = `ㅎㅇ, 내 위치는 "${currentAddress}" 임. 이 근처에서 놀만한곳, 추천할만한곳좀 선정해서 친근하게 알려주셈`;
+
+            const prompt = `안녕하세여, 제 위치는 "${currentAddress}" 이에여. 이 근처에서 놀만한곳, 관광객한테 추천할만한곳좀 선정해서 친근하게 존칭으로 알려주세요.`;
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {
@@ -387,19 +438,21 @@
                 let recommendationsHTML = '<ul class="list-unstyled">';
                 for (const recommendation of recommendations) {
                     const parts = recommendation.split('\n').filter(part => part.trim() !== '');
-                    if (parts.length >= 2) {
-                        const title = parts[0].replace(/^\*\*(.*?)\*\*$/, '$1');
-                        const description = parts.slice(1).join('<br>');
-                        recommendationsHTML = `
+                    if (parts.length >= 1) {
+
+                        const title = parts[0].replace(/^\*\*(.*?)\*\*$/, '$1').trim();
+                        const description = parts.slice(1).join('<br>').trim();
+
+                        recommendationsHTML += `
                             <li class="mb-3">
                                 <div class="card shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title mb-1"><strong>${title}</strong></h6>
-                                        <p class="card-text">${description}</p>
+                                        <h6><strong>${title}</strong></h6>
+                                        ${description ? `<p class="card-text">${description}</p>` : ''}
                                     </div>
                                 </div>
                             </li>
-                        ` + recommendationsHTML;
+                        `;
                     }
                 }
                 recommendationsHTML += '</ul>';
@@ -407,33 +460,34 @@
                 document.getElementById('aiRecommendations').innerHTML = recommendationsHTML;
                 document.getElementById('aiLoading').style.display = 'none';
 
-                // 초기 추천을 대화 기록에 추가
                 conversationHistory.push({ role: 'model', parts: [{ text: recommendationText }] });
 
             } else {
-                document.getElementById('aiRecommendations').innerHTML = '<p>추천 장소를 불러오는 데 실패했어요.</p>';
+                document.getElementById('aiRecommendations').innerHTML = '<p style="text-align:center; color:#6c757d;">추천 장소를 불러오는 데 실패했어요. 😥</p>';
                 document.getElementById('aiLoading').style.display = 'none';
+                console.error("AI 추천 데이터 형식 또는 내용 오류:", data);
             }
 
         } catch (error) {
             console.error('AI 추천 에러:', error);
-            document.getElementById('aiRecommendations').innerHTML = `<p>추천 기능을 이용하는 중에 오류가 발생했습니다: ${error.message}</p>`;
+            document.getElementById('aiRecommendations').innerHTML = `<p style="text-align:center; color:red;">추천 기능을 이용하는 중에 오류가 발생했습니다: ${error.message} 😭</p>`;
             document.getElementById('aiLoading').style.display = 'none';
         }
     }
 
-    // 추가 질문 전송
     async function sendQuestionToAI() {
-        const question = document.getElementById('aiQuestionInput').value;
-        if (!question.trim()) {
-            alert('질문을 입력해주세요!');
+        const questionInput = document.getElementById('aiQuestionInput');
+        const question = questionInput.value.trim();
+        if (!question) {
+            questionInput.placeholder = "질문을 입력해주세요!";
+            setTimeout(() => { questionInput.placeholder = "더 궁금한 것을 물어보세요!"; }, 2000);
             return;
         }
 
         document.getElementById('aiResponseLoading').style.display = 'block';
         document.getElementById('aiResponseArea').style.display = 'none';
+        document.getElementById('aiResponseArea').innerText = '';
 
-        // 현재 질문을 대화 기록에 추가
         conversationHistory.push({ role: 'user', parts: [{ text: question }] });
 
         try {
@@ -443,9 +497,7 @@
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(prompt)
             });
 
@@ -463,30 +515,55 @@
                 document.getElementById('aiResponseArea').innerText = responseText;
                 document.getElementById('aiResponseArea').style.display = 'block';
 
-                // AI 답변을 대화 기록에 추가
                 conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
 
             } else {
-                document.getElementById('aiResponseArea').innerText = 'AI 답변을 받지 못했습니다.';
+                document.getElementById('aiResponseArea').innerText = 'AI 답변을 받지 못했습니다. 다시 시도해 주세요. 🤔';
                 document.getElementById('aiResponseArea').style.display = 'block';
+                console.error("AI 답변 데이터 형식 또는 내용 오류:", data);
             }
 
         } catch (error) {
             console.error('AI 질문 에러:', error);
-            document.getElementById('aiResponseArea').innerText = `질문 처리 중 오류가 발생했습니다: ${error.message}`;
+            document.getElementById('aiResponseArea').innerText = `질문 처리 중 오류가 발생했습니다: ${error.message} 😔`;
             document.getElementById('aiResponseArea').style.display = 'block';
         } finally {
             document.getElementById('aiResponseLoading').style.display = 'none';
         }
 
-        document.getElementById('aiQuestionInput').value = '';
+        questionInput.value = '';
+        questionInput.style.height = 'auto';
+        questionInput.dispatchEvent(new Event('input'));
     }
+
+    // Textarea 자동 높이 조절 (페이지 로드 시에도 적용되도록)
+    document.addEventListener('DOMContentLoaded', () => {
+        const textarea = document.getElementById('aiQuestionInput');
+        if (textarea) {
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+    });
+
+    const questionInputGlobal = document.getElementById('aiQuestionInput');
+    if (questionInputGlobal) {
+        questionInputGlobal.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendQuestionToAI();
+            }
+        });
+    }
+
 
     function filterByCategory(category) {
     }
 
     function filterByLikes() {
     }
+    // ]]>
 </script>
 
 </body>
