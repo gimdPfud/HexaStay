@@ -34,14 +34,13 @@
         .flex-half { flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; padding-right: 10px; }
         /* ===== 사이드바 전체 ===== */
         .sidebar {
-            padding-top: 50px;
             width: 200px ;
             z-index: 1100;
-            background-color: #15212F;
+            background-color:#2b302d;
             color: #cbd5e1;
             height: 100vh;
             position: fixed;
-            top: 0;
+            top: 65px;
             left: 0;
             display: flex;
             flex-direction: column;
@@ -51,25 +50,6 @@
             overflow-y: auto;
             font-family: 'Spoqa Han Sans Neo', sans-serif;
             transition: all 0.3s ease-in-out;
-        }
-
-        /* ===== 로고 영역 ===== */
-        .sidebar .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 80px;
-            margin-bottom: 20px;
-        }
-
-        /* ===== 섹션 헤더 ===== */
-        .sidebar .section-title {
-            font-size: 15px;
-            text-transform: uppercase;
-            color: #6b7280;
-            padding: 12px 24px 4px;
-            letter-spacing: 0.05em;
-            font-weight: 600;
         }
 
         /* ===== 메뉴 항목 ===== */
@@ -94,31 +74,20 @@
 
         .sidebar a:hover,
         .sidebar button:hover {
-            background-color: #41474B;
+            background-color: #15212F;
             color: #ffffff;
         }
 
         .sidebar a.active,
         .sidebar button.active {
-            background-color: #41474B;
+            background-color: #15212F;
             color: #ffffff;
             font-weight: 600;
         }
 
-        /* ===== 뱃지 (예: 알림 수) ===== */
-        .sidebar .badge {
-            background-color: #ef4444;
-            color: white;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 3px 8px;
-            margin-left: auto;
-        }
-
         /* ===== 아이콘 (선택적) ===== */
         .sidebar i {
-            font-size: 10px;
+            font-size: 16px;
         }
 
         /* ===== 하위 메뉴 ===== */
@@ -131,14 +100,13 @@
         .sidebar .submenu a {
             font-size: 16px;
             padding: 6px 24px;
-            color: #41474B;
             background: none;
             border-radius: 6px;
         }
 
         .sidebar .submenu a:hover,
         .sidebar .submenu a.active {
-            background-color: #41474B;
+            background-color: #15212F;
             color: white;
             font-weight: 500;
         }
@@ -156,10 +124,7 @@
             border-top: 1px solid #2f3244;
             margin: 12px 0;
         }
-        .sidebar {
-            top: 70px;
-            height: calc(100vh - 80px);
-        }
+
 
         .submenu { display: none; padding-left: 20px; }
         .card.stretch { max-width: 100%; width: 100%; }
