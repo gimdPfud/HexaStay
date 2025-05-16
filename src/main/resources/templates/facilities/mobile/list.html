@@ -382,16 +382,16 @@
 <script th:inline="javascript">
     // <!CDATA[
     const currentAddress = /*[[${hotelAddress}]]*/ "인천광역시";
-    const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g"; // 중요: 실제 API 키로 교체하세요!
+    const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g";
     let conversationHistory = [];
 
     function showAIModal() {
         document.getElementById('aiModalBackdrop').style.display = 'flex';
-        document.getElementById('aiLoading').style.display = 'block'; // block 또는 flex (CSS에 따라)
+        document.getElementById('aiLoading').style.display = 'block';
         document.getElementById('aiRecommendations').innerHTML = '';
         document.getElementById('aiResponseArea').style.display = 'none';
         document.getElementById('aiResponseLoading').style.display = 'none';
-        document.getElementById('aiQuestionInput').value = ''; // 입력창 초기화
+        document.getElementById('aiQuestionInput').value = '';
         conversationHistory = [];
         fetchInitialRecommendations();
     }
