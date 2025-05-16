@@ -1,73 +1,87 @@
 <!-- fragments/sidebar.html -->
 <div id="sidebar" class="sidebar" th:fragment="sidebar">
 
-    <button onclick='location.href="/company/list"'><strong>조직 관리</strong></button>
+    <button  onclick='location.href="/company/list"'>
+        <i class="bi bi-building"></i><strong>조직 관리</strong>
+    </button>
 
-    <button onclick="toggleMenu('memberMenu')"><strong>회원 관리</strong></button>
+    <button onclick="toggleMenu('memberMenu')">
+        <i class="bi bi-person-square"></i><strong>회원 관리</strong>
+    </button>
     <div id="memberMenu" class="submenu">
         <a href="/admin/list">- 회원 목록</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/admin/approve">- 회원 승인</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'', ''MGR'')')}" href="/admin/insert">- 회원 등록</a>
+        <a href="/admin/approve" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}">- 회원 승인</a>
+        <a href="/admin/insert" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}">- 회원 등록</a>
     </div>
 
-    <!-- 객실 관리 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
-            onclick="toggleMenu('roomList')"><strong>객실 관리</strong></button>
+    <button onclick="toggleMenu('roomList')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
+        <i class="bi bi-calendar3"></i><strong>객실 관리</strong>
+    </button>
     <div id="roomList" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/admin/hotelroom/list">- 객실 목록 </a>
-        <a th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" href="/admin/hotelroom/input">- 객실 등록 </a>
+        <a href="/admin/hotelroom/input" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}">- 객실 등록 </a>
     </div>
 
-    <!-- 객실 예약 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
-            onclick="toggleMenu('roomBook')"><strong>객실 예약</strong></button>
+    <button onclick="toggleMenu('roomBook')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
+        <i class="bi bi-clock"></i><strong>객실 예약</strong>
+    </button>
     <div id="roomBook" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/roomlist">- 객실 예약 목록</a>
         <a href="/member-insertroom">- 객실 예약 등록</a>
     </div>
 
-    <!-- 객실 서비스 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
-            onclick="toggleMenu('roomService')"><strong>객실 서비스</strong></button>
+    <button onclick="toggleMenu('roomService')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
+        <i class="bi bi-houses-fill"></i><strong>객실 서비스</strong>
+    </button>
     <div id="roomService" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/roommenu/list">- 객실 서비스 목록</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" href="/roommenu/insert">- 객실 서비스 등록</a>
+        <a href="/roommenu/insert" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}">- 객실 서비스 등록</a>
         <a href="/roommenu/adminOrderList">- 객실 주문 내역</a>
     </div>
 
-    <button onclick="toggleMenu('extMenu')"><strong>요식업체</strong></button>
+    <button onclick="toggleMenu('extMenu')">
+        <i class="bi bi-shop-window"></i><strong>요식업체</strong>
+    </button>
     <div id="extMenu" class="submenu">
         <a href="/admin/store/list">- 요식업체 목록</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}" href="/admin/store/insert">- 요식업체 등록</a>
+        <a href="/admin/store/insert" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'', ''SV'')')}">- 요식업체 등록</a>
     </div>
 
-    <button onclick='location.href="/admin/store/order/list"'><strong>요식업체 주문 내역</strong></button>
+    <button onclick='location.href="/admin/store/order/list"'>
+        <i class="bi bi-receipt-cutoff"></i><strong>요식업체 주문 내역</strong>
+    </button>
 
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}" onclick="toggleMenu('erd')"><strong>자재 관리</strong></button>
+    <button onclick="toggleMenu('erd')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}">
+        <i class="bi bi-archive"></i><strong>자재 관리</strong>
+    </button>
     <div id="erd" class="submenu">
         <a href="/erd/list">- 자재관리 목록</a>
         <a href="/erd/insert">- 자재관리 등록</a>
     </div>
 
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}" onclick="toggleMenu('settle')"><strong>매출 관리</strong></button>
+    <button onclick="toggleMenu('settle')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}">
+        <i class="bi bi-bar-chart-line"></i><strong>매출 관리</strong>
+    </button>
     <div id="settle" class="submenu">
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/settle/chart">- 재무 정산</a>
-        <a th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}" href="/salaries/insert">- 급여 등록</a>
+        <a href="/settle/chart" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}">- 재무 정산</a>
+        <a href="/salaries/insert" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}">- 급여 등록</a>
         <a href="/salaries/list">- 급여 조회</a>
     </div>
 
-    <!-- 번역 승인 관리 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}" 
-            onclick='location.href="/roommenu/dev/translation"'><strong>번역 승인 관리</strong></button>
+    <button onclick='location.href="/roommenu/dev/translation"' th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'')')}">
+        <i class="bi bi-translate"></i><strong>번역 승인 관리</strong>
+    </button>
 
-    <button onclick="toggleMenu('notice')"><strong>공지사항</strong></button>
+    <button onclick="toggleMenu('notice')">
+        <i class="bi bi-signpost"></i><strong>공지사항</strong>
+    </button>
     <div id="notice" class="submenu">
         <a href="/notice/list">- 공지사항</a>
     </div>
 
-    <!-- 설문조사 메뉴: SUPERADMIN, MGR, SUBMGR, STAFF 제외 -->
-    <button th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}" 
-            onclick="toggleMenu('survey')"><strong>설문조사</strong></button>
+    <button onclick="toggleMenu('survey')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
+        <i class="bi bi-pencil-square"></i><strong>설문조사</strong>
+    </button>
     <div id="survey" class="submenu" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'')')}">
         <a href="/survey/list">- 설문조사 목록</a>
         <a href="/survey/form">- 설문조사 작성</a>

@@ -12,12 +12,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <link href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css" rel="stylesheet"/>
     <style>
-        /* 위에서 쓰던 스타일들 복사해서 그대로 붙여넣으세요 */
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
+        body { margin: 0; padding: 0; }
         .custom-navbar {
             background-color: #000 !important;
             position: fixed;
@@ -30,188 +25,179 @@
             align-items: center;
             padding: 10px 20px;
         }
-
-        .logo-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .toggle-btn {
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-        }
-
-        .text-white.small > .d-flex {
-            align-items: center;
-        }
-
-        .d-flex {
-            display: flex;
-            align-items: center;
-
-        }
-        .d-flex.justify-content-between {
-            width: 100%;
-            font-size: 14px;
-        }
-
-        .flex-gap-right {
-            margin-right: 20px;
-        }
-
-        .flex-half {
-            flex: 1;
-            min-width: 0;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            padding-right: 10px;
-        }
-
+        .logo-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .toggle-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; }
+        .text-white.small > .d-flex { align-items: center; }
+        .d-flex { display: flex; align-items: center; }
+        .d-flex.justify-content-between { width: 100%; font-size: 14px; }
+        .flex-gap-right { margin-right: 20px; }
+        .flex-half { flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; padding-right: 10px; }
+        /* ===== 사이드바 전체 ===== */
         .sidebar {
-            width: 200px;
-            min-width: 180px;
-            background-color: #343a40;
-            color: white;
+            padding-top: 50px;
+            width: 200px ;
+            z-index: 1100;
+            background-color: #15212F;
+            color: #cbd5e1;
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 1100;
-            padding-top: 80px;
-            overflow-y: auto;
-            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
             white-space: nowrap;
-            overflow-x: hidden;
-            text-overflow: ellipsis;
+            border-right: 1px solid #2e2e3e;
+            overflow-y: auto;
+            font-family: 'Spoqa Han Sans Neo', sans-serif;
+            transition: all 0.3s ease-in-out;
         }
 
+        /* ===== 로고 영역 ===== */
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== 섹션 헤더 ===== */
+        .sidebar .section-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #6b7280;
+            padding: 12px 24px 4px;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* ===== 메뉴 항목 ===== */
         .sidebar a,
         .sidebar button {
-            color: white;
-            text-decoration: none;
-            padding: 8px 20px;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            padding: 10px 24px;
+            color: #cbd5e1;
             background: none;
             border: none;
-            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
             width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            position: relative;
+            text-decoration: none;
         }
 
         .sidebar a:hover,
         .sidebar button:hover {
-            background-color: #495057;
+            background-color: #41474B;
+            color: #ffffff;
         }
 
-        .sidebar.show {
-            left: 0;
+        .sidebar a.active,
+        .sidebar button.active {
+            background-color: #41474B;
+            color: #ffffff;
+            font-weight: 600;
         }
 
-        .submenu {
+        /* ===== 뱃지 (예: 알림 수) ===== */
+        .sidebar .badge {
+            background-color: #ef4444;
+            color: white;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            margin-left: auto;
+        }
+
+        /* ===== 아이콘 (선택적) ===== */
+        .sidebar i {
+            font-size: 10px;
+        }
+
+        /* ===== 하위 메뉴 ===== */
+        .sidebar .submenu {
             display: none;
-            padding-left: 20px;
+            flex-direction: column;
+            margin-top: 2px;
         }
 
-        .card.stretch {
-            max-width: 100%;
-            width: 100%;
-        }
-        .dropdown > .btn {
-            padding: 0;
-            border: none;
+        .sidebar .submenu a {
+            font-size: 16px;
+            padding: 6px 24px;
+            color: #41474B;
             background: none;
-        }
-        .dropdown-toggle img {
-            cursor: pointer;
+            border-radius: 6px;
         }
 
+        .sidebar .submenu a:hover,
+        .sidebar .submenu a.active {
+            background-color: #41474B;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* ===== 토글 아이콘 (예: 화살표) ===== */
+        .sidebar .toggle-arrow {
+            margin-left: auto;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* ===== 작은 구분선 ===== */
+        .sidebar hr {
+            border: none;
+            border-top: 1px solid #2f3244;
+            margin: 12px 0;
+        }
+        .sidebar {
+            top: 70px;
+            height: calc(100vh - 80px);
+        }
+
+        .submenu { display: none; padding-left: 20px; }
+        .card.stretch { max-width: 100%; width: 100%; }
+        .dropdown > .btn { padding: 0; border: none; background: none; }
+        .dropdown-toggle img { cursor: pointer; }
         .profile-img {
             width: 65px;
             height: 65px;
             border-radius: 50%;
             object-fit: cover;
             cursor: pointer;
+            display: block;
+            pointer-events: none;
         }
-
-        .dropdown-menu {
-            font-size: 14px;
-            padding: 5px 5px;
-            min-width: 40px;
-            z-index: 100;
-            transform: translateX(10%);  /* 기존보다 왼쪽으로 10% 이동 */
-        }
-
-        .dropdown-item{
-            padding: 10px 10px;
-        }
-
-        .btn-sm-custom {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-        }
-
-        .user-info {
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #666;
-        }
-
+        .dropdown-menu { font-size: 14px; padding: 5px 5px; min-width: 40px; z-index: 100; transform: translateX(10%); }
+        .dropdown-item { padding: 10px 10px; }
+        .btn-sm-custom { font-size: 0.75rem; padding: 4px 8px; }
+        .user-info { padding: 10px 20px; font-size: 0.9rem; border-bottom: 1px solid #666; }
         #content {
             transition: all 0.3s ease-in-out;
-            margin-left: 180px; /* 사이드바가 있을 때 기본 여백 */
+            margin-left: 180px;
             padding: 30px;
             min-height: 800px;
             font-family: 'Spoqa Han Sans Neo', sans-serif !important;
         }
-
         .container-inner {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 140px 30px 140px 30px;
+            padding: 30px 30px 30px 30px;
             font-family: 'Spoqa Han Sans Neo', sans-serif !important;
         }
-
-        @media (max-width: 1200px) {
-            .content {
-                padding-top: 100px;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .content {
-                padding-top: 100px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                padding-top: 100px;
-            }
-        }
-        @media (max-width: 576px) {
-            .content {
-                padding-top: 100px;
-            }
-        }
-        .profile-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: block; /* 중요! */
-            cursor: pointer;
-            pointer-events: none; /* 이미지 자체에 클릭 효과 차단 */
-        }
-
+        @media (max-width: 1200px) { .content { padding-top: 100px; } }
+        @media (max-width: 992px) { .content { padding-top: 100px; } }
+        @media (max-width: 768px) { .content { padding-top: 100px; } }
+        @media (max-width: 576px) { .content { padding-top: 100px; } }
     </style>
 </head>
-
 <body class="sidebar-collapsed">
-
-<!--@@@@상단 네비게이션@@@@-->
 <nav th:fragment="navbar" class="navbar navbar-expand-sm navbar-dark custom-navbar justify-content-between">
     <div class="d-flex align-items-center">
         <button id="sidebarToggleBtn" class="toggle-btn me-3" onclick="toggleSidebar()">☰</button>
@@ -219,10 +205,7 @@
             <img src="/logo/HEXA%20black.jpg" alt="HexaStay 로고" height="75">
         </a>
     </div>
-    <!-- 사용자 고정 정보 + 토글 프로필 -->
     <div class="d-flex align-items-center gap-3">
-        <!-- 프로필 이미지 드롭다운 -->
-        <!-- 프로필 드롭다운 + 관리자 정보 블록 -->
         <div class="dropdown text-end">
             <button class="btn p-0 d-flex align-items-center gap-1" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <img class="profile-img"
@@ -235,9 +218,6 @@
                 <li><a class="dropdown-item" href="/admin/logout">로그아웃</a></li>
             </ul>
         </div>
-
-
-        <!-- 관리자 정보 텍스트 박스 -->
         <div class="text-white small text">
             <div class="d-flex mb-1">
                 <div class="flex-half">
@@ -258,29 +238,20 @@
         </div>
     </div>
 </nav>
-
-<!-- 사이드바 include -->
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-<!-- 콘텐츠 -->
 <div id="content">
     <div class="container-inner shadow p-4" style="margin-top: 100px" layout:fragment="content">
         <div class="container-fluid">
             <div class="card shadow p-4 stretch mt-5 mb-5">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12 col-md-6">
-
-                        </div>
+                        <div class="col-12 col-md-6"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-<!-- 알람 모달 시작  todo : 삭제하지마!! 모달 (알람창에 필수임) -->
 <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -288,26 +259,16 @@
                 <h5 class="modal-title" id="orderAlertModalLabel">🛎️ 새로운 주문 알림</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
             </div>
-            <div class="modal-body" id="orderAlertContent">
-                <!-- JS로 채워짐 -->
-            </div>
+            <div class="modal-body" id="orderAlertContent"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="orderAlertConfirmBtn">확인</button>
             </div>
         </div>
     </div>
 </div>
-<!-- 알람 모달 실행 끝 -->
-
-<!-- WebSocket 관련 라이브러리 추가 -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-<!-- 공통 웹소켓 알림 JS -->
 <script src="/js/order-alert.js"></script>
-
-<!-- 공통 스크립트 -->
-
-<!-- 클릭시 이동하는 스크립트 시작 -->
 <script>
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggleBtn');
@@ -319,9 +280,9 @@
             sidebar.style.minWidth = '0';
             content.style.marginLeft = '0';
         } else {
-            sidebar.style.width = '180px';
-            sidebar.style.minWidth = '180px';
-            content.style.marginLeft = '180px';
+            sidebar.style.width = '200px';
+            sidebar.style.minWidth = '200px';
+            content.style.marginLeft = '200px';
         }
     }
 
@@ -339,36 +300,91 @@
         const isShown = menu.style.display === 'block';
         document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
         if (!isShown) menu.style.display = 'block';
+        localStorage.setItem('submenu_' + menuId, !isShown ? 'open' : 'closed');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // 이미지 클릭 확대 기능
         document.querySelectorAll("img").forEach((img) => {
             img.addEventListener('click', () => {
                 const image = new Image();
                 image.src = img.src;
-
                 image.onload = () => {
                     const width = image.naturalWidth;
                     const height = image.naturalHeight;
-
                     const left = (window.innerWidth - width) / 2 + window.screenX;
                     const top = (window.innerHeight - height) / 2 + window.screenY;
-
-                    window.open(
-                        img.src,
-                        '_blank',
-                        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-                    );
+                    window.open(img.src, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
                 };
             });
         });
+
+        // 사이드바 a 링크에 active 적용
+        const links = document.querySelectorAll('.submenu a');
+        const currentPath = window.location.pathname;
+
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+
+                const submenu = link.closest('.submenu');
+                if (submenu) submenu.style.display = 'block';
+            }
+        });
+
+        // 토글 상태 복원
+        document.querySelectorAll('[id^=memberMenu], [id^=roomList], [id^=roomBook], [id^=roomService], [id^=extMenu], [id^=erd], [id^=settle], [id^=notice], [id^=survey]').forEach(menu => {
+            const id = menu.getAttribute('id');
+            if (localStorage.getItem('submenu_' + id) === 'open') {
+                menu.style.display = 'block';
+            }
+        });
     });
-    <!-- 클릭시 이동하는 스크립트 끝 -->
-    /* 공통 스크립트 끝 */
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
 
+        // 현재 경로에 해당하는 a 태그에 active 클래스 추가
+        const links = document.querySelectorAll('.submenu a');
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+
+                // 해당 a태그가 포함된 submenu를 열기
+                const parentSubmenu = link.closest('.submenu');
+                if (parentSubmenu) {
+                    parentSubmenu.style.display = 'block';
+                }
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const links = document.querySelectorAll('.submenu a');
+        const currentPath = window.location.pathname;
+
+        // 1. active + 하위메뉴 열기
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+                const submenu = link.closest('.submenu');
+                if (submenu) submenu.style.display = 'block';
+
+                // 하나만 기억하도록 덮어쓰기
+                const id = submenu.getAttribute('id');
+                localStorage.setItem('lastOpenedMenu', id);
+            }
+        });
+
+        // 2. 마지막 메뉴만 복원
+        const lastId = localStorage.getItem('lastOpenedMenu');
+        if (lastId) {
+            const lastMenu = document.getElementById(lastId);
+            if (lastMenu) {
+                document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
+                lastMenu.style.display = 'block';
+            }
+        }
+    });
 </script>
-<!-- Bootstrap JS + Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
