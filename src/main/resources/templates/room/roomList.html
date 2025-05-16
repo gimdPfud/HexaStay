@@ -8,11 +8,6 @@
     <style>
         .table td {
             vertical-align: middle;
-            font-size: 0.8rem;
-        }
-
-        .table th {
-            font-size: 0.8rem;
         }
 
         .table {
@@ -42,7 +37,7 @@
 <body style="background-color: #f8f9fa;">
 <div layout:fragment="content">
 
-    <div class="container mt-4 w-100 bg-light">
+    <div class="container mt-4 w-100 bg-light" style="max-width: 1400px;">
         <h2 class="fw-bold mb-4 text-center" >객실 예약 목록</h2>
 
         <!-- 성공 메시지 -->
@@ -126,8 +121,6 @@
             </form>
         </div>
 
-
-
         <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
 
@@ -163,7 +156,6 @@
             </a>
             <span>|</span>
 
-
             <!-- 숨김 객실 -->
             <a th:href="@{/roomlist/display/HIDDEN}"
                class="text-decoration-none text-secondary"
@@ -178,18 +170,18 @@
                 <table class="table table-bordered text-company mb-0" style="table-layout: fixed; width: 100%;">
                     <thead class="table-light text-center">
                     <tr>
-                        <th style="width: 6%;">번호</th>
-                        <th style="width: 12%;">객실명</th>
-                        <th style="width: 9%;">회원 이름</th>
-                        <th style="width: 18%;">회원 이메일</th>
-                        <th style="width: 8%;">메일 발송</th>
+                        <th style="width: 5%;">번호</th>
+                        <th style="width: 14%;">객실명</th>
+                        <th style="width: 9%">회원 이름</th>
+                        <th style="width: 20%;">회원 이메일</th>
+                        <th style="width: 7%;">메일 발송</th>
                         <th style="width: 10%;">객실 연락처</th>
                         <th style="width: 8%;">체크인</th>
                         <th style="width: 8%;">체크아웃</th>
-                        <th style="width: 8%;">비밀번호</th>
-                        <th style="width: 8%;">현재 상태</th>
-                        <th style="width: 9%;">상태 변경</th>
-                        <th style="width: 9%;" th:if="${currentStatus != 'VISIBLE'}">표시 변경</th>
+                        <th style="width: 7%;">비밀번호</th>
+                        <th style="width: 7%;">현재 상태</th>
+                        <th style="width: 7%;">상태 변경</th>
+                        <th style="width: 7%;" th:if="${currentStatus != 'VISIBLE'}">표시 변경</th>
                     </tr>
                     </thead>
                     <tbody>
