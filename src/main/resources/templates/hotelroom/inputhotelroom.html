@@ -5,139 +5,197 @@
 <head>
   <meta charset="UTF-8">
   <title>객실 등록</title>
-</head>
-<body style="background-color: #f8f9fa;">
-<div layout:fragment="content">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #3EC1D3;
+      --light-bg: #F1F6F9;
+      --highlight-orange: #FF9A00;
+    }
 
-  <div class="container mt-4 w-100 bg-light">
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-card {
+      background-color: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .custom-upload-area {
+      width: 100%;
+      height: 100%;
+      background-color: #f8f8f8;
+      border: 2px dashed var(--primary-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      min-height: 300px;
+      text-align: center;
+      flex-direction: column;
+      color: #888;
+    }
+
+    .custom-upload-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .icon-placeholder {
+      font-size: 4rem;
+      color: var(--primary-blue);
+    }
+
+    @media (min-width: 992px) {
+      .upload-wrapper {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .upload-wrapper .left {
+        flex: 0 0 40%;
+      }
+
+      .upload-wrapper .right {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+<div layout:fragment="content"><!--레이아웃 시작지점-->
+
+  <div class="container-fluid">
+  <div class="form-card">
     <h2 class="fw-bold mb-4 text-center">객실 등록</h2>
 
-      <!-- 폼 시작 -->
-      <form action="/admin/hotelroom/input" method="post" enctype="multipart/form-data">
-        <div class="container p-4" style="max-width: 700px;">
-
-          <!-- 이미지 업로드 -->
-          <div class="mb-3 user-box text-center" >
-            <div class="border mb-2" style="border: 1px solid rgba(59,132,152,0.89) !important; width: 700px; height: 300px; margin: auto ;display: flex; align-items: center; justify-content: center;">
-              <img id="pictureTemp" style="width: 100%; height: 100%; object-fit: cover;" src="#" class="d-none">
-            </div>
+    <form action="/admin/hotelroom/input" method="post" enctype="multipart/form-data">
+      <div class="upload-wrapper">
+        <!-- 이미지 업로드 좌측 -->
+        <div class="left">
+          <div class="custom-upload-area position-relative" id="uploadArea">
+            <i class="bi bi-image icon-placeholder"></i>
             <p class="file-name">객실 이미지가 선택되지 않았습니다.</p>
-            <button id="PictureBtn" type="button" class="custom-file-upload btn bt`n-primary border">이미지 선택</button>
-            <input type="file" id="adminProfile" name="hotelRoomProfile"
-                   hidden
-                   accept=".webp, .png, .jpeg, .jpg, .gif">
-            <small id="fileError" class="text-danger d-none"><br>올바른 파일이 선택되지 않았습니다.<br>.webp, .jpg, .jpeg, .png, .gif 파일만 지원합니다.</small>
+            <img id="pictureTemp" src="#" class="d-none">
           </div>
+          <button id="PictureBtn" type="button" class="btn btn-outline-primary mt-3 w-100">이미지 선택</button>
+          <input type="file" id="adminProfile" name="hotelRoomProfile" hidden accept=".webp, .png, .jpeg, .jpg, .gif">
+          <small id="fileError" class="text-danger d-none"><br>올바른 파일을 선택해 주세요. (.webp, .jpg, .jpeg, .png, .gif)</small>
+        </div>
 
-          <!-- 객실 정보 입력 -->
+        <!-- 객실 정보 우측 -->
+        <div class="right">
           <div class="row g-4">
-
+            <!-- 그대로 Thymeleaf 유지 -->
             <div class="col-12">
               <label class="form-label">소속</label>
               <input type="text" class="form-control rounded-3" th:value="${comapny.getCompanyName()}" readonly>
-              <!--벨류값 히든으로 숨겼음 이거 없으면 소속 안들어 갑니다-->
               <input type="hidden" name="companyNum" th:value="${comapny.getCompanyNum()}">
             </div>
-
             <div class="col-md-6">
               <label class="form-label">객실명</label>
               <input type="text" class="form-control rounded-3" name="hotelRoomName" required>
             </div>
-
             <div class="col-md-6">
               <label class="form-label">객실전화번호</label>
               <input type="tel" class="form-control rounded-3" name="hotelRoomPhone" required>
             </div>
-
             <div class="col-md-6">
               <label class="form-label">1박 숙박 요금 (₩)</label>
               <input type="number" class="form-control rounded-3" name="hotelRoomPrice" required>
             </div>
-
             <div class="col-md-6">
               <label class="form-label">QR 코드</label>
               <input type="text" class="form-control rounded-3" name="hotelRoomQr" placeholder="숫자3자리만입력해주세요" required>
             </div>
-
             <div class="col-12">
-              <label for="detail" class="form-label">상세 설명</label>
-              <textarea class="form-control rounded-3" rows="4" id="detail" name="hotelRoomContent"
+              <label class="form-label">상세 설명</label>
+              <textarea class="form-control rounded-3" rows="4" name="hotelRoomContent"
                         placeholder="객실 설명을 입력해 주세요."></textarea>
             </div>
-
             <div class="col-md-6">
-              <label for="hotelRoomType" class="form-label">객실 유형</label>
-              <select class="form-select rounded-3" id="hotelRoomType" name="hotelRoomType">
+              <label class="form-label">객실 유형</label>
+              <select class="form-select rounded-3" name="hotelRoomType">
                 <option value="single">싱글</option>
                 <option value="double">더블</option>
                 <option value="twin">트윈</option>
                 <option value="suite">스위트룸</option>
               </select>
             </div>
-
             <div class="col-md-6">
-              <label for="hotelRoomStatus" class="form-label">객실 상태</label>
-              <select class="form-select rounded-3" id="hotelRoomStatus" name="hotelRoomStatus">
-                <option value="checkin">비어있음</option>
-                <option value="checkout">사용중</option>
+              <label class="form-label">객실 상태</label>
+              <select class="form-select rounded-3" name="hotelRoomStatus">
+                <option value="checkout">비어있음</option>
+                <option value="checkin">사용중</option>
               </select>
             </div>
           </div>
-
-          <!-- 버튼 -->
-          <div class="d-flex justify-content-center gap-3 mt-4">
-            <button type="submit" class="btn btn-success">등록</button>
-            <a th:href="@{/admin/hotelroom/list}" class="btn btn-danger">취소</a>
-          </div>
         </div>
-      </form><!--폼 태그 끝 지점 -->
+      </div>
+
+      <!-- 버튼 -->
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <button type="submit" class="btn btn-primary">등록</button>
+        <a th:href="@{/admin/hotelroom/list}" class="btn btn-danger">취소</a>
+      </div>
+    </form>
   </div>
-
-  <script>
-    window.addEventListener('load', function () {
-      const fileInput = document.getElementById('adminProfile');
-      const fileBtn = document.getElementById('PictureBtn');
-      console.log('버튼:', fileBtn);
-      console.log('파일 input:', fileInput);
-      const errorMessage = document.getElementById('fileError');
-      const previewImage = document.getElementById('pictureTemp');
-      const fileNameLabel = document.querySelector('.file-name');
-
-      if (!fileInput || !fileBtn) return; // 요소가 없으면 중단
-
-      fileBtn.addEventListener('click', function () {
-        fileInput.click();
-      });
-
-      fileInput.addEventListener('change', function () {
-        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
-        const filePath = this.value;
-        const file = this.files[0];
-
-        if (!allowedExtensions.exec(filePath)) {
-          this.value = '';
-          errorMessage.classList.remove('d-none');
-          previewImage.classList.add('d-none');
-          fileNameLabel.textContent = '올바르지 않은 파일입니다.';
-          return;
-        }
-
-        errorMessage.classList.add('d-none');
-        fileNameLabel.textContent = file.name;
-
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImage.src = e.target.result;
-            previewImage.classList.remove('d-none');
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    });
-  </script>
-
 </div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('adminProfile');
+    const previewImage = document.getElementById('pictureTemp');
+    const errorMessage = document.getElementById('fileError');
+    const fileButton = document.getElementById('PictureBtn');
+    const fileNameLabel = document.querySelector('.file-name');
+    const uploadArea = document.getElementById('uploadArea');
+
+    fileButton.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', function () {
+      const allowedExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
+      const file = this.files[0];
+
+      if (!file || !allowedExtensions.test(file.name)) {
+        this.value = '';
+        errorMessage.classList.remove('d-none');
+        previewImage.classList.add('d-none');
+        fileNameLabel.textContent = '올바르지 않은 파일입니다.';
+        return;
+      }
+
+      errorMessage.classList.add('d-none');
+      fileNameLabel.textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewImage.classList.remove('d-none');
+        uploadArea.querySelector('.icon-placeholder').style.display = 'none';
+        fileNameLabel.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+</script>
+
+
+</div><!--레이아웃 끝지점-->
 
 </body>
 </html>

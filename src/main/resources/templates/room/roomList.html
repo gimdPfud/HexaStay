@@ -124,6 +124,14 @@
         <!--상태 변경 표시 링크-->
         <div class="d-flex justify-content-center mt-4 gap-3">
 
+            <!-- 표시된 객실 -->
+            <a th:href="@{/roomlist/display/VISIBLE}"
+               class="text-decoration-none text-success"
+               th:classappend="${currentStatus} == 'VISIBLE' ? 'border-bottom border-success fw-bold' : ''">
+                현재 예약 목록
+            </a>
+            <span>|</span>
+
             <!-- 전체 목록 -->
             <a th:href="@{/roomlist}"
                class="text-decoration-none text-dark"
@@ -132,13 +140,7 @@
             </a>
             <span>|</span>
 
-            <!-- 표시된 객실 -->
-            <a th:href="@{/roomlist/display/VISIBLE}"
-               class="text-decoration-none text-success"
-               th:classappend="${currentStatus} == 'VISIBLE' ? 'border-bottom border-success fw-bold' : ''">
-                현재 예약 목록
-            </a>
-            <span>|</span>
+
 
             <!-- 체크인 목록 -->
             <a th:href="@{/roomlist/checkin}"

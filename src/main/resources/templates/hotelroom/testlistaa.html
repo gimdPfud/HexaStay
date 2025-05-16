@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>HexaStay Admin - 객실 리스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1B56FD;
+            --bg-white: #FFF8F8;
+            --border-radius: 16px;
+            --shadow-card: 0 4px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-white);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .navbar-custom {
+            background-color: var(--primary-blue);
+            color: var(--bg-white);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: var(--primary-blue);
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            padding: 20px;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            color: var(--bg-white);
+            margin-bottom: 20px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .main {
+            margin-top: 60px;
+            padding: 30px;
+        }
+
+        .luxury-card {
+            border-radius: var(--border-radius);
+            background-color: #FFFFFF;
+            border-left: 6px solid var(--primary-blue);
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s;
+        }
+
+        .luxury-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .luxury-image img {
+            object-fit: cover;
+            width: 100%;
+            height: 200px;
+            border-bottom: 1px solid #E0E0E0;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        .btn-luxury {
+            background-color: var(--primary-blue);
+            color: #FFF8F8;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .btn-luxury-outline {
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .pagination .page-link {
+            color: var(--primary-blue);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: #FFF8F8;
+        }
+
+        @media (min-width: 992px) {
+            .luxury-card {
+                min-height: 550px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar-custom">
+    <div>HexaStay Admin</div>
+    <button class="btn btn-luxury btn-sm" onclick="toggleSidebar()">메뉴 열기</button>
+</div>
+
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+    <a href="#">대시보드</a>
+    <a href="#">예약 관리</a>
+    <a href="#">QR 인증 관리</a>
+    <a href="#">회원 관리</a>
+    <a href="#">리포트</a>
+</div>
+
+<!-- 메인 영역 -->
+<div class="main container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--primary-blue);">객실 목록</h2>
+        <button class="btn btn-luxury">객실 등록</button>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-sm-6 col-lg-4" th:each="hotelList : ${companylist}">
+            <div class="luxury-card d-flex flex-column h-100">
+
+                <div class="luxury-image">
+                    <img th:src="${hotelList.hotelRoomProfileMeta}" alt="호텔 이미지">
+                </div>
+
+                <div class="p-4 d-flex flex-column justify-content-between flex-grow-1">
+                    <div class="mb-3">
+                        <span class="badge mb-2"
+                              th:text="${hotelList.hotelRoomStatus} == 'checkin' ? '사용중' : '비어있음'"
+                              th:classappend="${hotelList.hotelRoomStatus} == 'checkin' ? 'bg-danger' : 'bg-primary'">
+                        </span>
+                        <h5 class="fw-bold" th:text="${hotelList.hotelRoomName}">객실명</h5>
+                        <p><strong>회사:</strong> <span th:text="${hotelList.getCompany().getCompanyName()}"></span></p>
+                        <p><strong>객실유형:</strong> <span th:text="${hotelList.hotelRoomType}"></span></p>
+                        <p><strong>가격:</strong> <span th:text="${#numbers.formatInteger(hotelList.hotelRoomPrice, 3, 'COMMA')} + ' 원'"></span></p>
+                        <p><strong>전화:</strong> <span th:text="${hotelList.hotelRoomPhone}"></span></p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
+                            <img th:src="${hotelList.hotelRoomQr}"
+                                 alt="QR 코드"
+                                 class="img-thumbnail"
+                                 style="width: 80px; height: 80px; border: 2px solid var(--primary-blue);">
+                        </a>
+                        <div>
+                            <a th:href="'/admin/hotelroom/details/' + ${hotelList.hotelRoomNum}">
+                                <button class="btn btn-luxury-outline btn-sm me-2">자세히</button>
+                            </a>
+                            <button th:onclick="|location.href='/register-hotelroom'|"
+                                    class="btn btn-luxury btn-sm"
+                                    th:disabled="${hotelList.hotelRoomStatus}!='checkout'">예약</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div class="d-flex justify-content-center mt-5">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${hotelRoomList.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/hotelroom/list(page=${hotelRoomList.number > 0 ? hotelRoomList.number - 1 : 0}, size=9)}">이전</a>
+            </li>
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, hotelRoomList.totalPages)}"
+                th:classappend="${hotelRoomList.number + 1} == pageNum ? 'active' : ''">
+                <a class="page-link"
+                   th:href="@{/admin/hotelroom/list(page=${pageNum - 1}, size=9)}"
+                   th:text="${pageNum}"></a>
+            </li>
+            <li class="page-item" th:classappend="${hotelRoomList.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/admin/hotelroom/list(page=${hotelRoomList.number + 1}, size=9)}">다음</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('show');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

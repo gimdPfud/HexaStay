@@ -226,6 +226,7 @@ public class SurveyController {
         }
     }
 
+    //todo:경로 오타 추후에 수정
     @GetMapping("/suyveytest")
     @ResponseBody
     public ResponseEntity<String> surveytest() {

@@ -41,6 +41,35 @@ public class HotelRoomController {
     private final HotelRoomService hotelRoomService;
 
 
+    /**************테스트용 디자인 컨셉*****/
+    @GetMapping("/test/list")
+    public String test() {
+
+        return "hotelroom/testlistaa";
+    }
+
+    @GetMapping("/test/detail")
+    public String detail() {
+        return "hotelroom/testlistaa";
+    }
+
+    @GetMapping("/test/input")
+    public String input(Principal principal , Model model) {
+
+
+        return "hotelroom/testinputhotelroom";
+    }
+
+    @GetMapping("/test/update")
+    public String update()
+    {
+
+        return "hotelroom/testupdatehotelroom";
+    }
+
+    /**************테스트용 디자인 컨셉*****/
+
+
 
     // roomlist.html - checkin , checkout 변경용 로직 <script>
     @PostMapping("/checkinout/{hotelRoomNum}")
@@ -61,7 +90,6 @@ public class HotelRoomController {
         }
 
     }
-
 
     //호텔룸 등록페이지
 
