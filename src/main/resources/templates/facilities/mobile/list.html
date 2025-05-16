@@ -288,6 +288,48 @@
         .list-unstyled li::before {
             content: "";
         }
+
+        /* 채팅 메시지 스타일 */
+        .user-message, .ai-message {
+            padding: 12px 16px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+        }
+
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            color: #0d47a1;
+        }
+
+        .ai-message {
+            background-color: #f5f5f5;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            color: #333;
+        }
+
+        .user-message strong, .ai-message strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .user-message strong {
+            color: #1565c0;
+        }
+
+        .ai-message strong {
+            color: #424242;
+        }
     </style>
 </head>
 <body>
@@ -384,6 +426,7 @@
     const currentAddress = /*[[${hotelAddress}]]*/ "인천광역시";
     const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g";
     let conversationHistory = [];
+    let chatMessages = [];
 
     function showAIModal() {
         document.getElementById('aiModalBackdrop').style.display = 'flex';
@@ -392,8 +435,35 @@
         document.getElementById('aiResponseArea').style.display = 'none';
         document.getElementById('aiResponseLoading').style.display = 'none';
         document.getElementById('aiQuestionInput').value = '';
-        conversationHistory = [];
-        fetchInitialRecommendations();
+
+        if (chatMessages.length === 0) {
+            fetchInitialRecommendations();
+        } else {
+            document.getElementById('aiLoading').style.display = 'none';
+            displayChatHistory();
+        }
+    }
+
+    function displayChatHistory() {
+        const recommendationsDiv = document.getElementById('aiRecommendations');
+        recommendationsDiv.innerHTML = '';
+        
+        chatMessages.forEach(msg => {
+            if (msg.type === 'user') {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-message mb-3';
+                userDiv.innerHTML = `<strong>나:</strong> ${msg.content}`;
+                recommendationsDiv.appendChild(userDiv);
+            } else if (msg.type === 'ai') {
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-message mb-3';
+                aiDiv.innerHTML = `<strong>AI:</strong> ${msg.content}`;
+                recommendationsDiv.appendChild(aiDiv);
+            }
+        });
+        
+        // 스크롤을 맨 아래로 이동
+        recommendationsDiv.scrollTop = recommendationsDiv.scrollHeight;
     }
 
     function closeAIModal() {
@@ -402,7 +472,6 @@
 
     async function fetchInitialRecommendations() {
         try {
-
             const prompt = `안녕하세여, 제 위치는 "${currentAddress}" 이에여. 이 근처에서 놀만한곳, 관광객한테 추천할만한곳좀 선정해서 친근하게 존칭으로 알려주세요.`;
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -429,42 +498,24 @@
                 data.candidates[0].content.parts.length > 0) {
 
                 const recommendationText = data.candidates[0].content.parts[0].text;
-                const recommendations = recommendationText.split('\n\n').filter(item => item.trim() !== '');
-
-                let recommendationsHTML = '<ul class="list-unstyled">';
-                for (const recommendation of recommendations) {
-                    const parts = recommendation.split('\n').filter(part => part.trim() !== '');
-                    if (parts.length >= 1) {
-
-                        const title = parts[0].replace(/^\*\*(.*?)\*\*$/, '$1').trim();
-                        const description = parts.slice(1).join('<br>').trim();
-
-                        recommendationsHTML += `
-                            <li class="mb-3">
-                                <div class="card shadow-sm">
-                                    <div class="card-body">
-                                        <h6><strong>${title}</strong></h6>
-                                        ${description ? `<p class="card-text">${description}</p>` : ''}
-                                    </div>
-                                </div>
-                            </li>
-                        `;
-                    }
-                }
-                recommendationsHTML += '</ul>';
-
-                document.getElementById('aiRecommendations').innerHTML = recommendationsHTML;
-                document.getElementById('aiLoading').style.display = 'none';
+                
+                // 초기 추천 메시지를 채팅 기록에 추가
+                chatMessages.push({ type: 'ai', content: recommendationText });
+                displayChatHistory();
 
                 conversationHistory.push({ role: 'model', parts: [{ text: recommendationText }] });
 
             } else {
-                document.getElementById('aiRecommendations').innerHTML = '<p style="text-align:center; color:#6c757d;">추천 장소를 불러오는 데 실패했어요. 😥</p>';
-                document.getElementById('aiLoading').style.display = 'none';
+                const errorMessage = '추천 장소를 불러오는 데 실패했어요. 😥';
+                chatMessages.push({ type: 'ai', content: errorMessage });
+                displayChatHistory();
             }
 
         } catch (error) {
-            document.getElementById('aiRecommendations').innerHTML = `<p style="text-align:center; color:red;">추천 기능을 이용하는 중에 오류가 발생했습니다: ${error.message} 😭</p>`;
+            const errorMessage = `추천 기능을 이용하는 중에 오류가 발생했습니다: ${error.message} 😭`;
+            chatMessages.push({ type: 'ai', content: errorMessage });
+            displayChatHistory();
+        } finally {
             document.getElementById('aiLoading').style.display = 'none';
         }
     }
@@ -477,6 +528,10 @@
             setTimeout(() => { questionInput.placeholder = "더 궁금한 것을 물어보세요!"; }, 2000);
             return;
         }
+
+        // 사용자 메시지 저장
+        chatMessages.push({ type: 'user', content: question });
+        displayChatHistory();
 
         document.getElementById('aiResponseLoading').style.display = 'block';
         document.getElementById('aiResponseArea').style.display = 'none';
@@ -506,21 +561,25 @@
                 data.candidates[0].content.parts.length > 0) {
 
                 const responseText = data.candidates[0].content.parts[0].text;
-                document.getElementById('aiResponseArea').innerText = responseText;
-                document.getElementById('aiResponseArea').style.display = 'block';
+                
+                // AI 응답 저장 (aiResponseArea는 사용하지 않음)
+                chatMessages.push({ type: 'ai', content: responseText });
+                displayChatHistory();
 
                 conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
 
             } else {
-                document.getElementById('aiResponseArea').innerText = 'AI 답변을 받지 못했습니다. 다시 시도해 주세요. 🤔';
-                document.getElementById('aiResponseArea').style.display = 'block';
+                const errorMessage = 'AI 답변을 받지 못했습니다. 다시 시도해 주세요. 🤔';
+                chatMessages.push({ type: 'ai', content: errorMessage });
+                displayChatHistory();
                 console.error("AI 답변 데이터 형식 또는 내용 오류:", data);
             }
 
         } catch (error) {
             console.error('AI 질문 에러:', error);
-            document.getElementById('aiResponseArea').innerText = `질문 처리 중 오류가 발생했습니다: ${error.message} 😔`;
-            document.getElementById('aiResponseArea').style.display = 'block';
+            const errorMessage = `질문 처리 중 오류가 발생했습니다: ${error.message} 😔`;
+            chatMessages.push({ type: 'ai', content: errorMessage });
+            displayChatHistory();
         } finally {
             document.getElementById('aiResponseLoading').style.display = 'none';
         }

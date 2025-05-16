@@ -9,6 +9,9 @@
     <title>모바일 주문 페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f9f9f9; }
@@ -323,10 +326,252 @@
             }
         }
         /* === 벚꽃 효과 스타일 END === */
+
+
+        .card-title {
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+
+        .ai-modal {
+            background-color: #ffffff;
+            border-radius: 20px;
+            width: clamp(320px, 90vw, 420px);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .ai-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .ai-modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .ai-modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            opacity: 0.8;
+        }
+        .ai-modal-close:hover {
+            color: #000000;
+            opacity: 1;
+        }
+
+        .ai-modal-content {
+            padding: 0px 20px 20px 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .ai-modal-content::-webkit-scrollbar { width: 6px; }
+        .ai-modal-content::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .ai-modal-content::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
+        .ai-modal-content::-webkit-scrollbar-thumb:hover { background: #aaaaaa; }
+
+
+        .ai-loading,
+        .ai-response-loading {
+            text-align: center;
+            padding: 25px 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .ai-loading p,
+        .ai-response-loading p {
+            margin-bottom: 12px;
+        }
+        .ai-loading .spinner-border,
+        .ai-response-loading .spinner-border {
+            width: 2rem;
+            height: 2rem;
+            color: #007bff;
+        }
+
+
+        .ai-recommendations {
+            margin-top: 15px;
+        }
+        .ai-recommendations ul {
+            list-style: none;
+            padding: 0;
+        }
+        .ai-recommendations li {
+            margin-bottom: 18px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e9ecef;
+        }
+        .ai-recommendations strong {
+            color: #007bff;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .ai-recommendations p {
+            line-height: 1.6;
+            color: #495057;
+            font-size: 0.875rem;
+            margin-bottom: 0;
+        }
+        .ai-recommendations p br {
+            content: "";
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+
+        .ai-response-area {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9f5ff;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            border: 1px solid #cce7ff;
+        }
+
+        .ai-question-area {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .ai-question-area textarea {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            overflow-y: auto;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .ai-question-area textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+        .ai-question-area button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .ai-question-area button:hover {
+            background-color: #0056b3;
+        }
+        .ai-question-area button i {
+            pointer-events: none;
+        }
+
+        .list-unstyled li::before {
+            content: "";
+        }
+
+        /* 채팅 메시지 스타일 */
+        .user-message, .ai-message {
+            padding: 12px 16px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+        }
+
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            color: #0d47a1;
+            white-space: pre-wrap;
+        }
+
+        .ai-message {
+            background-color: #f5f5f5;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        .user-message strong, .ai-message strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .user-message strong {
+            color: #1565c0;
+        }
+
+        .ai-message strong {
+            color: #424242;
+        }
     </style>
 </head>
 <body th:classappend="${#locale.language != 'ko'} ? 'lang-non-ko' : ''">
 <div layout:fragment="contentorderA">
+
+
     <div class="container">
         <div class="toast-container position-fixed top-0 end-0 p-3" id="notificationArea">
         </div>
@@ -336,9 +581,46 @@
                     <input type="hidden" name="type" th:value="S">
                     <input type="text" th:placeholder="#{search.placeholder}" name="keyword" id="searchInput">
                     <button type="submit" th:text="#{search.button}" id="searchBtn">검색</button>
+                    <button type="button" class="ai-recommend-btn" onclick="showAIModal()">AI 추천</button>
                 </div>
             </form>
         </div>
+
+
+        <div class="modal-backdrop" id="aiModalBackdrop">
+            <div class="ai-modal">
+                <div class="ai-modal-header">
+                    <div class="ai-modal-title">AI 메뉴 추천</div>
+                    <button class="ai-modal-close" onclick="closeAIModal()" aria-label="Close">&times;</button>
+                </div>
+                <div class="ai-modal-content">
+                    <div class="ai-loading" id="aiLoading">
+                        <p>메뉴 선정중...</p>
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="ai-recommendations" id="aiRecommendations"></div>
+
+                    <div id="aiResponseLoading" class="ai-response-loading" style="display:none;">
+                        <p>AI가 답변을 생성 중입니다...</p>
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="aiResponseArea" class="ai-response-area" style="display:none;"></div>
+
+                    <div class="ai-question-area">
+                        <textarea id="aiQuestionInput" placeholder="더 궁금한 것을 물어보세요!" rows="1"></textarea>
+                        <button onclick="sendQuestionToAI()" title="AI 답변 받기">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="tabs">
             <button type="button" onclick="window.location.href='/roommenu/orderpage?type=L'"
                     style="height: 37px;width: 90px;" class="btn btn-custom " >
@@ -415,8 +697,338 @@
         </ul>
     </div>
 
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+
+        // <![CDATA[
+        const menuListData = JSON.parse(/*[[${listJson}]]*/ '[]');
+
+        const apiKey = "AIzaSyAzh3bptFN2CSUsTJ0XbBHQHRVMiEPWd0g";
+        const imageBaseUrl = "http://wooriproject.iptime.org:9002";
+
+        let conversationHistory = [];
+        let chatMessages = [];
+
+        function showAIModal() {
+            document.getElementById('aiModalBackdrop').style.display = 'flex';
+            document.getElementById('aiLoading').style.display = 'block';
+            document.getElementById('aiRecommendations').innerHTML = '';
+            document.getElementById('aiResponseArea').style.display = 'none';
+            document.getElementById('aiResponseLoading').style.display = 'none';
+            document.getElementById('aiQuestionInput').value = '';
+
+            if (chatMessages.length === 0) {
+                fetchInitialRecommendations();
+            } else {
+                document.getElementById('aiLoading').style.display = 'none';
+                displayChatHistory();
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function displayChatHistory() {
+            const recommendationsDiv = document.getElementById('aiRecommendations');
+            recommendationsDiv.innerHTML = ''; // 기존 내용 비우기
+
+            chatMessages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = (msg.type === 'user' ? 'user-message' : 'ai-message') + ' mb-3';
+
+                const senderStrong = document.createElement('strong');
+                senderStrong.textContent = (msg.type === 'user' ? '나:' : 'AI: ');
+                msgDiv.appendChild(senderStrong);
+
+                if (msg.type === 'ai') {
+                    let aiContent = msg.content;
+
+                    // JSON 블록 감싸는 백틱과 "json" 제거
+                    const jsonMatch = aiContent.match(/```json\s*([\s\S]*?)\s*```/);
+                    if (jsonMatch && jsonMatch[1]) {
+                        aiContent = jsonMatch[1].trim();
+                    } else {
+                        aiContent = aiContent.trim();
+                    }
+
+                    // AI 응답이 JSON 형태인지 먼저 확인
+                    if (aiContent.startsWith('{') && aiContent.endsWith('}')) {
+                        try {
+                            const responseData = JSON.parse(aiContent);
+
+                            if (responseData.items && Array.isArray(responseData.items)) {
+                                const shuffledItems = shuffleArray([...responseData.items]);
+                                shuffledItems.forEach(item => {
+                                    if (item.imageUrl) {
+                                        const imgElement = document.createElement('img');
+                                        imgElement.src = item.imageUrl.startsWith('/') ? imageBaseUrl + item.imageUrl : item.imageUrl;
+                                        imgElement.alt = '메뉴 이미지';
+                                        imgElement.style.maxWidth = '250px';
+                                        imgElement.style.height = 'auto';
+                                        imgElement.style.display = 'block';
+                                        imgElement.style.marginTop = '5px';
+                                        imgElement.style.marginBottom = '10px';
+                                        imgElement.onerror = function() {
+                                            this.style.display = 'none';
+                                            console.error("이미지 로드 실패:", this.src);
+                                            const errorText = document.createElement('span');
+                                            errorText.style.color = 'red';
+                                            errorText.textContent = `[이미지 로드 실패: ${this.src}]`;
+                                            msgDiv.appendChild(errorText);
+                                        };
+                                        msgDiv.appendChild(imgElement);
+                                    }
+                                    if (item.text) {
+                                        const textWithBreaks = item.text.replace(/\n/g, '<br>');
+                                        const textSpan = document.createElement('span');
+                                        textSpan.innerHTML = textWithBreaks;
+                                        msgDiv.appendChild(textSpan);
+                                    }
+                                    msgDiv.appendChild(document.createElement('hr'));
+                                });
+                            } else if (responseData.text) {
+                                const textWithBreaks = responseData.text.replace(/\n/g, '<br>');
+                                const textSpan = document.createElement('span');
+                                textSpan.innerHTML = textWithBreaks;
+                                msgDiv.appendChild(textSpan);
+                            }
+                        } catch (error) {
+                            const errorText = document.createElement('span');
+                            errorText.style.color = 'red';
+                            errorText.textContent = "AI 응답을 처리하는 중에 오류가 발생했습니다. 😥";
+                            msgDiv.appendChild(errorText);
+                        }
+                    } else {
+
+                        const textWithBreaks = aiContent.replace(/\n/g, '<br>');
+                        const textSpan = document.createElement('span');
+                        textSpan.innerHTML = textWithBreaks;
+                        msgDiv.appendChild(textSpan);
+                    }
+                } else {
+                    const textWithBreaks = msg.content.replace(/\n/g, '<br>');
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = textWithBreaks;
+                    msgDiv.appendChild(textSpan);
+                }
+
+                recommendationsDiv.appendChild(msgDiv);
+            });
+            recommendationsDiv.scrollTop = recommendationsDiv.scrollHeight;
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModalBackdrop').style.display = 'none';
+        }
+
+        async function fetchInitialRecommendations() {
+            try {
+                if (!Array.isArray(menuListData) || menuListData.length === 0) {
+                    console.error("처리 후 메뉴 데이터가 배열이 아니거나 비어있습니다.");
+                    const errorMessage = "추천 메뉴 데이터를 찾을 수 없습니다. 😥";
+                    chatMessages.push({type: 'ai', content: errorMessage});
+                    displayChatHistory();
+                    document.getElementById('aiLoading').style.display = 'none';
+                    return;
+                }
+
+
+                const formattedMenuList = menuListData.map(item => {
+                    if (item.roomMenuAmount === 0) {
+                        return null;
+                    }
+                    const imageMeta = item.roomMenuImageMeta || '';
+                    return {
+                        "메뉴 이름": item.roomMenuName,
+                        "카테고리": item.roomMenuCategory,
+                        "설명": item.roomMenuContent,
+                        "이미지_경로": imageMeta
+                    };
+                }).filter(item => item !== null);
+
+
+                if (formattedMenuList.length === 0) {
+                    const errorMessage = "현재 추천 가능한 메뉴가 없습니다. (재고 없음 등) 😥";
+                    chatMessages.push({type: 'ai', content: errorMessage});
+                    displayChatHistory();
+                    document.getElementById('aiLoading').style.display = 'none';
+                    return;
+                }
+                const initialInstructions = `
+                [매우 중요] 제공된 메뉴 리스트를 기반으로 사용자에게 음식을 추천해주는 AI 메뉴 추천 도우미입니다.
+                [매우 중요] 너의 대답은 항상 JSON 형식으로 표현되니 텍스트는 Json 개행시켜주는 문자로 줄바꿈을 해주세요.
+
+1.  이 대화 세션이 끝날 때까지 이 대화의 모든 내용을 기억해야 합니다.
+2.  **오직 내가 밑에 제공하는 메뉴 리스트 안에서만 음식을 추천해야 합니다.** 이 리스트에 없는 음식은 절대 언급하거나 추천하지 마세요.
+3.  리스트에서 사용자 요청에 맞는 음식 한두 개를 JSON 형식으로 응답해야 합니다. 각 추천 메뉴는 "text" 필드에 설명과 특징 (카테고리, 설명 내용 기반 맛이나 특징)을 담고, "imageUrl" 필드에 이미지 경로를 담아야 합니다. 여러 메뉴를 추천할 때는 "items" 배열 안에 각 메뉴 객체를 담아 응답하세요. "이미지_경로" 정보가 없는 메뉴는 "imageUrl" 필드를 포함하지 마세요.
+4.  "설명" 내용을 잘 참고해서 메뉴의 맛이나 특징을 구체적으로 소개해주세요. 마치 맛집을 소개하듯 친근하게 이야기해주세요. 그리고 컨텐츠에 있는 말 그대로 하지말고 좀 꾸미고 각색해서 재밌게 얘기해야함.
+5. 추천메뉴 순서대로 하지말고 좀 섞어서 무작위로 추천해줘. 아니면 흐름에 맞춰서 추천.
+6. 메뉴설명을 보고 설명하는 느낌이 아니라 너가 진짜 호텔 직원인것처럼 얘기해줘.
+
+## 추천 가능한 메뉴 리스트:
+${JSON.stringify(formattedMenuList)}`;
+
+                conversationHistory = [];
+                conversationHistory.push({role: 'user', parts: [{text: initialInstructions + "\n\n## 사용자 요청:\n안녕하세요! 오늘 뭐 먹을지 고민이에요. 메뉴 하나 추천해주시겠어요?"}]});
+
+                const promptBody = {
+                    contents: [...conversationHistory]
+                };
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(promptBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 응답 오류: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.candidates && data.candidates.length > 0 &&
+                    data.candidates[0].content && data.candidates[0].content.parts &&
+                    data.candidates[0].content.parts.length > 0) {
+
+                    const responseText = data.candidates[0].content.parts[0].text;
+
+                    chatMessages.push({type: 'ai', content: responseText});
+
+                    displayChatHistory();
+
+                    conversationHistory.push({role: 'model', parts: [{text: responseText}]});
+
+                } else {
+                    const errorMessage = 'AI 답변을 받지 못했습니다. 응답 형식이 올바르지 않거나 내용이 비어있습니다. 🤔';
+                    chatMessages.push({type: 'ai', content: errorMessage});
+                    displayChatHistory();
+                    console.error("AI 답변 데이터 오류:", data);
+                }
+
+            } catch (error) {
+                console.error('AI 초기 추천 처리 에러:', error);
+                const errorMessage = `추천 기능을 이용하는 중에 오류가 발생했습니다: ${error.message} 😭`;
+                chatMessages.push({type: 'ai', content: errorMessage});
+                displayChatHistory();
+            } finally {
+                document.getElementById('aiLoading').style.display = 'none';
+                document.getElementById('aiResponseLoading').style.display = 'none';
+            }
+        }
+
+
+        async function sendQuestionToAI() {
+            const questionInput = document.getElementById('aiQuestionInput');
+            const question = questionInput.value.trim();
+            if (!question) {
+                questionInput.placeholder = "질문을 입력해주세요!";
+                setTimeout(() => {questionInput.placeholder = "더 궁금한 것을 물어보세요!";}, 2000);
+                return;
+            }
+
+            chatMessages.push({type: 'user', content: question});
+            displayChatHistory();
+
+            document.getElementById('aiResponseLoading').style.display = 'block';
+
+            conversationHistory.push({role: 'user', parts: [{text: question}]});
+
+            try {
+                const promptBody = {
+                    contents: [...conversationHistory]
+                };
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(promptBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`AI 질문 API 응답 오류: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.candidates && data.candidates.length > 0 &&
+                    data.candidates[0].content && data.candidates[0].content.parts &&
+                    data.candidates[0].content.parts.length > 0) {
+
+                    const responseText = data.candidates[0].content.parts[0].text;
+
+                    chatMessages.push({type: 'ai', content: responseText});
+
+                    displayChatHistory(); // 화면 업데이트
+
+                    conversationHistory.push({role: 'model', parts: [{text: responseText}]});
+
+                } else {
+                    const errorMessage = 'AI 답변을 받지 못했습니다. 응답 형식이 올바르지 않거나 내용이 비어있습니다. 다시 시도해 주세요. 🤔';
+                    chatMessages.push({type: 'ai', content: errorMessage});
+                    displayChatHistory(); // 에러 메시지 표시
+                    console.error("AI 답변 데이터 형식 또는 내용 오류:", data);
+                }
+
+            } catch (error) {
+                console.error('AI 질문 처리 에러:', error);
+                const errorMessage = `질문 처리 중 오류가 발생했습니다: ${error.message} 😔`;
+                chatMessages.push({type: 'ai', content: errorMessage});
+                displayChatHistory(); // 에러 메시지 표시
+            } finally {
+                document.getElementById('aiResponseLoading').style.display = 'none';
+            }
+
+            // 질문 입력창 초기화
+            questionInput.value = '';
+            questionInput.style.height = 'auto';
+            questionInput.dispatchEvent(new Event('input')); // 높이 자동 조절 업데이트
+        }
+
+        // 입력창 높이 자동 조절
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('aiQuestionInput');
+            if (textarea) {
+                textarea.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+                // 페이지 로드 시 초기 높이 설정
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+            }
+        });
+
+        // Enter 키로 질문 전송 (Shift+Enter는 줄바꿈)
+        const questionInputGlobal = document.getElementById('aiQuestionInput');
+        if (questionInputGlobal) {
+            questionInputGlobal.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendQuestionToAI();
+                }
+            });
+        }
+
+
+        function filterByCategory(category) {
+        }
+
+        function filterByLikes() {
+        }
+    </script>
+
+
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -433,7 +1045,9 @@
                 color: white; border-radius: 5px; z-index: 2000; font-size: 0.9rem;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);`;
                 document.body.appendChild(fallbackAlert);
-                setTimeout(() => { fallbackAlert.remove(); }, delay);
+                setTimeout(() => {
+                    fallbackAlert.remove();
+                }, delay);
                 return;
             }
 
@@ -531,7 +1145,9 @@
 
                 fetch(`/roommenu/orderpage/status/${menuId}`)
                     .then(res => {
-                        if (!res.ok) return res.text().then(text => { throw new Error(`좋아요 상태 로드 실패 (${res.status}): ${text.substring(0,100)}`) });
+                        if (!res.ok) return res.text().then(text => {
+                            throw new Error(`좋아요 상태 로드 실패 (${res.status}): ${text.substring(0, 100)}`)
+                        });
                         return res.json();
                     })
                     .then(data => {
@@ -586,10 +1202,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const currentLocale = /*[[${#locale.language}]]*/ 'ko';
             const messages = {
-                ko: { search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다." },
-                en: { search_disabled_message: "Search is not supported when changing languages." },
-                ja: { search_disabled_message: "言語を変更すると検索はサポートされません。" },
-                cn: { search_disabled_message: "更改语言时不支持搜索。" }
+                ko: {search_disabled_message: "다국어 변경시에는 검색을 지원하지 않습니다."},
+                en: {search_disabled_message: "Search is not supported when changing languages."},
+                ja: {search_disabled_message: "言語を変更すると検索はサポートされません。"},
+                cn: {search_disabled_message: "更改语言时不支持搜索。"}
             };
             let message = (messages[currentLocale] && messages[currentLocale].search_disabled_message)
                 ? messages[currentLocale].search_disabled_message
@@ -720,7 +1336,9 @@
             console.log('벚꽃 컨테이너 display를 block으로 설정.');
 
             if (sakuraIntervalId) clearInterval(sakuraIntervalId);
-            activeSakuraPetals.forEach(p => { if(p.parentElement) p.remove(); });
+            activeSakuraPetals.forEach(p => {
+                if (p.parentElement) p.remove();
+            });
             activeSakuraPetals = [];
             console.log('기존 벚꽃잎 정리 완료.');
 
@@ -778,7 +1396,7 @@
                 const itemName = itemNameElement ? itemNameElement.textContent : '선택된 아이템';
                 const cardElement = selectedItem.querySelector('.div-card');
 
-                selectedItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                selectedItem.scrollIntoView({behavior: 'smooth', block: 'center'});
 
                 if (cardElement) {
                     const originalBoxShadow = cardElement.style.boxShadow;
@@ -829,10 +1447,8 @@
             }
         });
         // --- Konami Code Easter Egg END ---
-
-
-
     </script>
+
 </div>
 </body>
 </html>

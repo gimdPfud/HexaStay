@@ -10,6 +10,10 @@ package com.sixthsense.hexastay.controller;
  * 입출력 변수 설계 : 김윤겸
  **************************************************/
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.sixthsense.hexastay.dto.RoomMenuDTO;
 import com.sixthsense.hexastay.entity.RoomMenu;
 import com.sixthsense.hexastay.repository.RoomMenuOrderItemRepository;
@@ -352,7 +356,7 @@ public class RoomMenuController {
                             @RequestParam(value = "category", defaultValue = "") String category,
                             Principal principal,
                             Locale locale,
-                            Model model) { // 무한스크롤 비슷하게 느낌을 내기 위해서 size를 100으로 조정
+                            Model model) throws JsonProcessingException { // 무한스크롤 비슷하게 느낌을 내기 위해서 size를 100으로 조정
         // size = Integer.MAX_VALUE 으로 다 불러올 수 있지만 데이터 많으면 오류생기니까 그냥 맵두자.
         log.info("주문페이지 컨트롤러 리스트 진입");
         log.info("로그인한 사용자: " + principal.getName());
@@ -367,12 +371,25 @@ public class RoomMenuController {
 
         Map<String, Integer> pageInfo = Pagination(roomMenuList);
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleFilterProvider filters = new SimpleFilterProvider()
+                .addFilter("roomMenuFilter",
+                        SimpleBeanPropertyFilter.serializeAllExcept(
+                                "createDate", "modifyDate", "supportsMultilang", "approvedByDev", "room", "hotelRoomNum"
+                        ));
+        String roomMenuListJson = objectMapper.writer(filters)
+                .writeValueAsString(roomMenuList.getContent());
+
         model.addAttribute("list", roomMenuList);
+        model.addAttribute("listJson", roomMenuListJson); // JS에서 사용
         model.addAttribute("type", type);
         model.addAttribute("keyword", keyword);
         model.addAttribute("category", category);
         model.addAttribute("totalCartItemCount", totalCartItemCount);
         model.addAllAttributes(pageInfo);
+
+
+
         return "roommenu/orderpage";
 
     }
