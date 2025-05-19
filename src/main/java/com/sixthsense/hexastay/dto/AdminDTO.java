@@ -87,16 +87,6 @@ public class AdminDTO {
     private String companyName;
     private String storeName;
 
-    // 추가 필드
-    private boolean ReadOnly;
-    private String fixedChoice;
-    private Long fixedCompanyNum;
-    private String fixedCompanyName;
-    private Long fixedStoreNum;
-    private String fixedStoreName;
-    private Long fixedParentCompanyNum;
-    private String fixedParentCompanyName;
-
     public String getAdminRoleKorean() {
         return AdminRole.displayNameFromCode(adminRole);
     }

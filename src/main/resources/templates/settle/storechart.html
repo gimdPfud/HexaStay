@@ -746,7 +746,7 @@
                 const sec = String(date.getSeconds()).padStart(2, '0');
                 return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
             }
-
+ 
             function formatCurrency(value) {
                 return (value ? Math.round(value) : 0).toLocaleString('ko-KR') + '원';
             }

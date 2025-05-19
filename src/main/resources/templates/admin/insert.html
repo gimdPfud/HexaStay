@@ -109,7 +109,7 @@
                                 <option th:selected="${fixedChoice == '본사'}">본사</option>
                                 <option th:selected="${fixedChoice == '지점'}">지점</option>
                                 <option th:selected="${fixedChoice == '외부시설'}">외부시설</option>
-                                <option th:selected="${fixedChoice == '스토어'}">스토어</option>
+                                <option th:if="${adminRole != 'SUPERADMIN' && adminRole != 'EXEC' && adminRole != 'HEAD' && adminRole != 'GM'}" th:selected="${fixedChoice == '스토어'}">스토어</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -295,6 +295,10 @@
 
         // 페이지 로드 시 초기 상태 설정
         window.addEventListener('load', function() {
+            // 초기 상태에서 3번째와 4번째 셀렉트박스 비활성화
+            adminBranchFacility.disabled = true;
+            adminStore.disabled = true;
+
             if (adminChoice.disabled) {
                 // 읽기 전용인 경우 초기 상태 설정
                 const fixedChoice = adminChoice.value;

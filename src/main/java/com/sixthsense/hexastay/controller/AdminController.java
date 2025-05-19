@@ -164,19 +164,16 @@ public class AdminController {
         }
 
         model.addAttribute("companyList", companyList);
-        
-        AdminDTO formDTO = new AdminDTO();
-        formDTO.setAdminRole(adminRole);
-        formDTO.setReadOnly(isReadOnly);
-        formDTO.setFixedChoice(fixedChoice);
-        formDTO.setFixedCompanyNum(fixedCompanyNum);
-        formDTO.setFixedCompanyName(fixedCompanyName);
-        formDTO.setFixedStoreNum(fixedStoreNum);
-        formDTO.setFixedStoreName(fixedStoreName);
-        formDTO.setFixedParentCompanyNum(fixedParentCompanyNum);
-        formDTO.setFixedParentCompanyName(fixedParentCompanyName);
-        
-        model.addAttribute("adminDTO", formDTO);
+        model.addAttribute("adminRole", adminRole);
+        model.addAttribute("adminDTO", new AdminDTO());
+        model.addAttribute("isReadOnly", isReadOnly);
+        model.addAttribute("fixedChoice", fixedChoice);
+        model.addAttribute("fixedCompanyNum", fixedCompanyNum);
+        model.addAttribute("fixedCompanyName", fixedCompanyName);
+        model.addAttribute("fixedStoreNum", fixedStoreNum);
+        model.addAttribute("fixedStoreName", fixedStoreName);
+        model.addAttribute("fixedParentCompanyNum", fixedParentCompanyNum);
+        model.addAttribute("fixedParentCompanyName", fixedParentCompanyName);
         
         return "admin/insert";
     }
