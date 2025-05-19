@@ -30,10 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -100,13 +97,11 @@ public class AdminController {
             return "redirect:/admin/logout";
         }
 
-        List<CompanyDTO> companyList;
+        List<CompanyDTO> companyList = new ArrayList<>();
         if (adminDTO.getAdminRole().equals("SUPERADMIN")) {
             companyList = companyService.getAllList();
         } else if (adminDTO.getAdminRole().equals("EXEC") || adminDTO.getAdminRole().equals("HEAD")) {
             companyList = companyService.getCompanyAndSubsidiaries(adminDTO.getCompanyNum());
-        } else {
-            companyList = Collections.singletonList(companyService.companyRead(adminDTO.getCompanyNum()));
         }
 
         model.addAttribute("companyList", companyList);
