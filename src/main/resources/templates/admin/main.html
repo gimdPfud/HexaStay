@@ -237,7 +237,6 @@
         </div>
     </div>
     <script>
-        //오늘 내일 날씨 가져오기 및 표시 (현재 시각 근접 예보 포함)
         $(document).ready(function() {
             fetchWeatherData();
         });
@@ -247,19 +246,15 @@
             const yesterday = new Date();
             yesterday.setDate(today.getDate() - 1);
 
-            // 공공데이터포털 단기예보 API의 base_date 결정 로직
-            // 발표 시간(0500) 기준, 현재 시각이 발표 시간 이전이면 전날, 이후면 당일
-            // (API 발표 시간: 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)
             const currentHour = today.getHours();
             const base_date = currentHour < 6 ?
                 `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}` :
                 `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
-            // API 호출에 필요한 정보 설정 (서비스 키, nx, ny, base_time)
             const serviceKey = 'wje5hA%2Bnn3R5RgOMpkRjQoneVn2py4RGqQmFJCCZS2IjYEetSvm7HP%2FngICVZN7%2FB0Mj2ig7Xp2oep7%2B4kcrSQ%3D%3D'; // 실제 본인의 서비스 키로 변경하세요
-            const nx = 37; // 예: 서울시청 근처 nx 값
-            const ny = 126; // 예: 서울시청 근처 ny 값
-            const base_time = '0500'; // 원하는 발표 시간 (데이터 기준 시각, 예: 05시 발표)
+            const nx = 37;
+            const ny = 126;
+            const base_time = '0500';
 
             const apiUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=500&dataType=JSON&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
 
@@ -267,116 +262,91 @@
                 url: apiUrl,
                 type: 'GET',
                 success: function(data) {
-                    // API 응답 결과 코드 확인
+
                     if (data.response.header.resultCode !== '00') {
                         console.error('API 호출 실패:', data.response.header.resultMsg);
-                        // 실패 시 사용자에게 알림 또는 기본값 설정
-                        $('#todayTMP').text('오류'); // 현재 기온 오류 표시
+
+                        $('#todayTMP').text('오류');
                         $('#todayTMX').text('오류');
                         $('#todayTMN').text('오류');
                         $('#tomorrowTMX').text('오류');
                         $('#tomorrowTMN').text('오류');
-                        // 오류 시 기본 아이콘/배경 설정
+
                         setSkyIcon(null, 'today');
                         setPtyIcon(null, 'today');
                         setSkyIcon(null, 'tomorrow');
                         setPtyIcon(null, 'tomorrow');
-                        return; // 데이터 처리 중단
+                        return;
                     }
 
-                    // 필요한 데이터를 저장할 객체 초기화
-                    // currentTMP는 API 데이터 중 현재 시각과 가장 가까운 예보 시각의 TMP
                     let todayForecast = { currentTMP: null, TMX: null, TMN: null, SKY: null, PTY: null };
                     let tomorrowForecast = { TMX: null, TMN: null, SKY: null, PTY: null };
 
-                    // 오늘과 내일 날짜 문자열 생성
                     let todayDateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
                     let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
                     let tomorrowDateStr = `${tomorrow.getFullYear()}${String(tomorrow.getMonth() + 1).padStart(2, '0')}${String(tomorrow.getDate()).padStart(2, '0')}`;
 
-                    // 대표 아이콘 설정을 위한 변수 (첫 번째 값 저장)
                     let tempTodaySky = null;
                     let tempTodayPty = null;
                     let tempTomorrowSky = null;
                     let tempTomorrowPty = null;
 
-
-                    // 현재 시각과 가장 가까운 TMP 값을 찾기 위한 변수 초기화
                     let closestTmp = null;
-                    let minTimeDiff = Infinity; // 최소 시간 차이 (분 단위)
+                    let minTimeDiff = Infinity;
 
                     // 현재 시각 (분 단위) 계산
                     const now = new Date();
                     const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
 
-
-                    // API 응답 데이터를 순회하며 필요한 정보 추출
                     data.response.body.items.item.forEach(item => {
                         const { fcstDate, fcstTime, category, fcstValue } = item;
 
-                        // 오늘 날짜 데이터 처리
                         if (fcstDate === todayDateStr) {
-                            // 오늘 최고 기온 (TMX, 보통 15시 예보)
                             if (category === 'TMX' && fcstTime === '1500') {
                                 todayForecast.TMX = fcstValue;
                             }
-
-                            // 오늘 하늘 상태 (SKY) - 해당 날짜의 첫 번째 SKY 값 사용 (대표값)
                             if (category === 'SKY' && tempTodaySky === null) {
                                 tempTodaySky = fcstValue;
                             }
-                            // 오늘 강수 형태 (PTY) - 해당 날짜의 첫 번째 PTY 값 사용 (대표값)
                             if (category === 'PTY' && tempTodayPty === null) {
                                 tempTodayPty = fcstValue;
                             }
 
-                            // 현재 시각과 가장 가까운 TMP 찾기
                             if (category === 'TMP') {
                                 const fcstHour = parseInt(fcstTime.substring(0, 2));
                                 const fcstMinute = parseInt(fcstTime.substring(2, 4));
                                 const fcstMinutes = fcstHour * 60 + fcstMinute;
                                 const timeDiff = Math.abs(currentTimeMinutes - fcstMinutes);
 
-                                // 현재 시각과 가장 가까운 예보 시각의 TMP를 저장
-                                // 같은 시간 차이면 더 빠른 예보 시각 우선 (선택 사항)
                                 if (timeDiff < minTimeDiff) {
                                     minTimeDiff = timeDiff;
                                     closestTmp = fcstValue;
-                                } // else if (timeDiff === minTimeDiff) { } // 같은 시간 차이 처리 로직 (필요 시 추가)
+                                }
                             }
                         }
 
-                        // 내일 날짜 데이터 처리
                         if (fcstDate === tomorrowDateStr) {
-                            // 내일 최고 기온 (TMX, 보통 15시 예보)
                             if (category === 'TMX' && fcstTime === '1500') {
                                 tomorrowForecast.TMX = fcstValue;
                             }
-                            // 내일 최저 기온 (TMN, 보통 06시 예보)
                             if (category === 'TMN' && fcstTime === '0600') {
                                 tomorrowForecast.TMN = fcstValue;
                             }
-                            // 내일 하늘 상태 (SKY) - 해당 날짜의 첫 번째 SKY 값 사용 (대표값)
                             if (category === 'SKY' && tempTomorrowSky === null) {
                                 tempTomorrowSky = fcstValue;
                             }
-                            // 내일 강수 형태 (PTY) - 해당 날짜의 첫 번째 PTY 값 사용 (대표값)
                             if (category === 'PTY' && tempTomorrowPty === null) {
                                 tempTomorrowPty = fcstValue;
                             }
                         }
                     });
 
-                    // 루프 종료 후 추출된 대표값 할당
                     todayForecast.currentTMP = closestTmp;
                     todayForecast.SKY = tempTodaySky;
                     todayForecast.PTY = tempTodayPty;
                     tomorrowForecast.SKY = tempTomorrowSky;
                     tomorrowForecast.PTY = tempTomorrowPty;
 
-
-                    // 추출된 데이터를 HTML 요소에 표시
-                    // '현재 기온'은 API 예보 데이터 중 가장 가까운 시각의 값임에 유의
                     $('#todayTMP').text(todayForecast.currentTMP !== null ? `${todayForecast.currentTMP}°C` : '정보 없음');
                     $('#todayTMX').text(todayForecast.TMX !== null ? `${todayForecast.TMX}°C` : '정보 없음');
                     $('#todayTMN').text(todayForecast.TMN !== null ? `${todayForecast.TMN}°C` : '정보 없음');
@@ -384,7 +354,7 @@
                     $('#tomorrowTMX').text(tomorrowForecast.TMX !== null ? `${tomorrowForecast.TMX}°C` : '정보 없음');
                     $('#tomorrowTMN').text(tomorrowForecast.TMN !== null ? `${tomorrowForecast.TMN}°C` : '정보 없음');
 
-                    // 날씨 아이콘 설정 - SKY와 PTY를 각각 호출하며 데이터 유무와 상관없이 설정 시도
+
                     setSkyIcon(todayForecast.SKY, 'today');
                     setPtyIcon(todayForecast.PTY, 'today');
 
@@ -394,13 +364,13 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('날씨 데이터를 가져오는 중 오류 발생:', status, error);
-                    // 실패 시 사용자에게 알림 또는 기본값 설정
-                    $('#todayTMP').text('오류'); // 현재 기온 오류 표시
+
+                    $('#todayTMP').text('오류');
                     $('#todayTMX').text('오류');
                     $('#todayTMN').text('오류');
                     $('#tomorrowTMX').text('오류');
                     $('#tomorrowTMN').text('오류');
-                    // 오류 시 기본 아이콘/배경 설정
+
                     setSkyIcon(null, 'today');
                     setPtyIcon(null, 'today');
                     setSkyIcon(null, 'tomorrow');
@@ -409,33 +379,29 @@
             });
         };
 
-        // 하늘 상태에 따른 배경 이미지 설정 함수
-        // skyCode가 null이면 기본 이미지 설정
         function setSkyIcon(skyCode, day) {
             let skyDiv = document.getElementById(`skyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
             if (!skyDiv) {
                 console.error(`Element skyIcon${day.charAt(0).toUpperCase() + day.slice(1)} not found`);
-                return; // 요소를 찾지 못하면 종료
+                return;
             }
 
-            let imageUrl = '/weatherimg/esteregg.png'; // 기본/오류 이미지 경로 (웹 경로)
+            let imageUrl = '';
 
             switch (skyCode) {
-                case '1': imageUrl = '/weatherimg/SKY1.png'; break; // 맑음 (웹 경로)
-                case '3': imageUrl = '/weatherimg/SKY3.png'; break; // 구름많음 (웹 경로)
-                case '4': imageUrl = '/weatherimg/SKY4.png'; break; // 흐림 (웹 경로)
-                default: imageUrl = '/weatherimg/esteregg.png'; break;  // 알 수 없는 코드 또는 null (기본 이미지)
+                case '1': imageUrl = '/weatherimg/SKY1.png'; break;
+                case '3': imageUrl = '/weatherimg/SKY3.png'; break;
+                case '4': imageUrl = '/weatherimg/SKY4.png'; break;
+                default: imageUrl = '/weatherimg/esteregg.png'; break;
             }
 
             skyDiv.style.backgroundImage = `url("${imageUrl}")`;
-            skyDiv.style.backgroundSize = "cover"; // 또는 "100% 100%"
+            skyDiv.style.backgroundSize = "cover";
             skyDiv.style.backgroundRepeat = "no-repeat";
             skyDiv.style.backgroundPosition = "center";
-            skyDiv.style.zIndex = "1"; // 배경이므로 z-index를 낮게 설정
+            skyDiv.style.zIndex = "1";
         }
 
-        // 강수 상태에 따른 이미지 설정 함수 (숨김/표시 로직 제거, PTY 0일 때 PTY0.png 설정)
-        // ptyCode가 null이면 기본 이미지 설정
         function setPtyIcon(ptyCode, day) {
             let ptyImgElement = document.getElementById(`ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
 
@@ -444,32 +410,29 @@
                 return;
             }
 
-            let ptyImageUrl = '/weatherimg/esteregg.webp'; // 기본/오류 이미지 (웹 경로)
+            let ptyImageUrl = '';
 
-            // PTY 코드를 문자열로 비교
             switch (ptyCode) {
-                case '0': ptyImageUrl = '/weatherimg/PTY0.png'; break; // 강수 없음 (PTY0.png 표시)
+                case '0': ptyImageUrl = '/weatherimg/PTY0.png'; break;
                 case '1': ptyImageUrl = '/weatherimg/PTY1.png'; break; // 비
                 case '2': ptyImageUrl = '/weatherimg/PTY2.png'; break; // 비/눈
                 case '3': ptyImageUrl = '/weatherimg/PTY3.png'; break; // 눈
                 case '4': ptyImageUrl = '/weatherimg/PTY4.png'; break; // 소나기
-                default: ptyImageUrl = '/weatherimg/esteregg.webp'; break;  // 알 수 없는 코드 또는 null (기본 이미지)
+                default: ptyImageUrl = '/weatherimg/esteregg.webp'; break;
             }
 
-            ptyImgElement.src = ptyImageUrl; // 무조건 src 설정
-            ptyImgElement.style.display = 'block'; // 무조건 보이도록 설정 (CSS에서 display: none;을 오버라이드)
+            ptyImgElement.src = ptyImageUrl;
+            ptyImgElement.style.display = 'block';
 
 
-            // PTY 이미지 요소의 스타일 (필요에 따라 조정)
-            // icon-area에 position: relative; 가 있어야 absolute가 제대로 동작합니다.
-            ptyImgElement.style.width = '70px'; // 크기 명시
-            ptyImgElement.style.height = '70px'; // 크기 명시
+            ptyImgElement.style.width = '70px';
+            ptyImgElement.style.height = '70px';
             ptyImgElement.style.position = 'absolute';
             ptyImgElement.style.top = '50%';
             ptyImgElement.style.left = '50%';
-            ptyImgElement.style.transform = 'translate(-50%, -50%)'; // 중앙 정렬
-            ptyImgElement.style.zIndex = '10'; // PTY 이미지가 배경 위에 오도록
-            ptyImgElement.style.objectFit = 'contain'; // 이미지 비율 유지 방식
+            ptyImgElement.style.transform = 'translate(-50%, -50%)';
+            ptyImgElement.style.zIndex = '10';
+            ptyImgElement.style.objectFit = 'contain';
         }
 
     </script>
