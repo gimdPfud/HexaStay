@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface CompanyService {
 
@@ -39,5 +40,7 @@ public interface CompanyService {
     List<CompanyDTO> getCompanyAndSubsidiaries(Long companyNum);
 
     List<CompanyDTO> getAllList();
+
+    List<CompanyDTO> getCompaniesByParentAndType(Long parentCompanyNum, String companyType);
 
 }

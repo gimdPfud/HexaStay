@@ -1,20 +1,25 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.AdminInsertDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
+import com.sixthsense.hexastay.entity.Company;
+import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.EmailService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +35,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,6 +58,7 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
     private final HttpServletRequest request;
     private final EmailService emailService;
+    private final ModelMapper modelMapper;
 
 
     // 시큐리티 체크
@@ -92,36 +105,97 @@ public class AdminController {
         }
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
-
         if (adminDTO == null) {
             return "redirect:/admin/logout";
         }
 
+        // 권한에 따른 소속 선택 로직
+        String adminRole = adminDTO.getAdminRole();
         List<CompanyDTO> companyList = new ArrayList<>();
-        if (adminDTO.getAdminRole().equals("SUPERADMIN")) {
+        boolean isReadOnly = false;
+        String fixedChoice = null;
+        Long fixedCompanyNum = null;
+        String fixedCompanyName = null;
+        Long fixedStoreNum = null;
+        String fixedStoreName = null;
+        Long fixedParentCompanyNum = null;
+        String fixedParentCompanyName = null;
+
+        if (adminRole.equals("SUPERADMIN")) {
+            // 슈퍼어드민은 모든 리스트 접근 가능
             companyList = companyService.getAllList();
-        } else if (adminDTO.getAdminRole().equals("EXEC") || adminDTO.getAdminRole().equals("HEAD")) {
-            companyList = companyService.getCompanyAndSubsidiaries(adminDTO.getCompanyNum());
+            // 본사 리스트만 가져오기
+            List<CompanyDTO> centerList = companyList.stream()
+                .filter(company -> company.getCompanyType().equals("center"))
+                .collect(Collectors.toList());
+            model.addAttribute("centerList", centerList);
+        } else if (adminRole.equals("EXEC")) {
+            // 본사 최고관리자는 본인의 CompanyNum만 표시
+            companyList = Collections.singletonList(companyService.companyRead(adminDTO.getCompanyNum()));
+        } else if (adminRole.equals("HEAD") || adminRole.equals("CREW")) {
+            // HEAD, CREW는 본사 고정 + 본인 companyName
+            isReadOnly = true;
+            fixedChoice = "본사";
+            fixedCompanyNum = adminDTO.getCompanyNum();
+            fixedCompanyName = adminDTO.getCompanyName();
+        } else if (Arrays.asList("GM", "SV", "AGENT", "PARTNER").contains(adminRole)) {
+            // 지점/외부시설 관리자
+            isReadOnly = true;
+            CompanyDTO company = companyService.companyRead(adminDTO.getCompanyNum());
+            if (company.getCompanyType().equals("branch")) {
+                fixedChoice = "지점";
+            } else if (company.getCompanyType().equals("facility")) {
+                fixedChoice = "외부시설";
+            }
+            fixedCompanyNum = adminDTO.getCompanyNum();
+            fixedCompanyName = company.getCompanyName();
+            fixedParentCompanyNum = company.getCompanyParent();
+            fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
+        } else if (adminDTO.getStoreNum() != null) {
+            // 스토어 직원
+            isReadOnly = true;
+            fixedChoice = "스토어";
+            Store store = storeRepository.findById(adminDTO.getStoreNum())
+                .orElseThrow(() -> new EntityNotFoundException("Store not found"));
+            fixedStoreNum = store.getStoreNum();
+            fixedStoreName = store.getStoreName();
+            fixedCompanyNum = store.getCompany().getCompanyNum();
+            fixedCompanyName = store.getCompany().getCompanyName();
+            fixedParentCompanyNum = store.getCompany().getCompanyParent();
+            fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
         }
 
-        model.addAttribute("companyList", companyList);
-        model.addAttribute("adminRole", adminDTO.getAdminRole());
-        model.addAttribute("adminDTO", new AdminDTO());
+        AdminInsertDTO insertDTO = new AdminInsertDTO();
+        insertDTO.setCompanyList(companyList);
+        insertDTO.setAdminRole(adminRole);
+        insertDTO.setAdminDTO(new AdminDTO());
+        insertDTO.setReadOnly(isReadOnly);
+        insertDTO.setFixedChoice(fixedChoice);
+        insertDTO.setFixedCompanyNum(fixedCompanyNum);
+        insertDTO.setFixedCompanyName(fixedCompanyName);
+        insertDTO.setFixedStoreNum(fixedStoreNum);
+        insertDTO.setFixedStoreName(fixedStoreName);
+        insertDTO.setFixedParentCompanyNum(fixedParentCompanyNum);
+        insertDTO.setFixedParentCompanyName(fixedParentCompanyName);
+
+        model.addAttribute("insertDTO", insertDTO);
+        
         return "admin/insert";
     }
 
     @ResponseBody
     @GetMapping("/insertselect")
-    public List<CompanyDTO> adminInsertSearch (Model model,
+    public List<CompanyDTO> adminInsertSearch(Model model,
                                             @RequestParam("centerNum") Long centerNum,
                                             @RequestParam("adminChoice") String adminChoice) {
-        return adminService.insertSelectList(centerNum, adminChoice);
+        String companyType = adminChoice.equals("지점") ? "branch" : "facility";
+        return companyService.getCompaniesByParentAndType(centerNum, companyType);
     }
 
     @ResponseBody
     @GetMapping("/insertstore")
-    public List<StoreDTO> adminInsertStore (Model model,
-                                           @RequestParam("branchFacilityNum") Long branchFacilityNum) {
+    public List<StoreDTO> adminInsertStore(Model model,
+                                         @RequestParam("branchFacilityNum") Long branchFacilityNum) {
         return adminService.insertStoreList(branchFacilityNum);
     }
 
@@ -154,7 +228,6 @@ public class AdminController {
             return "redirect:/admin/list";
 
         } catch (IOException e) {
-
             log.error("회원 가입 중, 오류 발생", e);
             model.addAttribute("error", "회원 가입 중, 오류가 발생했습니다.");
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");

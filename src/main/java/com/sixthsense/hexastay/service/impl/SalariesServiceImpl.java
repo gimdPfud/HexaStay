@@ -14,7 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional
 public class SalariesServiceImpl implements SalariesService {
 
     private final SalariesRepository salariesRepository;
@@ -37,14 +42,15 @@ public class SalariesServiceImpl implements SalariesService {
         Admin admin = adminRepository.findByAdminEmail(email);
         List<Admin> adminList = new ArrayList<>();
 
-        if (admin.getCompany().getCompanyNum() != null) {
+        if (admin.getCompany() != null && admin.getCompany().getCompanyNum() != null) {
             Long companyNum = admin.getCompany().getCompanyNum();
             adminList.addAll(adminRepository.findBySalariesCompany(companyNum));
-
-        } else if (admin.getStore().getStoreNum() != null) {
+        } else if (admin.getStore() != null && admin.getStore().getStoreNum() != null) {
             Long storeNum = admin.getStore().getStoreNum();
-            adminList.addAll(adminRepository.findBySalariesStore(storeNum));
+            Page<Admin> storeAdmins = adminRepository.findByStore_StoreNum(storeNum, pageable);
+            adminList.addAll(storeAdmins.getContent());
         }
+        
         Page<Admin> adminPageList = new PageImpl<>(adminList, pageable, adminList.size());
         return adminPageList.map(asi->modelMapper.map(asi, AdminDTO.class));
     }
@@ -58,9 +64,9 @@ public class SalariesServiceImpl implements SalariesService {
         Long companyNum = null;
         Long storeNum = null;
 
-        if (admin.getCompany().getCompanyNum() != null) {
+        if (admin.getCompany() != null && admin.getCompany().getCompanyNum() != null) {
             companyNum = admin.getCompany().getCompanyNum();
-        } else if (admin.getStore().getStoreNum() != null) {
+        } else if (admin.getStore() != null && admin.getStore().getStoreNum() != null) {
             storeNum = admin.getStore().getStoreNum();
         }
 
@@ -97,24 +103,24 @@ public class SalariesServiceImpl implements SalariesService {
         Long companyNum = null;
         Long storeNum = null;
 
-        if (admin.getCompany().getCompanyNum() != null) {
+        if (admin.getCompany() != null && admin.getCompany().getCompanyNum() != null) {
             companyNum = admin.getCompany().getCompanyNum();
-        } else if (admin.getStore().getStoreNum() != null) {
+        } else if (admin.getStore() != null && admin.getStore().getStoreNum() != null) {
             storeNum = admin.getStore().getStoreNum();
         }
 
         List<Salaries> oriSalariesList = new ArrayList<>();
 
         // 본사 계열
-        if (role.equals("exec") || role.equals("head") || role.equals("crew")) {
+        if (role.equals("EXEC") || role.equals("HEAD") || role.equals("CREW")) {
             oriSalariesList = salariesRepository.findHeadOfficeSalaries(email, role, companyNum);
         }
         // 지사/지점 계열
-        else if (role.equals("gm") || role.equals("sv") || role.equals("agent") || role.equals("partner")) {
+        else if (role.equals("GM") || role.equals("SV") || role.equals("AGENT") || role.equals("PARTNER")) {
             oriSalariesList = salariesRepository.findBranchSalaries(email, role, companyNum);
         }
         // 스토어 계열
-        else if (role.equals("mgr") || role.equals("submgr") || role.equals("staff")) {
+        else if (role.equals("MGR") || role.equals("SUBMGR") || role.equals("STAFF")) {
             oriSalariesList = salariesRepository.findStoreSalaries(email, role, storeNum);
         }
 
@@ -158,6 +164,116 @@ public class SalariesServiceImpl implements SalariesService {
         Admin admin = adminRepository.findByAdminNum(salariesDTO.getAdminDTO().getAdminNum());
         salaries.setAdmin(admin);
         
+        salaries.setSalBase(salariesDTO.getSalBase());
+        salaries.setSalariesBonus(salariesDTO.getSalariesBonus());
+        salaries.setSalariesDeduction(salariesDTO.getSalariesDeduction());
+        salaries.setSalariesTotal(salariesDTO.getSalariesTotal());
+        salaries.setSalDate(salariesDTO.getSalDate());
+        
         salariesRepository.save(salaries);
+    }
+
+    // 스토어 관련 메서드 구현
+    @Override
+    public Page<SalariesDTO> getStoreSalariesList(Long storeNum, Pageable pageable) {
+        Page<Salaries> salariesList = salariesRepository.findByStore_StoreNum(storeNum, pageable);
+        return salariesList.map(salaries -> {
+            SalariesDTO dto = modelMapper.map(salaries, SalariesDTO.class);
+            if (salaries.getAdmin() != null) {
+                dto.setAdminName(salaries.getAdmin().getAdminName());
+            }
+            return dto;
+        });
+    }
+
+    @Override
+    public Page<SalariesDTO> getStoreSalariesListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        
+        Page<Salaries> salariesList = salariesRepository.findByStore_StoreNumAndSalDateBetweenWithPage(
+            storeNum, startDateTime, endDateTime, pageable);
+            
+        return salariesList.map(salaries -> {
+            SalariesDTO dto = modelMapper.map(salaries, SalariesDTO.class);
+            if (salaries.getAdmin() != null) {
+                dto.setAdminName(salaries.getAdmin().getAdminName());
+            }
+            return dto;
+        });
+    }
+
+    @Override
+    public List<SalariesDTO> getAllStoreSalariesList(Long storeNum) {
+        List<Salaries> salariesList = salariesRepository.findByStore_StoreNum(storeNum);
+        return salariesList.stream().map(salaries -> {
+            SalariesDTO dto = modelMapper.map(salaries, SalariesDTO.class);
+            if (salaries.getAdmin() != null) {
+                dto.setAdminName(salaries.getAdmin().getAdminName());
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SalariesDTO> getAllStoreSalariesListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        
+        List<Salaries> salariesList = salariesRepository.findByStore_StoreNumAndSalDateBetween(
+            storeNum, startDateTime, endDateTime);
+            
+        return salariesList.stream().map(salaries -> {
+            SalariesDTO dto = modelMapper.map(salaries, SalariesDTO.class);
+            if (salaries.getAdmin() != null) {
+                dto.setAdminName(salaries.getAdmin().getAdminName());
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void registerStoreSalaries(SalariesDTO salariesDTO) {
+        Salaries salaries = modelMapper.map(salariesDTO, Salaries.class);
+        if (salariesDTO.getAdminNum() != null) {
+            Admin admin = adminRepository.findById(salariesDTO.getAdminNum())
+                .orElseThrow(() -> new IllegalArgumentException("Admin not found"));
+            salaries.setAdmin(admin);
+        }
+        salariesRepository.save(salaries);
+    }
+
+    @Override
+    public SalariesDTO getStoreSalaries(Long salariesNum) {
+        Salaries salaries = salariesRepository.findById(salariesNum)
+            .orElseThrow(() -> new IllegalArgumentException("Salaries not found"));
+        SalariesDTO dto = modelMapper.map(salaries, SalariesDTO.class);
+        if (salaries.getAdmin() != null) {
+            dto.setAdminName(salaries.getAdmin().getAdminName());
+        }
+        return dto;
+    }
+
+    @Override
+    public void modifyStoreSalaries(SalariesDTO salariesDTO) {
+        Salaries salaries = salariesRepository.findById(salariesDTO.getSalariesNum())
+            .orElseThrow(() -> new IllegalArgumentException("Salaries not found"));
+        
+        salaries.setSalBase(salariesDTO.getSalBase());
+        salaries.setSalariesBonus(salariesDTO.getSalariesBonus());
+        salaries.setSalariesDeduction(salariesDTO.getSalariesDeduction());
+        salaries.setSalariesTotal(salariesDTO.getSalariesTotal());
+        salaries.setSalDate(salariesDTO.getSalDate());
+        
+        if (salariesDTO.getAdminNum() != null) {
+            Admin admin = adminRepository.findById(salariesDTO.getAdminNum())
+                .orElseThrow(() -> new IllegalArgumentException("Admin not found"));
+            salaries.setAdmin(admin);
+        }
+    }
+
+    @Override
+    public void removeStoreSalaries(Long salariesNum) {
+        salariesRepository.deleteById(salariesNum);
     }
 }

@@ -1,7 +1,8 @@
 package com.sixthsense.hexastay.controller;
 
-import com.sixthsense.hexastay.dto.OrderstoreDTO;
 import com.sixthsense.hexastay.dto.RoomDTO;
+import com.sixthsense.hexastay.dto.SettleDTO;
+import com.sixthsense.hexastay.entity.Admin;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.HotelRoomRepository;
 import com.sixthsense.hexastay.service.*;
@@ -100,25 +101,51 @@ public class SettleController {
         return ResponseEntity.ok(allData);
     }
 
-    @GetMapping("/chartstore")
-    public String chartStore(Principal principal,
-                             Model model,
-                             Pageable pageable,
-                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
-    {
-        Long storeNum = adminRepository.findByAdminEmail(principal.getName()).getStore().getStoreNum();
-        Page<OrderstoreDTO> orderstoreDTOList;
-
-        if (startDate != null && endDate != null) {
-            // 날짜 범위로 조회
-            orderstoreDTOList = settleService.getSettleStoreListByDateRange(storeNum, startDate, endDate, pageable);
-        } else {
-            // 전체 조회
-            orderstoreDTOList = settleService.getSettleStoreList(storeNum, pageable);
+    @GetMapping("/storechart")
+    public String storeMy(Model model, Principal principal) {
+        String email = principal.getName();
+        Admin admin = adminRepository.findByAdminEmail(email);
+        
+        if (admin.getStore() == null) {
+            throw new RuntimeException("스토어 정보가 없습니다.");
         }
+        
+        Long storeNum = admin.getStore().getStoreNum();
+        List<SettleDTO> settleList = settleService.getStoreSettleList(storeNum);
 
-        model.addAttribute("storeDTOList", orderstoreDTOList);
-        return "settle/chartstore";
+        Map<String, Long> statistics = new HashMap<>();
+        long totalSales = 0;
+        long totalCost = 0;
+        long totalProfit = 0;
+        
+        for (SettleDTO settle : settleList) {
+            totalSales += settle.getSettleSales();
+            totalCost += settle.getSettleCost();
+            totalProfit += settle.getSettleProfit();
+        }
+        
+        statistics.put("totalSales", totalSales);
+        statistics.put("totalCost", totalCost);
+        statistics.put("totalProfit", totalProfit);
+        
+        model.addAttribute("settleList", settleList);
+        model.addAttribute("statistics", statistics);
+        return "settle/storechart";
+    }
+
+    @GetMapping("/storechart/data")
+    @ResponseBody
+    public List<SettleDTO> getStoreSettleData(Principal principal,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        String email = principal.getName();
+        Admin admin = adminRepository.findByAdminEmail(email);
+        
+        if (admin.getStore() == null) {
+            throw new RuntimeException("스토어 정보가 없습니다.");
+        }
+        
+        Long storeNum = admin.getStore().getStoreNum();
+        return settleService.getStoreSettleList(storeNum);
     }
 }

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>재무정산</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        .dashboard-container {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1D6F42;
+            margin: 8px 0;
+        }
+
+        .stat-card .label {
+            color: #6c757d;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .excel-btn {
+            background-color: #1D6F42;
+            color: white;
+            border: none;
+            height: 36px;
+            padding: 0 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .excel-btn:hover {
+            background-color: #145a35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1D6F42;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .date-range-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .date-range-form input[type="date"] {
+            width: 140px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .date-range-form button {
+            height: 36px;
+            padding: 0 15px;
+            border-radius: 6px;
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        table th {
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+
+        table td {
+            padding: 8px;
+            font-size: 0.8rem !important;
+        }
+
+        table td input {
+            font-size: 0.8rem !important;
+            padding: 4px;
+        }
+
+        h5 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body style="background-color: #f8f9fa;">
+<div layout:fragment="content">
+    <div class="container mt-4 w-100 bg-light">
+        <div class="container-fluid">재무정산산</h2>
+
+            <!-- 필터 섹션 -->
+            <div class="card mb-2">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex flex-column gap-2">
+                            <!-- 날짜 조회 -->
+                            <div class="d-flex align-items-center gap-3 justify-content-start">
+                                <input type="date" id="startDate" class="form-control" style="width: 180px;">
+                                <span>~</span>
+                                <input type="date" id="endDate" class="form-control" style="width: 180px;">
+                                <button id="dateSearchBtn" class="btn btn-primary">날짜로 조회</button>
+                                <button id="resetDateBtn" class="btn btn-secondary">전체 조회</button>
+                                <button type="button" id="excelDownloadBtn" class="btn excel-btn">
+                                    <i class="bi bi-file-earmark-excel"></i> 엑셀 다운로드
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상세 데이터 테이블 -->
+            <div class="card mb-3">
+                <h5 class="mb-2">상세 정산 내역</h5>
+                <div class="table-container">
+                    <table class="table table-bordered text-company mb-0 text-center">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 12%">주문일자</th>
+                            <th style="width: 15%">주문자</th>
+                            <th style="width: 15%">메뉴</th>
+                            <th style="width: 10%">수량</th>
+                            <th style="width: 10%">단가</th>
+                            <th style="width: 10%">매출 금액</th>
+                            <th style="width: 10%">수수료</th>
+                            <th style="width: 10%" class="text-success">최종 정산 금액</th>
+                        </tr>
+                        </thead>
+                        <tbody class="text-center">
+                        <tr th:each="order : ${settleList}">
+                            <td class="text-center"><input type="text" class="form-control" th:value="${#temporals.format(order.settleDate, 'yyyy-MM-dd HH:mm:ss')}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${order.memberDTO.memberName}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${order.menuNames}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${order.quantity}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control" th:value="${#numbers.formatInteger(order.unitPrice, 0, 'COMMA') + '원'}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control sales" th:value="${#numbers.formatInteger(order.settleSales, 0, 'COMMA') + '원'}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control commission" th:value="${#numbers.formatInteger(order.settleSales * 0.05, 0, 'COMMA') + '원'}" readonly></td>
+                            <td class="text-center"><input type="text" class="form-control final" th:value="${#numbers.formatInteger(order.settleSales * 0.95, 0, 'COMMA') + '원'}" readonly></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 주요 지표 카드 -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">총 매출액</div>
+                        <div class="value" id="totalSales">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">총 정산액</div>
+                        <div class="value" id="totalSettlement">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">평균 주문 금액</div>
+                        <div class="value" id="averagePrice">0원</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="label">주문 건수</div>
+                        <div class="value" id="totalOrders">0건</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 차트 섹션 -->
+            <div class="row">
+                <!-- 매출 & 정산 추이 -->
+                <div class="col-lg-8 mb-3">
+                    <div class="card">
+                        <h5>매출 & 정산 추이</h5>
+                        <div class="chart-container">
+                            <canvas id="mixedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 정산 비율 분석 -->
+                <div class="col-lg-4 mb-3">
+                    <div class="card">
+                        <h5>정산 비율 분석</h5>
+                        <div class="chart-container">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 메뉴별 매출 분석 -->
+                <div class="col-lg-6 mb-3">
+                    <div class="card">
+                        <h5>메뉴별 매출 분석</h5>
+                        <div class="chart-container">
+                            <canvas id="menuSalesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- 주간 성장률 -->
+                <div class="col-lg-6 mb-3">
+                    <div class="card">
+                        <h5>주간 성장률</h5>
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let allData = []; // 모든 데이터를 저장할 배열
+            let filteredData = []; // 필터링된 데이터를 저장할 배열
+            let isLoading = false;
+
+            // 현재 날짜 기준으로 당월 1일과 당일 설정
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            // 날짜 입력 필드에 기본값 설정
+            document.getElementById('startDate').value = formatDateForInput(firstDayOfMonth);
+            document.getElementById('endDate').value = formatDateForInput(today);
+
+            let startDate = document.getElementById('startDate').value;
+            let endDate = document.getElementById('endDate').value;
+
+            // 날짜 포맷 함수 (YYYY-MM-DD)
+            function formatDateForInput(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // 초기 데이터 로드
+            loadData();
+
+            // 데이터 로드 함수
+            async function loadData() {
+                const loadingOverlay = document.querySelector('.loading-overlay');
+                loadingOverlay.style.display = 'flex';
+
+                try {
+                    const response = await fetch(`/settle/storechart/data?startDate=${startDate}&endDate=${endDate}`);
+                    if (!response.ok) {
+                        throw new Error('데이터 로드 실패');
+                    }
+                    const data = await response.json();
+                    if (!Array.isArray(data)) {
+                        throw new Error('잘못된 데이터 형식');
+                    }
+                    allData = data;
+                    filteredData = [...allData];
+                    updateTable();
+                    updateCharts();
+                    updateStats();
+                } catch (error) {
+                    console.error('데이터 로드 중 오류 발생:', error);
+                    alert('데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+
+            // 테이블 업데이트 함수
+            function updateTable() {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                filteredData.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="text-center"><input type="text" class="form-control" value="${formatDate(order.settleDate)}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control" value="${order.memberDTO?.memberName || ''}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control" value="${order.menuNames || ''}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control" value="${order.quantity || 0}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control" value="${formatCurrency(order.unitPrice)}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control sales" value="${formatCurrency(order.settleSales)}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control commission" value="${formatCurrency(order.settleSales * 0.05)}" readonly></td>
+                        <td class="text-center"><input type="text" class="form-control final" value="${formatCurrency(order.settleSales * 0.95)}" readonly></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // 통계 업데이트 함수
+            function updateStats() {
+                const totalSales = filteredData.reduce((sum, order) => sum + (order.settleSales || 0), 0);
+                const totalSettlement = filteredData.reduce((sum, order) => sum + ((order.settleSales || 0) * 0.95), 0);
+                const averageOrder = filteredData.length > 0 ? totalSales / filteredData.length : 0;
+                const totalOrders = filteredData.length;
+
+                document.getElementById('totalSales').textContent = formatCurrency(totalSales);
+                document.getElementById('totalSettlement').textContent = formatCurrency(totalSettlement);
+                document.getElementById('averagePrice').textContent = formatCurrency(averageOrder);
+                document.getElementById('totalOrders').textContent = `${totalOrders}건`;
+            }
+
+            // 차트 업데이트 함수
+            function updateCharts() {
+                updateMixedChart();
+                updateDonutChart();
+                updateMenuSalesChart();
+                updateGrowthChart();
+            }
+
+            // 혼합형 차트 업데이트
+            function updateMixedChart() {
+                const ctx = document.getElementById('mixedChart').getContext('2d');
+                const data = prepareChartData();
+
+                if (window.mixedChart instanceof Chart) {
+                    window.mixedChart.destroy();
+                }
+
+                window.mixedChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                type: 'bar',
+                                label: '매출 금액',
+                                backgroundColor: chartColors.primary,
+                                data: data.sales,
+                                borderRadius: 8,
+                                borderWidth: 0
+                            },
+                            {
+                                type: 'line',
+                                label: '최종 정산 금액',
+                                borderColor: chartColors.quaternary,
+                                borderWidth: 3,
+                                fill: false,
+                                data: data.settlement,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: value => formatCurrency(value)
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += formatCurrency(context.parsed.y);
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 도넛 차트 업데이트
+            function updateDonutChart() {
+                const ctx = document.getElementById('donutChart').getContext('2d');
+                const data = prepareDonutData();
+
+                if (window.donutChart instanceof Chart) {
+                    window.donutChart.destroy();
+                }
+
+                window.donutChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['정산금액', '수수료'],
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                'rgba(29, 111, 66, 0.7)',
+                                'rgba(255, 193, 7, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(29, 111, 66, 1)',
+                                'rgba(255, 193, 7, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => {
+                                        const value = context.parsed;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 메뉴별 매출 차트 업데이트
+            function updateMenuSalesChart() {
+                const ctx = document.getElementById('menuSalesChart').getContext('2d');
+                const data = prepareMenuSalesData();
+                const colors = Object.values(chartColors);
+
+                if (window.menuSalesChart instanceof Chart) {
+                    window.menuSalesChart.destroy();
+                }
+
+                window.menuSalesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: '메뉴별 매출',
+                            data: data.sales,
+                            backgroundColor: data.labels.map((_, index) => colors[index % colors.length]),
+                            borderRadius: 8,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: value => formatCurrency(value)
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.parsed.y)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 성장률 차트 업데이트
+            function updateGrowthChart() {
+                const ctx = document.getElementById('growthChart').getContext('2d');
+                const data = prepareGrowthData();
+
+                if (window.growthChart instanceof Chart) {
+                    window.growthChart.destroy();
+                }
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, chartColors.tertiary);
+                gradient.addColorStop(1, 'rgba(54, 162, 235, 0.1)');
+
+                window.growthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: '매출 성장률',
+                            data: data.growth,
+                            borderColor: chartColors.tertiary,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: value => `${value}%`
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => `${context.parsed.y}%`
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 차트 데이터 준비 함수들
+            function prepareChartData() {
+                const groupedData = groupDataByDate(filteredData);
+                return {
+                    labels: Object.keys(groupedData),
+                    sales: Object.values(groupedData).map(data => data.sales),
+                    settlement: Object.values(groupedData).map(data => data.settlement)
+                };
+            }
+
+            function prepareDonutData() {
+                const totalSales = filteredData.reduce((sum, order) => sum + order.settleSales, 0);
+                const totalCommission = totalSales * 0.05;
+                const totalSettlement = totalSales - totalCommission;
+
+                return [totalSettlement, totalCommission];
+            }
+
+            function prepareMenuSalesData() {
+                const menuSales = {};
+                filteredData.forEach(order => {
+                    const menuName = order.menuNames;
+                    if (!menuSales[menuName]) {
+                        menuSales[menuName] = 0;
+                    }
+                    menuSales[menuName] += order.settleSales;
+                });
+
+                return {
+                    labels: Object.keys(menuSales),
+                    sales: Object.values(menuSales)
+                };
+            }
+
+            function prepareGrowthData() {
+                const weeklyData = groupDataByWeek(filteredData);
+                const weeks = Object.keys(weeklyData).sort();
+                const growth = [];
+
+                if (weeks.length < 2) {
+                    return {
+                        labels: weeks,
+                        growth: weeks.map(() => 0)
+                    };
+                }
+
+                growth.push(0);
+
+                for (let i = 1; i < weeks.length; i++) {
+                    const currentWeek = weeklyData[weeks[i]];
+                    const previousWeek = weeklyData[weeks[i - 1]];
+                    const growthRate = previousWeek === 0 ? 0 : ((currentWeek - previousWeek) / previousWeek) * 100;
+                    growth.push(parseFloat(growthRate.toFixed(1)));
+                }
+
+                return {
+                    labels: weeks,
+                    growth: growth
+                };
+            }
+
+            function groupDataByDate(data) {
+                const grouped = {};
+                data.forEach(order => {
+                    const date = formatDate(order.settleDate).split(' ')[0];
+                    if (!grouped[date]) {
+                        grouped[date] = {
+                            sales: 0,
+                            settlement: 0
+                        };
+                    }
+                    grouped[date].sales += order.settleSales;
+                    grouped[date].settlement += order.settleSales * 0.95;
+                });
+                return grouped;
+            }
+
+            function groupDataByWeek(data) {
+                const grouped = {};
+                data.forEach(order => {
+                    const date = new Date(order.settleDate);
+                    const weekKey = getWeekKey(date);
+                    if (!grouped[weekKey]) {
+                        grouped[weekKey] = 0;
+                    }
+                    grouped[weekKey] += order.settleSales;
+                });
+                return grouped;
+            }
+
+            function getWeekKey(date) {
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const day = date.getDate();
+                const week = Math.ceil((day + new Date(year, month, 1).getDay()) / 7);
+                return `${year}-${String(month + 1).padStart(2, '0')}-W${week}`;
+            }
+
+            // 유틸리티 함수들
+            function formatDate(dateStr) {
+                const date = new Date(dateStr);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hour = String(date.getHours()).padStart(2, '0');
+                const min = String(date.getMinutes()).padStart(2, '0');
+                const sec = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
+            }
+ 
+            function formatCurrency(value) {
+                return (value ? Math.round(value) : 0).toLocaleString('ko-KR') + '원';
+            }
+
+            // 이벤트 리스너
+            document.getElementById('dateSearchBtn').addEventListener('click', () => {
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+                loadData();
+            });
+
+            document.getElementById('resetDateBtn').addEventListener('click', () => {
+                document.getElementById('startDate').value = formatDateForInput(firstDayOfMonth);
+                document.getElementById('endDate').value = formatDateForInput(today);
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+                loadData();
+            });
+
+            document.getElementById('excelDownloadBtn').addEventListener('click', () => {
+                const loadingOverlay = document.querySelector('.loading-overlay');
+                loadingOverlay.style.display = 'flex';
+
+                try {
+                    const data = [];
+                    const headers = [];
+                    document.querySelectorAll('thead th').forEach(th => headers.push(th.innerText));
+                    data.push(headers);
+
+                    filteredData.forEach(order => {
+                        const rowData = [
+                            formatDate(order.settleDate),
+                            order.memberDTO?.memberName || '',
+                            order.menuNames || '',
+                            order.quantity || 0,
+                            formatCurrency(order.unitPrice),
+                            formatCurrency(order.settleSales),
+                            formatCurrency(order.settleSales * 0.05),
+                            formatCurrency(order.settleSales * 0.95)
+                        ];
+                        data.push(rowData);
+                    });
+
+                    const worksheet = XLSX.utils.aoa_to_sheet(data);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, '스토어 정산 데이터');
+
+                    const fileName = `스토어_정산데이터_${formatDateForInput(new Date())}.xlsx`;
+                    XLSX.writeFile(workbook, fileName);
+                } catch (error) {
+                    console.error('엑셀 다운로드 중 오류 발생:', error);
+                    alert('엑셀 다운로드 중 오류가 발생했습니다.');
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            });
+
+            // 차트 색상 설정
+            const chartColors = {
+                primary: 'rgba(29, 111, 66, 0.7)',    // 진한 녹색
+                secondary: 'rgba(255, 193, 7, 0.7)',  // 노란색
+                tertiary: 'rgba(54, 162, 235, 0.7)',  // 파란색
+                quaternary: 'rgba(255, 99, 132, 0.7)', // 분홍색
+                quinary: 'rgba(75, 192, 192, 0.7)',   // 청록색
+                senary: 'rgba(153, 102, 255, 0.7)',   // 보라색
+                septenary: 'rgba(255, 159, 64, 0.7)',  // 주황색
+                octonary: 'rgba(201, 203, 207, 0.7)'  // 회색
+            };
+        });
+    </script>
+</div>
+</body>
+</html>

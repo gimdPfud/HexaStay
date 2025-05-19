@@ -54,13 +54,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     List<Company> findByCompanyParent(Long companyParent);
     List<Company> findByCompanyNum(Long companyNum);
 
-
     //슈퍼어드민용
     @Query("SELECT c FROM Company c " +
             "WHERE (:choice IS NULL OR c.companyType = :choice)")
     Page<Company> findAllIgnoringCompanyNum(@Param("choice") String choice,
                                             Pageable pageable);
 
-
-
+    List<Company> findByCompanyParentAndCompanyType(Long companyParent, String companyType);
 }

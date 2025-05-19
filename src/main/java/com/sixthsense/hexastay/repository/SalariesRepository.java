@@ -1,10 +1,13 @@
 package com.sixthsense.hexastay.repository;
 
 import com.sixthsense.hexastay.entity.Salaries;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SalariesRepository extends JpaRepository <Salaries, Long> {
@@ -48,5 +51,25 @@ public interface SalariesRepository extends JpaRepository <Salaries, Long> {
     List<Salaries> findStoreSalaries(@Param("email") String email,
                                      @Param("role") String role,
                                      @Param("storeNum") Long storeNum);
+
+    // 스토어 관련 메서드
+    Page<Salaries> findByStore_StoreNum(Long storeNum, Pageable pageable);
+    
+    @Query("SELECT s FROM Salaries s WHERE s.store.storeNum = :storeNum AND s.salDate BETWEEN :startDate AND :endDate")
+    Page<Salaries> findByStore_StoreNumAndSalDateBetweenWithPage(
+            @Param("storeNum") Long storeNum,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            Pageable pageable
+    );
+    
+    List<Salaries> findByStore_StoreNum(Long storeNum);
+    
+    @Query("SELECT s FROM Salaries s WHERE s.store.storeNum = :storeNum AND s.salDate BETWEEN :startDate AND :endDate")
+    List<Salaries> findByStore_StoreNumAndSalDateBetween(
+            @Param("storeNum") Long storeNum,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 }

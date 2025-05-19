@@ -82,7 +82,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long>{
     List<Admin> findBySalariesCompany(@Param("companyNum") Long companyNum);
 
     @Query("SELECT a FROM Admin a WHERE a.store.storeNum = :storeNum AND a.adminRole <> :excludedRole")
-    List<Admin> findBySalariesStore(@Param("storeNum") Long storeNum);
+    List<Admin> findBySalariesStore(@Param("storeNum") Long storeNum, @Param("excludedRole") String excludedRole);
 
 
     // 사번 생성용

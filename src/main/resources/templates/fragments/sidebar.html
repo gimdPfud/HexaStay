@@ -63,7 +63,8 @@
         <i class="bi bi-bar-chart-line"></i><strong>매출 관리</strong>
     </button>
     <div id="settle" class="submenu">
-        <a href="/settle/chart" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}">- 재무 정산</a>
+        <a href="/settle/chart" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'')')}">- 재무 정산</a>
+        <a href="/settle/storechart" th:if="${#authorization.expression('hasAnyRole(''MGR'')')}">- 재무 정산</a>
         <a href="/salaries/insert" th:if="${#authorization.expression('hasAnyRole(''SUPERADMIN'', ''HEAD'', ''EXEC'', ''GM'', ''MGR'')')}">- 급여 등록</a>
         <a href="/salaries/list">- 급여 조회</a>
     </div>

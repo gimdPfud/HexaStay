@@ -9,15 +9,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,7 +29,6 @@ public class SalariesController {
 
     private final AdminRepository adminRepository;
     private final SalariesService salariesService;
-
 
     //급여용
     @GetMapping("/list")
@@ -79,4 +80,72 @@ public class SalariesController {
                 return "redirect:/salaries/list";
     }
 
+    // 스토어 관련 메서드
+    @GetMapping("/store/list")
+    @PreAuthorize("hasAnyRole('MGR', 'SUBMGR')")
+    public String storeList(@RequestParam(required = false) String startDate,
+                          @RequestParam(required = false) String endDate,
+                          @PageableDefault(size = 10) Pageable pageable,
+                          Model model) {
+        Long storeNum = getCurrentStoreNum(); // 현재 로그인한 관리자의 스토어 번호
+        
+        Page<SalariesDTO> salariesList;
+        if (startDate != null && endDate != null) {
+            LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
+            LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
+            salariesList = salariesService.getStoreSalariesListByDateRange(storeNum, start, end, pageable);
+        } else {
+            salariesList = salariesService.getStoreSalariesList(storeNum, pageable);
+        }
+        
+        model.addAttribute("salariesList", salariesList);
+        return "salaries/store_list";
+    }
+
+    @GetMapping("/store/register")
+    @PreAuthorize("hasRole('MGR')")
+    public String storeRegisterForm(Model model) {
+        model.addAttribute("salariesDTO", new SalariesDTO());
+        return "salaries/store_register";
+    }
+
+    @PostMapping("/store/register")
+    @PreAuthorize("hasRole('MGR')")
+    public String storeRegister(SalariesDTO salariesDTO, RedirectAttributes redirectAttributes) {
+        Long storeNum = getCurrentStoreNum();
+        salariesDTO.setStoreNum(storeNum);
+        salariesService.registerStoreSalaries(salariesDTO);
+        redirectAttributes.addFlashAttribute("msg", "급여가 등록되었습니다.");
+        return "redirect:/salaries/store/list";
+    }
+
+    @GetMapping("/store/modify/{salariesNum}")
+    @PreAuthorize("hasRole('MGR')")
+    public String storeModifyForm(@PathVariable Long salariesNum, Model model) {
+        SalariesDTO salariesDTO = salariesService.getStoreSalaries(salariesNum);
+        model.addAttribute("salariesDTO", salariesDTO);
+        return "salaries/store_modify";
+    }
+
+    @PostMapping("/store/modify")
+    @PreAuthorize("hasRole('MGR')")
+    public String storeModify(SalariesDTO salariesDTO, RedirectAttributes redirectAttributes) {
+        salariesService.modifyStoreSalaries(salariesDTO);
+        redirectAttributes.addFlashAttribute("msg", "급여가 수정되었습니다.");
+        return "redirect:/salaries/store/list";
+    }
+
+    @PostMapping("/store/remove")
+    @PreAuthorize("hasRole('MGR')")
+    public String storeRemove(@RequestParam Long salariesNum, RedirectAttributes redirectAttributes) {
+        salariesService.removeStoreSalaries(salariesNum);
+        redirectAttributes.addFlashAttribute("msg", "급여가 삭제되었습니다.");
+        return "redirect:/salaries/store/list";
+    }
+
+    // 현재 로그인한 관리자의 스토어 번호를 가져오는 메서드
+    private Long getCurrentStoreNum() {
+        // TODO: SecurityContext에서 현재 로그인한 관리자의 스토어 번호를 가져오는 로직 구현
+        return null;
+    }
 }
