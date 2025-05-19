@@ -41,36 +41,6 @@ public class HotelRoomController {
     private final HotelRoomService hotelRoomService;
 
 
-    /**************테스트용 디자인 컨셉*****/
-    @GetMapping("/test/list")
-    public String test() {
-
-        return "hotelroom/testlistaa";
-    }
-
-    @GetMapping("/test/detail")
-    public String detail() {
-        return "hotelroom/testlistaa";
-    }
-
-    @GetMapping("/test/input")
-    public String input(Principal principal , Model model) {
-
-
-        return "hotelroom/testinputhotelroom";
-    }
-
-    @GetMapping("/test/update")
-    public String update()
-    {
-
-        return "hotelroom/testupdatehotelroom";
-    }
-
-    /**************테스트용 디자인 컨셉*****/
-
-
-
     // roomlist.html - checkin , checkout 변경용 로직 <script>
     @PostMapping("/checkinout/{hotelRoomNum}")
     @ResponseBody
@@ -148,27 +118,23 @@ public class HotelRoomController {
     // list.html - 객실 정보 리스트 페이지
     @GetMapping("/list")
     public String hotelRoomList(Model model, Principal principal,
-                                @RequestParam(value = "page", defaultValue = "0") int page)
-    {
+                                @RequestParam(value = "page", defaultValue = "0") int page) {
 
-        System.out.println("✅ hotelRoomList Controller 호출됨");
         log.info("✅ hotelRoomList Controller 호출됨");
 
-        Pageable pageable = PageRequest.of(page, 9,
-                Sort.by("hotelRoomNum").descending()
-        );
-        //페이지 사이즈 체크 로그
-        log.info("pageable : page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
-
+        Pageable pageable = PageRequest.of(page, 9, Sort.by("hotelRoomNum").descending());
 
         AdminDTO adminDTO = adminService.adminFindEmail(principal.getName());
 
+        // 전체 호텔룸 리스트 (페이지네이션)
         Page<HotelRoomDTO> hotelRoomList = hotelRoomService.hotelroomList(pageable);
 
-        model.addAttribute("companylist", hotelRoomService.listCompany(adminDTO.getCompanyNum()));
+        // 회사 리스트는 유지하되
+        model.addAttribute("companylist", hotelRoomService.listCompany(adminDTO.getCompanyNum(),pageable));
+
+        // 카드 출력용 호텔룸 리스트
         model.addAttribute("hotelRoomList", hotelRoomList);
 
-        // ✔ Principal email 그대로 넘기기
         model.addAttribute("adminEmail", principal.getName());
 
         return "hotelroom/list";

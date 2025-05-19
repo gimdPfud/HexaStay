@@ -373,11 +373,12 @@ public class HotelRoomServiceImpl implements HotelRoomService {
 
     //6.호텔룸 조회 - princpal을 활용한 서지스 로직
     @Override
-    public List<HotelRoom> listCompany(Long companyNUm) {
+    public Page<HotelRoom> listCompany(Long companyNUm, Pageable pageable) {
+
         log.info(companyNUm.toString() + "company  num 을 가지고 왔지 ");
 
-        List<HotelRoom> hotelRoomList =
-        hotelRoomRepository.findByCompany_CompanyNum(companyNUm);
+        Page<HotelRoom> hotelRoomList =
+                hotelRoomRepository.findByCompany_CompanyNum(companyNUm,pageable);
 
         return hotelRoomList;
     }
