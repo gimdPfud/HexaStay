@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function createNotificationItemHTML(notification) {
         const timeValue = notification.createDate || notification.orderTimestamp; // API(createDate) 또는 WS(orderTimestamp)
         const timeString = timeValue ? new Date(timeValue).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short'}) : '시간 정보 없음';
-        const message = `<strong><span class="math-inline">\{notification\.memberEmail \|\| '알 수 없음'\}</strong\>님이 주문<br\><span class\="text\-primary"\>\(</span>{notification.totalPrice != null ? notification.totalPrice.toLocaleString('ko-KR') : '?'}원 / ${notification.hotelRoomName || '객실 정보 없음'})</span>`;
+        const message = `<strong>${notification.memberEmail || '알 수 없음'}</strong>님이 주문<br><span class="text-primary">(${notification.totalPrice != null ? notification.totalPrice.toLocaleString('ko-KR') : '?'}원 / ${notification.hotelRoomName || '객실 정보 없음'})</span>`;
         const link = notification.orderId ? `/roommenu/adminOrderList?highlight=${notification.orderId}` : '/roommenu/adminOrderList';
         const itemClass = notification.isRead ? 'read' : 'unread';
         return `<li class="${itemClass}"><a class="dropdown-item notification-item" href="${link}" data-notification-id="${notification.notificationId}"><div class="small text-muted">${timeString}</div><div>${message}</div></a></li>`;
@@ -129,20 +129,39 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // --- WebSocket 연결 및 처리 (항상 실행 시도) ---
     function connectWebSocket() {
         console.log("WebSocket 연결 시도...");
-/*        const socket = new SockJS("/ws-order-alert"); /!*todo : 지우지마!!*!/*/
-        const ngrokBaseUrl = 'wss://wooriproject.iptime.org.9002'; // 또는 'https://...' 일 수도 있습니다. SockJS는 보통 http/https 기반 URL을 사용합니다.
-        const socket = new SockJS('https://wooriproject.iptime.org.9002/ws-order-alert');
+
+        // 1. 환경에 따라 WebSocket URL 선택
+        let websocketUrl;
+        const currentHostname = window.location.hostname;
+        const productionUrl = 'https://wooriproject.iptime.org.9002/ws-order-alert'; // 실제 서비스용 URL
+        const developmentUrl = '/ws-order-alert'; // 개발 환경용 URL (상대 경로)
+
+        if (currentHostname === "localhost" || currentHostname === "127.0.0.1") {
+            websocketUrl = developmentUrl;
+            console.log(`개발 환경으로 감지되었습니다. 내부 URL(${websocketUrl})로 연결합니다.`);
+        } else {
+            websocketUrl = productionUrl;
+            console.log(`실제 서비스 환경으로 감지되었습니다. 외부 URL(${websocketUrl})로 연결합니다.`);
+        }
+
+        // 아래는 사용자의 기존 코드입니다.
+        // const socket = new SockJS("/ws-order-alert"); /*todo : 지우지마!!*/
+        // 현재 로직에서는 위에서 developmentUrl로 이미 정의되어 있습니다.
+        // const ngrokBaseUrl = 'wss://wooriproject.iptime.org.9002'; //
+
+        // 2. 선택된 URL로 SockJS 객체 생성
+        const socket = new SockJS(websocketUrl);
         const stompClient = Stomp.over(socket);
         stompClient.debug = null; // 디버그 로그 비활성화
 
         stompClient.connect({}, function (frame) {
-            console.log("✅ WebSocket 연결 성공: ", frame);
+            console.log("✅ WebSocket 연결 성공 (URL: " + websocketUrl + "): ", frame); // 어떤 URL로 연결되었는지 로그에 명시
             stompClient.subscribe("/topic/new-order", function (message) {
                 try {
                     const orderData = JSON.parse(message.body);
+                    console.log("📦 수신된 orderData 상세 내용:", JSON.stringify(orderData, null, 2));
                     console.log("📦 WebSocket 메시지 수신:", orderData);
 
                     const alertContent = document.getElementById("orderAlertContent");
@@ -151,19 +170,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (alertContent && confirmBtn && modalElement) {
                         const content = `
-                        <div style="text-align: center; color: #007bff; margin-bottom: 10px;">
-                            <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i>
-                        </div>
-                        <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 룸 서비스 주문 알림</h6>
-                        <div style="margin-bottom: 5px;">
-                            주문자 : <strong>${orderData.memberEmail || '정보 없음'}</strong><br>
-                           총 금액 : <strong>${orderData.totalPrice != null ? orderData.totalPrice.toLocaleString('ko-KR') : '?'}원</strong><br>
-                            주문 객실 : <strong>${orderData.hotelRoomName || '정보 없음'}</strong>  </div>
-                        <hr style="margin: 10px 0;">
-                        <p style="text-align: center; font-size: 0.9em;">
-                            관리자용 페이지를 확인하세요!<br> 확인을 누르시면 관리자용 페이지로 이동합니다.
-                        </p>
-                    `;
+                    <div style="text-align: center; color: #007bff; margin-bottom: 10px;">
+                        <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h6 class="modal-title" style="text-align: center; margin-bottom: 10px;">새로운 룸 서비스 주문 알림</h6>
+                    <div style="margin-bottom: 5px;">
+                        주문자 : <strong>${orderData.memberEmail || '정보 없음'}</strong><br>
+                       총 금액 : <strong>${orderData.totalPrice != null ? orderData.totalPrice.toLocaleString('ko-KR') : '?'}원</strong><br>
+                        주문 객실 : <strong>${orderData.hotelRoomName || '정보 없음'}</strong>  </div>
+                    <hr style="margin: 10px 0;">
+                    <p style="text-align: center; font-size: 0.9em;">
+                        관리자용 페이지를 확인하세요!<br> 확인을 누르시면 관리자용 페이지로 이동합니다.
+                    </p>
+                `;
                         // --- 모달 내용 수정 끝 ---
 
                         alertContent.innerHTML = content; // 수정된 내용 적용
@@ -196,10 +215,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }, function (error) {
-            console.error("❌ WebSocket 연결 실패", error);
+            console.error("❌ WebSocket 연결 실패 (URL: " + websocketUrl + "): ", error); // 어떤 URL에서 실패했는지 로그에 명시
             // setTimeout(connectWebSocket, 5000); // 필요 시 재연결
         });
     }
-    connectWebSocket(); // WebSocket 연결 실행
+connectWebSocket();
 
-}); // End DOMContentLoaded
+}); // End DOMContentLoaded (이 부분은 그대로 유지하시면 됩니다)
