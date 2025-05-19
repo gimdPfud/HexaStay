@@ -23,24 +23,41 @@
             z-index: 1200;
             display: flex;
             align-items: center;
-            padding: 10px 20px;
+            padding: 0 20px; /* Changed padding */
         }
-        .logo-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .logo-center {
+            position: absolute;
+            left: 50%;
+            top: 50%; /* Vertically center the logo */
+            transform: translate(-50%, -50%); /* Center both horizontally and vertically */
+            height: 80px; /* Container height */
+            display: flex;
+            align-items: center; /* Vertically center image inside logo-center */
+        }
+        .logo-center img {
+            height: 70px; /* Adjusted logo height */
+            width: auto;
+        }
         .toggle-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; }
-        .text-white.small > .d-flex { align-items: center; }
+        /* Original text-white.small > .d-flex styles no longer needed for the new structure */
+        /* .text-white.small > .d-flex { align-items: center; } */
         .d-flex { display: flex; align-items: center; }
-        .d-flex.justify-content-between { width: 100%; font-size: 14px; }
+        /* Original d-flex.justify-content-between styles no longer directly applicable to the user info block */
+        /* .d-flex.justify-content-between { width: 100%; font-size: 14px; } */
         .flex-gap-right { margin-right: 20px; }
-        .flex-half { flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; padding-right: 10px; }
+        /* Original flex-half styles no longer needed */
+        /* .flex-half { flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; padding-right: 10px; } */
+
         /* ===== 사이드바 전체 ===== */
         .sidebar {
             width: 200px ;
             z-index: 1100;
             background-color:#2b302d;
             color: #cbd5e1;
-            height: 100vh;
+            /* Adjusted top and height to account for fixed header */
+            height: calc(100vh - 80px);
             position: fixed;
-            top: 65px;
+            top: 80px;
             left: 0;
             display: flex;
             flex-direction: column;
@@ -125,41 +142,133 @@
             margin: 12px 0;
         }
 
+        /* Original user-info style (if used elsewhere) - keeping for safety but not for header */
+        /* .user-info { padding: 10px 20px; font-size: 0.9rem; border-bottom: 1px solid #666; } */
 
-        .submenu { display: none; padding-left: 20px; }
-        .card.stretch { max-width: 100%; width: 100%; }
-        .dropdown > .btn { padding: 0; border: none; background: none; }
-        .dropdown-toggle img { cursor: pointer; }
-        .profile-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-            display: block;
-            pointer-events: none;
-        }
-        .dropdown-menu { font-size: 14px; padding: 5px 5px; min-width: 40px; z-index: 100; transform: translateX(10%); }
-        .dropdown-item { padding: 10px 10px; }
-        .btn-sm-custom { font-size: 0.75rem; padding: 4px 8px; }
-        .user-info { padding: 10px 20px; font-size: 0.9rem; border-bottom: 1px solid #666; }
+        /* ===== Content Area ===== */
         #content {
             transition: all 0.3s ease-in-out;
-            margin-left: 180px;
+            margin-left: 200px; /* Adjusted base margin for open sidebar */
             padding: 30px;
-            min-height: 800px;
+            /* Adjusted min-height and padding-top for fixed header */
+            min-height: calc(100vh - 80px);
+            padding-top: 110px; /* Add padding-top to clear fixed header */
             font-family: 'Spoqa Han Sans Neo', sans-serif !important;
         }
+
+        /* Adjusted content margin for collapsed sidebar */
+        body.sidebar-collapsed #content {
+            margin-left: 0;
+        }
+
         .container-inner {
             max-width: 1400px;
             margin: 0 auto;
+            /* Removed margin-top as padding-top on #content handles spacing */
             padding: 30px 30px 30px 30px;
             font-family: 'Spoqa Han Sans Neo', sans-serif !important;
         }
-        @media (max-width: 1200px) { .content { padding-top: 100px; } }
-        @media (max-width: 992px) { .content { padding-top: 100px; } }
-        @media (max-width: 768px) { .content { padding-top: 100px; } }
-        @media (max-width: 576px) { .content { padding-top: 100px; } }
+
+        .submenu { display: none; padding-left: 20px; }
+        .card.stretch { max-width: 100%; width: 100%; }
+        .dropdown > .btn {
+            padding: 0;
+            border: none;
+            background: none;
+            display: flex; /* Ensure flex for vertical alignment */
+            align-items: center; /* Vertically center items in the button */
+            height: 65px; /* Set height to help align with text block */
+        }
+        .dropdown-toggle img { cursor: pointer; }
+        .layoutprofile-img {
+            width: 55px; /* Slightly smaller profile image */
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            display: block; /* Ensure it's a block element */
+            /* Removed pointer-events: none; as it was on the original and might prevent image click */
+        }
+
+        /* ===== Admin Info Display Styles (New) ===== */
+        .admin-info-display {
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            justify-content: center; /* Vertically center text block in its container */
+            font-size: 0.85rem; /* Slightly smaller font */
+            line-height: 1.3; /* Space out lines */
+            padding: 0 15px; /* Add horizontal padding */
+            border-left: 1px solid rgba(255, 255, 255, 0.3); /* Subtle separator line */
+            height: 60px; /* Give it a defined height to help alignment */
+            overflow: hidden; /* Hide overflow if text is too long */
+            text-overflow: ellipsis; /* Add ellipsis for long text */
+            color: #fff; /* Ensure text is white */
+        }
+
+        .admin-info-display div {
+            white-space: nowrap; /* Prevent wrapping */
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Add ellipsis */
+        }
+
+        .admin-name-role {
+            font-weight: 600; /* Make name bolder */
+            color: #e2e8f0; /* Slightly lighter white */
+        }
+
+        .admin-role {
+            font-weight: 400; /* Normal weight for role */
+            font-size: 0.8em; /* Smaller size for role in parenthesis */
+            color: #cbd5e1; /* Slightly grayed out */
+        }
+
+        .admin-position {
+            font-size: 0.9em; /* Smaller size for position */
+            color: #cbd5e1; /* Slightly grayed out */
+            margin-top: 2px; /* Small space above position */
+        }
+
+        .admin-email {
+            font-size: 0.9em; /* Smaller size for email */
+            color: #cbd5e1; /* Slightly grayed out */
+            margin-top: 2px; /* Small space above email */
+        }
+
+        /* Styles for the optional dropdown info block */
+        .admin-dropdown-info {
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            text-align: left; /* Align text left in dropdown */
+        }
+        .admin-name-role-sm { font-weight: 600; }
+        .admin-role-sm { font-weight: 400; font-size: 0.9em; color: #555; }
+        .admin-position-sm, .admin-email-sm { font-size: 0.9em; color: #555; margin-top: 2px; }
+
+
+        /* Dropdown menu styles */
+        .dropdown-menu {
+            font-size: 0.9rem; /* Adjusted font size */
+            padding: 5px; /* Adjusted padding */
+            min-width: 180px; /* Adjusted min-width for better content display */
+            z-index: 100;
+            /* Removed transform: translateX(10%); as it might cause misalignment */
+        }
+        .dropdown-item { padding: 8px 15px; text-align: left; /* Align dropdown items left */ }
+        .dropdown-item:hover { background-color: #f8f9fa; } /* Add hover effect */
+        .dropdown-divider { margin: 5px 0; border-color: #dee2e6; } /* Style divider */
+
+        .btn-sm-custom { font-size: 0.75rem; padding: 4px 8px; }
+
+
+        /* Media queries - adjust padding-top for content to clear fixed header */
+        @media (max-width: 1200px) { #content { padding-top: 110px; } }
+        @media (max-width: 992px) { #content { padding-top: 110px; } }
+        @media (max-width: 768px) { #content { padding-top: 110px; } }
+        @media (max-width: 576px) { #content { padding-top: 110px; } }
+
     </style>
 </head>
 <body class="sidebar-collapsed">
@@ -173,50 +282,55 @@
     <div class="d-flex align-items-center gap-3">
         <div class="dropdown text-end">
             <button class="btn p-0 d-flex align-items-center gap-1" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img class="profile-img"
+                <img class="layoutprofile-img"
                      th:src="${#authentication.principal.adminProfileMeta != null ? #authentication.principal.adminProfileMeta : '/profile/default.png'}"
                      alt="프로필" />
                 <i class="bi bi-caret-down-fill text-white" style="font-size: 0.9rem;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end text-center" aria-labelledby="profileDropdown">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li>
+                    <div class="dropdown-item-text admin-dropdown-info">
+                        <div class="admin-name-role-sm">
+                            <span th:text="${#authentication.principal.admin.adminName}">이름</span>
+                            <span class="admin-role-sm" th:text="' (' + ${#authentication.principal.adminRoleKorean} + ')'">(직급)</span>
+                        </div>
+                        <div class="admin-position-sm" th:text="${#authentication.principal.admin.adminPosition}">직책</div>
+                        <div class="admin-email-sm" th:text="${#authentication.principal.admin.adminEmail}">이메일</div>
+                    </div>
+                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/admin/mypageview">마이페이지</a></li>
                 <li><a class="dropdown-item" href="/admin/logout">로그아웃</a></li>
             </ul>
         </div>
-        <div class="text-white small text">
-            <div class="d-flex mb-1">
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminName}">이름</span>
-                </div>
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminPosition}">직책</span>
-                </div>
+        <div class="admin-info-display text-white">
+            <div class="admin-name-role">
+                <span th:text="${#authentication.principal.admin.adminName}">이름</span>
+                <span class="admin-role" th:text="' (' + ${#authentication.principal.adminRoleKorean} + ')'">(직급)</span>
             </div>
-            <div class="d-flex">
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.adminRoleKorean}">직급</span>
-                </div>
-                <div class="flex-half">
-                    <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span>
-                </div>
-            </div>
+            <div class="admin-position" th:text="${#authentication.principal.admin.adminPosition}">직책</div>
+            <div class="admin-email" th:text="${#authentication.principal.admin.adminEmail}">이메일</div>
         </div>
     </div>
 </nav>
+
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
 <div id="content">
-    <div class="container-inner shadow p-4" style="margin-top: 100px" layout:fragment="content">
+    <div class="container-inner shadow p-4" layout:fragment="content">
         <div class="container-fluid">
             <div class="card shadow p-4 stretch mt-5 mb-5">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12 col-md-6"></div>
+                        <div class="col-12 col-md-6">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="orderAlertModal" tabindex="-1" aria-labelledby="orderAlertModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -231,6 +345,7 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script src="/js/order-alert.js"></script>
@@ -251,15 +366,19 @@
         }
     }
 
+    // Apply state on load based on localStorage
     let isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     applySidebarState(isCollapsed);
 
+    // Toggle state on button click and save to localStorage
     toggleBtn.addEventListener('click', () => {
         isCollapsed = !isCollapsed;
         applySidebarState(isCollapsed);
         localStorage.setItem('sidebarCollapsed', isCollapsed);
     });
 
+    // Keep your existing toggleMenu function if used elsewhere (though not called in this snippet)
+    /*
     function toggleMenu(menuId) {
         const menu = document.getElementById(menuId);
         const isShown = menu.style.display === 'block';
@@ -267,88 +386,65 @@
         if (!isShown) menu.style.display = 'block';
         localStorage.setItem('submenu_' + menuId, !isShown ? 'open' : 'closed');
     }
+    */
 
     document.addEventListener('DOMContentLoaded', () => {
         // 이미지 클릭 확대 기능
         document.querySelectorAll("img").forEach((img) => {
-            img.addEventListener('click', () => {
-                const image = new Image();
-                image.src = img.src;
-                image.onload = () => {
-                    const width = image.naturalWidth;
-                    const height = image.naturalHeight;
-                    const left = (window.innerWidth - width) / 2 + window.screenX;
-                    const top = (window.innerHeight - height) / 2 + window.screenY;
-                    window.open(img.src, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
-                };
+            img.addEventListener('click', (event) => {
+                // Prevent image click on profile image from interfering with dropdown
+                if (img.closest('.profile-img')) {
+                    // Allow the dropdown toggle handler to work
+                } else {
+                    const image = new Image();
+                    image.src = img.src;
+                    image.onload = () => {
+                        const width = image.naturalWidth;
+                        const height = image.naturalHeight;
+                        const left = (window.innerWidth - width) / 2 + window.screenX;
+                        const top = (window.innerHeight - height) / 2 + window.screenY;
+                        window.open(img.src, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+                    };
+                }
             });
         });
 
-        // 사이드바 a 링크에 active 적용
+        // 사이드바 활성 링크 및 마지막 열린 메뉴 복원/처리
         const links = document.querySelectorAll('.submenu a');
         const currentPath = window.location.pathname;
+        let currentMenuOpened = false; // Flag to check if the current menu was found and opened
 
+        // First pass: Find the link for the current page and open its submenu
         links.forEach(link => {
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
-
                 const submenu = link.closest('.submenu');
-                if (submenu) submenu.style.display = 'block';
-            }
-        });
-
-        // 토글 상태 복원
-        document.querySelectorAll('[id^=memberMenu], [id^=roomList], [id^=roomBook], [id^=roomService], [id^=extMenu], [id^=erd], [id^=settle], [id^=notice], [id^=survey]').forEach(menu => {
-            const id = menu.getAttribute('id');
-            if (localStorage.getItem('submenu_' + id) === 'open') {
-                menu.style.display = 'block';
-            }
-        });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const currentPath = window.location.pathname;
-
-        // 현재 경로에 해당하는 a 태그에 active 클래스 추가
-        const links = document.querySelectorAll('.submenu a');
-        links.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
-
-                // 해당 a태그가 포함된 submenu를 열기
-                const parentSubmenu = link.closest('.submenu');
-                if (parentSubmenu) {
-                    parentSubmenu.style.display = 'block';
+                if (submenu) {
+                    // Close all submenus first
+                    document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
+                    // Open the relevant submenu
+                    submenu.style.display = 'block';
+                    // Store this as the last opened menu
+                    localStorage.setItem('lastOpenedMenu', submenu.getAttribute('id'));
+                    currentMenuOpened = true;
                 }
             }
         });
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-        const links = document.querySelectorAll('.submenu a');
-        const currentPath = window.location.pathname;
 
-        // 1. active + 하위메뉴 열기
-        links.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
-                const submenu = link.closest('.submenu');
-                if (submenu) submenu.style.display = 'block';
-
-                // 하나만 기억하도록 덮어쓰기
-                const id = submenu.getAttribute('id');
-                localStorage.setItem('lastOpenedMenu', id);
-            }
-        });
-
-        // 2. 마지막 메뉴만 복원
-        const lastId = localStorage.getItem('lastOpenedMenu');
-        if (lastId) {
-            const lastMenu = document.getElementById(lastId);
-            if (lastMenu) {
-                document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
-                lastMenu.style.display = 'block';
+        if (!currentMenuOpened) {
+            const lastId = localStorage.getItem('lastOpenedMenu');
+            if (lastId) {
+                const lastMenu = document.getElementById(lastId);
+                if (lastMenu) {
+                    // Close all submenus first
+                    document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
+                    lastMenu.style.display = 'block';
+                }
             }
         }
+
     });
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
