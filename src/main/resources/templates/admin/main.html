@@ -10,7 +10,6 @@
 <div layout:fragment="content">
 
     <style>
-        /* 기존 CSS 스타일은 그대로 유지 */
         body {
             width: 100%;
             min-height: 100vh;
@@ -217,9 +216,7 @@
                     <div class="temp-info-line">
                         <span class="temp-label">최고:</span> <span id="todayTMX" class="temp-value"></span><span class="temp-unit">°C</span>
                     </div>
-                    <div class="temp-info-line">
-                        <span class="temp-label">최저:</span> <span id="todayTMN" class="temp-value"></span><span class="temp-unit">°C</span>
-                    </div>
+
                 </div>
             </div>
 
@@ -239,9 +236,7 @@
             </div>
         </div>
     </div>
-
     <script>
-        //오늘 내일 날씨
         $(document).ready(function() {
             fetchWeatherData();
         });
@@ -250,94 +245,196 @@
             const today = new Date();
             const yesterday = new Date();
             yesterday.setDate(today.getDate() - 1);
-            const base_date = today.getHours() < 6 ?
+
+            const currentHour = today.getHours();
+            const base_date = currentHour < 6 ?
                 `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}` :
                 `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
+            const serviceKey = 'wje5hA%2Bnn3R5RgOMpkRjQoneVn2py4RGqQmFJCCZS2IjYEetSvm7HP%2FngICVZN7%2FB0Mj2ig7Xp2oep7%2B4kcrSQ%3D%3D'; // 실제 본인의 서비스 키로 변경하세요
+            const nx = 55;
+            const ny = 127;
+            const base_time = '0500';
+
+            const apiUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=500&dataType=JSON&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
+
             $.ajax({
-                url: `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=wje5hA%2Bnn3R5RgOMpkRjQoneVn2py4RGqQmFJCCZS2IjYEetSvm7HP%2FngICVZN7%2FB0Mj2ig7Xp2oep7%2B4kcrSQ%3D%3D&pageNo=1&numOfRows=500&dataType=JSON&base_date=${base_date}&base_time=0500&nx=55&ny=127`,
+                url: apiUrl,
                 type: 'GET',
                 success: function(data) {
-                    let todayWeather = {}, tomorrowWeather = {};
+
+                    if (data.response.header.resultCode !== '00') {
+                        console.error('API 호출 실패:', data.response.header.resultMsg);
+
+                        $('#todayTMP').text('오류');
+                        $('#todayTMX').text('오류');
+                        $('#todayTMN').text('오류');
+                        $('#tomorrowTMX').text('오류');
+                        $('#tomorrowTMN').text('오류');
+
+                        setSkyIcon(null, 'today');
+                        setPtyIcon(null, 'today');
+                        setSkyIcon(null, 'tomorrow');
+                        setPtyIcon(null, 'tomorrow');
+                        return;
+                    }
+
+                    let todayForecast = { currentTMP: null, TMX: null, TMN: null, SKY: null, PTY: null };
+                    let tomorrowForecast = { TMX: null, TMN: null, SKY: null, PTY: null };
+
                     let todayDateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
                     let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
                     let tomorrowDateStr = `${tomorrow.getFullYear()}${String(tomorrow.getMonth() + 1).padStart(2, '0')}${String(tomorrow.getDate()).padStart(2, '0')}`;
 
+                    let tempTodaySky = null;
+                    let tempTodayPty = null;
+                    let tempTomorrowSky = null;
+                    let tempTomorrowPty = null;
+
+                    let closestTmp = null;
+                    let minTimeDiff = Infinity;
+
+                    // 현재 시각 (분 단위) 계산
+                    const now = new Date();
+                    const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+
                     data.response.body.items.item.forEach(item => {
-                        // 오늘 날짜 데이터 처리
-                        if (item.fcstDate === todayDateStr) {
-                            if (item.category === 'TMP') todayWeather.TMP = item.fcstValue;
-                            if (item.category === 'TMX' && item.fcstTime === '1500') todayWeather.TMX = item.fcstValue; // 1500 시간의 TMX만
-                            if (item.category === 'TMN' && item.fcstTime === '0600') {
-                                // TMN 값이 있을 경우 그대로 사용
-                                todayWeather.TMN = item.fcstValue;
-                            } else if (item.category === 'TMP') {
-                                // TMP 값을 배열에 저장하고, 나중에 최소값을 사용
-                                if (!todayWeather.TMPs) todayWeather.TMPs = []; // TMPs 배열이 없으면 초기화
-                                todayWeather.TMPs.push(parseFloat(item.fcstValue));
+                        const { fcstDate, fcstTime, category, fcstValue } = item;
+
+                        if (fcstDate === todayDateStr) {
+                            if (category === 'TMX' && fcstTime === '1500') {
+                                todayForecast.TMX = fcstValue;
+                            }
+                            if (category === 'SKY' && tempTodaySky === null) {
+                                tempTodaySky = fcstValue;
+                            }
+                            if (category === 'PTY' && tempTodayPty === null) {
+                                tempTodayPty = fcstValue;
                             }
 
-                            // 이후 모든 데이터를 처리한 후 최저 TMP 값을 TMN으로 설정
-                            if (!todayWeather.TMN && todayWeather.TMPs && todayWeather.TMPs.length > 0) {
-                                todayWeather.TMN = Math.min(...todayWeather.TMPs); // TMP 값 중 최저값을 TMN으로 사용
-                            }
+                            if (category === 'TMP') {
+                                const fcstHour = parseInt(fcstTime.substring(0, 2));
+                                const fcstMinute = parseInt(fcstTime.substring(2, 4));
+                                const fcstMinutes = fcstHour * 60 + fcstMinute;
+                                const timeDiff = Math.abs(currentTimeMinutes - fcstMinutes);
 
-                            if (item.category === 'SKY') setSkyIcon(item.fcstValue, 'today');
-                            if (item.category === 'PTY') setPtyIcon(item.fcstValue, 'today');
+                                if (timeDiff < minTimeDiff) {
+                                    minTimeDiff = timeDiff;
+                                    closestTmp = fcstValue;
+                                }
+                            }
                         }
 
-                        if (item.fcstDate === tomorrowDateStr) {
-                            if (item.category === 'TMP') tomorrowWeather.TMP = item.fcstValue;
-                            if (item.category === 'TMX' && item.fcstTime === '1500') tomorrowWeather.TMX = item.fcstValue; // 1500 시간의 TMX만
-                            if (item.category === 'TMN' && item.fcstTime === '0600') tomorrowWeather.TMN = item.fcstValue; // 내일 TMN만
-
-                            if (item.category === 'SKY') setSkyIcon(item.fcstValue, 'tomorrow');
-                            if (item.category === 'PTY') setPtyIcon(item.fcstValue, 'tomorrow');
+                        if (fcstDate === tomorrowDateStr) {
+                            if (category === 'TMX' && fcstTime === '1500') {
+                                tomorrowForecast.TMX = fcstValue;
+                            }
+                            if (category === 'TMN' && fcstTime === '0600') {
+                                tomorrowForecast.TMN = fcstValue;
+                            }
+                            if (category === 'SKY' && tempTomorrowSky === null) {
+                                tempTomorrowSky = fcstValue;
+                            }
+                            if (category === 'PTY' && tempTomorrowPty === null) {
+                                tempTomorrowPty = fcstValue;
+                            }
                         }
                     });
 
-                    $('#todayTMP').text(todayWeather.TMP || '정보 없음');
-                    $('#todayTMX').text(todayWeather.TMX || '정보 없음');
-                    $('#todayTMN').text(todayWeather.TMN || '정보 없음');
+                    todayForecast.currentTMP = closestTmp;
+                    todayForecast.SKY = tempTodaySky;
+                    todayForecast.PTY = tempTodayPty;
+                    tomorrowForecast.SKY = tempTomorrowSky;
+                    tomorrowForecast.PTY = tempTomorrowPty;
 
-                    $('#tomorrowTMP').text(tomorrowWeather.TMP || '정보 없음');
-                    $('#tomorrowTMX').text(tomorrowWeather.TMX || '정보 없음');
-                    $('#tomorrowTMN').text(tomorrowWeather.TMN || '정보 없음');
+                    $('#todayTMP').text(todayForecast.currentTMP !== null ? `${todayForecast.currentTMP}°C` : '정보 없음');
+                    $('#todayTMX').text(todayForecast.TMX !== null ? `${todayForecast.TMX}°C` : '정보 없음');
+                    $('#todayTMN').text(todayForecast.TMN !== null ? `${todayForecast.TMN}°C` : '정보 없음');
+
+                    $('#tomorrowTMX').text(tomorrowForecast.TMX !== null ? `${tomorrowForecast.TMX}°C` : '정보 없음');
+                    $('#tomorrowTMN').text(tomorrowForecast.TMN !== null ? `${tomorrowForecast.TMN}°C` : '정보 없음');
+
+
+                    setSkyIcon(todayForecast.SKY, 'today');
+                    setPtyIcon(todayForecast.PTY, 'today');
+
+                    setSkyIcon(tomorrowForecast.SKY, 'tomorrow');
+                    setPtyIcon(tomorrowForecast.PTY, 'tomorrow');
+
                 },
-                error: function() {
-                    console.error('날씨 데이터를 가져오는 데 실패했습니다.');
+                error: function(xhr, status, error) {
+                    console.error('날씨 데이터를 가져오는 중 오류 발생:', status, error);
+
+                    $('#todayTMP').text('오류');
+                    $('#todayTMX').text('오류');
+                    $('#todayTMN').text('오류');
+                    $('#tomorrowTMX').text('오류');
+                    $('#tomorrowTMN').text('오류');
+
+                    setSkyIcon(null, 'today');
+                    setPtyIcon(null, 'today');
+                    setSkyIcon(null, 'tomorrow');
+                    setPtyIcon(null, 'tomorrow');
                 }
             });
         };
 
         function setSkyIcon(skyCode, day) {
             let skyDiv = document.getElementById(`skyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
-            switch (skyCode) {
-                case '1': skyDiv.style.backgroundImage = 'url("/weatherimg/SKY1.png")'; break; // 맑음
-                case '3': skyDiv.style.backgroundImage = 'url("/weatherimg/SKY3.png")'; break; // 구름많음
-                case '4': skyDiv.style.backgroundImage = 'url("/weatherimg/SKY4.png")'; break; // 흐림
-                default: skyDiv.style.backgroundImage = 'url("/weatherimg/SKY1.png")'; break;  // 이미지 없음
+            if (!skyDiv) {
+                console.error(`Element skyIcon${day.charAt(0).toUpperCase() + day.slice(1)} not found`);
+                return;
             }
+
+            let imageUrl = '';
+
+            switch (skyCode) {
+                case '1': imageUrl = '/weatherimg/SKY1.png'; break;
+                case '3': imageUrl = '/weatherimg/SKY3.png'; break;
+                case '4': imageUrl = '/weatherimg/SKY4.png'; break;
+                default: imageUrl = '/weatherimg/SKY1.png'; break;
+            }
+
+            skyDiv.style.backgroundImage = `url("${imageUrl}")`;
             skyDiv.style.backgroundSize = "cover";
-            skyDiv.style.backgroundSize = "100% 100%";
-            skyDiv.style.boxSizing = "border-box";
-            skyDiv.style.overflow = "hidden";
+            skyDiv.style.backgroundRepeat = "no-repeat";
+            skyDiv.style.backgroundPosition = "center";
             skyDiv.style.zIndex = "1";
         }
 
-        // 강수 상태에 따른 이미지 설정 함수
         function setPtyIcon(ptyCode, day) {
-            let ptyImg = document.getElementById(`ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
+            let ptyImgElement = document.getElementById(`ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
+
+            if (!ptyImgElement) {
+                console.error(`Element ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)} not found`);
+                return;
+            }
+
+            let ptyImageUrl = '';
 
             switch (ptyCode) {
-                case '0': ptyImg.src = '/weatherimg/PTY0.png'; break; // 강수 없음
-                case '1': ptyImg.src = '/weatherimg/PTY1.png'; break; // 비
-                case '2': ptyImg.src = '/weatherimg/PTY2.png'; break; // 비/눈
-                case '3': ptyImg.src = '/weatherimg/PTY3.png'; break; // 눈
-                case '4': ptyImg.src = '/weatherimg/PTY4.png'; break; // 소나기
-                default: ptyImg.src = '/weatherimg/PTY0.webp'; break;  // 이미지 없음
+                case '0': ptyImageUrl = '/weatherimg/PTY0.png'; break;
+                case '1': ptyImageUrl = '/weatherimg/PTY1.png'; break; // 비
+                case '2': ptyImageUrl = '/weatherimg/PTY2.png'; break; // 비/눈
+                case '3': ptyImageUrl = '/weatherimg/PTY3.png'; break; // 눈
+                case '4': ptyImageUrl = '/weatherimg/PTY4.png'; break; // 소나기
+                default: ptyImageUrl = '/weatherimg/PTY0.png'; break;
             }
+
+            ptyImgElement.src = ptyImageUrl;
+            ptyImgElement.style.display = 'block';
+
+
+            ptyImgElement.style.width = '70px';
+            ptyImgElement.style.height = '70px';
+            ptyImgElement.style.position = 'absolute';
+            ptyImgElement.style.top = '50%';
+            ptyImgElement.style.left = '50%';
+            ptyImgElement.style.transform = 'translate(-50%, -50%)';
+            ptyImgElement.style.zIndex = '10';
+            ptyImgElement.style.objectFit = 'contain';
         }
+
     </script>
 
 </div>
