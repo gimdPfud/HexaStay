@@ -13,6 +13,7 @@
 
 package com.sixthsense.hexastay.dto;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.sixthsense.hexastay.entity.Room;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonFilter("roomMenuFilter")
 public class RoomMenuDTO {
 
     private Long roomMenuNum;
