@@ -105,23 +105,37 @@
                     <label class="form-label">소속</label>
                     <div class="row g-2">
                         <div class="col-md-3">
-                            <select id="adminChoice" class="form-select">
-                                <option>본사</option>
-                                <option>지점</option>
-                                <option>외부시설</option>
-                                <option>스토어</option>
+                            <select id="adminChoice" class="form-select" th:disabled="${isReadOnly}">
+                                <option th:selected="${fixedChoice == '본사'}">본사</option>
+                                <option th:selected="${fixedChoice == '지점'}">지점</option>
+                                <option th:selected="${fixedChoice == '외부시설'}">외부시설</option>
+                                <option th:selected="${fixedChoice == '스토어'}">스토어</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminCenter" id="adminCenter" class="form-select">
-                                <option th:each="companyDTO : ${companyList}" th:text="${companyDTO.companyName}" th:value="${companyDTO.companyNum}"></option>
+                            <select name="adminCenter" id="adminCenter" class="form-select" th:disabled="${isReadOnly}">
+                                <option th:if="${adminRole != 'SUPERADMIN' && fixedParentCompanyNum != null}" 
+                                        th:text="${fixedParentCompanyName}" 
+                                        th:value="${fixedParentCompanyNum}"></option>
+                                <option th:if="${adminRole == 'SUPERADMIN'}"
+                                        th:each="company : ${centerList}"
+                                        th:text="${company.companyName}"
+                                        th:value="${company.companyNum}"></option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" disabled></select>
+                            <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" th:disabled="${isReadOnly}">
+                                <option th:if="${fixedCompanyNum != null}" 
+                                        th:text="${fixedCompanyName}" 
+                                        th:value="${fixedCompanyNum}"></option>
+                            </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminStore" id="adminStore" class="form-select" disabled></select>
+                            <select name="adminStore" id="adminStore" class="form-select" th:disabled="${isReadOnly}">
+                                <option th:if="${fixedStoreNum != null}" 
+                                        th:text="${fixedStoreName}" 
+                                        th:value="${fixedStoreNum}"></option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -183,10 +197,12 @@
         const companyNum = document.getElementById("companyNum");
         const storeNum = document.getElementById("storeNum");
 
-
         // 소속 선택 시 다른 선택 박스 활성화/비활성화
         adminChoice.addEventListener("change", function () {
+            if (this.disabled) return; // 읽기 전용인 경우 이벤트 무시
+
             adminBranchFacility.innerHTML = "<option value=''></option>";
+            adminStore.innerHTML = "<option value=''></option>";
 
             if (adminChoice.value === "본사") {
                 adminCenter.value = "";
@@ -200,7 +216,6 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = true;
 
-
             } else if (adminChoice.value === "지점" || adminChoice.value === "외부시설") {
                 adminCenter.value = "";
                 adminBranchFacility.value = "";
@@ -213,6 +228,22 @@
                 adminBranchFacilityRank.hidden = false;
                 adminStoreRank.hidden = true;
 
+                // 본사 선택 시 해당하는 지점/외부시설 리스트 가져오기
+                adminCenter.addEventListener("change", function() {
+                    if (this.value) {
+                        fetch(`/admin/insertselect?centerNum=${this.value}&adminChoice=${adminChoice.value}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                adminBranchFacility.innerHTML = "<option value=''></option>";
+                                data.forEach(item => {
+                                    const option = document.createElement("option");
+                                    option.value = item.companyNum;
+                                    option.textContent = item.companyName;
+                                    adminBranchFacility.appendChild(option);
+                                });
+                            });
+                    }
+                });
 
             } else if (adminChoice.value === "스토어") {
                 adminCenter.value = "";
@@ -226,85 +257,65 @@
                 adminBranchFacilityRank.hidden = true;
                 adminStoreRank.hidden = false;
 
-            }
-        })
-
-
-
-        document.getElementById("adminCenter").addEventListener("change", function () {
-            const centerCompanyNum = this.value;
-            const adminChoice = document.getElementById("adminChoice").value;
-
-
-            let mappedChoice;
-            switch (adminChoice) {
-                case "지점": mappedChoice = "branch"; break;
-                case "외부시설": mappedChoice = "facility"; break;
-                case "스토어": mappedChoice = "store"; break;
-                default: mappedChoice = ""; break;
-            }
-
-            if (!mappedChoice) return;
-
-            fetch(`/admin/insertselect?centerNum=${encodeURIComponent(centerCompanyNum)}&adminChoice=${mappedChoice}`)
-                .then(response => response.json())
-                .then(data => {
-                    const subSelect = document.getElementById("adminBranchFacility");
-                    subSelect.innerHTML = "";
-
-                    const defaultOption = document.createElement("option");
-                    defaultOption.textContent = "";
-                    defaultOption.value = "";
-                    subSelect.appendChild(defaultOption);
-
-                    data.forEach(company => {
-                        const option = document.createElement("option");
-                        option.value = company.companyNum;
-                        option.textContent = company.companyName;
-                        subSelect.appendChild(option);
-                    });
+                // 본사 선택 시 해당하는 지점/외부시설 리스트 가져오기
+                adminCenter.addEventListener("change", function() {
+                    if (this.value) {
+                        fetch(`/admin/insertselect?centerNum=${this.value}&adminChoice=지점`)
+                            .then(response => response.json())
+                            .then(data => {
+                                adminBranchFacility.innerHTML = "<option value=''></option>";
+                                data.forEach(item => {
+                                    const option = document.createElement("option");
+                                    option.value = item.companyNum;
+                                    option.textContent = item.companyName;
+                                    adminBranchFacility.appendChild(option);
+                                });
+                            });
+                    }
                 });
+
+                // 지점/외부시설 선택 시 해당하는 스토어 리스트 가져오기
+                adminBranchFacility.addEventListener("change", function() {
+                    if (this.value) {
+                        fetch(`/admin/insertstore?branchFacilityNum=${this.value}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                adminStore.innerHTML = "<option value=''></option>";
+                                data.forEach(item => {
+                                    const option = document.createElement("option");
+                                    option.value = item.storeNum;
+                                    option.textContent = item.storeName;
+                                    adminStore.appendChild(option);
+                                });
+                            });
+                    }
+                });
+            }
         });
 
-        // 브랜치/퍼실리티 선택 시 스토어 목록 가져오기
-        document.getElementById("adminBranchFacility").addEventListener("change", function () {
-            const companyNum = this.value;
-            const adminChoice = document.getElementById("adminChoice").value;
+        // 페이지 로드 시 초기 상태 설정
+        window.addEventListener('load', function() {
+            if (adminChoice.disabled) {
+                // 읽기 전용인 경우 초기 상태 설정
+                const fixedChoice = adminChoice.value;
+                if (fixedChoice === "본사") {
+                    adminCenterRank.hidden = false;
+                    adminBranchFacilityRank.hidden = true;
+                    adminStoreRank.hidden = true;
+                } else if (fixedChoice === "지점" || fixedChoice === "외부시설") {
+                    adminCenterRank.hidden = true;
+                    adminBranchFacilityRank.hidden = false;
+                    adminStoreRank.hidden = true;
+                } else if (fixedChoice === "스토어") {
+                    adminCenterRank.hidden = true;
+                    adminBranchFacilityRank.hidden = true;
+                    adminStoreRank.hidden = false;
+                }
 
-            console.log("Branch/Facility changed:", { companyNum, adminChoice: adminChoice.value });
-
-            // 스토어 선택 시에만 실행
-            if ((adminChoice === "스토어" || adminChoice === "지점" || adminChoice === "외부시설") && companyNum) {
-                console.log("Fetching store list for:", companyNum);
-
-                fetch(`/admin/insertstore?branchFacilityNum=${encodeURIComponent(companyNum)}`)
-                    .then(response => {
-                        console.log("Response status:", response.status);
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Received store data:", data);
-                        const storeSelect = document.getElementById("adminStore");
-                        storeSelect.innerHTML = "";
-
-                        // 기본 선택 옵션 추가
-                        const defaultOption = document.createElement("option");
-                        defaultOption.textContent = "";
-                        defaultOption.value = "";
-                        storeSelect.appendChild(defaultOption);
-
-                        // 받아온 스토어 리스트 추가
-                        data.forEach(store => {
-                            const option = document.createElement("option");
-                            option.value = store.storeNum;
-                            option.textContent = store.storeName;
-                            console.log(store.storeNum)
-                            storeSelect.appendChild(option);
-                        });
-                    });
+                // 읽기 전용인 경우 모든 선택박스 비활성화
+                adminCenter.disabled = true;
+                adminBranchFacility.disabled = true;
+                adminStore.disabled = true;
             }
         });
 
@@ -389,7 +400,6 @@
                     document.getElementById("adminRole").value = adminStoreRank.value;
                     companyNum.value = "";
                     storeNum.value = adminStore;
-
                     break;
             }
 

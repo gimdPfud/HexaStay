@@ -5,7 +5,9 @@ import com.sixthsense.hexastay.dto.SalariesDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
 
 public interface SalariesService {
 
@@ -19,4 +21,14 @@ public interface SalariesService {
     Page<AdminDTO> getSalarAdminList(String email, Pageable pageable);
 
     void postSalaries(SalariesDTO salariesDTO);
+
+    // 스토어 관련 메서드 추가
+    Page<SalariesDTO> getStoreSalariesList(Long storeNum, Pageable pageable);
+    Page<SalariesDTO> getStoreSalariesListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    List<SalariesDTO> getAllStoreSalariesList(Long storeNum);
+    List<SalariesDTO> getAllStoreSalariesListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate);
+    void registerStoreSalaries(SalariesDTO salariesDTO);
+    SalariesDTO getStoreSalaries(Long salariesNum);
+    void modifyStoreSalaries(SalariesDTO salariesDTO);
+    void removeStoreSalaries(Long salariesNum);
 }

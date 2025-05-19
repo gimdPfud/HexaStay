@@ -2,11 +2,13 @@ package com.sixthsense.hexastay.service;
 
 import com.sixthsense.hexastay.dto.OrderstoreDTO;
 import com.sixthsense.hexastay.dto.RoomDTO;
+import com.sixthsense.hexastay.dto.SettleDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface SettleService {
 
@@ -30,4 +32,9 @@ public interface SettleService {
     // 날짜 범위로 스토어넘 소속 스토어 찾기
     Page<OrderstoreDTO> getSettleStoreListByDateRange(Long storeNum, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
+    // 스토어 정산 관련 메소드
+    Map<String, Object> getStoreSettleStatistics(Long storeNum, LocalDate startDate, LocalDate endDate);
+
+    // 스토어 정산 내역 조회
+    List<SettleDTO> getStoreSettleList(Long storeNum);
 }

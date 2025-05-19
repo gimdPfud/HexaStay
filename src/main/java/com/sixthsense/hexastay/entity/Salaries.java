@@ -36,9 +36,20 @@ public class Salaries extends BaseEntity {
     // 날짜
     private YearMonth salDate;
 
+    private int salariesBonus;
+    private int salariesDeduction;
+    private int salariesTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin")
     private Admin admin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store")
+    private Store store;
+
+    public void updateSalaries(Integer salBase, int salariesBonus, int salariesDeduction, int salariesTotal, YearMonth salDate) {
+        // ... existing code ...
+    }
 
 }

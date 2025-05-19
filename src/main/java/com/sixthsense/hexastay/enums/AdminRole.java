@@ -10,7 +10,7 @@ public enum AdminRole {
     HEAD("팀장"),
     CREW("사원"),
 
-    //지사, 지점
+    //지사, 외부시설
     GM("총괄"),
     SV("관리자"),
     AGENT("직원"),

@@ -27,4 +27,14 @@ public class SalariesDTO extends BaseEntity {
     @Setter
     private AdminDTO adminDTO;
 
+    private Long salariesNum;
+    private Long adminNum;
+    private String adminName;
+    private Long storeNum;
+    private String storeName;
+    private int salariesBonus;
+    private int salariesDeduction;
+    private int salariesTotal;
+    private LocalDateTime regDate;
+    private LocalDateTime modDate;
 }

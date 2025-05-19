@@ -13,6 +13,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -37,4 +38,10 @@ public class OrderstoreDTO {
     private String roomName;
 
     private List<OrderstoreitemDTO> orderstoreitemDTOList = new ArrayList<>();
+
+    private Long orderNum;
+    private LocalDate orderDate;
+    private Long orderPrice;
+    private Long orderCost;
+    private String orderStatus;
 }

@@ -337,4 +337,12 @@ public class CompanyServiceImpl implements CompanyService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<CompanyDTO> getCompaniesByParentAndType(Long parentCompanyNum, String companyType) {
+        List<Company> companies = companyRepository.findByCompanyParentAndCompanyType(parentCompanyNum, companyType);
+        return companies.stream()
+            .map(company -> modelMapper.map(company, CompanyDTO.class))
+            .collect(Collectors.toList());
+    }
+
 }

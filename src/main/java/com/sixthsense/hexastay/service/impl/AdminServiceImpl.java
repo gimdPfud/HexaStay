@@ -440,9 +440,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<StoreDTO> insertStoreList(Long branchFacilityNum) {
-        List<Store> storeList = storeRepository.findByCompanyNum(branchFacilityNum);
-        return storeList.stream().map(store -> modelMapper.map(store, StoreDTO.class)).collect(Collectors.toList());
+    public List<StoreDTO> insertStoreList(Long companyNum) {
+        List<Store> stores = storeRepository.findByCompany_CompanyNum(companyNum);
+        return stores.stream()
+            .map(store -> modelMapper.map(store, StoreDTO.class))
+            .collect(Collectors.toList());
     }
 
     @Override
