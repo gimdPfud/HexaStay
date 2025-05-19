@@ -5,90 +5,475 @@
 <head>
     <meta charset="UTF-8">
     <title>매니지먼트 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+
     <style>
         body {
             width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f1f1f1;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #dfe9f3, #ffffff);
             margin: 0;
-            padding: 0;
-        }
-
-        h5 {
-            color: #333;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        p {
-            font-size: 14px;
-            color: #555;
-            word-break: break-word;
-        }
-
-        .container {
-            max-width: 500px;
-            width: 90%;
-            margin: 1rem auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .container img.round {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            object-fit: cover;
-            margin-bottom: 15px;
-        }
-
-        .card {
+            padding: 20px;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            box-sizing: border-box;
         }
 
-        .card h5, .card h6, .card p {
-            margin: 0;
+        h5 {
+            margin-bottom: 20px;
+            color: #444;
+            text-align: center;
+            width: 100%;
+        }
+
+        .content-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center; /* Vertically centers flex items */
+            gap: 30px;
+            box-sizing: border-box;
+        }
+
+        .profile-img {
+            flex-shrink: 0;
+            width: 120px;
+            height: 150px;
+        }
+
+        .profile-img img {
+            width: 100%;
+            height: 100%;
+            border: 5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+            display: block; /* Remove potential extra space below image */
+        }
+
+        .profile-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             color: #333;
         }
 
-        .card .email {
+        .profile-info h5 {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            color: #222;
+            text-align: left;
+        }
+
+        .profile-info div {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .profile-info div span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-info .email span {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .weather-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .weather-card-v2 {
+            display: flex;
+            width: 320px;
+            height: 140px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            flex-shrink: 0;
+        }
+
+        .icon-area {
+            flex: 1;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            position: relative; /* PTY 이미지를 absolute로 배치하기 위한 기준 */
+        }
+
+        .icon-area img {
+            width: 70px; /* 아이콘 크기 */
+            height: 70px; /* 아이콘 크기 */
+            z-index: 10; /* 아이콘이 배경 위에 오도록 */
+            position: absolute; /* icon-area 기준 위치 조정 */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* 중앙 정렬 */
+            object-fit: contain; /* 이미지 비율 유지 */
+        }
+
+        .info-area {
+            flex: 1.5;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #333;
+        }
+
+        .weather-title {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .temp-info-line {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .temp-info-line .temp-label {
             font-size: 14px;
-            color: #007bff;
-            word-break: break-all;
+            color: #666;
+            margin-right: 5px;
+        }
+
+        .temp-info-line .temp-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+        }
+        .temp-info-line .temp-unit {
+            font-size: 16px;
+            color: #444;
+            margin-left: 2px;
         }
     </style>
-</head>
-<body style="background-color: #f8f9fa;">
-<div layout:fragment="content">
 
-    <h5>오늘도 좋은 하루 보내세요!</h5>
+    <div class="content-container">
+        <h5>오늘도 좋은 하루 보내세요!</h5>
 
-    <div class="container mt-4">
-        <div class="mt-3">
-            <img th:if="${#authentication.principal.adminProfileMeta != null}"
-                 th:src="@{${#authentication.principal.adminProfileMeta}}"
-                 class="round" alt="관리자 프로필 이미지">
-            <img th:unless="${#authentication.principal.adminProfileMeta != null}"
-                 th:src="@{/profile/default.png}"
-                 class="round" alt="기본 프로필 이미지">
+        <div class="profile-card">
+            <div class="profile-img">
+                <img th:if="${#authentication.principal.adminProfileMeta != null}"
+                     th:src="@{${#authentication.principal.adminProfileMeta}}"
+                     alt="관리자 프로필 이미지">
+                <img th:unless="${#authentication.principal.adminProfileMeta != null}"
+                     th:src="@{/profile/default.png}"
+                     alt="기본 프로필 이미지">
+            </div>
+            <div class="profile-info">
+                <h5 th:text="${#authentication.principal.admin.adminName}">이름</h5>
+                <div>직책: <span th:text="${#authentication.principal.admin.adminPosition}">직책</span></div>
+                <div>직급: <span th:text="${#authentication.principal.adminRoleKorean}">직급</span></div>
+                <div>Email: <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span></div>
+            </div>
         </div>
-        <h5 th:text="${#authentication.principal.admin.adminName}">이름</h5>
-        <h6 th:text="${#authentication.principal.admin.adminPosition}">직책</h6>
-        <p th:text="${#authentication.principal.adminRoleKorean}">직급</p>
-        <p class="email">E: <span th:text="${#authentication.principal.admin.adminEmail}">이메일</span></p>
+
+        <div class="weather-row">
+            <div id="skyIconToday" class="weather-card-v2">
+                <div class="icon-area">
+                    <img id="ptyIconToday" src="" alt="Weather Icon">
+                </div>
+                <div class="info-area">
+                    <div class="weather-title">오늘의 날씨</div>
+                    <div class="temp-info-line">
+                        <span class="temp-label">현재:</span> <span id="todayTMP" class="temp-value"></span><span class="temp-unit">°C</span>
+                    </div>
+                    <div class="temp-info-line">
+                        <span class="temp-label">최고:</span> <span id="todayTMX" class="temp-value"></span><span class="temp-unit">°C</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="skyIconTomorrow" class="weather-card-v2">
+                <div class="icon-area">
+                    <img id="ptyIconTomorrow" src="" alt="Weather Icon">
+                </div>
+                <div class="info-area">
+                    <div class="weather-title">내일의 날씨</div>
+                    <div class="temp-info-line">
+                        <span class="temp-label">최저:</span> <span id="tomorrowTMN" class="temp-value"></span><span class="temp-unit">°C</span>
+                    </div>
+                    <div class="temp-info-line">
+                        <span class="temp-label">최고:</span> <span id="tomorrowTMX" class="temp-value"></span><span class="temp-unit">°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <script>
+        //오늘 내일 날씨 가져오기 및 표시 (현재 시각 근접 예보 포함)
+        $(document).ready(function() {
+            fetchWeatherData();
+        });
+
+        const fetchWeatherData = () => {
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+
+            // 공공데이터포털 단기예보 API의 base_date 결정 로직
+            // 발표 시간(0500) 기준, 현재 시각이 발표 시간 이전이면 전날, 이후면 당일
+            // (API 발표 시간: 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)
+            const currentHour = today.getHours();
+            const base_date = currentHour < 6 ?
+                `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}` :
+                `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+
+            // API 호출에 필요한 정보 설정 (서비스 키, nx, ny, base_time)
+            const serviceKey = 'wje5hA%2Bnn3R5RgOMpkRjQoneVn2py4RGqQmFJCCZS2IjYEetSvm7HP%2FngICVZN7%2FB0Mj2ig7Xp2oep7%2B4kcrSQ%3D%3D'; // 실제 본인의 서비스 키로 변경하세요
+            const nx = 37; // 예: 서울시청 근처 nx 값
+            const ny = 126; // 예: 서울시청 근처 ny 값
+            const base_time = '0500'; // 원하는 발표 시간 (데이터 기준 시각, 예: 05시 발표)
+
+            const apiUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=500&dataType=JSON&base_date=${base_date}&base_time=${base_time}&nx=${nx}&ny=${ny}`;
+
+            $.ajax({
+                url: apiUrl,
+                type: 'GET',
+                success: function(data) {
+                    // API 응답 결과 코드 확인
+                    if (data.response.header.resultCode !== '00') {
+                        console.error('API 호출 실패:', data.response.header.resultMsg);
+                        // 실패 시 사용자에게 알림 또는 기본값 설정
+                        $('#todayTMP').text('오류'); // 현재 기온 오류 표시
+                        $('#todayTMX').text('오류');
+                        $('#todayTMN').text('오류');
+                        $('#tomorrowTMX').text('오류');
+                        $('#tomorrowTMN').text('오류');
+                        // 오류 시 기본 아이콘/배경 설정
+                        setSkyIcon(null, 'today');
+                        setPtyIcon(null, 'today');
+                        setSkyIcon(null, 'tomorrow');
+                        setPtyIcon(null, 'tomorrow');
+                        return; // 데이터 처리 중단
+                    }
+
+                    // 필요한 데이터를 저장할 객체 초기화
+                    // currentTMP는 API 데이터 중 현재 시각과 가장 가까운 예보 시각의 TMP
+                    let todayForecast = { currentTMP: null, TMX: null, TMN: null, SKY: null, PTY: null };
+                    let tomorrowForecast = { TMX: null, TMN: null, SKY: null, PTY: null };
+
+                    // 오늘과 내일 날짜 문자열 생성
+                    let todayDateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+                    let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+                    let tomorrowDateStr = `${tomorrow.getFullYear()}${String(tomorrow.getMonth() + 1).padStart(2, '0')}${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+                    // 대표 아이콘 설정을 위한 변수 (첫 번째 값 저장)
+                    let tempTodaySky = null;
+                    let tempTodayPty = null;
+                    let tempTomorrowSky = null;
+                    let tempTomorrowPty = null;
+
+
+                    // 현재 시각과 가장 가까운 TMP 값을 찾기 위한 변수 초기화
+                    let closestTmp = null;
+                    let minTimeDiff = Infinity; // 최소 시간 차이 (분 단위)
+
+                    // 현재 시각 (분 단위) 계산
+                    const now = new Date();
+                    const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+
+
+                    // API 응답 데이터를 순회하며 필요한 정보 추출
+                    data.response.body.items.item.forEach(item => {
+                        const { fcstDate, fcstTime, category, fcstValue } = item;
+
+                        // 오늘 날짜 데이터 처리
+                        if (fcstDate === todayDateStr) {
+                            // 오늘 최고 기온 (TMX, 보통 15시 예보)
+                            if (category === 'TMX' && fcstTime === '1500') {
+                                todayForecast.TMX = fcstValue;
+                            }
+
+                            // 오늘 하늘 상태 (SKY) - 해당 날짜의 첫 번째 SKY 값 사용 (대표값)
+                            if (category === 'SKY' && tempTodaySky === null) {
+                                tempTodaySky = fcstValue;
+                            }
+                            // 오늘 강수 형태 (PTY) - 해당 날짜의 첫 번째 PTY 값 사용 (대표값)
+                            if (category === 'PTY' && tempTodayPty === null) {
+                                tempTodayPty = fcstValue;
+                            }
+
+                            // 현재 시각과 가장 가까운 TMP 찾기
+                            if (category === 'TMP') {
+                                const fcstHour = parseInt(fcstTime.substring(0, 2));
+                                const fcstMinute = parseInt(fcstTime.substring(2, 4));
+                                const fcstMinutes = fcstHour * 60 + fcstMinute;
+                                const timeDiff = Math.abs(currentTimeMinutes - fcstMinutes);
+
+                                // 현재 시각과 가장 가까운 예보 시각의 TMP를 저장
+                                // 같은 시간 차이면 더 빠른 예보 시각 우선 (선택 사항)
+                                if (timeDiff < minTimeDiff) {
+                                    minTimeDiff = timeDiff;
+                                    closestTmp = fcstValue;
+                                } // else if (timeDiff === minTimeDiff) { } // 같은 시간 차이 처리 로직 (필요 시 추가)
+                            }
+                        }
+
+                        // 내일 날짜 데이터 처리
+                        if (fcstDate === tomorrowDateStr) {
+                            // 내일 최고 기온 (TMX, 보통 15시 예보)
+                            if (category === 'TMX' && fcstTime === '1500') {
+                                tomorrowForecast.TMX = fcstValue;
+                            }
+                            // 내일 최저 기온 (TMN, 보통 06시 예보)
+                            if (category === 'TMN' && fcstTime === '0600') {
+                                tomorrowForecast.TMN = fcstValue;
+                            }
+                            // 내일 하늘 상태 (SKY) - 해당 날짜의 첫 번째 SKY 값 사용 (대표값)
+                            if (category === 'SKY' && tempTomorrowSky === null) {
+                                tempTomorrowSky = fcstValue;
+                            }
+                            // 내일 강수 형태 (PTY) - 해당 날짜의 첫 번째 PTY 값 사용 (대표값)
+                            if (category === 'PTY' && tempTomorrowPty === null) {
+                                tempTomorrowPty = fcstValue;
+                            }
+                        }
+                    });
+
+                    // 루프 종료 후 추출된 대표값 할당
+                    todayForecast.currentTMP = closestTmp;
+                    todayForecast.SKY = tempTodaySky;
+                    todayForecast.PTY = tempTodayPty;
+                    tomorrowForecast.SKY = tempTomorrowSky;
+                    tomorrowForecast.PTY = tempTomorrowPty;
+
+
+                    // 추출된 데이터를 HTML 요소에 표시
+                    // '현재 기온'은 API 예보 데이터 중 가장 가까운 시각의 값임에 유의
+                    $('#todayTMP').text(todayForecast.currentTMP !== null ? `${todayForecast.currentTMP}°C` : '정보 없음');
+                    $('#todayTMX').text(todayForecast.TMX !== null ? `${todayForecast.TMX}°C` : '정보 없음');
+                    $('#todayTMN').text(todayForecast.TMN !== null ? `${todayForecast.TMN}°C` : '정보 없음');
+
+                    $('#tomorrowTMX').text(tomorrowForecast.TMX !== null ? `${tomorrowForecast.TMX}°C` : '정보 없음');
+                    $('#tomorrowTMN').text(tomorrowForecast.TMN !== null ? `${tomorrowForecast.TMN}°C` : '정보 없음');
+
+                    // 날씨 아이콘 설정 - SKY와 PTY를 각각 호출하며 데이터 유무와 상관없이 설정 시도
+                    setSkyIcon(todayForecast.SKY, 'today');
+                    setPtyIcon(todayForecast.PTY, 'today');
+
+                    setSkyIcon(tomorrowForecast.SKY, 'tomorrow');
+                    setPtyIcon(tomorrowForecast.PTY, 'tomorrow');
+
+                },
+                error: function(xhr, status, error) {
+                    console.error('날씨 데이터를 가져오는 중 오류 발생:', status, error);
+                    // 실패 시 사용자에게 알림 또는 기본값 설정
+                    $('#todayTMP').text('오류'); // 현재 기온 오류 표시
+                    $('#todayTMX').text('오류');
+                    $('#todayTMN').text('오류');
+                    $('#tomorrowTMX').text('오류');
+                    $('#tomorrowTMN').text('오류');
+                    // 오류 시 기본 아이콘/배경 설정
+                    setSkyIcon(null, 'today');
+                    setPtyIcon(null, 'today');
+                    setSkyIcon(null, 'tomorrow');
+                    setPtyIcon(null, 'tomorrow');
+                }
+            });
+        };
+
+        // 하늘 상태에 따른 배경 이미지 설정 함수
+        // skyCode가 null이면 기본 이미지 설정
+        function setSkyIcon(skyCode, day) {
+            let skyDiv = document.getElementById(`skyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
+            if (!skyDiv) {
+                console.error(`Element skyIcon${day.charAt(0).toUpperCase() + day.slice(1)} not found`);
+                return; // 요소를 찾지 못하면 종료
+            }
+
+            let imageUrl = '/weatherimg/esteregg.png'; // 기본/오류 이미지 경로 (웹 경로)
+
+            switch (skyCode) {
+                case '1': imageUrl = '/weatherimg/SKY1.png'; break; // 맑음 (웹 경로)
+                case '3': imageUrl = '/weatherimg/SKY3.png'; break; // 구름많음 (웹 경로)
+                case '4': imageUrl = '/weatherimg/SKY4.png'; break; // 흐림 (웹 경로)
+                default: imageUrl = '/weatherimg/esteregg.png'; break;  // 알 수 없는 코드 또는 null (기본 이미지)
+            }
+
+            skyDiv.style.backgroundImage = `url("${imageUrl}")`;
+            skyDiv.style.backgroundSize = "cover"; // 또는 "100% 100%"
+            skyDiv.style.backgroundRepeat = "no-repeat";
+            skyDiv.style.backgroundPosition = "center";
+            skyDiv.style.zIndex = "1"; // 배경이므로 z-index를 낮게 설정
+        }
+
+        // 강수 상태에 따른 이미지 설정 함수 (숨김/표시 로직 제거, PTY 0일 때 PTY0.png 설정)
+        // ptyCode가 null이면 기본 이미지 설정
+        function setPtyIcon(ptyCode, day) {
+            let ptyImgElement = document.getElementById(`ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)}`);
+
+            if (!ptyImgElement) {
+                console.error(`Element ptyIcon${day.charAt(0).toUpperCase() + day.slice(1)} not found`);
+                return;
+            }
+
+            let ptyImageUrl = '/weatherimg/esteregg.webp'; // 기본/오류 이미지 (웹 경로)
+
+            // PTY 코드를 문자열로 비교
+            switch (ptyCode) {
+                case '0': ptyImageUrl = '/weatherimg/PTY0.png'; break; // 강수 없음 (PTY0.png 표시)
+                case '1': ptyImageUrl = '/weatherimg/PTY1.png'; break; // 비
+                case '2': ptyImageUrl = '/weatherimg/PTY2.png'; break; // 비/눈
+                case '3': ptyImageUrl = '/weatherimg/PTY3.png'; break; // 눈
+                case '4': ptyImageUrl = '/weatherimg/PTY4.png'; break; // 소나기
+                default: ptyImageUrl = '/weatherimg/esteregg.webp'; break;  // 알 수 없는 코드 또는 null (기본 이미지)
+            }
+
+            ptyImgElement.src = ptyImageUrl; // 무조건 src 설정
+            ptyImgElement.style.display = 'block'; // 무조건 보이도록 설정 (CSS에서 display: none;을 오버라이드)
+
+
+            // PTY 이미지 요소의 스타일 (필요에 따라 조정)
+            // icon-area에 position: relative; 가 있어야 absolute가 제대로 동작합니다.
+            ptyImgElement.style.width = '70px'; // 크기 명시
+            ptyImgElement.style.height = '70px'; // 크기 명시
+            ptyImgElement.style.position = 'absolute';
+            ptyImgElement.style.top = '50%';
+            ptyImgElement.style.left = '50%';
+            ptyImgElement.style.transform = 'translate(-50%, -50%)'; // 중앙 정렬
+            ptyImgElement.style.zIndex = '10'; // PTY 이미지가 배경 위에 오도록
+            ptyImgElement.style.objectFit = 'contain'; // 이미지 비율 유지 방식
+        }
+
+    </script>
+
 </div>
 </body>
 </html>
