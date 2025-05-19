@@ -13,7 +13,7 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">회원 등록</h2>
 
-        <form th:action="@{/admin/insert}" method="post" enctype="multipart/form-data" th:object="${adminDTO}">
+        <form th:action="@{/admin/insert}" method="post" enctype="multipart/form-data" th:object="${insertDTO.adminDTO}">
             <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-3 user-box text-center">
@@ -105,36 +105,36 @@
                     <label class="form-label">소속</label>
                     <div class="row g-2">
                         <div class="col-md-3">
-                            <select id="adminChoice" class="form-select" th:disabled="${isReadOnly}">
-                                <option th:selected="${fixedChoice == '본사'}">본사</option>
-                                <option th:selected="${fixedChoice == '지점'}">지점</option>
-                                <option th:selected="${fixedChoice == '외부시설'}">외부시설</option>
-                                <option th:if="${adminRole != 'SUPERADMIN' && adminRole != 'EXEC' && adminRole != 'HEAD' && adminRole != 'GM'}" th:selected="${fixedChoice == '스토어'}">스토어</option>
+                            <select id="adminChoice" class="form-select" th:disabled="${insertDTO.readOnly}">
+                                <option th:selected="${insertDTO.fixedChoice == '본사'}">본사</option>
+                                <option th:selected="${insertDTO.fixedChoice == '지점'}">지점</option>
+                                <option th:selected="${insertDTO.fixedChoice == '외부시설'}">외부시설</option>
+                                <option th:if="${insertDTO.adminRole != 'SUPERADMIN' && insertDTO.adminRole != 'EXEC' && insertDTO.adminRole != 'HEAD' && insertDTO.adminRole != 'GM'}" th:selected="${insertDTO.fixedChoice == '스토어'}">스토어</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminCenter" id="adminCenter" class="form-select" th:disabled="${isReadOnly}">
-                                <option th:if="${adminRole != 'SUPERADMIN' && fixedParentCompanyNum != null}" 
-                                        th:text="${fixedParentCompanyName}" 
-                                        th:value="${fixedParentCompanyNum}"></option>
-                                <option th:if="${adminRole == 'SUPERADMIN'}"
+                            <select name="adminCenter" id="adminCenter" class="form-select" th:disabled="${insertDTO.readOnly}">
+                                <option th:if="${insertDTO.adminRole != 'SUPERADMIN' && insertDTO.fixedParentCompanyNum != null}" 
+                                        th:text="${insertDTO.fixedParentCompanyName}" 
+                                        th:value="${insertDTO.fixedParentCompanyNum}"></option>
+                                <option th:if="${insertDTO.adminRole == 'SUPERADMIN'}"
                                         th:each="company : ${centerList}"
                                         th:text="${company.companyName}"
                                         th:value="${company.companyNum}"></option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" th:disabled="${isReadOnly}">
-                                <option th:if="${fixedCompanyNum != null}" 
-                                        th:text="${fixedCompanyName}" 
-                                        th:value="${fixedCompanyNum}"></option>
+                            <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" th:disabled="${insertDTO.readOnly}">
+                                <option th:if="${insertDTO.fixedCompanyNum != null}" 
+                                        th:text="${insertDTO.fixedCompanyName}" 
+                                        th:value="${insertDTO.fixedCompanyNum}"></option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="adminStore" id="adminStore" class="form-select" th:disabled="${isReadOnly}">
-                                <option th:if="${fixedStoreNum != null}" 
-                                        th:text="${fixedStoreName}" 
-                                        th:value="${fixedStoreNum}"></option>
+                            <select name="adminStore" id="adminStore" class="form-select" th:disabled="${insertDTO.readOnly}">
+                                <option th:if="${insertDTO.fixedStoreNum != null}" 
+                                        th:text="${insertDTO.fixedStoreName}" 
+                                        th:value="${insertDTO.fixedStoreNum}"></option>
                             </select>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 package com.sixthsense.hexastay.controller;
 
 import com.sixthsense.hexastay.dto.AdminDTO;
+import com.sixthsense.hexastay.dto.AdminInsertDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
 import com.sixthsense.hexastay.entity.Admin;
@@ -163,17 +164,20 @@ public class AdminController {
             fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
         }
 
-        model.addAttribute("companyList", companyList);
-        model.addAttribute("adminRole", adminRole);
-        model.addAttribute("adminDTO", new AdminDTO());
-        model.addAttribute("isReadOnly", isReadOnly);
-        model.addAttribute("fixedChoice", fixedChoice);
-        model.addAttribute("fixedCompanyNum", fixedCompanyNum);
-        model.addAttribute("fixedCompanyName", fixedCompanyName);
-        model.addAttribute("fixedStoreNum", fixedStoreNum);
-        model.addAttribute("fixedStoreName", fixedStoreName);
-        model.addAttribute("fixedParentCompanyNum", fixedParentCompanyNum);
-        model.addAttribute("fixedParentCompanyName", fixedParentCompanyName);
+        AdminInsertDTO insertDTO = new AdminInsertDTO();
+        insertDTO.setCompanyList(companyList);
+        insertDTO.setAdminRole(adminRole);
+        insertDTO.setAdminDTO(new AdminDTO());
+        insertDTO.setReadOnly(isReadOnly);
+        insertDTO.setFixedChoice(fixedChoice);
+        insertDTO.setFixedCompanyNum(fixedCompanyNum);
+        insertDTO.setFixedCompanyName(fixedCompanyName);
+        insertDTO.setFixedStoreNum(fixedStoreNum);
+        insertDTO.setFixedStoreName(fixedStoreName);
+        insertDTO.setFixedParentCompanyNum(fixedParentCompanyNum);
+        insertDTO.setFixedParentCompanyName(fixedParentCompanyName);
+
+        model.addAttribute("insertDTO", insertDTO);
         
         return "admin/insert";
     }
@@ -223,7 +227,6 @@ public class AdminController {
             return "redirect:/admin/list";
 
         } catch (IOException e) {
-
             log.error("회원 가입 중, 오류 발생", e);
             model.addAttribute("error", "회원 가입 중, 오류가 발생했습니다.");
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
