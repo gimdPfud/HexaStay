@@ -366,19 +366,15 @@
         }
     }
 
-    // Apply state on load based on localStorage
     let isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     applySidebarState(isCollapsed);
 
-    // Toggle state on button click and save to localStorage
     toggleBtn.addEventListener('click', () => {
         isCollapsed = !isCollapsed;
         applySidebarState(isCollapsed);
         localStorage.setItem('sidebarCollapsed', isCollapsed);
     });
 
-    // Keep your existing toggleMenu function if used elsewhere (though not called in this snippet)
-    /*
     function toggleMenu(menuId) {
         const menu = document.getElementById(menuId);
         const isShown = menu.style.display === 'block';
@@ -386,65 +382,89 @@
         if (!isShown) menu.style.display = 'block';
         localStorage.setItem('submenu_' + menuId, !isShown ? 'open' : 'closed');
     }
-    */
 
     document.addEventListener('DOMContentLoaded', () => {
-        // 이미지 클릭 확대 기능
-        document.querySelectorAll("img").forEach((img) => {
-            img.addEventListener('click', (event) => {
-                // Prevent image click on profile image from interfering with dropdown
-                if (img.closest('.profile-img')) {
-                    // Allow the dropdown toggle handler to work
-                } else {
-                    const image = new Image();
-                    image.src = img.src;
-                    image.onload = () => {
-                        const width = image.naturalWidth;
-                        const height = image.naturalHeight;
-                        const left = (window.innerWidth - width) / 2 + window.screenX;
-                        const top = (window.innerHeight - height) / 2 + window.screenY;
-                        window.open(img.src, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
-                    };
-                }
+        // 이미지 클릭 확대 기능 (layoutprofile-img 클래스를 가진 이미지는 제외)
+        document.querySelectorAll("img:not(.layoutprofile-img)").forEach((img) => { // <-- 이 부분이 수정되었습니다.
+            img.addEventListener('click', () => {
+                const image = new Image();
+                image.src = img.src;
+                image.onload = () => {
+                    const width = image.naturalWidth;
+                    const height = image.naturalHeight;
+                    const left = (window.innerWidth - width) / 2 + window.screenX;
+                    const top = (window.innerHeight - height) / 2 + window.screenY;
+                    window.open(img.src, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+                };
             });
         });
 
-        // 사이드바 활성 링크 및 마지막 열린 메뉴 복원/처리
+        // 사이드바 a 링크에 active 적용
         const links = document.querySelectorAll('.submenu a');
         const currentPath = window.location.pathname;
-        let currentMenuOpened = false; // Flag to check if the current menu was found and opened
 
-        // First pass: Find the link for the current page and open its submenu
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+
+                const submenu = link.closest('.submenu');
+                if (submenu) submenu.style.display = 'block';
+            }
+        });
+
+        // 토글 상태 복원
+        document.querySelectorAll('[id^=memberMenu], [id^=roomList], [id^=roomBook], [id^=roomService], [id^=extMenu], [id^=erd], [id^=settle], [id^=notice], [id^=survey]').forEach(menu => {
+            const id = menu.getAttribute('id');
+            if (localStorage.getItem('submenu_' + id) === 'open') {
+                menu.style.display = 'block';
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+
+        // 현재 경로에 해당하는 a 태그에 active 클래스 추가
+        const links = document.querySelectorAll('.submenu a');
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+
+                // 해당 a태그가 포함된 submenu를 열기
+                const parentSubmenu = link.closest('.submenu');
+                if (parentSubmenu) {
+                    parentSubmenu.style.display = 'block';
+                }
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const links = document.querySelectorAll('.submenu a');
+        const currentPath = window.location.pathname;
+
+        // 1. active + 하위메뉴 열기
         links.forEach(link => {
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
                 const submenu = link.closest('.submenu');
-                if (submenu) {
-                    // Close all submenus first
-                    document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
-                    // Open the relevant submenu
-                    submenu.style.display = 'block';
-                    // Store this as the last opened menu
-                    localStorage.setItem('lastOpenedMenu', submenu.getAttribute('id'));
-                    currentMenuOpened = true;
-                }
+                if (submenu) submenu.style.display = 'block';
+
+                // 하나만 기억하도록 덮어쓰기
+                const id = submenu.getAttribute('id');
+                localStorage.setItem('lastOpenedMenu', id);
             }
         });
 
-        if (!currentMenuOpened) {
-            const lastId = localStorage.getItem('lastOpenedMenu');
-            if (lastId) {
-                const lastMenu = document.getElementById(lastId);
-                if (lastMenu) {
-                    // Close all submenus first
-                    document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
-                    lastMenu.style.display = 'block';
-                }
+        // 2. 마지막 메뉴만 복원
+        const lastId = localStorage.getItem('lastOpenedMenu');
+        if (lastId) {
+            const lastMenu = document.getElementById(lastId);
+            if (lastMenu) {
+                document.querySelectorAll('.submenu').forEach(el => el.style.display = 'none');
+                lastMenu.style.display = 'block';
             }
         }
-
     });
-
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
