@@ -22,7 +22,7 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long> {
 
 
     //정렬 조건 추가 레퍼지토리
-    @Query("SELECT h FROM HotelRoom h ORDER BY h.hotelRoomNum DESC, h.createDate DESC")
+    @Query("SELECT h FROM HotelRoom h")
     Page<HotelRoom> findAllHotelRooms(Pageable pageable);
 
 

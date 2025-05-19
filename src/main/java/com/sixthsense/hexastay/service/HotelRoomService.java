@@ -50,7 +50,7 @@ public interface HotelRoomService {
     public void hotelroomDelet(Long hotelRoomNum);
 
     //호텔룸에서 컴퍼니 넘에서 가져 오기
-    public List<HotelRoom> listCompany(Long companyNUm);
+    public Page<HotelRoom> listCompany(Long companyNUm, Pageable pageable);
 
     //******************단일 호텔룸 CRRUD *************//
 
