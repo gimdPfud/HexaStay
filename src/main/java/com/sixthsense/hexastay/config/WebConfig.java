@@ -102,7 +102,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/hotelRoomsByMember/**")
                 .addResourceLocations("file:///" + "c:/data/hexastay/hotelroom/");
 
-        registry.addResourceHandler("/admin/**")
+        registry.addResourceHandler("/weatherimg/**")
                 .addResourceLocations("file:///" + "c:/data/hexastay/weatherimg/");
     }
 
