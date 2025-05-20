@@ -34,7 +34,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
-                    <input type="email" th:field="*{adminEmail}" class="form-control" th:classappend="${#fields.hasErrors('adminEmail')} ? 'is-invalid'">
+                    <input type="email" th:field="*{adminEmail}" class="form-control" th:classappend="${#fields.hasErrors('adminEmail')} ? 'is-invalid'" required>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminEmail')}" th:errors="*{adminEmail}"></div>
                 </div>
 
@@ -114,8 +114,8 @@
                         </div>
                         <div class="col-md-3">
                             <select name="adminCenter" id="adminCenter" class="form-select" th:disabled="${insertDTO.readOnly}">
-                                <option th:if="${insertDTO.adminRole != 'SUPERADMIN' && insertDTO.fixedParentCompanyNum != null}" 
-                                        th:text="${insertDTO.fixedParentCompanyName}" 
+                                <option th:if="${insertDTO.adminRole != 'SUPERADMIN' && insertDTO.fixedParentCompanyNum != null}"
+                                        th:text="${insertDTO.fixedParentCompanyName}"
                                         th:value="${insertDTO.fixedParentCompanyNum}"></option>
                                 <option th:if="${insertDTO.adminRole == 'SUPERADMIN'}"
                                         th:each="company : ${centerList}"
@@ -125,15 +125,15 @@
                         </div>
                         <div class="col-md-3">
                             <select name="adminBranchFacility" id="adminBranchFacility" class="form-select" th:disabled="${insertDTO.readOnly}">
-                                <option th:if="${insertDTO.fixedCompanyNum != null}" 
-                                        th:text="${insertDTO.fixedCompanyName}" 
+                                <option th:if="${insertDTO.fixedCompanyNum != null}"
+                                        th:text="${insertDTO.fixedCompanyName}"
                                         th:value="${insertDTO.fixedCompanyNum}"></option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <select name="adminStore" id="adminStore" class="form-select" th:disabled="${insertDTO.readOnly}">
-                                <option th:if="${insertDTO.fixedStoreNum != null}" 
-                                        th:text="${insertDTO.fixedStoreName}" 
+                                <option th:if="${insertDTO.fixedStoreNum != null}"
+                                        th:text="${insertDTO.fixedStoreName}"
                                         th:value="${insertDTO.fixedStoreNum}"></option>
                             </select>
                         </div>
@@ -328,7 +328,6 @@
 
             // 필수 입력 필드 검사
             const requiredFields = {
-                'adminEmail': '이메일',
                 'adminName': '이름',
                 'adminResidentNumPartOne': '주민등록번호 앞자리',
                 'adminResidentNumPartTwo': '주민등록번호 뒷자리',
