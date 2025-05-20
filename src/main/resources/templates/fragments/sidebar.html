@@ -55,8 +55,8 @@
         <i class="bi bi-archive"></i><strong>자재 관리</strong>
     </button>
     <div id="erd" class="submenu">
-        <a href="/erd/list">- 자재관리 목록</a>
-        <a href="/erd/insert">- 자재관리 등록</a>
+        <a href="/erd/list">- 자재 목록</a>
+        <a href="/erd/insert">- 자재 등록</a>
     </div>
 
     <button onclick="toggleMenu('settle')" th:if="${#authorization.expression('hasAnyRole(''HEAD'', ''EXEC'', ''GM'', ''SV'', ''AGENT'', ''PARTNER'', ''CREW'',''MGR'',''SUBMGR'',''STAFF'')')}">
