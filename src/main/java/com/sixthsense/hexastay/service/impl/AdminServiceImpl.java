@@ -552,4 +552,32 @@ public class AdminServiceImpl implements AdminService {
         });
     }
 
+    @Override
+    public boolean isEmailDuplicate(String email) {
+        return adminRepository.findByAdminEmail(email) != null;
+    }
+
+    @Override
+    public StoreDTO getStoreInfo(Long storeNum) {
+        Store store = storeRepository.findById(storeNum)
+            .orElseThrow(() -> new EntityNotFoundException("Store not found"));
+        
+        StoreDTO storeDTO = modelMapper.map(store, StoreDTO.class);
+        storeDTO.setCompanyName(store.getCompany().getCompanyName());
+        storeDTO.setParentCompanyNum(store.getCompany().getCompanyParent());
+        return storeDTO;
+    }
+
+    @Override
+    public AdminDTO verifyAdminIdentity(String name, String employeeNum, String birth) {
+        Admin admin = adminRepository.findByAdminNameAndAdminEmployeeNumAndAdminResidentNumStartingWith(
+            name, employeeNum, birth);
+        
+        if (admin == null) {
+            return null;
+        }
+        
+        return modelMapper.map(admin, AdminDTO.class);
+    }
+
 }

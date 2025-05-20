@@ -52,4 +52,10 @@ public interface AdminService {
     // 비밀번호 변경
     void updatePassword(String name, String employeeNum, String birth, 
                        String currentPassword, String newPassword);
+
+    boolean isEmailDuplicate(String email);
+
+    StoreDTO getStoreInfo(Long storeNum);
+
+    AdminDTO verifyAdminIdentity(String name, String employeeNum, String birth);
 }

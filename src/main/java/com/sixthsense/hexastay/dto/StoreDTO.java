@@ -52,6 +52,7 @@ public class StoreDTO {
     @NotNull
     private Long companyNum; //어디다 제공할 지 호텔(company) pk 따옴.
     private String companyName; //어디다 제공할 지 호텔(company) 이름.
+    private Long parentCompanyNum; //상위 회사 번호
 
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
