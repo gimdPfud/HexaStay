@@ -4,16 +4,12 @@ import com.sixthsense.hexastay.dto.AdminDTO;
 import com.sixthsense.hexastay.dto.AdminInsertDTO;
 import com.sixthsense.hexastay.dto.CompanyDTO;
 import com.sixthsense.hexastay.dto.StoreDTO;
-import com.sixthsense.hexastay.entity.Admin;
-import com.sixthsense.hexastay.entity.Company;
-import com.sixthsense.hexastay.entity.Store;
 import com.sixthsense.hexastay.repository.AdminRepository;
 import com.sixthsense.hexastay.repository.CompanyRepository;
 import com.sixthsense.hexastay.repository.StoreRepository;
 import com.sixthsense.hexastay.service.AdminService;
 import com.sixthsense.hexastay.service.CompanyService;
 import com.sixthsense.hexastay.service.EmailService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -66,7 +62,6 @@ public class AdminController {
     @ResponseBody
     public String checkSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getPrincipal());
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             return "세션 없음 (비인증 상태)";
         }
@@ -155,13 +150,12 @@ public class AdminController {
             // 스토어 직원
             isReadOnly = true;
             fixedChoice = "스토어";
-            Store store = storeRepository.findById(adminDTO.getStoreNum())
-                .orElseThrow(() -> new EntityNotFoundException("Store not found"));
+            StoreDTO store = adminService.getStoreInfo(adminDTO.getStoreNum());
             fixedStoreNum = store.getStoreNum();
             fixedStoreName = store.getStoreName();
-            fixedCompanyNum = store.getCompany().getCompanyNum();
-            fixedCompanyName = store.getCompany().getCompanyName();
-            fixedParentCompanyNum = store.getCompany().getCompanyParent();
+            fixedCompanyNum = store.getCompanyNum();
+            fixedCompanyName = store.getCompanyName();
+            fixedParentCompanyNum = store.getParentCompanyNum();
             fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
         }
 
@@ -213,7 +207,7 @@ public class AdminController {
         }
 
         // 이메일 중복 체크
-        if (adminRepository.findByAdminEmail(adminDTO.getAdminEmail()) != null) {
+        if (adminService.isEmailDuplicate(adminDTO.getAdminEmail())) {
             log.info("이메일 중복 체크 실패");
             bindingResult.rejectValue("adminEmail", "duplicate", "이미 사용 중인 이메일입니다.");
             List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
@@ -472,13 +466,11 @@ public class AdminController {
                 return ResponseEntity.badRequest().body("로그인이 필요합니다.");
             }
 
-            // 현재 로그인한 사용자 정보 조회
-            Admin currentAdmin = adminRepository.findByAdminEmail(principal.getName());
+            AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
             if (currentAdmin == null) {
                 return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
             }
 
-            // 입력한 정보와 현재 로그인한 사용자 정보 비교
             if (!currentAdmin.getAdminName().equals(name) ||
                 !currentAdmin.getAdminEmployeeNum().equals(employeeNum) ||
                 !currentAdmin.getAdminResidentNum().startsWith(birth)) {
@@ -508,25 +500,21 @@ public class AdminController {
                 return ResponseEntity.badRequest().body("로그인이 필요합니다.");
             }
 
-            // 현재 로그인한 사용자 정보 조회
-            Admin currentAdmin = adminRepository.findByAdminEmail(principal.getName());
+            AdminDTO currentAdmin = adminService.adminFindEmail(principal.getName());
             if (currentAdmin == null) {
                 return ResponseEntity.badRequest().body("사용자 정보를 찾을 수 없습니다.");
             }
 
-            // 입력한 정보와 현재 로그인한 사용자 정보 비교
             if (!currentAdmin.getAdminName().equals(name) ||
                 !currentAdmin.getAdminEmployeeNum().equals(employeeNum) ||
                 !currentAdmin.getAdminResidentNum().startsWith(birth)) {
                 return ResponseEntity.badRequest().body("본인 확인에 실패했습니다.");
             }
 
-            // 새 비밀번호 일치 확인
             if (!newPassword.equals(confirmPassword)) {
                 return ResponseEntity.badRequest().body("새 비밀번호가 일치하지 않습니다.");
             }
 
-            // 비밀번호 변경
             adminService.updatePassword(name, employeeNum, birth, currentPassword, newPassword);
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
         } catch (IllegalArgumentException e) {
@@ -564,8 +552,7 @@ public class AdminController {
         try {
             log.info("본인 확인 요청 - 이름: {}, 사번: {}, 생년월일: {}", name, employeeNum, birth);
             
-            Admin admin = adminRepository.findByAdminNameAndAdminEmployeeNumAndAdminResidentNumStartingWith(
-                name, employeeNum, birth);
+            AdminDTO admin = adminService.verifyAdminIdentity(name, employeeNum, birth);
             
             if (admin == null) {
                 log.info("일치하는 정보 없음");
