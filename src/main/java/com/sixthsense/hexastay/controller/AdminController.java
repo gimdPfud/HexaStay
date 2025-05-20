@@ -162,7 +162,6 @@ public class AdminController {
         AdminInsertDTO insertDTO = new AdminInsertDTO();
         insertDTO.setCompanyList(companyList);
         insertDTO.setAdminRole(adminRole);
-        insertDTO.setAdminDTO(new AdminDTO());
         insertDTO.setReadOnly(isReadOnly);
         insertDTO.setFixedChoice(fixedChoice);
         insertDTO.setFixedCompanyNum(fixedCompanyNum);
@@ -173,6 +172,7 @@ public class AdminController {
         insertDTO.setFixedParentCompanyName(fixedParentCompanyName);
 
         model.addAttribute("insertDTO", insertDTO);
+        model.addAttribute("adminDTO", new AdminDTO());
         
         return "admin/insert";
     }
@@ -194,15 +194,76 @@ public class AdminController {
     }
 
     @PostMapping("/insert")
-    public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model) {
+    public String insert(@Valid @ModelAttribute("adminDTO") AdminDTO adminDTO, BindingResult bindingResult, Model model, Principal principal) {
+        log.info("테스트" + adminDTO.toString());
         if (bindingResult.hasErrors()) {
             log.info("유효성 검사 오류 발생");
             bindingResult.getAllErrors().forEach(error -> {
                 log.error("유효성 검사 오류: {}", error.getDefaultMessage());
             });
 
-            List<CompanyDTO> companyList = adminService.insertSelectCompany("center");
-            model.addAttribute("companyList", companyList);
+            AdminDTO loginAdmin = adminService.adminFindEmail(principal.getName());
+            String adminRole = loginAdmin.getAdminRole();
+            List<CompanyDTO> companyList = new ArrayList<>();
+            boolean isReadOnly = false;
+            String fixedChoice = null;
+            Long fixedCompanyNum = null;
+            String fixedCompanyName = null;
+            Long fixedStoreNum = null;
+            String fixedStoreName = null;
+            Long fixedParentCompanyNum = null;
+            String fixedParentCompanyName = null;
+
+            if (adminRole.equals("SUPERADMIN")) {
+                companyList = companyService.getAllList();
+                List<CompanyDTO> centerList = companyList.stream()
+                    .filter(company -> company.getCompanyType().equals("center"))
+                    .collect(Collectors.toList());
+                model.addAttribute("centerList", centerList);
+            } else if (adminRole.equals("EXEC")) {
+                companyList = Collections.singletonList(companyService.companyRead(loginAdmin.getCompanyNum()));
+            } else if (adminRole.equals("HEAD") || adminRole.equals("CREW")) {
+                isReadOnly = true;
+                fixedChoice = "본사";
+                fixedCompanyNum = loginAdmin.getCompanyNum();
+                fixedCompanyName = loginAdmin.getCompanyName();
+            } else if (Arrays.asList("GM", "SV", "AGENT", "PARTNER").contains(adminRole)) {
+                isReadOnly = true;
+                CompanyDTO company = companyService.companyRead(loginAdmin.getCompanyNum());
+                if (company.getCompanyType().equals("branch")) {
+                    fixedChoice = "지점";
+                } else if (company.getCompanyType().equals("facility")) {
+                    fixedChoice = "외부시설";
+                }
+                fixedCompanyNum = loginAdmin.getCompanyNum();
+                fixedCompanyName = company.getCompanyName();
+                fixedParentCompanyNum = company.getCompanyParent();
+                fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
+            } else if (loginAdmin.getStoreNum() != null) {
+                isReadOnly = true;
+                fixedChoice = "스토어";
+                StoreDTO store = adminService.getStoreInfo(loginAdmin.getStoreNum());
+                fixedStoreNum = store.getStoreNum();
+                fixedStoreName = store.getStoreName();
+                fixedCompanyNum = store.getCompanyNum();
+                fixedCompanyName = store.getCompanyName();
+                fixedParentCompanyNum = store.getParentCompanyNum();
+                fixedParentCompanyName = companyService.companyRead(fixedParentCompanyNum).getCompanyName();
+            }
+
+            AdminInsertDTO insertDTO = new AdminInsertDTO();
+            insertDTO.setCompanyList(companyList);
+            insertDTO.setAdminRole(adminRole);
+            insertDTO.setReadOnly(isReadOnly);
+            insertDTO.setFixedChoice(fixedChoice);
+            insertDTO.setFixedCompanyNum(fixedCompanyNum);
+            insertDTO.setFixedCompanyName(fixedCompanyName);
+            insertDTO.setFixedStoreNum(fixedStoreNum);
+            insertDTO.setFixedStoreName(fixedStoreName);
+            insertDTO.setFixedParentCompanyNum(fixedParentCompanyNum);
+            insertDTO.setFixedParentCompanyName(fixedParentCompanyName);
+
+            model.addAttribute("insertDTO", insertDTO);
             return "admin/insert";
         }
 

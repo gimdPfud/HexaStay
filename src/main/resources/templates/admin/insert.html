@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout.html}">
+      layout:decorate="~{/layouts/layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>직원 정보 입력</title>
@@ -13,7 +13,7 @@
     <div class="container mt-4 w-100 bg-light">
         <h2 class="fw-bold mb-4 text-center">회원 등록</h2>
 
-        <form th:action="@{/admin/insert}" method="post" enctype="multipart/form-data" th:object="${insertDTO.adminDTO}">
+        <form th:action="@{/admin/insert}" method="post" enctype="multipart/form-data" th:object="${adminDTO}" id="adminInsertForm">
             <div class="container p-4" style="max-width: 700px;">
 
                 <div class="mb-3 user-box text-center">
@@ -34,13 +34,13 @@
 
                 <div class="mb-3">
                     <label class="form-label">이메일 (ID)</label>
-                    <input type="email" th:field="*{adminEmail}" class="form-control" th:classappend="${#fields.hasErrors('adminEmail')} ? 'is-invalid'" required>
+                    <input type="email" id="adminEmail" th:field="*{adminEmail}" class="form-control" th:classappend="${#fields.hasErrors('adminEmail')} ? 'is-invalid'" required>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminEmail')}" th:errors="*{adminEmail}"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">이름</label>
-                    <input type="text" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'">
+                    <input type="text" id="adminName" th:field="*{adminName}" class="form-control" th:classappend="${#fields.hasErrors('adminName')} ? 'is-invalid'" required>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></div>
                 </div>
 
@@ -73,8 +73,8 @@
                         </div>
                     </div>
                     <input type="text" id="adminAddressThree" class="form-control mt-2">
-                    <input hidden type="text" id="adminAddress" class="form-control"
-                           th:field="*{adminAddress}" th:classappend="${#fields.hasErrors('adminAddress')} ? 'is-invalid'">
+                    <input hidden id="adminAddress" th:field="*{adminAddress}" class="form-control"
+                           th:classappend="${#fields.hasErrors('adminAddress')} ? 'is-invalid'">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminAddress')}" th:errors="*{adminAddress}"></div>
                 </div>
 
@@ -162,14 +162,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">직책</label>
-                    <input type="text" th:field="*{adminPosition}" class="form-control" th:classappend="${#fields.hasErrors('adminPosition')} ? 'is-invalid'">
+                    <input type="text" id="adminPosition" th:field="*{adminPosition}" class="form-control" th:classappend="${#fields.hasErrors('adminPosition')} ? 'is-invalid'" required>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('adminPosition')}" th:errors="*{adminPosition}"></div>
                 </div>
 
 
                 <div class="mb-3">
                     <label class="form-label">입사일</label>
-                    <input type="date" th:field="*{adminJoinDate}" class="form-control" required>
+                    <input type="date" id="adminJoinDate" th:field="*{adminJoinDate}" class="form-control" required>
                 </div>
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
@@ -177,12 +177,12 @@
                     <a th:href="@{/admin/list}" class="btn btn-danger">취소</a>
                 </div>
             </div>
-            <input hidden name="adminPhone" id="adminPhone" class="form-control" style="width:30%">
-            <input hidden name="companyNum" id="companyNum">
-            <input hidden name="storeNum" id="storeNum">
-            <input hidden name="adminPassword" id="adminPassword" value="">
-            <input hidden name="adminResidentNum" id="adminResidentNum">
-            <input hidden name="adminRole" id="adminRole">
+            <input hidden id="adminPhone" th:field="*{adminPhone}" class="form-control" style="width:30%">
+            <input hidden id="companyNum" th:field="*{companyNum}">
+            <input hidden id="storeNum" th:field="*{storeNum}">
+            <input hidden id="adminPassword" th:field="*{adminPassword}" value="">
+            <input hidden id="adminResidentNum" th:field="*{adminResidentNum}">
+            <input hidden id="adminRole" th:field="*{adminRole}">
 
         </form>
     </div>
@@ -325,9 +325,11 @@
 
         function submitForm(event) {
             event.preventDefault();
+            console.log('폼 제출 시작');
 
             // 필수 입력 필드 검사
             const requiredFields = {
+                'adminEmail': '이메일',
                 'adminName': '이름',
                 'adminResidentNumPartOne': '주민등록번호 앞자리',
                 'adminResidentNumPartTwo': '주민등록번호 뒷자리',
@@ -350,82 +352,93 @@
                 }
             }
 
-            // 소속 선택 검사
-            const adminChoice = document.getElementById("adminChoice").value;
-            const adminCenter = document.getElementById("adminCenter").value;
-            const adminBranchFacility = document.getElementById("adminBranchFacility").value;
-            const adminStore = document.getElementById("adminStore").value;
+            try {
+                // 데이터 결합
+                const adminEmail = document.getElementById('adminEmail').value;
+                const adminName = document.getElementById('adminName').value;
+                const adminPassword = document.getElementById("adminResidentNumPartOne").value;
+                const adminPhone = document.getElementById("adminPhonePartOne").value + "-" +
+                                  document.getElementById("adminPhonePartTwo").value + "-" +
+                                  document.getElementById("adminPhonePartThree").value;
+                const adminResidentNum = document.getElementById("adminResidentNumPartOne").value + "-" + 
+                                        document.getElementById("adminResidentNumPartTwo").value;
+                const adminAddress = document.getElementById("adminAddressOne").value + " " + 
+                                   document.getElementById("adminAddressTwo").value + " " + 
+                                   document.getElementById("adminAddressThree").value;
+                const adminPosition = document.getElementById('adminPosition').value;
+                const adminJoinDate = document.getElementById('adminJoinDate').value;
 
-            if (adminChoice === "본사" && !adminCenter) {
-                alert("본사를 선택해주세요.");
-                document.getElementById("adminCenter").focus();
-                return;
+                console.log('입력된 데이터:', {
+                    adminEmail,
+                    adminName,
+                    adminPassword,
+                    adminPhone,
+                    adminResidentNum,
+                    adminAddress,
+                    adminPosition,
+                    adminJoinDate
+                });
+
+                // hidden 필드 값 설정
+                document.getElementById("adminPassword").value = adminPassword;
+                document.getElementById("adminPhone").value = adminPhone;
+                document.getElementById("adminResidentNum").value = adminResidentNum;
+                document.getElementById("adminAddress").value = adminAddress;
+
+                // 역할 설정
+                let adminRole, companyNum, storeNum;
+                const adminChoice = document.getElementById("adminChoice").value;
+                const adminCenter = document.getElementById("adminCenter").value;
+                const adminBranchFacility = document.getElementById("adminBranchFacility").value;
+                const adminStore = document.getElementById("adminStore").value;
+
+                switch (adminChoice) {
+                    case "본사":
+                        adminRole = adminCenterRank.value;
+                        companyNum = adminCenter;
+                        storeNum = "";
+                        break;
+                    case "지점":
+                    case "외부시설":
+                        adminRole = adminBranchFacilityRank.value;
+                        companyNum = adminBranchFacility;
+                        storeNum = "";
+                        break;
+                    case "스토어":
+                        adminRole = adminStoreRank.value;
+                        companyNum = "";
+                        storeNum = adminStore;
+                        break;
+                }
+
+                document.getElementById("adminRole").value = adminRole;
+                document.getElementById("companyNum").value = companyNum;
+                document.getElementById("storeNum").value = storeNum;
+
+                console.log('설정된 hidden 필드 값:', {
+                    adminPassword: document.getElementById("adminPassword").value,
+                    adminPhone: document.getElementById("adminPhone").value,
+                    adminResidentNum: document.getElementById("adminResidentNum").value,
+                    adminAddress: document.getElementById("adminAddress").value,
+                    adminRole: document.getElementById("adminRole").value,
+                    companyNum: document.getElementById("companyNum").value,
+                    storeNum: document.getElementById("storeNum").value
+                });
+
+                // 폼 데이터 확인
+                const form = document.getElementById('adminInsertForm');
+                const formData = new FormData(form);
+                console.log('전송될 폼 데이터:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
+                // 폼 제출
+                form.submit();
+            } catch (error) {
+                console.error('폼 제출 중 오류 발생:', error);
+                alert('데이터 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
             }
-
-            if ((adminChoice === "지점" || adminChoice === "외부시설") && !adminBranchFacility) {
-                alert("지점/외부시설을 선택해주세요.");
-                document.getElementById("adminBranchFacility").focus();
-                return;
-            }
-
-            if (adminChoice === "스토어" && !adminStore) {
-                alert("스토어를 선택해주세요.");
-                document.getElementById("adminStore").focus();
-                return;
-            }
-
-            // 이메일 형식 검사
-            const emailField = document.getElementsByName('adminEmail')[0];
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(emailField.value)) {
-                alert('올바른 이메일 형식이 아닙니다.');
-                emailField.focus();
-                return;
-            }
-
-            switch (adminChoice) {
-                case "본사":
-                    document.getElementById("adminRole").value = adminCenterRank.value;
-                    companyNum.value = adminCenter;
-                    storeNum.value = "";
-                    break;
-                case "지점":
-                    document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility;
-                    storeNum.value = "";
-                    break;
-                case "외부시설":
-                    document.getElementById("adminRole").value = adminBranchFacilityRank.value;
-                    companyNum.value = adminBranchFacility;
-                    storeNum.value = "";
-                    break;
-                case "스토어":
-                    document.getElementById("adminRole").value = adminStoreRank.value;
-                    companyNum.value = "";
-                    storeNum.value = adminStore;
-                    break;
-            }
-
-            // 주민번호 앞자리를 패스워드로 사용
-            document.getElementById("adminPassword").value = document.getElementById("adminResidentNumPartOne").value;
-
-            // 연락처 결합
-            document.getElementById('adminPhone').value =
-                document.getElementById('adminPhonePartOne').value + "-" +
-                document.getElementById('adminPhonePartTwo').value + "-" +
-                document.getElementById('adminPhonePartThree').value
-
-            // 주민번호 결합
-            document.getElementById('adminResidentNum').value =
-                document.getElementById('adminResidentNumPartOne').value + "-" + document.getElementById("adminResidentNumPartTwo").value;
-
-            // 주소 결합
-            document.getElementById('adminAddress').value =
-                document.getElementById('adminAddressOne').value + "\u00A0" + document.getElementById('adminAddressTwo').value
-                + "\u00A0" + document.getElementById('adminAddressThree').value;
-
-            // 폼 제출
-            event.target.form.submit();
         }
 
         // 프로필 사진
@@ -471,35 +484,6 @@
         // 입력 제한
         document.querySelectorAll('.numberOnly').forEach(input => input.addEventListener('input', () => input.value = input.value.replace(/[^0-9]/g, '')));
 
-
-
-        document.getElementById('memberId').addEventListener('keyup', function () {
-            var id = document.getElementById('memberId').value;
-            fetch(`/idcheck/`+(id), {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.text())
-                .then(result => {
-                    const idCheck = document.getElementById('idCheck');
-                    if (result.trim() === "1") {
-                        idCheck.textContent = "사용 가능한 ID";
-                        idCheck.style.color = "green";
-                        signupActive = true;
-                    } else {
-                        idCheck.textContent = "이미 사용중인 ID";
-                        idCheck.style.color = "#b10000";
-                        signupActive = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("ID 체크 중 오류 발생:", error);
-                    document.getElementById('idCheck').textContent = "ID 확인 실패.";
-                    signupActive = false;
-                });
-        });
 
 
         //주소 입력
